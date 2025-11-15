@@ -173,49 +173,131 @@ async function loadPost() {
 function parseMarkdown(markdown) {
   // Split content into blocks (paragraphs separated by double newlines)
   const blocks = markdown.trim().split('\n\n');
+  let inStatsSection = false;
+  let inHotspotsSection = false;
 
   const parsedBlocks = blocks.map(block => {
     block = block.trim();
 
-    // Headers
-    if (block.startsWith('### ')) {
-      return '<h3>' + block.substring(4) + '</h3>';
-    }
-    if (block.startsWith('## ')) {
-      return '<h2>' + block.substring(3) + '</h2>';
-    }
-    if (block.startsWith('# ')) {
-      return '<h1>' + block.substring(2) + '</h1>';
+    // Check for special sections
+    if (block === '### Key Statistics') {
+      inStatsSection = true;
+      return '<h3 class="text-2xl font-bold mt-8 mb-4 text-slate-900">📊 Key Statistics</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">';
     }
 
-    // Unordered lists
+    if (block === '### Geographic Hotspots') {
+      if (inStatsSection) {
+        inStatsSection = false;
+        inHotspotsSection = true;
+        return '</div><h3 class="text-2xl font-bold mt-8 mb-4 text-slate-900">📍 Geographic Hotspots</h3>';
+      }
+      inHotspotsSection = true;
+      return '<h3 class="text-2xl font-bold mt-8 mb-4 text-slate-900">📍 Geographic Hotspots</h3>';
+    }
+
+    if (block === '### Safety Recommendations') {
+      if (inStatsSection) {
+        inStatsSection = false;
+        return '</div><h3 class="text-2xl font-bold mt-8 mb-4 text-slate-900">🛡️ Safety Recommendations</h3>';
+      }
+      if (inHotspotsSection) {
+        inHotspotsSection = false;
+      }
+      return '<h3 class="text-2xl font-bold mt-8 mb-4 text-slate-900">🛡️ Safety Recommendations</h3>';
+    }
+
+    // Headers (other than special sections)
+    if (block.startsWith('### ')) {
+      if (inStatsSection) {
+        inStatsSection = false;
+        return '</div><h3 class="text-xl font-semibold mt-6 mb-3 text-slate-700">' + block.substring(4) + '</h3>';
+      }
+      return '<h3 class="text-xl font-semibold mt-6 mb-3 text-slate-700">' + block.substring(4) + '</h3>';
+    }
+    if (block.startsWith('## ')) {
+      return '<h2 class="text-3xl font-bold mt-10 mb-6 text-slate-900 border-b-2 border-rose-200 pb-3">' + block.substring(3) + '</h2>';
+    }
+    if (block.startsWith('# ')) {
+      return '<h1 class="text-4xl font-bold mb-4 text-slate-900">' + block.substring(2) + '</h1>';
+    }
+
+    // Stats section: Convert list items to stat cards
+    if (inStatsSection && (block.startsWith('- ') || block.includes('\n- '))) {
+      const items = block.split('\n')
+        .filter(line => line.startsWith('- '))
+        .map(line => {
+          const content = line.substring(2);
+          // Parse "**Crime Type**: Number incidents"
+          const match = content.match(/\*\*(.*?)\*\*:\s*(\d+)\s*incidents?/);
+          if (match) {
+            const [, crimeType, count] = match;
+            return `
+              <div class="bg-white rounded-lg p-5 shadow-md border-l-4 border-rose-500 hover:shadow-lg transition">
+                <div class="text-3xl font-bold text-rose-600 mb-1">${count}</div>
+                <div class="text-sm font-semibold text-slate-700 uppercase tracking-wide">${crimeType}</div>
+                <div class="text-xs text-slate-500 mt-1">incidents</div>
+              </div>
+            `;
+          }
+          return `<div class="bg-white rounded-lg p-4 shadow-md">${parseInline(content)}</div>`;
+        })
+        .join('');
+      return items;
+    }
+
+    // Hotspots section: Highlight area names
+    if (inHotspotsSection && block.startsWith('**') && block.includes('**')) {
+      const areaMatch = block.match(/\*\*(.*?)\*\*/);
+      if (areaMatch) {
+        const area = areaMatch[1];
+        const rest = block.replace(/\*\*(.*?)\*\*/, '').trim();
+        return `
+          <div class="bg-gradient-to-r from-slate-50 to-white rounded-lg p-5 mb-4 border-l-4 border-blue-500 shadow-sm">
+            <div class="text-lg font-bold text-slate-900 mb-2">📍 ${area}</div>
+            <p class="text-slate-700">${parseInline(rest)}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Regular unordered lists
     if (block.startsWith('- ') || block.includes('\n- ')) {
       const items = block.split('\n')
         .filter(line => line.startsWith('- '))
-        .map(line => '<li>' + parseInline(line.substring(2)) + '</li>')
+        .map(line => '<li class="mb-2">' + parseInline(line.substring(2)) + '</li>')
         .join('');
-      return '<ul>' + items + '</ul>';
+      return '<ul class="list-disc ml-6 mb-4 text-slate-700">' + items + '</ul>';
     }
 
     // Ordered lists
     if (/^\d+\. /.test(block) || block.includes('\n1. ')) {
       const items = block.split('\n')
         .filter(line => /^\d+\. /.test(line))
-        .map(line => '<li>' + parseInline(line.replace(/^\d+\. /, '')) + '</li>')
+        .map(line => '<li class="mb-2">' + parseInline(line.replace(/^\d+\. /, '')) + '</li>')
         .join('');
-      return '<ol>' + items + '</ol>';
+      return '<ol class="list-decimal ml-6 mb-4 text-slate-700">' + items + '</ol>';
     }
 
     // Horizontal rule
     if (block === '---') {
+      if (inStatsSection) {
+        inStatsSection = false;
+        return '</div><hr class="my-8 border-slate-300">';
+      }
       return '<hr class="my-8 border-slate-300">';
     }
 
     // Regular paragraph
-    return '<p>' + parseInline(block) + '</p>';
+    return '<p class="mb-4 text-slate-700 leading-relaxed text-lg">' + parseInline(block) + '</p>';
   });
 
-  return parsedBlocks.join('\n');
+  // Close stats section if still open
+  let html = parsedBlocks.join('\n');
+  if (inStatsSection) {
+    html += '</div>';
+  }
+
+  return html;
 }
 
 function parseInline(text) {

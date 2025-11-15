@@ -19,20 +19,15 @@
   <!-- Custom styles -->
   <link rel="stylesheet" href="/src/css/styles.css">
 
-  <!-- Markdown rendering -->
+  <!-- Custom blog styling -->
   <style>
-    .prose h1 { @apply text-3xl font-bold mb-4 text-slate-900; }
-    .prose h2 { @apply text-2xl font-bold mt-8 mb-4 text-slate-800; }
-    .prose h3 { @apply text-xl font-semibold mt-6 mb-3 text-slate-700; }
-    .prose p { @apply mb-4 text-slate-700 leading-relaxed; }
-    .prose ul, .prose ol { @apply mb-4 ml-6 text-slate-700; }
-    .prose li { @apply mb-2; }
-    .prose strong { @apply font-semibold text-slate-900; }
-    .prose blockquote { @apply border-l-4 border-rose-500 pl-4 italic text-slate-600 my-4; }
-    .prose table { @apply w-full border-collapse my-6; }
-    .prose th { @apply bg-slate-100 border border-slate-300 px-4 py-2 text-left font-semibold; }
-    .prose td { @apply border border-slate-300 px-4 py-2; }
-    .prose a { @apply text-rose-600 hover:text-rose-700 underline; }
+    /* Smooth animations for interactive elements */
+    .stat-card {
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -71,7 +66,7 @@
       </header>
 
       <!-- Article Body -->
-      <div id="article-body" class="prose max-w-none">
+      <div id="article-body" class="max-w-none">
         <!-- Markdown content will be rendered here -->
       </div>
 
