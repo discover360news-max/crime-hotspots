@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Guyana Headlines — Crime Hotspots</title>
+
+  <!-- Security: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://*.google.com https://*.googleusercontent.com https://lookerstudio.google.com https://docs.google.com; connect-src 'self' https://cdn.jsdelivr.net https://docs.google.com https://*.google.com https://*.googleusercontent.com https://*.googleapis.com https://script.google.com https://challenges.cloudflare.com; form-action 'self' https://script.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; child-src 'self' https://*.google.com;">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <link rel="stylesheet" href="./src/css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto}
+
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <!-- Global header -->
+  <script type="module">
+    import { renderHeader } from './src/js/components/header.js';
+    renderHeader();
+  </script>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fadeIn">
+    <h1 class="text-2xl font-semibold mb-3 text-center">Guyana Headlines</h1>
+
+    <div class="text-center mb-6" id="dashboardButtonContainer">
+      </div>
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+      <select id="areaSelect" class="px-3 py-2 border rounded bg-white text-sm">
+        <option value="">All Areas</option>
+      </select>
+      <button id="clearFilterBtn" class="text-sm text-slate-600 underline hidden">Clear filter</button>
+    </div>
+
+    <!-- Skeleton while loading -->
+    <div id="headlineSkeleton" class="flex flex-col items-center justify-center py-8">
+      <div class="w-3/4 h-6 bg-slate-200 rounded mb-3 animate-pulse"></div>
+      <div class="w-1/2 h-6 bg-slate-200 rounded animate-pulse"></div>
+    </div>
+
+    <!-- Area filter display (optional) -->
+    <div id="activeFilterBox" class="text-center mb-4 text-sm text-slate-600 hidden"></div>
+
+    <!-- Headlines container -->
+    <div id="headlinesContainer" class="grid gap-8 sm:grid-cols-1 lg:grid-cols-2 place-items-start justify-center mx-auto"></div>
+
+    <div class="text-center mt-10">
+      <button id="loadMoreBtn" class="px-6 py-2 bg-rose-600 text-white rounded-full hover:bg-rose-700 transition">Load More</button>
+    </div>
+  </main>
+
+  <!-- Frosted inline article tray (iframe preview) -->
+  <section id="headlineModal" class="fixed inset-x-0 bottom-0 backdrop-blur-md bg-white/70 rounded-t-2xl shadow-xl transform translate-y-full opacity-0 transition-all duration-700 ease-[cubic-bezier(.22,1,.36,1)] z-50 hidden">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between border-b border-white/40">
+      <button id="articlePrev" class="text-sm text-slate-600 hover:text-rose-600">← Prev</button>
+      <div class="text-sm text-slate-700 font-medium">Article preview</div>
+      <div class="flex items-center gap-3">
+        <a id="modalViewExternal" class="text-xs text-rose-600 hover:underline hidden" href="#" target="_blank" rel="noopener noreferrer">Open original</a>
+        <button id="articleClose" class="text-sm text-slate-600 hover:text-rose-600">Close</button>
+        <button id="articleNext" class="text-sm text-slate-600 hover:text-rose-600">Next →</button>
+      </div>
+    </div>
+
+    <div id="headlineIframeWrap" class="bg-white/80 rounded-b-2xl overflow-hidden">
+      <iframe id="headlineIframe" src="about:blank" class="w-full h-[80vh] border-0 opacity-0 transition-opacity duration-700 bg-gradient-to-b from-slate-100 to-white" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+    </div>
+  </section>
+
+  <!-- Dashboard panel (shared slide-up tray) -->
+  <section
+    id="dashboardPanel"
+    class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200
+          rounded-t-2xl shadow-xl transform translate-y-full opacity-0
+          transition-all duration-700 ease-[cubic-bezier(.22,1,.36,1)]
+          hidden z-50"
+  >
+
+    <div class="flex justify-center pt-3">
+      <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+    </div>
+
+    <div class="flex items-center justify-between bg-white p-4 border-b sticky top-0 z-10">
+
+      <button
+        id="dashboardClose"
+        class="text-slate-600 hover:text-rose-600 text-sm font-medium flex items-center gap-1"
+        aria-label="Close dashboard"
+      >
+        ← Back to Headlines
+      </button>
+
+      <a
+        id="dashboardHeadlinesLink"
+        href="#"
+        class="text-sm text-rose-600 hover:text-rose-700 font-medium opacity-0 pointer-events-none transition-opacity duration-700"
+      >
+        View Headlines →
+      </a>
+    </div>
+
+    <div class="relative bg-white rounded-lg shadow overflow-hidden">
+        <iframe
+          id="dashboardIframe"
+          title="Country Dashboard"
+          src="about:blank"
+          class="w-full h-[calc(85vh-6rem)] border-0 opacity-0 transition-opacity duration-700 bg-gradient-to-b from-slate-100 to-white"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+        ></iframe>
+
+        <div id="dashboardError" class="hidden p-6 text-sm text-rose-700 bg-rose-50">
+        <strong>Unable to load dashboard.</strong>
+        <p class="mt-2">
+            The dashboard might not allow embedding or there was a connection issue.
+            You can
+            <a
+              id="dashboardOpenNew"
+              class="underline font-medium"
+              href="#"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+            open it in a new tab
+            </a>.
+        </p>
+        </div>
+    </div>
+  </section>
+
+
+  <!-- Script (module) -->
+  <script type="module" src="./src/js/headlines-guyana.js"></script>
+
+  <!-- Backdrop overlay (for blur & dim behind tray) -->
+  <div
+    id="dashboardBackdrop"
+    class="fixed inset-0 bg-black/20 backdrop-blur-sm opacity-0 hidden transition-opacity duration-500 z-40"
+  ></div>
+</body>
+</html>

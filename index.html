@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Caribbean Crime Hotspots — Home</title>
+
+  <!-- Security: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://*.google.com https://*.googleusercontent.com https://lookerstudio.google.com https://docs.google.com; connect-src 'self' https://cdn.jsdelivr.net https://docs.google.com https://*.google.com https://*.googleusercontent.com https://*.googleapis.com https://script.google.com https://challenges.cloudflare.com; form-action 'self' https://script.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; child-src 'self' https://*.google.com;">
+
+  <!-- Tailwind via CDN for prototype -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./src/css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Base font */
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto;
+    }
+
+    /* Dashboard iframe soft background */
+    #dashboardIframe {
+      background: linear-gradient(to bottom, #f8fafc, #fff);
+      will-change: opacity;
+    }
+    
+    /* Transition for the View Headlines link */
+    #dashboardHeadlinesLink {
+      transition: opacity 0.6s ease 0.3s;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen">      
+  
+  <!-- Global header -->
+  <script type="module">
+    import { renderHeader } from './src/js/components/header.js';
+    renderHeader();
+  </script>
+
+  <!-- Main -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <!-- Cards grid -->
+        <section
+          id="reporting-section"
+          class="flex flex-col items-center justify-center text-center px-4 py-8"
+        >
+          <div class="text-center max-w-2xl mx-auto mb-8">
+            <h1 class="text-2xl font-semibold text-gray-600 mb-3">
+              Select Your Reporting Area
+            </h1>
+            <p class="text-sm text-slate-400">
+              Choose an island to view crime stats based on verified headlines.
+            </p>
+          </div>
+
+          <!-- Cards grid -->
+          <div
+            id="countryGrid"
+            class="grid gap-8 sm:gap-10 grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 place-items-center justify-center mx-auto"
+            role="list"
+            aria-label="Countries"
+          >
+            <!-- Loading skeleton (removed by JavaScript after cards load) -->
+            <div class="skeleton-card w-40 sm:w-48 rounded-2xl shadow-md overflow-hidden bg-slate-100 animate-pulse">
+              <div class="w-full aspect-square bg-slate-200"></div>
+              <div class="py-3 px-2 space-y-2">
+                <div class="h-4 bg-slate-200 rounded w-3/4 mx-auto"></div>
+                <div class="h-3 bg-slate-200 rounded w-1/2 mx-auto"></div>
+              </div>
+            </div>
+            <div class="skeleton-card w-40 sm:w-48 rounded-2xl shadow-md overflow-hidden bg-slate-100 animate-pulse">
+              <div class="w-full aspect-square bg-slate-200"></div>
+              <div class="py-3 px-2 space-y-2">
+                <div class="h-4 bg-slate-200 rounded w-3/4 mx-auto"></div>
+                <div class="h-3 bg-slate-200 rounded w-1/2 mx-auto"></div>
+              </div>
+            </div>
+            <div class="skeleton-card w-40 sm:w-48 rounded-2xl shadow-md overflow-hidden bg-slate-100 animate-pulse">
+              <div class="w-full aspect-square bg-slate-200"></div>
+              <div class="py-3 px-2 space-y-2">
+                <div class="h-4 bg-slate-200 rounded w-3/4 mx-auto"></div>
+                <div class="h-3 bg-slate-200 rounded w-1/2 mx-auto"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dashboard panel (hidden by default) -->
+        <!-- Backdrop (fades in behind the dashboard panel) -->
+
+        <!-- Slide-up Dashboard Panel -->
+        <section
+          id="dashboardPanel"
+          class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200
+                rounded-t-2xl shadow-xl transform translate-y-full opacity-0
+                transition-all duration-700 ease-[cubic-bezier(.22,1,.36,1)]
+                hidden z-50"
+        >
+
+          <div class="flex justify-center pt-3">
+            <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+          </div>
+
+          <div class="flex items-center justify-between bg-white p-4 border-b sticky top-0 z-10">
+            
+            <button
+              id="dashboardClose"
+              class="text-slate-600 hover:text-rose-600 text-sm font-medium flex items-center gap-1"
+              aria-label="Close dashboard"
+            >
+              ← Back to islands
+            </button>
+
+            <a
+              id="dashboardHeadlinesLink"
+              href="#"
+              class="text-sm text-rose-600 hover:text-rose-700 font-medium opacity-0 pointer-events-none transition-opacity duration-700"
+            >
+              View Headlines →
+            </a>
+          </div>
+
+          <div class="relative bg-white rounded-lg shadow overflow-hidden">
+              <iframe
+                id="dashboardIframe"
+                title="Country Dashboard"
+                src="about:blank"
+                class="w-full h-[calc(85vh-6rem)] border-0 opacity-0 transition-opacity duration-700 bg-gradient-to-b from-slate-100 to-white"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+              ></iframe>
+
+              <div id="dashboardError" class="hidden p-6 text-sm text-rose-700 bg-rose-50">
+              <strong>Unable to load dashboard.</strong>
+              <p class="mt-2">
+                  The dashboard might not allow embedding or there was a connection issue.
+                  You can
+                  <a
+                    id="dashboardOpenNew"
+                    class="underline font-medium"
+                    href="#"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                  open it in a new tab
+                  </a>.
+              </p>
+              </div>
+          </div>
+        </section>
+    </main>
+
+
+  <!-- Minimal script (data-driven rendering) -->
+  
+<script type="module" src="./src/js/main.js?"></script>
+
+<!-- Backdrop overlay (for blur & dim behind tray) -->
+<div
+  id="dashboardBackdrop"
+  class="fixed inset-0 bg-black/20 backdrop-blur-sm opacity-0 hidden transition-opacity duration-500 z-40"
+></div>
+
+</body>
+</html>

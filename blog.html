@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crime Statistics Blog - Crime Hotspots Caribbean</title>
+  <meta name="description" content="Weekly crime statistics analysis and reports for Trinidad & Tobago, Guyana, and the Caribbean. Data-driven insights into public safety trends.">
+  <meta name="keywords" content="Caribbean crime statistics, Trinidad crime report, Guyana crime data, public safety blog">
+
+  <!-- Open Graph for social sharing -->
+  <meta property="og:title" content="Crime Statistics Blog - Crime Hotspots Caribbean">
+  <meta property="og:description" content="Weekly crime statistics analysis and reports for Trinidad & Tobago, Guyana, and the Caribbean.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/src/assets/images/og-blog.jpg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="/src/css/styles.css">
+</head>
+<body class="bg-slate-50 min-h-screen">
+  <!-- Header will be injected here -->
+  <div id="header-container"></div>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-12 max-w-6xl">
+    <div class="mb-12">
+      <h1 class="text-4xl font-bold text-slate-900 mb-4">Crime Statistics Blog</h1>
+      <p class="text-lg text-slate-600">Weekly data-driven analysis of crime trends across the Caribbean</p>
+    </div>
+
+    <!-- Country Filter -->
+    <div class="mb-8 flex flex-wrap gap-2">
+      <button id="filter-all" class="px-4 py-2 rounded-lg bg-rose-600 text-white font-medium hover:bg-rose-700 transition">
+        All Countries
+      </button>
+      <button id="filter-tt" class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 font-medium hover:bg-slate-300 transition">
+        Trinidad & Tobago
+      </button>
+      <button id="filter-gy" class="px-4 py-2 rounded-lg bg-slate-200 text-slate-700 font-medium hover:bg-slate-300 transition">
+        Guyana
+      </button>
+    </div>
+
+    <!-- Blog Posts Grid -->
+    <div id="blog-posts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Posts will be dynamically loaded here -->
+      <div class="col-span-full text-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto"></div>
+        <p class="text-slate-600 mt-4">Loading posts...</p>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination" class="mt-12 flex justify-center gap-2 hidden">
+      <!-- Pagination buttons will be added here -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-800 text-white py-8 mt-16">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2025 Crime Hotspots Caribbean. All rights reserved.</p>
+      <p class="text-slate-400 text-sm mt-2">Data updated weekly. Subscribe to our <a href="/rss.xml" class="text-rose-400 hover:text-rose-300">RSS feed</a>.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module" src="/src/js/blog.js"></script>
+</body>
+</html>
