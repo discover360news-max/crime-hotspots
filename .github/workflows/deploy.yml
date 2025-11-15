@@ -1,4 +1,4 @@
-name: Build and Deploy to Cloudflare Pages
+name: Build and Validate
 
 on:
   push:
@@ -9,11 +9,10 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      deployments: write
 
     steps:
       - name: Checkout repository
@@ -36,13 +35,3 @@ jobs:
 
       - name: Generate RSS feed
         run: node scripts/generateRSS.js
-
-      - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: crime-hotspots
-          directory: dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
