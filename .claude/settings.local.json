@@ -40,7 +40,8 @@
       "Bash(git push:*)",
       "Bash(gh run list:*)",
       "Bash(gh run:*)",
-      "Bash(open \"http://localhost:5173/blog-post.html?slug=trinidad-weekly-2025-11-10\")"
+      "Bash(open \"http://localhost:5173/blog-post.html?slug=trinidad-weekly-2025-11-10\")",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

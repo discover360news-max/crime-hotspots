@@ -4,172 +4,221 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Crime Hotspots is a web-based data visualization platform for Caribbean crime statistics. The application displays crime data dashboards, headlines, and provides anonymous crime reporting functionality. Currently focused on Trinidad & Tobago, with Guyana and Barbados planned for future releases.
+Crime Hotspots is a web-based data visualization platform for Caribbean crime statistics. The application displays crime data dashboards, headlines, and provides anonymous crime reporting functionality.
 
-**Tech Stack:**
-- Vanilla JavaScript (ES Modules) with Vite as the build tool
-- Tailwind CSS (via CDN) for styling
-- Google Looker Studio for embedded dashboards
-- Google Sheets as CSV data source
-- Google Apps Script as serverless backend for form submissions
+**Current Status:** ✅ Production - Trinidad & Tobago and Guyana live
+**Live Site:** https://crimehotspots.com
+**Last Updated:** November 15, 2025
+
+---
+
+## Tech Stack
+
+**Frontend:**
+- Vanilla JavaScript (ES Modules) with Vite
+- Tailwind CSS (via CDN)
 - PapaParse for CSV parsing
+- DOMPurify for XSS protection
 - Cloudflare Turnstile for CAPTCHA
+
+**Backend/Automation:**
+- Google Apps Script (serverless)
+- Google Gemini AI (crime data extraction)
+- Google Sheets (data storage + CSV export)
+- GitHub Actions (CI/CD)
+
+**Hosting:**
+- Cloudflare Pages (auto-deploy from GitHub)
+- Custom domain: crimehotspots.com
+
+---
 
 ## Development Commands
 
 ```bash
-# Start development server with hot reload (default port: 5173)
-npm run dev
-
-# Build for production (outputs to dist/)
-npm run build
-
-# Preview production build locally
-npm run preview
+npm run dev      # Start dev server (port 5173)
+npm run build    # Build for production
+npm run preview  # Preview production build
 ```
 
-**Note:** No testing, linting, or deployment scripts are currently configured.
+**Deployment:** Push to `main` → GitHub Actions builds → Cloudflare Pages deploys automatically
+
+---
 
 ## Architecture
 
 ### Data-Driven Configuration
 
-The entire application is driven by the `src/js/data/countries.js` file. To add a new country:
+The entire application is driven by **`src/js/data/countries.js`**. To add a new country:
 
-1. Add entry to the `COUNTRIES` array with required fields:
-   - `id`: unique identifier
-   - `name`: full country name
-   - `flag`: emoji flag
-   - `dashboard`: Looker Studio embed URL
-   - `csvUrl`: Google Sheets CSV export URL
-   - `available`: boolean (false shows "Coming Soon")
-   - `image`: path to header image
-   - `headlinesSlug`: URL slug for headlines page
+1. Add entry to `COUNTRIES` array
+2. The header, country grid, and all UI elements automatically update
 
-2. The header navigation, country grid, and all UI elements will automatically update based on this configuration.
-
-### Component Architecture
-
-**Header Component (`src/js/components/header.js`):**
-- Dynamically builds navigation from `COUNTRIES` array
-- Auto-highlights active page/section based on URL
-- Responsive mobile menu with hamburger toggle
-- Dropdown for "View Headlines" with island-specific links
-
-**Dashboard Panel (`src/js/components/dashboardPanel.js`):**
-- Manages modal/drawer for embedded Looker Studio dashboards
-- Implements iframe caching strategy (dashboards persist after first load)
-- Handles 10-second timeout with fallback error messaging
-- Smooth fade-in transitions on load
-- Links to corresponding headlines page after dashboard loads
-
-**Page-Specific Scripts:**
-- `main.js`: Homepage country grid rendering and dashboard panel initialization
-- `headlines-trinidad.js`: CSV parsing, area filtering, pagination (10 headlines per batch)
-- `reportStandalone.js`: Form validation, honeypot, Turnstile CAPTCHA, Google Apps Script submission
-
-### Key Implementation Details
-
-**Dashboard Loading Flow:**
-1. User clicks country card → `loadDashboard()` called
-2. Check cache for existing iframe source
-3. If cached: instant display, else: load iframe and set 10s timeout
-4. On successful load: fade in dashboard, reveal "View Headlines" link
-5. Dashboard iframe remains cached for subsequent views
-
-**Headlines Processing:**
-- CSV fetched from Google Sheets via public URL
-- Client-side parsing with PapaParse
-- Headlines sorted by date (newest first)
-- Area dropdown populated dynamically from unique CSV values
-- "Load More" pagination adds 10 headlines at a time
-
-**Form Submission:**
-- Data posted to Google Apps Script webhook URL
-- Honeypot field (`website`) must be empty (bot detection)
-- Cloudflare Turnstile token validated server-side
-- Success/error states shown with visual feedback
-
-## File Structure
+### Key Files
 
 ```
-src/
-├── js/
-│   ├── main.js                    # Homepage initialization
-│   ├── headlines-trinidad.js      # Headlines page logic
-│   ├── reportStandalone.js        # Crime report form
-│   ├── components/
-│   │   ├── header.js              # Navigation header (responsive)
-│   │   └── dashboardPanel.js      # Dashboard modal/drawer
-│   ├── data/
-│   │   └── countries.js           # Country metadata (single source of truth)
-│   └── utils/
-│       └── dom.js                 # DOM utilities (spinner, fade animations)
-└── css/
-    └── styles.css                 # Custom animations & Tailwind overrides
+src/js/
+├── components/
+│   ├── header.js              # Navigation (dynamic from countries.js)
+│   ├── dashboardPanel.js      # Dashboard modal with caching
+│   ├── headlinesPage.js       # Shared headlines logic
+│   └── loadingStates.js       # Shimmer loaders
+├── data/
+│   └── countries.js           # Single source of truth
+└── utils/
+    └── dom.js                 # DOM utilities
+
+google-apps-script/
+├── trinidad/                  # Trinidad automation
+├── guyana/                    # Guyana automation
+└── weekly-reports/            # Blog post generation
 ```
-
-## Important Notes
-
-- **No TypeScript:** Pure JavaScript with ES modules
-- **No Testing Framework:** Tests not currently implemented
-- **No Linting:** ESLint/Prettier not configured
-- **External Dependencies:** React is listed in package.json but not actively used in codebase
-- **Not a Git Repository:** Project is not version-controlled (consider initializing with `git init`)
-
-## Common Patterns
-
-**Adding a New Page:**
-1. Create HTML file in root directory
-2. Import `header.js` component in page script
-3. Call `renderHeader()` with optional active section override
-4. Add navigation link to header component if needed
-
-**Working with CSV Data:**
-- Google Sheets CSVs must be published with "single=true&output=csv" parameters
-- PapaParse handles parsing automatically
-- Always sort/filter data client-side for responsiveness
-
-**Styling Conventions:**
-- Tailwind utility classes for layout and common styles
-- Custom animations defined in `src/css/styles.css`
-- Rose color palette (`rose-600`, `rose-700`) for primary actions
-- Slate palette for text and borders
 
 ---
 
-## Automated Data Collection System
+## Automated Data Collection
 
-This project includes a **production-ready automated crime data collection system** (Google Apps Script) that processes 100-120 articles/day from Trinidad & Tobago news sources using Google Gemini AI.
+**Location:** `google-apps-script/trinidad/` and `google-apps-script/guyana/`
 
-### Critical Implementation Details
+**How it works:**
+1. RSS feeds collected every 2 hours
+2. Full article text fetched every hour
+3. Gemini AI extracts crime data every hour
+4. Data published to Production sheet (public CSV)
 
-**Multi-Crime Detection:**
-Articles often contain multiple crime incidents. The system extracts crimes as an array, not single objects:
-```javascript
-{
-  "crimes": [{crime1}, {crime2}, {crime3}],
-  "confidence": 9
-}
+**Critical Configuration (NEVER change):**
+- `maxOutputTokens: 4096` - Must stay at 4096 to prevent truncation
+- Multi-crime detection - crimes must be an array
+- API keys stored in Script Properties, never hardcoded
+
+**Documentation:** `google-apps-script/trinidad/README.md`
+
+---
+
+## Weekly Blog Reports
+
+**Location:** `google-apps-script/weekly-reports/weeklyReportGenerator-IMPROVED.gs`
+
+**Runs:** Every Monday at 10 AM
+
+**Safeguards:**
+- Minimum 10 crimes required
+- Data freshness check (3+ recent crimes)
+- Duplicate detection
+- Backlog check (skips if > 50 pending)
+- Email notifications when skipped
+
+**Documentation:** `docs/automation/WEEKLY-REPORT-SAFEGUARDS.md`
+
+---
+
+## Common Patterns
+
+### Adding a New Page
+
+1. Create HTML file in root
+2. Import header component
+3. Add to `vite.config.js` input configuration
+
+### Working with CSV Data
+
+- Sheets must be published with `single=true&output=csv`
+- PapaParse handles parsing
+- Sort/filter client-side
+
+### Styling
+
+- Tailwind utilities for layout
+- Rose palette (`rose-600`, `rose-700`) for primary actions
+- Custom animations in `src/css/styles.css`
+
+---
+
+## Critical Rules
+
+### When Working on Automation
+
+**NEVER:**
+- Change `maxOutputTokens` from 4096
+- Remove multi-crime detection
+- Hardcode API keys
+
+**ALWAYS:**
+- Read automation README first
+- Test with `testRSSCollection()` functions
+- Verify Script Properties are set
+
+### When Working on Frontend
+
+**DO:**
+- Use Read, Edit, Write tools (not bash)
+- Prefer editing existing files
+- Test with `npm run dev`
+- Build successfully before committing
+
+**DON'T:**
+- Use emojis unless requested
+- Create markdown files unless required
+- Modify vite.config.js without understanding
+
+---
+
+## Git/GitHub
+
+**Only commit when user requests.**
+
+**Never:**
+- Force push to main
+- Skip hooks
+- Commit secrets
+
+**Commit format:**
+```bash
+git commit -m "Short title
+
+- Change details
+
+🤖 Generated with Claude Code
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
-**Key Configuration Values (NEVER change these):**
-- `maxOutputTokens: 4096` - Token limit must stay at 4096 (not 2048) to prevent truncation
-- Publication date ≠ crime date - Pass `publishedDate` to Gemini for relative date calculation
-- Duplicate detection uses URL + headline (not just URL) to avoid blocking multi-crime articles
+---
 
-**Automation Files Location:**
-`Development Progress/Agent - Workflow Architect/Kavell Automation Live Code/`
-- config.gs - Configuration & API management (API keys in Script Properties)
-- geminiClient.gs - AI extraction (multi-crime detection logic)
-- processor.gs - Main orchestrator (routing based on confidence)
-- rssCollector.gs, articleFetcher.gs, geocoder.gs
+## Project Status
 
-**Critical References:**
-- `PROJECT-CONTEXT.md` - Complete automation system history and technical decisions
-- `AGENT-BRIEFING.md` - Quick reference for agents working on automation
-- `GO-LIVE-CHECKLIST.md` - Production deployment checklist
+### ✅ Completed
+- Trinidad & Tobago automation (100% functional)
+- Guyana automation (launched Nov 15, 2025)
+- Automated deployment (GitHub → Cloudflare)
+- Blog system with visual components
+- Weekly report generator with safeguards
 
-**When Working on Automation:**
-Read `AGENT-BRIEFING.md` first. Never decrease token limits, remove multi-crime detection, or hardcode API keys.
-- Add to memory. NEVER Assume, as questions about or ask to be pointed to files to review for context, accuracy, continuity at all times you are unsure or lacking key details.
+### 🔄 In Progress
+- Guyana backfill processing (170 URLs)
+
+### 📋 Planned
+- Barbados automation
+- Google Analytics
+- Social media auto-posting
+- SEO optimization
+
+---
+
+## Documentation
+
+**For Developers:**
+- README.md - Project overview
+- This file (CLAUDE.md) - Architecture
+- google-apps-script/*/README.md - Automation details
+
+**For Growth:**
+- docs/automation/VIRAL-GROWTH-README.md
+
+**Archived:**
+- docs/archive/Development Progress/
+
+---
+
+**Version:** 1.2.0
+**Last Updated:** November 15, 2025
