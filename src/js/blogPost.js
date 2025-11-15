@@ -172,7 +172,8 @@ async function loadPost() {
     dashboardBtn.addEventListener('click', (e) => {
       e.preventDefault();
       if (dashboardController && dashboardController.loadDashboard) {
-        dashboardController.loadDashboard(country);
+        // Call with correct parameters: (dashboardUrl, title, headlineSlug)
+        dashboardController.loadDashboard(country.dashboard, country.name, country.headlinesSlug);
       }
     });
   }
