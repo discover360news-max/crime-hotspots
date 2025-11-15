@@ -123,6 +123,64 @@
     </div>
   </footer>
 
+  <!-- Dashboard Panel -->
+  <section
+    id="dashboardPanel"
+    class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200
+          rounded-t-2xl shadow-xl transform translate-y-full opacity-0
+          transition-all duration-700 ease-[cubic-bezier(.22,1,.36,1)]
+          hidden z-50"
+  >
+    <div class="flex justify-center pt-3">
+      <div class="w-12 h-1.5 bg-slate-300 rounded-full"></div>
+    </div>
+
+    <div class="flex items-center justify-between bg-white p-4 border-b sticky top-0 z-10">
+      <button
+        id="dashboardClose"
+        class="text-slate-600 hover:text-rose-600 text-sm font-medium flex items-center gap-1"
+        aria-label="Close dashboard"
+      >
+        ← Back to article
+      </button>
+
+      <a
+        id="dashboardHeadlinesLink"
+        href="#"
+        class="text-sm text-rose-600 hover:text-rose-700 font-medium opacity-0 pointer-events-none transition-opacity duration-700"
+      >
+        View Headlines →
+      </a>
+    </div>
+
+    <div class="relative bg-white rounded-lg shadow overflow-hidden">
+      <iframe
+        id="dashboardIframe"
+        title="Country Dashboard"
+        src="about:blank"
+        class="w-full h-[calc(85vh-6rem)] border-0 opacity-0 transition-opacity duration-700 bg-gradient-to-b from-slate-100 to-white"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+      ></iframe>
+
+      <div id="dashboardError" class="hidden p-6 text-sm text-rose-700 bg-rose-50">
+        <strong>Unable to load dashboard.</strong>
+        <p class="mt-2">
+          The dashboard might not allow embedding or there was a connection issue.
+          You can
+          <a
+            id="dashboardOpenNew"
+            class="underline font-medium"
+            href="#"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            open it in a new tab
+          </a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- Scripts -->
   <script type="module" src="/src/js/blogPost.js"></script>
 </body>

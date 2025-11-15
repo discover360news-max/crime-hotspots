@@ -1,6 +1,7 @@
 // src/js/blogPost.js
 import { renderHeader } from './components/header.js';
 import { COUNTRIES } from './data/countries.js';
+import { initDashboardPanel } from './components/dashboardPanel.js';
 
 // In production, this will fetch from a generated JSON file
 // For now, we'll use the same data structure as blog.js
@@ -117,9 +118,13 @@ For detailed interactive visualizations, view our [Guyana Dashboard](/).
   }
 };
 
+// Initialize dashboard panel
+let dashboardController;
+
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
   renderHeader();
+  dashboardController = initDashboardPanel();
   await loadPost();
   setupSocialSharing();
 });
@@ -159,10 +164,17 @@ async function loadPost() {
   // Render markdown content (simple implementation - in production use a proper markdown parser)
   document.getElementById('article-body').innerHTML = parseMarkdown(post.content);
 
-  // Set dashboard link
+  // Set up dashboard button to open dashboard panel
   const country = COUNTRIES.find(c => c.id === post.country);
   if (country) {
-    document.getElementById('dashboard-link').href = `/?country=${country.id}`;
+    const dashboardBtn = document.getElementById('dashboard-link');
+    dashboardBtn.href = '#'; // Prevent default link behavior
+    dashboardBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (dashboardController && dashboardController.loadDashboard) {
+        dashboardController.loadDashboard(country);
+      }
+    });
   }
 
   // Show article, hide loading
