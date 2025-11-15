@@ -12,7 +12,7 @@ const blogPosts = {
     date: '2025-11-10',
     author: 'Crime Hotspots Analytics',
     readTime: '4 min read',
-    image: './src/assets/images/trinidad.jpg',
+    image: '/assets/images/trinidad.jpg',
     content: `
 ## Weekly Crime Overview
 
@@ -68,7 +68,7 @@ For detailed interactive visualizations, view our [Trinidad & Tobago Dashboard](
     date: '2025-11-10',
     author: 'Crime Hotspots Analytics',
     readTime: '3 min read',
-    image: './src/assets/images/guyana.jpg',
+    image: '/assets/images/guyana.jpg',
     content: `
 ## Weekly Crime Overview
 
@@ -171,25 +171,58 @@ async function loadPost() {
 }
 
 function parseMarkdown(markdown) {
-  // Simple markdown parser (in production, use a library like marked.js)
-  let html = markdown
-    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+  // Split content into blocks (paragraphs separated by double newlines)
+  const blocks = markdown.trim().split('\n\n');
+
+  const parsedBlocks = blocks.map(block => {
+    block = block.trim();
+
+    // Headers
+    if (block.startsWith('### ')) {
+      return '<h3>' + block.substring(4) + '</h3>';
+    }
+    if (block.startsWith('## ')) {
+      return '<h2>' + block.substring(3) + '</h2>';
+    }
+    if (block.startsWith('# ')) {
+      return '<h1>' + block.substring(2) + '</h1>';
+    }
+
+    // Unordered lists
+    if (block.startsWith('- ') || block.includes('\n- ')) {
+      const items = block.split('\n')
+        .filter(line => line.startsWith('- '))
+        .map(line => '<li>' + parseInline(line.substring(2)) + '</li>')
+        .join('');
+      return '<ul>' + items + '</ul>';
+    }
+
+    // Ordered lists
+    if (/^\d+\. /.test(block) || block.includes('\n1. ')) {
+      const items = block.split('\n')
+        .filter(line => /^\d+\. /.test(line))
+        .map(line => '<li>' + parseInline(line.replace(/^\d+\. /, '')) + '</li>')
+        .join('');
+      return '<ol>' + items + '</ol>';
+    }
+
+    // Horizontal rule
+    if (block === '---') {
+      return '<hr class="my-8 border-slate-300">';
+    }
+
+    // Regular paragraph
+    return '<p>' + parseInline(block) + '</p>';
+  });
+
+  return parsedBlocks.join('\n');
+}
+
+function parseInline(text) {
+  return text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>')
-    .replace(/^- (.*$)/gim, '<li>$1</li>')
-    .replace(/\n\n/g, '</p><p>')
-    .replace(/^(\d+)\. (.*$)/gim, '<li>$2</li>');
-
-  // Wrap list items
-  html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
-
-  // Wrap paragraphs
-  html = '<p>' + html + '</p>';
-
-  return html;
+    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2">$1</a>');
 }
 
 function setupSocialSharing() {

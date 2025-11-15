@@ -13,7 +13,7 @@ const blogPosts = [
     excerpt: 'Analysis of 47 crime incidents reported this week. Murder rate decreased 12% compared to last week, while robbery incidents increased in Port of Spain area.',
     author: 'Crime Hotspots Analytics',
     readTime: '4 min read',
-    image: './src/assets/images/trinidad.jpg',
+    image: '/assets/images/trinidad.jpg',
     slug: 'trinidad-weekly-2025-11-10',
     tags: ['Trinidad', 'Weekly Report', 'Statistics']
   },
@@ -26,7 +26,7 @@ const blogPosts = [
     excerpt: 'Analysis of 23 crime incidents reported this week. Georgetown saw a spike in theft incidents, particularly in the Stabroek Market area.',
     author: 'Crime Hotspots Analytics',
     readTime: '3 min read',
-    image: './src/assets/images/guyana.jpg',
+    image: '/assets/images/guyana.jpg',
     slug: 'guyana-weekly-2025-11-10',
     tags: ['Guyana', 'Weekly Report', 'Statistics']
   }
