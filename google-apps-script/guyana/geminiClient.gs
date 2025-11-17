@@ -167,7 +167,7 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
   Utilities.formatDate(new Date(), Session.getScriptTimeZone(),
   'yyyy-MM-dd');
 
-    return `Extract crime data from this Trinidad & Tobago news article.
+    return `Extract crime data from this Guyana news article.
 
   PUBLISHED: ${pubDateStr}
   HEADLINE: ${articleTitle}
@@ -183,12 +183,12 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
       {
         "crime_date": "YYYY-MM-DD (calculate from article, NOT published date)",
         "crime_type": "Murder|Shooting|Robbery|Assault|Theft|Home Invasion|Sexual Assault|Kidnapping",
-        "area": "Neighborhood (e.g., Maraval, Port of Spain)",
+        "area": "Neighborhood (e.g., Georgetown, New Amsterdam)",
         "street": "Street address if mentioned",
         "headline": "Brief headline with victim name/age in parentheses if known",
         "details": "2-3 sentence summary",
         "victims": [{"name": "Name or null", "age": number, "aliases": []}],
-        "location_country": "Trinidad|Venezuela|Guyana|Other"
+        "location_country": "Guyana|Venezuela|Trinidad|Other"
       }
     ],
     "confidence": 1-10,
@@ -208,8 +208,8 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
 
   3. LOCATION FILTER: Set "location_country" for each crime
      - If crime happened in Venezuela/Guyana/etc, mark it
-     - Only Trinidad crimes should be extracted
-     - If unclear, mark as "Trinidad" but lower confidence
+     - Only Guyana crimes should be extracted
+     - If unclear, mark as "Guyana" but lower confidence
 
   4. MULTI-CRIME INCIDENTS: Handle overlapping crimes correctly
      - Home Invasion + Robbery = ONE "Home Invasion" (robbery is implied)

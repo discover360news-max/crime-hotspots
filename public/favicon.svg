@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="45" fill="#e11d48"/>
+
+  <!-- White map pin shape -->
+  <path d="M50 25 C40 25 32 33 32 43 C32 53 50 75 50 75 C50 75 68 53 68 43 C68 33 60 25 50 25 Z" fill="white"/>
+
+  <!-- Alert dot inside pin -->
+  <circle cx="50" cy="43" r="8" fill="#e11d48"/>
+</svg>

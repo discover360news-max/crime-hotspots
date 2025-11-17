@@ -95,7 +95,7 @@ Transform Crime Hotspots from a local tool to THE Caribbean public safety data p
 **Tasks:**
 1. Set up Google Analytics 4
    - Create GA4 property at https://analytics.google.com/
-   - Get Measurement ID (G-XXXXXXXXXX)
+   - Get Measurement ID (G-JMQ8B4DYEG)
    - Save for next step
 
 2. Integrate cookie consent + analytics
@@ -113,7 +113,7 @@ Transform Crime Hotspots from a local tool to THE Caribbean public safety data p
          // User accepted - initialize analytics
          initAnalytics({
            provider: 'ga4',
-           ga4MeasurementId: 'G-XXXXXXXXXX', // Replace with your ID
+           ga4MeasurementId: 'G-JMQ8B4DYEG', // Replace with your ID
            anonymizeIp: true,
            debug: false
          });

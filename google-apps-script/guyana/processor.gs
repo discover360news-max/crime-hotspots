@@ -64,9 +64,9 @@ function processReadyArticles() {
             extracted.crimes.forEach((crime, index) => {
               Logger.log(`  Processing crime ${index + 1}/${extracted.crimes.length}: ${crime.headline}`);
 
-              // ← NEW: Filter out crimes outside Trinidad
-              if (crime.location_country && crime.location_country !== 'Trinidad') {
-                Logger.log(`    ⏭️ Skipped: Crime occurred in ${crime.location_country}, not Trinidad`);
+              // ← NEW: Filter out crimes outside Guyana
+              if (crime.location_country && crime.location_country !== 'Guyana') {
+                Logger.log(`    ⏭️ Skipped: Crime occurred in ${crime.location_country}, not Guyana`);
                 return; // Skip this crime
               }
 
@@ -146,7 +146,7 @@ function processReadyArticles() {
       return;
     }
 
-    const fullAddress = `${crime.street || ''}, ${crime.area || ''}, Trinidad and Tobago`;
+    const fullAddress = `${crime.street || ''}, ${crime.area || ''}, Guyana and Tobago`;
     const geocoded = geocodeAddress(fullAddress);
 
     prodSheet.appendRow([
@@ -156,7 +156,7 @@ function processReadyArticles() {
       crime.street || '',
       geocoded.plus_code || '',
       crime.area || '',
-      'Trinidad',
+      'Guyana',
       crime.source_url || '',
       geocoded.lat || '',
       geocoded.lng || ''
@@ -174,7 +174,7 @@ function processReadyArticles() {
     const reviewSheet = getActiveSheet(SHEET_NAMES.REVIEW_QUEUE);
 
     const fullAddress = `${crime.street || ''}, ${crime.area || ''}, 
-  Trinidad and Tobago`;
+  Guyana and Tobago`;
     const geocoded = geocodeAddress(fullAddress);
 
     reviewSheet.appendRow([
@@ -184,7 +184,7 @@ function processReadyArticles() {
       crime.street || '',
       geocoded.plus_code || '',
       crime.area || '',
-      'Trinidad',
+      'Guyana',
       crime.source_url || '',
       geocoded.lat || '',
       geocoded.lng || '',

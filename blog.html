@@ -7,11 +7,37 @@
   <meta name="description" content="Weekly crime statistics analysis and reports for Trinidad & Tobago, Guyana, and the Caribbean. Data-driven insights into public safety trends.">
   <meta name="keywords" content="Caribbean crime statistics, Trinidad crime report, Guyana crime data, public safety blog">
 
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#e11d48">
+
   <!-- Open Graph for social sharing -->
   <meta property="og:title" content="Crime Statistics Blog - Crime Hotspots Caribbean">
   <meta property="og:description" content="Weekly crime statistics analysis and reports for Trinidad & Tobago, Guyana, and the Caribbean.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="/src/assets/images/og-blog.jpg">
+
+  <!-- Cookie Consent & Analytics -->
+  <script type="module">
+    import { initCookieConsent } from './src/js/utils/cookieConsent.js';
+    import { initAnalytics } from './src/js/utils/analytics.js';
+
+    initCookieConsent({
+      onAccept: () => {
+        initAnalytics({
+          provider: 'ga4',
+          ga4MeasurementId: 'G-JMQ8B4DYEG',
+          anonymizeIp: true,
+          debug: false
+        });
+      }
+    });
+  </script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>

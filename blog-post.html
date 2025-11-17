@@ -7,11 +7,37 @@
   <meta name="description" content="" id="post-description">
   <meta name="keywords" content="Caribbean crime statistics, crime analysis, public safety">
 
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#e11d48">
+
   <!-- Open Graph tags (dynamically populated) -->
   <meta property="og:title" content="" id="og-title">
   <meta property="og:description" content="" id="og-description">
   <meta property="og:type" content="article">
   <meta property="og:image" content="" id="og-image">
+
+  <!-- Cookie Consent & Analytics -->
+  <script type="module">
+    import { initCookieConsent } from './src/js/utils/cookieConsent.js';
+    import { initAnalytics } from './src/js/utils/analytics.js';
+
+    initCookieConsent({
+      onAccept: () => {
+        initAnalytics({
+          provider: 'ga4',
+          ga4MeasurementId: 'G-JMQ8B4DYEG',
+          anonymizeIp: true,
+          debug: false
+        });
+      }
+    });
+  </script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>

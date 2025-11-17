@@ -36,6 +36,9 @@ const CONFIG = {
   duplicateThreshold: 0.9      // If 90% of data is same as last week, skip
 };
 
+// Notification email (for skip/error notifications)
+const NOTIFICATION_EMAIL = 'discover360news@gmail.com';
+
 // Country configurations
 const COUNTRIES = {
   'trinidad': {
@@ -251,7 +254,7 @@ function calculateSimilarity(fp1, fp2) {
  */
 function sendSkipNotification(countryKey, validation) {
   const country = COUNTRIES[countryKey];
-  const recipient = Session.getActiveUser().getEmail();
+  const recipient = NOTIFICATION_EMAIL;
 
   const subject = `⚠️ Weekly Report Skipped: ${country.name}`;
   const body = `
@@ -282,7 +285,7 @@ Crime Hotspots Automated Report System
  */
 function sendErrorNotification(countryKey, error) {
   const country = COUNTRIES[countryKey];
-  const recipient = Session.getActiveUser().getEmail();
+  const recipient = NOTIFICATION_EMAIL;
 
   const subject = `❌ Weekly Report Error: ${country.name}`;
   const body = `
