@@ -1,3 +1,8 @@
+// dashboardPanel.js
+// Handles dashboard tray animation, caching, and headline linking.
+
+import { createDashboardShimmer } from './loadingStates.js';
+
 function safeUrl(u) {
   if (!u) return null;
   try {
@@ -7,11 +12,6 @@ function safeUrl(u) {
     return null;
   }
 }
-
-// dashboardPanel.js
-// Handles dashboard tray animation, caching, and headline linking.
-
-import { createDashboardShimmer } from './loadingStates.js';
 
 export function initDashboardPanel() {
   const panel = document.getElementById('dashboardPanel');
@@ -32,6 +32,8 @@ export function initDashboardPanel() {
   const cache = new Map();
   let currentId = null;
   let fallbackTimer = null; // Still keep for iframe timeout
+  let progressInterval = null; // For progressive loading messages
+  let shimmerStartTime = null; // Track when shimmer was created
 
   // Race condition prevention
   let isLoading = false;
@@ -41,7 +43,8 @@ export function initDashboardPanel() {
   function clearTimers() {
     clearTimeout(fallbackTimer);
     fallbackTimer = null;
-    // Removed resetProgress() call
+    clearInterval(progressInterval);
+    progressInterval = null;
   }
 
   // === Animations ===
@@ -81,7 +84,7 @@ export function initDashboardPanel() {
   }
 
   // === Error handling ===
-  function showError(msg, dashboardUrl = null) {
+  function showError(msg, dashboardUrl = null, isTimeout = false) {
     if (!errorBox) return;
 
     // Remove shimmer loader if present
@@ -95,24 +98,66 @@ export function initDashboardPanel() {
     iframe.classList.remove("opacity-100");
     iframe.classList.add("opacity-0");
 
-    // Update error message while preserving HTML structure
-    errorBox.innerHTML = `
-      <strong>Unable to load dashboard.</strong>
-      <p class="mt-2">
-        ${msg || "The dashboard might not allow embedding or there was a connection issue."}
-        You can
-        <a
-          id="dashboardOpenNew"
-          class="underline font-medium"
-          href="${dashboardUrl || '#'}"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-        open it in a new tab
-        </a>.
-      </p>
-    `;
+    // Context-aware error messages
+    let errorMessage;
+    if (isTimeout) {
+      errorMessage = `
+        <strong>Dashboard is taking longer than expected</strong>
+        <p class="mt-2 text-sm text-slate-600">
+          Google Looker Studio dashboards can be slow to load, especially on first visit.
+        </p>
+        <div class="mt-4 flex gap-3 flex-wrap">
+          <button id="retryDashboard"
+                  class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 text-sm font-medium transition-colors">
+            Try Again
+          </button>
+          <a id="dashboardOpenNew"
+             class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-sm font-medium transition-colors inline-block"
+             href="${dashboardUrl || '#'}"
+             target="_blank"
+             rel="noreferrer noopener">
+            Open in New Tab →
+          </a>
+        </div>
+      `;
+    } else {
+      errorMessage = `
+        <strong>Unable to load dashboard</strong>
+        <p class="mt-2 text-sm text-slate-600">
+          ${msg || "There was a connection issue."}
+        </p>
+        <div class="mt-4 flex gap-3 flex-wrap">
+          <button id="retryDashboard"
+                  class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 text-sm font-medium transition-colors">
+            Try Again
+          </button>
+          <a id="dashboardOpenNew"
+             class="px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-sm font-medium transition-colors inline-block"
+             href="${dashboardUrl || '#'}"
+             target="_blank"
+             rel="noreferrer noopener">
+            Open in New Tab →
+          </a>
+        </div>
+      `;
+    }
+
+    errorBox.innerHTML = errorMessage;
     errorBox.classList.remove("hidden");
+
+    // Add retry handler
+    const retryBtn = document.getElementById('retryDashboard');
+    if (retryBtn && dashboardUrl) {
+      retryBtn.addEventListener('click', () => {
+        errorBox.classList.add('hidden');
+
+        // Reset loading flag to allow retry
+        isLoading = false;
+
+        // Reload the dashboard
+        loadDashboard(dashboardUrl, currentId, cache.get(currentId)?.headlineSlug || '');
+      });
+    }
 
     // Hide the headlines link on error
     if (headlinesLink) headlinesLink.classList.add("opacity-0", "pointer-events-none");
@@ -177,7 +222,6 @@ export function initDashboardPanel() {
 
     // Hide dashboard iframe initially to start fade-in after loading
     iframe.classList.add("opacity-0");
-    iframe.src = "about:blank"; // Reset src first for smoother transition
 
     // Create and inject shimmer loader
     const shimmer = createDashboardShimmer();
@@ -187,63 +231,97 @@ export function initDashboardPanel() {
     iframeContainer.style.position = 'relative';
     iframeContainer.appendChild(shimmer);
 
-    // Start loading the dashboard
+    // Track when shimmer was created for minimum display time
+    shimmerStartTime = Date.now();
+
+    // Start loading the dashboard (don't set to about:blank first - causes premature onload)
     iframe.src = safe;
     cache.set(countryId, { url: safe, headlineSlug });
 
-    // Set fallback timer (10s is a good buffer for Looker Studio/heavy dashboards)
+    // Progressive loading messages to reduce perceived wait time
+    const progressMessages = [
+      { time: 5000, msg: "Fetching crime data..." },
+      { time: 10000, msg: "Almost there..." }
+    ];
+
+    let messageIndex = 0;
+    progressInterval = setInterval(() => {
+      if (messageIndex < progressMessages.length) {
+        const messageEl = shimmer.querySelector('.loading-message');
+        if (messageEl) {
+          messageEl.textContent = progressMessages[messageIndex].msg;
+        }
+        messageIndex++;
+      }
+    }, 5000);
+
+    // Set fallback timer (15s for Looker Studio dashboards which can be slow)
     fallbackTimer = setTimeout(() => {
       clearTimers();
-      showError("Dashboard timed out.", safe);
+      showError("Dashboard timed out.", safe, true);
       isLoading = false;
-    }, 10000); 
+    }, 15000);
   }
 
   iframe.onload = () => {
     try {
-      clearTimers();
-
-      // Reset loading flag on successful load
-      isLoading = false;
-
-      // Remove shimmer loader if present
-      const existingShimmer = document.getElementById('dashboardShimmer');
-      if (existingShimmer) {
-        existingShimmer.remove();
+      // Ignore onload events for about:blank (happens when closing/resetting)
+      if (iframe.src === 'about:blank' || iframe.src === '') {
+        return;
       }
 
-      // 1. Fade in iframe
-      iframe.classList.remove("opacity-0");
-      iframe.classList.add("opacity-100");
+      // Calculate how long shimmer has been visible
+      const MINIMUM_SHIMMER_TIME = 5000; // 5 seconds to cover Google's loading
+      const shimmerElapsedTime = shimmerStartTime ? Date.now() - shimmerStartTime : MINIMUM_SHIMMER_TIME;
+      const remainingTime = Math.max(0, MINIMUM_SHIMMER_TIME - shimmerElapsedTime);
 
-      // 2. Reveal "View Headlines" link
-      const cached = cache.get(currentId);
-      const slug = cached?.headlineSlug;
+      // Delay removing shimmer until minimum time has passed
+      setTimeout(() => {
+        clearTimers();
 
-      if (headlinesLink && slug) {
-        const headlinePath = `headlines-${slug}.html`;
+        // Reset loading flag on successful load
+        isLoading = false;
 
-        headlinesLink.href = headlinePath;
-        headlinesLink.removeAttribute("target");
-        headlinesLink.removeAttribute("rel");
+        // Remove shimmer loader if present
+        const existingShimmer = document.getElementById('dashboardShimmer');
+        if (existingShimmer) {
+          existingShimmer.remove();
+        }
 
-        // Reveal the link
-        headlinesLink.classList.remove("opacity-0", "pointer-events-none");
+        // 1. Fade in iframe
+        iframe.classList.remove("opacity-0");
+        iframe.classList.add("opacity-100");
 
-        headlinesLink.onclick = (e) => {
-            e.preventDefault();
-            panel.classList.remove('opacity-100', 'translate-y-0');
-            panel.classList.add("opacity-0", "translate-y-full");
+        // 2. Reveal "View Headlines" link
+        const cached = cache.get(currentId);
+        const slug = cached?.headlineSlug;
 
-            // Wait for panel close animation before navigating
-            setTimeout(() => {
-                window.location.href = headlinePath;
-            }, 400);
-        };
-      }
+        if (headlinesLink && slug) {
+          const headlinePath = `headlines-${slug}.html`;
 
-      // Ensure the "open in new tab" link stays hidden
-      if (openNewLink) openNewLink.classList.add("hidden");
+          headlinesLink.href = headlinePath;
+          headlinesLink.removeAttribute("target");
+          headlinesLink.removeAttribute("rel");
+
+          // Reveal the link
+          headlinesLink.classList.remove("opacity-0", "pointer-events-none");
+
+          headlinesLink.onclick = (e) => {
+              e.preventDefault();
+              panel.classList.remove('opacity-100', 'translate-y-0');
+              panel.classList.add("opacity-0", "translate-y-full");
+
+              // Wait for panel close animation before navigating
+              setTimeout(() => {
+                  window.location.href = headlinePath;
+              }, 400);
+          };
+        }
+
+        // Ensure the "open in new tab" link stays hidden
+        if (openNewLink) openNewLink.classList.add("hidden");
+
+      }, remainingTime); // Close the setTimeout block
 
     } catch (e) {
       console.warn("iframe onload handler error", e);
@@ -268,14 +346,26 @@ export function initDashboardPanel() {
       // Reset loading flag when closing
       isLoading = false;
 
-      // Ensure detached handlers don't fire during load/close
-      iframe.onload = null;
-      iframe.onerror = null;
+      // Reset shimmer start time
+      shimmerStartTime = null;
 
       clearTimers();
 
-      // Reset iframe source
-      iframe.src = "about:blank";
+      // Remove any lingering shimmer
+      const existingShimmer = document.getElementById('dashboardShimmer');
+      if (existingShimmer) {
+        existingShimmer.remove();
+      }
+
+      // Clear error messages
+      clearError();
+
+      // Reset iframe (wait for panel close animation)
+      setTimeout(() => {
+        iframe.src = "about:blank";
+        iframe.classList.add("opacity-0");
+        iframe.classList.remove("opacity-100");
+      }, 500);
 
       // Hide "View Headlines →" link
       if (headlinesLink) {

@@ -54,6 +54,13 @@ function createCountryCard(country, index) { // <-- Takes 'index'
       <div class="mt-2 text-center bg-white w-full py-2">
         <h3 class="text-sm font-semibold">${country.flag} ${country.name}</h3>
         <p class="mt-1 text-xs text-slate-500">${country.short}</p>
+        ${
+          country.available
+            ? `<p class="mt-2 text-xs font-medium text-rose-600 group-hover:text-rose-700 transition-colors">
+                View Dashboard →
+              </p>`
+            : ''
+        }
       </div>
     </div>
   `;

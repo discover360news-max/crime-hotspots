@@ -7,13 +7,23 @@
  */
 export function createDashboardShimmer() {
   const shimmer = document.createElement('div');
-  shimmer.className = 'dashboard-shimmer absolute inset-0 bg-white p-6 animate-pulse z-10';
+  shimmer.className = 'dashboard-shimmer absolute inset-0 bg-white p-6 z-10';
   shimmer.setAttribute('role', 'status');
   shimmer.setAttribute('aria-live', 'polite');
   shimmer.setAttribute('aria-label', 'Loading dashboard');
 
   shimmer.innerHTML = `
-    <div class="space-y-6">
+    <!-- Loading message at the top -->
+    <div class="flex items-center justify-center mb-6 gap-3">
+      <div class="w-6 h-6 border-3 border-rose-200 border-t-rose-600 rounded-full animate-spin"></div>
+      <div class="text-center">
+        <p class="text-slate-700 font-medium loading-message">Loading dashboard...</p>
+        <p class="text-xs text-slate-500 mt-1">This may take up to 15 seconds</p>
+      </div>
+    </div>
+
+    <!-- Shimmer skeleton below -->
+    <div class="space-y-6 animate-pulse opacity-40">
       <!-- Header bar -->
       <div class="flex items-center justify-between">
         <div class="h-8 bg-slate-200 rounded w-1/3"></div>
