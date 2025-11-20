@@ -13,7 +13,7 @@ const blogPosts = {
     date: '2025-11-10',
     author: 'Crime Hotspots Analytics',
     readTime: '4 min read',
-    image: '/assets/images/trinidad.jpg',
+    image: '/assets/images/report-hero.svg',
     content: `
 ## Weekly Crime Overview
 
@@ -69,7 +69,7 @@ For detailed interactive visualizations, view our [Trinidad & Tobago Dashboard](
     date: '2025-11-10',
     author: 'Crime Hotspots Analytics',
     readTime: '3 min read',
-    image: '/assets/images/guyana.jpg',
+    image: '/assets/images/report-hero.svg',
     content: `
 ## Weekly Crime Overview
 
