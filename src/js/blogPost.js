@@ -188,6 +188,7 @@ function parseMarkdown(markdown) {
   const blocks = markdown.trim().split('\n\n');
   let inStatsSection = false;
   let inHotspotsSection = false;
+  let inSafetySection = false;
 
   const parsedBlocks = blocks.map(block => {
     block = block.trim();
@@ -211,24 +212,40 @@ function parseMarkdown(markdown) {
     if (block === '### Safety Recommendations') {
       if (inStatsSection) {
         inStatsSection = false;
-        return '</div><h3 class="text-2xl font-bold mt-8 mb-4 text-slate-900">🛡️ Safety Recommendations</h3>';
       }
       if (inHotspotsSection) {
         inHotspotsSection = false;
       }
-      return '<h3 class="text-2xl font-bold mt-8 mb-4 text-slate-900">🛡️ Safety Recommendations</h3>';
+      inSafetySection = true;
+      return `
+        <div class="bg-amber-50 border-l-4 border-amber-500 rounded-r-lg p-6 my-8 shadow-lg">
+          <h3 class="text-2xl font-bold mb-4 text-amber-900 flex items-center gap-2">
+            <span class="text-3xl">🛡️</span> Safety Recommendations
+          </h3>
+          <p class="text-sm text-amber-800 font-medium mb-4">Important safety information for residents and visitors</p>
+      `;
     }
 
     // Headers (other than special sections)
     if (block.startsWith('### ')) {
+      let prefix = '';
       if (inStatsSection) {
         inStatsSection = false;
-        return '</div><h3 class="text-xl font-semibold mt-6 mb-3 text-slate-700">' + block.substring(4) + '</h3>';
+        prefix = '</div>';
       }
-      return '<h3 class="text-xl font-semibold mt-6 mb-3 text-slate-700">' + block.substring(4) + '</h3>';
+      if (inSafetySection) {
+        inSafetySection = false;
+        prefix = '</div></div>';
+      }
+      return prefix + '<h3 class="text-xl font-semibold mt-6 mb-3 text-slate-700">' + block.substring(4) + '</h3>';
     }
     if (block.startsWith('## ')) {
-      return '<h2 class="text-3xl font-bold mt-10 mb-6 text-slate-900 border-b-2 border-rose-200 pb-3">' + block.substring(3) + '</h2>';
+      let prefix = '';
+      if (inSafetySection) {
+        inSafetySection = false;
+        prefix = '</div></div>';
+      }
+      return prefix + '<h2 class="text-3xl font-bold mt-10 mb-6 text-slate-900 border-b-2 border-rose-200 pb-3">' + block.substring(3) + '</h2>';
     }
     if (block.startsWith('# ')) {
       return '<h1 class="text-4xl font-bold mb-4 text-slate-900">' + block.substring(2) + '</h1>';
@@ -265,12 +282,25 @@ function parseMarkdown(markdown) {
         const area = areaMatch[1];
         const rest = block.replace(/\*\*(.*?)\*\*/, '').trim();
         return `
-          <div class="bg-gradient-to-r from-slate-50 to-white rounded-lg p-5 mb-4 border-l-4 border-blue-500 shadow-sm">
+          <div class="bg-white rounded-lg p-5 mb-4 border border-slate-200 shadow-md">
             <div class="text-lg font-bold text-slate-900 mb-2">📍 ${area}</div>
             <p class="text-slate-700">${parseInline(rest)}</p>
           </div>
         `;
       }
+    }
+
+    // Safety section lists: Special styled recommendations
+    if (inSafetySection && (block.startsWith('- ') || block.includes('\n- ') || /^\d+\. /.test(block))) {
+      inSafetySection = false; // Close safety section after this block
+      const items = block.split('\n')
+        .filter(line => line.startsWith('- ') || /^\d+\. /.test(line))
+        .map(line => {
+          const content = line.startsWith('- ') ? line.substring(2) : line.replace(/^\d+\. /, '');
+          return '<li class="mb-3 flex items-start gap-3"><span class="text-amber-600 font-bold text-lg">✓</span><span>' + parseInline(content) + '</span></li>';
+        })
+        .join('');
+      return '<ul class="space-y-2 text-amber-900">' + items + '</ul></div></div>';
     }
 
     // Regular unordered lists

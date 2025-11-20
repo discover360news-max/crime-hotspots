@@ -61,20 +61,20 @@ function renderPosts() {
   container.innerHTML = paginatedPosts.map(post => `
     <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
       <a href="/blog-post.html?slug=${post.slug}" class="block">
-        <img src="${post.image}" alt="${post.countryName}" class="w-full h-48 object-cover">
-        <div class="p-6">
-          <div class="flex items-center gap-2 mb-3">
+        <img src="${post.image}" alt="${post.countryName}" class="w-full h-32 md:h-48 object-cover">
+        <div class="p-3 md:p-6">
+          <div class="flex items-center gap-1 md:gap-2 mb-2 md:mb-3 flex-wrap">
             <span class="text-xs font-semibold px-2 py-1 rounded bg-rose-100 text-rose-700">
               ${post.countryName}
             </span>
             <span class="text-xs text-slate-500">${formatDate(post.date)}</span>
           </div>
-          <h2 class="text-xl font-bold text-slate-900 mb-2 hover:text-rose-600 transition">
+          <h2 class="text-sm md:text-xl font-bold text-slate-900 mb-1 md:mb-2 hover:text-rose-600 transition line-clamp-2">
             ${post.title}
           </h2>
-          <p class="text-slate-600 mb-4 line-clamp-3">${post.excerpt}</p>
-          <div class="flex items-center justify-between text-sm text-slate-500">
-            <span>${post.author}</span>
+          <p class="text-xs md:text-base text-slate-600 mb-2 md:mb-4 line-clamp-2 md:line-clamp-3 hidden md:block">${post.excerpt}</p>
+          <div class="flex items-center justify-between text-xs md:text-sm text-slate-500">
+            <span class="hidden md:inline">${post.author}</span>
             <span>${post.readTime}</span>
           </div>
         </div>
