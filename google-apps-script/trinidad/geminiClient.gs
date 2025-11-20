@@ -184,7 +184,7 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
         "crime_date": "YYYY-MM-DD (calculate from article, NOT published date)",
         "crime_type": "Murder|Shooting|Robbery|Assault|Theft|Home Invasion|Sexual Assault|Kidnapping",
         "area": "Neighborhood (e.g., Maraval, Port of Spain)",
-        "street": "Street address if mentioned",
+        "street": "Street address INCLUDING business names/landmarks (e.g., 'KFC Arima', 'Grand Bazaar, Churchill Roosevelt Highway')",
         "headline": "Brief headline with victim name/age in parentheses if known",
         "details": "2-3 sentence summary",
         "victims": [{"name": "Name or null", "age": number, "aliases": []}],
@@ -198,30 +198,74 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
   CRITICAL RULES:
 
   1. CRIME DATE: Extract ACTUAL crime date from article text, NOT ${pubDateStr}.
-     - Look for "on Saturday", "yesterday", "Monday night", etc.
-     - Published ${pubDateStr}. Calculate relative dates from this.
-     - "yesterday" = ${pubDateStr} minus 1 day
-     - "Monday" = calculate from ${pubDateStr}
-     - If no date mentioned, use ${pubDateStr} as fallback
+     - Published: ${pubDateStr}
+     - Calculate relative dates from published date:
+       * "yesterday" = ${pubDateStr} minus 1 day
+       * "today" = ${pubDateStr}
+       * "on Monday" = find the most recent Monday before/on ${pubDateStr}
+       * "Monday night" = same Monday calculation
+       * "last Saturday" = find Saturday in the week before ${pubDateStr}
+       * "on the weekend" = use the most recent weekend day mentioned
+     - Examples:
+       * Article published Monday Nov 18, says "found on Monday" = Nov 18 (same day)
+       * Article published Tuesday Nov 19, says "on Monday" = Nov 18 (yesterday)
+       * Article published Monday, says "on Saturday" = most recent Saturday
+     - If no date mentioned at all, use ${pubDateStr} as fallback
 
-  2. NO "Other" CRIME TYPE: Only use listed crime types. If article doesn't match any, return {"crimes": [], "confidence": 0}
+  2. EXCLUDE UNCERTAIN DEATHS: DO NOT classify as "Murder" if:
+     - "No visible signs of violence"
+     - "Cause of death unknown"
+     - "Decomposed body" without confirmed foul play
+     - "Unidentified body" without clear evidence of homicide
+     - "Autopsy pending" or "Police investigating"
+     - Deaths under investigation where no crime is confirmed
+     - Return {"crimes": [], "confidence": 0} for these cases
 
-  3. LOCATION FILTER: Set "location_country" for each crime
+  3. MURDER CLASSIFICATION: ONLY use "Murder" when:
+     - Article explicitly states murder/killed/slain/homicide
+     - Clear evidence of violence (gunshot wounds, stabbing, beating)
+     - Police confirm foul play or criminal investigation
+     - Victim was shot/stabbed/attacked and died
+
+  4. NO "Other" CRIME TYPE: Only use listed crime types. If article doesn't match any, return {"crimes": [], "confidence": 0}
+
+  5. LOCATION DETAILS: Capture complete location information
+     - ALWAYS include business names (e.g., "KFC", "Grand Bazaar", "Movie Towne")
+     - Include landmarks (e.g., "near Queen's Park Savannah")
+     - street field should have: "Business/Landmark Name, Street Name" format
+     - Examples:
+       * "KFC Arima" → street: "KFC, Arima Main Road", area: "Arima"
+       * "Grand Bazaar shooting" → street: "Grand Bazaar, Churchill Roosevelt Highway", area: "Valsayn"
+       * "Queen's Park Savannah" → street: "Queen's Park Savannah", area: "Port of Spain"
+
+  6. LOCATION FILTER: Set "location_country" for each crime
      - If crime happened in Venezuela/Guyana/etc, mark it
      - Only Trinidad crimes should be extracted
      - If unclear, mark as "Trinidad" but lower confidence
 
-  4. MULTI-CRIME INCIDENTS: Handle overlapping crimes correctly
+  7. MULTI-CRIME INCIDENTS: Handle overlapping crimes correctly
      - Home Invasion + Robbery = ONE "Home Invasion" (robbery is implied)
      - Home Invasion + Murder = TWO separate crimes
      - Shooting + Murder = ONE "Murder" (shooting is the method)
      - Robbery + Assault = ONE "Robbery" (assault during robbery)
 
-  5. DUPLICATE DETECTION: Include victim details for deduplication
-     - Always include victim name, age, aliases if mentioned
-     - Include specific location details (street + area)
+  8. MULTI-VICTIM MURDERS: Extract EACH victim as SEPARATE crime entry
+     - Double murder = TWO "Murder" entries (one per victim)
+     - Triple murder = THREE "Murder" entries (one per victim)
+     - Each entry: same date/location, different victim name
+     - Example: "Husband and wife killed" = 2 Murder entries
+     - CRITICAL: This ensures accurate murder statistics
 
-  6. Not a crime article? Return {"crimes": [], "confidence": 0}
+  9. CRIME TYPE PRIORITY: When same incident has multiple crime labels
+     - If murder occurred, use "Murder" (not "Home Invasion" or "Shooting")
+     - Murder is the PRIMARY crime type when someone dies
+     - Exception: If victims include both dead and alive, split into separate crimes
+
+  10. DUPLICATE DETECTION: Include victim details for deduplication
+      - Always include victim name, age, aliases if mentioned
+      - Include specific location details (street + area)
+
+  11. Not a crime article? Return {"crimes": [], "confidence": 0}
 
   JSON only, no markdown.`;
   }
