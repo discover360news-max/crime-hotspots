@@ -234,6 +234,27 @@ function processReadyArticles() {
 // ============================================================================
 
 /**
+ * Normalize URLs for comparison (handles Trinidad Express article ID system)
+ * Trinidad Express URLs have format: /article-slug/article_UUID.html
+ * The slug can vary (typos, edits), but UUID is the unique identifier
+ *
+ * @param {string} url - Source URL
+ * @returns {string} Normalized URL (article ID for Trinidad Express, original URL otherwise)
+ */
+function normalizeUrl(url) {
+  if (!url) return url;
+
+  // Trinidad Express: Extract article ID (article_UUID.html)
+  const expressMatch = url.match(/article_([a-f0-9-]+)\.html/i);
+  if (expressMatch) {
+    return `trinidadexpress:${expressMatch[0]}`; // Returns "trinidadexpress:article_UUID.html"
+  }
+
+  // Other sources: Return original URL
+  return url;
+}
+
+/**
  * Check for duplicate crimes (enhanced fuzzy matching with victim/location)
  * @param {Sheet} sheet - Production or review sheet
  * @param {Object} crime - Crime data to check
@@ -264,8 +285,12 @@ function isDuplicateCrime(sheet, crime) {
       // ═══════════════════════════════════════════════════════════
       // CHECK 1: Same URL + Same location + Same date/type (same incident re-extracted)
       // Smart logic: Allows multi-crime articles with different incidents
+      // Uses normalized URLs to handle Trinidad Express article ID variations
       // ═══════════════════════════════════════════════════════════
-      if (existingUrl === crime.source_url && existingUrl && crime.source_url) {
+      const normalizedExistingUrl = normalizeUrl(existingUrl);
+      const normalizedNewUrl = normalizeUrl(crime.source_url);
+
+      if (normalizedExistingUrl === normalizedNewUrl && normalizedExistingUrl && normalizedNewUrl) {
         const existingStreet = row[6] || '';
         const existingLocationText = `${existingArea} ${existingStreet}`.toLowerCase();
         const newLocationText = `${crime.area || ''} ${crime.street || ''}`.toLowerCase();
