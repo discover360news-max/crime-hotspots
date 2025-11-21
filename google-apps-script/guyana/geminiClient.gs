@@ -213,19 +213,23 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
      - If no date mentioned at all, use ${pubDateStr} as fallback
 
   2. ARTICLE TYPE FILTER: Only extract from actual crime report articles
-     - ✅ INCLUDE: Breaking news about recent/ongoing crime incidents
-     - ✅ INCLUDE: Police reports of specific crimes with victim details
-     - ✅ INCLUDE: Court coverage of recent crimes (conviction/arraignment)
-     - ❌ EXCLUDE: Business/product launch articles (even if they mention crime as motivation)
-     - ❌ EXCLUDE: Opinion pieces, editorials, or analysis that reference historical crimes
-     - ❌ EXCLUDE: Crime prevention articles that use example crimes from the past
-     - ❌ EXCLUDE: Articles primarily about services/apps/companies where crime is mentioned in passing
-     - ❌ EXCLUDE: Historical crime examples used for context (check dates - if >1 month old, likely example)
-     - If article is NOT primarily reporting a specific recent crime incident, return {"crimes": [], "confidence": 0}
+     - ✅ INCLUDE: Breaking news about recent violent crimes (murder, shooting, robbery, assault)
+     - ✅ INCLUDE: Police reports of crimes affecting public safety
+     - ✅ INCLUDE: Property crimes affecting individuals (home invasion, burglary, car theft)
+     - ❌ EXCLUDE: Court/trial/verdict articles (found guilty, convicted, sentenced, liable, ruling)
+     - ❌ EXCLUDE: Court appearances/arraignments unless reporting NEW details of the original crime
+     - ❌ EXCLUDE: White-collar/corporate crime (bank fraud, embezzlement, tax evasion, securities violations)
+     - ❌ EXCLUDE: Fraud involving banks/corporations (unless physical robbery of bank)
+     - ❌ EXCLUDE: Historical crimes (>1 month old) mentioned in context
+     - ❌ EXCLUDE: Business launch articles mentioning crime as motivation
+     - ❌ EXCLUDE: Opinion pieces, editorials, crime analysis articles
+     - ❌ EXCLUDE: Crime prevention tips using example crimes
+     - If article is primarily about court proceedings, verdict, or corporate fraud, return {"crimes": [], "confidence": 0}
      - Examples to EXCLUDE:
-       * "New app helps victims sell safely" with past crime examples → NOT a crime report
-       * "Crime stats show increase" without specific new incidents → NOT extractable
-       * "Company launches security service" mentioning old robbery → NOT a crime report
+       * "Former bank officer found liable for fraud" → Court verdict, NOT crime report
+       * "Man convicted in 2023 murder case" → Court verdict, NOT new crime
+       * "Company employee embezzled $30M over 5 years" → Corporate fraud, NOT public safety crime
+       * "New app helps victims sell safely" with past examples → Product launch, NOT crime report
 
   3. EXCLUDE UNCERTAIN DEATHS: DO NOT classify as "Murder" if:
      - "No visible signs of violence"
