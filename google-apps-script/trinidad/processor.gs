@@ -374,7 +374,8 @@ function isDuplicateCrime(sheet, crime) {
       }
 
       // ═══════════════════════════════════════════════════════════
-      // CHECK 4: Same date + location + crime type (80%+ headline similarity)
+      // CHECK 4: Same date + location + crime type (70%+ headline similarity)
+      // Lowered from 80% to catch cross-source duplicates (different journalists write different headlines)
       // ═══════════════════════════════════════════════════════════
       if (existingDate && crime.crime_date) {
         const existingDateStr = Utilities.formatDate(new Date(existingDate), Session.getScriptTimeZone(), 'yyyy-MM-dd');
@@ -383,7 +384,7 @@ function isDuplicateCrime(sheet, crime) {
             existingCrimeType === crime.crime_type &&
             existingArea === crime.area) {
           const similarity = calculateSimilarity(existingHeadline, crime.headline);
-          if (similarity > 0.8) {
+          if (similarity > 0.70) {
             Logger.log(`Duplicate found: Same date + area "${crime.area}" + crime type + ${(similarity * 100).toFixed(0)}% similar headline`);
             return true;
           }
@@ -420,7 +421,10 @@ function isDuplicateCrime(sheet, crime) {
           const newLocationText = `${crime.area || ''} ${crime.street || ''}`.toLowerCase();
 
           // Extract significant location keywords (2+ words, ignore common words)
-          const significantWords = ['grand bazaar', 'movie towne', 'trincity mall', 'central market', 'queens park'];
+          const significantWords = [
+            'grand bazaar', 'movie towne', 'trincity mall', 'central market', 'queens park',
+            'priority bus route', 'pbr', 'churchill roosevelt highway'
+          ];
 
           for (const keyword of significantWords) {
             if (existingLocationText.includes(keyword) && newLocationText.includes(keyword)) {
@@ -432,7 +436,7 @@ function isDuplicateCrime(sheet, crime) {
             }
           }
 
-          // Fuzzy location match: if both have 3+ word overlap in location
+          // Fuzzy location match: if both have 2+ word overlap in location
           const existingWords = existingLocationText.split(/\s+/).filter(w => w.length > 3);
           const newWords = newLocationText.split(/\s+/).filter(w => w.length > 3);
           const commonWords = existingWords.filter(w => newWords.includes(w));
@@ -442,6 +446,43 @@ function isDuplicateCrime(sheet, crime) {
             if (similarity > 0.75) {
               Logger.log(`Duplicate found: Same date + crime type + ${commonWords.length} common location words + ${(similarity * 100).toFixed(0)}% similar headline`);
               return true;
+            }
+          }
+
+          // ═══════════════════════════════════════════════════════════
+          // SPECIAL CASE: Maxi taxi robberies with contextual matching
+          // These are frequently reported by multiple news sources
+          // Lower threshold to 65% when both mention "maxi" and share location
+          // ═══════════════════════════════════════════════════════════
+          const existingHeadlineLower = existingHeadline.toLowerCase();
+          const newHeadlineLower = crime.headline.toLowerCase();
+
+          // Check if both mention "maxi" (common crime context in Trinidad)
+          const bothMentionMaxi = existingHeadlineLower.includes('maxi') && newHeadlineLower.includes('maxi');
+
+          if (bothMentionMaxi && commonWords.length >= 2) {
+            const similarity = calculateSimilarity(existingHeadline, crime.headline);
+            if (similarity > 0.65) {
+              Logger.log(`Duplicate found: Same date + crime type + maxi taxi context + ${commonWords.length} location words + ${(similarity * 100).toFixed(0)}% similar headline`);
+              return true;
+            }
+          }
+
+          // Check for other common crime contexts that indicate same incident
+          const crimeContextKeywords = [
+            ['home invasion', 'home invasion'], // Both must mention home invasion
+            ['pbr', 'pbr'],                     // Both mention PBR
+            ['kfc', 'kfc'],                     // Both mention KFC
+            ['movie towne', 'movie towne']      // Both mention Movie Towne
+          ];
+
+          for (const [keyword1, keyword2] of crimeContextKeywords) {
+            if (existingHeadlineLower.includes(keyword1) && newHeadlineLower.includes(keyword2)) {
+              const similarity = calculateSimilarity(existingHeadline, crime.headline);
+              if (similarity > 0.65 && existingArea === crime.area) {
+                Logger.log(`Duplicate found: Same date + area + crime type + "${keyword1}" context + ${(similarity * 100).toFixed(0)}% similar headline`);
+                return true;
+              }
             }
           }
         }

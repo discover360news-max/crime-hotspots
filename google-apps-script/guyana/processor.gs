@@ -380,7 +380,8 @@ function isDuplicateCrime(sheet, crime) {
       }
 
       // ═══════════════════════════════════════════════════════════
-      // CHECK 4: Same date + location + crime type (80%+ headline similarity)
+      // CHECK 4: Same date + location + crime type (70%+ headline similarity)
+      // Lowered from 80% to catch cross-source duplicates (different journalists write different headlines)
       // ═══════════════════════════════════════════════════════════
       if (existingDate && crime.crime_date) {
         const existingDateStr = Utilities.formatDate(new Date(existingDate), Session.getScriptTimeZone(), 'yyyy-MM-dd');
@@ -389,7 +390,7 @@ function isDuplicateCrime(sheet, crime) {
             existingCrimeType === crime.crime_type &&
             existingArea === crime.area) {
           const similarity = calculateSimilarity(existingHeadline, crime.headline);
-          if (similarity > 0.8) {
+          if (similarity > 0.70) {
             Logger.log(`Duplicate found: Same date + area "${crime.area}" + crime type + ${(similarity * 100).toFixed(0)}% similar headline`);
             return true;
           }
@@ -426,7 +427,10 @@ function isDuplicateCrime(sheet, crime) {
           const newLocationText = `${crime.area || ''} ${crime.street || ''}`.toLowerCase();
 
           // Extract significant location keywords for Guyana
-          const significantWords = ['stabroek market', 'camp street', 'main street', 'robb street', 'water street', 'bourda market'];
+          const significantWords = [
+            'stabroek market', 'camp street', 'main street', 'robb street', 'water street', 'bourda market',
+            'sheriff street', 'giftland mall', 'east coast demerara', 'west coast demerara'
+          ];
 
           for (const keyword of significantWords) {
             if (existingLocationText.includes(keyword) && newLocationText.includes(keyword)) {
@@ -448,6 +452,32 @@ function isDuplicateCrime(sheet, crime) {
             if (similarity > 0.75) {
               Logger.log(`Duplicate found: Same date + crime type + ${commonWords.length} common location words + ${(similarity * 100).toFixed(0)}% similar headline`);
               return true;
+            }
+          }
+
+          // ═══════════════════════════════════════════════════════════
+          // SPECIAL CASE: Context keyword matching for common crimes
+          // These are frequently reported by multiple news sources
+          // Lower threshold to 65% when both mention same context and share location
+          // ═══════════════════════════════════════════════════════════
+          const existingHeadlineLower = existingHeadline.toLowerCase();
+          const newHeadlineLower = crime.headline.toLowerCase();
+
+          // Check for common crime contexts in Guyana
+          const crimeContextKeywords = [
+            ['bandit', 'bandit'],                     // Both mention bandit
+            ['stabroek', 'stabroek'],                 // Both mention Stabroek
+            ['sheriff street', 'sheriff street'],     // Both mention Sheriff Street
+            ['giftland', 'giftland']                  // Both mention Giftland
+          ];
+
+          for (const [keyword1, keyword2] of crimeContextKeywords) {
+            if (existingHeadlineLower.includes(keyword1) && newHeadlineLower.includes(keyword2)) {
+              const similarity = calculateSimilarity(existingHeadline, crime.headline);
+              if (similarity > 0.65 && existingArea === crime.area) {
+                Logger.log(`Duplicate found: Same date + area + crime type + "${keyword1}" context + ${(similarity * 100).toFixed(0)}% similar headline`);
+                return true;
+              }
             }
           }
         }
