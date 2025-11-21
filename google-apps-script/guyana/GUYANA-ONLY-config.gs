@@ -151,7 +151,8 @@ const NEWS_SOURCES = [
  */
 const PROCESSING_CONFIG = {
   CONFIDENCE_THRESHOLD: 7,     // Articles below this go to review queue
-  MAX_ARTICLES_PER_RUN: 15,    // Gemini free tier: 60 RPM, so 15 per run is safe
+  MAX_ARTICLES_PER_RUN: 30,    // Increased from 10 - safer with better time checks
+  MAX_EXECUTION_TIME_MS: 270000, // 4.5 minutes (270 seconds) - buffer before 6min limit
   MAX_FETCH_PER_RUN: 10,       // Article text fetching limit per run (matches articleFetcher)
   RATE_LIMIT_DELAY: 1000,      // Milliseconds between API calls
   FETCH_DELAY: 2000            // Milliseconds between article fetches

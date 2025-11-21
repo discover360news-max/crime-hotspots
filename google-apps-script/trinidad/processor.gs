@@ -14,6 +14,8 @@
 function processReadyArticles() {
     Logger.log('=== STARTING ARTICLE PROCESSING ===');
 
+    const startTime = new Date().getTime();
+
     const sheet = getActiveSheet(SHEET_NAMES.RAW_ARTICLES);
     const lastRow = sheet.getLastRow();
 
@@ -30,12 +32,35 @@ function processReadyArticles() {
     let successCount = 0;
     let reviewCount = 0;
     let failedCount = 0;
+    let timeoutReached = false;
 
     for (let i = 0; i < data.length && articlesProcessed < PROCESSING_CONFIG.MAX_ARTICLES_PER_RUN; i++) {
+      // ═══════════════════════════════════════════════════════════
+      // CHECK EXECUTION TIME - Stop before hitting 6-minute limit
+      // ═══════════════════════════════════════════════════════════
+      const elapsedTime = new Date().getTime() - startTime;
+      if (elapsedTime > PROCESSING_CONFIG.MAX_EXECUTION_TIME_MS) {
+        Logger.log(`⏱️ Approaching execution time limit (${Math.round(elapsedTime/1000)}s elapsed)`);
+        Logger.log(`⏹️ Stopping processing to avoid timeout. Processed ${articlesProcessed} articles.`);
+        timeoutReached = true;
+        break;
+      }
       const row = data[i];
       const status = row[6]; // Column G
 
       if (status === 'ready_for_processing') {
+        // ═══════════════════════════════════════════════════════════
+        // SECOND TIME CHECK - Before starting article processing
+        // Prevents timeout mid-processing (especially during slow Gemini API calls)
+        // ═══════════════════════════════════════════════════════════
+        const elapsedTimeBeforeArticle = new Date().getTime() - startTime;
+        if (elapsedTimeBeforeArticle > PROCESSING_CONFIG.MAX_EXECUTION_TIME_MS) {
+          Logger.log(`⏱️ Time limit reached before starting article ${i + 2} (${Math.round(elapsedTimeBeforeArticle/1000)}s elapsed)`);
+          Logger.log(`⏹️ Stopping to avoid timeout. Processed ${articlesProcessed} articles.`);
+          timeoutReached = true;
+          break;
+        }
+
         const rowNumber = i + 2;
 
         try {
@@ -120,12 +145,19 @@ function processReadyArticles() {
       }
     }
 
+    const totalTime = Math.round((new Date().getTime() - startTime) / 1000);
+
     Logger.log('=== PROCESSING COMPLETE ===');
+    Logger.log(`⏱️ Total execution time: ${totalTime}s`);
     Logger.log(`Articles processed: ${articlesProcessed}`);
     Logger.log(`Total crimes extracted: ${totalCrimesExtracted}`);
     Logger.log(`→ Production: ${successCount} crime(s)`);
     Logger.log(`→ Review Queue: ${reviewCount} crime(s)`);
     Logger.log(`→ Failed: ${failedCount} article(s)`);
+
+    if (timeoutReached) {
+      Logger.log(`⚠️ Stopped early due to time limit. Remaining articles will process in next run.`);
+    }
     Logger.log('===========================');
   }
 
@@ -230,21 +262,73 @@ function isDuplicateCrime(sheet, crime) {
       const existingUrl = row[7];
 
       // ═══════════════════════════════════════════════════════════
-      // CHECK 1: Exact URL + headline match
+      // CHECK 1: Same URL + Same location + Same date/type (same incident re-extracted)
+      // Smart logic: Allows multi-crime articles with different incidents
       // ═══════════════════════════════════════════════════════════
-      if (existingUrl === crime.source_url && existingHeadline === crime.headline) {
-        Logger.log('Duplicate found: Exact URL + headline match');
-        return true;
+      if (existingUrl === crime.source_url && existingUrl && crime.source_url) {
+        const existingStreet = row[6] || '';
+        const existingLocationText = `${existingArea} ${existingStreet}`.toLowerCase();
+        const newLocationText = `${crime.area || ''} ${crime.street || ''}`.toLowerCase();
+
+        // Check if same area
+        const sameArea = existingArea && crime.area && existingArea === crime.area;
+        const existingDateStr = existingDate ? Utilities.formatDate(new Date(existingDate), Session.getScriptTimeZone(), 'yyyy-MM-dd') : null;
+        const sameDate = existingDateStr && crime.crime_date && existingDateStr === crime.crime_date;
+
+        // SCENARIO 1: Same URL + Same Area + Same Date → Likely duplicate
+        if (sameArea && sameDate) {
+          Logger.log('Duplicate found: Same URL + Same area + Same date (re-extraction)');
+          return true;
+        }
+
+        // SCENARIO 2: Same URL + Same Area + Different Date → Allow (different incidents)
+        if (sameArea && !sameDate) {
+          Logger.log(`✓ Same URL + Same area but different dates (${existingDateStr} vs ${crime.crime_date}) - allowing separate incidents`);
+          return false; // Explicitly allow
+        }
+
+        // SCENARIO 3: Same URL + Different Area → Allow (multi-location article)
+        if (!sameArea) {
+          Logger.log(`✓ Same URL but different areas (${existingArea} vs ${crime.area}) - allowing multi-location article`);
+          return false; // Explicitly allow
+        }
+
+        // Check for location keywords overlap (handles street-level duplicates)
+        const locationWords = existingLocationText.split(/\s+/).filter(w => w.length > 4);
+        const newWords = newLocationText.split(/\s+/).filter(w => w.length > 4);
+        const commonLocationWords = locationWords.filter(w => newWords.includes(w));
+
+        if (commonLocationWords.length >= 2 && sameDate) {
+          Logger.log(`Duplicate found: Same URL + ${commonLocationWords.length} location words + same date`);
+          return true;
+        }
       }
 
       // ═══════════════════════════════════════════════════════════
-      // CHECK 2: Same URL + very similar headline (90%+)
+      // CHECK 2: Same victim names in headline (multi-victim incidents)
+      // Prevents double-counting same person in different extractions
       // ═══════════════════════════════════════════════════════════
-      if (existingUrl === crime.source_url) {
-        const similarity = calculateSimilarity(existingHeadline, crime.headline);
-        if (similarity > 0.9) {
-          Logger.log(`Duplicate found: Same URL + ${(similarity * 100).toFixed(0)}% similar headline`);
-          return true;
+      if (existingDate && crime.crime_date) {
+        const existingDateStr = Utilities.formatDate(new Date(existingDate), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+
+        if (existingDateStr === crime.crime_date) {
+          // Extract names from both headlines
+          const existingNames = extractNamesFromHeadline(existingHeadline);
+          const newNames = extractNamesFromHeadline(crime.headline);
+
+          // If any name appears in both, and locations match, it's likely same victim
+          for (const existingName of existingNames) {
+            for (const newName of newNames) {
+              if (existingName.length > 5 && newName.length > 5 &&
+                  (existingName.includes(newName) || newName.includes(existingName))) {
+                const similarity = calculateSimilarity(existingHeadline, crime.headline);
+                if (similarity > 0.6) {
+                  Logger.log(`Duplicate found: Same victim name "${existingName}" detected`);
+                  return true;
+                }
+              }
+            }
+          }
         }
       }
 
@@ -277,6 +361,63 @@ function isDuplicateCrime(sheet, crime) {
           if (similarity > 0.8) {
             Logger.log(`Duplicate found: Same date + area "${crime.area}" + crime type + ${(similarity * 100).toFixed(0)}% similar headline`);
             return true;
+          }
+        }
+      }
+
+      // ═══════════════════════════════════════════════════════════
+      // CHECK 5: Same date + crime type + very high headline similarity (85%+)
+      // Catches same incident even when location fields differ between sources
+      // ═══════════════════════════════════════════════════════════
+      if (existingDate && crime.crime_date) {
+        const existingDateStr = Utilities.formatDate(new Date(existingDate), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+
+        if (existingDateStr === crime.crime_date && existingCrimeType === crime.crime_type) {
+          const similarity = calculateSimilarity(existingHeadline, crime.headline);
+          if (similarity > 0.85) {
+            Logger.log(`Duplicate found: Same date + crime type + ${(similarity * 100).toFixed(0)}% similar headline (different sources)`);
+            return true;
+          }
+        }
+      }
+
+      // ═══════════════════════════════════════════════════════════
+      // CHECK 6: Same date + crime type + shared location keywords
+      // Catches when "Grand Bazaar" appears in different field combinations
+      // ═══════════════════════════════════════════════════════════
+      if (existingDate && crime.crime_date) {
+        const existingDateStr = Utilities.formatDate(new Date(existingDate), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+
+        if (existingDateStr === crime.crime_date && existingCrimeType === crime.crime_type) {
+          // Get all location text from both crimes
+          const existingStreet = row[6] || '';
+          const existingLocationText = `${existingArea} ${existingStreet}`.toLowerCase();
+          const newLocationText = `${crime.area || ''} ${crime.street || ''}`.toLowerCase();
+
+          // Extract significant location keywords (2+ words, ignore common words)
+          const significantWords = ['grand bazaar', 'movie towne', 'trincity mall', 'central market', 'queens park'];
+
+          for (const keyword of significantWords) {
+            if (existingLocationText.includes(keyword) && newLocationText.includes(keyword)) {
+              const similarity = calculateSimilarity(existingHeadline, crime.headline);
+              if (similarity > 0.75) {
+                Logger.log(`Duplicate found: Same date + crime type + location keyword "${keyword}" + ${(similarity * 100).toFixed(0)}% similar headline`);
+                return true;
+              }
+            }
+          }
+
+          // Fuzzy location match: if both have 3+ word overlap in location
+          const existingWords = existingLocationText.split(/\s+/).filter(w => w.length > 3);
+          const newWords = newLocationText.split(/\s+/).filter(w => w.length > 3);
+          const commonWords = existingWords.filter(w => newWords.includes(w));
+
+          if (commonWords.length >= 2) {
+            const similarity = calculateSimilarity(existingHeadline, crime.headline);
+            if (similarity > 0.75) {
+              Logger.log(`Duplicate found: Same date + crime type + ${commonWords.length} common location words + ${(similarity * 100).toFixed(0)}% similar headline`);
+              return true;
+            }
           }
         }
       }
@@ -333,6 +474,139 @@ function levenshteinDistance(str1, str2) {
   }
 
   return matrix[str2.length][str1.length];
+}
+
+/**
+ * Extract potential victim names from headline
+ * Looks for capitalized words in parentheses or after common patterns
+ * @param {string} headline - Crime headline
+ * @returns {Array<string>} Array of potential names
+ */
+function extractNamesFromHeadline(headline) {
+  const names = [];
+
+  // Pattern 1: Names in parentheses (most common in our format)
+  const parenMatches = headline.match(/\(([^)]+)\)/g);
+  if (parenMatches) {
+    parenMatches.forEach(match => {
+      // Remove parentheses and extract names
+      const content = match.replace(/[()]/g, '');
+      // Split by comma or "and"
+      const potentialNames = content.split(/,| and /);
+      potentialNames.forEach(name => {
+        const cleanName = name.trim().replace(/\d+/g, '').trim(); // Remove ages
+        if (cleanName.length > 3) {
+          names.push(cleanName.toLowerCase());
+        }
+      });
+    });
+  }
+
+  // Pattern 2: Capitalized sequences (2+ words starting with capitals)
+  const capitalizedMatches = headline.match(/\b[A-Z][a-z]+(?: [A-Z][a-z]+)+\b/g);
+  if (capitalizedMatches) {
+    capitalizedMatches.forEach(match => {
+      // Filter out common non-name phrases
+      const blacklist = ['Home Invasion', 'Port Of Spain', 'San Juan', 'Penal Rock Road', 'Grand Bazaar', 'New Grant'];
+      if (!blacklist.includes(match) && match.length > 5) {
+        names.push(match.toLowerCase());
+      }
+    });
+  }
+
+  return names;
+}
+
+// ============================================================================
+// BACKLOG MONITORING
+// ============================================================================
+
+/**
+ * Check backlog status and send email if queue is too large
+ * Can be called by a daily trigger to monitor processing health
+ */
+function checkBacklogStatus() {
+  Logger.log('=== CHECKING BACKLOG STATUS ===');
+
+  const sheet = getActiveSheet(SHEET_NAMES.RAW_ARTICLES);
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow < 2) {
+    Logger.log('No articles in Raw Articles sheet');
+    return;
+  }
+
+  const dataRange = sheet.getRange(2, 1, lastRow - 1, 8);
+  const data = dataRange.getValues();
+
+  let readyCount = 0;
+  let processingCount = 0;
+  let failedCount = 0;
+  let needsReviewCount = 0;
+  let oldestReadyDate = null;
+
+  data.forEach(row => {
+    const timestamp = row[0];
+    const status = row[6];
+
+    if (status === 'ready_for_processing') {
+      readyCount++;
+      if (!oldestReadyDate || timestamp < oldestReadyDate) {
+        oldestReadyDate = timestamp;
+      }
+    } else if (status === 'processing') {
+      processingCount++;
+    } else if (status === 'failed') {
+      failedCount++;
+    } else if (status === 'needs_review') {
+      needsReviewCount++;
+    }
+  });
+
+  Logger.log(`Backlog Summary:`);
+  Logger.log(`  Ready for processing: ${readyCount}`);
+  Logger.log(`  Currently processing: ${processingCount}`);
+  Logger.log(`  Failed: ${failedCount}`);
+  Logger.log(`  Needs review: ${needsReviewCount}`);
+
+  // Alert if backlog is large
+  const BACKLOG_ALERT_THRESHOLD = 50;
+  if (readyCount > BACKLOG_ALERT_THRESHOLD) {
+    const oldestAge = oldestReadyDate ? Math.round((new Date() - new Date(oldestReadyDate)) / (1000 * 60 * 60)) : 'unknown';
+
+    const emailBody = `
+⚠️ Large Processing Backlog Detected
+
+Current Status:
+- Ready for processing: ${readyCount} articles
+- Oldest pending: ${oldestAge} hours old
+- Currently processing: ${processingCount}
+- Failed: ${failedCount}
+- Needs review: ${needsReviewCount}
+
+The backlog threshold is ${BACKLOG_ALERT_THRESHOLD} articles.
+
+Recommendations:
+1. Check if triggers are running on schedule
+2. Review failed articles for common errors
+3. Consider temporarily increasing MAX_ARTICLES_PER_RUN if all is well
+4. Check API quota usage (Gemini free tier: 60 req/min)
+
+View spreadsheet: ${SpreadsheetApp.getActiveSpreadsheet().getUrl()}
+    `.trim();
+
+    GmailApp.sendEmail(
+      NOTIFICATION_EMAIL,
+      `⚠️ Crime Hotspots - Large Backlog (${readyCount} articles pending)`,
+      emailBody
+    );
+
+    Logger.log('⚠️ Alert email sent - backlog exceeds threshold');
+  } else {
+    Logger.log('✅ Backlog is within normal range');
+  }
+
+  Logger.log('===========================');
 }
 
 // ============================================================================
