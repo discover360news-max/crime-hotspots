@@ -334,4 +334,55 @@ After 3 days of automated operation:
 - processor.gs
 - geminiClient.gs
 
-See SESSION-SUMMARY-2025-11-17.md for complete details.
+See docs/archive/SESSION-SUMMARY-2025-11-17.md for complete details.
+
+---
+
+## Latest Updates (Nov 22, 2025)
+
+### ✅ CSP Headers Fixed (Production Issue)
+**Issue:** Cloudflare Insights beacon blocked by Content Security Policy
+**Fix:** Added `https://static.cloudflareinsights.com` to CSP headers
+**Files Updated:**
+- index.html
+- about.html
+- report.html
+- headlines-trinidad-and-tobago.html
+- headlines-guyana.html
+
+**Impact:** Analytics now working correctly on live site
+
+### ✅ Report Form Turnstile Configuration
+**Issue:** Turnstile error 110200 on report form
+**Root Cause:** Domains not registered for Turnstile site key
+**Solution:** Add `localhost` and `crimehotspots.com` to Turnstile domains in Cloudflare dashboard
+
+**Backend:** `google-apps-script/reports-page-Code.gs` documented and ready
+**Keys:** Site key `0x4AAAAAAB_ThEy2ACY1KEYQ` + Secret key in backend
+
+### ✅ Critical Data Quality Fixes (8 Total)
+**All fixes documented in:** `docs/fixes-2025-11/CRITICAL-FIXES-COMPLETED-2025-11-21.md`
+
+1. **Guyana Geocoding Bug** - Fixed "Guyana and Tobago" → "Guyana"
+2. **Court Verdict Detection** - Flags crimes >30 days old for review
+3. **Date Format Validation** - Auto-fallback to publication date
+4. **Geocoding API Key Separation** - Optional separate Maps API key
+5. **LockService Race Conditions** - Thread-safe duplicate detection
+6. **Plus Code Simplification** - Removed broken generator, use Google's only
+7. **Cross-Country Contamination** - Tobago = Trinidad, exclude other islands
+8. **Coordinate-Based Duplicates** - ±11m precision + 30% headline similarity
+
+**Files Modified:**
+- Trinidad: config.gs, geocoder.gs, processor.gs, geminiClient.gs
+- Guyana: config.gs, geocoder.gs, processor.gs, geminiClient.gs
+
+**Next Steps:**
+1. Deploy Google Apps Script updates to both countries
+2. Monitor Production sheets for 1 day
+3. Verify 99% accuracy achieved
+4. Proceed with Barbados automation
+
+---
+
+**Last Updated:** November 22, 2025
+**Status:** ✅ All critical fixes complete, CSP errors resolved, ready for deployment
