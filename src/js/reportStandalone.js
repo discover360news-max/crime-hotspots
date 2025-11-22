@@ -5,7 +5,7 @@ import { COUNTRIES } from "./data/countries.js";
 
 // === CRITICAL: REPLACE THIS URL ===
 // Use the deployed URL from your Google Apps Script, NOT the placeholder.
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFurArmdomUu2aFVBBumCqAmVYF-M-toquSY9KfUJ9QPhN_vgyG3uDu4yjy_aePnZB/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysi5VEpdS2nL9Ci9BWTn0ydXWA_IdR7j_3MR_EW5uK92N62xbt5OB0sKu2wMLGhkb7/exec";
 // ===================================
 
 const countrySelect = document.getElementById("reportCountry");
