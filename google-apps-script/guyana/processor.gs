@@ -101,13 +101,34 @@ function processReadyArticles() {
                 return; // Skip this crime
               }
 
+              // ← NEW: Validate crime date isn't too old (catches court verdicts about historical crimes)
+              if (crime.crime_date && publishedDate) {
+                try {
+                  const crimeDate = new Date(crime.crime_date);
+                  const pubDate = new Date(publishedDate);
+                  const daysDiff = Math.round((pubDate - crimeDate) / (1000 * 60 * 60 * 24));
+
+                  if (daysDiff > 30) {
+                    Logger.log(`    ⚠️ Crime date is ${daysDiff} days old - likely court verdict or historical reference`);
+                    // Force to review queue with low confidence
+                    if (extracted.confidence >= PROCESSING_CONFIG.CONFIDENCE_THRESHOLD) {
+                      extracted.confidence = 5; // Override to force review
+                    }
+                    if (!extracted.ambiguities) extracted.ambiguities = [];
+                    extracted.ambiguities.push(`Crime date (${crime.crime_date}) is ${daysDiff} days before publication - verify this is a new crime report, not court verdict`);
+                  }
+                } catch (e) {
+                  Logger.log(`    ⚠️ Error validating date: ${e.message}`);
+                }
+              }
+
               // Use overall confidence for routing decision
               if (extracted.confidence >= PROCESSING_CONFIG.CONFIDENCE_THRESHOLD) {
-                appendToProduction(crime);
+                appendToProduction(crime, publishedDate);
                 highConfCrimes++;
                 Logger.log(`    ✅ Added to Production`);
               } else if (extracted.confidence > 0) {
-                appendToReviewQueue(crime, extracted.confidence,extracted.ambiguities);
+                appendToReviewQueue(crime, extracted.confidence,extracted.ambiguities, publishedDate);
                 lowConfCrimes++;
                 Logger.log(`    ⚠️ Added to Review Queue`);
               }
@@ -162,55 +183,109 @@ function processReadyArticles() {
   }
 
 // ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+/**
+ * Validate and format date string
+ * @param {string} dateStr - Date string from Gemini
+ * @param {Date} fallbackDate - Fallback date if invalid
+ * @returns {string} Valid date string in YYYY-MM-DD format
+ */
+function validateAndFormatDate(dateStr, fallbackDate) {
+  if (!dateStr) {
+    Logger.log(`⚠️ No date provided, using fallback: ${fallbackDate}`);
+    return Utilities.formatDate(fallbackDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  }
+
+  try {
+    const parsed = new Date(dateStr);
+    if (isNaN(parsed.getTime())) {
+      Logger.log(`⚠️ Invalid date format: "${dateStr}", using fallback`);
+      return Utilities.formatDate(fallbackDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    }
+    return Utilities.formatDate(parsed, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  } catch (e) {
+    Logger.log(`⚠️ Error parsing date "${dateStr}": ${e.message}, using fallback`);
+    return Utilities.formatDate(fallbackDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  }
+}
+
+// ============================================================================
 // PRODUCTION SHEET FUNCTIONS
 // ============================================================================
 
 /**
    * Append extracted data to production sheet
-   * @param {Object} extracted - Crime data from Gemini
+   * @param {Object} crime - Crime data from Gemini
+   * @param {Date} publishedDate - Article publication date (fallback)
    */
-  function appendToProduction(crime) {
-    const prodSheet = getActiveSheet(SHEET_NAMES.PRODUCTION);
+  function appendToProduction(crime, publishedDate) {
+    // Acquire lock to prevent race conditions when multiple processes run simultaneously
+    const lock = LockService.getScriptLock();
 
-    // Check for duplicate before appending
-    if (isDuplicateCrime(prodSheet, crime)) {
-      Logger.log(`⚠️ Duplicate detected, skipping: ${crime.headline}`);
-      return;
-    }
+    try {
+      // Wait up to 30 seconds for lock
+      lock.waitLock(30000);
 
-    const fullAddress = `${crime.street || ''}, ${crime.area || ''}, Guyana and Tobago`;
-    const geocoded = geocodeAddress(fullAddress);
+      const prodSheet = getActiveSheet(SHEET_NAMES.PRODUCTION);
 
-    prodSheet.appendRow([
-      crime.crime_date || '',
-      crime.headline || 'No headline',
-      crime.crime_type || 'Other',
-      crime.street || '',
-      geocoded.plus_code || '',
-      crime.area || '',
-      'Guyana',
-      crime.source_url || '',
-      geocoded.lat || '',
-      geocoded.lng || ''
-    ]);
+      // Geocode first (needed for coordinate-based duplicate detection)
+      const fullAddress = `${crime.street || ''}, ${crime.area || ''}, Guyana`;
+      const geocoded = geocodeAddress(fullAddress);
 
-    Logger.log(`✅ Added to production: ${crime.headline} 
+      // Check for duplicate (now with geocoded coordinates available)
+      if (isDuplicateCrime(prodSheet, crime, geocoded)) {
+        Logger.log(`⚠️ Duplicate detected, skipping: ${crime.headline}`);
+        return;
+      }
+
+      // Validate and format crime date
+      const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
+
+      prodSheet.appendRow([
+        validatedDate,
+        crime.headline || 'No headline',
+        crime.crime_type || 'Other',
+        crime.street || '',
+        geocoded.plus_code || '',
+        crime.area || '',
+        'Guyana',
+        crime.source_url || '',
+        geocoded.lat || '',
+        geocoded.lng || ''
+      ]);
+
+      Logger.log(`✅ Added to production: ${crime.headline}
   [${geocoded.plus_code || 'No Plus Code'}]`);
+
+    } catch (e) {
+      Logger.log(`❌ Could not acquire lock or append failed: ${e.message}`);
+      throw e;
+    } finally {
+      // Always release lock
+      lock.releaseLock();
+    }
   }
 
 /**
    * Append to review queue for manual verification
-   * @param {Object} extracted - Crime data from Gemini
+   * @param {Object} crime - Crime data from Gemini
+   * @param {number} confidence - Confidence score
+   * @param {Array} ambiguities - Array of ambiguity strings
+   * @param {Date} publishedDate - Article publication date (fallback)
    */
-  function appendToReviewQueue(crime, confidence, ambiguities) {
+  function appendToReviewQueue(crime, confidence, ambiguities, publishedDate) {
     const reviewSheet = getActiveSheet(SHEET_NAMES.REVIEW_QUEUE);
 
-    const fullAddress = `${crime.street || ''}, ${crime.area || ''}, 
-  Guyana and Tobago`;
+    const fullAddress = `${crime.street || ''}, ${crime.area || ''}, Guyana`;
     const geocoded = geocodeAddress(fullAddress);
 
+    // Validate and format crime date
+    const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
+
     reviewSheet.appendRow([
-      crime.crime_date || '',
+      validatedDate,
       crime.headline || 'Needs headline',
       crime.crime_type || 'Unknown',
       crime.street || '',
@@ -264,9 +339,10 @@ function normalizeUrl(url) {
  * Check for duplicate crimes (enhanced fuzzy matching with victim/location)
  * @param {Sheet} sheet - Production or review sheet
  * @param {Object} crime - Crime data to check
+ * @param {Object} geocoded - Geocoded coordinates {lat, lng, plus_code, formatted_address}
  * @returns {boolean} True if duplicate found
  */
-function isDuplicateCrime(sheet, crime) {
+function isDuplicateCrime(sheet, crime, geocoded) {
     const lastRow = sheet.getLastRow();
 
     if (lastRow < 2) {
@@ -287,6 +363,37 @@ function isDuplicateCrime(sheet, crime) {
       const existingCrimeType = row[2];
       const existingArea = row[5];
       const existingUrl = row[7];
+      const existingLat = row[8];
+      const existingLng = row[9];
+
+      // ═══════════════════════════════════════════════════════════
+      // PRE-CHECK: Same exact coordinates + same date + same crime type + some headline similarity
+      // Very strong signal - different news sources reporting same incident at exact location
+      // Catches cross-source duplicates where headlines are very different
+      // Requires minimal headline similarity to avoid false positives from generic city-center coordinates
+      // ═══════════════════════════════════════════════════════════
+      if (existingDate && crime.crime_date && existingLat && existingLng && geocoded && geocoded.lat && geocoded.lng) {
+        const existingDateStr = Utilities.formatDate(new Date(existingDate), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+
+        if (existingDateStr === crime.crime_date && existingCrimeType === crime.crime_type) {
+          // Compare coordinates (round to 4 decimal places = ~11 meters precision)
+          const latMatch = Math.abs(existingLat - geocoded.lat) < 0.0001;
+          const lngMatch = Math.abs(existingLng - geocoded.lng) < 0.0001;
+
+          if (latMatch && lngMatch) {
+            // SAFETY CHECK: Require at least 30% headline similarity
+            // Prevents false positives when multiple crimes geocode to same city center
+            const similarity = calculateSimilarity(existingHeadline, crime.headline);
+
+            if (similarity > 0.30) {
+              Logger.log(`Duplicate found: Exact coordinates (${geocoded.lat}, ${geocoded.lng}) + same date + same crime type + ${(similarity * 100).toFixed(0)}% similar headline (cross-source duplicate)`);
+              return true;
+            } else {
+              Logger.log(`⚠️ Same coordinates but headlines too different (${(similarity * 100).toFixed(0)}% similarity) - likely different crimes at same general location`);
+            }
+          }
+        }
+      }
 
       // ═══════════════════════════════════════════════════════════
       // CHECK 1: Same URL + Same location + Same date/type (same incident re-extracted)

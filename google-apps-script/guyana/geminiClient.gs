@@ -258,9 +258,11 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
        * "Sheriff Street" → street: "Sheriff Street", area: "Campbellville"
 
   7. LOCATION FILTER: Set "location_country" for each crime
-     - If crime happened in Venezuela/Suriname/etc, mark it
-     - Only Guyana crimes should be extracted
-     - If unclear, mark as "Guyana" but lower confidence
+     - ✅ INCLUDE: Crimes in Guyana (Georgetown, Berbice, Essequibo, Demerara, etc.)
+     - ❌ EXCLUDE: Crimes in Trinidad, Tobago, Barbados, Jamaica, other Caribbean islands → mark as "Other"
+     - ❌ EXCLUDE: Crimes in Venezuela, Suriname, Brazil → mark as "Venezuela", "Suriname", "Other"
+     - If article is from Trinidad Express / CNC3 / Newsday → very likely NOT Guyana
+     - Only mark as "Guyana" if you're confident the crime occurred in Guyana
 
   8. MULTI-CRIME INCIDENTS: Handle overlapping crimes correctly
      - Home Invasion + Robbery = ONE "Home Invasion" (robbery is implied)

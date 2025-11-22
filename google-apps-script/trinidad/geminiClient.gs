@@ -258,9 +258,11 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
        * "Queen's Park Savannah" → street: "Queen's Park Savannah", area: "Port of Spain"
 
   7. LOCATION FILTER: Set "location_country" for each crime
-     - If crime happened in Venezuela/Guyana/etc, mark it
-     - Only Trinidad crimes should be extracted
-     - If unclear, mark as "Trinidad" but lower confidence
+     - ✅ INCLUDE: Crimes in Trinidad (Port of Spain, San Fernando, Arima, etc.)
+     - ✅ INCLUDE: Crimes in Tobago (Scarborough, Crown Point, etc.) → mark as "Trinidad" (Tobago is part of Trinidad & Tobago)
+     - ❌ EXCLUDE: Crimes in Guyana, Venezuela, Barbados, Jamaica, other countries → mark as "Other"
+     - If article is from Demerara Waves / INews Guyana → very likely NOT Trinidad
+     - Only mark as "Trinidad" if crime occurred in Trinidad or Tobago islands
 
   8. MULTI-CRIME INCIDENTS: Handle overlapping crimes correctly
      - Home Invasion + Robbery = ONE "Home Invasion" (robbery is implied)

@@ -298,3 +298,40 @@ After 3 days of automated operation:
 **Version:** 2.0 (2026 Ready)
 **Status:** ✅ Ready for Deployment
 **Next Milestone:** 3-Day Review (November 19, 2025)
+
+---
+
+## Latest Updates (Nov 17, 2025)
+
+### Timeout Prevention
+- Reduced MAX_ARTICLES_PER_RUN: 15 → 10
+- Added MAX_EXECUTION_TIME_MS: 300000 (5 minutes)
+- Execution time monitoring with graceful early exit
+
+### Enhanced Duplicate Detection (6 Layers)
+**CHECK 1:** Smart URL + Location + Date matching
+- Same URL + Same Area + Same Date → BLOCK
+- Same URL + Same Area + Different Dates → ALLOW
+- Same URL + Different Areas → ALLOW
+
+**CHECK 2:** Victim name extraction and matching
+
+**CHECK 3-6:** Additional cross-source detection layers
+
+### Multi-Victim Murder Splitting
+- Double murder = 2 separate Murder entries
+- Triple murder = 3 separate Murder entries
+- Ensures accurate murder statistics
+
+### Files Ready for Deployment
+**Trinidad:**
+- config.gs
+- processor.gs  
+- geminiClient.gs
+
+**Guyana:**
+- GUYANA-ONLY-config.gs
+- processor.gs
+- geminiClient.gs
+
+See SESSION-SUMMARY-2025-11-17.md for complete details.

@@ -7,7 +7,7 @@
   /**
    * Geocode an address to Plus Code, lat/lng
    * @param {string} address - Full address to geocode
-   * @returns {Object} Geocoding result with Plus Code
+   * @returns {Object} Geocoding result with Plus Code (if provided by Google)
    */
   function geocodeAddress(address) {
     // Validate input
@@ -33,7 +33,7 @@
     }
 
     // Call Geocoding API
-    const apiKey = getGeminiApiKey(); // Same API key works for all Google APIs
+    const apiKey = getGeocodingApiKey(); // Uses separate geocoding key if set, otherwise falls back to Gemini key
     const endpoint = 'https://maps.googleapis.com/maps/api/geocode/json';
     const url =`${endpoint}?address=${encodeURIComponent(address)}&key=${apiKey}`;
 
@@ -44,7 +44,7 @@
       if (data.status === 'OK' && data.results.length > 0) {
         const result = data.results[0];
 
-        // Extract Plus Code (preferred for Looker Studio)
+        // Extract Plus Code from Google's API (if provided)
         const plusCode = result.plus_code
           ? result.plus_code.global_code || result.plus_code.compound_code
           : null;
@@ -56,7 +56,7 @@
           formatted_address: result.formatted_address
         };
 
-        Logger.log(`✓ Geocoded: ${plusCode || 'No Plus Code'}`);
+        Logger.log(`✓ Geocoded: ${plusCode || 'No Plus Code (use lat/lng)'}`);
 
         // Cache for 30 days
         cache.put(cacheKey, JSON.stringify(geocoded), 2592000);
@@ -109,6 +109,23 @@
    */
   function clearGeocodingCache() {
     const cache = CacheService.getScriptCache();
-    cache.removeAll(['geo_']);
-    Logger.log('✓ Geocoding cache cleared');
+
+    // List of test addresses to clear
+    const testAddresses = [
+      'San Pedro Road, Pool Village, Rio Claro, Trinidad and Tobago',
+      'Queen Street, Port of Spain, Trinidad and Tobago',
+      'San Fernando, Trinidad and Tobago',
+      'Arima, Trinidad and Tobago'
+    ];
+
+    // Generate cache keys for each address
+    const keysToRemove = testAddresses.map(address =>
+      'geo_' + address.toLowerCase().replace(/\s+/g, '_').substring(0, 100)
+    );
+
+    // Remove all test address cache entries
+    cache.removeAll(keysToRemove);
+
+    Logger.log(`✓ Geocoding cache cleared for ${keysToRemove.length} test addresses`);
+    Logger.log(`Keys removed: ${keysToRemove.join(', ')}`);
   }

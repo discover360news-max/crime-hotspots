@@ -41,7 +41,14 @@
       "Bash(gh run list:*)",
       "Bash(gh run:*)",
       "Bash(open \"http://localhost:5173/blog-post.html?slug=trinidad-weekly-2025-11-10\")",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(\"/Users/kavellforde/Documents/Side Projects/Crime Hotspots/google-apps-script/guyana/geminiClient.gs\")",
+      "Bash(\"/Users/kavellforde/Documents/Side Projects/Crime Hotspots/google-apps-script/guyana/processor.gs\")",
+      "Bash(open http://localhost:5173/)",
+      "Bash(open http://localhost:5173/blog-post.html)",
+      "Bash(open http://localhost:5173/blog.html)",
+      "Bash(open \"http://localhost:5173/assets/images/report-hero.svg\")",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

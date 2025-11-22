@@ -38,6 +38,40 @@ function setGeminiApiKey() {
 }
 
 /**
+ * Get Geocoding API key (Maps API)
+ * Falls back to Gemini key if separate geocoding key not set
+ * @returns {string|null} API key or null if not set
+ */
+function getGeocodingApiKey() {
+  // Try geocoding-specific key first
+  const geocodingKey = PropertiesService.getScriptProperties().getProperty('GEOCODING_API_KEY');
+  if (geocodingKey) {
+    return geocodingKey;
+  }
+
+  // Fallback to Gemini key (works if Maps API is enabled for same key)
+  return getGeminiApiKey();
+}
+
+/**
+ * Set separate Geocoding API key (optional - run only if using different key)
+ * If not set, geocoding will use Gemini API key (which must have Maps API enabled)
+ *
+ * SECURITY WARNING: Never commit actual API keys to version control
+ */
+function setGeocodingApiKey() {
+  const apiKey = 'YOUR_GEOCODING_API_KEY_HERE'; // REPLACE THIS WITH YOUR ACTUAL KEY
+
+  if (apiKey === 'YOUR_GEOCODING_API_KEY_HERE') {
+    Logger.log('❌ ERROR: You must replace YOUR_GEOCODING_API_KEY_HERE with your actual API key');
+    throw new Error('Geocoding API key not configured');
+  }
+
+  PropertiesService.getScriptProperties().setProperty('GEOCODING_API_KEY', apiKey);
+  Logger.log('✅ Geocoding API key saved securely to Script Properties');
+}
+
+/**
  * Verify API key is set (utility function for debugging)
  */
 function verifyApiKey() {
