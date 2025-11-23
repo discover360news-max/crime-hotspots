@@ -87,6 +87,13 @@ function sendCrimeReportEmail(data) {
 // === SAVE TO GOOGLE SHEET ===
 function saveToSheet(data) {
   try {
+    if (!data) {
+      Logger.log('Error: data is undefined');
+      return;
+    }
+
+    Logger.log('Attempting to save report: ' + JSON.stringify(data));
+
     const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
 
     if (!sheet) {
@@ -98,20 +105,21 @@ function saveToSheet(data) {
 
     sheet.appendRow([
       timestamp,
-      data.id,
-      data.date,
-      data.crimeType,
-      data.countryName,
+      data.id || 'N/A',
+      data.date || 'N/A',
+      data.crimeType || 'N/A',
+      data.countryName || 'N/A',
       data.area || '',
       data.street || '',
-      data.headline,
-      data.details,
+      data.headline || 'N/A',
+      data.details || 'N/A',
       data.ua || 'Unknown'
     ]);
 
     Logger.log('Report saved to sheet: ' + data.id);
   } catch (error) {
     Logger.log('Error saving to sheet: ' + error.toString());
+    Logger.log('Stack trace: ' + error.stack);
   }
 }
 
