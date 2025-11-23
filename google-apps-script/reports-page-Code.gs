@@ -1,9 +1,11 @@
-// Crime Hotspots - Email Submission Handler
+// Crime Hotspots - Email Submission Handler + Google Sheets Storage
 // IMPORTANT: Deploy with "Who has access: Anyone" for CORS to work
 
 // === CONFIGURATION ===
 const RECIPIENT_EMAIL = "discover360news@gmail.com";
 const TURNSTILE_SECRET = "0x4AAAAAAB_ThJuP2rMpgWbkkvhEbLPN8Ms";
+const SHEET_ID = "YOUR_SHEET_ID_HERE"; // Replace with your Google Sheet ID
+const SHEET_NAME = "Reports"; // Name of the sheet tab
 
 // === HANDLE ALL REQUESTS ===
 function doPost(e) {
@@ -49,6 +51,7 @@ function handleRequest(e) {
     }
 
     sendCrimeReportEmail(payload);
+    saveToSheet(payload);
 
     return createResponse({
       success: true,
@@ -79,6 +82,37 @@ function sendCrimeReportEmail(data) {
     body: textBody,
     htmlBody: htmlBody
   });
+}
+
+// === SAVE TO GOOGLE SHEET ===
+function saveToSheet(data) {
+  try {
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName(SHEET_NAME);
+
+    if (!sheet) {
+      Logger.log('Sheet not found: ' + SHEET_NAME);
+      return;
+    }
+
+    const timestamp = new Date();
+
+    sheet.appendRow([
+      timestamp,
+      data.id,
+      data.date,
+      data.crimeType,
+      data.countryName,
+      data.area || '',
+      data.street || '',
+      data.headline,
+      data.details,
+      data.ua || 'Unknown'
+    ]);
+
+    Logger.log('Report saved to sheet: ' + data.id);
+  } catch (error) {
+    Logger.log('Error saving to sheet: ' + error.toString());
+  }
 }
 
 // === VALIDATE TURNSTILE ===
