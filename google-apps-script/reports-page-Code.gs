@@ -60,10 +60,13 @@ function handleRequest(e) {
     });
 
   } catch (error) {
-    Logger.log('Error: ' + error.toString());
+    Logger.log('ERROR in handleRequest: ' + error.toString());
+    Logger.log('Error stack: ' + error.stack);
+    Logger.log('Error name: ' + error.name);
+    Logger.log('Error message: ' + error.message);
     return createResponse({
       success: false,
-      message: 'Submission failed. Please try again.'
+      message: 'Submission failed. ' + error.message
     }, 500);
   }
 }
