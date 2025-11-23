@@ -4,7 +4,7 @@
 // === CONFIGURATION ===
 const RECIPIENT_EMAIL = "discover360news@gmail.com";
 const TURNSTILE_SECRET = "0x4AAAAAAB_ThJuP2rMpgWbkkvhEbLPN8Ms";
-const SHEET_ID = "YOUR_SHEET_ID_HERE"; // Replace with your Google Sheet ID
+const SHEET_ID = "1MLWKHu5TJoWp2_IzdHdH6eZxROglEQ8t0G9qo-kQei4"; // Replace with your Google Sheet ID
 const SHEET_NAME = "Reports"; // Name of the sheet tab
 
 // === HANDLE ALL REQUESTS ===
