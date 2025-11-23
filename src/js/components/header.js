@@ -29,24 +29,42 @@ export function renderHeader(activeOverride = '') {
             <img src="./assets/images/logo.png" alt="Crime Hotspots logo" class="h-16 w-auto" />
           </a>
 
-          <button id="menuToggle"
-                  class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-slate-700 hover:text-rose-600 focus:outline-none focus:ring-2 focus:ring-rose-300"
-                  aria-controls="mainNav"
-                  aria-expanded="false">
-            <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-
+          <!-- Mobile icons + hamburger menu (right side) -->
+          <div class="flex md:hidden items-center gap-3 ml-auto">
+            <a href="report.html"
+               class="p-2 rounded-full text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-all"
+               aria-label="Report a Crime"
+               title="Report a Crime">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </a>
+            <a href="blog.html"
+               class="p-2 rounded-full text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-all"
+               aria-label="Blog"
+               title="Blog">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+            </a>
+            <button id="menuToggle"
+                    class="inline-flex items-center justify-center p-2 rounded-md text-slate-700 hover:bg-slate-100 active:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-300 transition-all"
+                    aria-controls="mainNav"
+                    aria-expanded="false">
+              <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none"
+                  viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
 
           <nav id="mainNav"
-                class="relative z-50 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6
-                        bg-white md:bg-transparent absolute md:static left-4 right-4 top-16 md:top-auto
+                class="relative z-50 hidden md:flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6
+                        bg-white md:bg-transparent absolute md:static left-auto right-4 top-16 md:top-auto
                         border border-slate-200 md:border-0 rounded-lg md:rounded-none shadow-lg md:shadow-none
-                        p-4 md:p-0
-                        max-h-0 md:max-h-none overflow-visible // NOTE: Overflow is visible by default in HTML
+                        px-5 py-4 pb-6 md:p-0
+                        max-h-0 md:max-h-none overflow-visible
                         opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto
                         transition-[max-height,opacity] duration-200 ease-in-out"
                 role="navigation"
@@ -137,10 +155,11 @@ export function renderHeader(activeOverride = '') {
 
   if (menuToggle && mainNav) {
     function openNav() {
+      mainNav.classList.remove('hidden');
+      mainNav.classList.add('flex');
       // compute natural height
       mainNav.style.maxHeight = mainNav.scrollHeight + 'px';
-      // REMOVED: overflow-hidden to allow sub-menus to escape
-      mainNav.classList.remove('opacity-0', 'pointer-events-none', 'overflow-hidden'); 
+      mainNav.classList.remove('opacity-0', 'pointer-events-none', 'overflow-hidden');
       mainNav.classList.add('opacity-100');
       menuToggle.setAttribute('aria-expanded', 'true');
     }
@@ -149,19 +168,25 @@ export function renderHeader(activeOverride = '') {
       // collapse
       mainNav.style.maxHeight = '0px';
       mainNav.classList.remove('opacity-100');
-      // ADDED: overflow-hidden to ensure no content is visible when max-height is 0
       mainNav.classList.add('opacity-0', 'pointer-events-none', 'overflow-hidden');
       menuToggle.setAttribute('aria-expanded', 'false');
+      // Hide after animation completes
+      setTimeout(() => {
+        if (menuToggle.getAttribute('aria-expanded') === 'false') {
+          mainNav.classList.add('hidden');
+          mainNav.classList.remove('flex');
+        }
+      }, 200);
     }
 
     // Initialize based on screen width
     if (window.innerWidth < 768) {
-      closeNav(); // collapsed on mobile
+      // Already hidden by default on mobile
+      menuToggle.setAttribute('aria-expanded', 'false');
     } else {
       // visible on desktop
       mainNav.style.maxHeight = 'none';
-      // Removed overflow-hidden for desktop
-      mainNav.classList.remove('opacity-0', 'pointer-events-none', 'overflow-hidden'); 
+      mainNav.classList.remove('opacity-0', 'pointer-events-none', 'overflow-hidden', 'hidden');
       mainNav.classList.add('opacity-100');
     }
 
@@ -191,16 +216,15 @@ export function renderHeader(activeOverride = '') {
     window.addEventListener('resize', () => {
       if (window.innerWidth >= 768) {
         mainNav.style.maxHeight = null;
-        // Removed overflow-hidden for desktop
-        mainNav.classList.remove('opacity-0', 'pointer-events-none', 'overflow-hidden'); 
+        mainNav.classList.remove('opacity-0', 'pointer-events-none', 'overflow-hidden', 'hidden');
         mainNav.classList.add('opacity-100');
         menuToggle.setAttribute('aria-expanded', 'false');
       } else {
         // ensure collapsed when moving to small screens
         if (menuToggle.getAttribute('aria-expanded') !== 'true') {
           mainNav.style.maxHeight = '0px';
-          // Added overflow-hidden for mobile
-          mainNav.classList.add('opacity-0', 'pointer-events-none', 'overflow-hidden'); 
+          mainNav.classList.add('opacity-0', 'pointer-events-none', 'overflow-hidden', 'hidden');
+          mainNav.classList.remove('flex');
         }
       }
     });

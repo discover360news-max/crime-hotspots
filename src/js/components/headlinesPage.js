@@ -117,7 +117,7 @@ export function initHeadlinesPage(csvUrl) {
   // get current page slug
   function pageHeadlineSlug() {
     const path = window.location.pathname.split("/").pop() || "";
-    const match = path.match(/^headlines-(.+)\.html$/i);
+    const match = path.match(/^headlines-(.+?)(?:\.html)?$/i);
     return match ? match[1].toLowerCase() : null;
   }
 
