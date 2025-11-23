@@ -363,8 +363,9 @@ async function handleSubmit(e) {
     }
 
   } catch (err) {
+    console.error('Submission error:', err);
     resultBox.classList.remove("hidden");
-    resultBox.textContent = "❌ Submission failed. Please try again.";
+    resultBox.textContent = "❌ Submission failed. " + err.message;
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = "Submit";
