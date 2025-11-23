@@ -26,7 +26,7 @@ export function renderHeader(activeOverride = '') {
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
           <a href="index.html" class="flex items-center" data-nav="home">
-            <img src="./assets/images/logo.png" alt="Crime Hotspots logo" class="h-16 w-auto" />
+            <img src="./assets/images/logo.png" alt="Crime Hotspots logo" class="h-12 md:h-16 w-auto" />
           </a>
 
           <!-- Mobile icons + hamburger menu (right side) -->
@@ -59,16 +59,8 @@ export function renderHeader(activeOverride = '') {
             </button>
           </div>
 
-          <nav id="mainNav"
-                class="relative z-50 hidden md:flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6
-                        bg-white md:bg-transparent absolute md:static left-auto right-4 top-16 md:top-auto
-                        border border-slate-200 md:border-0 rounded-lg md:rounded-none shadow-lg md:shadow-none
-                        px-5 py-4 pb-6 md:p-0
-                        max-h-0 md:max-h-none overflow-visible
-                        opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto
-                        transition-[max-height,opacity] duration-200 ease-in-out"
-                role="navigation"
-                aria-label="Primary">
+          <!-- Desktop nav -->
+          <nav id="mainNav" class="hidden md:flex items-center gap-6" role="navigation" aria-label="Primary">
 
             <div class="relative group" data-nav="headlines">
               <button id="navHeadlinesBtn"
@@ -101,12 +93,53 @@ export function renderHeader(activeOverride = '') {
         </div>
       </div>
     </header>
+
+    <!-- Mobile menu backdrop -->
+    <div id="mobileMenuBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
+
+    <!-- Mobile menu overlay -->
+    <nav id="mobileNav" class="fixed top-0 right-0 bottom-0 w-72 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out md:hidden overflow-y-auto" role="navigation" aria-label="Mobile menu">
+      <div class="p-6 space-y-6">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-lg font-semibold text-slate-800">Menu</h2>
+          <button id="mobileMenuClose" class="p-2 rounded-full text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-all" aria-label="Close menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <div data-nav="headlines">
+            <button id="mobileHeadlinesBtn" class="w-full text-left text-base text-slate-700 hover:text-rose-600 font-medium flex items-center justify-between py-3 border-b border-slate-200" aria-haspopup="true" aria-expanded="false">
+              View Headlines
+              <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div id="mobileHeadlinesMenu" class="hidden mt-2 ml-4 space-y-2">
+              ${dropdownItems.replace(/block px-4 py-2 text-sm/g, 'block py-2 text-sm')}
+            </div>
+          </div>
+
+          <a href="blog.html" data-nav="blog" class="block text-base text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">Blog</a>
+
+          <a href="report.html" class="block w-full text-center px-4 py-3 rounded-full bg-rose-600 text-white hover:bg-rose-700 transition font-medium">Report a Crime</a>
+
+          <a href="about.html" data-nav="about" class="block text-base text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">About</a>
+        </div>
+      </div>
+    </nav>
   `;
 
-  // Inject header
-  const container = document.createElement('div');
-  container.innerHTML = headerHTML.trim();
-  document.body.prepend(container.firstChild);
+  // Inject header and mobile menu
+  const tempContainer = document.createElement('div');
+  tempContainer.innerHTML = headerHTML.trim();
+
+  // Insert all elements (header, backdrop, mobile nav)
+  while (tempContainer.firstChild) {
+    document.body.prepend(tempContainer.lastChild);
+  }
 
   // ---------- Auto-active highlight (unchanged) ----------
   const path = window.location.pathname.split('/').pop() || 'index.html';
@@ -120,8 +153,8 @@ export function renderHeader(activeOverride = '') {
     else if (path === 'blog.html' || path === 'blog-post.html') active = 'blog';
   }
 
-  // Highlight nav section
-  const navLinks = document.querySelectorAll('header [data-nav]');
+  // Highlight nav section (desktop and mobile)
+  const navLinks = document.querySelectorAll('header [data-nav], #mobileNav [data-nav]');
   navLinks.forEach(el => {
     if (el.dataset.nav === active) {
       el.classList.add('text-rose-600', 'font-semibold');
@@ -137,7 +170,7 @@ export function renderHeader(activeOverride = '') {
     const match = path.match(/^headlines-([a-z0-9-]+)\.html$/i);
     if (match) {
       const islandSlug = match[1];
-      const items = document.querySelectorAll('#navHeadlinesMenu a[data-island]');
+      const items = document.querySelectorAll('#navHeadlinesMenu a[data-island], #mobileHeadlinesMenu a[data-island]');
       items.forEach(a => {
         if (a.dataset.island === islandSlug) {
           a.classList.add('text-rose-600', 'font-semibold');
@@ -146,96 +179,93 @@ export function renderHeader(activeOverride = '') {
       });
       const btn = document.getElementById('navHeadlinesBtn');
       if (btn) btn.classList.add('text-rose-600', 'font-semibold');
+      const mobileBtn = document.getElementById('mobileHeadlinesBtn');
+      if (mobileBtn) mobileBtn.classList.add('text-rose-600', 'font-semibold');
     }
   }
 
-  // ---------- Mobile toggle (improved for animated open/close) ----------
+  // ---------- Mobile overlay menu ----------
   const menuToggle = document.getElementById('menuToggle');
-  const mainNav = document.getElementById('mainNav');
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileBackdrop = document.getElementById('mobileMenuBackdrop');
+  const mobileMenuClose = document.getElementById('mobileMenuClose');
 
-  if (menuToggle && mainNav) {
-    function openNav() {
-      mainNav.classList.remove('hidden');
-      mainNav.classList.add('flex');
-      // compute natural height
-      mainNav.style.maxHeight = mainNav.scrollHeight + 'px';
-      mainNav.classList.remove('opacity-0', 'pointer-events-none', 'overflow-hidden');
-      mainNav.classList.add('opacity-100');
-      menuToggle.setAttribute('aria-expanded', 'true');
-    }
+  function openMobileMenu() {
+    mobileBackdrop.classList.remove('hidden');
+    mobileNav.classList.remove('translate-x-full');
+    mobileNav.classList.add('translate-x-0');
+    document.body.style.overflow = 'hidden';
 
-    function closeNav() {
-      // collapse
-      mainNav.style.maxHeight = '0px';
-      mainNav.classList.remove('opacity-100');
-      mainNav.classList.add('opacity-0', 'pointer-events-none', 'overflow-hidden');
-      menuToggle.setAttribute('aria-expanded', 'false');
-      // Hide after animation completes
-      setTimeout(() => {
-        if (menuToggle.getAttribute('aria-expanded') === 'false') {
-          mainNav.classList.add('hidden');
-          mainNav.classList.remove('flex');
-        }
-      }, 200);
-    }
+    requestAnimationFrame(() => {
+      mobileBackdrop.classList.remove('opacity-0');
+      mobileBackdrop.classList.add('opacity-100');
+    });
 
-    // Initialize based on screen width
-    if (window.innerWidth < 768) {
-      // Already hidden by default on mobile
-      menuToggle.setAttribute('aria-expanded', 'false');
-    } else {
-      // visible on desktop
-      mainNav.style.maxHeight = 'none';
-      mainNav.classList.remove('opacity-0', 'pointer-events-none', 'overflow-hidden', 'hidden');
-      mainNav.classList.add('opacity-100');
-    }
+    menuToggle.setAttribute('aria-expanded', 'true');
+  }
 
+  function closeMobileMenu() {
+    mobileNav.classList.remove('translate-x-0');
+    mobileNav.classList.add('translate-x-full');
+    mobileBackdrop.classList.remove('opacity-100');
+    mobileBackdrop.classList.add('opacity-0');
+    document.body.style.overflow = '';
+
+    setTimeout(() => {
+      mobileBackdrop.classList.add('hidden');
+    }, 300);
+
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  if (menuToggle && mobileNav) {
     menuToggle.addEventListener('click', (e) => {
       e.stopPropagation();
-      const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
-      if (expanded) closeNav();
-      else openNav();
+      const isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
+      if (isOpen) closeMobileMenu();
+      else openMobileMenu();
     });
 
-    // close if clicking outside header
-    document.addEventListener('click', (e) => {
-      const headerEl = document.querySelector('header');
-      if (!headerEl.contains(e.target) && menuToggle.getAttribute('aria-expanded') === 'true') {
-        closeNav();
-      }
-    });
+    if (mobileMenuClose) {
+      mobileMenuClose.addEventListener('click', closeMobileMenu);
+    }
 
-    // close on ESC
+    if (mobileBackdrop) {
+      mobileBackdrop.addEventListener('click', closeMobileMenu);
+    }
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') {
-        closeNav();
+        closeMobileMenu();
       }
     });
 
-    // when resizing to desktop, reset inline styles so desktop layout shows normally
-    window.addEventListener('resize', () => {
-      if (window.innerWidth >= 768) {
-        mainNav.style.maxHeight = null;
-        mainNav.classList.remove('opacity-0', 'pointer-events-none', 'overflow-hidden', 'hidden');
-        mainNav.classList.add('opacity-100');
-        menuToggle.setAttribute('aria-expanded', 'false');
-      } else {
-        // ensure collapsed when moving to small screens
-        if (menuToggle.getAttribute('aria-expanded') !== 'true') {
-          mainNav.style.maxHeight = '0px';
-          mainNav.classList.add('opacity-0', 'pointer-events-none', 'overflow-hidden', 'hidden');
-          mainNav.classList.remove('flex');
-        }
-      }
-    });
-
-    // Close menu when any nav link is clicked (mobile)
-    mainNav.querySelectorAll('a').forEach(link => {
+    // Close menu when links are clicked
+    mobileNav.querySelectorAll('a').forEach(link => {
       link.addEventListener('click', () => {
-        if (window.innerWidth < 768) closeNav();
+        closeMobileMenu();
       });
     });
+  }
 
+  // Mobile headlines dropdown
+  const mobileHeadlinesBtn = document.getElementById('mobileHeadlinesBtn');
+  const mobileHeadlinesMenu = document.getElementById('mobileHeadlinesMenu');
+
+  if (mobileHeadlinesBtn && mobileHeadlinesMenu) {
+    mobileHeadlinesBtn.addEventListener('click', () => {
+      const isExpanded = mobileHeadlinesBtn.getAttribute('aria-expanded') === 'true';
+
+      if (isExpanded) {
+        mobileHeadlinesMenu.classList.add('hidden');
+        mobileHeadlinesBtn.setAttribute('aria-expanded', 'false');
+        mobileHeadlinesBtn.querySelector('svg').classList.remove('rotate-180');
+      } else {
+        mobileHeadlinesMenu.classList.remove('hidden');
+        mobileHeadlinesBtn.setAttribute('aria-expanded', 'true');
+        mobileHeadlinesBtn.querySelector('svg').classList.add('rotate-180');
+      }
+    });
   }
 
   // ---------- Mobile dropdown tap behavior (unchanged) ----------
