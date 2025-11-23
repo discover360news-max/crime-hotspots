@@ -31,11 +31,21 @@ function handleRequest(e) {
     }
 
     const turnstileToken = payload['cf-token'];
-    if (turnstileToken) {
-      const turnstileValid = validateTurnstile(turnstileToken);
-      if (!turnstileValid) {
-        Logger.log('Turnstile validation failed');
-      }
+    if (!turnstileToken) {
+      Logger.log('No Turnstile token provided');
+      return createResponse({
+        success: false,
+        message: 'Security validation required. Please refresh the page.'
+      }, 400);
+    }
+
+    const turnstileValid = validateTurnstile(turnstileToken);
+    if (!turnstileValid) {
+      Logger.log('Turnstile validation failed');
+      return createResponse({
+        success: false,
+        message: 'Security check failed. Please try again.'
+      }, 403);
     }
 
     sendCrimeReportEmail(payload);
