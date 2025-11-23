@@ -36,6 +36,8 @@ export function initHeadlinesPage(csvUrl) {
   let currentList = null;
   let currentIndex = -1;
   let uniqueAreas = [];
+  let activeAreaFilter = null;
+  let activeCrimeFilter = null;
 
   // Retry logic state
   let retryCount = 0;
@@ -156,8 +158,8 @@ export function initHeadlinesPage(csvUrl) {
     card.className = "bg-white rounded-2xl shadow-md p-5 w-full text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1";
     card.setAttribute("data-index", indexInCurrentList);
 
-    const dateBadge = `<span class="text-xs bg-white/60 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm border border-white/30 text-slate-700">${formatDate(item.Date)}</span>`;
-    const crimeTag = `<span class="text-xs font-semibold text-rose-600 uppercase">${sanitizeText(item["Crime Type"]||"")}</span>`;
+    const dateBadge = `<span class="text-xs text-slate-500">${formatDate(item.Date)}</span>`;
+    const crimeTag = `<button class="text-xs font-semibold text-rose-600 hover:text-rose-700 uppercase hover:underline crimeLink" data-crime="${sanitizeAttr(item["Crime Type"]||'')}">${sanitizeText(item["Crime Type"]||"")}</button>`;
     const address = `<p class="text-xs text-slate-500 mb-2">${sanitizeText(item["Street Address"]||"")}</p>`;
     const areaBtn = `<button class="text-xs text-rose-600 hover:text-rose-700 underline areaLink" data-area="${sanitizeAttr(item.Area||'')}">${sanitizeText(item.Area||'')}</button>`;
     const headlineHtml = `<div class="mb-2 text-sm text-slate-900 line-clamp-2">${sanitizeText(item.Headline||'')}</div>`;
@@ -195,21 +197,56 @@ export function initHeadlinesPage(csvUrl) {
     if (visibleCount >= currentList.length) loadMoreBtn.classList.add("hidden"); else loadMoreBtn.classList.remove("hidden");
   }
 
-  // apply area filter
-  function applyAreaFilter(area) {
-    if (!area) {
+  // apply combined filters
+  function applyFilters() {
+    if (!activeAreaFilter && !activeCrimeFilter) {
       filteredList = null;
       visibleCount = 0;
       container.innerHTML = "";
       renderBatch();
       clearFilterBtn.classList.add("hidden");
+      updateFilterDisplay();
       return;
     }
-    filteredList = allHeadlines.filter(h => ((h.Area||"").toLowerCase() === (area||"").toLowerCase()));
+
+    filteredList = allHeadlines.filter(h => {
+      const areaMatch = !activeAreaFilter || (h.Area||"").toLowerCase() === activeAreaFilter.toLowerCase();
+      const crimeMatch = !activeCrimeFilter || (h["Crime Type"]||"").toLowerCase() === activeCrimeFilter.toLowerCase();
+      return areaMatch && crimeMatch;
+    });
+
     visibleCount = 0;
     container.innerHTML = "";
     renderBatch();
     clearFilterBtn.classList.remove("hidden");
+    updateFilterDisplay();
+  }
+
+  // update filter display
+  function updateFilterDisplay() {
+    const activeFilterBox = document.getElementById("activeFilterBox");
+    if (!activeFilterBox) return;
+
+    if (!activeAreaFilter && !activeCrimeFilter) {
+      activeFilterBox.classList.add("hidden");
+      if (clearFilterBtn) {
+        clearFilterBtn.textContent = "Clear filter";
+      }
+      return;
+    }
+
+    const filters = [];
+    if (activeAreaFilter) filters.push(`Area: <strong>${activeAreaFilter}</strong>`);
+    if (activeCrimeFilter) filters.push(`Crime: <strong>${activeCrimeFilter}</strong>`);
+
+    activeFilterBox.innerHTML = filters.join(" • ");
+    activeFilterBox.classList.remove("hidden");
+
+    // Update clear button text
+    if (clearFilterBtn) {
+      const filterCount = (activeAreaFilter ? 1 : 0) + (activeCrimeFilter ? 1 : 0);
+      clearFilterBtn.textContent = filterCount > 1 ? "Clear filters" : "Clear filter";
+    }
   }
 
   // URL validation
@@ -497,14 +534,21 @@ export function initHeadlinesPage(csvUrl) {
       const card = e.target.closest('[data-index]');
       if (card && card.hasAttribute('data-has-url')) {
         const areaLink = e.target.closest('.areaLink');
+        const crimeLink = e.target.closest('.crimeLink');
+
         if (areaLink) {
           e.stopPropagation();
           const area = areaLink.dataset.area;
-          applyAreaFilter(area);
+          activeAreaFilter = area;
           if (areaSelect) {
             areaSelect.value = area;
-            clearFilterBtn.classList.remove("hidden");
           }
+          applyFilters();
+        } else if (crimeLink) {
+          e.stopPropagation();
+          const crime = crimeLink.dataset.crime;
+          activeCrimeFilter = crime;
+          applyFilters();
         } else {
           const index = parseInt(card.dataset.index);
           if (!isNaN(index)) {
@@ -522,18 +566,14 @@ export function initHeadlinesPage(csvUrl) {
   if (modalClose) modalClose.addEventListener("click", closeModal);
   if (areaSelect) areaSelect.addEventListener("change", (e) => {
     const val = e.target.value;
-    if (!val) {
-      applyAreaFilter(null);
-      clearFilterBtn.classList.add("hidden");
-    } else {
-      applyAreaFilter(val);
-      clearFilterBtn.classList.remove("hidden");
-    }
+    activeAreaFilter = val || null;
+    applyFilters();
   });
   if (clearFilterBtn) clearFilterBtn.addEventListener("click", () => {
     areaSelect.value = "";
-    applyAreaFilter(null);
-    clearFilterBtn.classList.add("hidden");
+    activeAreaFilter = null;
+    activeCrimeFilter = null;
+    applyFilters();
   });
 
   // Initialize on DOM ready

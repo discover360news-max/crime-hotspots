@@ -44,7 +44,7 @@ export function renderHeader(activeOverride = '') {
                aria-label="Blog"
                title="Blog">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </a>
             <button id="menuToggle"
@@ -99,9 +99,8 @@ export function renderHeader(activeOverride = '') {
 
     <!-- Mobile menu overlay -->
     <nav id="mobileNav" class="fixed top-0 right-0 bottom-0 w-72 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out md:hidden overflow-y-auto" role="navigation" aria-label="Mobile menu">
-      <div class="p-6 space-y-6">
-        <div class="flex items-center justify-between mb-8">
-          <h2 class="text-lg font-semibold text-slate-800">Menu</h2>
+      <div class="p-6">
+        <div class="flex items-center justify-end mb-8">
           <button id="mobileMenuClose" class="p-2 rounded-full text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-all" aria-label="Close menu">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -109,11 +108,14 @@ export function renderHeader(activeOverride = '') {
           </button>
         </div>
 
-        <div class="space-y-4">
+        <div class="space-y-1">
           <div data-nav="headlines">
-            <button id="mobileHeadlinesBtn" class="w-full text-left text-base text-slate-700 hover:text-rose-600 font-medium flex items-center justify-between py-3 border-b border-slate-200" aria-haspopup="true" aria-expanded="false">
-              View Headlines
-              <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button id="mobileHeadlinesBtn" class="w-full text-left text-base text-slate-700 hover:text-rose-600 font-medium flex items-center gap-2 py-3 border-b border-slate-200" aria-haspopup="true" aria-expanded="false">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+              <span class="flex-1">Headlines</span>
+              <svg class="w-5 h-5 transform transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
@@ -122,11 +124,26 @@ export function renderHeader(activeOverride = '') {
             </div>
           </div>
 
-          <a href="blog.html" data-nav="blog" class="block text-base text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">Blog</a>
+          <a href="blog.html" data-nav="blog" class="flex items-center gap-2 text-base text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Blog
+          </a>
 
-          <a href="report.html" class="block w-full text-center px-4 py-3 rounded-full bg-rose-600 text-white hover:bg-rose-700 transition font-medium">Report a Crime</a>
+          <a href="report.html" class="flex items-center gap-2 text-base text-rose-600 hover:text-rose-700 font-medium py-3 border-b border-slate-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            Report a Crime
+          </a>
 
-          <a href="about.html" data-nav="about" class="block text-base text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">About</a>
+          <a href="about.html" data-nav="about" class="flex items-center gap-2 text-base text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            About
+          </a>
         </div>
       </div>
     </nav>
