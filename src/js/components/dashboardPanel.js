@@ -2,6 +2,7 @@
 // Handles dashboard tray animation, caching, and headline linking.
 
 import { createDashboardShimmer } from './loadingStates.js';
+import { createGuyanaMap, GUYANA_REGIONS } from './guyanaMap.js';
 
 function safeUrl(u) {
   if (!u) return null;
@@ -22,18 +23,21 @@ export function initDashboardPanel() {
   const headlinesLink = document.getElementById('dashboardHeadlinesLink');
   const closeBtn = document.getElementById('dashboardClose');
   const backdrop = document.getElementById('dashboardBackdrop');
+  const mapContainer = document.getElementById('guyanaMapContainer');
 
   if (!panel || !iframe) {
     console.warn("Dashboard panel missing required DOM elements (panel or iframe).");
     return { loadDashboard() {} };
   }
 
-  // Cache stores { url: string, headlineSlug: string }
+  // Cache stores { url: string, headlineSlug: string, baseUrl: string }
   const cache = new Map();
   let currentId = null;
   let fallbackTimer = null; // Still keep for iframe timeout
   let progressInterval = null; // For progressive loading messages
   let shimmerStartTime = null; // Track when shimmer was created
+  let guyanaMapInstance = null; // Guyana map instance
+  let currentBaseUrl = null; // Base URL without filters
 
   // Race condition prevention
   let isLoading = false;
@@ -167,6 +171,34 @@ export function initDashboardPanel() {
     if (errorBox) errorBox.classList.add("hidden");
   }
 
+  // === Region filtering ===
+  function filterDashboardByRegion(regionName) {
+    if (!currentBaseUrl) return;
+
+    try {
+      // Parse the base URL
+      const url = new URL(currentBaseUrl);
+
+      // Looker Studio filter format: Add filter parameter
+      // This adds a filter for the "Area" field (you may need to adjust the field name)
+      // Format: params.filter_<field_name>=<value>
+      url.searchParams.set('params', JSON.stringify({
+        filter_Area: regionName
+      }));
+
+      // Alternative format that sometimes works:
+      // url.searchParams.set('filter', `Area:${regionName}`);
+
+      // Update iframe with filtered URL
+      iframe.src = url.toString();
+
+      console.log(`Filtering Guyana dashboard by region: ${regionName}`);
+      console.log(`Filtered URL: ${url.toString()}`);
+    } catch (e) {
+      console.error('Error filtering dashboard:', e);
+    }
+  }
+
   // === Main load logic ===
   function loadDashboard(rawUrl, title, headlineSlug) {
     // Prevent concurrent loads
@@ -183,6 +215,7 @@ export function initDashboardPanel() {
 
     const countryId = headlineSlug || title;
     currentId = countryId; // Set current ID for onload/cache use
+    currentBaseUrl = safe; // Store base URL for filtering
 
     // Mark as loading
     isLoading = true;
@@ -191,6 +224,36 @@ export function initDashboardPanel() {
     showPanel();
     clearError();
     clearTimers();
+
+    // 2. Setup Guyana map if this is a Guyana dashboard
+    const isGuyana = headlineSlug === 'guyana' || title.toLowerCase().includes('guyana');
+
+    if (isGuyana && mapContainer) {
+      // Show map container
+      mapContainer.classList.remove('hidden');
+
+      // Create map if not already created
+      if (!guyanaMapInstance) {
+        guyanaMapInstance = createGuyanaMap((regionNumber, regionName) => {
+          if (regionNumber) {
+            // Filter dashboard by region
+            const regionFullName = GUYANA_REGIONS[regionNumber];
+            filterDashboardByRegion(regionFullName);
+          } else {
+            // Clear filter - reload base URL
+            iframe.src = currentBaseUrl;
+          }
+        });
+
+        mapContainer.innerHTML = '';
+        mapContainer.appendChild(guyanaMapInstance.element);
+      }
+    } else {
+      // Hide map for non-Guyana dashboards
+      if (mapContainer) {
+        mapContainer.classList.add('hidden');
+      }
+    }
     
     // Hide Headline link until loaded/cached
     if (headlinesLink) {
@@ -359,6 +422,14 @@ export function initDashboardPanel() {
 
       // Clear error messages
       clearError();
+
+      // Hide and clear Guyana map
+      if (mapContainer) {
+        mapContainer.classList.add('hidden');
+      }
+      if (guyanaMapInstance) {
+        guyanaMapInstance.clearFilter();
+      }
 
       // Reset iframe (wait for panel close animation)
       setTimeout(() => {
