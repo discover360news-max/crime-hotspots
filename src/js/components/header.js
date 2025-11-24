@@ -98,7 +98,7 @@ export function renderHeader(activeOverride = '') {
     <div id="mobileMenuBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
 
     <!-- Mobile menu overlay -->
-    <nav id="mobileNav" class="fixed top-0 right-0 bottom-0 w-72 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out md:hidden overflow-y-auto" role="navigation" aria-label="Mobile menu">
+    <nav id="mobileNav" class="fixed top-0 right-0 bottom-0 w-72 bg-white/60 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out md:hidden overflow-y-auto" role="navigation" aria-label="Mobile menu">
       <div class="p-6">
         <div class="flex items-center justify-end mb-8">
           <button id="mobileMenuClose" class="p-2 rounded-full text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-all" aria-label="Close menu">

@@ -17,7 +17,9 @@ export function initHeadlinesPage(csvUrl) {
   const container = document.getElementById("headlinesContainer");
   const loadMoreBtn = document.getElementById("loadMoreBtn");
   const areaSelect = document.getElementById("areaSelect");
+  const crimeSelect = document.getElementById("crimeSelect");
   const clearFilterBtn = document.getElementById("clearFilterBtn");
+  const resultsCount = document.getElementById("resultsCount");
   const dashboardButtonContainer = document.getElementById("dashboardButtonContainer");
   const modal = document.getElementById("headlineModal");
   const iframe = document.getElementById("headlineIframe");
@@ -155,14 +157,49 @@ export function initHeadlinesPage(csvUrl) {
   function createCard(item, indexInCurrentList) {
     const hasUrl = item.URL && item.URL.trim().length > 0;
     const card = document.createElement("div");
-    card.className = "bg-white rounded-2xl shadow-md p-5 w-full text-left transition-all duration-300 hover:shadow-lg hover:-translate-y-1";
+
+    // Enhanced styling with better click affordance
+    if (hasUrl) {
+      card.className = "bg-white rounded-2xl shadow-md p-5 w-full text-left transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer border-2 border-transparent hover:border-rose-200 group";
+      card.setAttribute("data-has-url", "true");
+    } else {
+      card.className = "bg-white rounded-2xl shadow-md p-5 w-full text-left";
+    }
+
     card.setAttribute("data-index", indexInCurrentList);
 
     const dateBadge = `<span class="text-xs text-slate-500">${formatDate(item.Date)}</span>`;
-    const crimeTag = `<button class="text-xs font-semibold text-rose-600 hover:text-rose-700 uppercase hover:underline crimeLink" data-crime="${sanitizeAttr(item["Crime Type"]||'')}">${sanitizeText(item["Crime Type"]||"")}</button>`;
+
+    // Crime tag with icon
+    const crimeTag = `<button class="text-xs font-semibold text-rose-600 hover:text-rose-700 uppercase hover:underline crimeLink flex items-center gap-1" data-crime="${sanitizeAttr(item["Crime Type"]||'')}">
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+      </svg>
+      ${sanitizeText(item["Crime Type"]||"")}
+    </button>`;
+
     const address = `<p class="text-xs text-slate-500 mb-2">${sanitizeText(item["Street Address"]||"")}</p>`;
-    const areaBtn = `<button class="text-xs text-rose-600 hover:text-rose-700 underline areaLink" data-area="${sanitizeAttr(item.Area||'')}">${sanitizeText(item.Area||'')}</button>`;
+
+    // Area button with location icon
+    const areaBtn = `<button class="text-xs text-rose-600 hover:text-rose-700 underline areaLink flex items-center gap-1" data-area="${sanitizeAttr(item.Area||'')}">
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      ${sanitizeText(item.Area||'')}
+    </button>`;
+
     const headlineHtml = `<div class="mb-2 text-sm text-slate-900 line-clamp-2">${sanitizeText(item.Headline||'')}</div>`;
+
+    // Read article hint (only for clickable cards)
+    const readHint = hasUrl ? `
+      <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-rose-600 font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <span>Read article</span>
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    ` : '';
 
     card.innerHTML = `
       <div class="flex justify-between items-center mb-3">
@@ -172,12 +209,8 @@ export function initHeadlinesPage(csvUrl) {
       ${headlineHtml}
       ${address}
       ${areaBtn}
+      ${readHint}
     `;
-
-    if (hasUrl) {
-      card.classList.add("cursor-pointer");
-      card.setAttribute("data-has-url", "true");
-    }
 
     return card;
   }
@@ -195,6 +228,7 @@ export function initHeadlinesPage(csvUrl) {
     });
     visibleCount += next.length;
     if (visibleCount >= currentList.length) loadMoreBtn.classList.add("hidden"); else loadMoreBtn.classList.remove("hidden");
+    updateResultsCount();
   }
 
   // apply combined filters
@@ -206,6 +240,7 @@ export function initHeadlinesPage(csvUrl) {
       renderBatch();
       clearFilterBtn.classList.add("hidden");
       updateFilterDisplay();
+      updateResultsCount();
       return;
     }
 
@@ -220,32 +255,47 @@ export function initHeadlinesPage(csvUrl) {
     renderBatch();
     clearFilterBtn.classList.remove("hidden");
     updateFilterDisplay();
+    updateResultsCount();
   }
 
-  // update filter display
+  // update filter display with visual badges
   function updateFilterDisplay() {
     const activeFilterBox = document.getElementById("activeFilterBox");
     if (!activeFilterBox) return;
 
     if (!activeAreaFilter && !activeCrimeFilter) {
       activeFilterBox.classList.add("hidden");
-      if (clearFilterBtn) {
-        clearFilterBtn.textContent = "Clear filter";
-      }
       return;
     }
 
-    const filters = [];
-    if (activeAreaFilter) filters.push(`Area: <strong>${activeAreaFilter}</strong>`);
-    if (activeCrimeFilter) filters.push(`Crime: <strong>${activeCrimeFilter}</strong>`);
+    const badges = [];
+    if (activeAreaFilter) {
+      badges.push(`<span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-sm font-medium">
+        Area: <strong>${sanitizeText(activeAreaFilter)}</strong>
+      </span>`);
+    }
+    if (activeCrimeFilter) {
+      badges.push(`<span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-sm font-medium">
+        Crime: <strong>${sanitizeText(activeCrimeFilter)}</strong>
+      </span>`);
+    }
 
-    activeFilterBox.innerHTML = filters.join(" • ");
+    activeFilterBox.innerHTML = badges.join('');
     activeFilterBox.classList.remove("hidden");
+  }
 
-    // Update clear button text
-    if (clearFilterBtn) {
-      const filterCount = (activeAreaFilter ? 1 : 0) + (activeCrimeFilter ? 1 : 0);
-      clearFilterBtn.textContent = filterCount > 1 ? "Clear filters" : "Clear filter";
+  // update results count display
+  function updateResultsCount() {
+    if (!resultsCount) return;
+
+    const currentListForCount = filteredList || allHeadlines;
+    const total = allHeadlines.length;
+    const shown = currentListForCount.length;
+
+    if (filteredList) {
+      resultsCount.textContent = `Showing ${shown} of ${total} crimes`;
+    } else {
+      resultsCount.textContent = `${total} crimes`;
     }
   }
 
@@ -548,6 +598,9 @@ export function initHeadlinesPage(csvUrl) {
           e.stopPropagation();
           const crime = crimeLink.dataset.crime;
           activeCrimeFilter = crime;
+          if (crimeSelect) {
+            crimeSelect.value = crime;
+          }
           applyFilters();
         } else {
           const index = parseInt(card.dataset.index);
@@ -569,8 +622,14 @@ export function initHeadlinesPage(csvUrl) {
     activeAreaFilter = val || null;
     applyFilters();
   });
+  if (crimeSelect) crimeSelect.addEventListener("change", (e) => {
+    const val = e.target.value;
+    activeCrimeFilter = val || null;
+    applyFilters();
+  });
   if (clearFilterBtn) clearFilterBtn.addEventListener("click", () => {
-    areaSelect.value = "";
+    if (areaSelect) areaSelect.value = "";
+    if (crimeSelect) crimeSelect.value = "";
     activeAreaFilter = null;
     activeCrimeFilter = null;
     applyFilters();

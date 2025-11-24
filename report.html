@@ -58,54 +58,84 @@
         <!-- Honeypot -->
         <input type="text" id="hp_field" name="hp_field" autocomplete="off" style="display:none !important" aria-hidden="true" />
 
-        <div>
-          <label for="reportDate" class="text-xs font-medium text-slate-500">Date of Incident</label>
-          <input id="reportDate" name="reportDate" type="date" class="w-full px-3 py-2 border rounded-lg mt-1" required />
+        <!-- Incident Details Section -->
+        <div class="space-y-4 pb-4 border-b border-slate-200">
+          <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide">Incident Details</h3>
+
+          <div>
+            <label for="reportDate" class="text-sm font-semibold text-slate-700 block mb-2">
+              Date of Incident <span class="text-rose-600">*</span>
+            </label>
+            <input id="reportDate" name="reportDate" type="date" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500" required />
+          </div>
+
+          <div>
+            <label for="reportCrimeType" class="text-sm font-semibold text-slate-700 block mb-2">
+              Crime Type <span class="text-rose-600">*</span>
+            </label>
+            <select id="reportCrimeType" name="reportCrimeType" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500" required>
+              <option value="">Select a crime</option>
+              <option>Assault</option>
+              <option>Burglary</option>
+              <option>Home Invasion</option>
+              <option>Kidnapping</option>
+              <option>Murder</option>
+              <option>Robbery</option>
+              <option>Shooting</option>
+              <option>Theft</option>
+              <option>Other</option>
+            </select>
+          </div>
         </div>
 
-        <div>
-          <label for="reportCrimeType" class="text-xs font-medium text-slate-500">Crime Type</label>
-          <select id="reportCrimeType" name="reportCrimeType" class="w-full px-3 py-2 border rounded-lg mt-1" required>
-            <option value="">Select a crime</option>
-            <option>Assault</option>
-            <option>Burglary</option>
-            <option>Home Invasion</option>
-            <option>Kidnapping</option>
-            <option>Murder</option>
-            <option>Robbery</option>
-            <option>Shooting</option>
-            <option>Theft</option>
-            <option>Other</option>
-          </select>
+        <!-- Location Section -->
+        <div class="space-y-4 pb-4 border-b border-slate-200">
+          <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide">Location</h3>
+
+          <div>
+            <label for="reportCountry" class="text-sm font-semibold text-slate-700 block mb-2">
+              Country / Island <span class="text-rose-600">*</span>
+            </label>
+            <select id="reportCountry" name="reportCountry" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500" required>
+              <option value="">Select a country</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="reportArea" class="text-sm font-semibold text-slate-700 block mb-2">
+              Area <span class="text-xs font-normal text-slate-500">(optional)</span>
+            </label>
+            <select id="reportArea" name="reportArea" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500">
+              <option value="">Select area (optional)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="reportStreet" class="text-sm font-semibold text-slate-700 block mb-2">
+              Street / Location <span class="text-xs font-normal text-slate-500">(optional)</span>
+            </label>
+            <input id="reportStreet" name="reportStreet" type="text" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500" placeholder="e.g., Main Street near the plaza" />
+          </div>
         </div>
 
-        <div>
-          <label for="reportCountry" class="text-xs font-medium text-slate-500">Country / Island</label>
-          <select id="reportCountry" name="reportCountry" class="w-full px-3 py-2 border rounded-lg mt-1" required>
-            <option value="">Select a country</option>
-          </select>
-        </div>
+        <!-- Description Section -->
+        <div class="space-y-4">
+          <h3 class="text-sm font-semibold text-slate-700 uppercase tracking-wide">Description</h3>
 
-        <div>
-          <label for="reportArea" class="text-xs font-medium text-slate-500">Area</label>
-          <select id="reportArea" name="reportArea" class="w-full px-3 py-2 border rounded-lg mt-1">
-            <option value="">Select area (optional)</option>
-          </select>
-        </div>
+          <div>
+            <label for="reportHeadline" class="text-sm font-semibold text-slate-700 block mb-2">
+              Headline <span class="text-rose-600">*</span>
+              <span class="text-xs font-normal text-slate-500">(120 chars max)</span>
+            </label>
+            <input id="reportHeadline" name="reportHeadline" maxlength="120" type="text" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500" placeholder="Brief summary of the incident" required />
+          </div>
 
-        <div>
-          <label for="reportStreet" class="text-xs font-medium text-slate-500">Street / Location</label>
-          <input id="reportStreet" name="reportStreet" type="text" class="w-full px-3 py-2 border rounded-lg mt-1" />
-        </div>
-
-        <div>
-          <label for="reportHeadline" class="text-xs font-medium text-slate-500">Headline (120 chars max)</label>
-          <input id="reportHeadline" name="reportHeadline" maxlength="120" type="text" class="w-full px-3 py-2 border rounded-lg mt-1" required />
-        </div>
-
-        <div>
-          <label for="reportDetails" class="text-xs font-medium text-slate-500">Details</label>
-          <textarea id="reportDetails" name="reportDetails" rows="4" class="w-full px-3 py-2 border rounded-lg mt-1" required></textarea>
+          <div>
+            <label for="reportDetails" class="text-sm font-semibold text-slate-700 block mb-2">
+              Details <span class="text-rose-600">*</span>
+            </label>
+            <textarea id="reportDetails" name="reportDetails" rows="4" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500" placeholder="Provide as much detail as possible to help us verify the report" required></textarea>
+          </div>
         </div>
 
         <div class="cf-turnstile" data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ" data-theme="light"></div>
