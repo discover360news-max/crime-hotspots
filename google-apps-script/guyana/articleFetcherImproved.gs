@@ -79,7 +79,7 @@ const EXCLUDE_SELECTORS = [
 const VALIDATION = {
   MIN_CONTENT_LENGTH: 200,           // Minimum 200 chars
   MIN_TITLE_MATCH_PCT: 40,           // At least 40% of title keywords in content
-  MAX_CRIME_KEYWORDS_NONCRIME: 2,    // Max 2 crime keywords in non-crime article
+  MAX_CRIME_KEYWORDS_NONCRIME: 4,    // Max 4 crime keywords in non-crime article (increased from 2)
   MIN_SENTENCES: 3                   // At least 3 sentences
 };
 
@@ -395,10 +395,22 @@ function validateExtractedContent(content, title) {
 
   // Check 4: Detect sidebar contamination
   const crimeKeywords = ['murder', 'shot', 'killed', 'robbery', 'assault', 'crime', 'police'];
-  const crimeRelatedWords = ['murder', 'killed', 'shot', 'shooting', 'robbed', 'robbery', 'rob',
-                             'assault', 'attack', 'stabbed', 'kidnap', 'rape', 'theft', 'stolen',
-                             'executed', 'arrested', 'detained', 'terrorised', 'terrorized', 'terror',
-                             'gang', 'gangs'];
+  const crimeRelatedWords = [
+    'murder', 'murdered', 'murdering', 'kill', 'killed', 'killing',
+    'shot', 'shoot', 'shoots', 'shooting',
+    'robbed', 'robbery', 'rob', 'robbing',
+    'assault', 'assaulted', 'assaulting', 'attack', 'attacked', 'attacking',
+    'stabbed', 'stabbing', 'stab',
+    'kidnap', 'kidnapped', 'kidnapping',
+    'rape', 'raped', 'raping',
+    'theft', 'stolen', 'steal', 'stealing',
+    'executed', 'execution',
+    'arrested', 'arrest', 'arresting',
+    'detained', 'detain', 'detaining',
+    'terrorised', 'terrorized', 'terrorize', 'terror',
+    'gang', 'gangs', 'gunman', 'gunmen', 'gunfire',
+    'chopped', 'chopping', 'chop'  // Caribbean-specific
+  ];
 
   const titleLower = title.toLowerCase();
   const titleHasCrimeKeywords = crimeRelatedWords.some(kw => titleLower.includes(kw));

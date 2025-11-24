@@ -224,12 +224,21 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
      - ❌ EXCLUDE: Business launch articles mentioning crime as motivation
      - ❌ EXCLUDE: Opinion pieces, editorials, crime analysis articles
      - ❌ EXCLUDE: Crime prevention tips using example crimes
+     - ❌ EXCLUDE: Academic/educational articles mentioning crimes as examples
+     - ❌ EXCLUDE: Articles about OTHER topics that mention crimes in passing
+     - ❌ EXCLUDE: Social commentary articles that reference past crimes
      - If article is primarily about court proceedings, verdict, or corporate fraud, return {"crimes": [], "confidence": 0}
+     - If article mentions crimes as EXAMPLES or CONTEXT (not the main subject), return {"crimes": [], "confidence": 0}
      - Examples to EXCLUDE:
        * "Former bank officer found liable for fraud" → Court verdict, NOT crime report
        * "Man convicted in 2023 murder case" → Court verdict, NOT new crime
        * "Company employee embezzled $30M over 5 years" → Corporate fraud, NOT public safety crime
        * "New app helps victims sell safely" with past examples → Product launch, NOT crime report
+       * "New frontiers...in academia" mentioning pastor incident → Academic article, NOT crime report
+       * "Crime wave analysis: Why violence is rising" with example crimes → Analysis, NOT crime report
+     - CRITICAL: Check if crime is MAIN SUBJECT or just mentioned as CONTEXT/EXAMPLE
+       * Main subject: "Pastor attacks man with cutlass over parking dispute" → INCLUDE
+       * Context/example: "New academic programs aim to reduce crime. Recently, a pastor attacked..." → EXCLUDE
 
   3. EXCLUDE UNCERTAIN DEATHS: DO NOT classify as "Murder" if:
      - "No visible signs of violence"

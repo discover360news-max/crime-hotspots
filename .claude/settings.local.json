@@ -48,7 +48,10 @@
       "Bash(open http://localhost:5173/blog-post.html)",
       "Bash(open http://localhost:5173/blog.html)",
       "Bash(open \"http://localhost:5173/assets/images/report-hero.svg\")",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(VITE_COUNTRY_FILTER=guyana npm run build:*)",
+      "WebFetch(domain:guyana.crimehotspots.com)",
+      "Bash(open http://localhost:5173/dashboard-guyana.html)"
     ],
     "deny": [],
     "ask": []

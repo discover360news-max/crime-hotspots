@@ -396,6 +396,50 @@ function isDuplicateCrime(sheet, crime, geocoded) {
       }
 
       // ═══════════════════════════════════════════════════════════
+      // NEW CHECK: Same exact coordinates + similar dates (±2 days) + same crime type + victim name match
+      // Catches cross-source duplicates where dates vary due to different publication times
+      // Example: Article A says "yesterday" (Nov 20), Article B says "on Thursday" (Nov 21) - both about same Nov 20 crime
+      // ═══════════════════════════════════════════════════════════
+      if (existingDate && crime.crime_date && existingLat && existingLng && geocoded && geocoded.lat && geocoded.lng) {
+        const existingDateObj = new Date(existingDate);
+        const crimeDateObj = new Date(crime.crime_date);
+        const daysDiff = Math.abs(Math.round((existingDateObj - crimeDateObj) / (1000 * 60 * 60 * 24)));
+
+        // Allow 2-day variance for cross-source reporting
+        if (daysDiff <= 2 && existingCrimeType === crime.crime_type) {
+          // Compare coordinates (round to 4 decimal places = ~11 meters precision)
+          const latMatch = Math.abs(existingLat - geocoded.lat) < 0.0001;
+          const lngMatch = Math.abs(existingLng - geocoded.lng) < 0.0001;
+
+          if (latMatch && lngMatch) {
+            // Extract victim names from both headlines for comparison
+            const existingNames = extractNamesFromHeadline(existingHeadline);
+            const newNames = extractNamesFromHeadline(crime.headline);
+
+            // If both headlines contain a matching victim name, it's very likely the same incident
+            let victimNameMatch = false;
+            for (const existingName of existingNames) {
+              for (const newName of newNames) {
+                if (existingName.length > 5 && newName.length > 5 &&
+                    (existingName.includes(newName) || newName.includes(existingName))) {
+                  victimNameMatch = true;
+                  Logger.log(`Duplicate found: Exact coordinates + ${daysDiff} day variance + same crime type + victim name match "${existingName}" (cross-source duplicate with date variance)`);
+                  return true;
+                }
+              }
+            }
+
+            // If no victim name match, require higher headline similarity
+            const similarity = calculateSimilarity(existingHeadline, crime.headline);
+            if (similarity > 0.50) {
+              Logger.log(`Duplicate found: Exact coordinates + ${daysDiff} day variance + same crime type + ${(similarity * 100).toFixed(0)}% headline similarity (cross-source duplicate with date variance)`);
+              return true;
+            }
+          }
+        }
+      }
+
+      // ═══════════════════════════════════════════════════════════
       // CHECK 1: Same URL + Same location + Same date/type (same incident re-extracted)
       // Smart logic: Allows multi-crime articles with different incidents
       // Uses normalized URLs to handle article ID variations
