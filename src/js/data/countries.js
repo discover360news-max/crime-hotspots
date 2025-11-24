@@ -1,5 +1,9 @@
 // src/js/data/countries.js
-export const COUNTRIES = [
+
+/**
+ * All available countries - Master list
+ */
+const ALL_COUNTRIES = [
   {
     id: 'tt',
     name: 'Trinidad & Tobago',
@@ -35,3 +39,41 @@ export const COUNTRIES = [
   }
   // You can easily add more countries here later
 ];
+
+/**
+ * Get the country filter from build-time environment variable
+ * Supports: 'all', 'guyana', 'trinidad'
+ */
+const COUNTRY_FILTER = import.meta.env.VITE_COUNTRY_FILTER || 'all';
+
+/**
+ * Exported countries list - filtered based on VITE_COUNTRY_FILTER environment variable
+ *
+ * Usage:
+ * - Default build: shows all countries
+ * - VITE_COUNTRY_FILTER=guyana: shows only Guyana
+ * - VITE_COUNTRY_FILTER=trinidad: shows only Trinidad & Tobago
+ */
+export const COUNTRIES = (() => {
+  if (COUNTRY_FILTER === 'guyana') {
+    return ALL_COUNTRIES.filter(c => c.id === 'gy');
+  }
+  if (COUNTRY_FILTER === 'trinidad') {
+    return ALL_COUNTRIES.filter(c => c.id === 'tt');
+  }
+  // Default: show all countries
+  return ALL_COUNTRIES;
+})();
+
+/**
+ * Helper to check if site is country-specific
+ */
+export const isCountrySpecific = () => COUNTRY_FILTER !== 'all';
+
+/**
+ * Get the active country filter name (for branding)
+ */
+export const getCountryFilterName = () => {
+  const country = COUNTRIES[0];
+  return country ? country.name : 'Caribbean';
+};

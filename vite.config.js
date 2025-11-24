@@ -5,6 +5,11 @@ export default defineConfig({
   root: './',
   base: '/',
 
+  // Environment variable configuration for country filtering
+  define: {
+    'import.meta.env.VITE_COUNTRY_FILTER': JSON.stringify(process.env.VITE_COUNTRY_FILTER || 'all')
+  },
+
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
