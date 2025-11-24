@@ -68,7 +68,13 @@ function createCountryCard(country, index) { // <-- Takes 'index'
   // Attach the click handler only if available
   if (country.available) {
     cardButton.addEventListener('click', () => {
-      dashboard.loadDashboard(country.dashboard, country.name, country.headlinesSlug);
+      // Special handling for Guyana - go to dedicated dashboard page
+      if (country.headlinesSlug === 'guyana') {
+        window.location.href = 'dashboard-guyana.html';
+      } else {
+        // Other countries use the tray modal
+        dashboard.loadDashboard(country.dashboard, country.name, country.headlinesSlug);
+      }
     });
   }
 

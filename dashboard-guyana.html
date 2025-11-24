@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guyana Crime Dashboard — Regional Statistics</title>
+  <meta name="description" content="Interactive crime statistics dashboard for Guyana. View data by administrative region with real-time filtering.">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#e11d48">
+
+  <!-- Security: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://*.google.com https://*.googleusercontent.com https://lookerstudio.google.com https://docs.google.com; connect-src 'self' https://cdn.jsdelivr.net https://docs.google.com https://*.google.com https://*.googleusercontent.com https://*.googleapis.com https://script.google.com https://challenges.cloudflare.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; form-action 'self' https://script.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; child-src 'self' https://*.google.com;">
+
+  <!-- Cookie Consent & Analytics -->
+  <script type="module">
+    import { initCookieConsent } from './src/js/utils/cookieConsent.js';
+    import { initAnalytics } from './src/js/utils/analytics.js';
+
+    initCookieConsent({
+      onAccept: () => {
+        initAnalytics({
+          provider: 'ga4',
+          ga4MeasurementId: 'G-JMQ8B4DYEG',
+          anonymizeIp: true,
+          debug: false
+        });
+      }
+    });
+  </script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/src/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen">
+  <!-- Global Header -->
+  <script type="module">
+    import { renderHeader } from './src/js/components/header.js';
+    renderHeader();
+  </script>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-6 max-w-7xl">
+
+    <!-- Page Header -->
+    <div class="mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h1 class="text-3xl font-bold text-slate-900">🇬🇾 Guyana Crime Dashboard</h1>
+          <p class="text-slate-600 mt-1">Interactive regional crime statistics</p>
+        </div>
+        <a href="headlines-guyana.html"
+           class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium text-sm">
+          View Headlines →
+        </a>
+      </div>
+    </div>
+
+    <!-- Layout: Map + Dashboard -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Interactive Regional Map (Left side on desktop, top on mobile) -->
+      <div class="lg:col-span-4">
+        <div id="guyanaMapContainer" class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
+          <!-- Map will be injected here by JavaScript -->
+          <div class="flex items-center justify-center py-12">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Looker Studio Dashboard (Right side on desktop, below on mobile) -->
+      <div class="lg:col-span-8">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+
+          <!-- Dashboard Header -->
+          <div class="bg-gradient-to-r from-rose-600 to-rose-700 text-white p-4">
+            <h2 class="text-lg font-semibold">Crime Statistics Dashboard</h2>
+            <p class="text-sm text-rose-100 mt-1" id="dashboardSubtitle">Nationwide data</p>
+          </div>
+
+          <!-- Dashboard Iframe Container -->
+          <div class="relative bg-slate-50">
+            <iframe
+              id="dashboardIframe"
+              title="Guyana Crime Statistics Dashboard"
+              src="https://lookerstudio.google.com/embed/reporting/da8269b7-4987-4bbc-9206-ca5406b8ef97/page/LyPbF"
+              class="w-full h-[600px] lg:h-[800px] border-0"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+              loading="eager"
+            ></iframe>
+
+            <!-- Loading overlay -->
+            <div id="dashboardLoader" class="absolute inset-0 bg-white flex items-center justify-center">
+              <div class="text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto mb-4"></div>
+                <p class="text-slate-600 text-sm">Loading dashboard...</p>
+              </div>
+            </div>
+
+            <!-- Error state -->
+            <div id="dashboardError" class="hidden absolute inset-0 bg-rose-50 flex items-center justify-center p-6">
+              <div class="text-center max-w-md">
+                <svg class="w-16 h-16 text-rose-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h3 class="text-lg font-semibold text-slate-900 mb-2">Unable to load dashboard</h3>
+                <p class="text-sm text-slate-600 mb-4">The dashboard might not allow embedding or there was a connection issue.</p>
+                <a href="https://lookerstudio.google.com/reporting/da8269b7-4987-4bbc-9206-ca5406b8ef97/page/LyPbF"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="inline-block px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition">
+                  Open in New Tab →
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Info Cards Below -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white rounded-lg p-4 shadow">
+        <h3 class="font-semibold text-slate-900 mb-2">📊 Real-Time Data</h3>
+        <p class="text-sm text-slate-600">Dashboard updates automatically with the latest crime statistics from verified sources.</p>
+      </div>
+      <div class="bg-white rounded-lg p-4 shadow">
+        <h3 class="font-semibold text-slate-900 mb-2">🗺️ Regional Filtering</h3>
+        <p class="text-sm text-slate-600">Click any region on the map to filter the dashboard and view area-specific crime data.</p>
+      </div>
+      <div class="bg-white rounded-lg p-4 shadow">
+        <h3 class="font-semibold text-slate-900 mb-2">📱 Mobile Friendly</h3>
+        <p class="text-sm text-slate-600">Access crime statistics on any device with our responsive dashboard design.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-800 text-white py-8 mt-16">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2025 Crime Hotspots. All rights reserved.</p>
+      <p class="text-slate-400 text-sm mt-2">Data sources: Verified news outlets and official reports</p>
+    </div>
+  </footer>
+
+  <!-- Page Script -->
+  <script type="module" src="/src/js/dashboardGuyana.js"></script>
+
+</body>
+</html>
