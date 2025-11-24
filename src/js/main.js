@@ -82,12 +82,20 @@ function renderGrid() {
   const grid = el('#countryGrid');
   grid.innerHTML = '';
 
+  // Adjust layout for single country (center it)
+  if (COUNTRIES.length === 1) {
+    grid.className = 'flex justify-center items-center mx-auto';
+  } else {
+    // Keep original grid layout for multiple countries
+    grid.className = 'grid gap-8 sm:gap-10 grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 place-items-center justify-center mx-auto';
+  }
+
   COUNTRIES.forEach((country, index) => {
-    
+
     // --- THIS IS THE CORRECTED LINE ---
     // We pass 'index' now, not a callback.
     const card = createCountryCard(country, index);
-    
+
     // This line was already correct in your file, but was
     // moved inside createCountryCard for simplicity.
     // We'll keep it as you had it to be safe.
