@@ -1,8 +1,8 @@
-// src/js/dashboardGuyana.js
-// Dedicated Guyana dashboard page with custom data widgets
+// src/js/dashboardTrinidad.js
+// Dedicated Trinidad & Tobago dashboard page with custom data widgets
 
-import { createGuyanaMap, GUYANA_REGIONS } from './components/guyanaMap.js';
-import { fetchGuyanaData, calculateStats } from './services/guyanaDataService.js';
+import { createTrinidadMap, TRINIDAD_REGIONS } from './components/trinidadMap.js';
+import { fetchTrinidadData, calculateStats } from './services/trinidadDataService.js';
 import {
   createMetricsCards,
   createPieChart,
@@ -12,10 +12,10 @@ import {
   createErrorState,
   destroyAllCharts
 } from './components/dashboardWidgets.js';
-import { createGuyanaLeafletMap, getLeafletMapStyles } from './components/guyanaLeafletMap.js';
+import { createTrinidadLeafletMap, getLeafletMapStyles } from './components/trinidadLeafletMap.js';
 
 // DOM Elements
-const mapContainer = document.getElementById('guyanaMapContainer');
+const mapContainer = document.getElementById('trinidadMapContainer');
 const widgetsContainer = document.getElementById('dashboardWidgets');
 const subtitle = document.getElementById('dashboardSubtitle');
 const mobileRegionButton = document.getElementById('mobileRegionButton');
@@ -33,8 +33,8 @@ const clearDateFilterButton = document.getElementById('clearDateFilter');
 // Track current state
 let currentRegion = null;
 let currentDateRange = null;
-let guyanaMapInstance = null;
-let mobileGuyanaMapInstance = null;
+let trinidadMapInstance = null;
+let mobileTrinidadMapInstance = null;
 let leafletMapInstance = null;
 let allData = null;
 let isUpdatingRegion = false; // Prevent infinite loops
@@ -47,10 +47,10 @@ async function init() {
     // Inject Leaflet map styles
     injectLeafletStyles();
 
-    // Create and inject the Guyana map (desktop only)
+    // Create and inject the Trinidad map (desktop only)
     if (mapContainer) {
       try {
-        guyanaMapInstance = createGuyanaMap(handleRegionClick);
+        trinidadMapInstance = createTrinidadMap(handleRegionClick);
 
         // Hide skeleton and show map
         const mapSkeleton = document.getElementById('mapSkeleton');
@@ -58,7 +58,7 @@ async function init() {
           mapSkeleton.remove();
         }
 
-        mapContainer.appendChild(guyanaMapInstance.element);
+        mapContainer.appendChild(trinidadMapInstance.element);
       } catch (error) {
         console.error('Error creating desktop map:', error);
       }
@@ -104,8 +104,8 @@ async function loadDashboard(regionFilter = null, dateRange = null) {
 
     // Fetch data (or use cached data)
     if (!allData) {
-      console.log('Fetching Guyana data from CSV...');
-      allData = await fetchGuyanaData();
+      console.log('Fetching Trinidad data from CSV...');
+      allData = await fetchTrinidadData();
       console.log(`Fetched ${allData.length} records`);
       if (allData.length > 0) {
         console.log('Sample record:', allData[0]);
@@ -173,7 +173,7 @@ function renderWidgets(stats) {
         if (leafletMapInstance) {
           leafletMapInstance.destroy();
         }
-        leafletMapInstance = createGuyanaLeafletMap(allData, currentRegion?.name);
+        leafletMapInstance = createTrinidadLeafletMap(allData, currentRegion?.name);
         leafletMapInstance.element.classList.add('mb-6');
         widgetsContainer.appendChild(leafletMapInstance.element);
       } catch (error) {
@@ -264,7 +264,7 @@ function initializeMobileTray() {
   try {
     // Create mobile map instance
     if (mobileMapContainer) {
-      mobileGuyanaMapInstance = createGuyanaMap((regionNumber, regionName) => {
+      mobileTrinidadMapInstance = createTrinidadMap((regionNumber, regionName) => {
         try {
           handleRegionClick(regionNumber, regionName);
           closeTray();
@@ -273,7 +273,7 @@ function initializeMobileTray() {
         }
       });
       mobileMapContainer.innerHTML = '';
-      mobileMapContainer.appendChild(mobileGuyanaMapInstance.element);
+      mobileMapContainer.appendChild(mobileTrinidadMapInstance.element);
     }
 
     // Mobile region button - open tray
@@ -432,17 +432,17 @@ async function handleRegionClick(regionNumber, regionName) {
 
       // Clear both map visual states WITHOUT triggering their callbacks
       // (since we've already loaded the unfiltered data above)
-      if (guyanaMapInstance && typeof guyanaMapInstance.clearFilter === 'function') {
+      if (trinidadMapInstance && typeof trinidadMapInstance.clearFilter === 'function') {
         try {
-          guyanaMapInstance.clearFilter();
+          trinidadMapInstance.clearFilter();
         } catch (error) {
           console.error('Error clearing desktop map filter:', error);
         }
       }
 
-      if (mobileGuyanaMapInstance && typeof mobileGuyanaMapInstance.clearFilter === 'function') {
+      if (mobileTrinidadMapInstance && typeof mobileTrinidadMapInstance.clearFilter === 'function') {
         try {
-          mobileGuyanaMapInstance.clearFilter();
+          mobileTrinidadMapInstance.clearFilter();
         } catch (error) {
           console.error('Error clearing mobile map filter:', error);
         }
@@ -481,7 +481,7 @@ function updateSubtitle(text = null) {
   let subtitleText = '';
 
   if (currentRegion) {
-    subtitleText = `Region ${currentRegion.number} - ${currentRegion.name}`;
+    subtitleText = currentRegion.name;
   } else {
     subtitleText = 'Nationwide data';
   }
@@ -501,9 +501,9 @@ function updateSubtitle(text = null) {
 document.addEventListener('keydown', (e) => {
   // Press 'R' to reset filters
   if (e.key === 'r' || e.key === 'R') {
-    if (currentRegion && guyanaMapInstance) {
+    if (currentRegion && trinidadMapInstance) {
       e.preventDefault();
-      guyanaMapInstance.clearFilter();
+      trinidadMapInstance.clearFilter();
       handleRegionClick(null, null);
     }
   }

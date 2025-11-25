@@ -68,11 +68,14 @@ function createCountryCard(country, index) { // <-- Takes 'index'
   // Attach the click handler only if available
   if (country.available) {
     cardButton.addEventListener('click', () => {
-      // Special handling for Guyana - go to dedicated dashboard page
-      if (country.headlinesSlug === 'guyana') {
-        window.location.href = 'dashboard-guyana.html';
+      // Check if dashboard is a local page (new custom dashboards) or external iframe (Looker Studio)
+      const isLocalDashboard = country.dashboard && country.dashboard.startsWith('/');
+
+      if (isLocalDashboard) {
+        // Navigate directly to the new custom dashboard page
+        window.location.href = country.dashboard;
       } else {
-        // Other countries use the tray modal
+        // Load external dashboard in modal panel (legacy Looker Studio)
         dashboard.loadDashboard(country.dashboard, country.name, country.headlinesSlug);
       }
     });

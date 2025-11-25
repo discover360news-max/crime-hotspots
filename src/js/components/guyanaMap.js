@@ -8,7 +8,7 @@
  */
 export function createGuyanaMap(onRegionClick) {
   const container = document.createElement('div');
-  container.className = 'guyana-map-container bg-white rounded-lg shadow-md p-4';
+  container.className = 'guyana-map-container';
 
   container.innerHTML = `
     <div class="mb-4">

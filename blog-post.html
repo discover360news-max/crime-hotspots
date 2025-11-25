@@ -62,10 +62,42 @@
 
   <!-- Main Content -->
   <main class="container mx-auto px-4 py-12 max-w-4xl">
-    <!-- Loading State -->
-    <div id="loading" class="text-center py-12">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-600 mx-auto"></div>
-      <p class="text-slate-600 mt-4">Loading article...</p>
+    <!-- Skeleton Loading State -->
+    <div id="loading">
+      <!-- Hero Image Skeleton -->
+      <div class="mb-8 rounded-lg overflow-hidden">
+        <div class="skeleton w-full h-64 md:h-96"></div>
+      </div>
+
+      <!-- Article Header Skeleton -->
+      <header class="mb-8">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="skeleton w-24 h-6 rounded"></div>
+          <div class="skeleton w-32 h-4"></div>
+        </div>
+        <div class="skeleton skeleton-heading w-3/4 mb-4"></div>
+        <div class="flex items-center gap-4">
+          <div class="skeleton skeleton-text w-24"></div>
+          <div class="skeleton w-1 h-4"></div>
+          <div class="skeleton skeleton-text w-20"></div>
+        </div>
+      </header>
+
+      <!-- Article Body Skeleton -->
+      <div class="space-y-4 mb-8">
+        <div class="skeleton skeleton-text w-full"></div>
+        <div class="skeleton skeleton-text w-full"></div>
+        <div class="skeleton skeleton-text w-5/6"></div>
+        <div class="skeleton skeleton-text w-full"></div>
+        <div class="skeleton skeleton-text w-4/5"></div>
+        <div class="skeleton skeleton-text w-full mt-6"></div>
+        <div class="skeleton skeleton-text w-full"></div>
+        <div class="skeleton skeleton-text w-3/4"></div>
+        <div class="skeleton skeleton-heading w-2/3 mt-6"></div>
+        <div class="skeleton skeleton-text w-full"></div>
+        <div class="skeleton skeleton-text w-full"></div>
+        <div class="skeleton skeleton-text w-5/6"></div>
+      </div>
     </div>
 
     <!-- Article Content -->

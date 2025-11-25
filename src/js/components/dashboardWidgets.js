@@ -99,11 +99,15 @@ export function createPieChart(stats) {
         plugins: {
           legend: {
             position: 'bottom',
+            align: 'start',
             labels: {
-              padding: 15,
+              padding: 8,
+              boxWidth: 12,
+              boxHeight: 12,
               font: {
-                size: 12
-              }
+                size: 11
+              },
+              usePointStyle: false
             }
           },
           tooltip: {
@@ -215,11 +219,15 @@ export function createLast7DaysChart(stats) {
         plugins: {
           legend: {
             position: 'bottom',
+            align: 'start',
             labels: {
-              padding: 15,
+              padding: 8,
+              boxWidth: 12,
+              boxHeight: 12,
               font: {
-                size: 12
-              }
+                size: 11
+              },
+              usePointStyle: false
             }
           },
           datalabels: {

@@ -23,6 +23,7 @@ export default defineConfig({
         headlinesTrinidad: resolve(__dirname, 'headlines-trinidad-and-tobago.html'),
         headlinesGuyana: resolve(__dirname, 'headlines-guyana.html'),
         dashboardGuyana: resolve(__dirname, 'dashboard-guyana.html'),
+        dashboardTrinidad: resolve(__dirname, 'dashboard-trinidad.html'),
         report: resolve(__dirname, 'report.html'),
         about: resolve(__dirname, 'about.html'),
         blog: resolve(__dirname, 'blog.html'),

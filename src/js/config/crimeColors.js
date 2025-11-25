@@ -4,22 +4,23 @@
 
 /**
  * Crime type color mapping
- * Colors chosen for accessibility and visual distinction
+ * Pastel colors for most crimes, vivid red for Murder
+ * Each crime has a unique, distinct color
  */
 export const CRIME_COLORS = {
-  'Murder': '#dc2626',           // Red-600
-  'Robbery': '#ea580c',          // Orange-600
-  'Home Invasion': '#7c3aed',    // Violet-600
-  'Theft': '#ca8a04',            // Yellow-600
-  'Assault': '#f97316',          // Orange-500
-  'Burglary': '#9333ea',         // Purple-600
-  'Vehicle Theft': '#eab308',    // Yellow-500
-  'Kidnapping': '#be123c',       // Rose-700
-  'Sexual Assault': '#dc2626',   // Red-600
-  'Fraud': '#0891b2',            // Cyan-600
-  'Arson': '#ef4444',            // Red-500
-  'Drug-related': '#16a34a',     // Green-600
-  'Other': '#6b7280'             // Gray-500
+  'Murder': '#dc2626',           // VIVID RED (only non-pastel)
+  'Robbery': '#fca5a5',          // Pastel pink-red
+  'Home Invasion': '#c4b5fd',    // Pastel violet
+  'Theft': '#fde68a',            // Pastel yellow
+  'Assault': '#fdba74',          // Pastel orange
+  'Burglary': '#d8b4fe',         // Pastel purple
+  'Vehicle Theft': '#fef08a',    // Pastel bright yellow
+  'Kidnapping': '#fda4af',       // Pastel rose
+  'Sexual Assault': '#f87171',   // Medium red (lighter than murder)
+  'Fraud': '#a5f3fc',            // Pastel cyan
+  'Arson': '#fecaca',            // Pastel light red
+  'Drug-related': '#86efac',     // Pastel green
+  'Other': '#d1d5db'             // Light gray
 };
 
 /**

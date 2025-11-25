@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guyana Crime Dashboard — Regional Statistics</title>
-  <meta name="description" content="Interactive crime statistics dashboard for Guyana. View data by administrative region with real-time filtering.">
+  <title>Trinidad & Tobago Crime Dashboard — Regional Statistics</title>
+  <meta name="description" content="Interactive crime statistics dashboard for Trinidad & Tobago. View data by region with real-time filtering.">
 
   <!-- Favicons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -66,10 +66,10 @@
     <div class="mb-6">
       <div class="flex items-center justify-between gap-3 mb-4">
         <div class="flex-1 min-w-0">
-          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 truncate">🇬🇾 Guyana Crime Dashboard</h1>
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 truncate">🇹🇹 Trinidad & Tobago Crime Dashboard</h1>
           <p class="text-xs sm:text-sm text-slate-600 mt-1 hidden sm:block">Interactive regional crime statistics</p>
         </div>
-        <a href="headlines-guyana.html"
+        <a href="headlines-trinidad.html"
            class="flex-shrink-0 px-3 py-2 sm:px-4 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium text-xs sm:text-sm whitespace-nowrap">
           View Headlines →
         </a>
@@ -96,7 +96,7 @@
 
       <!-- Interactive Regional Map (Left side on desktop, hidden on mobile) -->
       <div class="hidden lg:block lg:col-span-4">
-        <div id="guyanaMapContainer" class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
+        <div id="trinidadMapContainer" class="bg-white rounded-xl shadow-lg p-6 sticky top-6">
           <!-- Skeleton loader for map -->
           <div id="mapSkeleton">
             <div class="skeleton skeleton-heading w-3/4 mx-auto"></div>
@@ -220,7 +220,7 @@
         <!-- Footer with reset button and instructions -->
         <div class="p-4 border-t border-gray-200 space-y-3">
           <button id="resetFilterButtonTray" class="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition">
-            🇬🇾 Show All Regions
+            🇹🇹 Show All Regions
           </button>
           <p class="text-xs text-center text-gray-600">
             Tap any region to filter crime data
@@ -286,7 +286,7 @@
   </footer>
 
   <!-- Page Script -->
-  <script type="module" src="/src/js/dashboardGuyana.js"></script>
+  <script type="module" src="/src/js/dashboardTrinidad.js"></script>
 
 </body>
 </html>

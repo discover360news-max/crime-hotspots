@@ -1,33 +1,33 @@
-// src/js/services/guyanaDataService.js
-// Data fetching and processing service for Guyana dashboard
+// src/js/services/trinidadDataService.js
+// Data fetching and processing service for Trinidad & Tobago dashboard
 
 import Papa from 'papaparse';
 import { dataCache } from '../utils/dataCache.js';
 
-const GUYANA_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRLuFajWrjyJk-LaZhN9SkSMMEvWcH74PHYzDJ03su3oGu_9W--2O7aUJ3_6Eul6BVUay1Gez-wWk3H/pub?gid=1749261532&single=true&output=csv';
-const CACHE_KEY = 'guyana_crime_data';
+const TRINIDAD_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv';
+const CACHE_KEY = 'trinidad_crime_data';
 const CACHE_TTL_MINUTES = 5; // Cache for 5 minutes
 
 /**
- * Fetch and parse Guyana crime data with caching
+ * Fetch and parse Trinidad & Tobago crime data with caching
  * @param {boolean} forceRefresh - Force refresh from server
  * @returns {Promise<Array>} Parsed crime records
  */
-export async function fetchGuyanaData(forceRefresh = false) {
+export async function fetchTrinidadData(forceRefresh = false) {
   // Try to get from cache first
   if (!forceRefresh) {
     const cached = dataCache.get(CACHE_KEY, CACHE_TTL_MINUTES);
     if (cached) {
-      console.log('📦 Using cached Guyana data');
+      console.log('📦 Using cached Trinidad data');
       return cached;
     }
   }
 
   // Fetch fresh data
-  console.log('🌐 Fetching fresh Guyana data from Google Sheets');
+  console.log('🌐 Fetching fresh Trinidad data from Google Sheets');
 
   return new Promise((resolve, reject) => {
-    Papa.parse(GUYANA_CSV_URL, {
+    Papa.parse(TRINIDAD_CSV_URL, {
       download: true,
       header: true,
       skipEmptyLines: true,
@@ -45,7 +45,7 @@ export async function fetchGuyanaData(forceRefresh = false) {
         resolve(results.data);
       },
       error: (error) => {
-        reject(new Error(`Failed to fetch Guyana data: ${error.message}`));
+        reject(new Error(`Failed to fetch Trinidad data: ${error.message}`));
       }
     });
   });

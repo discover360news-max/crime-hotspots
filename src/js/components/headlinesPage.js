@@ -442,15 +442,24 @@ export function initHeadlinesPage(csvUrl) {
       return;
     }
 
-    const button = document.createElement('button');
+    // Check if dashboard is a local page (new custom dashboards) or external iframe (Looker Studio)
+    const isLocalDashboard = country.dashboard.startsWith('/');
+
+    const button = document.createElement(isLocalDashboard ? 'a' : 'button');
     button.id = 'viewDashboardMain';
     button.className = 'inline-block px-6 py-2 bg-rose-600 text-white rounded-full hover:bg-rose-700 transition font-medium shadow-md';
     button.textContent = `View ${country.name} Dashboard`;
     button.setAttribute('aria-label', `View ${country.name} Dashboard`);
 
-    button.addEventListener('click', () => {
-      dashboard.loadDashboard(country.dashboard, country.name, country.headlinesSlug);
-    });
+    if (isLocalDashboard) {
+      // Navigate directly to the new custom dashboard page
+      button.href = country.dashboard;
+    } else {
+      // Load external dashboard in modal panel (legacy Looker Studio)
+      button.addEventListener('click', () => {
+        dashboard.loadDashboard(country.dashboard, country.name, country.headlinesSlug);
+      });
+    }
 
     dashboardButtonContainer.appendChild(button);
   }
