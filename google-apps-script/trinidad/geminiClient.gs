@@ -182,7 +182,7 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
     "crimes": [
       {
         "crime_date": "YYYY-MM-DD (calculate from article, NOT published date)",
-        "crime_type": "Murder|Shooting|Robbery|Assault|Theft|Home Invasion|Sexual Assault|Kidnapping",
+        "crime_type": "Murder|Shooting|Robbery|Assault|Theft|Home Invasion|Sexual Assault|Kidnapping|Police-Involved Shooting",
         "area": "Neighborhood (e.g., Maraval, Port of Spain)",
         "street": "Street address INCLUDING business names/landmarks (e.g., 'KFC Arima', 'Grand Bazaar, Churchill Roosevelt Highway')",
         "headline": "Brief headline with victim name/age in parentheses if known",
@@ -249,11 +249,19 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
      - Deaths under investigation where no crime is confirmed
      - Return {"crimes": [], "confidence": 0} for these cases
 
-  4. MURDER CLASSIFICATION: ONLY use "Murder" when:
-     - Article explicitly states murder/killed/slain/homicide
-     - Clear evidence of violence (gunshot wounds, stabbing, beating)
-     - Police confirm foul play or criminal investigation
-     - Victim was shot/stabbed/attacked and died
+  4. MURDER vs POLICE-INVOLVED SHOOTING:
+     - Use "Police-Involved Shooting" when:
+       * Police killed someone
+       * Officers shot someone
+       * Death occurred during police operation/confrontation
+       * Article states "killed by police/cops/officers"
+       * Person died in police custody with signs of violence
+     - Use "Murder" ONLY when:
+       * Civilian killed another civilian
+       * Article explicitly states murder/slain/homicide (by non-police)
+       * Clear evidence of criminal violence by non-law enforcement
+       * Victim was shot/stabbed/attacked by civilians and died
+     - CRITICAL: "killed by police" = "Police-Involved Shooting" NOT "Murder"
 
   5. NO "Other" CRIME TYPE: Only use listed crime types. If article doesn't match any, return {"crimes": [], "confidence": 0}
 
