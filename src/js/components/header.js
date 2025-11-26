@@ -83,7 +83,7 @@ export function renderHeader(activeOverride = '') {
             <a href="blog.html" data-nav="blog"
                class="text-sm text-slate-700 hover:text-rose-600 font-medium">Blog</a>
 
-            <a href="report.html" class="px-3 py-2 rounded-full bg-rose-600 text-white hover:bg-rose-700 transition">
+            <a href="report.html" class="px-3 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition">
               Report a Crime
             </a>
 

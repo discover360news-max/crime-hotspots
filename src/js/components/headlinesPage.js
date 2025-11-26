@@ -95,7 +95,7 @@ export function initHeadlinesPage(csvUrl) {
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
           <p class="text-rose-700 font-medium mb-4">${sanitizeText(message)}</p>
-          <button onclick="location.reload()" class="px-6 py-2 bg-rose-600 text-white rounded-full hover:bg-rose-700 transition-colors">
+          <button onclick="location.reload()" class="px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors">
             Reload Page
           </button>
         </div>
@@ -447,8 +447,8 @@ export function initHeadlinesPage(csvUrl) {
 
     const button = document.createElement(isLocalDashboard ? 'a' : 'button');
     button.id = 'viewDashboardMain';
-    button.className = 'inline-block px-6 py-2 bg-rose-600 text-white rounded-full hover:bg-rose-700 transition font-medium shadow-md';
-    button.textContent = `View ${country.name} Dashboard`;
+    button.className = 'inline-block px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium shadow-md';
+    button.textContent = 'View Dashboard';
     button.setAttribute('aria-label', `View ${country.name} Dashboard`);
 
     if (isLocalDashboard) {

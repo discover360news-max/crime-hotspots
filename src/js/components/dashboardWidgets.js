@@ -45,8 +45,8 @@ function createMetricCard({ label, value, color }) {
   const card = document.createElement('div');
   card.className = 'metric-card bg-white rounded-lg p-4 shadow-md transition-all hover:shadow-lg';
   card.innerHTML = `
-    <div class="text-sm font-medium text-gray-600 mb-2">${label}</div>
-    <div class="text-3xl font-bold text-gray-900">${value}</div>
+    <div class="text-xs sm:text-sm font-medium text-slate-600 mb-2">${label}</div>
+    <div class="text-2xl sm:text-3xl font-bold text-slate-900">${value}</div>
   `;
   return card;
 }
@@ -60,7 +60,7 @@ export function createPieChart(stats) {
   const container = document.createElement('div');
   container.className = 'chart-container bg-white rounded-lg p-6 shadow-md';
   container.innerHTML = `
-    <h3 class="text-lg font-semibold text-gray-800 mb-4">Crime Type Breakdown</h3>
+    <h3 class="text-lg font-semibold text-slate-700 mb-4">Crime Type Breakdown</h3>
     <div class="relative" style="height: 300px;">
       <canvas id="pieChart"></canvas>
     </div>
@@ -156,7 +156,7 @@ export function createLast7DaysChart(stats) {
   const container = document.createElement('div');
   container.className = 'chart-container bg-white rounded-lg p-6 shadow-md';
   container.innerHTML = `
-    <h3 class="text-lg font-semibold text-gray-800 mb-4">Last 7 Days Trend</h3>
+    <h3 class="text-lg font-semibold text-slate-700 mb-4">Last 7 Days Trend</h3>
     <div class="relative" style="height: 300px;">
       <canvas id="barChart"></canvas>
     </div>
@@ -250,7 +250,7 @@ export function createTopLocationsChart(stats) {
   const container = document.createElement('div');
   container.className = 'chart-container bg-white rounded-lg p-6 shadow-md';
   container.innerHTML = `
-    <h3 class="text-lg font-semibold text-gray-800 mb-4">Top Locations</h3>
+    <h3 class="text-lg font-semibold text-slate-700 mb-4">Top Locations</h3>
     <div class="relative" style="height: 400px;">
       <canvas id="locationChart"></canvas>
     </div>

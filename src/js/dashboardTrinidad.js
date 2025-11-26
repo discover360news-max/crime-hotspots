@@ -1,43 +1,33 @@
 // src/js/dashboardTrinidad.js
-// Dedicated Trinidad & Tobago dashboard page with custom data widgets
+// Trinidad & Tobago dashboard using modular components
 
-import { createTrinidadMap, TRINIDAD_REGIONS } from './components/trinidadMap.js';
+import { createTrinidadMap } from './components/trinidadMap.js';
 import { fetchTrinidadData, calculateStats } from './services/trinidadDataService.js';
 import {
   createMetricsCards,
   createPieChart,
   createLast7DaysChart,
   createTopLocationsChart,
-  createLoadingState,
   createErrorState,
   destroyAllCharts
 } from './components/dashboardWidgets.js';
 import { createTrinidadLeafletMap, getLeafletMapStyles } from './components/trinidadLeafletMap.js';
+import { FilterController } from './components/FilterController.js';
+import { RegionTray } from './components/RegionTray.js';
 
 // DOM Elements
 const mapContainer = document.getElementById('trinidadMapContainer');
 const widgetsContainer = document.getElementById('dashboardWidgets');
 const subtitle = document.getElementById('dashboardSubtitle');
-const mobileRegionButton = document.getElementById('mobileRegionButton');
-const regionTray = document.getElementById('regionTray');
-const trayOverlay = document.getElementById('trayOverlay');
-const closeTrayButton = document.getElementById('closeTrayButton');
-const mobileMapContainer = document.getElementById('mobileMapContainer');
 const resetFilterButton = document.getElementById('resetFilterButton');
-const resetFilterButtonTray = document.getElementById('resetFilterButtonTray');
-const startDateInput = document.getElementById('startDate');
-const endDateInput = document.getElementById('endDate');
-const applyDateFilterButton = document.getElementById('applyDateFilter');
-const clearDateFilterButton = document.getElementById('clearDateFilter');
 
-// Track current state
-let currentRegion = null;
-let currentDateRange = null;
+// State
 let trinidadMapInstance = null;
-let mobileTrinidadMapInstance = null;
 let leafletMapInstance = null;
 let allData = null;
-let isUpdatingRegion = false; // Prevent infinite loops
+let isUpdatingRegion = false;
+let filterController = null;
+let regionTray = null;
 
 /**
  * Initialize the page
@@ -47,7 +37,7 @@ async function init() {
     // Inject Leaflet map styles
     injectLeafletStyles();
 
-    // Create and inject the Trinidad map (desktop only)
+    // Create and inject the desktop map
     if (mapContainer) {
       try {
         trinidadMapInstance = createTrinidadMap(handleRegionClick);
@@ -64,17 +54,74 @@ async function init() {
       }
     }
 
-    // Initialize mobile region selector tray
-    initializeMobileTray();
+    // Initialize filter controller
+    filterController = new FilterController({
+      desktopStartInputId: 'startDate',
+      desktopEndInputId: 'endDate',
+      desktopApplyButtonId: 'applyDateFilter',
+      desktopClearButtonId: 'clearDateFilter',
+      mobileStartInputId: 'startDateMobile',
+      mobileEndInputId: 'endDateMobile',
+      mobileApplyButtonId: 'applyDateFilterMobile',
+      mobileClearButtonId: 'clearDateFilterMobile',
+      onFilterChange: async (regionFilter, dateRange) => {
+        await loadDashboard(regionFilter, dateRange);
+      },
+      onSubtitleUpdate: updateSubtitle,
+      onResetButtonUpdate: updateResetButtonVisibility
+    });
 
-    // Initialize date filter controls
-    initializeDateFilter();
+    // Initialize region tray
+    regionTray = new RegionTray({
+      trayId: 'regionTray',
+      overlayId: 'trayOverlay',
+      openButtonId: 'mobileRegionButton',
+      closeButtonId: 'closeTrayButton',
+      resetButtonId: 'resetFilterButtonTray',
+      mobileMapContainerId: 'mobileMapContainer',
+      createMapFn: (onClickCallback) => {
+        return createTrinidadMap((regionNumber, regionName) => {
+          handleRegionClick(regionNumber, regionName);
+          onClickCallback(regionNumber, regionName);
+        });
+      },
+      onReset: async () => {
+        await handleRegionClick(null, null);
+        if (filterController) {
+          await filterController.clearAllFilters();
+        }
+      }
+    });
 
-    // Load dashboard data and widgets
+    // Reset filter button
+    if (resetFilterButton) {
+      resetFilterButton.addEventListener('click', async () => {
+        try {
+          if (filterController) {
+            await filterController.clearAllFilters();
+          }
+          await handleRegionClick(null, null);
+        } catch (error) {
+          console.error('Error resetting filters:', error);
+        }
+      });
+    }
+
+    // Keyboard shortcut (R to reset)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'r' || e.key === 'R') {
+        if (filterController && filterController.getRegion() && trinidadMapInstance) {
+          e.preventDefault();
+          trinidadMapInstance.clearFilter();
+          handleRegionClick(null, null);
+        }
+      }
+    });
+
+    // Load dashboard data
     await loadDashboard();
   } catch (error) {
     console.error('Error initializing dashboard:', error);
-    // Show error to user
     if (widgetsContainer) {
       widgetsContainer.innerHTML = '<div class="p-6 text-center text-red-600">Failed to initialize dashboard. Please refresh the page.</div>';
     }
@@ -100,8 +147,6 @@ async function loadDashboard(regionFilter = null, dateRange = null) {
   }
 
   try {
-    // Skeleton is already in the HTML, no need to show loading state
-
     // Fetch data (or use cached data)
     if (!allData) {
       console.log('Fetching Trinidad data from CSV...');
@@ -139,7 +184,6 @@ async function loadDashboard(regionFilter = null, dateRange = null) {
       }
     } catch (errorStateError) {
       console.error('Error showing error state:', errorStateError);
-      // Last resort - show simple error message
       if (widgetsContainer) {
         widgetsContainer.innerHTML = '<div class="p-6 text-center text-red-600">Failed to load dashboard data. Please refresh the page.</div>';
       }
@@ -152,6 +196,9 @@ async function loadDashboard(regionFilter = null, dateRange = null) {
  */
 function renderWidgets(stats) {
   try {
+    // Clear existing widgets
+    widgetsContainer.innerHTML = '';
+
     // Destroy existing charts to prevent memory leaks
     try {
       destroyAllCharts();
@@ -173,6 +220,7 @@ function renderWidgets(stats) {
         if (leafletMapInstance) {
           leafletMapInstance.destroy();
         }
+        const currentRegion = filterController ? filterController.getRegion() : null;
         leafletMapInstance = createTrinidadLeafletMap(allData, currentRegion?.name);
         leafletMapInstance.element.classList.add('mb-6');
         widgetsContainer.appendChild(leafletMapInstance.element);
@@ -213,194 +261,7 @@ function renderWidgets(stats) {
     }
   } catch (error) {
     console.error('Error rendering widgets:', error);
-    throw error; // Re-throw to be caught by loadDashboard
-  }
-}
-
-/**
- * Initialize date filter controls
- */
-function initializeDateFilter() {
-  // Apply date filter button
-  if (applyDateFilterButton) {
-    applyDateFilterButton.addEventListener('click', async () => {
-      const startDate = startDateInput.value;
-      const endDate = endDateInput.value;
-
-      if (!startDate || !endDate) {
-        alert('Please select both start and end dates');
-        return;
-      }
-
-      if (new Date(startDate) > new Date(endDate)) {
-        alert('Start date must be before end date');
-        return;
-      }
-
-      currentDateRange = { startDate, endDate };
-      await loadDashboard(currentRegion?.name || null, currentDateRange);
-      updateSubtitle();
-      updateResetButtonVisibility();
-    });
-  }
-
-  // Clear date filter button
-  if (clearDateFilterButton) {
-    clearDateFilterButton.addEventListener('click', async () => {
-      startDateInput.value = '';
-      endDateInput.value = '';
-      currentDateRange = null;
-      await loadDashboard(currentRegion?.name || null, null);
-      updateSubtitle();
-      updateResetButtonVisibility();
-    });
-  }
-}
-
-/**
- * Initialize mobile region selector tray
- */
-function initializeMobileTray() {
-  try {
-    // Create mobile map instance
-    if (mobileMapContainer) {
-      mobileTrinidadMapInstance = createTrinidadMap((regionNumber, regionName) => {
-        try {
-          handleRegionClick(regionNumber, regionName);
-          closeTray();
-        } catch (error) {
-          console.error('Error handling region click from mobile tray:', error);
-        }
-      });
-      mobileMapContainer.innerHTML = '';
-      mobileMapContainer.appendChild(mobileTrinidadMapInstance.element);
-    }
-
-    // Mobile region button - open tray
-    if (mobileRegionButton) {
-      mobileRegionButton.addEventListener('click', () => {
-        try {
-          openTray();
-        } catch (error) {
-          console.error('Error opening tray:', error);
-        }
-      });
-    }
-
-    // Close tray button
-    if (closeTrayButton) {
-      closeTrayButton.addEventListener('click', () => {
-        try {
-          closeTray();
-        } catch (error) {
-          console.error('Error closing tray:', error);
-        }
-      });
-    }
-
-    // Overlay - close tray when clicked
-    if (trayOverlay) {
-      trayOverlay.addEventListener('click', () => {
-        try {
-          closeTray();
-        } catch (error) {
-          console.error('Error closing tray via overlay:', error);
-        }
-      });
-    }
-
-    // Reset filter buttons
-    if (resetFilterButton) {
-      resetFilterButton.addEventListener('click', async () => {
-        try {
-          // Clear date filter inputs
-          startDateInput.value = '';
-          endDateInput.value = '';
-          currentDateRange = null;
-
-          // Clear region filter
-          await handleRegionClick(null, null);
-        } catch (error) {
-          console.error('Error resetting filters:', error);
-        }
-      });
-    }
-
-    if (resetFilterButtonTray) {
-      resetFilterButtonTray.addEventListener('click', async () => {
-        try {
-          // Clear date filter inputs
-          startDateInput.value = '';
-          endDateInput.value = '';
-          currentDateRange = null;
-
-          // Clear region filter
-          await handleRegionClick(null, null);
-          closeTray();
-        } catch (error) {
-          console.error('Error resetting filters from tray:', error);
-          // Still try to close the tray even if reset fails
-          try {
-            closeTray();
-          } catch (closeError) {
-            console.error('Error closing tray after failed reset:', closeError);
-          }
-        }
-      });
-    }
-  } catch (error) {
-    console.error('Error initializing mobile tray:', error);
-  }
-}
-
-/**
- * Open mobile region tray
- */
-function openTray() {
-  try {
-    if (regionTray && trayOverlay) {
-      regionTray.classList.remove('translate-x-full');
-      trayOverlay.classList.remove('opacity-0', 'pointer-events-none');
-      if (document.body) {
-        document.body.style.overflow = 'hidden'; // Prevent scrolling
-      }
-    }
-  } catch (error) {
-    console.error('Error opening tray:', error);
-  }
-}
-
-/**
- * Close mobile region tray
- */
-function closeTray() {
-  try {
-    if (regionTray && trayOverlay) {
-      regionTray.classList.add('translate-x-full');
-      trayOverlay.classList.add('opacity-0', 'pointer-events-none');
-      if (document.body) {
-        document.body.style.overflow = ''; // Re-enable scrolling
-      }
-    }
-  } catch (error) {
-    console.error('Error closing tray:', error);
-  }
-}
-
-/**
- * Update reset filter button visibility
- */
-function updateResetButtonVisibility() {
-  try {
-    if (resetFilterButton) {
-      if (currentRegion || currentDateRange) {
-        resetFilterButton.classList.remove('hidden');
-      } else {
-        resetFilterButton.classList.add('hidden');
-      }
-    }
-  } catch (error) {
-    console.error('Error updating reset button visibility:', error);
+    throw error;
   }
 }
 
@@ -418,20 +279,25 @@ async function handleRegionClick(regionNumber, regionName) {
 
   try {
     if (regionNumber) {
-      // Region selected - filter dashboard
-      currentRegion = { number: regionNumber, name: regionName };
+      // Region selected - update filter controller
+      if (filterController) {
+        filterController.setRegion({ number: regionNumber, name: regionName });
+      }
 
-      // Reload dashboard with region filter (preserve date filter)
-      await loadDashboard(regionName, currentDateRange);
+      // Reload dashboard with region filter
+      const dateRange = filterController ? filterController.getDateRange() : null;
+      await loadDashboard(regionName, dateRange);
     } else {
-      // Clear filter - show all regions
-      currentRegion = null;
+      // Clear filter
+      if (filterController) {
+        filterController.setRegion(null);
+      }
 
-      // Reload dashboard without region filter (preserve date filter)
-      await loadDashboard(null, currentDateRange);
+      // Reload dashboard without region filter
+      const dateRange = filterController ? filterController.getDateRange() : null;
+      await loadDashboard(null, dateRange);
 
-      // Clear both map visual states WITHOUT triggering their callbacks
-      // (since we've already loaded the unfiltered data above)
+      // Clear both map visual states
       if (trinidadMapInstance && typeof trinidadMapInstance.clearFilter === 'function') {
         try {
           trinidadMapInstance.clearFilter();
@@ -440,27 +306,25 @@ async function handleRegionClick(regionNumber, regionName) {
         }
       }
 
-      if (mobileTrinidadMapInstance && typeof mobileTrinidadMapInstance.clearFilter === 'function') {
-        try {
-          mobileTrinidadMapInstance.clearFilter();
-        } catch (error) {
-          console.error('Error clearing mobile map filter:', error);
+      if (regionTray) {
+        const mobileMapInstance = regionTray.getMapInstance();
+        if (mobileMapInstance && typeof mobileMapInstance.clearFilter === 'function') {
+          try {
+            mobileMapInstance.clearFilter();
+          } catch (error) {
+            console.error('Error clearing mobile map filter:', error);
+          }
         }
       }
     }
-
-    // Update reset button visibility
-    updateResetButtonVisibility();
   } catch (error) {
     console.error('Error in handleRegionClick:', error);
-    // Try to recover by at least updating the subtitle
     try {
-      updateSubtitle('Error loading data');
+      updateSubtitle(null, null, 'Error loading data');
     } catch (subtitleError) {
       console.error('Error updating subtitle:', subtitleError);
     }
   } finally {
-    // Always reset the flag after processing
     isUpdatingRegion = false;
   }
 }
@@ -468,27 +332,25 @@ async function handleRegionClick(regionNumber, regionName) {
 /**
  * Update dashboard subtitle
  */
-function updateSubtitle(text = null) {
+function updateSubtitle(region, dateRange, errorText = null) {
   if (!subtitle) return;
 
-  // If text is provided, use it directly
-  if (text) {
-    subtitle.textContent = text;
+  if (errorText) {
+    subtitle.textContent = errorText;
     return;
   }
 
-  // Otherwise, build subtitle from current filters
   let subtitleText = '';
 
-  if (currentRegion) {
-    subtitleText = currentRegion.name;
+  if (region) {
+    subtitleText = region.name;
   } else {
     subtitleText = 'Nationwide data';
   }
 
-  if (currentDateRange) {
-    const startDate = new Date(currentDateRange.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const endDate = new Date(currentDateRange.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (dateRange) {
+    const startDate = new Date(dateRange.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const endDate = new Date(dateRange.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     subtitleText += ` | ${startDate} - ${endDate}`;
   }
 
@@ -496,18 +358,21 @@ function updateSubtitle(text = null) {
 }
 
 /**
- * Keyboard shortcuts
+ * Update reset filter button visibility
  */
-document.addEventListener('keydown', (e) => {
-  // Press 'R' to reset filters
-  if (e.key === 'r' || e.key === 'R') {
-    if (currentRegion && trinidadMapInstance) {
-      e.preventDefault();
-      trinidadMapInstance.clearFilter();
-      handleRegionClick(null, null);
+function updateResetButtonVisibility(region, dateRange) {
+  try {
+    if (resetFilterButton) {
+      if (region || dateRange) {
+        resetFilterButton.classList.remove('hidden');
+      } else {
+        resetFilterButton.classList.add('hidden');
+      }
     }
+  } catch (error) {
+    console.error('Error updating reset button visibility:', error);
   }
-});
+}
 
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', init);
