@@ -93,6 +93,14 @@ async function init() {
       }
     });
 
+    // Compact region button (in header, mobile only)
+    const mobileRegionButtonCompact = document.getElementById('mobileRegionButtonCompact');
+    if (mobileRegionButtonCompact && regionTray) {
+      mobileRegionButtonCompact.addEventListener('click', () => {
+        regionTray.open();
+      });
+    }
+
     // Reset filter button
     if (resetFilterButton) {
       resetFilterButton.addEventListener('click', async () => {
