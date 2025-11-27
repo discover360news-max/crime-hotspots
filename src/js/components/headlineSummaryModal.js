@@ -450,7 +450,7 @@ export function createHeadlineSummaryModal() {
     };
 
     try {
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQIcNVcNTEoikPdCNPberaU_kLJkrNcuve3HQzpYUZRJ-xMTXyWZe4BKSRSn_Gamct/exec';
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgxK4iMRUSgsHufvg6L7MGmKgBo6b3EgeDWtgG_oAtKAA8ZaGECPXALtmE7IwOVFI-/exec';
 
       const response = await fetch(SCRIPT_URL, {
         method: 'POST',
