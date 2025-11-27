@@ -112,6 +112,42 @@ google-apps-script/
 
 ---
 
+## Recent Features (Nov 2025)
+
+### Issue Reporting System
+**Location:** Headlines summary modal
+**Implementation:** Web3Forms API (free, no CORS issues)
+**Features:**
+- Native OS dropdown for issue type selection
+- Optional 500-char details textarea
+- Session rate limiting (3 reports max)
+- Text sanitization + honeypot protection
+- Email notifications to discover360news@gmail.com
+
+**Why Web3Forms (not Google Apps Script):**
+- No CORS/CSP complications
+- No deployment/authorization complexity
+- Free unlimited submissions
+- Instant email delivery
+
+### Typography Framework
+**Location:** `/src/css/styles.css`
+**Implementation:** CSS custom properties with semantic classes
+**Classes:** `.text-display`, `.text-h1`, `.text-h2`, `.text-h3`, `.text-body`, `.text-small`, `.text-tiny`, `.text-nav`
+**Benefit:** Single-source-of-truth for all text sizing, mobile-first responsive
+
+### Dashboard Improvements (Trinidad)
+**Completed Nov 27, 2025:**
+- Removed red background from dashboard header
+- Changed "View Headlines" button to outline style
+- Added compact "Select Region" button for mobile (header)
+- Fixed map z-index (no longer overlaps tray/header)
+- Clean, minimal design with proper visual hierarchy
+
+**Pending:** Apply same updates to Guyana dashboard
+
+---
+
 ## Common Patterns
 
 ### Adding a New Page
@@ -193,9 +229,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - Automated deployment (GitHub → Cloudflare)
 - Blog system with visual components
 - Weekly report generator with safeguards
+- User issue reporting system (Web3Forms integration)
+- Site-wide typography framework (responsive, consistent)
+- Trinidad dashboard styling overhaul (Nov 27, 2025)
 
 ### 🔄 In Progress
 - Guyana backfill processing (170 URLs)
+- Guyana dashboard styling updates (to match Trinidad)
 
 ### 📋 Planned
 - Barbados automation
@@ -220,5 +260,5 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 ---
 
-**Version:** 1.2.0
-**Last Updated:** November 15, 2025
+**Version:** 1.3.0
+**Last Updated:** November 27, 2025
