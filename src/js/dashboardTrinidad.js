@@ -75,7 +75,7 @@ async function init() {
     regionTray = new RegionTray({
       trayId: 'regionTray',
       overlayId: 'trayOverlay',
-      openButtonId: 'mobileRegionButton',
+      openButtonId: 'mobileRegionButtonCompact',
       closeButtonId: 'closeTrayButton',
       resetButtonId: 'resetFilterButtonTray',
       mobileMapContainerId: 'mobileMapContainer',
@@ -92,14 +92,6 @@ async function init() {
         }
       }
     });
-
-    // Compact region button (in header, mobile only)
-    const mobileRegionButtonCompact = document.getElementById('mobileRegionButtonCompact');
-    if (mobileRegionButtonCompact && regionTray) {
-      mobileRegionButtonCompact.addEventListener('click', () => {
-        regionTray.open();
-      });
-    }
 
     // Reset filter button
     if (resetFilterButton) {
