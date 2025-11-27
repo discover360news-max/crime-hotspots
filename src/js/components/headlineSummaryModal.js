@@ -433,61 +433,38 @@ export function createHeadlineSummaryModal() {
     if (!issueType || !currentCrime) return;
 
     try {
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_4stfkJGTTDvjZ62jVae-BqbvHLHscuMgX76q6oLV7ETCwE1esVj_co5bHTeG_gSl/exec';
+      // Use Web3Forms - simple, free, no CORS issues
+      const formData = new FormData();
+      formData.append('access_key', 'c3ca4fbb-23f5-43ef-80b5-66236933b403');
+      formData.append('subject', `Crime Hotspots Issue Report: ${issueType}`);
+      formData.append('from_name', 'Crime Hotspots User');
 
-      // Use JSONP (script tag) to completely bypass CORS restrictions
-      const callbackName = 'issueReportCallback_' + Date.now();
+      // Issue details
+      formData.append('Issue Type', issueType);
+      formData.append('User Details', details || 'None provided');
+      formData.append('Timestamp', new Date().toISOString());
 
-      // Create promise that resolves when callback is called
-      const submitPromise = new Promise((resolve, reject) => {
-        // Set up callback
-        window[callbackName] = function(response) {
-          delete window[callbackName];
-          if (response.status === 200) {
-            resolve(response);
-          } else {
-            reject(new Error(response.message));
-          }
-        };
+      // Crime details
+      formData.append('Headline', currentCrime.Headline || '');
+      formData.append('Crime Type', currentCrime['Crime Type'] || '');
+      formData.append('Date', currentCrime.Date || '');
+      formData.append('Location', currentCrime['Street Address'] || currentCrime.Area || '');
+      formData.append('Area', currentCrime.Area || '');
+      formData.append('Country', currentCrime.Country || '');
+      formData.append('Source URL', currentCrime.URL || '');
+      formData.append('Plus Code', currentCrime.Location || '');
+      formData.append('Report Page', window.location.href);
 
-        // Set timeout
-        setTimeout(() => {
-          delete window[callbackName];
-          reject(new Error('Request timeout'));
-        }, 10000);
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData
       });
 
-      // Build URL with parameters
-      const params = new URLSearchParams({
-        callback: callbackName,
-        issueType,
-        details: details || '',
-        timestamp: new Date().toISOString(),
-        headline: currentCrime.Headline || '',
-        crimeType: currentCrime['Crime Type'] || '',
-        date: currentCrime.Date || '',
-        location: currentCrime['Street Address'] || currentCrime.Area || '',
-        area: currentCrime.Area || '',
-        country: currentCrime.Country || '',
-        url: currentCrime.URL || '',
-        plusCode: currentCrime.Location || '',
-        pageUrl: window.location.href
-      });
+      const result = await response.json();
 
-      // Create and inject script tag
-      const script = document.createElement('script');
-      script.src = `${SCRIPT_URL}?${params.toString()}`;
-      script.onerror = () => {
-        delete window[callbackName];
-        alert('Failed to submit report. Please try again.');
-      };
-      document.body.appendChild(script);
-
-      // Wait for callback
-      await submitPromise;
-
-      // Clean up
-      document.body.removeChild(script);
+      if (!result.success) {
+        throw new Error(result.message || 'Submission failed');
+      }
 
       // Increment rate limit counter
       incrementReportCount();

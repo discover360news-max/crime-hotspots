@@ -52,7 +52,8 @@
       "Bash(VITE_COUNTRY_FILTER=guyana npm run build:*)",
       "WebFetch(domain:guyana.crimehotspots.com)",
       "Bash(open http://localhost:5173/dashboard-guyana.html)",
-      "Bash(open http://localhost:5173/dashboard-trinidad.html)"
+      "Bash(open http://localhost:5173/dashboard-trinidad.html)",
+      "Bash(open \"http://localhost:5173/headlines-trinidad.html\")"
     ],
     "deny": [],
     "ask": []
