@@ -48,8 +48,8 @@ function createCountryCard(country, index, dashboard) {
         }
       </div>
       <div class="mt-2 text-center bg-white w-full py-2">
-        <h3 class="text-sm font-semibold">${country.flag} ${country.name}</h3>
-        <p class="mt-1 text-xs text-slate-500">${country.short}</p>
+        <h3 class="text-small font-semibold">${country.flag} ${country.name}</h3>
+        <p class="mt-1 text-tiny text-slate-500">${country.short}</p>
       </div>
     </div>
   `;

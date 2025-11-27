@@ -52,23 +52,23 @@
   </script>
   
   <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fadeIn">
-    <h1 class="text-2xl font-semibold mb-3 text-center">Trinidad & Tobago Headlines</h1>
+    <h1 class="text-display font-bold mb-3">Trinidad & Tobago Headlines</h1>
 
-    <div class="text-center mb-6" id="dashboardButtonContainer">
+    <div class="mb-6" id="dashboardButtonContainer">
       </div>
 
     <!-- Filter Controls -->
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+    <div class="flex flex-row flex-wrap items-center gap-2 mb-6">
       <div>
         <label for="areaSelect" class="sr-only">Area</label>
-        <select id="areaSelect" class="px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm min-w-[160px] focus:ring-2 focus:ring-rose-500 focus:border-rose-500">
+        <select id="areaSelect" class="px-2 py-1.5 border border-slate-300 rounded-md bg-white text-tiny focus:ring-2 focus:ring-rose-500 focus:border-rose-500">
           <option value="">All Areas</option>
         </select>
       </div>
 
       <div>
         <label for="crimeSelect" class="sr-only">Crime Type</label>
-        <select id="crimeSelect" class="px-3 py-2 border border-slate-300 rounded-lg bg-white text-sm min-w-[160px] focus:ring-2 focus:ring-rose-500 focus:border-rose-500">
+        <select id="crimeSelect" class="px-2 py-1.5 border border-slate-300 rounded-md bg-white text-tiny focus:ring-2 focus:ring-rose-500 focus:border-rose-500">
           <option value="">All Crimes</option>
           <option>Assault</option>
           <option>Burglary</option>
@@ -82,19 +82,19 @@
         </select>
       </div>
 
-      <button id="clearFilterBtn" class="text-sm text-rose-600 hover:text-rose-700 font-medium underline hidden flex items-center gap-1">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button id="clearFilterBtn" class="text-tiny text-rose-600 hover:text-rose-700 font-medium underline hidden flex items-center gap-1">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-        Clear filters
+        Clear
       </button>
     </div>
 
     <!-- Active Filter Badges -->
-    <div id="activeFilterBox" class="flex justify-center gap-2 mb-4 hidden"></div>
+    <div id="activeFilterBox" class="flex gap-2 mb-4 hidden"></div>
 
     <!-- Results Count -->
-    <div id="resultsCount" class="text-center text-sm text-slate-600 mb-4"></div>
+    <div id="resultsCount" class="text-small text-slate-600 mb-4"></div>
 
     <!-- Skeleton while loading -->
     <div id="headlineSkeleton" class="flex flex-col items-center justify-center py-8">
@@ -103,9 +103,9 @@
     </div>
 
     <!-- Headlines container -->
-    <div id="headlinesContainer" class="grid gap-8 sm:grid-cols-1 lg:grid-cols-2 place-items-start justify-center mx-auto"></div>
+    <div id="headlinesContainer" class="grid gap-8 sm:grid-cols-1 lg:grid-cols-2 place-items-start"></div>
 
-    <div class="text-center mt-10">
+    <div class="mt-10">
       <button id="loadMoreBtn" class="px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition">Load More</button>
     </div>
   </main>

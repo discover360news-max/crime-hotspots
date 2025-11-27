@@ -3,6 +3,7 @@
 
 import { COUNTRIES } from '../data/countries.js';
 import { initDashboardPanel } from './dashboardPanel.js';
+import { createHeadlineSummaryModal } from './headlineSummaryModal.js';
 import DOMPurify from 'dompurify';
 
 const BATCH_SIZE = 10;
@@ -30,6 +31,9 @@ export function initHeadlinesPage(csvUrl) {
 
   // Dashboard panel (shared)
   const dashboard = initDashboardPanel();
+
+  // Summary modal
+  const summaryModal = createHeadlineSummaryModal();
 
   // state
   let allHeadlines = [];
@@ -168,20 +172,20 @@ export function initHeadlinesPage(csvUrl) {
 
     card.setAttribute("data-index", indexInCurrentList);
 
-    const dateBadge = `<span class="text-xs text-slate-500">${formatDate(item.Date)}</span>`;
+    const dateBadge = `<span class="text-tiny text-slate-500">${formatDate(item.Date)}</span>`;
 
     // Crime tag with icon
-    const crimeTag = `<button class="text-xs font-semibold text-rose-600 hover:text-rose-700 uppercase hover:underline crimeLink flex items-center gap-1" data-crime="${sanitizeAttr(item["Crime Type"]||'')}">
+    const crimeTag = `<button class="text-tiny font-semibold text-rose-600 hover:text-rose-700 uppercase hover:underline crimeLink flex items-center gap-1" data-crime="${sanitizeAttr(item["Crime Type"]||'')}">
       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
       </svg>
       ${sanitizeText(item["Crime Type"]||"")}
     </button>`;
 
-    const address = `<p class="text-xs text-slate-500 mb-2">${sanitizeText(item["Street Address"]||"")}</p>`;
+    const address = `<p class="text-tiny text-slate-500 mb-2">${sanitizeText(item["Street Address"]||"")}</p>`;
 
     // Area button with location icon
-    const areaBtn = `<button class="text-xs text-rose-600 hover:text-rose-700 underline areaLink flex items-center gap-1" data-area="${sanitizeAttr(item.Area||'')}">
+    const areaBtn = `<button class="text-tiny text-rose-600 hover:text-rose-700 underline areaLink flex items-center gap-1" data-area="${sanitizeAttr(item.Area||'')}">
       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -189,11 +193,11 @@ export function initHeadlinesPage(csvUrl) {
       ${sanitizeText(item.Area||'')}
     </button>`;
 
-    const headlineHtml = `<div class="mb-2 text-sm text-slate-900 line-clamp-2">${sanitizeText(item.Headline||'')}</div>`;
+    const headlineHtml = `<div class="mb-2 text-small text-slate-900 line-clamp-2">${sanitizeText(item.Headline||'')}</div>`;
 
     // Read article hint (only for clickable cards)
     const readHint = hasUrl ? `
-      <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-rose-600 font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div class="mt-3 pt-3 border-t border-slate-100 text-tiny text-rose-600 font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <span>Read article</span>
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -270,12 +274,12 @@ export function initHeadlinesPage(csvUrl) {
 
     const badges = [];
     if (activeAreaFilter) {
-      badges.push(`<span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-sm font-medium">
+      badges.push(`<span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-small font-medium">
         Area: <strong>${sanitizeText(activeAreaFilter)}</strong>
       </span>`);
     }
     if (activeCrimeFilter) {
-      badges.push(`<span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-sm font-medium">
+      badges.push(`<span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-small font-medium">
         Crime: <strong>${sanitizeText(activeCrimeFilter)}</strong>
       </span>`);
     }
@@ -334,56 +338,12 @@ export function initHeadlinesPage(csvUrl) {
     const item = currentList[currentIndex];
     if (!item) return;
 
-    const rawUrl = item.URL?.trim();
-    if (rawUrl && isValidHttpUrl(rawUrl)) {
-      try {
-        const url = new URL(rawUrl);
-        const isSameDomain = url.hostname === window.location.hostname;
+    // Get country slug for "View on Map" button
+    const country = countryForCurrentPage();
+    const countrySlug = country ? country.headlinesSlug : null;
 
-        if (!isSameDomain) {
-          window.open(url.href, "_blank", "noopener,noreferrer");
-          return;
-        }
-
-        modal.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-
-        iframe.classList.remove("opacity-100");
-        iframe.classList.add("opacity-0");
-
-        iframe.src = url.href;
-        modalOpenExternal.href = url.href;
-        modalOpenExternal.rel = "noopener noreferrer nofollow";
-        modalOpenExternal.classList.remove("hidden");
-      } catch (e) {
-        console.warn("URL processing error:", rawUrl, e);
-        modal.classList.remove("hidden");
-        document.body.style.overflow = "hidden";
-        iframe.src = "about:blank";
-        modalOpenExternal.classList.add("hidden");
-      }
-    } else {
-      modal.classList.remove("hidden");
-      document.body.style.overflow = "hidden";
-
-      if (rawUrl) {
-        console.warn("Blocked unsafe URL:", rawUrl);
-      }
-      iframe.src = "about:blank";
-      modalOpenExternal.classList.add("hidden");
-    }
-
-    requestAnimationFrame(() => {
-      modal.classList.remove("translate-y-full", "opacity-0");
-      modal.classList.add("translate-y-0", "opacity-100");
-    });
-
-    iframe.onload = () => {
-      setTimeout(() => {
-        iframe.classList.remove("opacity-0");
-        iframe.classList.add("opacity-100");
-      }, 250);
-    };
+    // Show summary modal
+    summaryModal.show(item, countrySlug);
 
     updateModalNavButtons();
   }
@@ -447,7 +407,7 @@ export function initHeadlinesPage(csvUrl) {
 
     const button = document.createElement(isLocalDashboard ? 'a' : 'button');
     button.id = 'viewDashboardMain';
-    button.className = 'inline-block px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium shadow-md';
+    button.className = 'inline-block px-4 py-1.5 border-2 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-small';
     button.textContent = 'View Dashboard';
     button.setAttribute('aria-label', `View ${country.name} Dashboard`);
 
@@ -523,7 +483,9 @@ export function initHeadlinesPage(csvUrl) {
               "Crime Type": (r["Crime Type"] || "").trim(),
               "Street Address": (r["Street Address"] || "").trim(),
               Area: (r["Area"] || "").trim(),
-              URL: (r["URL"] || "").trim()
+              Country: (r["Country"] || "").trim(),
+              URL: (r["URL"] || "").trim(),
+              Summary: (r["Summary"] || "").trim()
             }))
             .filter(r => r.Headline);
 

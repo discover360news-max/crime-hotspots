@@ -7,14 +7,14 @@ export function renderHeader(activeOverride = '') {
     if (c.available) {
       return `
         <a href="headlines-${c.headlinesSlug}.html" data-island="${c.headlinesSlug}"
-           class="block px-4 py-2 text-sm text-slate-700 hover:bg-rose-50 hover:text-rose-600"
+           class="block px-4 py-2 text-nav text-slate-700 hover:bg-rose-50 hover:text-rose-600"
            role="menuitem">
           ${c.flag} ${c.name}
         </a>`;
     } else {
       return `
         <a href="#" data-island="${c.headlinesSlug}"
-           class="block px-4 py-2 text-sm text-slate-400 cursor-not-allowed"
+           class="block px-4 py-2 text-nav text-slate-400 cursor-not-allowed"
            role="menuitem" aria-disabled="true">
           ${c.flag} ${c.name} (Coming Soon)
         </a>`;
@@ -64,7 +64,7 @@ export function renderHeader(activeOverride = '') {
 
             <div class="relative group" data-nav="headlines">
               <button id="navHeadlinesBtn"
-                class="text-sm text-slate-700 hover:text-rose-600 font-medium flex items-center gap-1 focus:outline-none"
+                class="text-nav text-slate-700 hover:text-rose-600 font-medium flex items-center gap-1 focus:outline-none"
                 aria-haspopup="true" aria-expanded="false">
                 View Headlines
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -81,14 +81,14 @@ export function renderHeader(activeOverride = '') {
             </div>
 
             <a href="blog.html" data-nav="blog"
-               class="text-sm text-slate-700 hover:text-rose-600 font-medium">Blog</a>
+               class="text-nav text-slate-700 hover:text-rose-600 font-medium">Blog</a>
 
-            <a href="report.html" class="px-3 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition">
+            <a href="report.html" class="px-3 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition text-nav">
               Report a Crime
             </a>
 
             <a href="about.html" data-nav="about"
-               class="text-sm text-slate-700 hover:text-rose-600 font-medium">About</a>
+               class="text-nav text-slate-700 hover:text-rose-600 font-medium">About</a>
           </nav>
         </div>
       </div>
@@ -110,7 +110,7 @@ export function renderHeader(activeOverride = '') {
 
         <div class="space-y-1">
           <div data-nav="headlines">
-            <button id="mobileHeadlinesBtn" class="w-full text-left text-base text-slate-700 hover:text-rose-600 font-medium flex items-center gap-2 py-3 border-b border-slate-200" aria-haspopup="true" aria-expanded="false">
+            <button id="mobileHeadlinesBtn" class="w-full text-left text-nav text-slate-700 hover:text-rose-600 font-medium flex items-center gap-2 py-3 border-b border-slate-200" aria-haspopup="true" aria-expanded="false">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
               </svg>
@@ -120,25 +120,25 @@ export function renderHeader(activeOverride = '') {
               </svg>
             </button>
             <div id="mobileHeadlinesMenu" class="hidden mt-2 ml-4 space-y-2">
-              ${dropdownItems.replace(/block px-4 py-2 text-sm/g, 'block py-2 text-sm')}
+              ${dropdownItems.replace(/block px-4 py-2 text-nav/g, 'block py-2 text-nav')}
             </div>
           </div>
 
-          <a href="blog.html" data-nav="blog" class="flex items-center gap-2 text-base text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+          <a href="blog.html" data-nav="blog" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Blog
           </a>
 
-          <a href="report.html" class="flex items-center gap-2 text-base text-rose-600 hover:text-rose-700 font-medium py-3 border-b border-slate-200">
+          <a href="report.html" class="flex items-center gap-2 text-nav text-rose-600 hover:text-rose-700 font-medium py-3 border-b border-slate-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             Report a Crime
           </a>
 
-          <a href="about.html" data-nav="about" class="flex items-center gap-2 text-base text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+          <a href="about.html" data-nav="about" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

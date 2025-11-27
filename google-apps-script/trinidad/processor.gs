@@ -253,7 +253,8 @@ function validateAndFormatDate(dateStr, fallbackDate) {
         'Trinidad',
         crime.source_url || '',
         geocoded.lat || '',
-        geocoded.lng || ''
+        geocoded.lng || '',
+        crime.details || '' // Summary for SEO and UX
       ]);
 
       Logger.log(`✅ Added to production: ${crime.headline}
@@ -296,6 +297,7 @@ function validateAndFormatDate(dateStr, fallbackDate) {
       crime.source_url || '',
       geocoded.lat || '',
       geocoded.lng || '',
+      crime.details || '', // Summary for SEO and UX
       confidence,
       (ambiguities || []).join('; '),
       'pending',

@@ -186,7 +186,7 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
         "area": "Neighborhood (e.g., Georgetown, New Amsterdam)",
         "street": "Street address INCLUDING business names/landmarks (e.g., 'Stabroek Market', 'Sheriff Street, Campbellville')",
         "headline": "Brief headline with victim name/age in parentheses if known",
-        "details": "2-3 sentence summary",
+        "details": "2-3 sentence summary. Include crime type, location, and key details. Make it informative and engaging for readers. Use proper grammar and complete sentences.",
         "victims": [{"name": "Name or null", "age": number, "aliases": []}],
         "location_country": "Guyana|Venezuela|Suriname|Other"
       }

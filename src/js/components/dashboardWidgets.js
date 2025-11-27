@@ -45,8 +45,8 @@ function createMetricCard({ label, value, color }) {
   const card = document.createElement('div');
   card.className = 'metric-card bg-white rounded-lg p-4 shadow-md transition-all hover:shadow-lg';
   card.innerHTML = `
-    <div class="text-xs sm:text-sm font-medium text-slate-600 mb-2">${label}</div>
-    <div class="text-2xl sm:text-3xl font-bold text-slate-900">${value}</div>
+    <div class="text-small font-medium text-slate-600 mb-2">${label}</div>
+    <div class="text-display font-bold text-slate-900">${value}</div>
   `;
   return card;
 }
@@ -60,7 +60,7 @@ export function createPieChart(stats) {
   const container = document.createElement('div');
   container.className = 'chart-container bg-white rounded-lg p-6 shadow-md';
   container.innerHTML = `
-    <h3 class="text-lg font-semibold text-slate-700 mb-4">Crime Type Breakdown</h3>
+    <h3 class="text-h3 font-semibold text-slate-700 mb-4">Crime Type Breakdown</h3>
     <div class="relative" style="height: 300px;">
       <canvas id="pieChart"></canvas>
     </div>
@@ -156,7 +156,7 @@ export function createLast7DaysChart(stats) {
   const container = document.createElement('div');
   container.className = 'chart-container bg-white rounded-lg p-6 shadow-md';
   container.innerHTML = `
-    <h3 class="text-lg font-semibold text-slate-700 mb-4">Last 7 Days Trend</h3>
+    <h3 class="text-h3 font-semibold text-slate-700 mb-4">Last 7 Days Trend</h3>
     <div class="relative" style="height: 300px;">
       <canvas id="barChart"></canvas>
     </div>
@@ -250,7 +250,7 @@ export function createTopLocationsChart(stats) {
   const container = document.createElement('div');
   container.className = 'chart-container bg-white rounded-lg p-6 shadow-md';
   container.innerHTML = `
-    <h3 class="text-lg font-semibold text-slate-700 mb-4">Top Locations</h3>
+    <h3 class="text-h3 font-semibold text-slate-700 mb-4">Top Locations</h3>
     <div class="relative" style="height: 400px;">
       <canvas id="locationChart"></canvas>
     </div>
@@ -339,8 +339,8 @@ export function createErrorState(message) {
     <svg class="w-12 h-12 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
     </svg>
-    <h3 class="text-lg font-semibold text-gray-900 mb-2">Failed to Load Dashboard</h3>
-    <p class="text-sm text-gray-600">${message}</p>
+    <h3 class="text-h3 font-semibold text-gray-900 mb-2">Failed to Load Dashboard</h3>
+    <p class="text-small text-gray-600">${message}</p>
   `;
   return container;
 }

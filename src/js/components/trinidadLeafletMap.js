@@ -112,8 +112,8 @@ export function createTrinidadLeafletMap(crimeData, regionFilter = null) {
   container.className = 'leaflet-map-container bg-white rounded-lg shadow-md overflow-hidden';
   container.innerHTML = `
     <div class="p-4 border-b border-gray-200">
-      <h3 class="text-lg font-semibold text-slate-700">Crime Incidents Map</h3>
-      <p class="text-xs text-gray-600 mt-1">Click markers for details • Zoom to see individual incidents</p>
+      <h3 class="text-h3 font-semibold text-slate-700">Incidents Map</h3>
+      <p class="text-tiny text-gray-600 mt-1">Click markers for details • Zoom to see individual incidents</p>
     </div>
     <div id="trinidadLeafletMap" style="height: 500px; width: 100%;"></div>
   `;

@@ -186,7 +186,7 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
         "area": "Neighborhood (e.g., Maraval, Port of Spain)",
         "street": "Street address INCLUDING business names/landmarks (e.g., 'KFC Arima', 'Grand Bazaar, Churchill Roosevelt Highway')",
         "headline": "Brief headline with victim name/age in parentheses if known",
-        "details": "2-3 sentence summary",
+        "details": "2-3 sentence summary. Include crime type, location, and key details. Make it informative and engaging for readers. Use proper grammar and complete sentences.",
         "victims": [{"name": "Name or null", "age": number, "aliases": []}],
         "location_country": "Trinidad|Venezuela|Guyana|Other"
       }

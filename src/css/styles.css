@@ -1,3 +1,136 @@
+/* ===================================================================
+   TYPOGRAPHY FRAMEWORK
+   Consistent text sizing across all pages (~20% smaller than before)
+
+   USAGE:
+   - Use semantic classes (.text-display, .text-h1, etc.) instead of Tailwind
+   - Mobile-first responsive: base size for mobile, sm: for desktop
+   - Never use arbitrary text sizes - stick to this scale
+
+   SCALE:
+   - Display: Page titles (e.g., "Trinidad & Tobago")
+   - H1: Main section headings
+   - H2: Subsection headings
+   - H3: Component headings
+   - Body: Default paragraph text
+   - Small: Labels, metadata
+   - Tiny: Timestamps, footnotes
+   =================================================================== */
+
+:root {
+  /* Display (Page Titles) */
+  --text-display: 1.25rem;         /* 20px - mobile */
+  --text-display-sm: 1.75rem;      /* 28px - desktop */
+
+  /* H1 (Main Headings) */
+  --text-h1: 1.25rem;              /* 20px - mobile */
+  --text-h1-sm: 1.5rem;            /* 24px - desktop */
+
+  /* H2 (Subheadings) */
+  --text-h2: 0.875rem;             /* 14px - mobile */
+  --text-h2-sm: 1rem;              /* 16px - desktop */
+
+  /* H3 (Component Headings) */
+  --text-h3: 0.5rem;               /* 8px - mobile */
+  --text-h3-sm: 0.625rem;          /* 10px - desktop */
+
+  /* Body (Default Text) */
+  --text-body: 0.5rem;             /* 8px - mobile */
+  --text-body-sm: 0.625rem;        /* 10px - desktop */
+
+  /* Small (Labels) */
+  --text-small: 0.875rem;          /* 14px - mobile */
+  --text-small-sm: 1rem;           /* 16px - desktop */
+
+  /* Tiny (Metadata) */
+  --text-tiny: 0.625rem;           /* 10px - mobile */
+  --text-tiny-sm: 0.75rem;         /* 12px - desktop */
+
+  /* Navigation (Menu Links) */
+  --text-nav: 0.875rem;            /* 14px - mobile */
+  --text-nav-sm: 1rem;             /* 16px - desktop */
+}
+
+/* Typography utility classes */
+.text-display {
+  font-size: var(--text-display);
+  line-height: 1.2;
+}
+
+.text-h1 {
+  font-size: var(--text-h1);
+  line-height: 1.3;
+}
+
+.text-h2 {
+  font-size: var(--text-h2);
+  line-height: 1.4;
+}
+
+.text-h3 {
+  font-size: var(--text-h3);
+  line-height: 1.4;
+}
+
+.text-body {
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+
+.text-small {
+  font-size: var(--text-small);
+  line-height: 1.4;
+}
+
+.text-tiny {
+  font-size: var(--text-tiny);
+  line-height: 1.3;
+}
+
+.text-nav {
+  font-size: var(--text-nav);
+  line-height: 1.4;
+}
+
+/* Responsive typography - desktop sizes */
+@media (min-width: 640px) {
+  .text-display {
+    font-size: var(--text-display-sm);
+  }
+
+  .text-h1 {
+    font-size: var(--text-h1-sm);
+  }
+
+  .text-h2 {
+    font-size: var(--text-h2-sm);
+  }
+
+  .text-h3 {
+    font-size: var(--text-h3-sm);
+  }
+
+  .text-body {
+    font-size: var(--text-body-sm);
+  }
+
+  .text-small {
+    font-size: var(--text-small-sm);
+  }
+
+  .text-tiny {
+    font-size: var(--text-tiny-sm);
+  }
+
+  .text-nav {
+    font-size: var(--text-nav-sm);
+  }
+}
+
+/* ===================================================================
+   END TYPOGRAPHY FRAMEWORK
+   =================================================================== */
+
 @keyframes fadeInCard {
   from {
     opacity: 0;
