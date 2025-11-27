@@ -23,32 +23,52 @@ const CONFIG = {
 };
 
 /**
- * Handle incoming POST requests
- * IMPORTANT: Web App must be deployed with "Anyone" access for CORS to work
+ * Handle incoming GET requests with URL parameters
+ * Supports JSONP to completely bypass CORS restrictions
+ * IMPORTANT: Web App must be deployed with "Anyone" access
  */
-function doPost(e) {
+function doGet(e) {
   try {
-    // Parse incoming data
-    const data = JSON.parse(e.postData.contents);
+    const params = e.parameter;
+    const callback = params.callback;
 
     // Validate required fields
-    if (!data.issueType || !data.crime || !data.timestamp) {
-      return createResponse(400, 'Missing required fields');
+    if (!params.issueType || !params.timestamp) {
+      return createJSONPResponse(callback, 400, 'Missing required fields');
     }
 
     // Additional validation
-    if (data.details && data.details.length > 500) {
-      return createResponse(400, 'Details too long');
+    if (params.details && params.details.length > 500) {
+      return createJSONPResponse(callback, 400, 'Details too long');
     }
+
+    // Prepare data structure
+    const data = {
+      issueType: params.issueType,
+      details: params.details || '',
+      timestamp: params.timestamp,
+      crime: {
+        headline: params.headline || '',
+        crimeType: params.crimeType || '',
+        date: params.date || '',
+        location: params.location || '',
+        area: params.area || '',
+        country: params.country || '',
+        url: params.url || '',
+        plusCode: params.plusCode || ''
+      },
+      pageUrl: params.pageUrl || ''
+    };
 
     // Save to sheet
     saveToSheet(data);
 
-    return createResponse(200, 'Report submitted successfully');
+    return createJSONPResponse(callback, 200, 'Report submitted successfully');
 
   } catch (error) {
     Logger.log('Error processing report: ' + error.message);
-    return createResponse(500, 'Internal server error');
+    const callback = e.parameter.callback;
+    return createJSONPResponse(callback, 500, 'Internal server error');
   }
 }
 
@@ -218,20 +238,25 @@ function formatIssueType(type) {
 }
 
 /**
- * Helper: Create JSON response
- * Note: Google Apps Script automatically handles CORS when deployed with "Anyone" access
+ * Helper: Create JSONP response (JavaScript that calls callback function)
+ * This bypasses CORS completely by returning executable JavaScript
+ */
+function createJSONPResponse(callback, status, message) {
+  const response = { status, message };
+  const output = callback + '(' + JSON.stringify(response) + ');';
+
+  return ContentService
+    .createTextOutput(output)
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+
+/**
+ * Helper: Create JSON response (for backward compatibility)
  */
 function createResponse(status, message) {
   return ContentService
     .createTextOutput(JSON.stringify({ status, message }))
     .setMimeType(ContentService.MimeType.JSON);
-}
-
-/**
- * Handle GET requests
- */
-function doGet(e) {
-  return createResponse(200, 'Issue reporting endpoint active');
 }
 
 /**

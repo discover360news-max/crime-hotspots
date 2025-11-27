@@ -433,10 +433,33 @@ export function createHeadlineSummaryModal() {
     if (!issueType || !currentCrime) return;
 
     try {
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz79mP4GuOtQht6nx209lp7xyckQhWh4gPuuL_fCBLMsh_PxrgZsd9bx3wj9rNTI5Cm/exec';
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCbO2p-eP3hsaQbRTsZ__7JqMa3tOIdKOwE_6MI65hAceCq2cVxKH6WYa830oTALg/exec';
 
-      // Use GET request with URL parameters to avoid CORS preflight
+      // Use JSONP (script tag) to completely bypass CORS restrictions
+      const callbackName = 'issueReportCallback_' + Date.now();
+
+      // Create promise that resolves when callback is called
+      const submitPromise = new Promise((resolve, reject) => {
+        // Set up callback
+        window[callbackName] = function(response) {
+          delete window[callbackName];
+          if (response.status === 200) {
+            resolve(response);
+          } else {
+            reject(new Error(response.message));
+          }
+        };
+
+        // Set timeout
+        setTimeout(() => {
+          delete window[callbackName];
+          reject(new Error('Request timeout'));
+        }, 10000);
+      });
+
+      // Build URL with parameters
       const params = new URLSearchParams({
+        callback: callbackName,
         issueType,
         details: details || '',
         timestamp: new Date().toISOString(),
@@ -451,11 +474,20 @@ export function createHeadlineSummaryModal() {
         pageUrl: window.location.href
       });
 
-      const response = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
-        method: 'GET'
-      });
+      // Create and inject script tag
+      const script = document.createElement('script');
+      script.src = `${SCRIPT_URL}?${params.toString()}`;
+      script.onerror = () => {
+        delete window[callbackName];
+        alert('Failed to submit report. Please try again.');
+      };
+      document.body.appendChild(script);
 
-      if (!response.ok) throw new Error('Submission failed');
+      // Wait for callback
+      await submitPromise;
+
+      // Clean up
+      document.body.removeChild(script);
 
       // Increment rate limit counter
       incrementReportCount();
