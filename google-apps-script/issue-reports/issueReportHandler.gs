@@ -23,52 +23,36 @@ const CONFIG = {
 };
 
 /**
- * Handle incoming GET requests with URL parameters
- * Supports JSONP to completely bypass CORS restrictions
- * IMPORTANT: Web App must be deployed with "Anyone" access
+ * Handle incoming POST requests
  */
-function doGet(e) {
+function doPost(e) {
+  // Handle CORS preflight
+  if (e && e.parameter && e.parameter.method === 'OPTIONS') {
+    return createCORSResponse();
+  }
+
   try {
-    const params = e.parameter;
-    const callback = params.callback;
+    // Parse incoming data
+    const data = JSON.parse(e.postData.contents);
 
     // Validate required fields
-    if (!params.issueType || !params.timestamp) {
-      return createJSONPResponse(callback, 400, 'Missing required fields');
+    if (!data.issueType || !data.crime || !data.timestamp) {
+      return createResponse(400, 'Missing required fields');
     }
 
     // Additional validation
-    if (params.details && params.details.length > 500) {
-      return createJSONPResponse(callback, 400, 'Details too long');
+    if (data.details && data.details.length > 500) {
+      return createResponse(400, 'Details too long');
     }
-
-    // Prepare data structure
-    const data = {
-      issueType: params.issueType,
-      details: params.details || '',
-      timestamp: params.timestamp,
-      crime: {
-        headline: params.headline || '',
-        crimeType: params.crimeType || '',
-        date: params.date || '',
-        location: params.location || '',
-        area: params.area || '',
-        country: params.country || '',
-        url: params.url || '',
-        plusCode: params.plusCode || ''
-      },
-      pageUrl: params.pageUrl || ''
-    };
 
     // Save to sheet
     saveToSheet(data);
 
-    return createJSONPResponse(callback, 200, 'Report submitted successfully');
+    return createResponse(200, 'Report submitted successfully');
 
   } catch (error) {
-    Logger.log('Error processing report: ' + error.message);
-    const callback = e.parameter.callback;
-    return createJSONPResponse(callback, 500, 'Internal server error');
+    console.error('Error processing report:', error);
+    return createResponse(500, 'Internal server error');
   }
 }
 
@@ -235,28 +219,6 @@ function formatIssueType(type) {
     'other': '💬 Other Issue'
   };
   return types[type] || type;
-}
-
-/**
- * Helper: Create JSONP response (JavaScript that calls callback function)
- * This bypasses CORS completely by returning executable JavaScript
- */
-function createJSONPResponse(callback, status, message) {
-  const response = { status, message };
-  const output = callback + '(' + JSON.stringify(response) + ');';
-
-  return ContentService
-    .createTextOutput(output)
-    .setMimeType(ContentService.MimeType.JAVASCRIPT);
-}
-
-/**
- * Helper: Create JSON response (for backward compatibility)
- */
-function createResponse(status, message) {
-  return ContentService
-    .createTextOutput(JSON.stringify({ status, message }))
-    .setMimeType(ContentService.MimeType.JSON);
 }
 
 /**

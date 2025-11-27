@@ -433,7 +433,7 @@ export function createHeadlineSummaryModal() {
     if (!issueType || !currentCrime) return;
 
     try {
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCbO2p-eP3hsaQbRTsZ__7JqMa3tOIdKOwE_6MI65hAceCq2cVxKH6WYa830oTALg/exec';
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_4stfkJGTTDvjZ62jVae-BqbvHLHscuMgX76q6oLV7ETCwE1esVj_co5bHTeG_gSl/exec';
 
       // Use JSONP (script tag) to completely bypass CORS restrictions
       const callbackName = 'issueReportCallback_' + Date.now();
