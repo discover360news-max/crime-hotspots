@@ -432,30 +432,27 @@ export function createHeadlineSummaryModal() {
 
     if (!issueType || !currentCrime) return;
 
-    const issueData = {
-      issueType,
-      details,
-      timestamp: new Date().toISOString(),
-      crime: {
-        headline: currentCrime.Headline,
-        crimeType: currentCrime['Crime Type'],
-        date: currentCrime.Date,
-        location: currentCrime['Street Address'] || currentCrime.Area,
-        area: currentCrime.Area,
-        country: currentCrime.Country,
-        url: currentCrime.URL,
-        plusCode: currentCrime.Location
-      },
-      pageUrl: window.location.href
-    };
-
     try {
-      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgxK4iMRUSgsHufvg6L7MGmKgBo6b3EgeDWtgG_oAtKAA8ZaGECPXALtmE7IwOVFI-/exec';
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz79mP4GuOtQht6nx209lp7xyckQhWh4gPuuL_fCBLMsh_PxrgZsd9bx3wj9rNTI5Cm/exec';
 
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(issueData)
+      // Use GET request with URL parameters to avoid CORS preflight
+      const params = new URLSearchParams({
+        issueType,
+        details: details || '',
+        timestamp: new Date().toISOString(),
+        headline: currentCrime.Headline || '',
+        crimeType: currentCrime['Crime Type'] || '',
+        date: currentCrime.Date || '',
+        location: currentCrime['Street Address'] || currentCrime.Area || '',
+        area: currentCrime.Area || '',
+        country: currentCrime.Country || '',
+        url: currentCrime.URL || '',
+        plusCode: currentCrime.Location || '',
+        pageUrl: window.location.href
+      });
+
+      const response = await fetch(`${SCRIPT_URL}?${params.toString()}`, {
+        method: 'GET'
       });
 
       if (!response.ok) throw new Error('Submission failed');
