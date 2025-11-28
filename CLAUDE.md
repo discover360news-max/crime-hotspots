@@ -237,6 +237,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - Guyana backfill processing (170 URLs)
 - Guyana dashboard styling updates (to match Trinidad)
 
+### 🐛 Known Issues
+- **Date parsing bug:** Some headlines show wrong month (day/month swap)
+  - Example: 12/03/2025 showing as Dec 3 instead of Mar 12
+  - Cause: Caribbean uses DD/MM/YYYY, script parsing as MM/DD/YYYY
+  - Fix location: `google-apps-script/trinidad/processor.gs` and `guyana/processor.gs`
+  - Status: Identified Nov 27, fix pending next session
+
 ### 📋 Planned
 - Barbados automation
 - Google Analytics
