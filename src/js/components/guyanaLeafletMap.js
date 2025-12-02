@@ -76,7 +76,7 @@ export function createGuyanaLeafletMap(crimeData, regionFilter = null) {
     <div class="p-4 border-b border-gray-200 flex items-center justify-between">
       <div>
         <h3 class="text-h3 font-semibold text-slate-700">Incidents Map</h3>
-        <p class="text-tiny text-gray-600 mt-1">Use two fingers to zoom • Click markers for details</p>
+        <p class="text-tiny text-gray-600 mt-1">Use two fingers to move map • Click markers for details</p>
       </div>
       <button id="resetMapView" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-tiny font-medium text-slate-700 transition flex items-center gap-1">
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,11 +87,11 @@ export function createGuyanaLeafletMap(crimeData, regionFilter = null) {
     </div>
     <div class="relative">
       <div id="guyanaLeafletMap" style="height: 500px; width: 100%;"></div>
-      <!-- Zoom instruction overlay (shown on scroll attempt) -->
+      <!-- Pan instruction overlay (shown on single finger touch) -->
       <div id="mapZoomHint" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="z-index: 1000;">
         <div class="bg-white rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
-          <p class="text-small font-semibold text-slate-900">Use two fingers to zoom</p>
-          <p class="text-tiny text-slate-600 mt-1">Or use the zoom buttons</p>
+          <p class="text-small font-semibold text-slate-900">Use two fingers to move map</p>
+          <p class="text-tiny text-slate-600 mt-1">One finger scrolls the page</p>
         </div>
       </div>
     </div>
@@ -104,25 +104,32 @@ export function createGuyanaLeafletMap(crimeData, regionFilter = null) {
     const resetButton = container.querySelector('#resetMapView');
     if (!mapDiv) return;
 
-    // Create map with scroll wheel zoom disabled (requires Ctrl+scroll on desktop, two fingers on mobile)
+    // Create map - disable dragging by default (single finger should scroll page, not pan map)
     mapInstance = L.map('guyanaLeafletMap', {
-      scrollWheelZoom: false, // Disabled by default
-      dragging: true,
-      touchZoom: true, // Two-finger zoom works
+      dragging: false, // Disabled - only enable on two-finger touch
+      scrollWheelZoom: true, // Allow mouse wheel zoom on desktop
+      touchZoom: true, // Two-finger pinch zoom
       doubleClickZoom: true,
       boxZoom: true,
       tap: true
     }).setView(GUYANA_CENTER, DEFAULT_ZOOM);
 
-    // Enable scroll wheel zoom only when user holds Ctrl (desktop) or uses two fingers (mobile)
-    mapInstance.scrollWheelZoom.enable();
-    mapInstance.scrollWheelZoom.disable(); // Start disabled
-
-    // Show hint when user tries to scroll without Ctrl/two fingers
+    // Track touch count for enabling/disabling dragging
+    let touchCount = 0;
     let hintTimeout;
-    mapInstance.on('wheel', function(e) {
-      if (!mapInstance.scrollWheelZoom.enabled() && !e.originalEvent.ctrlKey) {
-        // User is trying to scroll but scroll zoom is disabled
+
+    // On touch start, count fingers
+    mapDiv.addEventListener('touchstart', function(e) {
+      touchCount = e.touches.length;
+
+      if (touchCount === 2) {
+        // Two fingers - enable map dragging
+        mapInstance.dragging.enable();
+      } else if (touchCount === 1) {
+        // One finger - disable map dragging (let page scroll)
+        mapInstance.dragging.disable();
+
+        // Show hint to educate user
         if (zoomHint) {
           zoomHint.classList.remove('opacity-0');
           zoomHint.classList.add('opacity-100');
@@ -134,6 +141,22 @@ export function createGuyanaLeafletMap(crimeData, regionFilter = null) {
           }, 2000);
         }
       }
+    }, { passive: true });
+
+    // On touch end, disable dragging
+    mapDiv.addEventListener('touchend', function(e) {
+      if (e.touches.length === 0) {
+        mapInstance.dragging.disable();
+      }
+    }, { passive: true });
+
+    // On desktop, enable dragging with mouse
+    mapDiv.addEventListener('mouseenter', function() {
+      mapInstance.dragging.enable();
+    });
+
+    mapDiv.addEventListener('mouseleave', function() {
+      // Keep enabled for mouse interactions
     });
 
     // Reset view button

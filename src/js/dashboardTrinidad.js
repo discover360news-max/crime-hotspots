@@ -173,7 +173,7 @@ async function loadDashboard(regionFilter = null, dateRange = null) {
     }
 
     console.log('Rendering widgets...');
-    renderWidgets(stats);
+    renderWidgets(stats, regionFilter, dateRange);
 
     console.log(`Dashboard loaded successfully. Total incidents: ${stats.total}`);
   } catch (error) {
@@ -196,9 +196,6 @@ async function loadDashboard(regionFilter = null, dateRange = null) {
 }
 
 /**
- * Render all dashboard widgets
- */
-/**
  * Create a visual separator (light divider line)
  */
 function createSeparator() {
@@ -207,7 +204,10 @@ function createSeparator() {
   return separator;
 }
 
-function renderWidgets(stats) {
+/**
+ * Render all dashboard widgets
+ */
+function renderWidgets(stats, regionFilter = null, dateRange = null) {
   try {
     // Clear existing widgets
     widgetsContainer.innerHTML = '';
@@ -236,8 +236,27 @@ function renderWidgets(stats) {
         if (leafletMapInstance) {
           leafletMapInstance.destroy();
         }
+
+        // Filter data by date range and region for the map
+        let filteredMapData = allData;
+
+        // Filter by date range if specified
+        if (dateRange && dateRange.startDate && dateRange.endDate) {
+          const startDate = new Date(dateRange.startDate);
+          const endDate = new Date(dateRange.endDate);
+
+          filteredMapData = filteredMapData.filter(record => {
+            if (!record.Date) return false;
+            const recordDate = new Date(record.Date);
+            return recordDate >= startDate && recordDate <= endDate;
+          });
+
+          console.log(`📍 Map filtered by date: ${filteredMapData.length} records`);
+        }
+
+        // Create map with filtered data
         const currentRegion = filterController ? filterController.getRegion() : null;
-        leafletMapInstance = createTrinidadLeafletMap(allData, currentRegion?.name);
+        leafletMapInstance = createTrinidadLeafletMap(filteredMapData, currentRegion?.name);
         leafletMapInstance.element.classList.add('mb-6');
         widgetsContainer.appendChild(leafletMapInstance.element);
       } catch (error) {
