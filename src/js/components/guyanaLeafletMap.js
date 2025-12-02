@@ -114,39 +114,66 @@ export function createGuyanaLeafletMap(crimeData, regionFilter = null) {
       tap: true
     }).setView(GUYANA_CENTER, DEFAULT_ZOOM);
 
-    // Track touch count for enabling/disabling dragging
+    // Track touch count and movement for enabling/disabling dragging
     let touchCount = 0;
     let hintTimeout;
+    let touchStartPos = null;
+    let hasMoved = false;
 
-    // On touch start, count fingers
+    // On touch start, count fingers and track position
     mapDiv.addEventListener('touchstart', function(e) {
       touchCount = e.touches.length;
+      hasMoved = false;
 
       if (touchCount === 2) {
-        // Two fingers - enable map dragging
+        // Two fingers - enable map dragging and hide any hint
         mapInstance.dragging.enable();
+        if (zoomHint) {
+          zoomHint.classList.remove('opacity-100');
+          zoomHint.classList.add('opacity-0');
+        }
       } else if (touchCount === 1) {
         // One finger - disable map dragging (let page scroll)
         mapInstance.dragging.disable();
+        // Track starting position but don't show hint yet (user might just be tapping)
+        touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+    }, { passive: true });
 
-        // Show hint to educate user
-        if (zoomHint) {
-          zoomHint.classList.remove('opacity-0');
-          zoomHint.classList.add('opacity-100');
+    // On touch move, detect if user is trying to drag with one finger
+    mapDiv.addEventListener('touchmove', function(e) {
+      if (touchCount === 1 && touchStartPos) {
+        const currentPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        const distance = Math.sqrt(
+          Math.pow(currentPos.x - touchStartPos.x, 2) +
+          Math.pow(currentPos.y - touchStartPos.y, 2)
+        );
 
-          clearTimeout(hintTimeout);
-          hintTimeout = setTimeout(() => {
-            zoomHint.classList.remove('opacity-100');
-            zoomHint.classList.add('opacity-0');
-          }, 2000);
+        // If user has moved more than 10px with one finger, they're trying to pan
+        if (distance > 10 && !hasMoved) {
+          hasMoved = true;
+
+          // Show hint - user is trying to pan with one finger
+          if (zoomHint) {
+            zoomHint.classList.remove('opacity-0');
+            zoomHint.classList.add('opacity-100');
+
+            clearTimeout(hintTimeout);
+            hintTimeout = setTimeout(() => {
+              zoomHint.classList.remove('opacity-100');
+              zoomHint.classList.add('opacity-0');
+            }, 2000);
+          }
         }
       }
     }, { passive: true });
 
-    // On touch end, disable dragging
+    // On touch end, disable dragging and reset tracking
     mapDiv.addEventListener('touchend', function(e) {
       if (e.touches.length === 0) {
         mapInstance.dragging.disable();
+        touchStartPos = null;
+        hasMoved = false;
       }
     }, { passive: true });
 
