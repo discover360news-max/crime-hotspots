@@ -44,13 +44,24 @@ export function createMetricsCards(stats) {
 
   // Fade gradient hint on the right (indicates more content)
   const fadeHint = document.createElement('div');
-  fadeHint.className = 'absolute right-0 top-0 bottom-0 w-16 pointer-events-none bg-gradient-to-l from-slate-50 to-transparent opacity-0 transition-opacity duration-300';
+  fadeHint.className = 'absolute right-0 top-0 bottom-0 w-24 pointer-events-none bg-gradient-to-l from-slate-100 via-slate-50 to-transparent opacity-0 transition-opacity duration-300';
   fadeHint.id = 'scrollFadeHint';
+
+  // Chevron arrow indicator for scrolling
+  const chevronHint = document.createElement('div');
+  chevronHint.className = 'absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 transition-opacity duration-300';
+  chevronHint.id = 'scrollChevronHint';
+  chevronHint.innerHTML = `
+    <svg class="w-5 h-5 text-slate-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  `;
 
   wrapper.appendChild(container);
   wrapper.appendChild(fadeHint);
+  wrapper.appendChild(chevronHint);
 
-  // Show/hide fade hint based on scroll position
+  // Show/hide fade hint and chevron based on scroll position
   container.addEventListener('scroll', () => {
     const scrollLeft = container.scrollLeft;
     const maxScroll = container.scrollWidth - container.clientWidth;
@@ -59,9 +70,13 @@ export function createMetricsCards(stats) {
     if (maxScroll - scrollLeft > 10) {
       fadeHint.classList.remove('opacity-0');
       fadeHint.classList.add('opacity-100');
+      chevronHint.classList.remove('opacity-0');
+      chevronHint.classList.add('opacity-100');
     } else {
       fadeHint.classList.remove('opacity-100');
       fadeHint.classList.add('opacity-0');
+      chevronHint.classList.remove('opacity-100');
+      chevronHint.classList.add('opacity-0');
     }
   });
 
@@ -71,6 +86,8 @@ export function createMetricsCards(stats) {
     if (maxScroll > 10) {
       fadeHint.classList.remove('opacity-0');
       fadeHint.classList.add('opacity-100');
+      chevronHint.classList.remove('opacity-0');
+      chevronHint.classList.add('opacity-100');
     }
   }, 100);
 
@@ -230,14 +247,14 @@ export function createLast7DaysChart(stats) {
     const crimeTypesArray = Array.from(allCrimeTypes);
     const colors = getCrimeColorsArray(crimeTypesArray);
 
-    // Create datasets for each crime type (NOT stacked, separate bars)
+    // Create datasets for each crime type (stacked bars)
     const datasets = crimeTypesArray.map((crimeType, index) => {
       return {
         label: crimeType,
         data: stats.last7Days.map(item => item.crimes[crimeType] || 0),
         backgroundColor: colors[index],
         borderRadius: 4,
-        barPercentage: 0.8,
+        barPercentage: 0.7,
         categoryPercentage: 0.9
       };
     });
@@ -253,7 +270,7 @@ export function createLast7DaysChart(stats) {
         maintainAspectRatio: false,
         scales: {
           x: {
-            stacked: false, // NOT stacked - separate bars
+            stacked: true, // Stacked bars
             grid: {
               display: false
             },
@@ -263,11 +280,12 @@ export function createLast7DaysChart(stats) {
               },
               maxRotation: 0, // Horizontal labels (no slant)
               minRotation: 0,
-              autoSkip: false
+              autoSkip: true, // Automatically skip labels to prevent overlap
+              maxTicksLimit: 7 // Limit to 7 labels for 7 days
             }
           },
           y: {
-            stacked: false, // NOT stacked
+            stacked: true, // Stacked bars
             beginAtZero: true,
             ticks: {
               stepSize: 1,
