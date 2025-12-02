@@ -274,6 +274,18 @@ svg path:focus {
   }
 }
 
+/* Leaflet incidents map - must be below header and region tray */
+.leaflet-map-container {
+  position: relative;
+  z-index: 1 !important;
+}
+
+/* Ensure header stays above Leaflet map */
+header {
+  position: relative;
+  z-index: 30 !important;
+}
+
 /* Ensure tray and overlay are above everything at all breakpoints */
 #regionTray {
   z-index: 50 !important;
