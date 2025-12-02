@@ -111,20 +111,75 @@ export function createTrinidadLeafletMap(crimeData, regionFilter = null) {
   const container = document.createElement('div');
   container.className = 'leaflet-map-container bg-white rounded-lg shadow-md overflow-hidden';
   container.innerHTML = `
-    <div class="p-4 border-b border-gray-200">
-      <h3 class="text-h3 font-semibold text-slate-700">Incidents Map</h3>
-      <p class="text-tiny text-gray-600 mt-1">Click markers for details • Zoom to see individual incidents</p>
+    <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+      <div>
+        <h3 class="text-h3 font-semibold text-slate-700">Incidents Map</h3>
+        <p class="text-tiny text-gray-600 mt-1">Use two fingers to zoom • Click markers for details</p>
+      </div>
+      <button id="resetMapViewTrinidad" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-tiny font-medium text-slate-700 transition flex items-center gap-1">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Reset View
+      </button>
     </div>
-    <div id="trinidadLeafletMap" style="height: 500px; width: 100%;"></div>
+    <div class="relative">
+      <div id="trinidadLeafletMap" style="height: 500px; width: 100%;"></div>
+      <!-- Zoom instruction overlay (shown on scroll attempt) -->
+      <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="z-index: 1000;">
+        <div class="bg-white rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
+          <p class="text-small font-semibold text-slate-900">Use two fingers to zoom</p>
+          <p class="text-tiny text-slate-600 mt-1">Or use the zoom buttons</p>
+        </div>
+      </div>
+    </div>
   `;
 
   // Wait for DOM insertion
   setTimeout(() => {
     const mapDiv = container.querySelector('#trinidadLeafletMap');
+    const zoomHint = container.querySelector('#mapZoomHintTrinidad');
+    const resetButton = container.querySelector('#resetMapViewTrinidad');
     if (!mapDiv) return;
 
-    // Create map
-    mapInstance = L.map('trinidadLeafletMap').setView(TRINIDAD_CENTER, DEFAULT_ZOOM);
+    // Create map with scroll wheel zoom disabled (requires Ctrl+scroll on desktop, two fingers on mobile)
+    mapInstance = L.map('trinidadLeafletMap', {
+      scrollWheelZoom: false, // Disabled by default
+      dragging: true,
+      touchZoom: true, // Two-finger zoom works
+      doubleClickZoom: true,
+      boxZoom: true,
+      tap: true
+    }).setView(TRINIDAD_CENTER, DEFAULT_ZOOM);
+
+    // Enable scroll wheel zoom only when user holds Ctrl (desktop) or uses two fingers (mobile)
+    mapInstance.scrollWheelZoom.enable();
+    mapInstance.scrollWheelZoom.disable(); // Start disabled
+
+    // Show hint when user tries to scroll without Ctrl/two fingers
+    let hintTimeout;
+    mapInstance.on('wheel', function(e) {
+      if (!mapInstance.scrollWheelZoom.enabled() && !e.originalEvent.ctrlKey) {
+        // User is trying to scroll but scroll zoom is disabled
+        if (zoomHint) {
+          zoomHint.classList.remove('opacity-0');
+          zoomHint.classList.add('opacity-100');
+
+          clearTimeout(hintTimeout);
+          hintTimeout = setTimeout(() => {
+            zoomHint.classList.remove('opacity-100');
+            zoomHint.classList.add('opacity-0');
+          }, 2000);
+        }
+      }
+    });
+
+    // Reset view button
+    if (resetButton) {
+      resetButton.addEventListener('click', () => {
+        mapInstance.setView(TRINIDAD_CENTER, DEFAULT_ZOOM);
+      });
+    }
 
     // Add grey tile layer (CartoDB Positron - clean grey style)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -281,6 +336,31 @@ function addMarkersToMap(crimeData, regionFilter) {
 export function getLeafletMapStyles() {
   return `
     /* Leaflet Map Custom Styles */
+
+    /* Fix z-index to prevent map from overlapping mobile tray (z-50) and overlay (z-40) */
+    .leaflet-map-container {
+      position: relative;
+      z-index: 1 !important;
+    }
+
+    .leaflet-container,
+    .leaflet-pane,
+    .leaflet-map-pane {
+      z-index: 1 !important;
+    }
+
+    .leaflet-control-container {
+      z-index: 30 !important;
+    }
+
+    .leaflet-popup-pane {
+      z-index: 35 !important;
+    }
+
+    .leaflet-tooltip-pane {
+      z-index: 32 !important;
+    }
+
     .crime-marker-pin {
       width: 20px;
       height: 20px;
