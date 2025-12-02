@@ -227,21 +227,87 @@ google-apps-script/
 - Transformed metrics cards from grid to horizontal scrollable layout
 - Added smooth snap scrolling with visual hints
 - Fade gradient indicator shows when more content is available
+- Animated rose-colored chevron arrow hint (pulsing)
 - Custom scrollbar styling for better UX
 
 **Visual Hierarchy:**
 - Added gradient separator lines between dashboard sections
+- Separator above "Crime Statistics Dashboard" heading
 - Clear separation: metrics → map → charts
 - Improved visual flow and content organization
 
 **Mobile Fixes:**
 - Fixed Guyana SVG map scaling in mobile tray (was cut off)
 - Compact "Select Region" button integrated in header
-- Proper z-index layering (map, tray, overlay)
+- Proper z-index layering: tray (z-50) > overlay (z-40) > header (z-30) > leaflet map (z-1)
+- Fixed Leaflet incidents map scrolling over header
+
+**Date Picker Improvements:**
+- Added "From:" and "To:" labels for desktop date pickers
+- Added "From Date:" and "To Date:" labels for mobile
+- Title tooltips for accessibility
+- Region tray auto-closes after applying date filter
 
 **Homepage Cleanup:**
 - Removed flag emoji and "Nationwide Coverage" text from country cards
 - Cleaner, more minimal card design
+
+### Leaflet Map UX Overhaul (Dec 2, 2025)
+
+**Critical Mobile Scroll Fix:**
+- **Problem:** Single-finger scroll over map would zoom/pan map instead of scrolling page
+- **Solution:** Implemented two-finger pan requirement
+  - ONE finger = scrolls page (map doesn't intercept touch)
+  - TWO fingers = pans/drags map
+  - Desktop mouse = normal dragging enabled
+- Touch detection counts fingers and dynamically enables/disables map dragging
+- Prevents frustrating map interaction when user just wants to scroll
+
+**Smart Hint System:**
+- Shows "Use two fingers to move map" overlay ONLY when user tries to pan with one finger
+- Detects actual panning intent (movement > 10px)
+- Does NOT show on:
+  - Two-finger touches (correct behavior)
+  - Quick taps to select markers
+  - Any touch without significant drag movement
+- Auto-dismisses after 2 seconds
+- Prevents hint from blocking marker popups
+
+**Reset View Button:**
+- Returns map to original center coordinates and zoom level
+- Icon button in map header with "Reset View" label
+- Smooth transition animation
+
+**Date Filter Integration:**
+- Fixed critical bug: Leaflet map was showing ALL data regardless of date filter
+- Now properly filters markers by selected date range
+- Passes filtered data to map creation
+- Console logging: "📍 Map filtered by date: X records"
+- Synchronizes with other dashboard widgets
+
+**Applied to Both Dashboards:**
+- Trinidad Leaflet Map (src/js/components/trinidadLeafletMap.js)
+- Guyana Leaflet Map (src/js/components/guyanaLeafletMap.js)
+
+**Technical Implementation:**
+```javascript
+// Touch detection for smart panning
+mapDiv.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    mapInstance.dragging.enable(); // Two fingers = pan
+  } else if (e.touches.length === 1) {
+    mapInstance.dragging.disable(); // One finger = scroll page
+  }
+});
+
+// Movement detection for smart hints
+mapDiv.addEventListener('touchmove', (e) => {
+  const distance = calculateMovement(touchStart, currentPos);
+  if (distance > 10 && touchCount === 1) {
+    showHint(); // Only show if actually dragging with one finger
+  }
+});
+```
 
 ---
 
@@ -347,11 +413,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   - Regional filtering, date range selection, crime heatmaps
   - Mobile-optimized with slide-up tray
   - Both dashboards fully synchronized (Dec 2, 2025)
-- Dashboard UI enhancements (Dec 2, 2025)
-  - Navigation dropdown system
-  - Horizontal scrollable widgets with visual hints
-  - Visual hierarchy improvements
-  - Site-wide button standardization
+- **Dashboard UI enhancements (Dec 2, 2025)**
+  - Navigation dropdown system (auto-populates from countries.js)
+  - Horizontal scrollable widgets with animated visual hints
+  - Visual hierarchy improvements (gradient separators)
+  - Site-wide button standardization (px-4 py-1.5)
+  - Date picker labels and accessibility improvements
+  - Auto-closing region tray on filter apply
+  - Z-index layering fixes (header, tray, maps)
+- **Leaflet Map UX Overhaul (Dec 2, 2025)**
+  - Two-finger pan requirement (one finger scrolls page)
+  - Smart hint system (only shows when actually panning with one finger)
+  - Reset View button to return to original position
+  - Date filter integration (map updates with filtered data)
+  - Touch movement detection (10px threshold)
+  - Prevents hint from blocking marker popups
 - Google Analytics 4 integration (GA4: G-JMQ8B4DYEG)
 - Cookie consent system
 
@@ -401,6 +477,54 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 **Archived:**
 - docs/archive/Development Progress/ - Historical development logs
+
+---
+
+## Development Sessions
+
+### December 2, 2025 - Dashboard Polish & Leaflet Map UX
+
+**Major Accomplishments:**
+- ✅ Dashboard standardization complete (Trinidad as standard, Guyana matched)
+- ✅ Leaflet map UX overhaul with smart touch detection
+- ✅ Critical mobile scroll fix (two-finger pan requirement)
+- ✅ Date filter integration for Leaflet maps
+
+**Commits:**
+1. `e46e88a` - Dashboard improvements and UI standardization
+2. `31ec2bd` - Update CLAUDE.md with Dec 2 dashboard improvements
+3. `8e730f1` - Urgent dashboard fixes (charts, widgets, z-index)
+4. `dd08691` - Fix Leaflet incidents map z-index issue
+5. `4e58dba` - UX improvements (tray auto-close, date labels, red scroll cue, separator)
+6. `77515bb` - Major Leaflet map UX improvements (two-finger zoom, reset, alerts)
+7. `4cabbc1` - CRITICAL FIX: Corrected map scrolling and date filter updates
+8. `6e1891c` - Fix map hint to only show when actually panning with one finger
+
+**Key Features Delivered:**
+- Horizontal scrollable widgets with visual cues (rose chevron, fade gradient)
+- Dashboard dropdown navigation (auto-populates from countries.js)
+- Two-finger pan requirement for Leaflet maps (prevents scroll hijacking)
+- Smart hint system (movement detection, 10px threshold)
+- Date filter synchronization across all widgets including Leaflet map
+- Reset View button for map navigation
+- Z-index hierarchy fixes (tray > overlay > header > leaflet map)
+- Date picker labels and accessibility improvements
+
+**Bug Fixes:**
+- Fixed 7-day trend chart duplicate dates (autoSkip with maxTicksLimit: 7)
+- Fixed stacked bars visualization
+- Fixed Leaflet map not updating when date filter applied
+- Fixed hint appearing on every touch (now only on actual pan attempts)
+- Fixed map hint blocking marker popups
+- Fixed Guyana SVG map scaling in mobile tray
+
+**UX Improvements:**
+- Region tray auto-closes after applying filter
+- Site-wide button standardization (px-4 py-1.5)
+- Visual hierarchy with gradient separators
+- Cleaner homepage cards (removed emoji and subtitle)
+
+**Status:** Production ready, all features tested and deployed
 
 ---
 
