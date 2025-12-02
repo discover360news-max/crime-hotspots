@@ -66,6 +66,10 @@ async function init() {
       mobileClearButtonId: 'clearDateFilterMobile',
       onFilterChange: async (regionFilter, dateRange) => {
         await loadDashboard(regionFilter, dateRange);
+        // Close region tray after applying filter (mobile only)
+        if (regionTray) {
+          regionTray.close();
+        }
       },
       onSubtitleUpdate: updateSubtitle,
       onResetButtonUpdate: updateResetButtonVisibility
