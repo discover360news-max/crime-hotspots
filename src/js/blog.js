@@ -145,11 +145,13 @@ function updateFilterButtons(activeId) {
   ['filter-all', 'filter-tt', 'filter-gy'].forEach(id => {
     const button = document.getElementById(id);
     if (id === activeId) {
-      button.classList.remove('bg-slate-200', 'text-slate-700');
-      button.classList.add('bg-rose-600', 'text-white');
+      // Active state: solid rose background
+      button.classList.remove('border-2', 'border-slate-300', 'text-slate-700', 'hover:bg-slate-50');
+      button.classList.add('bg-rose-600', 'text-white', 'hover:bg-rose-700');
     } else {
-      button.classList.remove('bg-rose-600', 'text-white');
-      button.classList.add('bg-slate-200', 'text-slate-700');
+      // Inactive state: outlined border
+      button.classList.remove('bg-rose-600', 'text-white', 'hover:bg-rose-700');
+      button.classList.add('border-2', 'border-slate-300', 'text-slate-700', 'hover:bg-slate-50');
     }
   });
 }

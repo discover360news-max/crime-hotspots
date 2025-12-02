@@ -19,8 +19,15 @@ let locationChartInstance = null;
  * @returns {HTMLElement} Container with metric cards
  */
 export function createMetricsCards(stats) {
+  // Wrapper with relative positioning for scroll indicators
+  const wrapper = document.createElement('div');
+  wrapper.className = 'relative mb-6';
+
+  // Scrollable container
   const container = document.createElement('div');
-  container.className = 'metrics-cards grid grid-cols-2 md:grid-cols-5 gap-4 mb-6';
+  container.className = 'metrics-cards flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100';
+  container.style.scrollbarWidth = 'thin'; // Firefox
+  container.style.scrollbarColor = '#cbd5e1 #f1f5f9'; // Firefox (thumb track)
 
   const metrics = [
     { label: 'Total Incidents', value: stats.total, color: 'blue' },
@@ -35,7 +42,39 @@ export function createMetricsCards(stats) {
     container.appendChild(card);
   });
 
-  return container;
+  // Fade gradient hint on the right (indicates more content)
+  const fadeHint = document.createElement('div');
+  fadeHint.className = 'absolute right-0 top-0 bottom-0 w-16 pointer-events-none bg-gradient-to-l from-slate-50 to-transparent opacity-0 transition-opacity duration-300';
+  fadeHint.id = 'scrollFadeHint';
+
+  wrapper.appendChild(container);
+  wrapper.appendChild(fadeHint);
+
+  // Show/hide fade hint based on scroll position
+  container.addEventListener('scroll', () => {
+    const scrollLeft = container.scrollLeft;
+    const maxScroll = container.scrollWidth - container.clientWidth;
+
+    // Show hint if not scrolled all the way to the right
+    if (maxScroll - scrollLeft > 10) {
+      fadeHint.classList.remove('opacity-0');
+      fadeHint.classList.add('opacity-100');
+    } else {
+      fadeHint.classList.remove('opacity-100');
+      fadeHint.classList.add('opacity-0');
+    }
+  });
+
+  // Initially show the hint if content is scrollable
+  setTimeout(() => {
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    if (maxScroll > 10) {
+      fadeHint.classList.remove('opacity-0');
+      fadeHint.classList.add('opacity-100');
+    }
+  }, 100);
+
+  return wrapper;
 }
 
 /**
@@ -43,7 +82,7 @@ export function createMetricsCards(stats) {
  */
 function createMetricCard({ label, value, color }) {
   const card = document.createElement('div');
-  card.className = 'metric-card bg-white rounded-lg p-4 shadow-md transition-all hover:shadow-lg';
+  card.className = 'metric-card bg-white rounded-lg p-4 shadow-md transition-all hover:shadow-lg flex-shrink-0 w-40 snap-start';
   card.innerHTML = `
     <div class="text-small font-medium text-slate-600 mb-2">${label}</div>
     <div class="text-display font-bold text-slate-900">${value}</div>
@@ -148,7 +187,7 @@ export function createPieChart(stats) {
 }
 
 /**
- * Create bar chart for last 7 days
+ * Create bar chart for last 7 days trend
  * @param {Object} stats - Statistics object
  * @returns {HTMLElement} Container with bar chart
  */
@@ -173,8 +212,16 @@ export function createLast7DaysChart(stats) {
       barChartInstance.destroy();
     }
 
-    // Prepare data
+    // Check if we have data
+    if (!stats.last7Days || stats.last7Days.length === 0) {
+      console.warn('No last 7 days data available');
+      return;
+    }
+
+    // Prepare data - last 7 days timeline
     const dates = stats.last7Days.map(item => formatDate(item.date));
+
+    // Get all unique crime types across all days
     const allCrimeTypes = new Set();
     stats.last7Days.forEach(item => {
       Object.keys(item.crimes).forEach(type => allCrimeTypes.add(type));
@@ -183,12 +230,15 @@ export function createLast7DaysChart(stats) {
     const crimeTypesArray = Array.from(allCrimeTypes);
     const colors = getCrimeColorsArray(crimeTypesArray);
 
+    // Create datasets for each crime type (NOT stacked, separate bars)
     const datasets = crimeTypesArray.map((crimeType, index) => {
       return {
         label: crimeType,
         data: stats.last7Days.map(item => item.crimes[crimeType] || 0),
         backgroundColor: colors[index],
-        borderRadius: 4
+        borderRadius: 4,
+        barPercentage: 0.8,
+        categoryPercentage: 0.9
       };
     });
 
@@ -203,16 +253,25 @@ export function createLast7DaysChart(stats) {
         maintainAspectRatio: false,
         scales: {
           x: {
-            stacked: true,
+            stacked: false, // NOT stacked - separate bars
             grid: {
               display: false
+            },
+            ticks: {
+              font: {
+                size: 10
+              },
+              maxRotation: 0, // Horizontal labels (no slant)
+              minRotation: 0,
+              autoSkip: false
             }
           },
           y: {
-            stacked: true,
+            stacked: false, // NOT stacked
             beginAtZero: true,
             ticks: {
-              stepSize: 1
+              stepSize: 1,
+              precision: 0
             }
           }
         },
@@ -225,13 +284,23 @@ export function createLast7DaysChart(stats) {
               boxWidth: 12,
               boxHeight: 12,
               font: {
-                size: 11
+                size: 10
               },
               usePointStyle: false
             }
           },
           datalabels: {
-            display: false
+            display: false // Too cluttered with multiple bars per day
+          },
+          tooltip: {
+            callbacks: {
+              title: function(context) {
+                return context[0].label;
+              },
+              label: function(context) {
+                return `${context.dataset.label}: ${context.parsed.y}`;
+              }
+            }
           }
         }
       }
@@ -277,7 +346,7 @@ export function createTopLocationsChart(stats) {
         datasets: [{
           label: 'Incidents',
           data,
-          backgroundColor: '#3b82f6',
+          backgroundColor: '#e11d48', // Rose-600 to match site theme
           borderRadius: 4
         }]
       },
@@ -289,12 +358,28 @@ export function createTopLocationsChart(stats) {
           x: {
             beginAtZero: true,
             ticks: {
-              stepSize: 1
+              stepSize: 1,
+              font: {
+                size: 11
+              }
             }
           },
           y: {
             grid: {
               display: false
+            },
+            ticks: {
+              font: {
+                size: 10
+              },
+              // Truncate long location names
+              callback: function(value, index) {
+                const label = this.getLabelForValue(value);
+                if (label.length > 25) {
+                  return label.substring(0, 22) + '...';
+                }
+                return label;
+              }
             }
           }
         },
@@ -303,7 +388,22 @@ export function createTopLocationsChart(stats) {
             display: false
           },
           datalabels: {
-            display: false
+            anchor: 'end',
+            align: 'right',
+            formatter: (value) => value,
+            color: '#ffffff',
+            font: {
+              weight: 'bold',
+              size: 10
+            }
+          },
+          tooltip: {
+            callbacks: {
+              title: function(context) {
+                // Show full location name in tooltip
+                return stats.topLocations[context[0].dataIndex].location;
+              }
+            }
           }
         }
       }

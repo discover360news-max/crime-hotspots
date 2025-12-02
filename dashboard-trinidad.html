@@ -3,8 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trinidad & Tobago Crime Dashboard — Regional Statistics</title>
-  <meta name="description" content="Interactive crime statistics dashboard for Trinidad & Tobago. View data by region with real-time filtering.">
+
+  <!-- Primary Meta Tags -->
+  <title>Trinidad & Tobago Crime Dashboard 2025 — Port of Spain, San Fernando, Arima Statistics</title>
+  <meta name="title" content="Trinidad & Tobago Crime Dashboard 2025 — Regional Crime Statistics">
+  <meta name="description" content="Live crime statistics for Trinidad & Tobago by region. Track murders, robberies, and incidents in Port of Spain, San Fernando, Arima, Chaguanas, and more. Data from Trinidad Express, Guardian TT, Newsday, and CNC3.">
+  <meta name="keywords" content="Trinidad crime statistics, Port of Spain crime, San Fernando murders, Arima robberies, Chaguanas crime, Tobago crime, Trinidad homicide rate, crime by region Trinidad, Trinidad Express crime, Guardian TT crime news">
+  <meta name="author" content="Crime Hotspots Caribbean">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://crimehotspots.com/dashboard-trinidad.html">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://crimehotspots.com/dashboard-trinidad.html">
+  <meta property="og:title" content="Trinidad & Tobago Crime Dashboard 2025 — Regional Statistics">
+  <meta property="og:description" content="Interactive crime statistics dashboard for Trinidad & Tobago. View data by region with real-time filtering.">
+  <meta property="og:image" content="https://crimehotspots.com/og-trinidad.jpg">
+  <meta property="og:site_name" content="Crime Hotspots Caribbean">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://crimehotspots.com/dashboard-trinidad.html">
+  <meta name="twitter:title" content="Trinidad & Tobago Crime Dashboard 2025">
+  <meta name="twitter:description" content="Live crime statistics for Trinidad & Tobago by region. Track murders, robberies, and incidents.">
+  <meta name="twitter:image" content="https://crimehotspots.com/og-trinidad.jpg">
 
   <!-- Favicons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -81,7 +103,7 @@
           </button>
         </div>
         <a href="headlines-trinidad-and-tobago.html"
-           class="px-3 py-1.5 border-2 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-tiny whitespace-nowrap">
+           class="px-4 py-1.5 border-2 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-small whitespace-nowrap">
           View Headlines →
         </a>
       </div>
@@ -131,29 +153,29 @@
             </div>
 
             <!-- Date Range Filter (Desktop) -->
-            <div class="hidden lg:flex flex-wrap items-center gap-2 bg-slate-100 rounded p-2 text-xs">
+            <div class="hidden lg:flex flex-wrap items-center gap-2 bg-slate-100 rounded p-2 text-tiny">
               <input
                 type="date"
                 id="startDate"
-                class="px-2 py-1 rounded border border-slate-300 text-slate-900 text-xs focus:ring-1 focus:ring-rose-300 outline-none w-32"
+                class="px-2 py-1 rounded border border-slate-300 text-slate-900 text-tiny focus:ring-1 focus:ring-rose-300 outline-none w-32"
                 placeholder="Start"
               >
               <span class="text-slate-600">to</span>
               <input
                 type="date"
                 id="endDate"
-                class="px-2 py-1 rounded border border-slate-300 text-slate-900 text-xs focus:ring-1 focus:ring-rose-300 outline-none w-32"
+                class="px-2 py-1 rounded border border-slate-300 text-slate-900 text-tiny focus:ring-1 focus:ring-rose-300 outline-none w-32"
                 placeholder="End"
               >
               <button
                 id="applyDateFilter"
-                class="px-3 py-1 bg-rose-600 text-white rounded text-xs font-medium hover:bg-rose-700 transition"
+                class="px-4 py-1.5 bg-rose-600 text-white rounded-lg text-tiny font-medium hover:bg-rose-700 transition"
               >
                 Apply
               </button>
               <button
                 id="clearDateFilter"
-                class="px-2 py-1 bg-slate-200 hover:bg-slate-300 rounded text-xs font-medium text-slate-700 transition"
+                class="px-2 py-1 bg-slate-200 hover:bg-slate-300 rounded text-tiny font-medium text-slate-700 transition"
               >
                 Clear
               </button>
@@ -198,7 +220,7 @@
       <div class="relative h-full flex flex-col">
         <!-- Header (compact) -->
         <div class="flex items-center justify-between p-4 border-b border-gray-200">
-          <h3 class="text-lg font-bold text-slate-700">Select Region</h3>
+          <h3 class="text-h2 font-bold text-slate-700">Select Region</h3>
           <button id="closeTrayButton" class="p-2 hover:bg-gray-100 rounded-lg transition">
             <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -213,25 +235,25 @@
 
         <!-- Date Filter (Mobile) -->
         <div class="p-4 border-t border-gray-200 space-y-3">
-          <p class="text-xs font-semibold text-gray-700 mb-2">Date Range Filter</p>
+          <p class="text-tiny font-semibold text-gray-700 mb-2">Date Range Filter</p>
           <div class="space-y-2">
             <input
               type="date"
               id="startDateMobile"
-              class="w-full px-3 py-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-rose-300 outline-none"
+              class="w-full px-3 py-2 rounded border border-gray-300 text-small focus:ring-2 focus:ring-rose-300 outline-none"
               placeholder="Start Date"
             >
             <input
               type="date"
               id="endDateMobile"
-              class="w-full px-3 py-2 rounded border border-gray-300 text-sm focus:ring-2 focus:ring-rose-300 outline-none"
+              class="w-full px-3 py-2 rounded border border-gray-300 text-small focus:ring-2 focus:ring-rose-300 outline-none"
               placeholder="End Date"
             >
             <div class="flex gap-2">
-              <button id="applyDateFilterMobile" class="flex-1 px-3 py-2 bg-rose-600 text-white rounded text-sm font-medium hover:bg-rose-700 transition">
+              <button id="applyDateFilterMobile" class="flex-1 px-4 py-2 bg-rose-600 text-white rounded-lg text-small font-medium hover:bg-rose-700 transition">
                 Apply Filter
               </button>
-              <button id="clearDateFilterMobile" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium text-gray-700 transition">
+              <button id="clearDateFilterMobile" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-small font-medium text-gray-700 transition">
                 Clear
               </button>
             </div>
@@ -240,10 +262,10 @@
 
         <!-- Footer with reset button and instructions -->
         <div class="p-4 border-t border-gray-200 space-y-3">
-          <button id="resetFilterButtonTray" class="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition">
+          <button id="resetFilterButtonTray" class="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-small font-medium text-gray-700 transition">
             🇹🇹 Show All Regions
           </button>
-          <p class="text-xs text-center text-gray-600">
+          <p class="text-tiny text-center text-gray-600">
             Tap any region to filter crime data
           </p>
         </div>
@@ -264,7 +286,7 @@
           </div>
           <div>
             <h3 class="font-semibold text-slate-900 mb-2">Real-Time Data</h3>
-            <p class="text-sm text-slate-600">Dashboard updates automatically with the latest crime statistics from verified sources.</p>
+            <p class="text-small text-slate-600">Dashboard updates automatically with the latest crime statistics from verified sources.</p>
           </div>
         </div>
       </div>
@@ -277,7 +299,7 @@
           </div>
           <div>
             <h3 class="font-semibold text-slate-900 mb-2">Regional Filtering</h3>
-            <p class="text-sm text-slate-600">Click any region on the map to filter the dashboard and view area-specific crime data.</p>
+            <p class="text-small text-slate-600">Click any region on the map to filter the dashboard and view area-specific crime data.</p>
           </div>
         </div>
       </div>
@@ -290,7 +312,7 @@
           </div>
           <div>
             <h3 class="font-semibold text-slate-900 mb-2">Mobile Friendly</h3>
-            <p class="text-sm text-slate-600">Access crime statistics on any device with our responsive dashboard design.</p>
+            <p class="text-small text-slate-600">Access crime statistics on any device with our responsive dashboard design.</p>
           </div>
         </div>
       </div>
@@ -302,7 +324,7 @@
   <footer class="bg-slate-800 text-white py-8 mt-16">
     <div class="container mx-auto px-4 text-center">
       <p>&copy; 2025 Crime Hotspots. All rights reserved.</p>
-      <p class="text-slate-400 text-sm mt-2">Data sources: Verified news outlets and official reports</p>
+      <p class="text-slate-400 text-small mt-2">Data sources: Verified news outlets and official reports</p>
     </div>
   </footer>
 

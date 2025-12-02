@@ -2,8 +2,12 @@
 import { COUNTRIES } from '../data/countries.js';
 
 export function renderHeader(activeOverride = '') {
-  // dynamically build dropdown from COUNTRIES
-  const dropdownItems = COUNTRIES.map(c => {
+  // Check if we're on the homepage
+  const path = window.location.pathname.split('/').pop() || 'index.html';
+  const isHomepage = path === 'index.html' || path === '';
+
+  // Build headlines dropdown from COUNTRIES
+  const headlinesDropdownItems = COUNTRIES.map(c => {
     if (c.available) {
       return `
         <a href="headlines-${c.headlinesSlug}.html" data-island="${c.headlinesSlug}"
@@ -14,6 +18,25 @@ export function renderHeader(activeOverride = '') {
     } else {
       return `
         <a href="#" data-island="${c.headlinesSlug}"
+           class="block px-4 py-2 text-nav text-slate-400 cursor-not-allowed"
+           role="menuitem" aria-disabled="true">
+          ${c.flag} ${c.name} (Coming Soon)
+        </a>`;
+    }
+  }).join('');
+
+  // Build dashboard dropdown from COUNTRIES (only show when NOT on homepage)
+  const dashboardDropdownItems = COUNTRIES.map(c => {
+    if (c.available) {
+      return `
+        <a href="${c.dashboard}" data-dashboard="${c.id}"
+           class="block px-4 py-2 text-nav text-slate-700 hover:bg-rose-50 hover:text-rose-600"
+           role="menuitem">
+          ${c.flag} ${c.name}
+        </a>`;
+    } else {
+      return `
+        <a href="#" data-dashboard="${c.id}"
            class="block px-4 py-2 text-nav text-slate-400 cursor-not-allowed"
            role="menuitem" aria-disabled="true">
           ${c.flag} ${c.name} (Coming Soon)
@@ -62,6 +85,26 @@ export function renderHeader(activeOverride = '') {
           <!-- Desktop nav -->
           <nav id="mainNav" class="hidden md:flex items-center gap-6" role="navigation" aria-label="Primary">
 
+            ${!isHomepage ? `
+            <div class="relative group" data-nav="dashboard">
+              <button id="navDashboardBtn"
+                class="text-nav text-slate-700 hover:text-rose-600 font-medium flex items-center gap-1 focus:outline-none"
+                aria-haspopup="true" aria-expanded="false">
+                View Dashboard
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <div id="navDashboardMenu"
+                   class="absolute right-0 w-56 bg-white border border-slate-200 rounded-lg shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
+                   role="menu"
+                   aria-label="Dashboard by island">
+                ${dashboardDropdownItems}
+              </div>
+            </div>
+            ` : ''}
+
             <div class="relative group" data-nav="headlines">
               <button id="navHeadlinesBtn"
                 class="text-nav text-slate-700 hover:text-rose-600 font-medium flex items-center gap-1 focus:outline-none"
@@ -76,7 +119,7 @@ export function renderHeader(activeOverride = '') {
                    class="absolute right-0 w-56 bg-white border border-slate-200 rounded-lg shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200"
                    role="menu"
                    aria-label="Headlines by island">
-                ${dropdownItems}
+                ${headlinesDropdownItems}
               </div>
             </div>
 
@@ -109,6 +152,23 @@ export function renderHeader(activeOverride = '') {
         </div>
 
         <div class="space-y-1">
+          ${!isHomepage ? `
+          <div data-nav="dashboard">
+            <button id="mobileDashboardBtn" class="w-full text-left text-nav text-slate-700 hover:text-rose-600 font-medium flex items-center gap-2 py-3 border-b border-slate-200" aria-haspopup="true" aria-expanded="false">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              <span class="flex-1">Dashboard</span>
+              <svg class="w-5 h-5 transform transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div id="mobileDashboardMenu" class="hidden mt-2 ml-4 space-y-2">
+              ${dashboardDropdownItems.replace(/block px-4 py-2 text-nav/g, 'block py-2 text-nav')}
+            </div>
+          </div>
+          ` : ''}
+
           <div data-nav="headlines">
             <button id="mobileHeadlinesBtn" class="w-full text-left text-nav text-slate-700 hover:text-rose-600 font-medium flex items-center gap-2 py-3 border-b border-slate-200" aria-haspopup="true" aria-expanded="false">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,7 +180,7 @@ export function renderHeader(activeOverride = '') {
               </svg>
             </button>
             <div id="mobileHeadlinesMenu" class="hidden mt-2 ml-4 space-y-2">
-              ${dropdownItems.replace(/block px-4 py-2 text-nav/g, 'block py-2 text-nav')}
+              ${headlinesDropdownItems.replace(/block px-4 py-2 text-nav/g, 'block py-2 text-nav')}
             </div>
           </div>
 
@@ -158,12 +218,12 @@ export function renderHeader(activeOverride = '') {
     document.body.prepend(tempContainer.lastChild);
   }
 
-  // ---------- Auto-active highlight (unchanged) ----------
-  const path = window.location.pathname.split('/').pop() || 'index.html';
+  // ---------- Auto-active highlight ----------
   let active = activeOverride || '';
 
   if (!active) {
     if (/^headlines-/.test(path)) active = 'headlines';
+    else if (/^dashboard-/.test(path)) active = 'dashboard';
     else if (path === 'index.html' || path === '') active = 'home';
     else if (path === 'about.html') active = 'about';
     else if (path === 'report.html') active = 'report';
@@ -181,6 +241,27 @@ export function renderHeader(activeOverride = '') {
       el.removeAttribute('aria-current');
     }
   });
+
+  // Highlight specific dashboard (for dashboard pages)
+  if (active === 'dashboard') {
+    const match = path.match(/^dashboard-([a-z0-9-]+)\.html$/i);
+    if (match) {
+      const dashboardSlug = match[1];
+      // Match by the dashboard path
+      const items = document.querySelectorAll('#navDashboardMenu a[data-dashboard], #mobileDashboardMenu a[data-dashboard]');
+      items.forEach(a => {
+        const href = a.getAttribute('href');
+        if (href && href.includes(`dashboard-${dashboardSlug}.html`)) {
+          a.classList.add('text-rose-600', 'font-semibold');
+          a.setAttribute('aria-current', 'true');
+        }
+      });
+      const btn = document.getElementById('navDashboardBtn');
+      if (btn) btn.classList.add('text-rose-600', 'font-semibold');
+      const mobileBtn = document.getElementById('mobileDashboardBtn');
+      if (mobileBtn) mobileBtn.classList.add('text-rose-600', 'font-semibold');
+    }
+  }
 
   // Highlight specific island (for headlines pages)
   if (active === 'headlines') {
@@ -265,6 +346,26 @@ export function renderHeader(activeOverride = '') {
     });
   }
 
+  // Mobile dashboard dropdown
+  const mobileDashboardBtn = document.getElementById('mobileDashboardBtn');
+  const mobileDashboardMenu = document.getElementById('mobileDashboardMenu');
+
+  if (mobileDashboardBtn && mobileDashboardMenu) {
+    mobileDashboardBtn.addEventListener('click', () => {
+      const isExpanded = mobileDashboardBtn.getAttribute('aria-expanded') === 'true';
+
+      if (isExpanded) {
+        mobileDashboardMenu.classList.add('hidden');
+        mobileDashboardBtn.setAttribute('aria-expanded', 'false');
+        mobileDashboardBtn.querySelectorAll('svg')[1].classList.remove('rotate-180');
+      } else {
+        mobileDashboardMenu.classList.remove('hidden');
+        mobileDashboardBtn.setAttribute('aria-expanded', 'true');
+        mobileDashboardBtn.querySelectorAll('svg')[1].classList.add('rotate-180');
+      }
+    });
+  }
+
   // Mobile headlines dropdown
   const mobileHeadlinesBtn = document.getElementById('mobileHeadlinesBtn');
   const mobileHeadlinesMenu = document.getElementById('mobileHeadlinesMenu');
@@ -276,16 +377,61 @@ export function renderHeader(activeOverride = '') {
       if (isExpanded) {
         mobileHeadlinesMenu.classList.add('hidden');
         mobileHeadlinesBtn.setAttribute('aria-expanded', 'false');
-        mobileHeadlinesBtn.querySelector('svg').classList.remove('rotate-180');
+        mobileHeadlinesBtn.querySelectorAll('svg')[1].classList.remove('rotate-180');
       } else {
         mobileHeadlinesMenu.classList.remove('hidden');
         mobileHeadlinesBtn.setAttribute('aria-expanded', 'true');
-        mobileHeadlinesBtn.querySelector('svg').classList.add('rotate-180');
+        mobileHeadlinesBtn.querySelectorAll('svg')[1].classList.add('rotate-180');
       }
     });
   }
 
-  // ---------- Mobile dropdown tap behavior (unchanged) ----------
+  // ---------- Desktop dropdown tap behavior for Dashboard ----------
+  const navDashboardBtn = document.getElementById('navDashboardBtn');
+  const navDashboardMenu = document.getElementById('navDashboardMenu');
+
+  if (navDashboardBtn && navDashboardMenu) {
+    function openDashboardDropdown() {
+      navDashboardMenu.classList.add('opacity-100', 'visible');
+      navDashboardMenu.classList.remove('opacity-0', 'invisible');
+      navDashboardBtn.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeDashboardDropdown() {
+      navDashboardMenu.classList.remove('opacity-100', 'visible');
+      navDashboardMenu.classList.add('opacity-0', 'invisible');
+      navDashboardBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    const isMobile = () => window.innerWidth < 768;
+
+    navDashboardBtn.addEventListener('click', (e) => {
+      if (!isMobile()) return; // keep hover behavior on desktop
+      e.preventDefault();
+      e.stopPropagation();
+      const expanded = navDashboardBtn.getAttribute('aria-expanded') === 'true';
+      if (expanded) closeDashboardDropdown();
+      else openDashboardDropdown();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (isMobile() && !navDashboardBtn.contains(e.target) && !navDashboardMenu.contains(e.target)) {
+        closeDashboardDropdown();
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (!isMobile()) {
+        closeDashboardDropdown();
+      } else {
+        if (navDashboardBtn.getAttribute('aria-expanded') !== 'true') {
+          closeDashboardDropdown();
+        }
+      }
+    });
+  }
+
+  // ---------- Desktop dropdown tap behavior for Headlines ----------
   const navHeadlinesBtn = document.getElementById('navHeadlinesBtn');
   const navHeadlinesMenu = document.getElementById('navHeadlinesMenu');
 
@@ -322,7 +468,7 @@ export function renderHeader(activeOverride = '') {
     window.addEventListener('resize', () => {
       if (!isMobile()) {
         // Close menu explicitly on desktop resize so CSS hover takes over.
-        closeDropdown(); 
+        closeDropdown();
       } else {
         // Close on mobile resize unless already open by tap
         if (navHeadlinesBtn.getAttribute('aria-expanded') !== 'true') {

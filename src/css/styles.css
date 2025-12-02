@@ -19,36 +19,36 @@
 
 :root {
   /* Display (Page Titles) */
-  --text-display: 1.25rem;         /* 20px - mobile */
-  --text-display-sm: 1.75rem;      /* 28px - desktop */
+  --text-display: 1.5rem;          /* 24px - mobile */
+  --text-display-sm: 2rem;         /* 32px - desktop */
 
   /* H1 (Main Headings) */
   --text-h1: 1.25rem;              /* 20px - mobile */
   --text-h1-sm: 1.5rem;            /* 24px - desktop */
 
   /* H2 (Subheadings) */
-  --text-h2: 0.875rem;             /* 14px - mobile */
-  --text-h2-sm: 1rem;              /* 16px - desktop */
+  --text-h2: 1rem;                 /* 16px - mobile */
+  --text-h2-sm: 1.125rem;          /* 18px - desktop */
 
   /* H3 (Component Headings) */
-  --text-h3: 0.5rem;               /* 8px - mobile */
-  --text-h3-sm: 0.625rem;          /* 10px - desktop */
+  --text-h3: 0.8125rem;            /* 13px - mobile */
+  --text-h3-sm: 0.9375rem;         /* 15px - desktop */
 
   /* Body (Default Text) */
-  --text-body: 0.5rem;             /* 8px - mobile */
-  --text-body-sm: 0.625rem;        /* 10px - desktop */
+  --text-body: 0.8125rem;          /* 13px - mobile */
+  --text-body-sm: 0.9375rem;       /* 15px - desktop */
 
   /* Small (Labels) */
-  --text-small: 0.875rem;          /* 14px - mobile */
-  --text-small-sm: 1rem;           /* 16px - desktop */
+  --text-small: 0.6875rem;         /* 11px - mobile */
+  --text-small-sm: 0.8125rem;      /* 13px - desktop */
 
   /* Tiny (Metadata) */
   --text-tiny: 0.625rem;           /* 10px - mobile */
-  --text-tiny-sm: 0.75rem;         /* 12px - desktop */
+  --text-tiny-sm: 0.6875rem;       /* 11px - desktop */
 
   /* Navigation (Menu Links) */
-  --text-nav: 0.875rem;            /* 14px - mobile */
-  --text-nav-sm: 1rem;             /* 16px - desktop */
+  --text-nav: 0.6875rem;           /* 11px - mobile */
+  --text-nav-sm: 0.8125rem;        /* 13px - desktop */
 }
 
 /* Typography utility classes */
@@ -243,11 +243,11 @@
   display: none !important;
 }
 
-/* Make SVG larger in mobile tray */
+/* Ensure SVG fits properly in mobile tray */
 #mobileMapContainer svg {
   max-width: 100%;
   height: auto;
-  transform: scale(1.1);
+  transform: scale(1);
 }
 
 /* Remove focus outline from map regions */
@@ -500,4 +500,26 @@ button:hover, a:hover {
 
 button:active, a:active {
   transform: translateY(0);
+}
+
+/* ===== Horizontal Scrollable Metrics Cards ===== */
+
+/* Webkit scrollbar styling for metrics cards */
+.metrics-cards::-webkit-scrollbar {
+  height: 8px;
+}
+
+.metrics-cards::-webkit-scrollbar-track {
+  background: #f1f5f9; /* slate-100 */
+  border-radius: 4px;
+}
+
+.metrics-cards::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* slate-300 */
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.metrics-cards::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* slate-400 */
 }

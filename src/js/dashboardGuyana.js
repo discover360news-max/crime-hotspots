@@ -75,7 +75,7 @@ async function init() {
     regionTray = new RegionTray({
       trayId: 'regionTray',
       overlayId: 'trayOverlay',
-      openButtonId: 'mobileRegionButton',
+      openButtonId: 'mobileRegionButtonCompact',
       closeButtonId: 'closeTrayButton',
       resetButtonId: 'resetFilterButtonTray',
       mobileMapContainerId: 'mobileMapContainer',
@@ -192,6 +192,15 @@ async function loadDashboard(regionFilter = null, dateRange = null) {
 }
 
 /**
+ * Create a visual separator (light divider line)
+ */
+function createSeparator() {
+  const separator = document.createElement('div');
+  separator.className = 'w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-6';
+  return separator;
+}
+
+/**
  * Render all dashboard widgets
  */
 function renderWidgets(stats) {
@@ -214,6 +223,9 @@ function renderWidgets(stats) {
       console.error('Error creating metrics cards:', error);
     }
 
+    // Separator after metrics
+    widgetsContainer.appendChild(createSeparator());
+
     // Create Leaflet map with crime markers (full width)
     if (allData) {
       try {
@@ -228,6 +240,9 @@ function renderWidgets(stats) {
         console.error('Error creating Leaflet map:', error);
       }
     }
+
+    // Separator after map
+    widgetsContainer.appendChild(createSeparator());
 
     // Create charts container with 2-column grid
     const chartsContainer = document.createElement('div');
