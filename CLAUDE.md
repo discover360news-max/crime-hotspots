@@ -309,6 +309,50 @@ mapDiv.addEventListener('touchmove', (e) => {
 });
 ```
 
+### Header Navigation Enhancements (Dec 3, 2025)
+
+**Major UX Improvement:**
+- Added horizontal scrollable "quick access pills" below main header
+- Added "Subscribe" button with slide-out tray for social media links
+- Inspired by modern news apps (Ground News pattern)
+
+**Quick Access Pills:**
+- **Location:** Below main header, above page content
+- **Horizontal scroll:** Touch-friendly, snap-to-grid behavior
+- **No active states:** Pills remain static (no highlighting)
+- **Pills included:**
+  - Report a Crime (primary CTA - rose-600 background)
+  - Trinidad Headlines
+  - Guyana Headlines
+  - Trinidad Dashboard
+  - Guyana Dashboard
+  - Blog
+  - About
+
+**Subscribe Tray:**
+- **Trigger:** "Subscribe" button in desktop nav (outline style, rose-600 border)
+- **Pattern:** Reuses mobile menu slide-in tray design
+- **Social platforms:**
+  - X (Twitter): @crimehotspots
+  - Facebook: @crimehotspots
+  - WhatsApp: Direct messaging link
+- **UX:** Backdrop blur, smooth animations, Escape key closes
+
+**Technical Details:**
+- Pills use Tailwind snap scroll (`snap-x snap-mandatory`)
+- Z-index hierarchy maintained: tray (z-50) > backdrop (z-40) > header (z-40)
+- Custom scrollbar styling for pills container
+- Subscribe tray shares code pattern with mobile menu
+
+**File Modified:**
+- `src/js/components/header.js` (lines 136-628)
+
+**Why This Matters:**
+- Surfaces "Report a Crime" feature (previously buried in footer)
+- Quick navigation to key pages without dropdown hunting
+- Social media engagement now one tap away
+- Mobile-first design with horizontal scroll
+
 ---
 
 ## Common Patterns

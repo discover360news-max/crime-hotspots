@@ -27,7 +27,9 @@ export default defineConfig({
         report: resolve(__dirname, 'report.html'),
         about: resolve(__dirname, 'about.html'),
         blog: resolve(__dirname, 'blog.html'),
-        blogPost: resolve(__dirname, 'blog-post.html')
+        blogPost: resolve(__dirname, 'blog-post.html'),
+        faq: resolve(__dirname, 'faq.html'),
+        methodology: resolve(__dirname, 'methodology.html')
       },
       output: {
         manualChunks: {

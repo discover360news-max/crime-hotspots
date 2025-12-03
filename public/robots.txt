@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Crawl important pages first
+Sitemap: https://crimehotspots.com/sitemap.xml
+
+# Allow Google bots to crawl JS/CSS/Assets
+User-agent: Googlebot
+Allow: /src/js/
+Allow: /src/css/
+Allow: /assets/
+
+# Crawl delay (be nice to servers)
+Crawl-delay: 1

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary Meta Tags -->
+  <title>Our Methodology — How We Collect and Verify Caribbean Crime Data | Crime Hotspots</title>
+  <meta name="title" content="Our Methodology — How We Collect and Verify Crime Data">
+  <meta name="description" content="Learn how Crime Hotspots Caribbean collects, verifies, and publishes crime statistics. Our data comes from Trinidad Express, Guardian TT, Newsday, Stabroek News, and Kaieteur News, processed with Google Gemini AI and human oversight.">
+  <meta name="keywords" content="crime data methodology, Caribbean crime statistics, verified crime data, data collection process, AI crime analysis, Trinidad crime sources, Guyana crime sources, E-E-A-T compliance">
+  <meta name="author" content="Crime Hotspots Caribbean">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://crimehotspots.com/methodology.html">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://crimehotspots.com/methodology.html">
+  <meta property="og:title" content="Our Methodology — How We Collect and Verify Crime Data">
+  <meta property="og:description" content="Transparency in crime data collection. Learn about our sources, AI extraction process, and human oversight protocols.">
+  <meta property="og:image" content="https://crimehotspots.com/og-methodology.jpg">
+  <meta property="og:site_name" content="Crime Hotspots Caribbean">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://crimehotspots.com/methodology.html">
+  <meta name="twitter:title" content="Our Methodology — Crime Data Collection">
+  <meta name="twitter:description" content="Transparency in crime data collection. Learn about our sources, AI extraction, and verification protocols.">
+  <meta name="twitter:image" content="https://crimehotspots.com/og-methodology.jpg">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#e11d48">
+
+  <!-- Security: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://*.google.com https://*.googleusercontent.com https://lookerstudio.google.com https://docs.google.com; connect-src 'self' https://cdn.jsdelivr.net https://docs.google.com https://*.google.com https://*.googleusercontent.com https://*.googleapis.com https://script.google.com https://challenges.cloudflare.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; form-action 'self' https://script.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; child-src 'self' https://*.google.com;">
+
+  <!-- Cookie Consent & Analytics -->
+  <script type="module">
+    import { initCookieConsent } from './src/js/utils/cookieConsent.js';
+    import { initAnalytics } from './src/js/utils/analytics.js';
+
+    initCookieConsent({
+      onAccept: () => {
+        initAnalytics({
+          provider: 'ga4',
+          ga4MeasurementId: 'G-JMQ8B4DYEG',
+          anonymizeIp: true,
+          debug: false
+        });
+      }
+    });
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./src/css/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto}
+  </style>
+</head>
+
+<body class="bg-gradient-to-b from-slate-50 to-white text-slate-800 min-h-screen">
+  <!-- Global header -->
+  <script type="module">
+    import { renderHeader } from './src/js/components/header.js';
+    renderHeader();
+  </script>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fadeIn">
+    <div class="bg-white/70 backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100">
+    <!-- Introduction -->
+    <section class="mb-10">
+      <h1 class="text-display font-bold mb-4">How We Collect and Verify Crime Data for Trinidad & Tobago and Guyana</h1>
+      <p class="text-small text-slate-700 mb-4">Crime Hotspots is a data-driven statistics platform dedicated to enhancing public safety and awareness across the Caribbean. Our mission is to provide unfiltered, timely, and accessible crime data for citizens, researchers, and policymakers across the Caribbean. We believe that transparency is the bedrock of community safety, and a clear understanding of regional crime patterns empowers better decision-making.</p>
+      <p class="text-small text-slate-700">We exist to bridge the gap between official reporting and public perception by aggregating data from trusted media and community sources. This methodology page outlines the rigorous processes, technologies, and ethical standards we employ to ensure the information presented on our site is as accurate and verifiable as possible, building the Trustworthiness (E-E-A-T) essential for a reliable data source.</p>
+    </section>
+
+    <!-- Our Data Sources -->
+    <section class="mb-10">
+      <h2 class="text-h2 font-semibold text-slate-900 mb-4">Our Data Sources</h2>
+      <p class="text-small text-slate-700 mb-4">We rely exclusively on publicly available, high-authority sources to build our comprehensive crime datasets for all nations. Using diverse sources helps mitigate reliance on a single news outlet or platform.</p>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Trinidad & Tobago Sources</h3>
+      <p class="text-small text-slate-700 mb-4">For Trinidad & Tobago, our primary data streams are RSS feeds from established media houses: the Trinidad Express, the Guardian TT, CNC 3 and Newsday. This provides a foundational layer of verified reports. Additionally, we integrate data from high-traffic, community-focused social media pages, specifically the Ian Alleyne Network and DJ Sherrif, to capture localized incidents and community alerts that may precede formal media reports.</p>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Guyana Sources</h3>
+      <p class="text-small text-slate-700 mb-4">In Guyana, our data is sourced exclusively from the RSS feeds of leading, established news organizations: Stabroek News, Kaieteur News, and the Guyana Chronicle.</p>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Source Verification and Reliability</h3>
+      <p class="text-small text-slate-700 mb-4">We choose these sources because they have established reputations for journalistic integrity and high update frequency. Every entry on our platform is explicitly linked back to its original source article or post, allowing users to verify the context and details immediately. We treat official media reports as primary verification and community sources (like Facebook) as timely alerts, prioritizing the media sources for final classification and location confirmation.</p>
+    </section>
+
+    <!-- How We Collect Data -->
+    <section class="mb-10">
+      <h2 class="text-h2 font-semibold text-slate-900 mb-4">How We Collect Data</h2>
+      <p class="text-small text-slate-700 mb-4">Our collection process is designed for speed, consistency, and structured data output, relying on automation and advanced AI technology.</p>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Automated RSS Collection</h3>
+      <p class="text-small text-slate-700 mb-4">The foundation of our system is an automated script built on Google Apps Script. This script executes at regular intervals, querying the RSS feeds of all our specified media partners. When a new article is detected, the script pulls the URL and headline and initiates the next stage of processing.</p>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Google Gemini AI Extraction Methodology</h3>
+      <p class="text-small text-slate-700 mb-4">This is the core of our Expertise. The text from each collected news article or social media post is fed into the Google Gemini AI model. The AI is trained to perform a critical extraction task: reading the unstructured narrative of a crime report and converting it into a structured data format.</p>
+
+      <p class="text-small text-slate-700 mb-2">The Gemini model extracts the following structured data fields:</p>
+      <ul class="list-disc list-inside text-small text-slate-700 mb-4 ml-4">
+        <li><strong>Crime Type:</strong> (e.g., Homicide, Robbery, Burglary, Kidnapping)</li>
+        <li><strong>Location:</strong> (Specific street address or junction, if available)</li>
+        <li><strong>Area/Town:</strong> (General town, city, or neighborhood)</li>
+        <li><strong>Date & Time:</strong> (Timestamp of the incident, often different from the report date)</li>
+        <li><strong>Source URL:</strong> (Direct link to the original article for verification)</li>
+      </ul>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Human Oversight and Validation</h3>
+      <p class="text-small text-slate-700 mb-4">While automation is efficient, human expertise is essential. All data entries classified as 'High Severity' or those flagged with ambiguous location data by the AI undergo a mandatory human validation step. Our team reviews the original source article to confirm the crime type, verify the location against a map, and ensure the classification is accurate before the data is published to the live dashboard.</p>
+    </section>
+
+    <!-- Data Accuracy & Limitations -->
+    <section class="mb-10">
+      <h2 class="text-h2 font-semibold text-slate-900 mb-4">Data Accuracy & Limitations</h2>
+      <p class="text-small text-slate-700 mb-4">We strive for maximum accuracy, but the nature of sourcing media reports introduces inherent limitations that users must be aware of.</p>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Ensuring Accuracy</h3>
+      <p class="text-small text-slate-700 mb-4">Our primary commitment to accuracy is achieved through our Source-to-Record link and the Human Validation step. We categorize reported incidents using standardized police terminology whenever possible. Furthermore, all data is stored in Google Sheets, which is publicly exported as a CSV file, providing full transparency into the raw, underlying data we use.</p>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Limitations and Biases</h3>
+      <ul class="list-disc list-inside text-small text-slate-700 mb-4 ml-4">
+        <li><strong>Reported Crimes Only:</strong> We only capture incidents that are reported by our media sources or community feeds. We cannot account for the "dark figure" of crime (unreported crimes).</li>
+        <li><strong>Media Coverage Gaps:</strong> Crime distribution on our map is influenced by where media organizations choose to focus. This can lead to Geographic Biases, often showing higher density in urban and populated areas (Port of Spain, Georgetown) simply because they receive more media coverage than remote rural areas.</li>
+      </ul>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Disclaimer on Official Statistics</h3>
+      <p class="text-small text-slate-700 mb-4">Our platform provides valuable real-time trend data and geographic insight, but it is not a substitute for official Government or Police crime statistics. Our numbers may differ due to timing, reporting categories, and the inclusion of data from non-official (but community-verified) sources.</p>
+    </section>
+
+    <!-- Privacy & Ethics -->
+    <section class="mb-10">
+      <h2 class="text-h2 font-semibold text-slate-900 mb-4">Privacy & Ethics: Data Fidelity and Public Record Accountability</h2>
+      <p class="text-small text-slate-700 mb-4">Our approach to PII (Personally Identifiable Information) is governed by a policy of Data Fidelity to our authoritative sources. Unlike many data platforms that anonymize records, Crime Hotspots Caribbean maintains the integrity of the public record established by the originating news media.</p>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Policy on Personally Identifiable Information (PII)</h3>
+      <p class="text-small text-slate-700 mb-4">We retain the PII—including names, specific addresses, and vehicle details—when that information is explicitly included in the public news article or social media post we source.</p>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Rationale: Verification and Data Fidelity</h3>
+      <p class="text-small text-slate-700 mb-2">We retain these specific details for two primary reasons:</p>
+      <ul class="list-disc list-inside text-small text-slate-700 mb-4 ml-4">
+        <li><strong>Verification and Accountability:</strong> Retaining the original context allows users, researchers, and policymakers to fully verify the incident against the source material. This ensures maximum authoritativeness and allows for precise geographic analysis, which is critical for understanding specific crime hotspots.</li>
+        <li><strong>Public Record Integrity:</strong> Our platform functions as an aggregate library of incidents already published by established journalistic organizations. We rely on the established editorial and ethical standards of our media sources (Trinidad Express, Stabroek News, etc.) for the initial decision to publish PII.</li>
+      </ul>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Ethical Constraints and Disclaimer</h3>
+      <p class="text-small text-slate-700 mb-2">By accessing our platform, users acknowledge that the data presented reflects the public record created by third-party journalistic outlets.</p>
+      <ul class="list-disc list-inside text-small text-slate-700 mb-4 ml-4">
+        <li>Our platform uses this data strictly for the purpose of community safety, research, and trend analysis.</li>
+        <li>We do not generate new PII or use this data for individual targeting or commercial marketing.</li>
+        <li>We encourage all users to consult the original source link provided with every entry for the complete context and background of the published incident.</li>
+      </ul>
+    </section>
+
+    <!-- Updates & Maintenance -->
+    <section class="mb-10">
+      <h2 class="text-h2 font-semibold text-slate-900 mb-4">Updates & Maintenance</h2>
+      <p class="text-small text-slate-700 mb-4">Maintaining data freshness is crucial for safety awareness. Our schedules are optimized to provide the most current view of the crime landscape.</p>
+
+      <h3 class="text-h3 font-semibold text-slate-900 mb-3">Update Schedules</h3>
+      <p class="text-small text-slate-700 mb-2">Our platform maintains two distinct update schedules:</p>
+      <ul class="list-disc list-inside text-small text-slate-700 mb-4 ml-4">
+        <li><strong>Trinidad & Tobago:</strong> The RSS feeds are checked for new reports every two hours. Facebook sources are monitored manually throughout the day.</li>
+        <li><strong>Guyana:</strong> RSS feeds are checked hourly due to high flow of news from the key media sources.</li>
+      </ul>
+      <p class="text-small text-slate-700 mb-4">Data is refreshed on the live dashboard immediately following validation. We use Google Sheets for immediate data storage, which is then exported as a public CSV for transparency. We retain a comprehensive historical record of all collected data for trend analysis and research purposes.</p>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-white border border-slate-200 rounded-lg p-6 mt-10">
+      <h2 class="text-h3 font-semibold text-slate-900 mb-2">Have questions about our methodology?</h2>
+      <p class="text-small text-slate-700 mb-4">If you need more information or have specific questions about how we collect and verify data, check out our FAQ page.</p>
+      <a href="/faq.html" class="inline-block px-4 py-1.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium text-small">View Frequently Asked Questions</a>
+    </section>
+    </div>
+  </main>
+</body>
+</html>
