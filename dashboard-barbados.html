@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary Meta Tags -->
+  <title>Barbados Crime Dashboard — Bridgetown, Christ Church, St Andrews Statistics</title>
+  <meta name="title" content="Barbados Crime Dashboard — Regional Crime Statistics">
+  <meta name="description" content="Explore real-time Barbados crime statistics on our interactive map. View Bridgetown data and regional safety trends. Check the live dashboard now.">
+  <meta name="keywords" content="Barbados crime statistics, Bridgetown crime, Christ Church murders, St Andrews robberies, St James crime, St Michael crime, Barbados homicide rate, crime by region Barbados, Barbados Today crime, Nation News crime news">
+  <meta name="author" content="Crime Hotspots">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://crimehotspots.com/dashboard-barbados.html">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://crimehotspots.com/dashboard-barbados.html">
+  <meta property="og:title" content="Barbados Crime Dashboard — Regional Statistics">
+  <meta property="og:description" content="Check the real-time crime dashboard for Barbados now. See verified incidents, filter by area, and identify local hotspots. Know the facts affecting your community today. View the live map and data.">
+  <meta property="og:image" content="https://crimehotspots.com/og-barbados.jpg">
+  <meta property="og:site_name" content="Crime Hotspots">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://crimehotspots.com/dashboard-barbados.html">
+  <meta name="twitter:title" content="Barbados Crime Dashboard">
+  <meta name="twitter:description" content="Check the real-time crime dashboard for Barbados now. See verified incidents, filter by area, and identify local hotspots.">
+  <meta name="twitter:image" content="https://crimehotspots.com/og-barbados.jpg">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta name="theme-color" content="#e11d48">
+
+  <!-- Security: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://*.google.com https://*.googleusercontent.com https://lookerstudio.google.com https://docs.google.com; connect-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://docs.google.com https://*.google.com https://*.googleusercontent.com https://*.googleapis.com https://script.google.com https://challenges.cloudflare.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://tile.openstreetmap.org https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com; form-action 'self' https://script.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; child-src 'self' https://*.google.com;">
+
+  <!-- Cookie Consent & Analytics -->
+  <script type="module">
+    import { initCookieConsent } from './src/js/utils/cookieConsent.js';
+    import { initAnalytics } from './src/js/utils/analytics.js';
+
+    initCookieConsent({
+      onAccept: () => {
+        initAnalytics({
+          provider: 'ga4',
+          ga4MeasurementId: 'G-JMQ8B4DYEG',
+          anonymizeIp: true,
+          debug: false
+        });
+      }
+    });
+  </script>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/src/css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+  <style>
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen">
+  <!-- Global Header -->
+  <script type="module">
+    import { renderHeader } from './src/js/components/header.js';
+    renderHeader();
+  </script>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-6 max-w-7xl">
+
+    <!-- Page Header -->
+    <div class="mb-6">
+      <div class="mb-4">
+        <h1 class="text-display font-bold text-slate-900">🇧🇧 Barbados</h1>
+        <p class="text-small text-slate-600 mt-1">Regional statistics</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="hidden lg:block flex-1">
+          <p class="text-body text-slate-700 font-medium">Click regions on the map to filter →</p>
+        </div>
+        <div class="lg:hidden flex-1">
+          <button id="mobileRegionButtonCompact" class="w-full px-3 py-1.5 min-h-[44px] border border-slate-300 rounded-lg bg-white hover:bg-slate-50 transition text-tiny text-slate-700 flex items-center justify-between">
+            <span>Select Region</span>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+        <a href="headlines-barbados.html"
+           class="px-4 py-1.5 min-h-[44px] flex items-center justify-center border-2 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-small whitespace-nowrap">
+          View Headlines →
+        </a>
+      </div>
+    </div>
+
+
+    <!-- Layout: Map + Dashboard -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Interactive Regional Map (Left side on desktop, hidden on mobile) -->
+      <div class="hidden lg:block lg:col-span-4">
+        <div id="barbadosMapContainer" class="bg-white rounded-xl shadow-lg p-6 sticky top-6 z-10">
+          <!-- Skeleton loader for map -->
+          <div id="mapSkeleton">
+            <div class="skeleton skeleton-heading w-3/4 mx-auto"></div>
+            <div class="skeleton skeleton-text-sm w-1/2 mx-auto mb-6"></div>
+            <div class="skeleton-map"></div>
+            <div class="mt-4 space-y-2">
+              <div class="flex items-center gap-2">
+                <div class="skeleton w-4 h-4"></div>
+                <div class="skeleton skeleton-text w-32"></div>
+              </div>
+              <div class="flex items-center gap-2">
+                <div class="skeleton w-4 h-4"></div>
+                <div class="skeleton skeleton-text w-32"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Dashboard Widgets (Right side on desktop, full width on mobile) -->
+      <div class="lg:col-span-8">
+        <!-- Separator before dashboard section -->
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-6"></div>
+
+        <!-- Dashboard Header -->
+        <div class="mb-4">
+          <div class="flex flex-col gap-3">
+            <!-- Top row: Title and Reset Button -->
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-h2 font-semibold text-slate-900">Crime Statistics Dashboard</h2>
+                <p class="text-tiny text-slate-600 mt-1" id="dashboardSubtitle">Nationwide data</p>
+              </div>
+              <!-- Reset Filter Button (hidden when no filter active) -->
+              <button id="resetFilterButton" class="hidden px-3 py-1.5 min-h-[44px] bg-slate-100 hover:bg-slate-200 rounded-lg text-tiny font-medium text-slate-700 transition flex items-center justify-center">
+                Reset Filters
+              </button>
+            </div>
+
+            <!-- Date Range Filter (Desktop) -->
+            <div class="hidden lg:flex flex-wrap items-center gap-2 bg-slate-100 rounded p-2 text-tiny">
+              <label for="startDate" class="text-slate-600 font-medium">From:</label>
+              <input
+                type="date"
+                id="startDate"
+                class="px-2 py-1 min-h-[44px] rounded border border-slate-300 text-slate-900 text-tiny focus:ring-1 focus:ring-rose-300 outline-none w-32"
+                title="Select start date"
+              >
+              <span class="text-slate-600">to</span>
+              <label for="endDate" class="text-slate-600 font-medium">To:</label>
+              <input
+                type="date"
+                id="endDate"
+                class="px-2 py-1 min-h-[44px] rounded border border-slate-300 text-slate-900 text-tiny focus:ring-1 focus:ring-rose-300 outline-none w-32"
+                title="Select end date"
+              >
+              <button
+                id="applyDateFilter"
+                class="px-4 py-1.5 min-h-[44px] flex items-center justify-center bg-rose-600 text-white rounded-lg text-tiny font-medium hover:bg-rose-700 transition"
+              >
+                Apply
+              </button>
+              <button
+                id="clearDateFilter"
+                class="px-2 py-1 min-h-[44px] flex items-center justify-center bg-slate-200 hover:bg-slate-300 rounded text-tiny font-medium text-slate-700 transition"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Widgets Container -->
+        <div id="dashboardWidgets" class="bg-slate-50">
+          <!-- Skeleton loader for widgets -->
+          <div id="widgetsSkeleton">
+            <!-- Metric cards grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div class="skeleton-metric"></div>
+              <div class="skeleton-metric"></div>
+              <div class="skeleton-metric"></div>
+              <div class="skeleton-metric"></div>
+            </div>
+
+            <!-- Charts grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <div class="skeleton-chart"></div>
+              <div class="skeleton-chart"></div>
+            </div>
+
+            <!-- Additional widgets -->
+            <div class="grid grid-cols-1 gap-6">
+              <div class="skeleton-chart" style="height: 400px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Mobile Region Selector Tray (slide-out from right) -->
+    <div id="regionTray" class="fixed inset-y-0 right-0 w-96 max-w-full transform translate-x-full transition-transform duration-300 ease-in-out z-50 lg:hidden">
+      <!-- Frosted glass background -->
+      <div class="absolute inset-0 bg-white/80 backdrop-blur-lg shadow-2xl"></div>
+
+      <!-- Tray content -->
+      <div class="relative h-full flex flex-col">
+        <!-- Header (compact) -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200">
+          <h3 class="text-h2 font-bold text-slate-700">Select Region</h3>
+          <button id="closeTrayButton" class="p-2 hover:bg-gray-100 rounded-lg transition">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Interactive Region Map (large, centered) -->
+        <div id="mobileMapContainer" class="flex-1 flex items-center justify-center p-4 overflow-auto">
+          <!-- Map will be injected here by JavaScript -->
+        </div>
+
+        <!-- Date Filter (Mobile) -->
+        <div class="p-4 border-t border-gray-200 space-y-3">
+          <p class="text-tiny font-semibold text-gray-700 mb-2">Date Range Filter</p>
+          <div class="space-y-2">
+            <div>
+              <label for="startDateMobile" class="block text-tiny text-slate-600 font-medium mb-1">From Date:</label>
+              <input
+                type="date"
+                id="startDateMobile"
+                class="w-full px-3 py-2 min-h-[44px] rounded border border-gray-300 text-small focus:ring-2 focus:ring-rose-300 outline-none"
+                title="Select start date"
+              >
+            </div>
+            <div>
+              <label for="endDateMobile" class="block text-tiny text-slate-600 font-medium mb-1">To Date:</label>
+              <input
+                type="date"
+                id="endDateMobile"
+                class="w-full px-3 py-2 min-h-[44px] rounded border border-gray-300 text-small focus:ring-2 focus:ring-rose-300 outline-none"
+                title="Select end date"
+              >
+            </div>
+            <div class="flex gap-2">
+              <button id="applyDateFilterMobile" class="flex-1 px-4 py-2 min-h-[44px] flex items-center justify-center bg-rose-600 text-white rounded-lg text-small font-medium hover:bg-rose-700 transition">
+                Apply Filter
+              </button>
+              <button id="clearDateFilterMobile" class="px-3 py-2 min-h-[44px] flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded text-small font-medium text-gray-700 transition">
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer with reset button and instructions -->
+        <div class="p-4 border-t border-gray-200 space-y-3">
+          <button id="resetFilterButtonTray" class="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-small font-medium text-gray-700 transition">
+            🇹🇹 Show All Regions
+          </button>
+          <p class="text-body text-center text-slate-700 font-medium">
+            Tap any region to filter crime data
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tray Overlay (darkens background when tray is open) -->
+    <div id="trayOverlay" class="fixed inset-0 bg-black/20 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 z-40 lg:hidden"></div>
+
+    <!-- Info Cards Below -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white rounded-lg p-4 shadow">
+        <div class="flex items-start gap-3">
+          <div class="flex-shrink-0">
+            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-slate-900 mb-2">Real-Time Data</h3>
+            <p class="text-small text-slate-600">Dashboard updates automatically with the latest crime statistics from verified sources.</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg p-4 shadow">
+        <div class="flex items-start gap-3">
+          <div class="flex-shrink-0">
+            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-slate-900 mb-2">Regional Filtering</h3>
+            <p class="text-body text-slate-700 font-medium">Click any region on the map to filter the dashboard and view area-specific crime data.</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg p-4 shadow">
+        <div class="flex items-start gap-3">
+          <div class="flex-shrink-0">
+            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-slate-900 mb-2">Mobile Friendly</h3>
+            <p class="text-small text-slate-600">Access crime statistics on any device with our responsive dashboard design.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-800 text-white py-8 mt-16">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2025 Crime Hotspots. All rights reserved.</p>
+      <p class="text-slate-400 text-small mt-2">Data sources: Verified news outlets and official reports</p>
+    </div>
+  </footer>
+
+  <!-- Page Script -->
+  <script type="module" src="/src/js/dashboardBarbados.js"></script>
+
+</body>
+</html>
