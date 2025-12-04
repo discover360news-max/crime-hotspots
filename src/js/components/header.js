@@ -130,49 +130,49 @@ export function renderHeader(activeOverride = '') {
           </nav>
         </div>
 
-        <!-- Separator (top of pills) -->
-        <div class="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
+        <!-- Separator (top of pills) - MOBILE ONLY -->
+        <div class="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent md:hidden"></div>
 
-        <!-- Quick Access Pills (horizontal scroll) -->
-        <div class="bg-white">
+        <!-- Quick Access Pills (horizontal scroll) - MOBILE ONLY -->
+        <div class="bg-white md:hidden">
           <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="relative">
               <!-- Pills container -->
               <div id="pillsContainer" class="flex items-center gap-2 py-2.5 overflow-x-auto snap-x snap-mandatory hide-scrollbar">
                 <a href="report.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 rounded-full bg-rose-600 text-white hover:bg-rose-700 transition text-small font-medium whitespace-nowrap">
+                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[44px] flex items-center justify-center rounded-full bg-rose-600 text-white hover:bg-rose-700 transition text-small font-medium whitespace-nowrap">
                   Report Crime
                 </a>
                 <a href="headlines-trinidad-and-tobago.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
+                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[44px] flex items-center justify-center rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
                   TnT Headlines
                 </a>
                 <a href="headlines-guyana.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
+                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[44px] flex items-center justify-center rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
                   GY Headlines
                 </a>
                 <a href="dashboard-trinidad.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
+                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[44px] flex items-center justify-center rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
                   TnT Dashboard
                 </a>
                 <a href="dashboard-guyana.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
+                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[44px] flex items-center justify-center rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
                   GY Dashboard
                 </a>
                 <a href="blog.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
+                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[44px] flex items-center justify-center rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
                   Blog
                 </a>
                 <a href="about.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
+                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[44px] flex items-center justify-center rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
                   About
                 </a>
                 <a href="faq.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
+                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[44px] flex items-center justify-center rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
                   FAQ
                 </a>
                 <a href="methodology.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
+                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[44px] flex items-center justify-center rounded-full border border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
                   Methodology
                 </a>
               </div>
@@ -187,8 +187,8 @@ export function renderHeader(activeOverride = '') {
           </div>
         </div>
 
-        <!-- Separator (bottom of pills) -->
-        <div class="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
+        <!-- Separator (bottom of pills) - MOBILE ONLY -->
+        <div class="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent md:hidden"></div>
       </div>
     </header>
 

@@ -44,15 +44,38 @@ export function createMetricsCards(stats) {
 
   // Fade gradient hint on the right (indicates more content)
   const fadeHint = document.createElement('div');
-  fadeHint.className = 'absolute right-0 top-0 bottom-0 w-24 pointer-events-none bg-gradient-to-l from-slate-100 via-slate-50 to-transparent opacity-0 transition-opacity duration-300';
+  fadeHint.className = 'absolute right-0 top-0 h-full w-24 pointer-events-none bg-gradient-to-l from-slate-100 via-slate-50 to-transparent opacity-0 transition-opacity duration-300';
   fadeHint.id = 'scrollFadeHint';
 
-  // Chevron arrow indicator for scrolling
+  // Chevron arrow indicator for scrolling (MOBILE ONLY with "Scroll" text)
   const chevronHint = document.createElement('div');
-  chevronHint.className = 'absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 transition-opacity duration-300';
+  chevronHint.className = 'md:hidden absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 transition-opacity duration-300 flex items-center gap-1';
   chevronHint.id = 'scrollChevronHint';
   chevronHint.innerHTML = `
-    <svg class="w-5 h-5 text-rose-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <span class="text-tiny font-medium text-rose-600">Scroll</span>
+    <svg class="w-4 h-4 text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  `;
+
+  // Desktop navigation arrows (LEFT arrow)
+  const leftArrow = document.createElement('button');
+  leftArrow.className = 'hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-md border border-slate-200 hover:bg-rose-50 hover:border-rose-600 transition z-10 opacity-0 pointer-events-none';
+  leftArrow.id = 'metricsScrollLeft';
+  leftArrow.setAttribute('aria-label', 'Scroll metrics left');
+  leftArrow.innerHTML = `
+    <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+  `;
+
+  // Desktop navigation arrows (RIGHT arrow)
+  const rightArrow = document.createElement('button');
+  rightArrow.className = 'hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-md border border-slate-200 hover:bg-rose-50 hover:border-rose-600 transition z-10';
+  rightArrow.id = 'metricsScrollRight';
+  rightArrow.setAttribute('aria-label', 'Scroll metrics right');
+  rightArrow.innerHTML = `
+    <svg class="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
     </svg>
   `;
@@ -60,13 +83,24 @@ export function createMetricsCards(stats) {
   wrapper.appendChild(container);
   wrapper.appendChild(fadeHint);
   wrapper.appendChild(chevronHint);
+  wrapper.appendChild(leftArrow);
+  wrapper.appendChild(rightArrow);
 
-  // Show/hide fade hint and chevron based on scroll position
-  container.addEventListener('scroll', () => {
+  // Arrow click handlers (desktop only)
+  leftArrow.addEventListener('click', () => {
+    container.scrollBy({ left: -300, behavior: 'smooth' });
+  });
+
+  rightArrow.addEventListener('click', () => {
+    container.scrollBy({ left: 300, behavior: 'smooth' });
+  });
+
+  // Show/hide hints and arrows based on scroll position
+  function updateScrollIndicators() {
     const scrollLeft = container.scrollLeft;
     const maxScroll = container.scrollWidth - container.clientWidth;
 
-    // Show hint if not scrolled all the way to the right
+    // Mobile: Show fade hint and chevron if not scrolled all the way to the right
     if (maxScroll - scrollLeft > 10) {
       fadeHint.classList.remove('opacity-0');
       fadeHint.classList.add('opacity-100');
@@ -78,17 +112,35 @@ export function createMetricsCards(stats) {
       chevronHint.classList.remove('opacity-100');
       chevronHint.classList.add('opacity-0');
     }
-  });
 
-  // Initially show the hint if content is scrollable
-  setTimeout(() => {
-    const maxScroll = container.scrollWidth - container.clientWidth;
-    if (maxScroll > 10) {
-      fadeHint.classList.remove('opacity-0');
-      fadeHint.classList.add('opacity-100');
-      chevronHint.classList.remove('opacity-0');
-      chevronHint.classList.add('opacity-100');
+    // Desktop: Show/hide left arrow (hidden if at start)
+    if (scrollLeft <= 10) {
+      leftArrow.classList.remove('opacity-100');
+      leftArrow.classList.add('opacity-0');
+      leftArrow.style.pointerEvents = 'none';
+    } else {
+      leftArrow.classList.remove('opacity-0');
+      leftArrow.classList.add('opacity-100');
+      leftArrow.style.pointerEvents = 'auto';
     }
+
+    // Desktop: Show/hide right arrow (hidden if at end)
+    if (maxScroll - scrollLeft <= 10) {
+      rightArrow.classList.remove('opacity-100');
+      rightArrow.classList.add('opacity-0');
+      rightArrow.style.pointerEvents = 'none';
+    } else {
+      rightArrow.classList.remove('opacity-0');
+      rightArrow.classList.add('opacity-100');
+      rightArrow.style.pointerEvents = 'auto';
+    }
+  }
+
+  container.addEventListener('scroll', updateScrollIndicators);
+
+  // Initially show indicators if content is scrollable
+  setTimeout(() => {
+    updateScrollIndicators();
   }, 100);
 
   return wrapper;
