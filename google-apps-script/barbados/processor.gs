@@ -24,7 +24,11 @@ function processReadyArticles() {
       return;
     }
 
-    const dataRange = sheet.getRange(2, 1, lastRow - 1, 8);
+    // ← DYNAMIC COLUMN MAPPING: Get column map from headers
+    const columnMap = getColumnMap(sheet, 'RAW_ARTICLES');
+
+    // Get all data (full row width to accommodate any column layout)
+    const dataRange = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn());
     const data = dataRange.getValues();
 
     let articlesProcessed = 0;
@@ -46,7 +50,7 @@ function processReadyArticles() {
         break;
       }
       const row = data[i];
-      const status = row[6]; // Column G
+      const status = getRowValue(row, columnMap, 'STATUS'); // ← DYNAMIC: Use column name
 
       if (status === 'ready_for_processing') {
         // ═══════════════════════════════════════════════════════════
@@ -64,13 +68,15 @@ function processReadyArticles() {
         const rowNumber = i + 2;
 
         try {
-          sheet.getRange(rowNumber, 7).setValue('processing');
+          // ← DYNAMIC: Set status using column name
+          sheet.getRange(rowNumber, columnMap.STATUS).setValue('processing');
           SpreadsheetApp.flush();
 
-          const articleTitle = row[2];
-          const articleUrl = row[3];
-          const articleText = row[4];
-          const publishedDate = row[5]; // ← IMPORTANT: Get publication date
+          // ← DYNAMIC: Get values using column names
+          const articleTitle = getRowValue(row, columnMap, 'TITLE');
+          const articleUrl = getRowValue(row, columnMap, 'URL');
+          const articleText = getRowValue(row, columnMap, 'FULL_TEXT');
+          const publishedDate = getRowValue(row, columnMap, 'PUBLISHED_DATE');
 
           Logger.log(`Processing row ${rowNumber}: ${articleTitle.substring(0, 50)}...`);
 
@@ -138,19 +144,19 @@ function processReadyArticles() {
 
             // Update article status
             if (highConfCrimes > 0) {
-              sheet.getRange(rowNumber, 7).setValue('completed');
-              sheet.getRange(rowNumber, 8).setValue(`✅ Extracted ${extracted.crimes.length} crime(s), confidence: ${extracted.confidence}`);
+              sheet.getRange(rowNumber, columnMap.STATUS).setValue('completed');
+              sheet.getRange(rowNumber, columnMap.NOTES).setValue(`✅ Extracted ${extracted.crimes.length} crime(s), confidence: ${extracted.confidence}`);
               successCount += highConfCrimes;
             } else if (lowConfCrimes > 0) {
-              sheet.getRange(rowNumber, 7).setValue('needs_review');
-              sheet.getRange(rowNumber, 8).setValue(`⚠️ ${extracted.crimes.length} crime(s) need review, confidence: ${extracted.confidence}`);
+              sheet.getRange(rowNumber, columnMap.STATUS).setValue('needs_review');
+              sheet.getRange(rowNumber, columnMap.NOTES).setValue(`⚠️ ${extracted.crimes.length} crime(s) need review, confidence: ${extracted.confidence}`);
               reviewCount += lowConfCrimes;
             }
 
           } else {
             // No crimes found
-            sheet.getRange(rowNumber, 7).setValue('skipped');
-            sheet.getRange(rowNumber, 8).setValue(`Not a crime article: ${(extracted.ambiguities || []).join(', ')}`);
+            sheet.getRange(rowNumber, columnMap.STATUS).setValue('skipped');
+            sheet.getRange(rowNumber, columnMap.NOTES).setValue(`Not a crime article: ${(extracted.ambiguities || []).join(', ')}`);
             Logger.log(`⏭️ Skipped (no crimes detected)`);
           }
 
@@ -159,8 +165,8 @@ function processReadyArticles() {
 
         } catch (error) {
           Logger.log(`❌ Error processing row ${rowNumber}: ${error.message}`);
-          sheet.getRange(rowNumber, 7).setValue('failed');
-          sheet.getRange(rowNumber, 8).setValue(`Error: ${error.message.substring(0, 100)}`);
+          sheet.getRange(rowNumber, columnMap.STATUS).setValue('failed');
+          sheet.getRange(rowNumber, columnMap.NOTES).setValue(`Error: ${error.message.substring(0, 100)}`);
           failedCount++;
         }
       }

@@ -124,6 +124,92 @@ const SHEET_NAMES = {
   LIVE: 'LIVE'
 };
 
+/**
+ * Column name mappings for dynamic column access
+ * Uses header row to find column positions - resilient to column reordering
+ */
+const COLUMN_MAPPINGS = {
+  RAW_ARTICLES: {
+    TIMESTAMP: 'Timestamp',
+    SOURCE: 'Source',
+    TITLE: 'Title',
+    URL: 'URL',
+    FULL_TEXT: 'Full Text',
+    PUBLISHED_DATE: 'Published Date',
+    STATUS: 'Status',
+    NOTES: 'Notes'
+  },
+  PRODUCTION: {
+    DATE: 'Date',
+    HEADLINE: 'Headline',
+    CRIME_TYPE: 'Crime Type',
+    STREET: 'Street',
+    PLUS_CODE: 'Plus Code',
+    AREA: 'Area',
+    REGION: 'Region',
+    ISLAND: 'Island',
+    URL: 'URL',
+    SOURCE: 'Source',
+    LAT: 'Lat',
+    LONG: 'Long',
+    SUMMARY: 'Summary',
+    FORWARD: 'Forward'  // Manual column (not populated by automation)
+  }
+};
+
+/**
+ * Get column index from header name (dynamic column mapping)
+ * @param {Sheet} sheet - Google Sheets sheet object
+ * @param {string} columnName - Name of the column to find
+ * @returns {number} Column index (1-based) or -1 if not found
+ */
+function getColumnIndex(sheet, columnName) {
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const index = headers.indexOf(columnName);
+  return index === -1 ? -1 : index + 1; // Convert to 1-based index
+}
+
+/**
+ * Get column map for a sheet (caches for performance)
+ * @param {Sheet} sheet - Google Sheets sheet object
+ * @param {string} sheetType - Type from COLUMN_MAPPINGS (e.g., 'RAW_ARTICLES', 'PRODUCTION')
+ * @returns {Object} Map of column names to indexes
+ */
+function getColumnMap(sheet, sheetType) {
+  const expectedColumns = COLUMN_MAPPINGS[sheetType];
+  if (!expectedColumns) {
+    throw new Error(`Unknown sheet type: ${sheetType}`);
+  }
+
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const columnMap = {};
+
+  for (const [key, columnName] of Object.entries(expectedColumns)) {
+    const index = headers.indexOf(columnName);
+    if (index === -1) {
+      Logger.log(`⚠️ Warning: Column "${columnName}" not found in ${sheet.getName()}`);
+      columnMap[key] = -1;
+    } else {
+      columnMap[key] = index + 1; // Convert to 1-based index
+    }
+  }
+
+  return columnMap;
+}
+
+/**
+ * Get value from row using column name (safer than index)
+ * @param {Array} row - Row data array (0-based)
+ * @param {Object} columnMap - Column map from getColumnMap()
+ * @param {string} columnKey - Key from COLUMN_MAPPINGS (e.g., 'TITLE', 'URL')
+ * @returns {*} Cell value or null if column not found
+ */
+function getRowValue(row, columnMap, columnKey) {
+  const colIndex = columnMap[columnKey];
+  if (colIndex === -1) return null;
+  return row[colIndex - 1]; // Convert 1-based to 0-based
+}
+
 // ============================================================================
 // NEWS SOURCES (SINGLE SOURCE OF TRUTH)
 // ============================================================================
