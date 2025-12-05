@@ -49,19 +49,65 @@ export function initHeadlinesPage(csvUrl) {
   let retryCount = 0;
   const MAX_RETRIES = 3;
 
-  // UTIL: parse date robustly
+  /**
+   * UTIL: Parse date robustly with DD/MM vs MM/DD detection
+   * Handles both formats by detecting which is valid based on values
+   * @param {string} s - Date string (can be DD/MM/YYYY, MM/DD/YYYY, or YYYY-MM-DD)
+   * @returns {Date} Parsed date object
+   */
   function parseDate(s) {
     if (!s) return new Date(0);
-    const d = new Date(s);
-    if (!isNaN(d)) return d;
-    const parts = s.trim().split(/[\/\-\.]/).map(p => p.trim());
-    if (parts.length === 3) {
-      if (parts[2].length === 4) {
-        const day = parseInt(parts[0],10), month = parseInt(parts[1],10)-1, year = parseInt(parts[2],10);
-        const dt = new Date(year, month, day);
-        if (!isNaN(dt)) return dt;
-      }
+
+    // Try ISO format first (YYYY-MM-DD) - most reliable
+    const isoMatch = s.trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (isoMatch) {
+      const year = parseInt(isoMatch[1], 10);
+      const month = parseInt(isoMatch[2], 10) - 1;
+      const day = parseInt(isoMatch[3], 10);
+      return new Date(year, month, day);
     }
+
+    // Try standard Date parsing
+    const d = new Date(s);
+    if (!isNaN(d)) {
+      // Additional check: if Date parsed it as MM/DD but day > 12, it's likely wrong
+      const parts = s.trim().split(/[\/\-\.]/);
+      if (parts.length === 3) {
+        const first = parseInt(parts[0], 10);
+        const second = parseInt(parts[1], 10);
+
+        // If first number > 12, it MUST be DD/MM format (since months only go to 12)
+        if (first > 12) {
+          const year = parseInt(parts[2], 10);
+          const month = second - 1;
+          const day = first;
+          return new Date(year, month, day);
+        }
+
+        // If second number > 12, it MUST be MM/DD format
+        if (second > 12) {
+          return d; // Use the Date object as-is
+        }
+
+        // Ambiguous case: both numbers ≤ 12
+        // Google Sheets exports as MM/DD/YYYY, so use that interpretation
+        // (Once backend fix with apostrophe is deployed, dates will be DD/MM text)
+        return d; // Use Date object (which parses as MM/DD)
+      }
+      return d;
+    }
+
+    // Manual parsing fallback (DD/MM/YYYY assumption for Caribbean)
+    const parts = s.trim().split(/[\/\-\.]/).map(p => p.trim());
+    if (parts.length === 3 && parts[2].length === 4) {
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+      const dt = new Date(year, month, day);
+      if (!isNaN(dt)) return dt;
+    }
+
+    // Last resort
     return new Date(s);
   }
 
@@ -407,7 +453,7 @@ export function initHeadlinesPage(csvUrl) {
 
     const button = document.createElement(isLocalDashboard ? 'a' : 'button');
     button.id = 'viewDashboardMain';
-    button.className = 'inline-block px-4 py-1.5 border-2 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-small';
+    button.className = 'inline-block px-4 py-1.5 border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-small';
     button.textContent = 'View Dashboard';
     button.setAttribute('aria-label', `View ${country.name} Dashboard`);
 
@@ -485,6 +531,7 @@ export function initHeadlinesPage(csvUrl) {
               Area: (r["Area"] || "").trim(),
               Country: (r["Country"] || "").trim(),
               URL: (r["URL"] || "").trim(),
+              Source: (r["Source"] || "").trim(),
               Summary: (r["Summary"] || "").trim()
             }))
             .filter(r => r.Headline);

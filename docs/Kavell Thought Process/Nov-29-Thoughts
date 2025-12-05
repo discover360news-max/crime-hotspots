@@ -1,0 +1,102 @@
+Things to Address - Bugs and UX fixes. Go through this list and group together and layout the best plan to fix these (Feel free to think out loud), so when you are working on a particular page, we can get everything done, test and move one without the back and forth. Each feature should be robust, have failsafes, and a fallback mechanism to eliminate failure outright. iOS. Concepts, clean, functional and fit for purpose.
+
+Our core focus and guide for design and implementation moving forward:
+
+Core principles of UX design
+* User-centricity: Design products from the perspective of the user, focusing on solving their problems and meeting their needs.
+* Consistency: Maintain consistent design elements, layouts, and interactions to create a sense of familiarity and reliability.
+* Accessibility: Ensure that the product can be used by everyone, regardless of their abilities, by designing for inclusivity.
+* Usability: Prioritize functionality and make sure the product is easy and intuitive for users to figure out and use.
+* Feedback: Provide clear and immediate responses to user actions to confirm what has happened.
+* Simplicity: Keep the interface and options as simple as possible to avoid overwhelming users and to keep them engaged.
+* Context: Design for the user's specific environment and situation, as this shapes their needs and expectations. 
+
+Remember, everything is built modal, so we can call a feature anywhere on the site as needed and it would work out of the box, access the same data out of the box and be open to change wherever it is location on the site. 
+
+
+Below are bugs and issues to be addressed that would allow us to be ready before adding more features. 
+
+Website design theme: Frosted, curved edges, slid e in trays (Side or Bottom). Rose color accents, dark grey, light grey, off white. 
+
+victims": [{"name": "Name or null" showing up in Production. “Null” is not ideal, “Unknown” is better
+
+
+Additional Ideas: For the pop-up-module oh headlines
+
+  1. Timeline View - "What happened when" for multi-victim incidents
+  2. Crime Trend Badge - "3 robberies in this area this week"
+  3. Safety Tips - Contextual advice based on crime type
+  4. Email Alerts - "Notify me of crimes in my area"
+  5. Export/Print - PDF generation for personal records
+
+Dashboard and pages 
+- [ ] Add widgets - Shootings
+- [ ] Incidents maps - Still over everything
+- [ ] Map and charts label large as “Crime Statistics Dashboard” - Statistics
+- [ ] Info widget at the bottom to be updated with text sizes to match new layout.
+- [ ] Trinidad date range filter in tray (not showing placement text)
+- [ ] Map in tray zoomable, also, sizes down to fit (Guyana is being cut off)
+- [ ] A info icon that can pop out and explain features of the dashboard. 
+- [ ] Need to have Region inserted into production. (I get it by google search example, St. Clair is in which region in Trinidad and Tobago
+- [ ] Clear distinction between victim and suspect in headlines
+- [ ] Current SEO score
+- [ ] Start to work on socials, (When all bugs are completed, but we need to create profiles, descriptions, guide from start to finish and first post, auto posting and how it’ll work (I’m thinking similar to headline module setup, not sure). Should have cohesive handles across all platforms (most impactful reach) 
+- [ ] Social Media - I think the idea would be to promote getting ALL headlines in one please along with stats. Adopt a Ground.news approach (Thoughts?)
+- [ ] Auto story (blog) (haven’t had any since) need to check its working and create the ability to force production of story if the thresholds was not met for auto generation) 
+- [ ] “Penal Debe” fix need to be “Penal-Debe” (This is on the clickable region maps, Trinidad)
+- [ ] Date on Headline cards are wrong (reading some as mm/dd/yyyy and others as dd/mm/yyyy. I did correct the format in google sheets, and this seemed to help. Anything we can put in place to catch errors in how date is saved and parsed from in the sheet?
+- [ ] How many rows are too much for one CSV? How can we create a snapshot so data loads faster but use has option to refresh data (reload)
+- [ ] Sources from FB need to pull page name from link or we can pre-save them (Not sure if possible as some links from Facebook I noticed is a short link)
+- [ ] Cards (Homepage) does not need “Nationwide Coverage”
+- [ ] Cards does not need flag icon (But it should remain in menu items)
+- [ ] “Nationwide Data” text- removed
+- [ ] Incidents Map - Incidents Text below: (Click, Zoom, Explore)
+- [ ] Map cards needs Street and Area added when clicking on a dot/marker.
+- [ ] Legend colors (how are they generated?) asking because kidnapping and robbery - similar, home invasion and burglary, similar. 
+- [ ] 7 day trend chart not working, and, instead of days and amount of crime, we want Crime type and the amount. 
+- [ ] Top locations chart - the count at the bottom is turning slanted because it’s so much numbers, we can use an exponential type count, most important is to have lower numbers of course and the last (total number) in between is just reference, so it would look neater
+- [ ] “Select region” should become a floating bubble with a world icon when user scrolls down (allowing them to change region while watching other data (currently they’d have to scroll back up to the top) 
+- [ ] Total crimes (Top of headlines) is important info and should be a bit bigger (Maybe size of the page title?
+- [ ] Headlines cards- “Read Article” link I think shows as a hover effect, doesn’t work too well for Mobile. As it’s not there it doesn’t offer direction to the user. 
+- [ ] Headlines Module: I notice (not sure) if the “source field is empty, the module does not show when the card is clicked. We need a better way to handle this. It is possible that there is a lot more data (which there would be) to be shown in the module. I am wondering if to create a column in the sheets for Source Name, so we can have the link within the name (you are doing this via the link) but it possible to have additional Sources for news with weird links. Currently, links from Facebook shows the source as Facebook, not professional. LOL (I created the Source field), would need a fallback if it is empty.
+- [ ] Headlines - Is it possible to have “Select Region” here as well? This would then only provide the headlines for within that region.
+- [ ] Site-wide - check if fonts are all controlled by the new font framework. Check if the framework meets standards for “information rich” data sites. Make recommendation, offer other site examples I can check and reference. (My sizing idea - big enough to read but small and neat enough so more info can be seen at a glance.
+- [ ] Cookies and cookie request. What cookies are we or have we implemented, would need to implement and should implement? The request banner should theme colored. The request should slide up and look like the design theme, frosted, curved edges
+- [ ] While dashboard is loading, the shimmer is non-existent or too light to be seen, but it gives no feedback to the user. I like the cloud flare idea for loading, The logo (simple) with a loading circle.
+- [ ] Crime Count Widgets (Dashboard) - Scrollable so all is in one line - That way we can save space as well as when we add more cards, it is neatly done. (Thoughts?)
+- [ ] Need to work on share icons and how they work, how they format the story and link to be shared, should be as frictionless as possible. Should include all the socials we would be on? This would tie into the Social development part of this list. 
+- [ ] Create a sheet that holds Areas and Regions, then add formula that pulls in the Region Automatically into sheet, Currently, I keep looking for them manually, takes time) 
+- [ ] Tray for headlines - Source, read full story, view on map could be same line, making room for other things below and cleaning up the dead space. 
+- [ ] View Map (Headlines tray Tray) for Trinidad leads back to home page. Should be dashboard, directly to the map)
+- [ ] Possible that the tray can be minimized or maximized (As there may be more data within the tray) controlled by the handle. Example, Initial headline click > Half Screen, Swipe with handle up > Full Screen, Swipe down from full screen > Half Screen, Swipe down from Half Screen (or click outside)> Close.
+- [ ] All trays should be similar to the Headline Tray (keep one design language throughout. 
+- [ ] View Map (Headlines tray) - goes to the dashboard page, great, but we can create an anchor for the map, so it goes directly there on the page (it says View map after all)
+- [ ] When using sheets, we should be using cell mapping, so even if the cell moves, data can flow where it is mentioned to go
+- [ ] Feedback, the ability for people to leave feedback (maybe the About Us Page)
+- [ ] Blog - Image on the left (square) with the Headline, date and intro text on the right. Clean look, no card layout look. >>>> The filter selected on top (Countries) can be smaller to match as well button setup. >>>> Title needs to be re-sized, renamed to “The Hotspot Report”
+- [ ] Footer - Currently blue. Thinking a dark grey or frosted (text to match, meaning contrast enough to read) Should be site-wide as well. 
+- [ ] Data, because we’re moving stories to archive I assume it’s affect the automation ability to find duplicates, we may need to change approach as many duplicates are coming through. So currently, we are no closer to having the system run fully automated. 
+- [ ] Suggestion - Create a sample frosted widget that we can tweak until right, then we can use that as the bases for our frosted design language, look, text, buttons that would be on the frosted element as well. Thoughts?
+- [ ] Button sizes - I like the button size on the Dashboard for “View Headlines”. Also, Two button types, solid red for main CTA and outlined red for secondary CTA.
+- [ ] Reports Page - Design language to be implemented, font sizes to be adjusted
+- [ ] Contribute - The ability for people to contribute or community ideas
+- [ ] Terms of use and Privacy need to be done. (If needed) 
+- [ ] Check for bloat, optimise for modality, no duplicate styling issues clashing
+- [ ] Looking at Ground.news for design ideas
+    - [ ] Things I like and I think makes sense 
+        - [ ] Below the header (Menu bar) There is a bar with pebble sized buttons that is scalable and is used for selecting topics (Ideas?)
+        - [ ] Suggest a Source button and a small banner(They have this linked to a google Form Page) Thoughts?
+        - [ ] Footer 
+            - [ ] About - History - Mission - Blog -
+            - [ ] Help > Help Center - FAQ - Contact Us - News Sources - Topics
+        - [ ] Timelines - Here they have different topic timelines (Nice touch)
+        - [ ] CTA on homepage to join
+- [ ] Dark and Light mode (Possible)
+- [ ] Changes Made - I made some text changes to the homepage (Every Island | Every Incident | One Map > Access data and headlines across the islands > Select a region for immediate geographical intelligence, trend analysis, and real-time updates.)
+- [ ] 
+
+
+
+Feel free to ask as many questions for clarification so that we are on the same page before layout out a delivery plan, most important, most impactful, recommended ideas, changes, other concepts to consider etc. 
+
+You can offer alternative solutions that can achieve our goal. We would use my help to generate content for any section if you need (rather than using up too many credits). I would use Gemini to help us tackle some parts. Just tell me what you need and I would provide it for you.

@@ -187,29 +187,45 @@ function processReadyArticles() {
 // ============================================================================
 
 /**
- * Validate and format date string
- * @param {string} dateStr - Date string from Gemini
- * @param {Date} fallbackDate - Fallback date if invalid
- * @returns {string} Valid date string in YYYY-MM-DD format
- */
-function validateAndFormatDate(dateStr, fallbackDate) {
-  if (!dateStr) {
-    Logger.log(`⚠️ No date provided, using fallback: ${fallbackDate}`);
-    return Utilities.formatDate(fallbackDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
-  }
+   * Validate and format date for Google Sheets
+   * Returns formatted string to prevent Google Sheets auto-reformatting basedon locale
+   * Format: "MM/DD/YYYY" (US standard - matches Production sheet) prefixed with apostrophe for plain text
+   * @param {string} dateStr - Date string from Gemini
+   * @param {Date} fallbackDate - Fallback date if parsing fails
+   * @returns {string} Plain text date string in MM/DD/YYYY format
+   */
+  function validateAndFormatDate(dateStr, fallbackDate) {
+    let dateToFormat;
 
-  try {
-    const parsed = new Date(dateStr);
-    if (isNaN(parsed.getTime())) {
-      Logger.log(`⚠️ Invalid date format: "${dateStr}", using fallback`);
-      return Utilities.formatDate(fallbackDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+    if (!dateStr) {
+      Logger.log(`⚠️ No date provided, using fallback: ${fallbackDate}`);
+      dateToFormat = fallbackDate;
+    } else {
+      try {
+        const parsed = new Date(dateStr);
+        if (isNaN(parsed.getTime())) {
+          Logger.log(`⚠️ Invalid date format: "${dateStr}", using fallback`);
+          dateToFormat = fallbackDate;
+        } else {
+          dateToFormat = parsed;
+        }
+      } catch (e) {
+        Logger.log(`⚠️ Error parsing date "${dateStr}": ${e.message}, using fallback`);
+        dateToFormat = fallbackDate;
+      }
     }
-    return Utilities.formatDate(parsed, Session.getScriptTimeZone(), 'yyyy-MM-dd');
-  } catch (e) {
-    Logger.log(`⚠️ Error parsing date "${dateStr}": ${e.message}, using fallback`);
-    return Utilities.formatDate(fallbackDate, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+
+    // Format as MM/DD/YYYY (US standard - matches Production sheet format)
+    // Prefix with apostrophe to force plain text (prevents Sheets reformatting)
+    const day = Utilities.formatDate(dateToFormat,
+  Session.getScriptTimeZone(), 'dd');
+    const month = Utilities.formatDate(dateToFormat,
+  Session.getScriptTimeZone(), 'MM');
+    const year = Utilities.formatDate(dateToFormat,
+  Session.getScriptTimeZone(), 'yyyy');
+
+    return `'${month}/${day}/${year}`;
   }
-}
 
 // ============================================================================
 // PRODUCTION SHEET FUNCTIONS
@@ -234,10 +250,22 @@ function validateAndFormatDate(dateStr, fallbackDate) {
       const fullAddress = `${crime.street || ''}, ${crime.area || ''}, Trinidad and Tobago`;
       const geocoded = geocodeAddress(fullAddress);
 
-      // Check for duplicate (now with geocoded coordinates available)
+      // Check for duplicate in Production sheet
       if (isDuplicateCrime(prodSheet, crime, geocoded)) {
-        Logger.log(`⚠️ Duplicate detected, skipping: ${crime.headline}`);
+        Logger.log(`⚠️ Duplicate detected in Production, skipping: ${crime.headline}`);
         return;
+      }
+
+      // Check for duplicate in Production Archive (may be archived already)
+      try {
+        const archiveSheet = getActiveSheet(SHEET_NAMES.PRODUCTION_ARCHIVE);
+        if (archiveSheet && isDuplicateCrime(archiveSheet, crime, geocoded)) {
+          Logger.log(`⚠️ Duplicate detected in Production Archive, skipping: ${crime.headline}`);
+          return;
+        }
+      } catch (e) {
+        // Archive sheet might not exist yet, that's okay
+        Logger.log(`ℹ️ Production Archive not found (may not exist yet): ${e.message}`);
       }
 
       // Validate and format crime date

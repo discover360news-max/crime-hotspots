@@ -52,7 +52,6 @@ export function createMetricsCards(stats) {
   chevronHint.className = 'md:hidden absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 transition-opacity duration-300 flex items-center gap-1';
   chevronHint.id = 'scrollChevronHint';
   chevronHint.innerHTML = `
-    <span class="text-tiny font-medium text-rose-600">Scroll</span>
     <svg class="w-4 h-4 text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
     </svg>
@@ -153,8 +152,8 @@ function createMetricCard({ label, value, color }) {
   const card = document.createElement('div');
   card.className = 'metric-card bg-white rounded-lg p-4 shadow-md transition-all hover:shadow-lg flex-shrink-0 w-40 snap-start';
   card.innerHTML = `
-    <div class="text-small font-medium text-slate-600 mb-2">${label}</div>
-    <div class="text-display font-bold text-slate-900">${value}</div>
+    <div class="text-small font-medium text-slate-400 mb-2">${label}</div>
+    <div class="text-display font-bold text-slate-700">${value}</div>
   `;
   return card;
 }

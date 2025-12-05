@@ -118,6 +118,7 @@ const GEMINI_CONFIG = {
 const SHEET_NAMES = {
   RAW_ARTICLES: 'Raw Articles',
   PRODUCTION: 'Production',
+  PRODUCTION_ARCHIVE: 'Production Archive',
   REVIEW_QUEUE: 'Review Queue',
   PROCESSING_QUEUE: 'Processing Queue',
   ARCHIVE: 'Archive'

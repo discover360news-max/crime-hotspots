@@ -114,12 +114,12 @@ let markerClusterGroup = null;
  */
 export function createBarbadosLeafletMap(crimeData, regionFilter = null) {
   const container = document.createElement('div');
-  container.className = 'leaflet-map-container bg-white rounded-lg shadow-md overflow-hidden';
+  container.className = 'leaflet-map-container bg-gray-300 rounded-lg shadow-md overflow-hidden';
   container.innerHTML = `
     <div class="p-4 border-b border-gray-200 flex items-center justify-between">
       <div>
-        <h3 class="text-h3 font-semibold text-slate-700">Incidents Map</h3>
-        <p class="text-tiny text-gray-600 mt-1">Use two fingers to move map • Click markers for details</p>
+        <h3 class="text-h3 font-semibold text-slate-600">Incidents Map</h3>
+        <p class="text-tiny text-slate-500 mt-1">Use two fingers to move map • Click markers for details</p>
       </div>
       <button id="resetMapViewBarbados" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-tiny font-medium text-slate-700 transition flex items-center gap-1">
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,7 +133,7 @@ export function createBarbadosLeafletMap(crimeData, regionFilter = null) {
       <!-- Pan instruction overlay (shown on single finger touch) -->
       <div id="mapZoomHintBarbados" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="z-index: 1000;">
         <div class="bg-white rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
-          <p class="text-small font-semibold text-slate-900">Use two fingers to move map</p>
+          <p class="text-small font-semibold text-slate-700">Use two fingers to move map</p>
           <p class="text-tiny text-slate-600 mt-1">One finger scrolls the page</p>
         </div>
       </div>
@@ -316,7 +316,9 @@ function addMarkersToMap(crimeData, regionFilter) {
     const location = record.Location;
     const headline = record.Headline || 'No headline';
     const crimeType = record['Crime Type'] || 'Other';
+    const area = record['Area'] || 'Other';
     const date = record.Date || 'Unknown date';
+    const streetAddress = record['Street Address'] || 'Other';
 
     // Only use Latitude and Longitude columns (K and L)
     // No Plus Code fallback - we have accurate coordinates now
@@ -355,14 +357,25 @@ function addMarkersToMap(crimeData, regionFilter) {
       // Create popup content
       const popupContent = `
         <div class="crime-popup">
-          <div class="crime-popup-header" style="border-left: 4px solid ${color};">
-            <strong class="text-sm font-semibold text-gray-900">${crimeType}</strong>
+          <div class="inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full" 
+              style="background-color: ${color}; color: white;">
+            ${crimeType}
           </div>
-          <div class="crime-popup-body">
-            <p class="text-xs text-gray-700 mb-2">${headline}</p>
-            <p class="text-xs text-gray-500">
-              <span class="font-medium">Date:</span> ${date}
-            </p>
+          
+          <div class="crime-popup-body flex flex-col gap-0.25"> 
+            
+            <p class="text-sm text-gray-700">${headline}</p> 
+
+            <div class="text-xs text-gray-300">
+              <p>
+                <span class="font-medium">Date:</span> ${date}
+              </p>
+              <p>${streetAddress}</p> 
+              <p>
+                <span class="font-medium">Area:</span>${area}
+              </p>
+
+            </div>
           </div>
         </div>
       `;

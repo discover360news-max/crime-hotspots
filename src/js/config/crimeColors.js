@@ -3,24 +3,44 @@
 // Use this across ALL visualizations for consistency
 
 /**
- * Crime type color mapping
- * Pastel colors for most crimes, vivid red for Murder
- * Each crime has a unique, distinct color
+ * Crime type color mapping - Family-Based System
+ *
+ * VIOLENCE FAMILY (Reds - Darkest to Lightest):
+ *   Darkest = Most Severe
+ *
+ * PROPERTY CRIMES (Oranges/Warm):
+ *   Force-based property crimes
+ *
+ * THEFT FAMILY (Yellows):
+ *   Non-violent property theft
+ *
+ * OTHER (Cool Colors):
+ *   Distinct categories
  */
 export const CRIME_COLORS = {
-  'Murder': '#dc2626',           // VIVID RED (only non-pastel)
-  'Robbery': '#fca5a5',          // Pastel pink-red
-  'Home Invasion': '#c4b5fd',    // Pastel violet
-  'Theft': '#fde68a',            // Pastel yellow
-  'Assault': '#fdba74',          // Pastel orange
-  'Burglary': '#d8b4fe',         // Pastel purple
-  'Vehicle Theft': '#fef08a',    // Pastel bright yellow
-  'Kidnapping': '#fda4af',       // Pastel rose
-  'Sexual Assault': '#f87171',   // Medium red (lighter than murder)
-  'Fraud': '#a5f3fc',            // Pastel cyan
-  'Arson': '#fecaca',            // Pastel light red
-  'Drug-related': '#86efac',     // Pastel green
-  'Other': '#d1d5db'             // Light gray
+  // VIOLENCE FAMILY (Reds)
+  'Murder': '#7f1d1d',           // Darkest red - Most severe
+  'Sexual Assault': '#b91c1c',   // Dark red - Very severe
+  'Kidnapping': '#dc2626',       // Standard red - Severe
+  'Assault': '#ef4444',          // Medium red - Violent
+  'Shooting': '#f87171',         // Light red - Violence with weapon
+
+  // PROPERTY CRIMES FAMILY (Oranges/Warm)
+  'Robbery': '#ea580c',          // Dark orange - Force + property
+  'Home Invasion': '#f97316',    // Orange - Occupied dwelling
+  'Burglary': '#fb923c',         // Medium orange - Breaking & entering
+  'Arson': '#fb7185',            // Coral/pink-orange - Fire damage
+
+  // THEFT FAMILY (Yellows)
+  'Vehicle Theft': '#ca8a04',    // Dark amber - Specific target
+  'Theft': '#eab308',            // Yellow - General theft
+
+  // OTHER CRIMES (Cool Colors)
+  'Fraud': '#0891b2',            // Cyan - White-collar
+  'Drug-related': '#059669',     // Green - Separate category
+  'Seizures': '#3b82f6',         // Blue - Police enforcement/recovery
+  'Police-Involved Shooting': '#1e40af', // Dark blue - Law enforcement
+  'Other': '#6b7280'             // Grey - Catch-all
 };
 
 /**
@@ -40,21 +60,31 @@ export function getCrimeColorsArray(crimeTypes) {
 }
 
 /**
- * Get ordered list of crime types by priority
- * Used for legend ordering
+ * Get ordered list of crime types by family grouping
+ * Used for legend ordering - keeps families together
  */
 export const CRIME_TYPE_ORDER = [
+  // Violence Family (Reds - Darkest to Lightest)
   'Murder',
+  'Sexual Assault',
+  'Kidnapping',
+  'Assault',
+  'Shooting',
+
+  // Property Crimes Family (Oranges)
   'Robbery',
   'Home Invasion',
-  'Assault',
-  'Theft',
   'Burglary',
-  'Vehicle Theft',
-  'Kidnapping',
-  'Sexual Assault',
-  'Fraud',
   'Arson',
+
+  // Theft Family (Yellows)
+  'Vehicle Theft',
+  'Theft',
+
+  // Other Crimes (Cool Colors)
+  'Fraud',
   'Drug-related',
+  'Seizures',
+  'Police-Involved Shooting',
   'Other'
 ];

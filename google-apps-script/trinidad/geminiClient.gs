@@ -182,7 +182,7 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
     "crimes": [
       {
         "crime_date": "YYYY-MM-DD (calculate from article, NOT published date)",
-        "crime_type": "Murder|Shooting|Robbery|Assault|Theft|Home Invasion|Sexual Assault|Kidnapping|Police-Involved Shooting",
+        "crime_type": "Murder|Shooting|Robbery|Assault|Theft|Home Invasion|Sexual Assault|Kidnapping|Police-Involved Shooting|Seizures",
         "area": "Neighborhood (e.g., Maraval, Port of Spain)",
         "street": "Street address INCLUDING business names/landmarks (e.g., 'KFC Arima', 'Grand Bazaar, Churchill Roosevelt Highway')",
         "headline": "Brief headline with victim name/age in parentheses if known",
@@ -265,7 +265,23 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
 
   5. NO "Other" CRIME TYPE: Only use listed crime types. If article doesn't match any, return {"crimes": [], "confidence": 0}
 
-  6. LOCATION DETAILS: Capture complete location information
+  6. SEIZURES vs THEFT: Critical distinction
+     - Use "Seizures" when:
+       * Police/law enforcement found/seized illegal items (drugs, guns, ammo, contraband)
+       * Stolen goods recovered by police
+       * Illegal weapons/ammunition discovered during police operation
+       * Contraband confiscated by authorities
+       * Examples: "Gun and ammunition recovered", "Police seize drugs", "Stolen vehicle found"
+     - Use "Theft" when:
+       * Someone stole items FROM a victim
+       * Property was taken by criminals
+       * Burglary where items were stolen
+       * Examples: "Man's car stolen", "House burgled", "Phone snatched"
+     - CRITICAL: "Police found gun" = "Seizures" NOT "Theft"
+     - CRITICAL: "Police seized drugs" = "Seizures" NOT "Theft"
+     - Seizures indicate police enforcement/recovery actions, NOT crimes against victims
+
+  7. LOCATION DETAILS: Capture complete location information
      - ALWAYS include business names (e.g., "KFC", "Grand Bazaar", "Movie Towne")
      - Include landmarks (e.g., "near Queen's Park Savannah")
      - street field should have: "Business/Landmark Name, Street Name" format
@@ -274,36 +290,37 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
        * "Grand Bazaar shooting" → street: "Grand Bazaar, Churchill Roosevelt Highway", area: "Valsayn"
        * "Queen's Park Savannah" → street: "Queen's Park Savannah", area: "Port of Spain"
 
-  7. LOCATION FILTER: Set "location_country" for each crime
+  8. LOCATION FILTER: Set "location_country" for each crime
      - ✅ INCLUDE: Crimes in Trinidad (Port of Spain, San Fernando, Arima, etc.)
      - ✅ INCLUDE: Crimes in Tobago (Scarborough, Crown Point, etc.) → mark as "Trinidad" (Tobago is part of Trinidad & Tobago)
      - ❌ EXCLUDE: Crimes in Guyana, Venezuela, Barbados, Jamaica, other countries → mark as "Other"
      - If article is from Demerara Waves / INews Guyana → very likely NOT Trinidad
      - Only mark as "Trinidad" if crime occurred in Trinidad or Tobago islands
 
-  8. MULTI-CRIME INCIDENTS: Handle overlapping crimes correctly
+  9. MULTI-CRIME INCIDENTS: Handle overlapping crimes correctly
      - Home Invasion + Robbery = ONE "Home Invasion" (robbery is implied)
      - Home Invasion + Murder = TWO separate crimes
      - Shooting + Murder = ONE "Murder" (shooting is the method)
      - Robbery + Assault = ONE "Robbery" (assault during robbery)
+     - Police operation + gun seizure = ONE "Seizures" (enforcement action)
 
-  9. MULTI-VICTIM MURDERS: Extract EACH victim as SEPARATE crime entry
+  10. MULTI-VICTIM MURDERS: Extract EACH victim as SEPARATE crime entry
      - Double murder = TWO "Murder" entries (one per victim)
      - Triple murder = THREE "Murder" entries (one per victim)
      - Each entry: same date/location, different victim name
      - Example: "Husband and wife killed" = 2 Murder entries
      - CRITICAL: This ensures accurate murder statistics
 
-  10. CRIME TYPE PRIORITY: When same incident has multiple crime labels
+  11. CRIME TYPE PRIORITY: When same incident has multiple crime labels
      - If murder occurred, use "Murder" (not "Home Invasion" or "Shooting")
      - Murder is the PRIMARY crime type when someone dies
      - Exception: If victims include both dead and alive, split into separate crimes
 
-  11. DUPLICATE DETECTION: Include victim details for deduplication
+  12. DUPLICATE DETECTION: Include victim details for deduplication
       - Always include victim name, age, aliases if mentioned
       - Include specific location details (street + area)
 
-  12. Not a crime article? Return {"crimes": [], "confidence": 0}
+  13. Not a crime article? Return {"crimes": [], "confidence": 0}
 
   JSON only, no markdown.`;
   }

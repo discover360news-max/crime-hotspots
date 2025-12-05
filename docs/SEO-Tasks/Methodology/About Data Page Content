@@ -1,0 +1,88 @@
+Our Methodology: The Data Behind Crime Hotspots Caribbean
+
+1. Page Title & Introduction
+H1: How We Collect and Verify Crime Data for Trinidad & Tobago and Guyana
+Crime Hotspots is a data-driven statistics platform dedicated to enhancing public safety and awareness across the Caribbean. Our mission is to provide unfiltered, timely, and accessible crime data for citizens, researchers, and policymakers across the Caribbean. We believe that transparency is the bedrock of community safety, and a clear understanding of regional crime patterns empowers better decision-making.
+
+We exist to bridge the gap between official reporting and public perception by aggregating data from trusted media and community sources. This methodology page outlines the rigorous processes, technologies, and ethical standards we employ to ensure the information presented on our site is as accurate and verifiable as possible, building the Trustworthiness (E-E-A-T) essential for a reliable data source.
+
+2. Our Data Sources
+We rely exclusively on publicly available, high-authority sources to build our comprehensive crime datasets for all nations. Using diverse sources helps mitigate reliance on a single news outlet or platform.
+
+Trinidad & Tobago Sources
+For Trinidad & Tobago, our primary data streams are RSS feeds from established media houses: the Trinidad Express, the Guardian TT, CNC 3 and Newsday. This provides a foundational layer of verified reports. Additionally, we integrate data from high-traffic, community-focused social media pages, specifically the Ian Alleyne Network and DJ Sherrif, to capture localized incidents and community alerts that may precede formal media reports.
+
+Guyana Sources
+In Guyana, our data is sourced exclusively from the RSS feeds of leading, established news organizations: Stabroek News, Kaieteur News, and the Guyana Chronicle.
+
+Source Verification and Reliability
+We choose these sources because they have established reputations for journalistic integrity and high update frequency. Every entry on our platform is explicitly linked back to its original source article or post, allowing users to verify the context and details immediately. We treat official media reports as primary verification and community sources (like Facebook) as timely alerts, prioritizing the media sources for final classification and location confirmation.
+
+3. How We Collect Data
+Our collection process is designed for speed, consistency, and structured data output, relying on automation and advanced AI technology.
+
+Automated RSS Collection
+The foundation of our system is an automated script built on Google Apps Script. This script executes at regular intervals, querying the RSS feeds of all our specified media partners. When a new article is detected, the script pulls the URL and headline and initiates the next stage of processing.
+
+Google Gemini AI Extraction Methodology
+This is the core of our Expertise. The text from each collected news article or social media post is fed into the Google Gemini AI model. The AI is trained to perform a critical extraction task: reading the unstructured narrative of a crime report and converting it into a structured data format.
+
+The Gemini model extracts the following structured data fields:
+
+Crime Type: (e.g., Homicide, Robbery, Burglary, Kidnapping)
+
+Location: (Specific street address or junction, if available)
+
+Area/Town: (General town, city, or neighborhood)
+
+Date & Time: (Timestamp of the incident, often different from the report date)
+
+Source URL: (Direct link to the original article for verification)
+
+Human Oversight and Validation
+While automation is efficient, human expertise is essential. All data entries classified as 'High Severity' or those flagged with ambiguous location data by the AI undergo a mandatory human validation step. Our team reviews the original source article to confirm the crime type, verify the location against a map, and ensure the classification is accurate before the data is published to the live dashboard.
+
+4. Data Accuracy & Limitations
+We strive for maximum accuracy, but the nature of sourcing media reports introduces inherent limitations that users must be aware of.
+
+Ensuring Accuracy
+Our primary commitment to accuracy is achieved through our Source-to-Record link and the Human Validation step. We categorize reported incidents using standardized police terminology whenever possible. Furthermore, all data is stored in Google Sheets, which is publicly exported as a CSV file, providing full transparency into the raw, underlying data we use.
+
+Limitations and Biases
+Reported Crimes Only: We only capture incidents that are reported by our media sources or community feeds. We cannot account for the "dark figure" of crime (unreported crimes).
+
+Media Coverage Gaps: Crime distribution on our map is influenced by where media organizations choose to focus. This can lead to Geographic Biases, often showing higher density in urban and populated areas (Port of Spain, Georgetown) simply because they receive more media coverage than remote rural areas.
+
+Disclaimer on Official Statistics: Our platform provides valuable real-time trend data and geographic insight, but it is not a substitute for official Government or Police crime statistics. Our numbers may differ due to timing, reporting categories, and the inclusion of data from non-official (but community-verified) sources.
+
+5. Privacy & Ethics: Data Fidelity and Public Record Accountability
+Our approach to PII (Personally Identifiable Information) is governed by a policy of Data Fidelity to our authoritative sources. Unlike many data platforms that anonymize records, Crime Hotspots Caribbean maintains the integrity of the public record established by the originating news media.
+
+Policy on Personally Identifiable Information (PII)
+We retain the PII—including names, specific addresses, and vehicle details—when that information is explicitly included in the public news article or social media post we source.
+
+Rationale: Verification and Data Fidelity
+We retain these specific details for two primary reasons:
+
+Verification and Accountability: Retaining the original context allows users, researchers, and policymakers to fully verify the incident against the source material. This ensures maximum authoritativeness and allows for precise geographic analysis, which is critical for understanding specific crime hotspots.
+
+Public Record Integrity: Our platform functions as an aggregate library of incidents already published by established journalistic organizations. We rely on the established editorial and ethical standards of our media sources (Trinidad Express, Stabroek News, etc.) for the initial decision to publish PII.
+
+Ethical Constraints and Disclaimer
+By accessing our platform, users acknowledge that the data presented reflects the public record created by third-party journalistic outlets.
+
+Our platform uses this data strictly for the purpose of community safety, research, and trend analysis.
+
+We do not generate new PII or use this data for individual targeting or commercial marketing.
+
+We encourage all users to consult the original source link provided with every entry for the complete context and background of the published incident.
+
+6. Updates & Maintenance
+Maintaining data freshness is crucial for safety awareness. Our schedules are optimized to provide the most current view of the crime landscape.
+
+Update Schedules
+Our platform maintains two distinct update schedules:
+
+Trinidad & Tobago: The RSS feeds are checked for new reports every two hours. Facebook sources are monitored manually throughout the day.
+
+Guyana: RSS feeds are checked hourly due to high flow of news from the key media sources. Data is refreshed on the live dashboard immediately following validation. We use Google Sheets for immediate data storage, which is then exported as a public CSV for transparency. We retain a comprehensive historical record of all collected data for trend analysis and research purposes.

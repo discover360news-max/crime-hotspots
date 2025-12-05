@@ -167,7 +167,7 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
   Utilities.formatDate(new Date(), Session.getScriptTimeZone(),
   'yyyy-MM-dd');
 
-    return `Extract crime data from this Barbados & Tobago news article.
+    return `Extract crime data from this Barbados news article.
 
   PUBLISHED: ${pubDateStr}
   HEADLINE: ${articleTitle}
@@ -182,13 +182,13 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
     "crimes": [
       {
         "crime_date": "YYYY-MM-DD (calculate from article, NOT published date)",
-        "crime_type": "Murder|Shooting|Robbery|Assault|Theft|Home Invasion|Sexual Assault|Kidnapping|Police-Involved Shooting|Seizures",
-        "area": "Neighborhood (e.g., Maraval, Port of Spain)",
+        "crime_type": "Murder|Shooting|Robbery|Assault|Theft|Home Invasion|Sexual Assault|Kidnapping|Police-Involved Shooting|Seizure",
+        "area": "Neighborhood (e.g., Belleplaine, Bathsheba)",
         "street": "Street address INCLUDING business names/landmarks (e.g., 'KFC Arima', 'Grand Bazaar, Churchill Roosevelt Highway')",
         "headline": "Brief headline with victim name/age in parentheses if known",
         "details": "2-3 sentence summary. Include crime type, location, and key details. Make it informative and engaging for readers. Use proper grammar and complete sentences.",
         "victims": [{"name": "Name or null", "age": number, "aliases": []}],
-        "location_country": "Barbados|Venezuela|Guyana|Other"
+        "location_country": "Barbados|Other"
       }
     ],
     "confidence": 1-10,
@@ -282,8 +282,8 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
      - Seizures indicate police enforcement/recovery actions, NOT crimes against victims
 
   7. LOCATION DETAILS: Capture complete location information
-     - ALWAYS include business names (e.g., "KFC", "Grand Bazaar", "Movie Towne")
-     - Include landmarks (e.g., "near Queen's Park Savannah")
+     - ALWAYS include business names (e.g., "KFC", "Movie Towne")
+     - Include landmarks (e.g., "near Bridgetown")
      - street field should have: "Business/Landmark Name, Street Name" format
      - Examples:
        * "KFC Arima" → street: "KFC, Arima Main Road", area: "Arima"
@@ -291,11 +291,10 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
        * "Queen's Park Savannah" → street: "Queen's Park Savannah", area: "Port of Spain"
 
   8. LOCATION FILTER: Set "location_country" for each crime
-     - ✅ INCLUDE: Crimes in Barbados (Port of Spain, San Fernando, Arima, etc.)
-     - ✅ INCLUDE: Crimes in Tobago (Scarborough, Crown Point, etc.) → mark as "Barbados" (Tobago is part of Barbados & Tobago)
-     - ❌ EXCLUDE: Crimes in Guyana, Venezuela, Barbados, Jamaica, other countries → mark as "Other"
-     - If article is from Demerara Waves / INews Guyana → very likely NOT Barbados
-     - Only mark as "Barbados" if crime occurred in Barbados or Tobago islands
+     - ✅ INCLUDE: Crimes in Barbados (Bridgetown, Holetown, Bathsheba and more )
+     - ❌ EXCLUDE: Crimes in Guyana, Venezuela, Grenada, Jamaica, other countries → mark as "Other"
+     - If article is from Demerara Waves / INews Guyana / Trinidad Express → very likely NOT Barbados
+     - Only mark as "Barbados" if crime occurred in Barbados
 
   9. MULTI-CRIME INCIDENTS: Handle overlapping crimes correctly
      - Home Invasion + Robbery = ONE "Home Invasion" (robbery is implied)
@@ -321,6 +320,14 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
       - Include specific location details (street + area)
 
   13. Not a crime article? Return {"crimes": [], "confidence": 0}
+
+  14.   (Ambiguities): "If the article lacks clear details for a required field 
+      - (e.g., street name is missing, only vague 'Area' is mentioned, or the date is a vague month/year), 
+      - list the missing field and the reason for the vagueness in the ambiguities array. If multiple incidents are extracted, 
+      - link the ambiguity to the relevant incident." (Or, simply fill ambiguities with a string summarizing the data quality).
+
+  15. (Final Filter Action): "If the article is EXCLUDED by any of the above rules, or if no crime is found, 
+      - your ONLY output MUST be {\"crimes\": [], \"confidence\": 0}. Do not output anything else.
 
   JSON only, no markdown.`;
   }

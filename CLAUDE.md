@@ -147,7 +147,44 @@ google-apps-script/
 
 ---
 
-## Recent Features (Nov 2025)
+## Recent Features (Nov-Dec 2025)
+
+### Enhanced Duplicate Detection (Dec 3, 2025)
+**Location:** `google-apps-script/guyana/processor.gs`, `google-apps-script/trinidad/processor.gs`
+
+**Problem:** Duplicates slipping through when older crimes have been archived from Production to Production Archive
+
+**Solution:** Duplicate detection now checks BOTH sheets
+- Checks Production sheet first (recent data, fast)
+- Checks Production Archive second (historical data)
+- Skips crime if duplicate found in either sheet
+- Gracefully handles missing archive sheet
+
+**Implementation:**
+- Added `PRODUCTION_ARCHIVE` to `SHEET_NAMES` config
+- Sequential duplicate checks with early exit
+- Clear logging shows which sheet had the duplicate
+- Both Trinidad and Guyana automation updated
+
+**Documentation:** `docs/automation/DUPLICATE-DETECTION-ARCHIVE.md`
+
+### Seizures Crime Type (Dec 3, 2025)
+**Location:** `google-apps-script/guyana/geminiClient.gs`, `google-apps-script/trinidad/geminiClient.gs`
+
+**Problem:** Gun/ammunition seizure stories were incorrectly classified as "Theft"
+
+**Solution:** Added new "Seizures" crime type for police enforcement actions
+- Police seizures of illegal items (guns, drugs, contraband)
+- Recovery of stolen goods
+- Distinct from actual thefts (crimes against victims)
+- Blue color (#3b82f6) for visual association with law enforcement
+
+**Implementation:**
+- Updated Gemini prompts with clear "Seizures vs Theft" rules
+- Added to crime color configuration (`src/js/config/crimeColors.js`)
+- Both Trinidad and Guyana automation updated
+
+**Documentation:** `docs/automation/SEIZURES-CRIME-TYPE.md`
 
 ### Custom Interactive Dashboards
 **Completed Nov 22-24, 2025**
@@ -474,24 +511,87 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   - Prevents hint from blocking marker popups
 - Google Analytics 4 integration (GA4: G-JMQ8B4DYEG)
 - Cookie consent system
+- **Seizures Crime Type (Dec 3, 2025)**
+  - New crime type for police enforcement actions
+  - Fixes gun/drug seizures misclassified as "Theft"
+  - Blue color for visual distinction
+  - Applied to both Trinidad and Guyana
+- **Enhanced Duplicate Detection (Dec 3, 2025)**
+  - Checks both Production and Production Archive sheets
+  - Prevents duplicates from archived crimes
+  - Smart performance with early exit
+  - Applied to both Trinidad and Guyana
+- **Phase 1 SEO Implementation (Dec 3, 2025)**
+  - FAQ page with accordion UI and Schema.org markup
+  - Methodology page for E-E-A-T compliance
+  - robots.txt and sitemap.xml
+  - Optimized meta descriptions and Open Graph tags
+  - Navigation enhancements (FAQ, Methodology, Instagram links)
 
 ### 🔄 In Progress
 - Guyana backfill processing (170 URLs)
 - Facebook data collection automation (Ian Alleyne Network, DJ Sherrif)
 
 ### 🐛 Known Issues
-- **Date parsing bug:** Some headlines show wrong month (day/month swap)
-  - Example: 12/03/2025 showing as Dec 3 instead of Mar 12
-  - Cause: Caribbean uses DD/MM/YYYY, script parsing as MM/DD/YYYY
-  - Fix location: `google-apps-script/trinidad/processor.gs` and `guyana/processor.gs`
-  - Status: Identified Nov 27, fix pending next session
+- None currently identified
 
 ### 📋 Planned
+
+**Near-Term:**
 - Barbados automation
 - Social media auto-posting (Facebook, X, WhatsApp)
-- SEO optimization (meta tags, structured data, sitemap)
-- Open Graph images for social sharing
-- Methodology/About Data page (E-E-A-T compliance)
+- Open Graph images for social sharing (social media cards)
+- SEO Phase 2: NewsArticle Schema, internal linking, breadcrumbs
+- SEO Phase 3: Submit sitemap to search engines, local SEO
+
+**Data Scalability & Analytics (Long-Term Vision)**
+
+**Current Status (Dec 2025):**
+- Trinidad LIVE: 1,201 rows ≈ 120 KB CSV ✅ Healthy
+- Guyana LIVE: ~400-600 rows (estimated)
+- Performance: Excellent, no issues
+- Growth Rate: ~1,500 rows/year per country
+
+**Vision:** Build Crime Hotspots as the authoritative data hub for Caribbean crime analytics - serving students, policymakers, researchers, news outlets, and the general public.
+
+**Phased Implementation Plan:**
+
+**Phase 1: Current Architecture (Years 1-3, 2025-2028)**
+- Status: ✅ Active
+- Approach: Single CSV export per country
+- Trigger: Monitor until 5,000 rows
+- Action: None needed, system scales well
+
+**Phase 2: Smart Pagination (Years 3-5, 2028-2030)**
+- Trigger: When LIVE sheet reaches 5,000 rows
+- Approach: Split data by year (Recent + Historical sheets)
+- Benefit: Fast initial loads, historical data on demand
+- Cost: Free (additional Google Sheets tabs)
+- Features: Year-over-year comparisons
+
+**Phase 3: API + Advanced Analytics (Years 5+, 2030+)**
+- Trigger: When building advanced analytics features
+- Approach: Cloudflare Workers + R2 Storage
+- Cost: Free (100K requests/day, 10 GB storage)
+- Features:
+  - Year-over-year trend analysis
+  - Crime pattern detection (ML/AI)
+  - Heatmap time-lapse animations
+  - Statistical dashboards (crime clock, seasonal trends)
+  - Crime forecasting/predictions
+  - Public API for researchers
+  - Historical lookup by street/area
+  - Neighborhood comparison tools
+  - Correlation analysis (weather, holidays, etc.)
+
+**Monitoring Strategy:**
+- Monthly check: LIVE sheet row count and CSV size
+- Alert triggers:
+  - >5,000 rows → Plan Phase 2 implementation
+  - CSV >500 KB → Consider optimization
+  - Load time >3 seconds → User impact detected
+
+**Documentation:** `docs/architecture/CSV-DATA-MANAGEMENT.md`
 
 ---
 

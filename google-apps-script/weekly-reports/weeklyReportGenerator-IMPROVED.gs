@@ -122,9 +122,17 @@ function validateDataReadiness(countryKey) {
   const productionData = productionSheet.getDataRange().getValues();
   const productionHeaders = productionData[0];
 
-  // Find column indices
-  const dateCol = productionHeaders.indexOf('Incident Date');
-  const timestampCol = productionHeaders.indexOf('Timestamp');
+  // Find column index (use 'Date' - the actual column name in Production sheet)
+  const dateCol = productionHeaders.indexOf('Date');
+
+  // Verify column exists
+  if (dateCol === -1) {
+    return {
+      passed: false,
+      reason: 'ERROR: Date column not found in Production sheet. Check sheet structure.',
+      details: { availableColumns: productionHeaders }
+    };
+  }
 
   // Get last 7 days of data
   const oneWeekAgo = new Date();
@@ -144,19 +152,20 @@ function validateDataReadiness(countryKey) {
     };
   }
 
-  // CHECK 2: Data freshness - ensure recent processing
-  const twoDaysAgo = new Date();
-  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+  // CHECK 2: Data freshness - ensure recent crimes exist
+  // (Timestamp column doesn't exist, so we check for recent crime dates instead)
+  const threeDaysAgo = new Date();
+  threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
   const recentCrimes = weekData.filter(row => {
-    const timestamp = new Date(row[timestampCol]);
-    return timestamp >= twoDaysAgo;
+    const crimeDate = new Date(row[dateCol]);
+    return crimeDate >= threeDaysAgo;
   });
 
   if (recentCrimes.length < CONFIG.minDataFreshness) {
     return {
       passed: false,
-      reason: `Data appears stale: Only ${recentCrimes.length} crimes processed in last 48 hours (minimum: ${CONFIG.minDataFreshness})`,
+      reason: `Data appears stale: Only ${recentCrimes.length} crimes from last 3 days (minimum: ${CONFIG.minDataFreshness})`,
       details: { recentCount: recentCrimes.length, threshold: CONFIG.minDataFreshness }
     };
   }
@@ -317,8 +326,8 @@ function generateCountryReport(countryKey) {
   const data = sheet.getDataRange().getValues();
   const headers = data[0];
 
-  // Find column indices
-  const dateCol = headers.indexOf('Incident Date');
+  // Find column indices (use actual column names from Production sheet)
+  const dateCol = headers.indexOf('Date');
   const crimeTypeCol = headers.indexOf('Crime Type');
   const areaCol = headers.indexOf('Area');
 
