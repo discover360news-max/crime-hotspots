@@ -22,7 +22,7 @@ const ALL_COUNTRIES = [
     flag: '🇬🇾',
     dashboard: '/dashboard-guyana.html',
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRLuFajWrjyJk-LaZhN9SkSMMEvWcH74PHYzDJ03su3oGu_9W--2O7aUJ3_6Eul6BVUay1Gez-wWk3H/pub?gid=1749261532&single=true&output=csv',
-    available: true,
+    available: false,
     image: '/assets/images/guyana.jpg',
     headlinesSlug: 'guyana',
   },
@@ -33,7 +33,7 @@ const ALL_COUNTRIES = [
     flag: '🇧🇧',
     dashboard: '/dashboard-barbados.html',
     csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6y1Btbcvj2U1hlQD4-AMiOLDx-NgZc3IVYxXWYGb88vWs8D1EMWU3-BYxwy1fEAw9IqGiv8-KokeO/pub?gid=1749261532&single=true&output=csv',
-    available: true,
+    available: false,
     image: '/assets/images/barbados.jpg',
     headlinesSlug: 'barbados',
     regions: [

@@ -210,10 +210,10 @@ export function initHeadlinesPage(csvUrl) {
 
     // Enhanced styling with better click affordance
     if (hasUrl) {
-      card.className = "bg-white rounded-2xl shadow-md p-5 w-full text-left transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer border-2 border-transparent hover:border-rose-200 group";
+      card.className = "bg-white/25 backdrop-blur-md rounded-xl shadow-md p-5 w-full text-left transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer border-2 border-transparent hover:border-rose-200 group";
       card.setAttribute("data-has-url", "true");
     } else {
-      card.className = "bg-white rounded-2xl shadow-md p-5 w-full text-left";
+      card.className = "bg-white rounded-lg shadow-md p-5 w-full text-left";
     }
 
     card.setAttribute("data-index", indexInCurrentList);
@@ -244,7 +244,7 @@ export function initHeadlinesPage(csvUrl) {
     // Read article hint (only for clickable cards)
     const readHint = hasUrl ? `
       <div class="mt-3 pt-3 border-t border-slate-100 text-tiny text-rose-600 font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <span>Read article</span>
+        <span>Article Summary</span>
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>

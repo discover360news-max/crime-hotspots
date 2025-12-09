@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Primary Meta Tags -->
-  <title>Trinidad & Tobago Crime Dashboard 2025 — Port of Spain, San Fernando, Arima Statistics</title>
-  <meta name="title" content="Trinidad & Tobago Crime Dashboard 2025 — Regional Crime Statistics">
+  <title>Trinidad & Tobago Crime Dashboard — Nationwide Statistics</title>
+  <meta name="title" content="Trinidad & Tobago Crime Dashboard — Regional Crime Statistics">
   <meta name="description" content="Explore real-time Trinidad crime statistics on our interactive map. View Port of Spain data and regional safety trends. Check the live dashboard now.">
   <meta name="keywords" content="Trinidad crime statistics, Port of Spain crime, San Fernando murders, Arima robberies, Chaguanas crime, Tobago crime, Trinidad homicide rate, crime by region Trinidad, Trinidad Express crime, Guardian TT crime news">
   <meta name="author" content="Crime Hotspots Caribbean">
@@ -16,7 +16,7 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://crimehotspots.com/dashboard-trinidad.html">
-  <meta property="og:title" content="Trinidad & Tobago Crime Dashboard 2025 — Regional Statistics">
+  <meta property="og:title" content="Trinidad & Tobago Crime Dashboard — Regional Statistics">
   <meta property="og:description" content="Check the real-time crime dashboard for Trinidad & Tobago now. See verified incidents, filter by area, and identify local hotspots. Know the facts affecting your community today. View the live map and data.">
   <meta property="og:image" content="https://crimehotspots.com/og-trinidad.jpg">
   <meta property="og:site_name" content="Crime Hotspots Caribbean">
@@ -24,7 +24,7 @@
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://crimehotspots.com/dashboard-trinidad.html">
-  <meta name="twitter:title" content="Trinidad & Tobago Crime Dashboard 2025">
+  <meta name="twitter:title" content="Trinidad & Tobago Crime Dashboard">
   <meta name="twitter:description" content="Check the real-time crime dashboard for Trinidad & Tobago now. See verified incidents, filter by area, and identify local hotspots.">
   <meta name="twitter:image" content="https://crimehotspots.com/og-trinidad.jpg">
 
@@ -70,11 +70,27 @@
   <style>
     body {
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto;
+      /* Tailwind's bg-slate-100 color is #f1f5f9 */
+      /* 1. Layer: Linear gradient fading FROM the background color TO transparent */
+      background-image: 
+        linear-gradient(to bottom, 
+          rgba(241, 245, 249, 0) 0%,      /* FULLY TRANSPARENT (Image visible) at the top */
+          rgba(241, 245, 249, 0.5) 5%,   /* Midway fade by 20% down */
+          #f1f5f9 25%                     /* FULLY OPAQUE (Image hidden) by 40% down */
+        ),
+        
+        /* 2. Layer: The actual image */
+        url('/assets/images/trinidad-page-bg.png'); 
+      
+      background-repeat: no-repeat;
+      background-position: top center; /* Center the image at the top */
+      background-size: 100% auto;    /* Ensure image stretches to full width */
+      background-attachment: fixed; /* Optional: Makes the image stay fixed as content scrolls */
     }
   </style>
 </head>
 
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-slate-100 min-h-screen">
   <!-- Global Header -->
   <script type="module">
     import { renderHeader } from './src/js/components/header.js';
@@ -86,17 +102,29 @@
 
     <!-- Page Header -->
     <div class="mb-6">
-      <div class="mb-4">
-        <h1 class="text-display font-bold text-slate-700">🇹🇹 Trinidad & Tobago</h1>
-        <p class="text-small text-slate-600 mt-1">Interactive regional statistics</p>
+      <h1 class="text-display font-bold text-slate-700">Trinidad & Tobago</h1>
+      <div class="mb-4 flex items-center space-x-2">
+        
+        <p class="text-small text-slate-400 mt-1">Crime Statistics Dashboard</p>
+        
+        <div class="relative group cursor-pointer">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+
+          <div class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-64 p-4 bg-white/70 backdrop-blur-md border border-slate-200 rounded-lg shadow-lg text-sm text-slate-500 opacity-0 invisible group-hover:opacity-100 group-hover:visible z-10 transition duration-300">
+            <p class="font-bold mb-1">Data Coverage:</p>
+            <p>This dashboard pulls data from all national published news outlets, representing the current year's reported serious crimes statistics.</p>
+          </div>
+        </div>
       </div>
       <div class="flex items-center gap-2">
         <div class="hidden lg:block flex-1">
-          <p class="text-body text-slate-500 font-medium">Select a region to view and filter</p>
+          <p class="text-body text-slate-400 font-medium">Select a region to view and filter</p>
         </div>
         <div class="lg:hidden flex-1">
           <button id="mobileRegionButtonCompact" class="w-full px-3 py-1.5 min-h-[30px] border border-slate-300 rounded-lg bg-white hover:bg-slate-50 transition text-tiny text-slate-700 flex items-center justify-between">
-            <span>Select Region</span>
+            <span>Filter by Region</span>
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
@@ -115,7 +143,7 @@
 
       <!-- Interactive Regional Map (Left side on desktop, hidden on mobile) -->
       <div class="hidden lg:block lg:col-span-4">
-        <div id="trinidadMapContainer" class="bg-white rounded-xl shadow-lg p-6 sticky top-6 z-10">
+        <div id="trinidadMapContainer" class="bg-white/25 backdrop-blur-md rounded-xl shadow-lg p-6 sticky top-6 z-10">
           <!-- Skeleton loader for map -->
           <div id="mapSkeleton">
             <div class="skeleton skeleton-heading w-3/4 mx-auto"></div>
@@ -145,54 +173,38 @@
           <div class="flex flex-col gap-3">
             <!-- Top row: Title and Reset Button -->
             <div class="flex items-center justify-between">
-              <div>
-                <div class="flex items-center space-x-2">
-                  <h2 class="text-h2 font-semibold text-slate-700">Crime Statistics Dashboard</h2>
-
-                  <div class="relative group cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="info-icon w-5 h-5 text-slate-500 hover:text-slate-700">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041.02a.75.75 0 010 1.06l-.041.02m-.084-2.25h.084m2.13 0h.084m-2.13-.084v.084m2.13-.084v.084m-2.13.084h.084m2.13 0h.084m-2.13.084v.084m2.13-.084v.084m-2.13-.084h.084m2.13 0h.084m-2.13.084v.084m2.13-.084v.084M12 21a9 9 0 100-18 9 9 0 000 18zM12 11.25v3.75" />
-                    </svg>
-
-                    <div class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-64 p-3 bg-white border border-slate-200 rounded shadow-lg text-sm text-slate-600 opacity-0 invisible group-hover:opacity-100 group-hover:visible z-10 transition duration-300">
-                      <p class="font-bold mb-1">Data Coverage:</p>
-                      <p>This dashboard pulls data from all national published news outlets, representing the current year's reported serious crimes statistics.</p>
-                    </div>
-                  </div>
-                  </div>
-              </div>
+              
               <!-- Reset Filter Button (hidden when no filter active) -->
-              <button id="resetFilterButton" class="hidden px-3 py-1.5 min-h-[22px] bg-slate-100 hover:bg-slate-200 rounded-lg text-tiny font-medium text-slate-700 transition flex items-center justify-center">
+              <button id="resetFilterButton" class="hidden px-3 py-1.5 min-h-[22px] bg-slate-100 hover:bg-slate-200 rounded-lg text-tiny font-medium text-rose-600 transition flex items-center justify-center">
                 Reset Filters
               </button>
             </div>
 
             <!-- Date Range Filter (Desktop) -->
-            <div class="hidden lg:flex flex-wrap items-center gap-2 bg-slate-100 rounded p-2 text-tiny">
+            <div class="hidden lg:flex flex-wrap bg-white/25 backdrop-blur-md items-center gap-2 bg-slate-100 rounded-lg p-2 text-tiny">
               <label for="startDate" class="text-slate-600 font-medium">From:</label>
               <input
                 type="date"
                 id="startDate"
-                class="px-2 py-1 min-h-[44px] rounded border border-slate-300 text-slate-900 text-tiny focus:ring-1 focus:ring-rose-300 outline-none w-32"
+                class="px-2 py-1 min-h-[22px] rounded-lg border border-slate-300 text-slate-500 text-tiny focus:ring-1 focus:ring-rose-300 outline-none w-32"
                 title="Select start date"
               >
-              <span class="text-slate-600">to</span>
               <label for="endDate" class="text-slate-600 font-medium">To:</label>
               <input
                 type="date"
                 id="endDate"
-                class="px-2 py-1 min-h-[44px] rounded border border-slate-300 text-slate-900 text-tiny focus:ring-1 focus:ring-rose-300 outline-none w-32"
+                class="px-2 py-1 min-h-[22px] rounded-lg border border-slate-300 text-slate-500 text-tiny focus:ring-1 focus:ring-rose-300 outline-none w-32"
                 title="Select end date"
               >
               <button
                 id="applyDateFilter"
-                class="px-4 py-1.5 min-h-[44px] flex items-center justify-center bg-rose-600 text-white rounded-lg text-tiny font-medium hover:bg-rose-700 transition"
+                class="px-4 py-1.5 min-h-[22px] flex items-center justify-center bg-rose-600 text-white rounded-lg text-tiny font-medium hover:bg-rose-700 transition"
               >
                 Apply
               </button>
               <button
                 id="clearDateFilter"
-                class="px-2 py-1 min-h-[44px] flex items-center justify-center bg-slate-200 hover:bg-slate-300 rounded text-tiny font-medium text-slate-700 transition"
+                class="px-4 py-1.5 min-h-[22px] flex items-center justify-center bg-slate-200 hover:bg-slate-300 rounded-lg text-tiny font-medium text-slate-700 transition"
               >
                 Clear
               </button>
@@ -201,7 +213,7 @@
         </div>
 
         <!-- Dashboard Widgets Container -->
-        <div id="dashboardWidgets" class="bg-slate-50">
+        <div id="dashboardWidgets" class="rounded-lg">
           <!-- Skeleton loader for widgets -->
           <div id="widgetsSkeleton">
             <!-- Metric cards grid -->
@@ -239,7 +251,7 @@
         <div class="flex items-center justify-between p-4 border-b border-gray-200">
           <h3 class="text-h2 font-bold text-slate-700">Select Region</h3>
           <button id="closeTrayButton" class="p-2 hover:bg-gray-100 rounded-lg transition">
-            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -252,31 +264,31 @@
 
         <!-- Date Filter (Mobile) -->
         <div class="p-4 border-t border-gray-200 space-y-3">
-          <p class="text-tiny font-semibold text-gray-700 mb-2">Date Range Filter</p>
+          <p class="text-tiny font-semibold text-gray-500 mb-2">Date Range Filter</p>
           <div class="space-y-2">
             <div>
-              <label for="startDateMobile" class="block text-tiny text-slate-600 font-medium mb-1">From Date:</label>
+              <label for="startDateMobile" class="block text-tiny text-slate-500 font-medium mb-1">From:</label>
               <input
                 type="date"
                 id="startDateMobile"
-                class="w-full px-3 py-2 min-h-[44px] rounded border border-gray-300 text-small focus:ring-2 focus:ring-rose-300 outline-none"
+                class="w-full px-3 py-2 min-h-[22px] rounded-lg border border-gray-300 text-small focus:ring-2 focus:ring-rose-300 outline-none"
                 title="Select start date"
               >
             </div>
             <div>
-              <label for="endDateMobile" class="block text-tiny text-slate-600 font-medium mb-1">To Date:</label>
+              <label for="endDateMobile" class="block text-tiny text-slate-500 font-medium mb-1">To:</label>
               <input
                 type="date"
                 id="endDateMobile"
-                class="w-full px-3 py-2 min-h-[44px] rounded border border-gray-300 text-small focus:ring-2 focus:ring-rose-300 outline-none"
+                class="w-full px-3 py-2 min-h-[22px] rounded-lg border border-gray-300 text-small focus:ring-2 focus:ring-rose-300 outline-none"
                 title="Select end date"
               >
             </div>
-            <div class="flex gap-2">
-              <button id="applyDateFilterMobile" class="flex-1 px-4 py-2 min-h-[44px] flex items-center justify-center bg-rose-600 text-white rounded-lg text-small font-medium hover:bg-rose-700 transition">
-                Apply Filter
+            <div class="flex gap-2 py-4">
+              <button id="applyDateFilterMobile" class="flex-1 px-4 py-2 min-h-[22px] flex items-center justify-center bg-rose-600 text-white rounded-lg text-small font-medium hover:bg-rose-700 transition">
+                Apply
               </button>
-              <button id="clearDateFilterMobile" class="px-3 py-2 min-h-[44px] flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded text-small font-medium text-gray-700 transition">
+              <button id="clearDateFilterMobile" class="px-3 py-2 min-h-[22px] flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-lg text-small font-medium text-gray-700 transition">
                 Clear
               </button>
             </div>
@@ -284,11 +296,11 @@
         </div>
 
         <!-- Footer with reset button and instructions -->
-        <div class="p-4 border-t border-gray-200 space-y-3">
+        <div class="p-4 border-t border-gray-200 space-y-1">
           <button id="resetFilterButtonTray" class="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-small font-medium text-gray-700 transition">
-            🇹🇹 Show All Regions
+            Show All Regions
           </button>
-          <p class="text-body text-center text-slate-700 font-medium">
+          <p class="py-4 text-body text-center text-slate-400 font-medium">
             Tap any region to filter crime data
           </p>
         </div>
@@ -296,11 +308,11 @@
     </div>
 
     <!-- Tray Overlay (darkens background when tray is open) -->
-    <div id="trayOverlay" class="fixed inset-0 bg-black/20 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 z-40 lg:hidden"></div>
+    <div id="trayOverlay" class="fixed inset-0 bg-white/20 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 z-40 lg:hidden"></div>
 
     <!-- Info Cards Below -->
     <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-white rounded-lg p-4 shadow">
+      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
         <div class="flex items-start gap-3">
           <div class="flex-shrink-0">
             <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -313,7 +325,7 @@
           </div>
         </div>
       </div>
-      <div class="bg-white rounded-lg p-4 shadow">
+      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
         <div class="flex items-start gap-3">
           <div class="flex-shrink-0">
             <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,7 +338,7 @@
           </div>
         </div>
       </div>
-      <div class="bg-white rounded-lg p-4 shadow">
+      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
         <div class="flex items-start gap-3">
           <div class="flex-shrink-0">
             <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,7 +356,7 @@
   </main>
 
   <!-- Footer -->
-  <footer class="bg-slate-800 text-white py-8 mt-16">
+  <footer class="bg-slate-600 text-white py-8 mt-16">
     <div class="container mx-auto px-4 text-center">
       <p>&copy; 2025 Crime Hotspots. All rights reserved.</p>
       <p class="text-slate-400 text-small mt-2">Data sources: Verified news outlets and official reports</p>

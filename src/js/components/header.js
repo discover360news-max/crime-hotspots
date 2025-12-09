@@ -145,18 +145,7 @@ export function renderHeader(activeOverride = '') {
                    class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
                   T & T+
                 </a>
-                <a href="headlines-guyana.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
-                  GY+
-                </a>
-                <a href="dashboard-barbados.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
-                  Barbados+
-                </a>
-                <a href="dashboard-guyana.html"
-                   class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
-                  GY Dashboard
-                </a>
+                
                 <a href="blog.html"
                    class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-small font-medium whitespace-nowrap">
                   Blog+

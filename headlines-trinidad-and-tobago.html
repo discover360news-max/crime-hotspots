@@ -121,21 +121,40 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <link rel="stylesheet" href="./src/css/styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  
   <style>
-    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto}
-
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto;
+      /* Tailwind's bg-slate-100 color is #f1f5f9 */
+      /* 1. Layer: Linear gradient fading FROM the background color TO transparent */
+      background-image: 
+        linear-gradient(to bottom, 
+          rgba(241, 245, 249, 0) 0%,      /* FULLY TRANSPARENT (Image visible) at the top */
+          rgba(241, 245, 249, 0.5) 5%,   /* Midway fade by 20% down */
+          #f1f5f9 25%                     /* FULLY OPAQUE (Image hidden) by 40% down */
+        ),
+        
+        /* 2. Layer: The actual image */
+        url('/assets/images/trinidad-page-bg.png'); 
+      
+      background-repeat: no-repeat;
+      background-position: top center; /* Center the image at the top */
+      background-size: 100% auto;    /* Ensure image stretches to full width */
+      background-attachment: fixed; /* Optional: Makes the image stay fixed as content scrolls */
+    }
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body class="bg-slate-50 text-slate-700 min-h-screen">
   <!-- Global header -->
   <script type="module">
     import { renderHeader } from './src/js/components/header.js';
     renderHeader();
   </script>
-  
-  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fadeIn">
-    <h1 class="text-display font-bold mb-3">Trinidad & Tobago Headlines</h1>
+
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-5 animate-fadeIn">
+    <h1 class="text-h1 font-bold mb-3">Trinidad & Tobago Headlines</h1>
 
     <div class="mb-6" id="dashboardButtonContainer">
       </div>
@@ -206,7 +225,7 @@
       </div>
     </div>
 
-    <div id="headlineIframeWrap" class="bg-white/80 rounded-b-2xl overflow-hidden">
+    <div id="headlineIframeWrap" class="bg-white/70 rounded-b-2xl overflow-hidden">
       <iframe id="headlineIframe" src="about:blank" class="w-full h-[80vh] border-0 opacity-0 transition-opacity duration-700 bg-gradient-to-b from-slate-100 to-white" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
     </div>
   </section>

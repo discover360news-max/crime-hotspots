@@ -25,9 +25,9 @@ export function createMetricsCards(stats) {
 
   // Scrollable container
   const container = document.createElement('div');
-  container.className = 'metrics-cards flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100';
-  container.style.scrollbarWidth = 'thin'; // Firefox
-  container.style.scrollbarColor = '#cbd5e1 #f1f5f9'; // Firefox (thumb track)
+  container.className = 'metrics-cards rounded-lg flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory py-2 hide-scrollbar';
+  // container.style.scrollbarWidth = 'thin'; // Firefox
+  // container.style.scrollbarColor = '#cbd5e1 #f1f5f9'; // Firefox (thumb track)
 
   const metrics = [
     { label: 'Total Incidents', value: stats.total, color: 'blue' },
@@ -44,7 +44,7 @@ export function createMetricsCards(stats) {
 
   // Fade gradient hint on the right (indicates more content)
   const fadeHint = document.createElement('div');
-  fadeHint.className = 'absolute right-0 top-0 h-full w-24 pointer-events-none bg-gradient-to-l from-slate-100 via-slate-50 to-transparent opacity-0 transition-opacity duration-300';
+  fadeHint.className = 'absolute rounded-lg right-0 top-2 h-full w-24 pointer-events-none bg-gradient-to-l from-slate-100 via-slate-50 to-transparent opacity-0 transition-opacity duration-300';
   fadeHint.id = 'scrollFadeHint';
 
   // Chevron arrow indicator for scrolling (MOBILE ONLY with "Scroll" text)
@@ -59,7 +59,7 @@ export function createMetricsCards(stats) {
 
   // Desktop navigation arrows (LEFT arrow)
   const leftArrow = document.createElement('button');
-  leftArrow.className = 'hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-md border border-slate-200 hover:bg-rose-50 hover:border-rose-600 transition z-10 opacity-0 pointer-events-none';
+  leftArrow.className = 'hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 items-center justify-center bg-white/50 backdrop-blur-sm rounded-full shadow-md border border-slate-200 hover:bg-rose-50 hover:border-rose-600 transition z-10 opacity-0 pointer-events-none';
   leftArrow.id = 'metricsScrollLeft';
   leftArrow.setAttribute('aria-label', 'Scroll metrics left');
   leftArrow.innerHTML = `
@@ -153,7 +153,7 @@ function createMetricCard({ label, value, color }) {
   card.className = 'metric-card bg-white rounded-lg p-4 shadow-md transition-all hover:shadow-lg flex-shrink-0 w-40 snap-start';
   card.innerHTML = `
     <div class="text-small font-medium text-slate-400 mb-2">${label}</div>
-    <div class="text-display font-bold text-slate-700">${value}</div>
+    <div class="text-display font-bold text-slate-600">${value}</div>
   `;
   return card;
 }
@@ -165,9 +165,9 @@ function createMetricCard({ label, value, color }) {
  */
 export function createPieChart(stats) {
   const container = document.createElement('div');
-  container.className = 'chart-container bg-white rounded-lg p-6 shadow-md';
+  container.className = 'chart-container bg-white/25 backdrop-blur-md rounded-lg p-6 shadow-md';
   container.innerHTML = `
-    <h3 class="text-h3 font-semibold text-slate-700 mb-4">Crime Type Breakdown</h3>
+    <h3 class="text-h3 font-semibold text-slate-500 mb-4">Crime Type Breakdown</h3>
     <div class="relative" style="height: 300px;">
       <canvas id="pieChart"></canvas>
     </div>
@@ -212,7 +212,7 @@ export function createPieChart(stats) {
               boxWidth: 12,
               boxHeight: 12,
               font: {
-                size: 11
+                size: 8
               },
               usePointStyle: false
             }
@@ -261,9 +261,9 @@ export function createPieChart(stats) {
  */
 export function createLast7DaysChart(stats) {
   const container = document.createElement('div');
-  container.className = 'chart-container bg-white rounded-lg p-6 shadow-md';
+  container.className = 'chart-container bg-white/25 backdrop-blur-md rounded-lg p-6 shadow-md';
   container.innerHTML = `
-    <h3 class="text-h3 font-semibold text-slate-700 mb-4">Last 7 Days Trend</h3>
+    <h3 class="text-h3 font-semibold text-slate-500 mb-4">Last 7 Days Trend</h3>
     <div class="relative" style="height: 300px;">
       <canvas id="barChart"></canvas>
     </div>
@@ -327,7 +327,7 @@ export function createLast7DaysChart(stats) {
             },
             ticks: {
               font: {
-                size: 10
+                size: 8
               },
               maxRotation: 0, // Horizontal labels (no slant)
               minRotation: 0,
@@ -339,7 +339,7 @@ export function createLast7DaysChart(stats) {
             stacked: true, // Stacked bars
             beginAtZero: true,
             ticks: {
-              stepSize: 1,
+              stepSize: 2,
               precision: 0
             }
           }
@@ -353,7 +353,7 @@ export function createLast7DaysChart(stats) {
               boxWidth: 12,
               boxHeight: 12,
               font: {
-                size: 10
+                size: 8
               },
               usePointStyle: false
             }
@@ -386,9 +386,9 @@ export function createLast7DaysChart(stats) {
  */
 export function createTopLocationsChart(stats) {
   const container = document.createElement('div');
-  container.className = 'chart-container bg-white rounded-lg p-6 shadow-md';
+  container.className = 'chart-container bg-white/25 backdrop-blur-md rounded-lg p-6 shadow-md';
   container.innerHTML = `
-    <h3 class="text-h3 font-semibold text-slate-700 mb-4">Top Locations</h3>
+    <h3 class="text-h3 font-semibold text-slate-500 mb-4">Top Locations</h3>
     <div class="relative" style="height: 400px;">
       <canvas id="locationChart"></canvas>
     </div>
@@ -416,7 +416,7 @@ export function createTopLocationsChart(stats) {
           label: 'Incidents',
           data,
           backgroundColor: '#e11d48', // Rose-600 to match site theme
-          borderRadius: 4
+          borderRadius: 8
         }]
       },
       options: {
@@ -427,9 +427,9 @@ export function createTopLocationsChart(stats) {
           x: {
             beginAtZero: true,
             ticks: {
-              stepSize: 1,
+              stepSize: 25,
               font: {
-                size: 11
+                size: 8
               }
             }
           },
@@ -439,13 +439,13 @@ export function createTopLocationsChart(stats) {
             },
             ticks: {
               font: {
-                size: 10
+                size: 8
               },
               // Truncate long location names
               callback: function(value, index) {
                 const label = this.getLabelForValue(value);
-                if (label.length > 25) {
-                  return label.substring(0, 22) + '...';
+                if (label.length > 15) {
+                  return label.substring(0, 10) + '...';
                 }
                 return label;
               }
@@ -460,10 +460,10 @@ export function createTopLocationsChart(stats) {
             anchor: 'end',
             align: 'right',
             formatter: (value) => value,
-            color: '#ffffff',
+            color: '#a5a5a5ff',
             font: {
               weight: 'bold',
-              size: 10
+              size: 8
             }
           },
           tooltip: {
