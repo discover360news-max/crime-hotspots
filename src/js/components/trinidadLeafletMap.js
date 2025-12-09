@@ -110,26 +110,46 @@ let markerClusterGroup = null;
  */
 export function createTrinidadLeafletMap(crimeData, regionFilter = null) {
   const container = document.createElement('div');
-  container.className = 'leaflet-map-container bg-gray-300 rounded-lg shadow-md overflow-hidden';
+  container.className = 'leaflet-map-container bg-white/70 backdrop-blur-md rounded-lg shadow-md overflow-hidden';
   container.innerHTML = `
     <div class="p-4 border-b border-gray-200 flex items-center justify-between">
-      <div>
+      <div class="flex items-center gap-2">
         <h3 class="text-h3 font-semibold text-slate-600">Incidents Map</h3>
-        <p class="text-tiny text-slate-500 mt-1">Two fingers to move map • Click markers for details</p>
+        <!-- Info Icon with Tooltip -->
+        
+        <div class="relative group cursor-pointer">
+          <svg class="w-5 h-5 text-slate-400" cursor-pointer hover:text-slate-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+
+          <div class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-64 p-3 bg-white/70 backdrop-blur-md border border-slate-200 rounded-lg shadow-lg text-tiny text-slate-500 opacity-0 invisible group-hover:opacity-100 group-hover:visible z-20 transition-all duration-300">
+            <p class="font-semibold mb-1">Understanding the Map</p>
+            <p class="mb-2">This map shows estimated/reported locations of crimes in and are updated daily.</p>
+            <p class="font-semibold mb-1">How to Use:</p>
+            <ul class="list-disc list-inside space-y-1 text-tiny">
+              <li>Click clusters to zoom in</li>
+              <li>Click markers for incident details</li>
+              <li>Use two fingers to pan map</li>
+              <li>Filter by region or date range</li>
+            </ul>
+          </div>
+        </div>
+        
       </div>
-      <button id="resetMapViewTrinidad" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-tiny font-medium text-slate-700 transition flex items-center gap-1">
+      <button id="resetMapViewTrinidad" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-tiny font-medium text-slate-500 transition flex items-center gap-1">
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
         Reset View
       </button>
     </div>
+  
     <div class="relative">
       <div id="trinidadLeafletMap" style="height: 500px; width: 100%;"></div>
       <!-- Pan instruction overlay (shown on single finger touch) -->
       <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="z-index: 1000;">
-        <div class="bg-white rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
-          <p class="text-small font-semibold text-slate-700">Use two fingers to move map</p>
+        <div class="bg-white/70 backdrop-blur-md rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
+          <p class="text-small font-semibold text-slate-600">Use two fingers to move map</p>
           <p class="text-tiny text-slate-600 mt-1">One finger scrolls the page</p>
         </div>
       </div>
@@ -229,6 +249,71 @@ export function createTrinidadLeafletMap(crimeData, regionFilter = null) {
     if (resetButton) {
       resetButton.addEventListener('click', () => {
         mapInstance.setView(TRINIDAD_CENTER, DEFAULT_ZOOM);
+      });
+    }
+
+    // Info icon tooltip behavior (desktop hover + mobile tap)
+    const infoIconContainer = container.querySelector('.info-icon-container');
+    const infoIcon = infoIconContainer?.querySelector('svg');
+    const infoTooltip = infoIconContainer?.querySelector('.info-tooltip');
+
+    if (infoIcon && infoTooltip) {
+      let isTooltipOpen = false;
+
+      // Desktop: Show on hover (CSS handles this, but we track state)
+      infoIconContainer.addEventListener('mouseenter', () => {
+        infoTooltip.classList.remove('opacity-0', 'invisible');
+        infoTooltip.classList.add('opacity-100', 'visible');
+        isTooltipOpen = true;
+      });
+
+      infoIconContainer.addEventListener('mouseleave', () => {
+        infoTooltip.classList.remove('opacity-100', 'visible');
+        infoTooltip.classList.add('opacity-0', 'invisible');
+        isTooltipOpen = false;
+      });
+
+      // Mobile: Toggle on tap
+      infoIcon.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent event from bubbling
+
+        if (isTooltipOpen) {
+          // Close tooltip
+          infoTooltip.classList.remove('opacity-100', 'visible');
+          infoTooltip.classList.add('opacity-0', 'invisible');
+          isTooltipOpen = false;
+        } else {
+          // Open tooltip
+          infoTooltip.classList.remove('opacity-0', 'invisible');
+          infoTooltip.classList.add('opacity-100', 'visible');
+          isTooltipOpen = true;
+
+          // Smart positioning: Check if tooltip goes off screen
+          setTimeout(() => {
+            const tooltipRect = infoTooltip.getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+
+            // If tooltip goes off right edge, align to right instead of center
+            if (tooltipRect.right > viewportWidth - 10) {
+              infoTooltip.classList.remove('left-1/2', 'transform', '-translate-x-1/2');
+              infoTooltip.classList.add('right-0');
+            }
+            // If tooltip goes off left edge, align to left
+            else if (tooltipRect.left < 10) {
+              infoTooltip.classList.remove('left-1/2', 'transform', '-translate-x-1/2');
+              infoTooltip.classList.add('left-0');
+            }
+          }, 10);
+        }
+      });
+
+      // Close tooltip when clicking outside
+      document.addEventListener('click', (e) => {
+        if (isTooltipOpen && !infoIconContainer.contains(e.target)) {
+          infoTooltip.classList.remove('opacity-100', 'visible');
+          infoTooltip.classList.add('opacity-0', 'invisible');
+          isTooltipOpen = false;
+        }
       });
     }
 

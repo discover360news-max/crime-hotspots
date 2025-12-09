@@ -8,7 +8,7 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 
 **Current Status:** ✅ Production - Trinidad & Tobago and Guyana live
 **Live Site:** https://crimehotspots.com
-**Last Updated:** November 29, 2025
+**Last Updated:** December 9, 2025
 
 ---
 ## Kavell Forde - Owner - Guidance
@@ -421,10 +421,13 @@ mapDiv.addEventListener('touchmove', (e) => {
 
 ### Styling
 
+**IMPORTANT:** Before making ANY UI changes, consult `docs/guides/DESIGN-TOKENS.md` for the official design system.
+
 - Tailwind utilities for layout
 - Rose palette (`rose-600`, `rose-700`) for primary actions
 - Custom animations in `src/css/styles.css`
-- See `docs/guides/DESIGN-Guidelines.md` for complete framework
+- See `docs/guides/DESIGN-TOKENS.md` for **component patterns, button variants, colors, typography** (v1.0, Dec 2025)
+- See `docs/guides/DESIGN-Guidelines.md` for complete framework (v2.0)
 
 ---
 
@@ -445,15 +448,21 @@ mapDiv.addEventListener('touchmove', (e) => {
 ### When Working on Frontend
 
 **DO:**
+- **Check `docs/guides/DESIGN-TOKENS.md` BEFORE making any UI/styling changes** ⭐
 - Use Read, Edit, Write tools (not bash)
 - Prefer editing existing files
 - Test with `npm run dev`
 - Build successfully before committing
+- Follow established button patterns (`px-4 py-1.5`, `min-h-[22px]`)
+- Use `rounded-lg` (not `rounded-md`)
+- Always add explicit text colors (`text-slate-700`, `text-slate-400`)
 
 **DON'T:**
 - Use emojis unless requested
 - Create markdown files unless required
 - Modify vite.config.js without understanding
+- Create new button variants (use existing patterns from DESIGN-TOKENS.md)
+- Use colors outside the Rose + Slate palette
 
 ---
 
@@ -527,6 +536,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   - robots.txt and sitemap.xml
   - Optimized meta descriptions and Open Graph tags
   - Navigation enhancements (FAQ, Methodology, Instagram links)
+- **Official Design System Documentation (Dec 9, 2025)**
+  - DESIGN-TOKENS.md created as single source of truth
+  - Documented button system (5 variants with copy-paste templates)
+  - Frosted glass opacity scale (25/50/70/80)
+  - Typography usage rules with examples
+  - Color palette formalized (Rose-600 + Slate grays)
+  - Common mistakes section for consistency
+  - Integrated into CLAUDE.md as required reading
 
 ### 🔄 In Progress
 - Guyana backfill processing (170 URLs)
@@ -605,6 +622,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - docs/FACEBOOK-DATA-COLLECTION.md - Facebook sources documentation
 
 **For Design & SEO:**
+- docs/guides/DESIGN-TOKENS.md - **Official Design System (v1.0, Dec 2025)** ⭐ CHECK THIS FIRST
+  - Button variants (Primary, Secondary, Large, Subtle, Neutral)
+  - Frosted glass containers (opacity scale: 25/50/70/80)
+  - Typography system with usage rules
+  - Color palette (Rose + Slate)
+  - Form inputs, active states, spacing
+  - Copy-paste component templates
+  - Common mistakes to avoid
 - docs/guides/DESIGN-Guidelines.md - Complete design framework (v2.0)
   - High-Density Glass philosophy
   - Typography system, color palette, components
