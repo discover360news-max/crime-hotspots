@@ -299,3 +299,4 @@ This is a personal project, but suggestions are welcome!
 **Last Updated:** November 15, 2025
 **Version:** 1.2.0
 **Status:** ✅ Production (Trinidad & Guyana Live)
+# Trigger deployment
