@@ -25,7 +25,7 @@ export function createMetricsCards(stats) {
 
   // Scrollable container
   const container = document.createElement('div');
-  container.className = 'metrics-cards rounded-lg flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory py-2 hide-scrollbar';
+  container.className = 'metrics-cards rounded-lg flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory hide-scrollbar';
   // container.style.scrollbarWidth = 'thin'; // Firefox
   // container.style.scrollbarColor = '#cbd5e1 #f1f5f9'; // Firefox (thumb track)
 

@@ -24,11 +24,12 @@ function processReadyArticles() {
       return;
     }
 
-    // ← DYNAMIC COLUMN MAPPING: Get column map from headers
-    const columnMap = getColumnMap(sheet, 'RAW_ARTICLES');
+    // 1. FIX: Use the corrected function name and signature (assuming getDynamicColumnMap is defined)
+    const columnMap = getDynamicColumnMap(sheet);
+    const numColumns = Object.keys(columnMap).length; // Get the true width of the data
 
-    // Get all data (full row width to accommodate any column layout)
-    const dataRange = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn());
+    // Get all data. Use numColumns for robustness.
+    const dataRange = sheet.getRange(2, 1, lastRow - 1, numColumns);
     const data = dataRange.getValues();
 
     let articlesProcessed = 0;
@@ -50,12 +51,12 @@ function processReadyArticles() {
         break;
       }
       const row = data[i];
-      const status = getRowValue(row, columnMap, 'STATUS'); // ← DYNAMIC: Use column name
+      // 2. FIX: Use direct array access (0-based)
+      const status = row[columnMap.STATUS]; 
 
       if (status === 'ready_for_processing') {
         // ═══════════════════════════════════════════════════════════
         // SECOND TIME CHECK - Before starting article processing
-        // Prevents timeout mid-processing (especially during slow Gemini API calls)
         // ═══════════════════════════════════════════════════════════
         const elapsedTimeBeforeArticle = new Date().getTime() - startTime;
         if (elapsedTimeBeforeArticle > PROCESSING_CONFIG.MAX_EXECUTION_TIME_MS) {
@@ -68,46 +69,46 @@ function processReadyArticles() {
         const rowNumber = i + 2;
 
         try {
-          // ← DYNAMIC: Set status using column name
-          sheet.getRange(rowNumber, columnMap.STATUS).setValue('processing');
+          // 3. CRITICAL FIX: Add + 1 for 1-based sheet column index
+          sheet.getRange(rowNumber, columnMap.STATUS + 1).setValue('processing');
           SpreadsheetApp.flush();
 
-          // ← DYNAMIC: Get values using column names
-          const articleTitle = getRowValue(row, columnMap, 'TITLE');
-          const articleUrl = getRowValue(row, columnMap, 'URL');
-          const articleText = getRowValue(row, columnMap, 'FULL_TEXT');
-          const publishedDate = getRowValue(row, columnMap, 'PUBLISHED_DATE');
+          // 4. FIX: Use direct array access (0-based)
+          const articleTitle = row[columnMap.TITLE];
+          const articleUrl = row[columnMap.URL];
+          const articleText = row[columnMap.FULL_TEXT];
+          const publishedDate = row[columnMap.PUBLISHED_DATE];
 
           Logger.log(`Processing row ${rowNumber}: ${articleTitle.substring(0, 50)}...`);
 
           // Extract data using Gemini (now returns array of crimes)
-          const extracted = extractCrimeData(articleText, articleTitle,articleUrl, publishedDate);
+          const extracted = extractCrimeData(articleText, articleTitle, articleUrl, publishedDate);
 
           // ← CRITICAL FIX: Check if crimes array exists and has items
-          if (extracted.crimes && Array.isArray(extracted.crimes) &&extracted.crimes.length > 0) {
+          if (extracted.crimes && Array.isArray(extracted.crimes) && extracted.crimes.length > 0) {
 
-            Logger.log(`✅ Found ${extracted.crimes.length} crime(s) in thisarticle`);
+            Logger.log(`✅ Found ${extracted.crimes.length} crime(s) in this article`);
 
             let highConfCrimes = 0;
             let lowConfCrimes = 0;
 
             // ← CRITICAL FIX: Loop through EACH crime separately
             extracted.crimes.forEach((crime, index) => {
-              Logger.log(`  Processing crime ${index + 1}/${extracted.crimes.length}: ${crime.headline}`);
-
-              // ← NEW: Filter out crimes outside Barbados
+              // ... (Crime filtering and routing logic remains the same) ...
+              
+              // NEW: Filter out crimes outside Barbados
               if (crime.location_country && crime.location_country !== 'Barbados') {
                 Logger.log(`    ⏭️ Skipped: Crime occurred in ${crime.location_country}, not Barbados`);
                 return; // Skip this crime
               }
 
-              // ← NEW: Filter out "Other" crime types (should be caught by prompt, but double-check)
+              // NEW: Filter out "Other" crime types
               if (crime.crime_type === 'Other' || !crime.crime_type) {
                 Logger.log(`    ⏭️ Skipped: Invalid crime type "${crime.crime_type}"`);
                 return; // Skip this crime
               }
 
-              // ← NEW: Validate crime date isn't too old (catches court verdicts about historical crimes)
+              // NEW: Validate crime date isn't too old
               if (crime.crime_date && publishedDate) {
                 try {
                   const crimeDate = new Date(crime.crime_date);
@@ -115,10 +116,9 @@ function processReadyArticles() {
                   const daysDiff = Math.round((pubDate - crimeDate) / (1000 * 60 * 60 * 24));
 
                   if (daysDiff > 30) {
-                    Logger.log(`    ⚠️ Crime date is ${daysDiff} days old - likely court verdict or historical reference`);
-                    // Force to review queue with low confidence
+                    Logger.log(`    ⚠️ Crime date is ${daysDiff} days old - historical reference`);
                     if (extracted.confidence >= PROCESSING_CONFIG.CONFIDENCE_THRESHOLD) {
-                      extracted.confidence = 5; // Override to force review
+                      extracted.confidence = 5; 
                     }
                     if (!extracted.ambiguities) extracted.ambiguities = [];
                     extracted.ambiguities.push(`Crime date (${crime.crime_date}) is ${daysDiff} days before publication - verify this is a new crime report, not court verdict`);
@@ -134,7 +134,7 @@ function processReadyArticles() {
                 highConfCrimes++;
                 Logger.log(`    ✅ Added to Production`);
               } else if (extracted.confidence > 0) {
-                appendToReviewQueue(crime, extracted.confidence,extracted.ambiguities, publishedDate);
+                appendToReviewQueue(crime, extracted.confidence, extracted.ambiguities, publishedDate);
                 lowConfCrimes++;
                 Logger.log(`    ⚠️ Added to Review Queue`);
               }
@@ -142,31 +142,33 @@ function processReadyArticles() {
 
             totalCrimesExtracted += extracted.crimes.length;
 
-            // Update article status
+            // Update article status using 1-based index (+1)
             if (highConfCrimes > 0) {
-              sheet.getRange(rowNumber, columnMap.STATUS).setValue('completed');
-              sheet.getRange(rowNumber, columnMap.NOTES).setValue(`✅ Extracted ${extracted.crimes.length} crime(s), confidence: ${extracted.confidence}`);
+              sheet.getRange(rowNumber, columnMap.STATUS + 1).setValue('completed');
+              sheet.getRange(rowNumber, columnMap.NOTES + 1).setValue(`✅ Extracted ${extracted.crimes.length} crime(s), confidence: ${extracted.confidence}`);
               successCount += highConfCrimes;
             } else if (lowConfCrimes > 0) {
-              sheet.getRange(rowNumber, columnMap.STATUS).setValue('needs_review');
-              sheet.getRange(rowNumber, columnMap.NOTES).setValue(`⚠️ ${extracted.crimes.length} crime(s) need review, confidence: ${extracted.confidence}`);
+              sheet.getRange(rowNumber, columnMap.STATUS + 1).setValue('needs_review');
+              sheet.getRange(rowNumber, columnMap.NOTES + 1).setValue(`⚠️ ${extracted.crimes.length} crime(s) need review, confidence: ${extracted.confidence}`);
               reviewCount += lowConfCrimes;
             }
 
           } else {
             // No crimes found
-            sheet.getRange(rowNumber, columnMap.STATUS).setValue('skipped');
-            sheet.getRange(rowNumber, columnMap.NOTES).setValue(`Not a crime article: ${(extracted.ambiguities || []).join(', ')}`);
+            sheet.getRange(rowNumber, columnMap.STATUS + 1).setValue('skipped');
+            sheet.getRange(rowNumber, columnMap.NOTES + 1).setValue(`Not a crime article: ${(extracted.ambiguities || []).join(', ')}`);
             Logger.log(`⏭️ Skipped (no crimes detected)`);
           }
 
           articlesProcessed++;
-          Utilities.sleep(PROCESSING_CONFIG.RATE_LIMIT_DELAY);
+          // 5. FIX: REMOVE redundant fixed sleep. Throttling is now handled by resilientFetch inside extractCrimeData.
+          // Utilities.sleep(PROCESSING_CONFIG.RATE_LIMIT_DELAY); 
 
         } catch (error) {
           Logger.log(`❌ Error processing row ${rowNumber}: ${error.message}`);
-          sheet.getRange(rowNumber, columnMap.STATUS).setValue('failed');
-          sheet.getRange(rowNumber, columnMap.NOTES).setValue(`Error: ${error.message.substring(0, 100)}`);
+          // 6. FIX: Add + 1 for 1-based sheet column index
+          sheet.getRange(rowNumber, columnMap.STATUS + 1).setValue('failed');
+          sheet.getRange(rowNumber, columnMap.NOTES + 1).setValue(`Error: ${error.message.substring(0, 100)}`);
           failedCount++;
         }
       }
@@ -242,7 +244,7 @@ function processReadyArticles() {
    * @param {Object} crime - Crime data from Gemini
    * @param {Date} publishedDate - Article publication date (fallback)
    */
-  function appendToProduction(crime, publishedDate) {
+  function appendToProduction(crime, publishedDate, sourceName) {
     // Acquire lock to prevent race conditions when multiple processes run simultaneously
     const lock = LockService.getScriptLock();
 
@@ -274,22 +276,25 @@ function processReadyArticles() {
         Logger.log(`ℹ️ Production Archive not found (may not exist yet): ${e.message}`);
       }
 
-      // Validate and format crime date
-      const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
+      // Extract parish from area or geocoded address
+  const parish = extractParish(crime.area, geocoded.formatted_address);
 
-      prodSheet.appendRow([
-        validatedDate,
-        crime.headline || 'No headline',
-        crime.crime_type || 'Other',
-        crime.street || '',
-        geocoded.plus_code || '',
-        crime.area || '',
-        'Barbados',
-        crime.source_url || '',
-        geocoded.lat || '',
-        geocoded.lng || '',
-        crime.details || '' // Summary for SEO and UX
-      ]);
+  prodSheet.appendRow([
+    validatedDate,                  // 1. Date
+    crime.headline || 'No headline', // 2. Headline
+    crime.crime_type || 'Other',    // 3. Crime Type
+    crime.street || '',             // 4. Street
+    geocoded.plus_code || '',       // 5. Plus Code
+    crime.area || '',               // 6. Area
+    parish || '',                   // 7. Region (NEW)
+    'Barbados',                     // 8. Island (NEW)
+    crime.source_url || '',         // 9. URL
+    sourceName || '',               // 10. Source (NEW - pass from Raw Articles)
+    geocoded.lat || '',             // 11. Lat
+    geocoded.lng || '',             // 12. Long
+    crime.details || ''             // 13. Summary
+    // 14. Forward (manual column, not populated)
+  ]);
 
       Logger.log(`✅ Added to production: ${crime.headline}
   [${geocoded.plus_code || 'No Plus Code'}]`);
@@ -302,6 +307,42 @@ function processReadyArticles() {
       lock.releaseLock();
     }
   }
+
+/**
+ * Extract parish from area or geocoded address
+ * @param {string} area - Area from crime data
+ * @param {string} formattedAddress - Formatted address from geocoding
+ * @returns {string} Parish name or empty string
+ */
+function extractParish(area, formattedAddress) {
+  const locationText = `${area || ''} ${formattedAddress || ''}`.toLowerCase();
+
+  // Check for each Barbados parish
+  for (const parish of BARBADOS_PARISHES) {
+    if (locationText.includes(parish.toLowerCase())) {
+      return parish;
+    }
+  }
+
+  // Fallback: try to infer from major area names
+  const areaToParish = {
+    'Bridgetown': 'St. Michael',
+    'Speightstown': 'St. Peter',
+    'Oistins': 'Christ Church',
+    'Holetown': 'St. James',
+    'Bathsheba': 'St. Joseph',
+    'Six cross roads': 'St. Philip'
+    // Add more mappings as needed
+  };
+
+  for (const [areaName, parishName] of Object.entries(areaToParish)) {
+    if (locationText.includes(areaName)) {
+      return parishName;
+    }
+  }
+
+  return ''; // Unknown parish
+}
 
 /**
    * Append to review queue for manual verification

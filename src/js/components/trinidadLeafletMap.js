@@ -7,8 +7,8 @@ import { getCrimeColor } from '../config/crimeColors.js';
 import { clipArea } from 'chart.js/helpers';
 
 // Trinidad & Tobago center coordinates (adjusted to show both islands)
-const TRINIDAD_CENTER = [10.734963, -61.097207];
-const DEFAULT_ZOOM = 9;
+const TRINIDAD_CENTER = [10.634963, -61.197207];
+const DEFAULT_ZOOM = 8;
 
 // Reference coordinates for major Trinidad & Tobago locations (sorted by frequency/importance)
 const LOCATION_REFERENCES = {
@@ -122,15 +122,14 @@ export function createTrinidadLeafletMap(crimeData, regionFilter = null) {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
 
-          <div class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-64 p-3 bg-white/70 backdrop-blur-md border border-slate-200 rounded-lg shadow-lg text-tiny text-slate-500 opacity-0 invisible group-hover:opacity-100 group-hover:visible z-20 transition-all duration-300">
+          <div class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-64 p-3 bg-white/70 backdrop-blur-md border border-slate-200 rounded-lg shadow-lg text-sm text-slate-500 opacity-0 invisible group-hover:opacity-100 group-hover:visible z-20 transition-all duration-300">
             <p class="font-semibold mb-1">Understanding the Map</p>
             <p class="mb-2">This map shows estimated/reported locations of crimes in and are updated daily.</p>
             <p class="font-semibold mb-1">How to Use:</p>
-            <ul class="list-disc list-inside space-y-1 text-tiny">
+            <ul class="list-disc list-inside space-y-1 text-sm">
               <li>Click clusters to zoom in</li>
               <li>Click markers for incident details</li>
               <li>Use two fingers to pan map</li>
-              <li>Filter by region or date range</li>
             </ul>
           </div>
         </div>
@@ -145,7 +144,7 @@ export function createTrinidadLeafletMap(crimeData, regionFilter = null) {
     </div>
   
     <div class="relative">
-      <div id="trinidadLeafletMap" style="height: 500px; width: 100%;"></div>
+      <div id="trinidadLeafletMap" style="height: 750px; width: 100%;"></div>
       <!-- Pan instruction overlay (shown on single finger touch) -->
       <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="z-index: 1000;">
         <div class="bg-white/70 backdrop-blur-md rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
@@ -445,9 +444,9 @@ function addMarkersToMap(crimeData, regionFilter) {
           
           <div class="crime-popup-body flex flex-col gap-0.25"> 
             
-            <p class="text-sm text-gray-700">${headline}</p> 
+            <p class="text-sm text-gray-600">${headline}</p> 
 
-            <div class="text-xs text-gray-300">
+            <div class="text-sm text-gray-400">
               <p>
                 <span class="font-medium">Date:</span> ${date}
               </p>

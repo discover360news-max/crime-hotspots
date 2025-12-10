@@ -200,7 +200,7 @@ async function loadDashboard(regionFilter = null, dateRange = null) {
  */
 function createSeparator() {
   const separator = document.createElement('div');
-  separator.className = 'w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-6';
+  separator.className = 'w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent my-4';
   return separator;
 }
 

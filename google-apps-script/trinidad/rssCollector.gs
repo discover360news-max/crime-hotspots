@@ -55,7 +55,7 @@ function collectAllFeeds() {
         }
 
         // No other keyword filtering - AI will determine if it's crime-related
-        if (!isDuplicate(sheet, article.url)) {
+        if (!isDuplicate(sheet, article.url, article.title)) {
           appendArticle(sheet, article, feed.name);
           newArticlesCount++;
           collected++;
@@ -196,22 +196,102 @@ function isEditorialContent(article) {
 // ============================================================================
 
 /**
- * Check for duplicate URLs using O(1) TextFinder lookup
- * PERFORMANCE FIX: Replaced O(n) array iteration with TextFinder
+ * Calculate string similarity using Levenshtein distance
+ * @param {string} str1 - First string
+ * @param {string} str2 - Second string
+ * @returns {number} Similarity percentage (0-100)
+ */
+function calculateSimilarity(str1, str2) {
+  if (!str1 || !str2) return 0;
+
+  const s1 = str1.toLowerCase().trim();
+  const s2 = str2.toLowerCase().trim();
+
+  if (s1 === s2) return 100;
+
+  const longer = s1.length > s2.length ? s1 : s2;
+  const shorter = s1.length > s2.length ? s2 : s1;
+
+  if (longer.length === 0) return 100;
+
+  const editDistance = levenshteinDistance(s1, s2);
+  return Math.round(((longer.length - editDistance) / longer.length) * 100);
+}
+
+/**
+ * Calculate Levenshtein distance between two strings
+ * @param {string} str1 - First string
+ * @param {string} str2 - Second string
+ * @returns {number} Edit distance
+ */
+function levenshteinDistance(str1, str2) {
+  const matrix = [];
+
+  for (let i = 0; i <= str2.length; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= str1.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= str2.length; i++) {
+    for (let j = 1; j <= str1.length; j++) {
+      if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1,     // insertion
+          matrix[i - 1][j] + 1      // deletion
+        );
+      }
+    }
+  }
+
+  return matrix[str2.length][str1.length];
+}
+
+/**
+ * Check for duplicate URLs and headlines
+ * Checks both exact URL match and headline similarity (80%+)
  *
  * @param {Sheet} sheet - Raw Articles sheet
  * @param {string} url - Article URL to check
- * @returns {boolean} True if URL already exists in sheet
+ * @param {string} title - Article title to check
+ * @returns {boolean} True if URL or headline already exists in sheet
  */
-function isDuplicate(sheet, url) {
+function isDuplicate(sheet, url, title) {
   if (sheet.getLastRow() < 2) return false;
 
-  // Use TextFinder for O(1) lookup instead of loading all URLs
-  const finder = sheet.createTextFinder(url)
+  // CHECK 1: Exact URL match (fast)
+  const urlFinder = sheet.createTextFinder(url)
     .matchEntireCell(true)
     .findNext();
 
-  return finder !== null;
+  if (urlFinder !== null) {
+    return true; // Exact URL duplicate
+  }
+
+  // CHECK 2: Headline similarity (catches same story, different URL)
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    const existingTitle = data[i][2]; // Column C (Title)
+
+    if (existingTitle && title) {
+      const similarity = calculateSimilarity(existingTitle, title);
+
+      if (similarity >= 80) {
+        Logger.log(`   ⚠️ Headline duplicate detected (${similarity}% similar):`);
+        Logger.log(`      Existing: "${existingTitle}"`);
+        Logger.log(`      New:      "${title}"`);
+        return true; // Headline too similar
+      }
+    }
+  }
+
+  return false; // Not a duplicate
 }
 
 // ============================================================================

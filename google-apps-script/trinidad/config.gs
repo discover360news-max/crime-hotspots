@@ -169,7 +169,7 @@ const NEWS_SOURCES = [
  */
 const PROCESSING_CONFIG = {
   CONFIDENCE_THRESHOLD: 7,     // Articles below this go to review queue
-  MAX_ARTICLES_PER_RUN: 30,    // Increased from 10 - safer with better time checks
+  MAX_ARTICLES_PER_RUN: 6,     // CRITICAL: 3 runs/day × 6 = 18 API calls (under 20 RPD limit)
   MAX_EXECUTION_TIME_MS: 270000, // 4.5 minutes (270 seconds) - buffer before 6min limit
   MAX_FETCH_PER_RUN: 10,       // Article text fetching limit per run (matches articleFetcher.md)
   RATE_LIMIT_DELAY: 1000,      // Milliseconds between API calls

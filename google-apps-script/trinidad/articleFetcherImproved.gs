@@ -18,7 +18,7 @@
 // CONFIGURATION
 // ============================================================================
 
-const CONTENT_SELECTORS = {
+var CONTENT_SELECTORS = {
   // Priority order - try these in sequence
   primary: [
     'article',
@@ -52,7 +52,7 @@ const CONTENT_SELECTORS = {
 };
 
 // Elements to EXCLUDE (navigation, sidebar, etc.)
-const EXCLUDE_SELECTORS = [
+var EXCLUDE_SELECTORS = [
   'nav',
   'header',
   'footer',
@@ -76,7 +76,7 @@ const EXCLUDE_SELECTORS = [
 ];
 
 // Minimum content validation thresholds
-const VALIDATION = {
+var VALIDATION = {
   MIN_CONTENT_LENGTH: 200,           // Minimum 200 chars
   MIN_TITLE_MATCH_PCT: 40,           // At least 40% of title keywords in content
   MAX_CRIME_KEYWORDS_NONCRIME: 4,    // Max 4 crime keywords in non-crime article (increased from 2)
@@ -485,7 +485,7 @@ function fetchPendingArticlesImproved() {
       if (result.success) {
         // Success - update Full Text and Status
         sheet.getRange(i + 1, fullTextCol + 1).setValue(result.content);
-        sheet.getRange(i + 1, statusCol + 1).setValue('ready_for_processing');
+        sheet.getRange(i + 1, statusCol + 1).setValue('text_fetched');
 
         const note = `✅ Fetched (${result.content.length} chars, method: ${result.method})`;
         sheet.getRange(i + 1, notesCol + 1).setValue(note);

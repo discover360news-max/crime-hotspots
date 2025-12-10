@@ -282,13 +282,13 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
      - Seizures indicate police enforcement/recovery actions, NOT crimes against victims
 
   7. LOCATION DETAILS: Capture complete location information
-     - ALWAYS include business names (e.g., "KFC", "Movie Towne")
-     - Include landmarks (e.g., "near Bridgetown")
+     - ALWAYS include business names (e.g., "Speightstown Market", "Bridgetown Port")
+     - Include landmarks (e.g., "near St. Michael's Cathedral")
      - street field should have: "Business/Landmark Name, Street Name" format
      - Examples:
-       * "KFC Arima" → street: "KFC, Arima Main Road", area: "Arima"
-       * "Grand Bazaar shooting" → street: "Grand Bazaar, Churchill Roosevelt Highway", area: "Valsayn"
-       * "Queen's Park Savannah" → street: "Queen's Park Savannah", area: "Port of Spain"
+       * "Swan Street" → street: "Swan Street", area: "Bridgetown"
+       * "Oistins shooting" → street: "Oistins Bay Garden", area: "Christ Church"
+       * "Holetown Plaza" → street: "Holetown Plaza, Highway 1", area: "St. James"
 
   8. LOCATION FILTER: Set "location_country" for each crime
      - ✅ INCLUDE: Crimes in Barbados (Bridgetown, Holetown, Bathsheba and more )
