@@ -72,13 +72,13 @@
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto;
       /* Tailwind's bg-slate-100 color is #f1f5f9 */
       /* 1. Layer: Linear gradient fading FROM the background color TO transparent */
-      background-image: 
-        linear-gradient(to bottom, 
-          rgba(241, 245, 249, 0) 0%,      /* FULLY TRANSPARENT (Image visible) at the top */
-          rgba(241, 245, 249, 0.5) 5%,   /* Midway fade by 20% down */
-          #f1f5f9 25%                     /* FULLY OPAQUE (Image hidden) by 40% down */
+      background-image:
+        linear-gradient(to bottom,
+          rgba(241, 245, 249, 0.7) 0%,    /* Image shows at 30% opacity (heavily faded) */
+          rgba(241, 245, 249, 0.85) 15%,  /* Image at 15% opacity */
+          #f1f5f9 30%                     /* Image fully hidden */
         ),
-        
+
         /* 2. Layer: The actual image */
         url('/assets/images/trinidad-page-bg.png'); 
       
