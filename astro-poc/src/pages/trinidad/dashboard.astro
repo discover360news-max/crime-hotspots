@@ -113,7 +113,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       <div class="flex items-start justify-between gap-4 pt-4">
         <div>
           <h1 class="text-display font-bold text-slate-700">Trinidad & Tobago</h1>
-          <p class="text-xs text-slate-400 mt-1">Crime Statistics Dashboard</p>
+          <p class="text-xs text-slate-500 mt-1">Crime Statistics Dashboard</p>
         </div>
         <a href="/trinidad/headlines"
            class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border-1 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap flex-shrink-0">
@@ -127,9 +127,11 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 
     <!-- Statistics Cards - Horizontal Scroll -->
     <div class="stats-scroll-container mb-4">
-      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
-        <div class="text-3xl font-bold text-rose-600">{crimes.length}</div>
-        <div class="text-xs text-slate-500">Total Incidents</div>
+      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm" id="totalIncidentsCard">
+        <div class="text-3xl font-bold text-rose-600" id="totalIncidents">{crimes.length}</div>
+        <div class="text-xs text-slate-500 mb-2">Total Incidents</div>
+        <!-- Trend indicators (populated by JavaScript) -->
+        <div id="totalIncidentsTrends" class="space-y-1.5"></div>
       </div>
 
       <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
@@ -161,7 +163,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       <div class="flex items-center gap-4">
         <h2 class="text-h2 font-bold text-slate-700 pt-4 px-4 mb-4">Crime Incidents Map</h2>
         <div class="relative group cursor-pointer">
-          <svg class="w-5 h-5 text-slate-400" cursor-pointer hover:text-slate-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-slate-500" cursor-pointer hover:text-slate-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
 
@@ -282,7 +284,126 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
   <script define:vars={{ crimes }}>
     // Wait for DOM and Leaflet to load
     window.addEventListener('DOMContentLoaded', () => {
-      
+
+      // ==========================================
+      // Trend Calculation Functions
+      // ==========================================
+
+      function subtractDays(date, days) {
+        const result = new Date(date);
+        result.setDate(result.getDate() - days);
+        return result;
+      }
+
+      function calculatePercentage(current, previous) {
+        if (previous === 0) return current > 0 ? 100 : 0;
+        return Math.round(((current - previous) / previous) * 100);
+      }
+
+      function calculateTrends(allCrimes, filteredCrimes) {
+        const currentCount = filteredCrimes.length;
+
+        // Get date range of current filtered data
+        if (currentCount === 0) {
+          return { insufficient: true };
+        }
+
+        const dates = filteredCrimes.map(c => new Date(c.Date)).sort((a, b) => a - b);
+        const currentStart = dates[0];
+        const currentEnd = dates[dates.length - 1];
+
+        // Last week comparison (7 days before current period)
+        const weekAgoStart = subtractDays(currentStart, 7);
+        const weekAgoEnd = subtractDays(currentEnd, 7);
+        const lastWeekCrimes = allCrimes.filter(c => {
+          const date = new Date(c.Date);
+          return date >= weekAgoStart && date <= weekAgoEnd;
+        });
+
+        // Last month comparison (30 days before current period)
+        const monthAgoStart = subtractDays(currentStart, 30);
+        const monthAgoEnd = subtractDays(currentEnd, 30);
+        const lastMonthCrimes = allCrimes.filter(c => {
+          const date = new Date(c.Date);
+          return date >= monthAgoStart && date <= monthAgoEnd;
+        });
+
+        return {
+          vsLastWeek: {
+            change: currentCount - lastWeekCrimes.length,
+            percentage: calculatePercentage(currentCount, lastWeekCrimes.length),
+            direction: currentCount > lastWeekCrimes.length ? 'up' : currentCount < lastWeekCrimes.length ? 'down' : 'neutral',
+            insufficient: lastWeekCrimes.length === 0
+          },
+          vsLastMonth: {
+            change: currentCount - lastMonthCrimes.length,
+            percentage: calculatePercentage(currentCount, lastMonthCrimes.length),
+            direction: currentCount > lastMonthCrimes.length ? 'up' : currentCount < lastMonthCrimes.length ? 'down' : 'neutral',
+            insufficient: lastMonthCrimes.length === 0
+          }
+        };
+      }
+
+      function displayTrends(trends, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        if (trends.insufficient) {
+          container.innerHTML = `<span class="text-xs text-slate-400 italic">Insufficient data</span>`;
+          return;
+        }
+
+        let html = '';
+
+        // Last week trend
+        if (!trends.vsLastWeek.insufficient) {
+          const weekColor = trends.vsLastWeek.direction === 'up' ? 'text-red-600' : trends.vsLastWeek.direction === 'down' ? 'text-emerald-600' : 'text-slate-500';
+          const weekArrowRotation = trends.vsLastWeek.direction === 'up' ? 'rotate-0' : 'rotate-180';
+          const weekArrowColor = trends.vsLastWeek.direction === 'up' ? 'text-red-500' : trends.vsLastWeek.direction === 'down' ? 'text-emerald-500' : 'text-slate-400';
+
+          html += `
+            <div class="flex items-center gap-1.5 text-xs">
+              <svg class="w-3 h-3 ${weekArrowColor} ${weekArrowRotation}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+              <span class="${weekColor} font-medium">
+                ${Math.abs(trends.vsLastWeek.percentage)}%
+              </span>
+              <span class="text-slate-400">vs last week</span>
+            </div>
+          `;
+        }
+
+        // Last month trend
+        if (!trends.vsLastMonth.insufficient) {
+          const monthColor = trends.vsLastMonth.direction === 'up' ? 'text-red-600' : trends.vsLastMonth.direction === 'down' ? 'text-emerald-600' : 'text-slate-500';
+          const monthArrowRotation = trends.vsLastMonth.direction === 'up' ? 'rotate-0' : 'rotate-180';
+          const monthArrowColor = trends.vsLastMonth.direction === 'up' ? 'text-red-500' : trends.vsLastMonth.direction === 'down' ? 'text-emerald-500' : 'text-slate-400';
+
+          html += `
+            <div class="flex items-center gap-1.5 text-xs">
+              <svg class="w-3 h-3 ${monthArrowColor} ${monthArrowRotation}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+              <span class="${monthColor} font-medium">
+                ${Math.abs(trends.vsLastMonth.percentage)}%
+              </span>
+              <span class="text-slate-400">vs last month</span>
+            </div>
+          `;
+        }
+
+        container.innerHTML = html;
+      }
+
+      // Calculate and display initial trends (all data)
+      const initialTrends = calculateTrends(crimes, crimes);
+      displayTrends(initialTrends, 'totalIncidentsTrends');
+
+      // ==========================================
+      // End Trend Calculation
+      // ==========================================
+
       // Load Leaflet scripts
       const leafletScript = document.createElement('script');
       leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
