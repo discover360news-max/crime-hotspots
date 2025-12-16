@@ -304,7 +304,17 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
         return { insufficient: true };
       }
 
-      const dates = filteredCrimes.map(c => c.dateObj || new Date(c.date)).sort((a, b) => a - b);
+      // Convert to Date objects and filter out invalid dates
+      const dates = filteredCrimes
+        .map(c => c.dateObj || new Date(c.date))
+        .filter(d => d instanceof Date && !isNaN(d.getTime()))
+        .sort((a, b) => a.getTime() - b.getTime());
+
+      if (dates.length === 0) {
+        console.log('⚠️ No valid dates in filtered data');
+        return { insufficient: true };
+      }
+
       const currentStart = dates[0];
       const currentEnd = dates[dates.length - 1];
 
