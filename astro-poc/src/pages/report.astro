@@ -238,7 +238,8 @@ const description = "Help build safer communities: report crime anonymously via 
         // Simple CSV parsing (assumes first row is headers, Area column exists)
         const lines = csvText.split('\n');
         const headers = lines[0].split(',');
-        const areaIndex = headers.findIndex(h => h.toLowerCase().includes('area'));
+        // Match EXACTLY "Area" column, not "Plus Code Area" or other variations
+        const areaIndex = headers.findIndex(h => h.trim().toLowerCase() === 'area');
 
         if (areaIndex === -1) {
           areaSelect.innerHTML = `<option>No area data available</option>`;
@@ -428,9 +429,20 @@ const description = "Help build safer communities: report crime anonymously via 
       // Get Turnstile token
       const token = formData.get('cf-turnstile-response');
 
-      if (!token) {
+      // Check if Turnstile loaded and generated a token
+      if (!token || token === '') {
         resultBox.classList.remove("hidden");
-        resultBox.textContent = "❌ Security check failed. Please refresh the page.";
+        resultBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-700');
+        resultBox.textContent = "❌ Security verification failed. Please wait a moment for the security check to load, then try again.";
+        return;
+      }
+
+      // Additional check: Ensure Turnstile widget is present
+      const turnstileWidget = document.querySelector('.cf-turnstile');
+      if (!turnstileWidget) {
+        resultBox.classList.remove("hidden");
+        resultBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-700');
+        resultBox.textContent = "❌ Security widget not loaded. Please refresh the page and try again.";
         return;
       }
 
@@ -517,6 +529,30 @@ const description = "Help build safer communities: report crime anonymously via 
       // Initialize honeypot tracking
       sessionStorage.setItem('formLoadTime', Date.now().toString());
       sessionStorage.setItem('mouseMovements', '0');
+
+      // Disable submit button until Turnstile is ready
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Loading security check...";
+
+      // Wait for Turnstile to load (max 10 seconds)
+      let checkCount = 0;
+      const checkInterval = setInterval(() => {
+        checkCount++;
+        const turnstileResponse = document.querySelector('input[name="cf-turnstile-response"]') as HTMLInputElement;
+
+        if (turnstileResponse && turnstileResponse.value) {
+          // Turnstile is ready
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit";
+          clearInterval(checkInterval);
+        } else if (checkCount > 50) {
+          // Timeout after 10 seconds (50 * 200ms)
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit";
+          clearInterval(checkInterval);
+          console.warn('Turnstile loading timed out');
+        }
+      }, 200);
 
       // Track focus on honeypot field
       if (hp) {
