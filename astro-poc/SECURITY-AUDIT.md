@@ -38,30 +38,20 @@ The Astro version now has **full security parity** with the Vite version. All se
 
 ### 1. **Content Security Policy (CSP)**
 
-**Location:** `astro-poc/public/_headers` (HTTP header, NOT meta tag)
+**Location:** `astro-poc/src/layouts/Layout.astro:56` (meta tag)
 
-**CRITICAL:** CSP is delivered as an HTTP header via Cloudflare Pages `_headers` file, NOT as a `<meta>` tag. This is essential for:
-- Cloudflare Turnstile compatibility (error 600010 fix)
-- Proper `frame-ancestors` enforcement
-- Better security header support
+**IMPORTANT:** CSP is delivered as a `<meta>` tag to ensure Cloudflare Turnstile compatibility. HTTP header CSP was causing error 600010 with Turnstile's Private Access Token feature. Meta tag CSP has a limitation where `frame-ancestors` is ignored (browser warning), but this doesn't affect functionality.
 
 **CSP Configuration:**
-```
-Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com https://www.googletagmanager.com https://*.google-analytics.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://unpkg.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://*.google.com https://*.googleusercontent.com https://challenges.cloudflare.com https://lookerstudio.google.com https://docs.google.com; connect-src 'self' https://cdn.jsdelivr.net https://docs.google.com https://*.google.com https://*.googleusercontent.com https://*.googleapis.com https://script.google.com https://challenges.cloudflare.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://unpkg.com; form-action 'self' https://script.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
+```html
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com https://www.googletagmanager.com https://*.google-analytics.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://unpkg.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://*.google.com https://*.googleusercontent.com https://challenges.cloudflare.com https://lookerstudio.google.com https://docs.google.com; connect-src 'self' https://cdn.jsdelivr.net https://docs.google.com https://*.google.com https://*.googleusercontent.com https://*.googleapis.com https://script.google.com https://challenges.cloudflare.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://unpkg.com; form-action 'self' https://script.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'">
 ```
 
 **Protection:**
 - Prevents XSS attacks
 - Blocks unauthorized script execution
 - Restricts external resource loading
-- Prevents clickjacking with `frame-ancestors 'none'`
-
-**Additional Security Headers (also in `_headers` file):**
-- `X-Content-Type-Options: nosniff` - Prevents MIME type sniffing
-- `X-Frame-Options: DENY` - Prevents clickjacking (backup to CSP)
-- `X-XSS-Protection: 1; mode=block` - Legacy XSS filter for older browsers
-- `Referrer-Policy: strict-origin-when-cross-origin` - Protects referrer information
-- `Permissions-Policy` - Restricts access to browser features (geolocation, camera, microphone)
+- Attempts to prevent clickjacking (though `frame-ancestors` is ignored in meta tags)
 
 ---
 
@@ -296,11 +286,19 @@ function getValidatedLocalStorage(key, validator) {
 2. **Web Application Firewall (WAF)**
    - Cloudflare WAF rules for additional protection
 
-3. **Subresource Integrity (SRI)**
+3. **Additional Security Headers via Cloudflare**
+   - `X-Content-Type-Options: nosniff`
+   - `X-Frame-Options: DENY`
+   - `X-XSS-Protection: 1; mode=block`
+   - `Referrer-Policy: strict-origin-when-cross-origin`
+   - `Permissions-Policy: geolocation=(), microphone=(), camera=()`
+   - Note: These can be added via Cloudflare dashboard without affecting Turnstile
+
+4. **Subresource Integrity (SRI)**
    - Add SRI hashes for external scripts
    - Example: `integrity="sha384-..."`
 
-4. **Content Security Policy Reporting**
+5. **Content Security Policy Reporting**
    - Add `report-uri` directive
    - Monitor CSP violations
 
@@ -320,7 +318,8 @@ function getValidatedLocalStorage(key, validator) {
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.1 | Dec 16, 2025 | CRITICAL: Moved CSP from meta tag to HTTP headers (_headers file) to fix Turnstile error 600010. Added X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy headers. |
+| 1.2 | Dec 16, 2025 | REVERTED: Back to meta tag CSP for Turnstile compatibility. HTTP header CSP caused error 600010 with Private Access Token feature. Meta tag approach proven to work in Vite version. |
+| 1.1 | Dec 16, 2025 | ~~Moved CSP to HTTP headers~~ (reverted in v1.2) |
 | 1.0 | Dec 16, 2025 | Initial security audit, full parity achieved |
 
 ---
