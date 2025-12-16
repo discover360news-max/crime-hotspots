@@ -308,7 +308,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
           return { insufficient: true };
         }
 
-        const dates = filteredCrimes.map(c => new Date(c.Date)).sort((a, b) => a - b);
+        const dates = filteredCrimes.map(c => c.dateObj || new Date(c.date)).sort((a, b) => a - b);
         const currentStart = dates[0];
         const currentEnd = dates[dates.length - 1];
 
@@ -316,7 +316,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
         const weekAgoStart = subtractDays(currentStart, 7);
         const weekAgoEnd = subtractDays(currentEnd, 7);
         const lastWeekCrimes = allCrimes.filter(c => {
-          const date = new Date(c.Date);
+          const date = c.dateObj || new Date(c.date);
           return date >= weekAgoStart && date <= weekAgoEnd;
         });
 
@@ -324,7 +324,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
         const monthAgoStart = subtractDays(currentStart, 30);
         const monthAgoEnd = subtractDays(currentEnd, 30);
         const lastMonthCrimes = allCrimes.filter(c => {
-          const date = new Date(c.Date);
+          const date = c.dateObj || new Date(c.date);
           return date >= monthAgoStart && date <= monthAgoEnd;
         });
 
@@ -398,6 +398,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 
       // Calculate and display initial trends (all data)
       const initialTrends = calculateTrends(crimes, crimes);
+      console.log('📊 Trend Calculation:', initialTrends);
       displayTrends(initialTrends, 'totalIncidentsTrends');
 
       // ==========================================
