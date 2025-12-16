@@ -1,0 +1,435 @@
+---
+/**
+ * Trinidad & Tobago Crime Dashboard
+ * Interactive dashboard with regional SVG map and Leaflet incidents map
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import { getTrinidadCrimes } from '../../lib/crimeData';
+
+const crimes = await getTrinidadCrimes();
+
+const title = "Trinidad & Tobago Crime Dashboard — Regional Statistics";
+const description = "Real-time Trinidad crime statistics on our interactive map. View Port of Spain data and regional safety trends. Check the live dashboard now.";
+---
+
+<Layout title={title} description={description}>
+  <!-- Background image and SVG styles -->
+  <style>
+    /* Desktop only: Show faded background image */
+    @media (min-width: 768px) {
+      body {
+        background-image:
+          linear-gradient(to bottom,
+            rgba(241, 245, 249, 0.7) 0%,
+            rgba(241, 245, 249, 0.85) 15%,
+            #f1f5f9 30%
+          ),
+          url('/assets/images/trinidad-page-bg.png');
+
+        background-repeat: no-repeat;
+        background-position: top center;
+        background-size: 100% auto;
+        background-attachment: fixed;
+      }
+    }
+
+    /* Trinidad SVG Map Styles */
+    .region-path {
+      fill: #e5e7eb;
+      stroke: #9ca3af;
+      stroke-width: 2;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .region-path:hover {
+      fill: #d1d5db;
+      stroke: #6b7280;
+      stroke-width: 2.5;
+    }
+    .region-path.active {
+      fill: #e11d48;
+      stroke: #be123c;
+      stroke-width: 3;
+    }
+    .region-label {
+      fill: #374151;
+      font-size: 12px;
+      font-weight: 700;
+      pointer-events: none;
+      text-anchor: middle;
+    }
+
+    /* Fix map z-index to stay below header */
+    #leafletMap {
+      z-index: 1 !important;
+      position: relative;
+    }
+    .leaflet-pane,
+    .leaflet-map-pane {
+      z-index: 1 !important;
+    }
+    .leaflet-control-container {
+      z-index: 10 !important;
+    }
+
+    /* Horizontal scrolling cards */
+    .stats-scroll-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 1rem;
+      scrollbar-width: thin;
+      scrollbar-color: #e11d48 #f1f5f9;
+      padding-bottom: 0.5rem;
+    }
+    .stats-scroll-container::-webkit-scrollbar {
+      height: 6px;
+    }
+    .stats-scroll-container::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 3px;
+    }
+    .stats-scroll-container::-webkit-scrollbar-thumb {
+      background: #e11d48;
+      border-radius: 3px;
+    }
+    .stat-card {
+      flex: 0 0 auto;
+      min-width: 160px;
+      scroll-snap-align: start;
+    }
+  </style>
+
+  <div class="container mx-auto px-4 py-2 max-w-7xl">
+    <!-- Page Header -->
+    <div class="mb-4">
+      <div class="flex items-start justify-between gap-4 pt-4">
+        <div>
+          <h1 class="text-display font-bold text-slate-700">Trinidad & Tobago</h1>
+          <p class="text-xs text-slate-400 mt-1">Crime Statistics Dashboard</p>
+        </div>
+        <a href="/trinidad/headlines"
+           class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border-1 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap flex-shrink-0">
+          View Headlines
+        </a>
+      </div>
+    </div>
+
+    <!-- Separator -->
+    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-4"></div>
+
+    <!-- Statistics Cards - Horizontal Scroll -->
+    <div class="stats-scroll-container mb-4">
+      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
+        <div class="text-h2 font-bold text-rose-600">{crimes.length}</div>
+        <div class="text-xs text-slate-500">Total Incidents</div>
+      </div>
+
+      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
+        <div class="text-h2 font-bold text-rose-600">{crimes.filter(c => c.crimeType === 'Murder').length}</div>
+        <div class="text-xs text-slate-500">Murders</div>
+      </div>
+
+      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
+        <div class="text-h2 font-bold text-rose-600">{crimes.filter(c => c.crimeType === 'Robbery').length}</div>
+        <div class="text-xs text-slate-500">Robberies</div>
+      </div>
+
+      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
+        <div class="text-h2 font-bold text-rose-600">{crimes.filter(c => c.crimeType === 'Home Invasion').length}</div>
+        <div class="text-xs text-slate-500">Home Invasions</div>
+      </div>
+
+      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
+        <div class="text-h2 font-bold text-rose-600">{crimes.filter(c => c.crimeType === 'Theft').length}</div>
+        <div class="text-xs text-slate-500">Thefts</div>
+      </div>
+    </div>
+
+    <!-- Separator -->
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-4"></div>
+
+    <!-- Leaflet Map -->
+    <div class="mb-6">
+      <div class="flex items-center gap-4">
+        <h2 class="text-h2 font-bold text-slate-700 pt-4 px-4 mb-4">Crime Incidents Map</h2>
+        <div class="relative group cursor-pointer">
+          <svg class="w-5 h-5 text-slate-400" cursor-pointer hover:text-slate-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+
+          <div class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-64 p-3 bg-white/70 backdrop-blur-md border border-slate-200 rounded-lg shadow-lg text-sm text-slate-500 opacity-0 invisible group-hover:opacity-100 group-hover:visible z-20 transition-all duration-300">
+            <p class="font-semibold mb-1">Understanding the Map</p>
+            <p class="mb-2">This map shows estimated/reported locations of crimes in and are updated daily.</p>
+            <p class="font-semibold mb-1">How to Use:</p>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li>Click clusters to zoom in</li>
+              <li>Click markers for incident details</li>
+              <li>Use two fingers to pan map</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="relative">
+        <div id="leafletMap" class="w-full h-150 rounded-lg"></div>
+        <!-- Pan instruction overlay (shown on single finger touch) -->
+      <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="z-index: 1000;">
+        <div class="bg-white/70 backdrop-blur-md rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
+          <p class="text-small font-semibold text-slate-600">Use two fingers to move map</p>
+          <p class="text-tiny text-slate-600 mt-1">One finger scrolls the page</p>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Crime Type Breakdown -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
+        <h3 class="text-h3 font-bold text-slate-700 mb-4">Crime Types</h3>
+        <div class="space-y-2">
+          {Array.from(
+            crimes.reduce((acc, crime) => {
+              const type = crime.crimeType || 'Unknown';
+              acc.set(type, (acc.get(type) || 0) + 1);
+              return acc;
+            }, new Map())
+          )
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10)
+            .map(([type, count]) => (
+              <div class="flex justify-between items-center pb-2 border-b border-slate-200 last:border-0">
+                <span class="text-xs text-slate-500">{type}</span>
+                <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
+                  {count}
+                </span>
+              </div>
+            ))}
+        </div>
+      </div>
+
+      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
+        <h3 class="text-h3 font-bold text-slate-700 mb-4">Top Regions</h3>
+        <div class="space-y-2">
+          {Array.from(
+            crimes.reduce((acc, crime) => {
+              const region = crime.region || 'Unknown';
+              acc.set(region, (acc.get(region) || 0) + 1);
+              return acc;
+            }, new Map())
+          )
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10)
+            .map(([region, count]) => (
+              <div class="flex justify-between items-center pb-2 border-b border-slate-200 last:border-0">
+                <span class="text-xs text-slate-500">{region}</span>
+                <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
+                  {count}
+                </span>
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <div>
+            <h3 class="font-semibold text-slate-600 mb-2">Real-Time Data</h3>
+            <p class="text-xs text-slate-400">Dashboard updates daily with the latest crime incidents from verified sources.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+          <div>
+            <h3 class="font-semibold text-slate-600 mb-2">Regional Filtering</h3>
+            <p class="text-xs text-slate-400">Click any region on the map to filter the dashboard and view area-specific crime data.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
+        <div class="flex items-start gap-3">
+          <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          <div>
+            <h3 class="font-semibold text-slate-600 mb-2">Mobile Optimized</h3>
+            <p class="text-xs text-slate-400">Fully responsive dashboard works seamlessly on all devices and screen sizes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Initialize Map -->
+  <script define:vars={{ crimes }}>
+    // Wait for DOM and Leaflet to load
+    window.addEventListener('DOMContentLoaded', () => {
+      
+      // Load Leaflet scripts
+      const leafletScript = document.createElement('script');
+      leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      leafletScript.onload = () => {
+        const clusterScript = document.createElement('script');
+        clusterScript.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
+        clusterScript.onload = initMap;
+        document.head.appendChild(clusterScript);
+      };
+      document.head.appendChild(leafletScript);
+    });
+
+    function initMap() {
+      // Initialize map centered on Trinidad
+      const map = L.map('leafletMap', {
+        dragging: true,
+        scrollWheelZoom: false
+      }).setView([10.634963, -61.197207],9);
+
+      // *** CRITICAL FIX: Force Leaflet to recalculate size ***
+      // This resolves the "map in pieces" or "gray tiles" issue.
+      map.invalidateSize();
+
+      // Two-finger scroll/zoom implementation
+      const mapDiv = document.getElementById('leafletMap');
+      const hint = document.getElementById('mapZoomHintTrinidad');
+      let touchCount = 0;
+      let touchStartPos = null;
+      let hintTimeout = null;
+
+      mapDiv.addEventListener('touchstart', (e) => {
+        touchCount = e.touches.length;
+        touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+
+        if (touchCount === 2) {
+          map.dragging.enable();
+          map.scrollWheelZoom.enable();
+        } else if (touchCount === 1) {
+          map.dragging.disable();
+          map.scrollWheelZoom.disable();
+        }
+      }, { passive: true });
+
+      mapDiv.addEventListener('touchmove', (e) => {
+        if (touchCount === 1 && touchStartPos) {
+          const distance = Math.sqrt(
+            Math.pow(e.touches[0].clientX - touchStartPos.x, 2) +
+            Math.pow(e.touches[0].clientY - touchStartPos.y, 2)
+          );
+
+          if (distance > 10) {
+            hint.style.opacity = '1';
+            hint.style.pointerEvents = 'none';
+
+            clearTimeout(hintTimeout);
+            hintTimeout = setTimeout(() => {
+              hint.style.opacity = '0';
+            }, 2000);
+          }
+        }
+      }, { passive: true });
+
+      mapDiv.addEventListener('touchend', () => {
+        touchCount = 0;
+        map.dragging.enable();
+      }, { passive: true });
+
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 18
+      }).addTo(map);
+
+      // Create marker cluster group
+      const markers = L.markerClusterGroup({
+        chunkedLoading: true,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        maxClusterRadius: 50,
+        iconCreateFunction: function(cluster) {
+          const count = cluster.getChildCount();
+          let size = 'small';
+          if (count > 50) size = 'large';
+          else if (count > 10) size = 'medium';
+
+          return L.divIcon({
+            html: `<div class="cluster-${size}">${count}</div>`,
+            className: 'custom-cluster-icon',
+            iconSize: L.point(40, 40)
+          });
+        } 
+      });
+
+      // Custom marker icons by crime type
+      const getCrimeIcon = (crimeType) => {
+        const colors = {
+          'Murder': '#e11d48',
+          'Shooting': '#dc2626',
+          'Robbery': '#f97316',
+          'Home Invasion': '#9333ea',
+          'Theft': '#06b6d4',
+          'Kidnapping': '#ec4899',
+          'Sexual Assault': '#c026d3',
+          'Assault': '#8b5cf6',
+          'Seizures': '#3b82f6',
+          'Burglary': '#eab308'
+        };
+
+        const color = colors[crimeType] || '#64748b';
+
+        return L.divIcon({
+          html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+          className: 'custom-crime-marker',
+          iconSize: [12, 12],
+          iconAnchor: [6, 6],
+          popupAnchor: [0, -6]
+        });
+      };
+
+      // Add crime markers
+      crimes.forEach(crime => {
+        // 1. Validate that the crime object has valid coordinates
+        // We check if crime.latitude and crime.longitude exist and are finite numbers.
+        const latitude = Number(crime.latitude);
+        const longitude = Number(crime.longitude);
+
+        if (isNaN(latitude) || isNaN(longitude) || !isFinite(latitude) || !isFinite(longitude)) {
+            // Optional: Log a message for incidents being skipped due to missing data
+            // console.warn(`Skipping crime incident ${crime.slug} due to invalid coordinates: ${crime.latitude}, ${crime.longitude}`);
+            return; // Skip this iteration if coordinates are invalid or missing
+        }
+
+        // 2. Use the actual coordinates from the crime object with custom icon
+        const marker = L.marker([latitude, longitude], {
+          icon: getCrimeIcon(crime.crimeType)
+        });
+
+        marker.bindPopup(`
+          <div class="p-2">
+            <div class="text-xs text-slate-500 mb-2">${crime.date}</div>
+            <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
+            <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
+            <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
+            <div class="text-xs text-rose-600">${crime.area}</div>
+            <a href="/trinidad/crime/${crime.slug}" class="text-tiny text-rose-600 hover:underline mt-4 inline-block">View Details →</a>
+          </div>
+        `);
+        markers.addLayer(marker);
+      });
+
+      map.addLayer(markers);
+    }
+  </script>
+</Layout>

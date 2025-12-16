@@ -1,0 +1,327 @@
+---
+/**
+ * Trinidad & Tobago Headlines Page
+ * Shows all crime headlines with filters (Area, Crime Type, Date)
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import CrimeCard from '../../components/CrimeCard.astro';
+import { getTrinidadCrimes, type Crime } from '../../lib/crimeData';
+
+// Fetch all crimes (server-side)
+const allCrimes = await getTrinidadCrimes();
+
+// Get unique areas and crime types for filters
+const areas = [...new Set(allCrimes.map(c => c.area).filter(Boolean))].sort();
+const crimeTypes = [...new Set(allCrimes.map(c => c.crimeType).filter(Boolean))].sort();
+
+// SEO
+const title = "Trinidad & Tobago Crime Headlines 2025 — Latest Reports";
+const description = "Trinidad crime headlines updated every 2 hours. Filter the latest incidents (Murder, Robbery, etc.) by area, sourced from Guardian, Express, and Newsday.";
+
+// Breadcrumbs
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard' },
+  { label: 'Headlines' }
+];
+---
+
+<Layout title={title} description={description}>
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+    <!-- Breadcrumbs -->
+    <Breadcrumbs items={breadcrumbs} />
+
+    <!-- Page Header -->
+    <div class="mb-4">
+      <h1 class="text-h1 font-bold text-slate-700 mb-2">
+        Trinidad Crime Headlines:
+      </h1>
+    </div>
+
+    <!-- Mobile Filter Toggle Button -->
+    <div class="mb-4 md:hidden">
+      <button
+        id="filterToggle"
+        class="w-full px-4 py-2.5 bg-white/50 text-rose-600 rounded-lg hover:bg-rose-700 transition font-medium text-xs flex items-center justify-between"
+      >
+        <span>Filters</span>
+        <svg id="filterToggleIcon" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Filters Container -->
+    <div id="filtersContainer" class="bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 mb-6 hidden md:block">
+      <div class="flex flex-col md:flex-row md:flex-wrap md:items-end gap-3">
+        <!-- Date Range -->
+        <div class="flex-1 min-w-[140px]">
+          <label for="dateFrom" class="block text-xs font-medium text-slate-600 mb-1">
+            From:
+          </label>
+          <input
+            type="date"
+            id="dateFrom"
+            class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
+          />
+        </div>
+
+        <div class="flex-1 min-w-[140px]">
+          <label for="dateTo" class="block text-xs font-medium text-slate-600 mb-1">
+            To:
+          </label>
+          <input
+            type="date"
+            id="dateTo"
+            class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
+          />
+        </div>
+
+        <!-- Crime Type -->
+        <div class="flex-1 min-w-[160px]">
+          <label for="crimeType" class="block text-xs font-medium text-slate-600 mb-1">
+            Crime Type
+          </label>
+          <select
+            id="crimeType"
+            class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
+          >
+            <option value="">All Types</option>
+            {crimeTypes.map(type => (
+              <option value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+
+        <!-- Area -->
+        <div class="flex-1 min-w-[160px]">
+          <label for="area" class="block text-xs font-medium text-slate-600 mb-1">
+            Area
+          </label>
+          <select
+            id="area"
+            class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
+          >
+            <option value="">All Areas</option>
+            {areas.map(area => (
+              <option value={area}>{area}</option>
+            ))}
+          </select>
+        </div>
+
+        <!-- Clear Filters -->
+        <button
+          id="clearFilters"
+          class="px-4 py-1.5 text-xs text-rose-600 hover:text-rose-700 font-medium border-2 border-rose-600 rounded-lg hover:bg-rose-50 transition"
+        >
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- Results Count -->
+      <div class="mt-3 text-xs text-slate-500">
+        Showing <span id="resultsCount">{allCrimes.length}</span> of {allCrimes.length} crimes
+      </div>
+    </div>
+
+    <!-- Crime Cards Grid -->
+    <div id="crimeGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {allCrimes.slice(0, 30).map(crime => (
+        <CrimeCard
+          crime={{
+            date: crime.date,
+            crimeType: crime.crimeType,
+            location: crime.headline,
+            area: crime.area,
+            source: crime.url,
+            slug: crime.slug
+          }}
+        />
+      ))}
+    </div>
+
+    <!-- Load More -->
+    <div class="mt-8 text-center">
+      <button
+        id="loadMore"
+        class="px-6 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium text-xs"
+      >
+        Load More
+      </button>
+    </div>
+  </main>
+
+  <!-- Client-side filtering script -->
+  <script define:vars={{ allCrimes }}>
+    let currentPage = 1;
+    const perPage = 30;
+    let filteredCrimes = [...allCrimes];
+
+    // Filter function
+    function applyFilters() {
+      const dateFrom = document.getElementById('dateFrom').value;
+      const dateTo = document.getElementById('dateTo').value;
+      const crimeType = document.getElementById('crimeType').value;
+      const area = document.getElementById('area').value;
+
+      filteredCrimes = allCrimes.filter(crime => {
+        const crimeDate = new Date(crime.date);
+
+        // Date filters
+        if (dateFrom && crimeDate < new Date(dateFrom)) return false;
+        if (dateTo && crimeDate > new Date(dateTo)) return false;
+
+        // Crime type filter
+        if (crimeType && crime.crimeType !== crimeType) return false;
+
+        // Area filter
+        if (area && crime.area !== area) return false;
+
+        return true;
+      });
+
+      // Reset to page 1
+      currentPage = 1;
+      renderCrimes();
+      updateResultsCount();
+    }
+
+    // Render crimes
+    function renderCrimes() {
+      const grid = document.getElementById('crimeGrid');
+      const crimes = filteredCrimes.slice(0, currentPage * perPage);
+
+      grid.innerHTML = crimes.map(crime => `
+        <article class="bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 hover:shadow-lg transition cursor-pointer group" onclick="window.location.href='/trinidad/crime/${crime.slug}'">
+          <div class="flex items-start justify-between mb-3">
+            <span class="inline-block px-3 py-1 rounded-full text-white text-xs font-medium" style="background-color: ${getCrimeColorHex(crime.crimeType)}">
+              ${crime.crimeType}
+            </span>
+            <span class="text-xs text-slate-400">
+              ${formatDate(crime.date)}
+            </span>
+          </div>
+
+          <h3 class="text-small font-semibold text-slate-700 mb-2">
+            ${crime.headline}
+          </h3>
+
+          <p class="text-xs text-slate-500 mb-3 flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            ${crime.area}
+          </p>
+
+          <div class="flex items-center justify-between pt-3 border-t border-slate-200">
+            <a href="/trinidad/crime/${crime.slug}" class="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1">
+              View Details
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+
+            <a href="${crime.url}" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1" title="Read original article">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              Source
+            </a>
+          </div>
+        </article>
+      `).join('');
+
+      // Show/hide load more button
+      const loadMore = document.getElementById('loadMore');
+      if (crimes.length >= filteredCrimes.length) {
+        loadMore.style.display = 'none';
+      } else {
+        loadMore.style.display = 'block';
+      }
+    }
+
+    // Update results count
+    function updateResultsCount() {
+      document.getElementById('resultsCount').textContent = filteredCrimes.length;
+    }
+
+    // Helper: Get crime color (hex for inline styles)
+    function getCrimeColorHex(type) {
+      const colors = {
+        'Murder': '#e11d48',      // rose-600
+        'Shooting': '#dc2626',    // red-600
+        'Robbery': '#f97316',     // orange-500
+        'Burglary': '#eab308',    // yellow-500
+        'Theft': '#06b6d4',       // cyan-500
+        'Home Invasion': '#9333ea', // purple-600
+        'Kidnapping': '#ec4899',  // pink-600
+        'Sexual Assault': '#c026d3', // fuchsia-600
+        'Assault': '#8b5cf6',     // violet-500
+        'Seizures': '#3b82f6'     // blue-500
+      };
+      return colors[type] || '#64748b'; // slate-500
+    }
+
+    // Helper: Format date
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+
+    // Filter toggle for mobile
+    const filterToggle = document.getElementById('filterToggle');
+    const filtersContainer = document.getElementById('filtersContainer');
+    const filterToggleIcon = document.getElementById('filterToggleIcon');
+
+    if (filterToggle) {
+      filterToggle.addEventListener('click', () => {
+        const isHidden = filtersContainer.classList.contains('hidden');
+
+        if (isHidden) {
+          filtersContainer.classList.remove('hidden');
+          filterToggleIcon.style.transform = 'rotate(180deg)';
+        } else {
+          filtersContainer.classList.add('hidden');
+          filterToggleIcon.style.transform = 'rotate(0deg)';
+        }
+      });
+    }
+
+    // Event listeners
+    document.getElementById('dateFrom').addEventListener('change', applyFilters);
+    document.getElementById('dateTo').addEventListener('change', applyFilters);
+    document.getElementById('crimeType').addEventListener('change', applyFilters);
+    document.getElementById('area').addEventListener('change', applyFilters);
+
+    document.getElementById('clearFilters').addEventListener('click', () => {
+      document.getElementById('dateFrom').value = '';
+      document.getElementById('dateTo').value = '';
+      document.getElementById('crimeType').value = '';
+      document.getElementById('area').value = '';
+      applyFilters();
+    });
+
+    document.getElementById('loadMore').addEventListener('click', () => {
+      currentPage++;
+      renderCrimes();
+    });
+
+    // Set default date range (last 30 days)
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+
+    document.getElementById('dateFrom').value = thirtyDaysAgo.toISOString().split('T')[0];
+    document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+
+    // Apply default filters
+    applyFilters();
+  </script>
+</Layout>

@@ -1,0 +1,136 @@
+---
+/**
+ * Blog Index Page
+ * Displays all blog posts with country filtering
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog');
+const sortedPosts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const title = "Crime Statistics Blog — Weekly Crime Reports & Analysis | Crime Hotspots Caribbean";
+const description = "Read in-depth Caribbean crime analysis and weekly reports. We uncover emerging crime trends in Trinidad and Guyana. Browse our latest data insights.";
+
+function formatDate(date: Date) {
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(date).toLocaleDateString('en-US', options);
+}
+---
+
+<Layout title={title} description={description}>
+  <main class="container mx-auto px-4 py-8 sm:py-12 max-w-6xl">
+    <div class="mb-8 sm:mb-12">
+      <h1 class="text-display font-bold text-slate-900 mb-4">Crime Statistics Blog</h1>
+      <p class="text-xs text-slate-600">Weekly data-driven analysis of crime trends across the Caribbean</p>
+    </div>
+
+    <!-- Country Filter -->
+    <div class="mb-6 sm:mb-8 flex flex-wrap gap-3">
+      <button id="filter-all" class="px-4 py-1 min-h-[22px] rounded-lg bg-rose-600 text-white font-medium hover:bg-rose-700 transition text-xs">
+        All Countries
+      </button>
+      <button id="filter-tt" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition text-xs">
+        Trinidad & Tobago
+      </button>
+      <button id="filter-gy" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition text-xs">
+        Guyana
+      </button>
+    </div>
+
+    <!-- Blog Posts Grid -->
+    <div id="blog-posts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+      {sortedPosts.map((post) => (
+        <article
+          class="blog-post bg-white/70 backdrop-blur-md rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all border border-slate-100"
+          data-country={post.data.country}
+        >
+          <a href={`/blog/${post.slug}`} class="block">
+            <img src={post.data.image} alt={post.data.countryName} class="w-full h-32 md:h-48 object-cover">
+            <div class="p-3 md:p-6">
+              <div class="flex items-center gap-1 md:gap-2 mb-2 md:mb-3 flex-wrap">
+                <span class="text-xs font-semibold px-2 py-1 rounded-full bg-rose-50 text-rose-600">
+                  {post.data.countryName}
+                </span>
+                <span class="text-xs text-slate-500">{formatDate(post.data.date)}</span>
+              </div>
+              <h2 class="text-small md:text-h3 font-bold text-slate-900 mb-1 md:mb-2 hover:text-rose-600 transition line-clamp-2">
+                {post.data.title}
+              </h2>
+              <p class="text-tiny md:text-small text-slate-500 mb-2 md:mb-4 line-clamp-2 md:line-clamp-3 hidden md:block">
+                {post.data.excerpt}
+              </p>
+              <div class="flex items-center justify-between text-tiny md:text-xs text-slate-500">
+                <span class="hidden md:inline">{post.data.author}</span>
+                <span>{post.data.readTime}</span>
+              </div>
+            </div>
+          </a>
+        </article>
+      ))}
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden col-span-full text-center py-12">
+      <p class="text-slate-600 text-body">No blog posts found for this filter.</p>
+    </div>
+  </main>
+
+  <!-- Filter Script -->
+  <script is:inline>
+    let currentFilter = 'all';
+
+    function filterPosts() {
+      const posts = document.querySelectorAll('.blog-post');
+      const emptyState = document.getElementById('empty-state');
+      let visibleCount = 0;
+
+      posts.forEach(post => {
+        const country = post.getAttribute('data-country');
+        if (currentFilter === 'all' || country === currentFilter) {
+          post.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          post.classList.add('hidden');
+        }
+      });
+
+      if (visibleCount === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+    }
+
+    function updateFilterButtons(activeId) {
+      ['filter-all', 'filter-tt', 'filter-gy'].forEach(id => {
+        const button = document.getElementById(id);
+        if (id === activeId) {
+          button.classList.remove('border-2', 'border-slate-300', 'text-slate-700', 'hover:bg-slate-50');
+          button.classList.add('bg-rose-600', 'text-white', 'hover:bg-rose-700');
+        } else {
+          button.classList.remove('bg-rose-600', 'text-white', 'hover:bg-rose-700');
+          button.classList.add('border-2', 'border-slate-300', 'text-slate-700', 'hover:bg-slate-50');
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const filterButtons = {
+        'filter-all': 'all',
+        'filter-tt': 'tt',
+        'filter-gy': 'gy'
+      };
+
+      Object.entries(filterButtons).forEach(([buttonId, filter]) => {
+        const button = document.getElementById(buttonId);
+        button.addEventListener('click', () => {
+          currentFilter = filter;
+          updateFilterButtons(buttonId);
+          filterPosts();
+        });
+      });
+    });
+  </script>
+</Layout>

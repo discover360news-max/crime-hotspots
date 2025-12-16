@@ -1,0 +1,84 @@
+---
+/**
+ * About Page
+ * Information about Crime Hotspots mission and methodology
+ */
+
+import Layout from '../layouts/Layout.astro';
+
+const title = "About Crime Hotspots — Caribbean Crime Data Transparency & Methodology";
+const description = "Learn about Crime Hotspots Caribbean and our rigorous data methodology. We provide verified crime statistics to empower communities. Read our mission.";
+---
+
+<Layout title={title} description={description}>
+  <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-12 text-slate-700">
+    <h1 class="text-h1 font-semibold mb-3 text-center">About Crime Hotspots</h1>
+    <div class="bg-white/50 backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 leading-relaxed">
+      <h2 class="text-h2 font-semibold mb-3 text-slate-700">Our Mission</h2>
+      <p class="text-xs text-slate-500 mb-6">
+        <strong>Crime Hotspots</strong> is a regional initiative designed to
+        create greater awareness and provide accessible, data-driven insights
+        into serious crimes across the Caribbean. Our goal is to help
+        communities, journalists, and policymakers better understand crime
+        patterns through verified reporting and transparent data aggregation.
+      </p>
+
+      <h2 class="text-h2 font-semibold mb-3 text-slate-700">How We Collect Data</h2>
+      <p class="text-xs text-slate-500 mb-6">
+        All statistics presented on this platform are compiled from verified
+        media reports, police statements, and open-source data. Each incident
+        is <strong>cross-referenced with reputable news sources</strong> before
+        inclusion to maintain accuracy and credibility.
+      </p>
+      <p class="text-xs text-slate-500 mb-6">
+        Location markers shown on maps represent estimated positions based on
+        available information. While the
+        <strong>Area and Street Address</strong> fields reflect accurate data
+        from verified reports, map coordinates may be approximate and are not
+        intended for investigative use.
+      </p>
+
+      <h2 class="text-h2 font-semibold mb-3 text-slate-700">Data Sources</h2>
+      <p class="text-xs text-slate-500 mb-6">
+        Our crime data is currrently sourced from:
+      </p>
+      <ul class="list-disc list-inside text-xs text-slate-500 mb-6 space-y-1">
+        <li>Trinidad Express</li>
+        <li>Guardian TT</li>
+        <li>Newsday</li>
+        <li>CNC3</li>
+        <li>Community social media sources (Ian Alleyne Network, DJ Sherrif)</li>
+      </ul>
+
+      <h2 class="text-h2 font-semibold mb-3 text-slate-700">Transparency and Accuracy</h2>
+      <p class="text-xs text-slate-500 mb-6">
+        We use <strong>Google Gemini AI</strong> to extract structured data
+        from unstructured news articles, ensuring consistency and speed across
+        thousands of reports. All high-severity incidents undergo mandatory
+        human oversight before publication to ensure accuracy.
+      </p>
+      <p class="text-xs text-slate-500 mb-6">
+        Every entry on our platform is explicitly linked back to its original
+        source article, allowing users to verify the context and details
+        immediately.
+      </p>
+
+      <h2 class="text-h2 font-semibold mb-3 text-slate-700">Privacy and Ethics</h2>
+      <p class="text-xs text-slate-500 mb-6">
+        We adhere to strict ethical standards. Our platform focuses on crime
+        statistics and trends. We do not solicit or publish private, unverified
+        information. We only reflect details that have already been made public
+        by the originating news source, maintaining data fidelity to the public
+        record.
+      </p>
+
+      <h2 class="text-h2 font-semibold mb-3 text-slate-700">Contact Us</h2>
+      <p class="text-xs text-slate-500">
+        For inquiries, partnerships, or data requests, please contact us at{' '}
+        <a href="mailto:discover360news@gmail.com" class="text-rose-600 hover:text-rose-700 underline">
+          discover360news@gmail.com
+        </a>
+      </p>
+    </div>
+  </main>
+</Layout>

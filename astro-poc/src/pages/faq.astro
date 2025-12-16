@@ -1,0 +1,175 @@
+---
+/**
+ * FAQ Page
+ * Frequently Asked Questions with Schema.org FAQPage markup
+ */
+
+import Layout from '../layouts/Layout.astro';
+
+const title = "FAQ — Crime Hotspots Caribbean | Frequently Asked Questions";
+const description = "Answers to frequently asked questions about Crime Hotspots Caribbean. Learn about our data sources, update frequency, platform usage, and privacy policies.";
+
+// FAQ data for Schema.org and rendering
+const faqData = [
+  {
+    category: "Data Accuracy and Sources",
+    questions: [
+      {
+        question: "Where does Crime Hotspots get its crime data?",
+        answer: "Our crime data is sourced exclusively from public reports by established media outlets like the Trinidad Express, Guardian TT, Newsday, Stabroek News, and Kaieteur News. For Trinidad, we also monitor specific high-traffic community social media feeds. This ensures we provide real-time crime statistics reflecting the public record."
+      },
+      {
+        question: "How often is the crime map updated for any island??",
+        answer: "We are committed to providing the freshest data possible. Our automated systems check Guyana crime reports hourly and Trinidad crime data every two hours. High-severity incidents undergo immediate human validation. This near real-time crime data ensures you're viewing the latest available public safety information."
+      },
+      {
+        question: "Is your data based on official police statistics?",
+        answer: "No. We aggregate incidents as they are reported by the media, not official police records. This means our figures reflect media coverage and public awareness, not necessarily the official, verified crime counts. We recommend cross-referencing our crime trends with government statistics for formal research."
+      },
+      {
+        question: "Do you use AI to analyze the crime reports?",
+        answer: "Yes, we utilize Google Gemini AI to extract structured data (Crime Type, Date, Location) from unstructured news articles. This AI-driven extraction ensures consistency and speed across thousands of reports. All high-severity incidents are subject to mandatory human oversight before publication to ensure accuracy."
+      }
+    ]
+  },
+  {
+    category: "How to Use the Platform",
+    questions: [
+      {
+        question: "How can I find the crime rate for my specific area or town?",
+        answer: "Use the interactive crime map on the Dashboard page. You can filter by Crime Type (e.g., Murder, Robbery) and select your specific town or area in the Caribbean from the drop-down menu. The map aggregates incidents, helping you visualize local crime hotspots."
+      },
+      {
+        question: "Can I filter the data by specific dates or crime types?",
+        answer: "Yes. All crime dashboards offer advanced filtering tools. You can narrow down the data to view specific periods, such as the last 30 days, or focus on a single category, such as vehicle theft statistics."
+      },
+      {
+        question: "How do I read the crime map?",
+        answer: "The map uses incident markers placed at the generalized location of the reported crime. Clusters of markers indicate a crime hotspot. Tap on any marker to view the source article and all structured details, including the Crime Type and the date of the incident."
+      }
+    ]
+  },
+  {
+    category: "Coverage and Limitations",
+    questions: [
+      {
+        question: "What regions in the Caribbean do you cover?",
+        answer: "We aim for comprehensive national coverage, tracking incidents reported by major media outlets across all islands. However, our data density naturally favors metropolitan areas due to higher media reporting in those zones."
+      },
+      {
+        question: "What are the main limitations of your crime data?",
+        answer: "Our key limitation is that we only reflect media-reported crimes. We do not account for unreported crimes or incidents that receive no press coverage, especially in remote rural areas. Our data represents media visibility, which may contain geographic biases."
+      },
+      {
+        question: "Why are exact street addresses often not shown on the map?",
+        answer: "While our source reports often contain exact addresses, we generalize the location to the nearest street junction or area name to maintain focus on community-wide trends rather than specific residences. This also helps balance data specificity with safety considerations."
+      },
+      {
+        question: "Why do some locations on your map have names different from the local name?",
+        answer: "We prioritize geographic accuracy for researchers and official bodies. Our location data is extracted and validated against government and official mapping standards, ensuring the names used correspond to recognized administrative or municipal boundaries. This means a locally known neighborhood name may be mapped under the broader, official name of the area that it geographically falls into. We use these precise definitions to provide accurate regional crime statistics to our policy users."
+      }
+    ]
+  },
+  {
+    category: "Privacy and Reporting",
+    questions: [
+      {
+        question: "Does Crime Hotspots protect privacy?",
+        answer: "Yes, we adhere to strict ethical standards. Our platform focuses on crime statistics and trends. We do not solicit or publish private, unverified information. We only reflect details that have already been made public by the originating news source, maintaining data fidelity to the public record."
+      },
+      {
+        question: "Do you offer a way to report crime or submit a tip?",
+        answer: "Yes. We provide a secure crime tip line form on our platform where you can report crime anonymously. This information is used to support local community awareness and is managed with confidentiality."
+      }
+    ]
+  }
+];
+
+// Flatten questions for Schema.org
+const allQuestions = faqData.flatMap(category => category.questions);
+---
+
+<Layout title={title} description={description}>
+  <!-- FAQPage Schema.org markup -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": allQuestions.map(q => ({
+      "@type": "Question",
+      "name": q.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": q.answer
+      }
+    }))
+  })} />
+
+  <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-12">
+    <h1 class="text-h1 text-slate-700 font-semibold mb-3 text-center">Frequently Asked Questions</h1>
+    <p class="text-xs text-slate-400 mb-8 text-center">Common questions about Crime Hotspots, our data sources, and how to use the platform.</p>
+
+    <div class="bg-white/70 backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100">
+      {faqData.map((category) => (
+        <div class="mb-8 last:mb-0">
+          <h2 class="text-h2 font-semibold mb-4 text-slate-600">{category.category}</h2>
+          <div class="space-y-3">
+            {category.questions.map((item, index) => (
+              <div class="border border-slate-200 rounded-lg overflow-hidden">
+                <button
+                  class="faq-question w-full text-left px-4 py-3 flex justify-between items-start gap-3 hover:bg-rose-50 transition-colors"
+                  aria-expanded="false"
+                  data-faq-id={`${category.category}-${index}`}
+                >
+                  <span class="text-sm font-medium text-slate-500 
+                  flex-1">{item.question}</span>
+                  <span class="flex-shrink-0">
+                    <svg class="faq-icon w-4 h-4 text-rose-600 transform 
+                  transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 
+                  24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4v16m8-8H4"/>
+                    </svg>
+                  </span>
+                </button>
+                <div class="faq-answer hidden px-4 pb-4 text-xs text-slate-400">
+                  {item.answer}
+                  {item.question.includes("report crime") && (
+                    <span>
+                      {' '}<a href="/report" class="text-rose-600 hover:text-rose-700 font-medium underline">Submit a report here</a>.
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </main>
+
+  <!-- FAQ Accordion Script -->
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      const questions = document.querySelectorAll('.faq-question');
+
+      questions.forEach(question => {
+        question.addEventListener('click', function() {
+          const answer = this.nextElementSibling;
+          const icon = this.querySelector('.faq-icon');
+          const isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+          // Toggle answer visibility
+          if (isExpanded) {
+            answer.classList.add('hidden');
+            icon.style.transform = 'rotate(0deg)';
+            this.setAttribute('aria-expanded', 'false');
+          } else {
+            answer.classList.remove('hidden');
+            icon.style.transform = 'rotate(45deg)';
+            this.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+    });
+  </script>
+</Layout>
