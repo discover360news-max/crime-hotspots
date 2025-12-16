@@ -2,6 +2,7 @@
 
 **Date:** December 16, 2025
 **Status:** ✅ Security Parity Achieved
+**Turnstile Status:** ✅ WORKING (anti-debugging protection active)
 
 ---
 
@@ -184,6 +185,17 @@ function getValidatedLocalStorage(key, validator) {
 
 **Server-side verification** handled by Google Apps Script endpoint.
 
+**IMPORTANT - Turnstile Anti-Debugging Protection:**
+Cloudflare Turnstile includes anti-debugging features that prevent it from working when browser DevTools is open. This is expected security behavior and NOT a bug.
+
+**Symptoms when DevTools is open:**
+- Error 600010 appears in console
+- Widget may show but fail on interaction
+- "Turnstile loading timed out" warnings
+- Challenge platform preload warnings
+
+**Solution:** Close DevTools completely to test Turnstile functionality. The widget works perfectly in normal browsing mode.
+
 ---
 
 ## Network Security
@@ -318,6 +330,7 @@ function getValidatedLocalStorage(key, validator) {
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3 | Dec 16, 2025 | ✅ RESOLVED: Turnstile working correctly. Error 600010 was caused by anti-debugging protection (DevTools open). Added documentation about expected behavior. Moved Turnstile script to Layout.astro head for consistent loading. |
 | 1.2 | Dec 16, 2025 | REVERTED: Back to meta tag CSP for Turnstile compatibility. HTTP header CSP caused error 600010 with Private Access Token feature. Meta tag approach proven to work in Vite version. |
 | 1.1 | Dec 16, 2025 | ~~Moved CSP to HTTP headers~~ (reverted in v1.2) |
 | 1.0 | Dec 16, 2025 | Initial security audit, full parity achieved |
