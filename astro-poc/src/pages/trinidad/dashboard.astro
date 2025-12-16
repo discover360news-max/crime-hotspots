@@ -280,130 +280,145 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     </div>
   </div>
 
+  <!-- Trend Calculations (Independent of Map) -->
+  <script define:vars={{ crimes }}>
+    console.log('🔍 Trend script loaded, crimes count:', crimes.length);
+
+    function subtractDays(date, days) {
+      const result = new Date(date);
+      result.setDate(result.getDate() - days);
+      return result;
+    }
+
+    function calculatePercentage(current, previous) {
+      if (previous === 0) return current > 0 ? 100 : 0;
+      return Math.round(((current - previous) / previous) * 100);
+    }
+
+    function calculateTrends(allCrimes, filteredCrimes) {
+      const currentCount = filteredCrimes.length;
+
+      // Get date range of current filtered data
+      if (currentCount === 0) {
+        console.log('⚠️ No crimes in filtered data');
+        return { insufficient: true };
+      }
+
+      const dates = filteredCrimes.map(c => c.dateObj || new Date(c.date)).sort((a, b) => a - b);
+      const currentStart = dates[0];
+      const currentEnd = dates[dates.length - 1];
+
+      console.log('📅 Date range:', currentStart.toISOString().split('T')[0], 'to', currentEnd.toISOString().split('T')[0]);
+
+      // Last week comparison (7 days before current period)
+      const weekAgoStart = subtractDays(currentStart, 7);
+      const weekAgoEnd = subtractDays(currentEnd, 7);
+      const lastWeekCrimes = allCrimes.filter(c => {
+        const date = c.dateObj || new Date(c.date);
+        return date >= weekAgoStart && date <= weekAgoEnd;
+      });
+
+      // Last month comparison (30 days before current period)
+      const monthAgoStart = subtractDays(currentStart, 30);
+      const monthAgoEnd = subtractDays(currentEnd, 30);
+      const lastMonthCrimes = allCrimes.filter(c => {
+        const date = c.dateObj || new Date(c.date);
+        return date >= monthAgoStart && date <= monthAgoEnd;
+      });
+
+      console.log('📊 Comparison data:', {
+        current: currentCount,
+        lastWeek: lastWeekCrimes.length,
+        lastMonth: lastMonthCrimes.length
+      });
+
+      return {
+        vsLastWeek: {
+          change: currentCount - lastWeekCrimes.length,
+          percentage: calculatePercentage(currentCount, lastWeekCrimes.length),
+          direction: currentCount > lastWeekCrimes.length ? 'up' : currentCount < lastWeekCrimes.length ? 'down' : 'neutral',
+          insufficient: lastWeekCrimes.length === 0
+        },
+        vsLastMonth: {
+          change: currentCount - lastMonthCrimes.length,
+          percentage: calculatePercentage(currentCount, lastMonthCrimes.length),
+          direction: currentCount > lastMonthCrimes.length ? 'up' : currentCount < lastMonthCrimes.length ? 'down' : 'neutral',
+          insufficient: lastMonthCrimes.length === 0
+        }
+      };
+    }
+
+    function displayTrends(trends, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) {
+        console.error('❌ Container not found:', containerId);
+        return;
+      }
+
+      console.log('✅ Container found, displaying trends');
+
+      if (trends.insufficient) {
+        container.innerHTML = `<span class="text-xs text-slate-400 italic">Insufficient data</span>`;
+        return;
+      }
+
+      let html = '';
+
+      // Last week trend
+      if (!trends.vsLastWeek.insufficient) {
+        const weekColor = trends.vsLastWeek.direction === 'up' ? 'text-red-600' : trends.vsLastWeek.direction === 'down' ? 'text-emerald-600' : 'text-slate-500';
+        const weekArrowRotation = trends.vsLastWeek.direction === 'up' ? 'rotate-0' : 'rotate-180';
+        const weekArrowColor = trends.vsLastWeek.direction === 'up' ? 'text-red-500' : trends.vsLastWeek.direction === 'down' ? 'text-emerald-500' : 'text-slate-400';
+
+        html += `
+          <div class="flex items-center gap-1.5 text-xs">
+            <svg class="w-3 h-3 ${weekArrowColor} ${weekArrowRotation}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+            <span class="${weekColor} font-medium">
+              ${Math.abs(trends.vsLastWeek.percentage)}%
+            </span>
+            <span class="text-slate-400">vs last week</span>
+          </div>
+        `;
+      }
+
+      // Last month trend
+      if (!trends.vsLastMonth.insufficient) {
+        const monthColor = trends.vsLastMonth.direction === 'up' ? 'text-red-600' : trends.vsLastMonth.direction === 'down' ? 'text-emerald-600' : 'text-slate-500';
+        const monthArrowRotation = trends.vsLastMonth.direction === 'up' ? 'rotate-0' : 'rotate-180';
+        const monthArrowColor = trends.vsLastMonth.direction === 'up' ? 'text-red-500' : trends.vsLastMonth.direction === 'down' ? 'text-emerald-500' : 'text-slate-400';
+
+        html += `
+          <div class="flex items-center gap-1.5 text-xs">
+            <svg class="w-3 h-3 ${monthArrowColor} ${monthArrowRotation}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+            <span class="${monthColor} font-medium">
+              ${Math.abs(trends.vsLastMonth.percentage)}%
+            </span>
+            <span class="text-slate-400">vs last month</span>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+      console.log('✅ Trends displayed successfully');
+    }
+
+    // Run immediately when script loads
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🚀 DOM loaded, calculating trends...');
+      const initialTrends = calculateTrends(crimes, crimes);
+      console.log('📊 Trend Calculation Result:', initialTrends);
+      displayTrends(initialTrends, 'totalIncidentsTrends');
+    });
+  </script>
+
   <!-- Initialize Map -->
   <script define:vars={{ crimes }}>
     // Wait for DOM and Leaflet to load
     window.addEventListener('DOMContentLoaded', () => {
-
-      // ==========================================
-      // Trend Calculation Functions
-      // ==========================================
-
-      function subtractDays(date, days) {
-        const result = new Date(date);
-        result.setDate(result.getDate() - days);
-        return result;
-      }
-
-      function calculatePercentage(current, previous) {
-        if (previous === 0) return current > 0 ? 100 : 0;
-        return Math.round(((current - previous) / previous) * 100);
-      }
-
-      function calculateTrends(allCrimes, filteredCrimes) {
-        const currentCount = filteredCrimes.length;
-
-        // Get date range of current filtered data
-        if (currentCount === 0) {
-          return { insufficient: true };
-        }
-
-        const dates = filteredCrimes.map(c => c.dateObj || new Date(c.date)).sort((a, b) => a - b);
-        const currentStart = dates[0];
-        const currentEnd = dates[dates.length - 1];
-
-        // Last week comparison (7 days before current period)
-        const weekAgoStart = subtractDays(currentStart, 7);
-        const weekAgoEnd = subtractDays(currentEnd, 7);
-        const lastWeekCrimes = allCrimes.filter(c => {
-          const date = c.dateObj || new Date(c.date);
-          return date >= weekAgoStart && date <= weekAgoEnd;
-        });
-
-        // Last month comparison (30 days before current period)
-        const monthAgoStart = subtractDays(currentStart, 30);
-        const monthAgoEnd = subtractDays(currentEnd, 30);
-        const lastMonthCrimes = allCrimes.filter(c => {
-          const date = c.dateObj || new Date(c.date);
-          return date >= monthAgoStart && date <= monthAgoEnd;
-        });
-
-        return {
-          vsLastWeek: {
-            change: currentCount - lastWeekCrimes.length,
-            percentage: calculatePercentage(currentCount, lastWeekCrimes.length),
-            direction: currentCount > lastWeekCrimes.length ? 'up' : currentCount < lastWeekCrimes.length ? 'down' : 'neutral',
-            insufficient: lastWeekCrimes.length === 0
-          },
-          vsLastMonth: {
-            change: currentCount - lastMonthCrimes.length,
-            percentage: calculatePercentage(currentCount, lastMonthCrimes.length),
-            direction: currentCount > lastMonthCrimes.length ? 'up' : currentCount < lastMonthCrimes.length ? 'down' : 'neutral',
-            insufficient: lastMonthCrimes.length === 0
-          }
-        };
-      }
-
-      function displayTrends(trends, containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        if (trends.insufficient) {
-          container.innerHTML = `<span class="text-xs text-slate-400 italic">Insufficient data</span>`;
-          return;
-        }
-
-        let html = '';
-
-        // Last week trend
-        if (!trends.vsLastWeek.insufficient) {
-          const weekColor = trends.vsLastWeek.direction === 'up' ? 'text-red-600' : trends.vsLastWeek.direction === 'down' ? 'text-emerald-600' : 'text-slate-500';
-          const weekArrowRotation = trends.vsLastWeek.direction === 'up' ? 'rotate-0' : 'rotate-180';
-          const weekArrowColor = trends.vsLastWeek.direction === 'up' ? 'text-red-500' : trends.vsLastWeek.direction === 'down' ? 'text-emerald-500' : 'text-slate-400';
-
-          html += `
-            <div class="flex items-center gap-1.5 text-xs">
-              <svg class="w-3 h-3 ${weekArrowColor} ${weekArrowRotation}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-              <span class="${weekColor} font-medium">
-                ${Math.abs(trends.vsLastWeek.percentage)}%
-              </span>
-              <span class="text-slate-400">vs last week</span>
-            </div>
-          `;
-        }
-
-        // Last month trend
-        if (!trends.vsLastMonth.insufficient) {
-          const monthColor = trends.vsLastMonth.direction === 'up' ? 'text-red-600' : trends.vsLastMonth.direction === 'down' ? 'text-emerald-600' : 'text-slate-500';
-          const monthArrowRotation = trends.vsLastMonth.direction === 'up' ? 'rotate-0' : 'rotate-180';
-          const monthArrowColor = trends.vsLastMonth.direction === 'up' ? 'text-red-500' : trends.vsLastMonth.direction === 'down' ? 'text-emerald-500' : 'text-slate-400';
-
-          html += `
-            <div class="flex items-center gap-1.5 text-xs">
-              <svg class="w-3 h-3 ${monthArrowColor} ${monthArrowRotation}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-              <span class="${monthColor} font-medium">
-                ${Math.abs(trends.vsLastMonth.percentage)}%
-              </span>
-              <span class="text-slate-400">vs last month</span>
-            </div>
-          `;
-        }
-
-        container.innerHTML = html;
-      }
-
-      // Calculate and display initial trends (all data)
-      const initialTrends = calculateTrends(crimes, crimes);
-      console.log('📊 Trend Calculation:', initialTrends);
-      displayTrends(initialTrends, 'totalIncidentsTrends');
-
-      // ==========================================
-      // End Trend Calculation
-      // ==========================================
 
       // Load Leaflet scripts
       const leafletScript = document.createElement('script');
