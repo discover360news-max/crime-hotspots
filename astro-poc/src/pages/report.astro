@@ -15,6 +15,9 @@ const description = "Help build safer communities: report crime anonymously via 
   <!-- Cloudflare Turnstile Script -->
   <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
+  <!-- PapaParse for reliable CSV parsing -->
+  <script is:inline src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
   <main class="flex-1 w-full max-w-2xl mx-auto p-6">
     <Breadcrumbs items={[
       { label: 'Home', href: '/' },
@@ -111,7 +114,11 @@ const description = "Help build safer communities: report crime anonymously via 
         </div>
       </div>
 
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ" data-theme="light"></div>
+      <div class="cf-turnstile"
+           data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ"
+           data-theme="light"
+           data-callback="onTurnstileSuccess"
+           data-error-callback="onTurnstileError"></div>
       <div class="flex items-center justify-between mt-4">
         <div class="text-xs text-slate-500">
           You'll receive a unique anonymous report ID.
@@ -231,50 +238,46 @@ const description = "Help build safer communities: report crime anonymously via 
         return;
       }
 
-      try {
-        const response = await fetch(csvUrl);
-        const csvText = await response.text();
-
-        // Simple CSV parsing (assumes first row is headers, Area column exists)
-        const lines = csvText.split('\n');
-        const headers = lines[0].split(',');
-        // Match EXACTLY "Area" column, not "Plus Code Area" or other variations
-        const areaIndex = headers.findIndex(h => h.trim().toLowerCase() === 'area');
-
-        if (areaIndex === -1) {
-          areaSelect.innerHTML = `<option>No area data available</option>`;
-          return;
-        }
-
-        const areas = lines.slice(1)
-          .map(line => {
-            const cols = line.split(',');
-            return cols[areaIndex]?.replace(/"/g, '').trim();
-          })
-          .filter(area => area && area.length > 0)
-          .filter((value, index, self) => self.indexOf(value) === index) // Deduplicate
-          .sort((a, b) => a.localeCompare(b));
-
-        areaSelect.innerHTML = `<option value="">Select Area (Optional)</option>`;
-        areas.forEach((area) => {
-          const option = document.createElement("option");
-          option.value = area;
-          option.textContent = area;
-          areaSelect.appendChild(option);
-        });
-
-        areaSelect.disabled = false;
-
-        const savedArea = getValidatedLocalStorage("ccw_selected_area", (val) => {
-          return /^[a-zA-Z0-9\s\-,]+$/.test(val) && val.length < 100 && areas.includes(val);
-        });
-        if (savedArea) {
-          areaSelect.value = savedArea;
-        }
-      } catch (err) {
-        console.error("Area loading error:", err);
-        areaSelect.innerHTML = `<option>Error loading areas</option>`;
+      // Use PapaParse for reliable CSV parsing (same as Vite version)
+      if (!(window as any).Papa) {
+        areaSelect.innerHTML = `<option>CSV parser not loaded</option>`;
+        return;
       }
+
+      (window as any).Papa.parse(csvUrl, {
+        download: true,
+        header: true,
+        complete: function (results: any) {
+          const areaNames = results.data
+            .map((r: any) => r.Area)
+            .filter((area: string) => area && area.trim().length > 0)
+            .map(cleanAreaName)
+            // Deduplicate and sort
+            .filter((value: string, index: number, self: string[]) => self.indexOf(value) === index)
+            .sort((a: string, b: string) => a.localeCompare(b));
+
+          areaSelect.innerHTML = `<option value="">Select Area (Optional)</option>`;
+          areaNames.forEach((area: string) => {
+            const option = document.createElement("option");
+            option.value = area;
+            option.textContent = area;
+            areaSelect.appendChild(option);
+          });
+
+          areaSelect.disabled = false;
+
+          const savedArea = getValidatedLocalStorage("ccw_selected_area", (val) => {
+            return /^[a-zA-Z0-9\s\-,]+$/.test(val) && val.length < 100 && areaNames.includes(val);
+          });
+          if (savedArea) {
+            areaSelect.value = savedArea;
+          }
+        },
+        error: (err: any) => {
+          console.error("Area CSV parse error:", err);
+          areaSelect.innerHTML = `<option>Error loading areas</option>`;
+        }
+      });
     }
 
     // --- Validation ---
@@ -524,6 +527,24 @@ const description = "Help build safer communities: report crime anonymously via 
       }
     }
 
+    // --- Turnstile Callbacks ---
+    // Make these global so Turnstile can call them
+    (window as any).onTurnstileSuccess = function(token: string) {
+      console.log('Turnstile loaded successfully');
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit";
+    };
+
+    (window as any).onTurnstileError = function() {
+      console.error('Turnstile failed to load');
+      // Still allow submission in case of Turnstile failure
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit";
+      resultBox.classList.remove("hidden");
+      resultBox.classList.add('bg-yellow-50', 'border-yellow-200', 'text-yellow-700');
+      resultBox.textContent = "⚠️ Security check failed to load. You can still submit, but it may take longer to process.";
+    };
+
     // --- Initialize ---
     document.addEventListener("DOMContentLoaded", () => {
       // Initialize honeypot tracking
@@ -534,25 +555,14 @@ const description = "Help build safer communities: report crime anonymously via 
       submitBtn.disabled = true;
       submitBtn.textContent = "Loading security check...";
 
-      // Wait for Turnstile to load (max 10 seconds)
-      let checkCount = 0;
-      const checkInterval = setInterval(() => {
-        checkCount++;
-        const turnstileResponse = document.querySelector('input[name="cf-turnstile-response"]') as HTMLInputElement;
-
-        if (turnstileResponse && turnstileResponse.value) {
-          // Turnstile is ready
+      // Fallback timeout (20 seconds) in case callbacks never fire
+      setTimeout(() => {
+        if (submitBtn.disabled) {
+          console.warn('Turnstile timeout - enabling button anyway');
           submitBtn.disabled = false;
           submitBtn.textContent = "Submit";
-          clearInterval(checkInterval);
-        } else if (checkCount > 50) {
-          // Timeout after 10 seconds (50 * 200ms)
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Submit";
-          clearInterval(checkInterval);
-          console.warn('Turnstile loading timed out');
         }
-      }, 200);
+      }, 20000);
 
       // Track focus on honeypot field
       if (hp) {
