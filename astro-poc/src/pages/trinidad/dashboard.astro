@@ -80,8 +80,8 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       scroll-snap-type: x mandatory;
       gap: 1rem;
       scrollbar-width: thin;
-      scrollbar-color: #e11d48 #f1f5f9;
-      padding-bottom: 0.5rem;
+      scrollbar-color: #989092ff #f1f5f9;
+      padding-bottom: 1rem;
     }
     .stats-scroll-container::-webkit-scrollbar {
       height: 6px;
@@ -281,19 +281,26 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       const leafletScript = document.createElement('script');
       leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
       leafletScript.onload = () => {
-        const clusterScript = document.createElement('script');
-        clusterScript.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
-        clusterScript.onload = initMap;
-        document.head.appendChild(clusterScript);
+        // Load fullscreen plugin first
+        const fullscreenScript = document.createElement('script');
+        fullscreenScript.src = 'https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.1/Control.FullScreen.js';
+        fullscreenScript.onload = () => {
+          // Then load marker cluster
+          const clusterScript = document.createElement('script');
+          clusterScript.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
+          clusterScript.onload = initMap;
+          document.head.appendChild(clusterScript);
+        };
+        document.head.appendChild(fullscreenScript);
       };
-      document.head.appendChild(leafletScript);
-    });
+      document.head.appendChild(leafletScript); // CRITICAL: Actually load Leaflet!
 
-    function initMap() {
+      function initMap() {
       // Initialize map centered on Trinidad
       const map = L.map('leafletMap', {
         dragging: true,
-        scrollWheelZoom: false
+        scrollWheelZoom: false,
+        fullscreenControl: true
       }).setView([10.634963, -61.197207],9);
 
       // *** CRITICAL FIX: Force Leaflet to recalculate size ***
@@ -430,6 +437,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       });
 
       map.addLayer(markers);
-    }
+      }
+    });
   </script>
 </Layout>

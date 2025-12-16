@@ -1,0 +1,582 @@
+---
+/**
+ * Anonymous Crime Reporting Form
+ * Cloudflare Turnstile CAPTCHA + honeypot anti-bot protection
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+const title = "Report a Crime Anonymously — Crime Hotspots Caribbean";
+const description = "Help build safer communities: report crime anonymously via our secure platform. Use our reliable crime tip line for the Caribbean. Submit a report now.";
+---
+
+<Layout title={title} description={description}>
+  <!-- Cloudflare Turnstile Script -->
+  <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+  <main class="flex-1 w-full max-w-2xl mx-auto p-6">
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: 'Report a Crime' }
+    ]} />
+
+    <h1 class="text-h1 font-semibold mb-3 text-center text-slate-700">Report a Crime (Anonymously)</h1>
+    <p class="text-xs text-slate-600 mb-4 text-center">
+      Your report is anonymous. Please provide as much detail as possible to help us identify trends and verify reports.
+    </p>
+
+    <form id="reportForm" class="space-y-4 bg-white/50 backdrop-blur-md p-6 rounded-2xl shadow-lg border border-slate-100">
+      <!-- Honeypot -->
+      <input type="text" id="hp_field" name="hp_field" autocomplete="off" style="display:none !important" aria-hidden="true" />
+
+      <!-- Incident Details Section -->
+      <div class="space-y-4 pb-4 border-b border-slate-200">
+        <h3 class="text-small font-semibold text-slate-600 uppercase tracking-wide">Incident Details</h3>
+
+        <div>
+          <label for="reportDate" class="text-xs font-semibold text-slate-500 block mb-2">
+            Date of Incident <span class="text-rose-600">*</span>
+          </label>
+          <input id="reportDate" name="reportDate" type="date" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-700" required />
+        </div>
+
+        <div>
+          <label for="reportCrimeType" class="text-xs font-semibold text-slate-500 block mb-2">
+            Crime Type <span class="text-rose-600">*</span>
+          </label>
+          <select id="reportCrimeType" name="reportCrimeType" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-700" required>
+            <option value="">Select a crime</option>
+            <option>Assault</option>
+            <option>Burglary</option>
+            <option>Home Invasion</option>
+            <option>Kidnapping</option>
+            <option>Murder</option>
+            <option>Robbery</option>
+            <option>Shooting</option>
+            <option>Seizures</option>
+            <option>Theft</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Location Section -->
+      <div class="space-y-4 pb-4 border-b border-slate-200">
+        <h3 class="text-small font-semibold text-slate-600 uppercase tracking-wide">Location</h3>
+
+        <div>
+          <label for="reportCountry" class="text-xs font-semibold text-slate-500 block mb-2">
+            Country / Island <span class="text-rose-600">*</span>
+          </label>
+          <select id="reportCountry" name="reportCountry" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-700" required>
+            <option value="">Select a country</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="reportArea" class="text-xs font-semibold text-slate-500 block mb-2">
+            Area <span class="text-xs font-normal text-slate-500">(optional)</span>
+          </label>
+          <select id="reportArea" name="reportArea" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-500">
+            <option value="">Select area (optional)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="reportStreet" class="text-xs font-semibold text-slate-500 block mb-2">
+            Street / Location <span class="text-xs font-normal text-slate-500">(optional)</span>
+          </label>
+          <input id="reportStreet" name="reportStreet" type="text" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-500" placeholder="e.g., Main Street near the plaza" />
+        </div>
+      </div>
+
+      <!-- Description Section -->
+      <div class="space-y-4">
+        <h3 class="text-small font-semibold text-slate-600 uppercase tracking-wide">Description</h3>
+
+        <div>
+          <label for="reportHeadline" class="text-xs font-semibold text-slate-500 block mb-2">
+            Headline <span class="text-rose-600">*</span>
+            <span class="text-xs font-normal text-slate-500">(120 chars max)</span>
+          </label>
+          <input id="reportHeadline" name="reportHeadline" maxlength="120" type="text" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-500" placeholder="Brief summary of the incident" required />
+        </div>
+
+        <div>
+          <label for="reportDetails" class="text-xs font-semibold text-slate-500 block mb-2">
+            Details <span class="text-rose-600">*</span>
+          </label>
+          <textarea id="reportDetails" name="reportDetails" rows="4" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-500" placeholder="Provide as much detail as possible to help us verify the report" required></textarea>
+        </div>
+      </div>
+
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ" data-theme="light"></div>
+      <div class="flex items-center justify-between mt-4">
+        <div class="text-xs text-slate-500">
+          You'll receive a unique anonymous report ID.
+        </div>
+        <button
+          id="reportSubmit"
+          type="submit"
+          class="px-6 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium text-xs"
+        >
+          Submit
+        </button>
+      </div>
+    </form>
+
+    <!-- Confirmation Screen -->
+    <div
+      id="reportSuccess"
+      class="hidden fixed inset-0 bg-white/70 backdrop-blur-md flex flex-col items-center justify-center z-50 text-center p-8 transition-all duration-700"
+    >
+      <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-lg p-8 max-w-sm w-full border border-slate-200">
+        <h2 class="text-h2 font-semibold text-slate-800 mb-2">Thank You</h2>
+        <p class="text-small text-slate-600 mb-4">
+          Your report has been submitted anonymously. Please keep this ID for your reference.
+        </p>
+
+        <div class="bg-rose-50 text-rose-700 font-mono text-h2 font-medium py-3 px-6 rounded-full mb-4 select-all shadow-sm" id="reportIdDisplay">
+          ID-XXXX-XXXX
+        </div>
+
+        <button
+          id="copyIdBtn"
+          class="px-6 py-2.5 mb-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium text-small"
+        >
+          Copy ID
+        </button>
+
+        <div class="flex justify-center gap-3">
+          <a href="/report" class="px-6 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium text-small">Submit Another</a>
+          <a href="/" class="px-6 py-2.5 border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium text-small">Home</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback -->
+    <div id="reportResult" class="hidden mt-6 text-center p-4 rounded-xl bg-rose-50 text-rose-700 font-medium shadow-sm text-small"></div>
+  </main>
+
+  <!-- Client-side form logic -->
+  <script>
+    import { COUNTRIES, APPS_SCRIPT_URL } from '../data/countries';
+
+    const countrySelect = document.getElementById("reportCountry") as HTMLSelectElement;
+    const areaSelect = document.getElementById("reportArea") as HTMLSelectElement;
+    const form = document.getElementById("reportForm") as HTMLFormElement;
+    const resultBox = document.getElementById("reportResult") as HTMLDivElement;
+    const submitBtn = document.getElementById("reportSubmit") as HTMLButtonElement;
+    const hp = document.getElementById("hp_field") as HTMLInputElement;
+
+    // --- Utility Functions ---
+    function generateId(prefix = "REP") {
+      const n = new Date();
+      const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+      return `${prefix}-${n.getFullYear()}${String(n.getMonth() + 1).padStart(2, "0")}${String(n.getDate()).padStart(2, "0")}-${rand}`;
+    }
+
+    function cleanAreaName(str: string) {
+      return str.trim();
+    }
+
+    function getValidatedLocalStorage(key: string, validator?: (val: string) => boolean) {
+      try {
+        const value = localStorage.getItem(key);
+        if (!value) return null;
+
+        const clean = value.trim();
+
+        if (/<script|javascript:|data:|vbscript:/i.test(clean)) {
+          console.warn(`Blocked suspicious localStorage value for ${key}`);
+          localStorage.removeItem(key);
+          return null;
+        }
+
+        if (validator && !validator(clean)) {
+          console.warn(`Invalid localStorage value for ${key}`);
+          localStorage.removeItem(key);
+          return null;
+        }
+
+        return clean;
+      } catch (e) {
+        console.error('localStorage access error:', e);
+        return null;
+      }
+    }
+
+    // --- Data Loading ---
+    function loadCountries() {
+      countrySelect.innerHTML = `<option value="">Select a Country</option>`;
+      COUNTRIES.filter(c => c.available).forEach((country) => {
+        const option = document.createElement("option");
+        option.value = country.id;
+        option.textContent = country.name;
+        countrySelect.appendChild(option);
+      });
+    }
+
+    async function loadAreas(country: any) {
+      areaSelect.disabled = true;
+      areaSelect.innerHTML = `<option>Loading Areas...</option>`;
+
+      const csvUrl = country?.csvUrl;
+
+      if (!csvUrl) {
+        areaSelect.innerHTML = `<option>N/A (No area data for ${country.name})</option>`;
+        areaSelect.value = "N/A";
+        areaSelect.disabled = true;
+        return;
+      }
+
+      try {
+        const response = await fetch(csvUrl);
+        const csvText = await response.text();
+
+        // Simple CSV parsing (assumes first row is headers, Area column exists)
+        const lines = csvText.split('\n');
+        const headers = lines[0].split(',');
+        const areaIndex = headers.findIndex(h => h.toLowerCase().includes('area'));
+
+        if (areaIndex === -1) {
+          areaSelect.innerHTML = `<option>No area data available</option>`;
+          return;
+        }
+
+        const areas = lines.slice(1)
+          .map(line => {
+            const cols = line.split(',');
+            return cols[areaIndex]?.replace(/"/g, '').trim();
+          })
+          .filter(area => area && area.length > 0)
+          .filter((value, index, self) => self.indexOf(value) === index) // Deduplicate
+          .sort((a, b) => a.localeCompare(b));
+
+        areaSelect.innerHTML = `<option value="">Select Area (Optional)</option>`;
+        areas.forEach((area) => {
+          const option = document.createElement("option");
+          option.value = area;
+          option.textContent = area;
+          areaSelect.appendChild(option);
+        });
+
+        areaSelect.disabled = false;
+
+        const savedArea = getValidatedLocalStorage("ccw_selected_area", (val) => {
+          return /^[a-zA-Z0-9\s\-,]+$/.test(val) && val.length < 100 && areas.includes(val);
+        });
+        if (savedArea) {
+          areaSelect.value = savedArea;
+        }
+      } catch (err) {
+        console.error("Area loading error:", err);
+        areaSelect.innerHTML = `<option>Error loading areas</option>`;
+      }
+    }
+
+    // --- Validation ---
+    function validateHoneypot() {
+      if (hp && hp.value) {
+        console.warn('Honeypot: field filled');
+        return false;
+      }
+
+      const wasFocused = hp && hp.dataset.focused === 'true';
+      if (wasFocused) {
+        console.warn('Honeypot: field focused');
+        return false;
+      }
+
+      const formLoadTime = parseInt(sessionStorage.getItem('formLoadTime') || '0');
+      const timeDelta = Date.now() - formLoadTime;
+      if (timeDelta < 2000) {
+        console.warn('Honeypot: too fast submission');
+        return false;
+      }
+
+      const mouseMovements = parseInt(sessionStorage.getItem('mouseMovements') || '0');
+      if (mouseMovements < 3) {
+        console.warn('Honeypot: insufficient mouse activity');
+        return false;
+      }
+
+      return true;
+    }
+
+    // --- Rate Limiter ---
+    class RateLimiter {
+      maxRequests: number;
+      windowMs: number;
+      requests: number[];
+
+      constructor(maxRequests: number, windowMs: number) {
+        this.maxRequests = maxRequests;
+        this.windowMs = windowMs;
+        this.requests = [];
+      }
+
+      canMakeRequest() {
+        const now = Date.now();
+        this.requests = this.requests.filter(time => now - time < this.windowMs);
+
+        if (this.requests.length >= this.maxRequests) {
+          return false;
+        }
+
+        this.requests.push(now);
+        return true;
+      }
+
+      getTimeUntilNextRequest() {
+        if (this.requests.length === 0) return 0;
+        const now = Date.now();
+        const oldestRequest = this.requests[0];
+        return Math.max(0, this.windowMs - (now - oldestRequest));
+      }
+    }
+
+    const submitLimiter = new RateLimiter(3, 3600000); // 3 per hour
+
+    function validateForm(formData: FormData) {
+      const errors: string[] = [];
+
+      // Date validation
+      const dateStr = formData.get('reportDate') as string;
+      const date = new Date(dateStr);
+      const today = new Date();
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+      if (isNaN(date.getTime())) {
+        errors.push('Invalid date format');
+      } else if (date > today) {
+        errors.push('Date cannot be in the future');
+      } else if (date < oneYearAgo) {
+        errors.push('Please report incidents from the past year only');
+      }
+
+      // Headline validation
+      const headline = formData.get('reportHeadline') as string;
+      if (!headline || headline.trim().length < 10) {
+        errors.push('Headline must be at least 10 characters');
+      }
+      if (headline && headline.length > 120) {
+        errors.push('Headline must be under 120 characters');
+      }
+      if (headline && /<script|javascript:|data:|vbscript:/i.test(headline)) {
+        errors.push('Headline contains invalid characters');
+      }
+
+      // Details validation
+      const details = formData.get('reportDetails') as string;
+      if (!details || details.trim().length < 20) {
+        errors.push('Please provide at least 20 characters of details');
+      }
+      if (details && details.length > 5000) {
+        errors.push('Details must be under 5000 characters');
+      }
+
+      // Country validation
+      const countryId = formData.get('reportCountry') as string;
+      if (!countryId || !COUNTRIES.some(c => c.id === countryId)) {
+        errors.push('Invalid country selection');
+      }
+
+      // Crime type validation
+      const validCrimes = ['Assault', 'Burglary', 'Home Invasion', 'Kidnapping', 'Murder', 'Robbery', 'Shooting', 'Theft', 'Other'];
+      const crimeType = formData.get('reportCrimeType') as string;
+      if (!crimeType || !validCrimes.includes(crimeType)) {
+        errors.push('Invalid crime type');
+      }
+
+      return errors;
+    }
+
+    // --- Form Submission ---
+    async function handleSubmit(e: Event) {
+      e.preventDefault();
+
+      // Rate limiting check
+      if (!submitLimiter.canMakeRequest()) {
+        const waitTime = Math.ceil(submitLimiter.getTimeUntilNextRequest() / 60000);
+        resultBox.classList.remove("hidden");
+        resultBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-700');
+        resultBox.textContent = `⏱️ Rate limit exceeded. Please wait ${waitTime} minute(s) before submitting again.`;
+        return;
+      }
+
+      // Honeypot validation
+      if (!validateHoneypot()) {
+        console.warn('Bot detected by honeypot');
+        return;
+      }
+
+      // Form validation
+      const formData = new FormData(form);
+      const validationErrors = validateForm(formData);
+
+      if (validationErrors.length > 0) {
+        resultBox.classList.remove("hidden");
+        resultBox.classList.add('bg-rose-50', 'border-rose-200');
+        resultBox.innerHTML = '<p class="font-semibold mb-2 text-rose-700">Please fix the following errors:</p>' +
+          validationErrors.map(err => `<p class="text-rose-700">• ${err}</p>`).join('');
+        return;
+      }
+
+      // Get Turnstile token
+      const token = formData.get('cf-turnstile-response');
+
+      if (!token) {
+        resultBox.classList.remove("hidden");
+        resultBox.textContent = "❌ Security check failed. Please refresh the page.";
+        return;
+      }
+
+      const countryId = countrySelect.value;
+      const country = COUNTRIES.find((c) => c.id === countryId);
+
+      const payload = {
+        id: generateId(countryId.toUpperCase()),
+        countryId,
+        countryName: country?.name || "Unknown",
+        date: (document.getElementById('reportDate') as HTMLInputElement).value,
+        crimeType: (document.getElementById('reportCrimeType') as HTMLSelectElement).value,
+        area: (document.getElementById('reportArea') as HTMLSelectElement).value,
+        street: (document.getElementById('reportStreet') as HTMLInputElement).value,
+        headline: (document.getElementById('reportHeadline') as HTMLInputElement).value,
+        details: (document.getElementById('reportDetails') as HTMLTextAreaElement).value,
+        ua: navigator.userAgent,
+        "cf-token": token
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Submitting…";
+      resultBox.classList.add("hidden");
+
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          const idDisplay = document.getElementById("reportIdDisplay")!;
+          const successScreen = document.getElementById("reportSuccess")!;
+          const copyBtn = document.getElementById("copyIdBtn")!;
+
+          idDisplay.textContent = payload.id;
+          successScreen.classList.remove("hidden");
+          successScreen.classList.add("opacity-0");
+          setTimeout(() => {
+            successScreen.classList.remove("opacity-0");
+            successScreen.classList.add("opacity-100");
+          }, 50);
+
+          copyBtn.addEventListener("click", async () => {
+            try {
+              await navigator.clipboard.writeText(payload.id);
+              copyBtn.textContent = "✓ Copied!";
+              setTimeout(() => (copyBtn.textContent = "Copy ID"), 2000);
+            } catch (err) {
+              console.warn('Clipboard API failed:', err);
+              copyBtn.textContent = "❌ Copy failed";
+            }
+          });
+
+          form.classList.add("hidden");
+          resultBox.classList.add("hidden");
+
+        } else {
+          resultBox.classList.remove("hidden");
+          resultBox.textContent = `❌ Submission failed. ${data.message || "Please try again."}`;
+        }
+
+      } catch (err) {
+        resultBox.classList.remove("hidden");
+        resultBox.textContent = "❌ Submission failed. Please try again.";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Submit";
+        try {
+          if ((window as any).turnstile && typeof (window as any).turnstile.reset === 'function') {
+            (window as any).turnstile.reset();
+          }
+        } catch (error) {
+          console.error('Turnstile reset failed:', error);
+        }
+      }
+    }
+
+    // --- Initialize ---
+    document.addEventListener("DOMContentLoaded", () => {
+      // Initialize honeypot tracking
+      sessionStorage.setItem('formLoadTime', Date.now().toString());
+      sessionStorage.setItem('mouseMovements', '0');
+
+      // Track focus on honeypot field
+      if (hp) {
+        hp.addEventListener('focus', function() {
+          this.dataset.focused = 'true';
+        });
+      }
+
+      // Track mouse movements
+      let moveCount = 0;
+      document.addEventListener('mousemove', () => {
+        moveCount++;
+        sessionStorage.setItem('mouseMovements', moveCount.toString());
+      });
+
+      // Populate countries
+      loadCountries();
+
+      // Initially disable area dropdown
+      areaSelect.disabled = true;
+      areaSelect.innerHTML = `<option>Select a country first</option>`;
+
+      // Auto-memory: check if last country is saved
+      const savedCountryId = getValidatedLocalStorage("ccw_selected_country", (val) => {
+        return COUNTRIES.some(c => c.id === val);
+      });
+      if (savedCountryId) {
+        const country = COUNTRIES.find((c) => c.id === savedCountryId);
+        if (country) {
+          countrySelect.value = savedCountryId;
+          loadAreas(country);
+        }
+      }
+
+      // Country change event
+      countrySelect.addEventListener("change", (e) => {
+        const selectedId = (e.target as HTMLSelectElement).value;
+
+        localStorage.setItem("ccw_selected_country", selectedId);
+
+        if (!selectedId) {
+          areaSelect.disabled = true;
+          areaSelect.innerHTML = `<option>Select a country first</option>`;
+          return;
+        }
+
+        const country = COUNTRIES.find((c) => c.id === selectedId);
+        loadAreas(country);
+      });
+
+      // Save area selection
+      areaSelect.addEventListener("change", (e) => {
+        const selectedArea = (e.target as HTMLSelectElement).value;
+        if (selectedArea) {
+          localStorage.setItem("ccw_selected_area", selectedArea);
+        }
+      });
+
+      // Form submission
+      form.addEventListener("submit", handleSubmit);
+    });
+  </script>
+</Layout>
