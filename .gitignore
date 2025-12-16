@@ -32,3 +32,5 @@ yarn-error.log*
 
 # Google Sheets API credentials (NEVER commit)
 google-credentials.json
+**/crime-hotspots-local-tools-*.json
+local-fb-extractor-files/*.json
