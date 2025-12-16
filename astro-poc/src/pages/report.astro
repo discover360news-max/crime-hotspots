@@ -116,9 +116,7 @@ const description = "Help build safer communities: report crime anonymously via 
 
       <div class="cf-turnstile"
            data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ"
-           data-theme="light"
-           data-callback="onTurnstileSuccess"
-           data-error-callback="onTurnstileError"></div>
+           data-theme="light"></div>
       <div class="flex items-center justify-between mt-4">
         <div class="text-xs text-slate-500">
           You'll receive a unique anonymous report ID.
@@ -527,42 +525,11 @@ const description = "Help build safer communities: report crime anonymously via 
       }
     }
 
-    // --- Turnstile Callbacks ---
-    // Make these global so Turnstile can call them
-    (window as any).onTurnstileSuccess = function(token: string) {
-      console.log('Turnstile loaded successfully');
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Submit";
-    };
-
-    (window as any).onTurnstileError = function() {
-      console.error('Turnstile failed to load');
-      // Still allow submission in case of Turnstile failure
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Submit";
-      resultBox.classList.remove("hidden");
-      resultBox.classList.add('bg-yellow-50', 'border-yellow-200', 'text-yellow-700');
-      resultBox.textContent = "⚠️ Security check failed to load. You can still submit, but it may take longer to process.";
-    };
-
     // --- Initialize ---
     document.addEventListener("DOMContentLoaded", () => {
       // Initialize honeypot tracking
       sessionStorage.setItem('formLoadTime', Date.now().toString());
       sessionStorage.setItem('mouseMovements', '0');
-
-      // Disable submit button until Turnstile is ready
-      submitBtn.disabled = true;
-      submitBtn.textContent = "Loading security check...";
-
-      // Fallback timeout (20 seconds) in case callbacks never fire
-      setTimeout(() => {
-        if (submitBtn.disabled) {
-          console.warn('Turnstile timeout - enabling button anyway');
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Submit";
-        }
-      }, 20000);
 
       // Track focus on honeypot field
       if (hp) {
