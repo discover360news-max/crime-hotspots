@@ -7,6 +7,7 @@
 
 import Layout from '../../../layouts/Layout.astro';
 import { getTrinidadCrimes, type Crime } from '../../../lib/crimeData';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 
 // This tells Astro to generate a static page for each crime
 export async function getStaticPaths() {
@@ -97,19 +98,11 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
 
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumbs -->
-    <nav aria-label="Breadcrumb" class="mb-6">
-      <ol class="flex items-center gap-2 text-xs text-slate-500">
-        <li><a href="/" class="hover:text-rose-600 transition">Home</a></li>
-        <li>/</li>
-        <li><a href="/trinidad/archive" class="hover:text-rose-600 transition">Trinidad</a></li>
-        <li>/</li>
-        <li><a href={`/trinidad/archive/${crime.year}/${String(crime.month).padStart(2, '0')}`} class="hover:text-rose-600 transition">
-          {crime.year}-{String(crime.month).padStart(2, '0')}
-        </a></li>
-        <li>/</li>
-        <li class="text-rose-600 font-medium truncate max-w-xs">{crime.headline.substring(0, 40)}{crime.headline.length > 40 ? '...' : ''}</li>
-      </ol>
-    </nav>
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: 'TnT Archive', href: '/trinidad/archive' },
+      { label: crime.year }
+    ]} />
 
     <article class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6 sm:p-8">
       <!-- Crime Details -->

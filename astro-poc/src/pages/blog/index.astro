@@ -6,6 +6,7 @@
 
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 
 const allPosts = await getCollection('blog');
 const sortedPosts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -21,6 +22,10 @@ function formatDate(date: Date) {
 
 <Layout title={title} description={description}>
   <main class="container mx-auto px-4 py-8 sm:py-12 max-w-6xl">
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: 'Page Name' }  // Last item has NO href (current page)
+    ]} />
     <div class="mb-8 sm:mb-12">
       <h1 class="text-display font-bold text-slate-900 mb-4">Crime Statistics Blog</h1>
       <p class="text-xs text-slate-600">Weekly data-driven analysis of crime trends across the Caribbean</p>
