@@ -6,9 +6,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Crime Hotspots is a web-based data visualization platform for Caribbean crime statistics. The application displays crime data dashboards, headlines, and provides anonymous crime reporting functionality.
 
-**Current Status:** ✅ Production - Trinidad & Tobago and Guyana live
+**Current Status:** ✅ Production - Trinidad & Tobago LIVE (Astro-powered)
 **Live Site:** https://crimehotspots.com
-**Last Updated:** December 9, 2025
+**Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
+**Focus:** Trinidad-only implementation (Guyana expansion deferred)
+**Last Updated:** December 16, 2025
 
 ---
 ## Kavell Forde - Owner - Guidance
@@ -18,10 +20,11 @@ My thought are just my thought process and is always open to critisism and can b
 ## Tech Stack
 
 **Frontend:**
-- Vanilla JavaScript (ES Modules) with Vite
-- Tailwind CSS (via CDN)
-- PapaParse for CSV parsing
-- DOMPurify for XSS protection
+- **Astro 5.16.5** - Static site generator with file-based routing
+- **Tailwind CSS 4.1.18** - Via Vite plugin (@tailwindcss/vite)
+- **TypeScript** - Type safety for components and content
+- **Astro Content Collections** - Type-safe blog system
+- **Native Fetch API** - Server-side CSV parsing (no PapaParse)
 - Cloudflare Turnstile for CAPTCHA
 - Leaflet.js for interactive maps
 - Leaflet.markercluster for map clustering
@@ -37,60 +40,94 @@ My thought are just my thought process and is always open to critisism and can b
 - Cloudflare Pages (auto-deploy from GitHub)
 - Custom domain: crimehotspots.com
 
+**Legacy (Deprecated):**
+- ~~Vite~~ - Replaced by Astro (December 2025)
+- ~~PapaParse~~ - Replaced by native Fetch API
+- ~~DOMPurify~~ - Astro handles XSS protection
+
 ---
 
 ## Development Commands
 
+**Working Directory:** `astro-poc/`
+
 ```bash
-npm run dev      # Start dev server (port 5173)
+cd astro-poc
+npm run dev      # Start dev server (port 4321, not 5173)
 npm run build    # Build for production
 npm run preview  # Preview production build
 ```
 
-**Deployment:** Push to `main` → GitHub Actions builds → Cloudflare Pages deploys automatically
+**Deployment:**
+- **Manual:** Push to `main` → GitHub Actions builds from `astro-poc/` → Cloudflare Pages deploys automatically
+- **Automatic:** Daily rebuild at 6 AM UTC (2 AM Trinidad time) via GitHub Actions schedule
+- **Manual Trigger:** GitHub Actions UI → "Build and Validate" workflow → "Run workflow" button
+
+**Build Output:** `astro-poc/dist/` (1,300+ static HTML pages)
 
 ---
 
 ## Architecture
 
-### Data-Driven Configuration
+### Astro File-Based Routing
 
-The entire application is driven by **`src/js/data/countries.js`**. To add a new country:
+**All pages are in `astro-poc/src/pages/` with automatic routing:**
 
-1. Add entry to `COUNTRIES` array
-2. The header, country grid, and all UI elements automatically update
+- `index.astro` → `/` (homepage)
+- `trinidad/dashboard.astro` → `/trinidad/dashboard`
+- `trinidad/headlines.astro` → `/trinidad/headlines`
+- `trinidad/crime/[slug].astro` → `/trinidad/crime/murder-port-of-spain-2025-12-15` (1,300+ pages)
+- `trinidad/archive/[year]/[month].astro` → `/trinidad/archive/2025/12`
+- `blog/[slug].astro` → `/blog/trinidad-weekly-2025-11-10`
+
+**No `countries.js` file** - Configuration moved directly into pages.
 
 ### Key Files
 
 ```
-Pages:
-├── index.html                 # Homepage with country cards
-├── dashboard-trinidad.html    # Trinidad custom dashboard (Leaflet map + stats)
-├── dashboard-guyana.html      # Guyana custom dashboard (Leaflet map + stats)
-├── headlines-trinidad-and-tobago.html  # Trinidad crime headlines
-├── headlines-guyana.html      # Guyana crime headlines
-├── blog.html                  # Blog index
-├── blog-post.html             # Individual blog posts (dynamic)
-├── report.html                # Crime reporting form
-└── about.html                 # About page
+astro-poc/
+├── src/
+│   ├── components/           # Reusable Astro components
+│   │   ├── Header.astro      # Navigation with mobile menu + subscribe tray
+│   │   ├── CrimeCard.astro   # Crime card component
+│   │   └── Breadcrumbs.astro # SEO breadcrumb navigation
+│   ├── content/              # Astro Content Collections
+│   │   ├── config.ts         # Blog schema (TypeScript validation)
+│   │   └── blog/             # Markdown blog posts
+│   ├── layouts/              # Base templates
+│   │   └── Layout.astro      # Main layout (SEO, header, footer)
+│   ├── lib/                  # Utilities & data fetching
+│   │   ├── crimeData.ts      # Trinidad CSV fetcher + processors
+│   │   └── crimeColors.ts    # Crime type color mappings
+│   ├── pages/                # File-based routing (auto-generates URLs)
+│   │   ├── index.astro       # Homepage
+│   │   ├── trinidad/
+│   │   │   ├── dashboard.astro      # Dashboard (Leaflet map)
+│   │   │   ├── headlines.astro      # Headlines page
+│   │   │   ├── crime/[slug].astro   # 1,300+ crime pages
+│   │   │   └── archive/             # Monthly archives
+│   │   ├── blog/
+│   │   │   ├── index.astro          # Blog listing
+│   │   │   └── [slug].astro         # Individual posts
+│   │   ├── about.astro
+│   │   ├── faq.astro
+│   │   ├── methodology.astro
+│   │   └── 404.astro
+│   └── styles/               # Global CSS
+│       └── global.css        # Tailwind imports
+├── public/                   # Static assets
+│   ├── assets/
+│   │   ├── images/           # Country cards, backgrounds
+│   │   └── Trinidad-Map.svg  # Regional SVG map
+│   └── favicon files
+├── astro.config.mjs          # Astro configuration
+├── tailwind.config.mjs       # Tailwind CSS config
+└── package.json
 
-src/js/
-├── components/
-│   ├── header.js              # Navigation (dynamic from countries.js)
-│   ├── dashboardPanel.js      # Legacy dashboard modal (deprecated)
-│   ├── headlinesPage.js       # Shared headlines logic
-│   ├── loadingStates.js       # Shimmer loaders
-│   ├── trinidadMap.js         # Trinidad SVG regional map
-│   └── guyanaMap.js           # Guyana SVG regional map
-├── data/
-│   └── countries.js           # Single source of truth (dashboard URLs, CSV URLs)
-└── utils/
-    └── dom.js                 # DOM utilities
-
-google-apps-script/
-├── trinidad/                  # Trinidad automation
-├── guyana/                    # Guyana automation
-└── weekly-reports/            # Blog post generation
+google-apps-script/          # (Unchanged - same automation)
+├── trinidad/                # Trinidad automation
+├── guyana/                  # Guyana automation (deferred)
+└── weekly-reports/          # Blog post generation
 ```
 
 ---
@@ -148,6 +185,56 @@ google-apps-script/
 ---
 
 ## Recent Features (Nov-Dec 2025)
+
+### Astro Migration (Dec 16, 2025)
+**Status:** ✅ LIVE in Production
+**Location:** `astro-poc/` directory
+
+**What Changed:**
+- **Complete framework migration** from Vite to Astro 5.16.5
+- **1,300+ auto-generated crime pages** with SEO optimization
+- **Static Site Generation (SSG)** - All pages pre-rendered at build time
+- **File-based routing** - No more manual HTML files
+- **Content Collections** - Type-safe blog system with Markdown
+
+**Key Benefits:**
+- **SEO Explosion:** 1,300+ indexed pages (was ~15 pages in Vite)
+- **Unique URLs per crime:** `/trinidad/crime/murder-port-of-spain-2025-12-15`
+- **Monthly archives:** `/trinidad/archive/2025/12` with statistics
+- **Schema.org markup:** NewsArticle, BreadcrumbList, FAQPage
+- **Lightning fast:** Static HTML = <1s load times
+
+**Pages Implemented:**
+- ✅ Homepage with country cards
+- ✅ Trinidad Dashboard (Leaflet map functional, minor bugs acceptable)
+- ✅ Trinidad Headlines (`/trinidad/headlines`)
+- ✅ 1,300+ individual crime pages with related crimes sidebar
+- ✅ Monthly archive pages with statistics
+- ✅ Blog system (index + individual posts)
+- ✅ Static pages (About, FAQ, Methodology, 404)
+
+**Missing Features (To-Do):**
+- ❌ **Breadcrumbs** - Missing on some pages
+- ❌ **Report form** - Needs recreation from `report.html` to Astro
+- ❌ **Report Issue feature** - Crime pages need "Report Issue" button
+  - Should reuse pattern from `src/js/reportStandalone.js`
+  - Allow users to flag incorrect crime data
+  - Similar to existing issue reporting modal
+
+**Technical Details:**
+- **Build:** `cd astro-poc && npm run build`
+- **Dev server:** Port 4321 (not 5173)
+- **Build output:** `astro-poc/dist/`
+- **Build time:** ~30-60 seconds (generates 1,300+ pages)
+- **Deployment:** GitHub Actions → Cloudflare Pages
+  - Build command: `cd astro-poc && npm ci && npm run build`
+  - Output directory: `astro-poc/dist`
+
+**Focus:** Trinidad-only implementation. Guyana expansion deferred until Trinidad is perfected.
+
+**Vite Version:** Deprecated and no longer deployed.
+
+---
 
 ### Enhanced Duplicate Detection (Dec 3, 2025)
 **Location:** `google-apps-script/guyana/processor.gs`, `google-apps-script/trinidad/processor.gs`
@@ -392,32 +479,75 @@ mapDiv.addEventListener('touchmove', (e) => {
 
 ---
 
-## Common Patterns
+## Common Patterns (Astro)
 
 ### Adding a New Page
 
-1. Create HTML file in root
-2. Import header component
-3. Add to `vite.config.js` input configuration
+1. Create `.astro` file in `astro-poc/src/pages/`
+2. URL is auto-generated from file path:
+   - `src/pages/about.astro` → `/about`
+   - `src/pages/trinidad/headlines.astro` → `/trinidad/headlines`
+3. Use `Layout.astro` for consistent header/footer
+4. No configuration needed - Astro handles routing
 
-### Working with CSV Data
+**Example:**
+```astro
+---
+import Layout from '../layouts/Layout.astro';
+const title = "My New Page";
+---
+
+<Layout title={title}>
+  <main>
+    <h1>My New Page</h1>
+  </main>
+</Layout>
+```
+
+### Working with CSV Data (Server-Side)
+
+**Location:** `astro-poc/src/lib/crimeData.ts`
 
 - Sheets must be published with `single=true&output=csv`
-- PapaParse handles parsing
-- Sort/filter client-side
+- Use native `fetch()` API (no PapaParse)
+- Data fetched at BUILD TIME (server-side only)
+- Sort/filter happens during build
+- All processed data is baked into static HTML
 
-### Creating Dashboards
+**Example:**
+```typescript
+import { getTrinidadCrimes } from '../lib/crimeData';
 
-**Current Approach (Nov 2025):**
-- Create standalone HTML page (e.g., `dashboard-trinidad.html`)
-- Use Leaflet.js for interactive maps
-- OpenStreetMap for tiles (no API key needed)
-- Custom SVG regional maps for filtering
-- Direct links in `countries.js`
+const crimes = await getTrinidadCrimes(); // Server-side only
+```
 
-**Deprecated:**
-- `dashboardPanel.js` - Old modal approach with Google Looker Studio iframes
-- Kept for reference but no longer used in production
+### Creating Dynamic Pages (SSG)
+
+**Example:** Auto-generate page for each crime
+
+```astro
+---
+// src/pages/trinidad/crime/[slug].astro
+import { getTrinidadCrimes } from '../../../lib/crimeData';
+
+export async function getStaticPaths() {
+  const crimes = await getTrinidadCrimes();
+  return crimes.map((crime) => ({
+    params: { slug: crime.slug },
+    props: { crime },
+  }));
+}
+
+const { crime } = Astro.props;
+---
+
+<Layout title={crime.headline}>
+  <h1>{crime.headline}</h1>
+  <p>{crime.summary}</p>
+</Layout>
+```
+
+This generates 1,300+ static HTML pages at build time.
 
 ### Styling
 
@@ -445,24 +575,28 @@ mapDiv.addEventListener('touchmove', (e) => {
 - Test with `testRSSCollection()` functions
 - Verify Script Properties are set
 
-### When Working on Frontend
+### When Working on Astro Frontend
 
 **DO:**
 - **Check `docs/guides/DESIGN-TOKENS.md` BEFORE making any UI/styling changes** ⭐
+- Work in `astro-poc/` directory (NOT root)
 - Use Read, Edit, Write tools (not bash)
 - Prefer editing existing files
-- Test with `npm run dev`
-- Build successfully before committing
+- Test with `cd astro-poc && npm run dev` (port 4321)
+- Build successfully before committing: `cd astro-poc && npm run build`
 - Follow established button patterns (`px-4 py-1.5`, `min-h-[22px]`)
 - Use `rounded-lg` (not `rounded-md`)
 - Always add explicit text colors (`text-slate-700`, `text-slate-400`)
+- Use Astro components (`.astro` files) for reusable UI
+- Put pages in `src/pages/` for auto-routing
 
 **DON'T:**
 - Use emojis unless requested
 - Create markdown files unless required
-- Modify vite.config.js without understanding
+- Modify `astro.config.mjs` without understanding
 - Create new button variants (use existing patterns from DESIGN-TOKENS.md)
 - Use colors outside the Rose + Slate palette
+- Work in root directory (Vite version is deprecated)
 
 ---
 
@@ -491,18 +625,24 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 ## Project Status
 
 ### ✅ Completed
+- **Astro Migration (Dec 16, 2025)** 🎉
+  - Complete framework migration from Vite to Astro 5.16.5
+  - 1,300+ auto-generated crime pages with SEO
+  - File-based routing with TypeScript
+  - Content Collections for type-safe blog system
+  - LIVE in production at crimehotspots.com
 - Trinidad & Tobago automation (100% functional)
-- Guyana automation (launched Nov 15, 2025)
-- Automated deployment (GitHub → Cloudflare)
-- Blog system with visual components
+- ~~Guyana automation~~ (deferred - Trinidad-only focus)
+- Automated deployment (GitHub Actions → Cloudflare Pages)
+- Blog system with Content Collections
 - Weekly report generator with safeguards
 - User issue reporting system (Web3Forms integration)
 - Site-wide typography framework (responsive, consistent)
-- **Custom interactive dashboards** (Trinidad & Guyana)
+- **Trinidad Dashboard** (Leaflet map functional)
   - Replaced Google Looker Studio with Leaflet.js maps
   - Regional filtering, date range selection, crime heatmaps
   - Mobile-optimized with slide-up tray
-  - Both dashboards fully synchronized (Dec 2, 2025)
+  - Minor bugs acceptable for now
 - **Dashboard UI enhancements (Dec 2, 2025)**
   - Navigation dropdown system (auto-populates from countries.js)
   - Horizontal scrollable widgets with animated visual hints
@@ -544,22 +684,47 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   - Color palette formalized (Rose-600 + Slate grays)
   - Common mistakes section for consistency
   - Integrated into CLAUDE.md as required reading
+- **Dashboard Trend Comparisons (Dec 16, 2025)**
+  - Added trend indicators to Trinidad dashboard statistics cards
+  - Last 7 days vs previous 7 days comparison
+  - Last 30 days vs previous 30 days comparison
+  - Color coded: red for crime increase, green for crime decrease
+  - Calculates from current date (not filtered data range)
+  - Real-time calculations in browser
+- **Daily Auto-Rebuild & Manual Trigger (Dec 16, 2025)**
+  - GitHub Actions workflow runs daily at 6 AM UTC (2 AM Trinidad time)
+  - Generates new crime detail pages for crimes added to CSV
+  - Manual trigger available via GitHub Actions UI
+  - Ensures static site stays updated with latest crime data
 
 ### 🔄 In Progress
-- Guyana backfill processing (170 URLs)
+- **Astro Missing Features:**
+  - Breadcrumbs missing on some pages
+  - Report form (needs Astro recreation from `report.html`)
+  - Report Issue feature for crime pages (flag incorrect data)
 - Facebook data collection automation (Ian Alleyne Network, DJ Sherrif)
 
 ### 🐛 Known Issues
-- None currently identified
+- Minor dashboard bugs (acceptable for now)
+- Some pages missing breadcrumb navigation
 
 ### 📋 Planned
 
-**Near-Term:**
+**Near-Term (Astro Completion):**
+- Complete breadcrumb navigation across all pages
+- Recreate report form in Astro (`/report`)
+- Add "Report Issue" button to crime pages
+  - Reuse pattern from `src/js/reportStandalone.js`
+  - Allow users to flag incorrect crime summaries
+- Fix remaining dashboard bugs
+
+**Long-Term:**
+- Guyana expansion (mirror Trinidad structure)
 - Barbados automation
 - Social media auto-posting (Facebook, X, WhatsApp)
 - Open Graph images for social sharing (social media cards)
-- SEO Phase 2: NewsArticle Schema, internal linking, breadcrumbs
-- SEO Phase 3: Submit sitemap to search engines, local SEO
+- SEO Phase 2: Complete internal linking, sitemaps
+- SEO Phase 3: Submit to search engines, local SEO
 
 **Data Scalability & Analytics (Long-Term Vision)**
 
@@ -697,5 +862,44 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 ---
 
-**Version:** 1.5.0
-**Last Updated:** December 2, 2025
+### December 16, 2025 - Dashboard Trend Comparisons & Auto-Rebuild
+
+**Major Accomplishments:**
+- ✅ Implemented trend indicators for Trinidad dashboard
+- ✅ Added daily automatic rebuilds at 6 AM UTC
+- ✅ Added manual workflow trigger via GitHub UI
+
+**Commit:**
+- `78b5e5c` - Add dashboard trend comparisons and daily auto-rebuild
+
+**Feature Details:**
+
+**Trend Comparisons:**
+- Displays "vs last week" and "vs last month" trends on Total Incidents card
+- Compares last 7 days vs previous 7 days (from today)
+- Compares last 30 days vs previous 30 days (from today)
+- Color coding: Red arrow (↑) for crime increase, Green arrow (↓) for crime decrease
+- JavaScript runs in browser using current date, no rebuild needed for daily updates
+- Fixed Date validation bug preventing `toISOString is not a function` error
+
+**Auto-Rebuild System:**
+- GitHub Actions workflow updated with `schedule` trigger
+- Runs daily at 6 AM UTC (2 AM Trinidad time)
+- Also added `workflow_dispatch` for manual triggering
+- Ensures new crime detail pages are generated daily
+- No code changes needed - just triggers existing build
+
+**Implementation Notes:**
+- Trend calculation logic in `astro-poc/src/pages/trinidad/dashboard.astro` (lines 298-356)
+- Workflow configuration in `.github/workflows/deploy.yml`
+- Comprehensive documentation in `docs/archive/Development Progress/December-16-2025-Trend-Comparisons.md`
+
+**Console Logging:**
+- Added emoji-prefixed debugging: 🔍 (load), 🚀 (init), 📅 (dates), 📊 (data), ✅ (success)
+
+**Status:** Production ready, deployed to main branch
+
+---
+
+**Version:** 2.0.0 (Astro)
+**Last Updated:** December 16, 2025
