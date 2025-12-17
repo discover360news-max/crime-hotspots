@@ -295,65 +295,62 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       return Math.round(((current - previous) / previous) * 100);
     }
 
-    function calculateTrends(allCrimes, filteredCrimes) {
-      const currentCount = filteredCrimes.length;
+    function calculateTrends(allCrimes) {
+      // Default view: Always compare last 7 days vs previous 7 days, last 30 days vs previous 30 days from TODAY
+      const today = new Date();
+      today.setHours(23, 59, 59, 999); // End of today
 
-      // Get date range of current filtered data
-      if (currentCount === 0) {
-        console.log('⚠️ No crimes in filtered data');
-        return { insufficient: true };
-      }
+      console.log('📅 Calculating trends from today:', today.toISOString().split('T')[0]);
 
-      // Convert to Date objects and filter out invalid dates
-      const dates = filteredCrimes
-        .map(c => c.dateObj || new Date(c.date))
-        .filter(d => d instanceof Date && !isNaN(d.getTime()))
-        .sort((a, b) => a.getTime() - b.getTime());
-
-      if (dates.length === 0) {
-        console.log('⚠️ No valid dates in filtered data');
-        return { insufficient: true };
-      }
-
-      const currentStart = dates[0];
-      const currentEnd = dates[dates.length - 1];
-
-      console.log('📅 Date range:', currentStart.toISOString().split('T')[0], 'to', currentEnd.toISOString().split('T')[0]);
-
-      // Last week comparison (7 days before current period)
-      const weekAgoStart = subtractDays(currentStart, 7);
-      const weekAgoEnd = subtractDays(currentEnd, 7);
-      const lastWeekCrimes = allCrimes.filter(c => {
+      // WEEK COMPARISON: Last 7 days (0-6 days ago) vs Previous 7 days (7-13 days ago)
+      const last7DaysStart = subtractDays(today, 7);
+      const currentWeekCrimes = allCrimes.filter(c => {
         const date = c.dateObj || new Date(c.date);
-        return date >= weekAgoStart && date <= weekAgoEnd;
+        return date >= last7DaysStart && date <= today;
       });
 
-      // Last month comparison (30 days before current period)
-      const monthAgoStart = subtractDays(currentStart, 30);
-      const monthAgoEnd = subtractDays(currentEnd, 30);
-      const lastMonthCrimes = allCrimes.filter(c => {
+      const previous7DaysStart = subtractDays(today, 14);
+      const previous7DaysEnd = subtractDays(today, 7);
+      const previousWeekCrimes = allCrimes.filter(c => {
         const date = c.dateObj || new Date(c.date);
-        return date >= monthAgoStart && date <= monthAgoEnd;
+        return date >= previous7DaysStart && date < previous7DaysEnd;
+      });
+
+      // MONTH COMPARISON: Last 30 days vs Previous 30 days
+      const last30DaysStart = subtractDays(today, 30);
+      const currentMonthCrimes = allCrimes.filter(c => {
+        const date = c.dateObj || new Date(c.date);
+        return date >= last30DaysStart && date <= today;
+      });
+
+      const previous30DaysStart = subtractDays(today, 60);
+      const previous30DaysEnd = subtractDays(today, 30);
+      const previousMonthCrimes = allCrimes.filter(c => {
+        const date = c.dateObj || new Date(c.date);
+        return date >= previous30DaysStart && date < previous30DaysEnd;
       });
 
       console.log('📊 Comparison data:', {
-        current: currentCount,
-        lastWeek: lastWeekCrimes.length,
-        lastMonth: lastMonthCrimes.length
+        currentWeek: currentWeekCrimes.length,
+        previousWeek: previousWeekCrimes.length,
+        currentMonth: currentMonthCrimes.length,
+        previousMonth: previousMonthCrimes.length
       });
 
       return {
         vsLastWeek: {
-          change: currentCount - lastWeekCrimes.length,
-          percentage: calculatePercentage(currentCount, lastWeekCrimes.length),
-          direction: currentCount > lastWeekCrimes.length ? 'up' : currentCount < lastWeekCrimes.length ? 'down' : 'neutral',
-          insufficient: lastWeekCrimes.length === 0
+          change: currentWeekCrimes.length - previousWeekCrimes.length,
+          percentage: calculatePercentage(currentWeekCrimes.length, previousWeekCrimes.length),
+          direction: currentWeekCrimes.length > previousWeekCrimes.length ? 'up' :
+                     currentWeekCrimes.length < previousWeekCrimes.length ? 'down' : 'neutral',
+          insufficient: currentWeekCrimes.length === 0 && previousWeekCrimes.length === 0
         },
         vsLastMonth: {
-          change: currentCount - lastMonthCrimes.length,
-          percentage: calculatePercentage(currentCount, lastMonthCrimes.length),
-          direction: currentCount > lastMonthCrimes.length ? 'up' : currentCount < lastMonthCrimes.length ? 'down' : 'neutral',
-          insufficient: lastMonthCrimes.length === 0
+          change: currentMonthCrimes.length - previousMonthCrimes.length,
+          percentage: calculatePercentage(currentMonthCrimes.length, previousMonthCrimes.length),
+          direction: currentMonthCrimes.length > previousMonthCrimes.length ? 'up' :
+                     currentMonthCrimes.length < previousMonthCrimes.length ? 'down' : 'neutral',
+          insufficient: currentMonthCrimes.length === 0 && previousMonthCrimes.length === 0
         }
       };
     }
@@ -419,7 +416,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     // Run immediately when script loads
     document.addEventListener('DOMContentLoaded', () => {
       console.log('🚀 DOM loaded, calculating trends...');
-      const initialTrends = calculateTrends(crimes, crimes);
+      const initialTrends = calculateTrends(crimes);
       console.log('📊 Trend Calculation Result:', initialTrends);
       displayTrends(initialTrends, 'totalIncidentsTrends');
     });

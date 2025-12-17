@@ -7,6 +7,9 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+  schedule:
+    - cron: '0 6 * * *'  # Runs daily at 6 AM UTC (2 AM Trinidad time)
 
 jobs:
   build:
