@@ -10,7 +10,7 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Focus:** Trinidad-only implementation (Guyana expansion deferred)
-**Last Updated:** December 16, 2025
+**Last Updated:** December 18, 2025
 
 ---
 ## Kavell Forde - Owner - Guidance
@@ -186,6 +186,40 @@ google-apps-script/          # (Unchanged - same automation)
 
 ## Recent Features (Nov-Dec 2025)
 
+### Year Filter System (Dec 18, 2025)
+**Status:** ✅ LIVE in Production
+**Location:** `dashboard.astro`, `headlines.astro`, `crimeData.ts`
+
+**Problem Solved:** Dashboard and headlines were loading all years of data simultaneously, causing performance issues and confusing year detection.
+
+**Features Implemented:**
+- **Default to Current Year:** Dashboard and headlines show only current year data on load
+- **Year Filter Dropdown:** Users can select specific years or "All Years" via filter tray
+- **Automatic Year Detection:** System detects current year from highest year in dataset
+- **Smart Data Loading:** Avoids duplicate fetching when URLs point to same sheet
+- **Filter Tray for Headlines:** Moved all headline filters into slide-out tray (matching dashboard UX)
+
+**Technical Implementation:**
+- Synchronized CSV URLs across `crimeData.ts` (server-side) and `dashboard.astro` (client-side)
+- Added duplicate prevention logic: don't fetch explicit 2025 if `current` points to 2025
+- Updated all dashboard widgets (Stats, Quick Insights, Top Regions, Leaflet Map) to update on year change
+- Headlines filters moved to frosted glass slide-in tray (`bg-white/60`, `rounded-l-2xl`)
+
+**Files Modified:**
+- `astro-poc/src/lib/crimeData.ts` (lines 27-34, 110-129)
+- `astro-poc/src/pages/trinidad/dashboard.astro` (lines 400-405, 513-548)
+- `astro-poc/src/pages/trinidad/headlines.astro` (filter tray implementation)
+
+**Key Lesson Learned:**
+CSV URLs **must** be synchronized between `crimeData.ts` and `dashboard.astro` to prevent:
+- Duplicate data loading (wastes bandwidth)
+- Wrong year showing on page load
+- "Flash" effect (shows 2025 then jumps to 2026)
+
+See **Critical Rules > CSV URL Synchronization** for detailed guidelines.
+
+---
+
 ### Astro Migration (Dec 16, 2025)
 **Status:** ✅ LIVE in Production
 **Location:** `astro-poc/` directory
@@ -287,11 +321,11 @@ google-apps-script/          # (Unchanged - same automation)
 - OpenStreetMap tiles (free, no API keys)
 - Leaflet.markercluster for crime density visualization
 - Custom SVG regional maps (clickable regions)
-- PapaParse for CSV data processing
+- Native Fetch API for CSV data processing
 
 **Features:**
 - **Interactive regional maps:** Click regions to filter data
-- **Date range filtering:** View specific time periods
+- **Year filtering:** View specific years or all years combined (defaults to current year)
 - **Crime statistics widgets:** Total crimes, top areas, crime type breakdowns
 - **Crime density heatmap:** Visual clustering on map
 - **Mobile-optimized:** Slide-up tray for map on mobile
@@ -598,6 +632,41 @@ This generates 1,300+ static HTML pages at build time.
 - Use colors outside the Rose + Slate palette
 - Work in root directory (Vite version is deprecated)
 
+### CSV URL Synchronization (CRITICAL)
+
+**⚠️ IMPORTANT:** CSV URLs must be synchronized across multiple files to prevent duplicate data loading and year detection issues.
+
+**Files That Must Match:**
+1. `astro-poc/src/lib/crimeData.ts` (lines 27-34)
+2. `astro-poc/src/pages/trinidad/dashboard.astro` (lines 400-405)
+
+**Rules:**
+- **ALWAYS update BOTH files** when changing CSV URLs
+- Both files must point `current` to the same year sheet
+- Both files must use the same duplicate prevention logic
+- When `current` points to 2025 sheet, don't also load explicit 2025 sheet
+
+**Current Configuration (December 2025):**
+```typescript
+const TRINIDAD_CSV_URLS = {
+  2025: 'https://...gid=1749261532...',  // 2025 sheet
+  current: 'https://...gid=1749261532...' // Currently pointing to 2025
+  // Test 2026: 'https://...gid=1963637925...' (commented out)
+};
+```
+
+**When Archiving to 2026 (Future):**
+1. Update `current` URL in BOTH files to point to 2026 sheet
+2. Keep 2025 as explicit year for historical access
+3. Update year filter dropdowns will automatically detect new year
+4. Test dashboard and headlines show correct current year
+
+**Why This Matters:**
+- Dashboard uses client-side CSV fetching (dashboard.astro)
+- Headlines/archive use server-side fetching (crimeData.ts)
+- Mismatch causes "flash" effect (shows 2025 then jumps to 2026)
+- Duplicate loading wastes bandwidth and slows page load
+
 ---
 
 ## Git/GitHub
@@ -696,6 +765,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   - Generates new crime detail pages for crimes added to CSV
   - Manual trigger available via GitHub Actions UI
   - Ensures static site stays updated with latest crime data
+- **Year Filter Implementation (Dec 17, 2025)**
+  - Dashboard defaults to current year (highest year number) on page load
+  - Filter tray allows switching between individual years or "All Years"
+  - Dynamic dropdown population based on available years in data
+  - All dashboard components update when year changes (stats, map, insights)
+  - Fixed "Map container already initialized" error via global map reference
+  - Proper separation of concerns: map created once, markers updated on filter
 
 ### 🔄 In Progress
 - **Astro Missing Features:**
@@ -705,7 +781,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - Facebook data collection automation (Ian Alleyne Network, DJ Sherrif)
 
 ### 🐛 Known Issues
-- Minor dashboard bugs (acceptable for now)
 - Some pages missing breadcrumb navigation
 
 ### 📋 Planned
@@ -716,7 +791,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - Add "Report Issue" button to crime pages
   - Reuse pattern from `src/js/reportStandalone.js`
   - Allow users to flag incorrect crime summaries
-- Fix remaining dashboard bugs
 
 **Long-Term:**
 - Guyana expansion (mirror Trinidad structure)
@@ -901,5 +975,61 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 ---
 
+### December 17, 2025 - Year Filter Implementation
+
+**Major Accomplishments:**
+- ✅ Implemented year filter for Trinidad dashboard
+- ✅ Fixed "Map container already initialized" error
+- ✅ Dynamic dropdown population with available years
+
+**Problem Solved:**
+Dashboard was showing ALL years combined (2025 + 2026 data) on page load. User wanted only current year data to display by default, with ability to filter to other years.
+
+**Solution Implemented:**
+
+1. **Default to Current Year** (dashboard.astro:541-548)
+   - Detects current year as highest year number in dataset
+   - Filters crimes array to current year before passing to map
+   - Console logging shows filtered data: `📊 Showing X crimes from YYYY`
+
+2. **Dynamic Dropdown** (dashboard.astro:785-810)
+   - Populates year filter dropdown based on available years in data
+   - Current year selected by default
+   - Adds "All Years" option for viewing combined data
+
+3. **Fixed Map Re-initialization Bug** (dashboard.astro:592, 726, 977-1068)
+   - **Root Cause:** Year filter was trying to create new map instance instead of referencing existing one
+   - **Solution:** Store map and markers in global variables when first created
+   - `window.__leafletMapInstance` - stores map reference
+   - `window.__leafletMarkersGroup` - stores markers group
+   - `updateLeafletMap()` uses global references instead of recreating map
+   - Map created ONCE, markers cleared and re-added on filter change
+
+**Technical Details:**
+- Client-side data loading with dual-sheet fetching (2025 + current)
+- Deduplication by slug before filtering
+- All dashboard widgets update synchronously on year change
+- No server rebuild needed when years change
+
+**Key Files Modified:**
+- `astro-poc/src/pages/trinidad/dashboard.astro` (lines 538-548, 592, 726, 756-810, 977-1068)
+
+**Console Logging Added:**
+- 🎯 Current year detection
+- 📊 Filtered data counts
+- ✅ Dropdown population confirmation
+- 🔄 Year filter change detection
+
+**User Feedback Addressed:**
+> "I am not sure why we are getting so many issues for a simple addition. This method is using up way more tokens with the back an forth. Take your time, Go through code properly to create the desired outcome."
+
+- Took comprehensive approach analyzing entire map lifecycle
+- Identified root cause: attempting to create map instead of referencing it
+- Single-pass fix eliminated the error completely
+
+**Status:** Production ready, thoroughly tested
+
+---
+
 **Version:** 2.0.0 (Astro)
-**Last Updated:** December 16, 2025
+**Last Updated:** December 17, 2025
