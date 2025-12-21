@@ -7,6 +7,13 @@
 import Layout from '../../layouts/Layout.astro';
 import { getTrinidadCrimes } from '../../lib/crimeData';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import StatCard from '../../components/StatCard.astro';
+import QuickInsightsCard from '../../components/QuickInsightsCard.astro';
+import TopRegionsCard from '../../components/TopRegionsCard.astro';
+import FiltersTray from '../../components/FiltersTray.astro';
+import InfoPopup from '../../components/InfoPopup.astro';
+import LoadingShimmer from '../../components/LoadingShimmer.astro';
+import '../../styles/dashboard.css';
 
 const crimes = await getTrinidadCrimes();
 
@@ -40,24 +47,24 @@ const calculateInsights = (crimeData: typeof crimes) => {
   const busiestMonth = Array.from(monthCount.entries())
     .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
 
-  // Regional stats
-  const regionCount = new Map<string, number>();
+  // Area stats
+  const areaCount = new Map<string, number>();
   crimeData.forEach(crime => {
-    const region = crime.region || 'Unknown';
-    regionCount.set(region, (regionCount.get(region) || 0) + 1);
+    const area = crime.area || 'Unknown';
+    areaCount.set(area, (areaCount.get(area) || 0) + 1);
   });
-  const regionArray = Array.from(regionCount.entries()).sort((a, b) => b[1] - a[1]);
+  const areaArray = Array.from(areaCount.entries()).sort((a, b) => b[1] - a[1]);
 
-  // Find safest region (exclude "Unknown" and empty values)
-  const validRegions = regionArray.filter(([region]) => region && region !== 'Unknown' && region.trim() !== '');
-  const safestRegion = validRegions[validRegions.length - 1]?.[0] || 'N/A';
-  const safestRegionCount = validRegions[validRegions.length - 1]?.[1] || 0;
+  // Find safest area (exclude "Unknown" and empty values)
+  const validAreas = areaArray.filter(([area]) => area && area !== 'Unknown' && area.trim() !== '');
+  const safestRegion = validAreas[validAreas.length - 1]?.[0] || 'N/A';
+  const safestRegionCount = validAreas[validAreas.length - 1]?.[1] || 0;
 
-  const mostDangerousRegion = regionArray[0]?.[0] || 'N/A';
-  const mostDangerousRegionCount = regionArray[0]?.[1] || 0;
+  const mostDangerousRegion = areaArray[0]?.[0] || 'N/A';
+  const mostDangerousRegionCount = areaArray[0]?.[1] || 0;
 
-  // Top 3 regions concentration
-  const top3Count = regionArray.slice(0, 3).reduce((sum, [_, count]) => sum + count, 0);
+  // Top 3 areas concentration
+  const top3Count = areaArray.slice(0, 3).reduce((sum, [_, count]) => sum + count, 0);
   const top3Percentage = ((top3Count / crimeData.length) * 100).toFixed(0);
 
   return {
@@ -80,92 +87,6 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 ---
 
 <Layout title={title} description={description}>
-  <!-- Background image and SVG styles -->
-  <style>
-    /* Desktop only: Show faded background image */
-    @media (min-width: 768px) {
-      body {
-        background-image:
-          linear-gradient(to bottom,
-            rgba(241, 245, 249, 0.7) 0%,
-            rgba(241, 245, 249, 0.85) 15%,
-            #f1f5f9 30%
-          ),
-          url('/assets/images/trinidad-page-bg.png');
-
-        background-repeat: no-repeat;
-        background-position: top center;
-        background-size: 100% auto;
-        background-attachment: fixed;
-      }
-    }
-
-    /* Trinidad SVG Map Styles */
-    .region-path {
-      fill: #e5e7eb;
-      stroke: #9ca3af;
-      stroke-width: 2;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .region-path:hover {
-      fill: #d1d5db;
-      stroke: #6b7280;
-      stroke-width: 2.5;
-    }
-    .region-path.active {
-      fill: #e11d48;
-      stroke: #be123c;
-      stroke-width: 3;
-    }
-    .region-label {
-      fill: #374151;
-      font-size: 12px;
-      font-weight: 700;
-      pointer-events: none;
-      text-anchor: middle;
-    }
-
-    /* Fix map z-index to stay below header */
-    #leafletMap {
-      z-index: 1 !important;
-      position: relative;
-    }
-    .leaflet-pane,
-    .leaflet-map-pane {
-      z-index: 1 !important;
-    }
-    .leaflet-control-container {
-      z-index: 10 !important;
-    }
-
-    /* Horizontal scrolling cards */
-    .stats-scroll-container {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      gap: 1rem;
-      scrollbar-width: thin;
-      scrollbar-color: #989092ff #f1f5f9;
-      padding-bottom: 1rem;
-    }
-    .stats-scroll-container::-webkit-scrollbar {
-      height: 6px;
-    }
-    .stats-scroll-container::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 3px;
-    }
-    .stats-scroll-container::-webkit-scrollbar-thumb {
-      background: #e11d48;
-      border-radius: 3px;
-    }
-    .stat-card {
-      flex: 0 0 auto;
-      min-width: 160px;
-      scroll-snap-align: start;
-    }
-  </style>
 
   <div class="container mx-auto px-4 py-2 max-w-7xl">
     <!-- Page Header -->
@@ -178,20 +99,17 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       <div class="flex items-start justify-between gap-10 pt-4">
         <div>
           <h1 class="text-2xl font-bold text-slate-700">Trinidad & Tobago</h1>
-          <p class="text-xs text-slate-500 mt-1">Crime Statistics Dashboard</p>
+          <p class="text-small text-slate-500">Crime Statistics Dashboard</p>
         </div>
-        <div class="flex-1 items-center gap-2 flex-shrink-0">
-          
-          <div class="mb-2">
-            <a href="/trinidad/headlines"
-              class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border-1 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap">
-              Headlines
-            </a>
-          </div>
+        <div class="flex flex-col gap-2">
+          <a href="/trinidad/headlines"
+            class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap">
+            Headlines
+          </a>
 
           <button id="filtersBtn"
-              class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border-1 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap">
-              Filters ›
+            class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap">
+            Filters ›
           </button>
         </div>
       </div>
@@ -201,30 +119,28 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-4"></div>
 
     <!-- Statistics Cards - Horizontal Scroll -->
-    <div class="stats-scroll-container mb-4">
-      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm" id="totalIncidentsCard">
-        <div class="text-3xl font-bold text-rose-600" id="totalIncidents">{crimes.length}</div>
-        <div class="text-xs text-slate-500">Total Incidents</div>
+    <div class="stats-wrapper">
+      <!-- Stats Shimmer (shown during loading) -->
+      <div id="statsShimmer" class="flex gap-4 overflow-x-auto pb-4">
+        {[...Array(10)].map(() => (
+          <div class="flex-shrink-0" style="width: 180px;">
+            <LoadingShimmer height="120px" />
+          </div>
+        ))}
       </div>
 
-      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
-        <div class="text-3xl font-bold text-rose-600">{crimes.filter(c => c.crimeType === 'Murder').length}</div>
-        <div class="text-xs text-slate-500">Murders</div>
-      </div>
-
-      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
-        <div class="text-3xl font-bold text-rose-600">{crimes.filter(c => c.crimeType === 'Robbery').length}</div>
-        <div class="text-xs text-slate-500">Robberies</div>
-      </div>
-
-      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
-        <div class="text-3xl font-bold text-rose-600">{crimes.filter(c => c.crimeType === 'Home Invasion').length}</div>
-        <div class="text-xs text-slate-500">Home Invasions</div>
-      </div>
-
-      <div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm">
-        <div class="text-3xl font-bold text-rose-600">{crimes.filter(c => c.crimeType === 'Theft').length}</div>
-        <div class="text-xs text-slate-500">Thefts</div>
+      <!-- Actual Stats (hidden initially) -->
+      <div class="stats-scroll-container opacity-0 transition-opacity duration-300">
+        <StatCard value={crimes.length} label="Total Incidents" id="totalIncidents" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Murder').length} label="Murders" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Robbery').length} label="Robberies" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Home Invasion').length} label="Home Invasions" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Theft').length} label="Thefts" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Shooting').length} label="Shootings" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Assault').length} label="Assaults" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Burglary').length} label="Burglaries" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Seizures').length} label="Seizures" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Kidnapping').length} label="Kidnappings" />
       </div>
     </div>
 
@@ -233,128 +149,50 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 
     <!-- Leaflet Map -->
     <div class="mb-6">
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
         <h2 class="text-h2 font-bold text-slate-700 pt-4 px-4 mb-4">Crime Incidents Map</h2>
-        <div class="relative group cursor-pointer">
-          <svg class="w-5 h-5 text-slate-500" cursor-pointer hover:text-slate-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-
-          <div class="absolute left-1/2 transform -translate-x-1/2 mt-2 w-64 p-3 bg-white/70 backdrop-blur-md border border-slate-200 rounded-lg shadow-lg text-sm text-slate-500 opacity-0 invisible group-hover:opacity-100 group-hover:visible z-20 transition-all duration-300">
-            <p class="font-semibold mb-1">Understanding the Map</p>
-            <p class="mb-2">This map shows estimated/reported locations of crimes in and are updated daily.</p>
-            <p class="font-semibold mb-1">How to Use:</p>
-            <ul class="list-disc list-inside space-y-1 text-sm">
-              <li>Click clusters to zoom in</li>
-              <li>Click markers for incident details</li>
-              <li>Use two fingers to pan map</li>
-            </ul>
-          </div>
-        </div>
+        <InfoPopup id="map-info">
+          <p class="font-semibold mb-2 text-slate-700">Understanding the Map</p>
+          <p class="mb-3">This map shows estimated/reported locations of crimes and is updated daily.</p>
+          <p class="font-semibold mb-2 text-slate-700">How to Use:</p>
+          <ul class="list-disc list-inside space-y-1">
+            <li>Click clusters to zoom in</li>
+            <li>Click markers for incident details</li>
+            <li>Use two fingers to pan map</li>
+          </ul>
+        </InfoPopup>
       </div>
       <div class="relative">
-        <div id="leafletMap" class="w-full h-150 rounded-lg"></div>
-        <!-- Pan instruction overlay (shown on single finger touch) -->
-      <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300" style="z-index: 1000;">
-        <div class="bg-white/70 backdrop-blur-md rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
-          <p class="text-small font-semibold text-slate-600">Use two fingers to move map</p>
-          <p class="text-tiny text-slate-600 mt-1">One finger scrolls the page</p>
+        <!-- Map Shimmer (shown during loading) -->
+        <div id="mapShimmer" class="w-full">
+          <LoadingShimmer height="600px" />
         </div>
-      </div>
+
+        <!-- Actual Map (hidden initially) -->
+        <div id="leafletMap" class="w-full h-150 rounded-lg opacity-0 transition-opacity duration-300"></div>
+
+        <!-- Pan instruction overlay (shown on single finger touch) -->
+        <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-10">
+          <div class="bg-white/70 backdrop-blur-md rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
+            <p class="text-small font-semibold text-slate-600">Use two fingers to move map</p>
+            <p class="text-tiny text-slate-600 mt-1">One finger scrolls the page</p>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Quick Insights & Top Regions -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <!-- Quick Insights Card -->
-      <div id="quickInsightsCard" class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
-        <h3 class="text-h3 font-bold text-slate-600 mb-4">Quick Insights</h3>
-        <div class="space-y-4">
-          <!-- Daily Average -->
-          <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            <div class="flex-1">
-              <div class="text-xs text-slate-500 mb-1">Daily Average</div>
-              <div id="avgPerDay" class="text-lg font-bold text-slate-600">{insights.avgPerDay} crimes/day</div>
-            </div>
-          </div>
-
-          <!-- Most Dangerous Day -->
-          <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <div class="flex-1">
-              <div class="text-xs text-slate-500 mb-1">Peak Activity Day</div>
-              <div id="mostDangerousDay" class="text-lg font-bold text-slate-600">{insights.mostDangerousDay}</div>
-            </div>
-          </div>
-
-          <!-- Busiest Month -->
-          <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <div class="flex-1">
-              <div class="text-xs text-slate-500 mb-1">Busiest Month</div>
-              <div id="busiestMonth" class="text-lg font-bold text-slate-600">{insights.busiestMonth}</div>
-            </div>
-          </div>
-
-          <!-- Crime Concentration -->
-          <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <div class="flex-1">
-              <div class="text-xs text-slate-500 mb-1">Crime Concentration</div>
-              <div id="top3Percentage" class="text-lg font-bold text-slate-600">Top 3 regions: {insights.top3Percentage}%</div>
-            </div>
-          </div>
-
-          <!-- Safety Indicators -->
-          <div class="pt-2 border-t border-slate-200">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <div class="text-xs text-slate-400 mb-1">Most Dangerous</div>
-                <div id="mostDangerousRegion" class="text-sm font-semibold text-rose-600">{insights.mostDangerousRegion}</div>
-                <div id="mostDangerousRegionCount" class="text-xs text-slate-500">{insights.mostDangerousRegionCount} incidents</div>
-              </div>
-              <div>
-                <div class="text-xs text-slate-400 mb-1">Safest Area</div>
-                <div id="safestRegion" class="text-sm font-semibold text-emerald-600">{insights.safestRegion}</div>
-                <div id="safestRegionCount" class="text-xs text-slate-500">{insights.safestRegionCount} incidents</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Insight Cards Shimmer (shown during loading) -->
+      <div id="insightsShimmer" class="contents">
+        <LoadingShimmer height="400px" />
+        <LoadingShimmer height="400px" />
       </div>
 
-      <!-- Top Regions (Keep this) -->
-      <div id="topRegionsCard" class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
-        <h3 class="text-h3 font-bold text-slate-700 mb-4">Top Regions</h3>
-        <div id="topRegionsContainer" class="space-y-2">
-          {Array.from(
-            crimes.reduce((acc, crime) => {
-              const region = crime.region || 'Unknown';
-              acc.set(region, (acc.get(region) || 0) + 1);
-              return acc;
-            }, new Map())
-          )
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 10)
-            .map(([region, count]) => (
-              <div class="flex justify-between items-center pb-2 border-b border-slate-200 last:border-0">
-                <span class="text-xs text-slate-500">{region}</span>
-                <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
-                  {count}
-                </span>
-              </div>
-            ))}
-        </div>
+      <!-- Actual Insight Cards (hidden initially) -->
+      <div id="insightsCards" class="contents opacity-0 transition-opacity duration-300">
+        <QuickInsightsCard insights={insights} />
+        <TopRegionsCard crimes={crimes} />
       </div>
     </div>
 
@@ -514,8 +352,30 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       }
     }
 
+    // Shimmer control with minimum display time (global scope)
+    const MINIMUM_SHIMMER_TIME = 500; // milliseconds
+
+    window.hideShimmerWithMinTime = async function(shimmerEl, contentEl, shimmerStartTime) {
+      const elapsed = Date.now() - shimmerStartTime;
+      const remaining = Math.max(0, MINIMUM_SHIMMER_TIME - elapsed);
+
+      // Wait for minimum time if needed
+      if (remaining > 0) {
+        await new Promise(resolve => setTimeout(resolve, remaining));
+      }
+
+      // Hide shimmer, show content
+      if (shimmerEl) shimmerEl.style.display = 'none';
+      if (contentEl) {
+        contentEl.style.opacity = '1';
+      }
+    }
+
     // Wait for DOM and load crimes data
     window.addEventListener('DOMContentLoaded', async () => {
+      // Track when shimmers started
+      const shimmerStartTime = Date.now();
+
       console.log('🔍 Loading crimes data from CSV...');
 
       // Fetch crimes, avoiding duplicates if URLs match
@@ -550,190 +410,75 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       const currentYearCrimes = crimes.filter(c => c.year === currentYear);
       console.log(`📊 Showing ${currentYearCrimes.length} crimes from ${currentYear} (filtered from ${crimes.length} total)`);
 
-    // Now initialize map with current year crimes only
-    (function() {
-      const crimes = currentYearCrimes; // Use filtered data for map
+      // Hide stats and insights shimmers with minimum display time
+      await window.hideShimmerWithMinTime(
+        document.getElementById('statsShimmer'),
+        document.querySelector('.stats-scroll-container'),
+        shimmerStartTime
+      );
 
-      // Load Leaflet scripts
-      const leafletScript = document.createElement('script');
-      leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-      leafletScript.onload = () => {
-        // Load fullscreen plugin first
-        const fullscreenScript = document.createElement('script');
-        fullscreenScript.src = 'https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.1/Control.FullScreen.js';
-        fullscreenScript.onload = () => {
-          // Then load marker cluster
-          const clusterScript = document.createElement('script');
-          clusterScript.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
-          clusterScript.onload = initMap;
-          document.head.appendChild(clusterScript);
-        };
-        document.head.appendChild(fullscreenScript);
-      };
-      document.head.appendChild(leafletScript); // CRITICAL: Actually load Leaflet!
+      await window.hideShimmerWithMinTime(
+        document.getElementById('insightsShimmer'),
+        document.getElementById('insightsCards'),
+        shimmerStartTime
+      );
 
-      function initMap() {
-      // Check if map is already initialized
-      const mapContainer = document.getElementById('leafletMap');
-      if (mapContainer._leaflet_id) {
-        console.log('⚠️ Map already initialized, skipping');
+    // Map will be initialized by separate script below
+  }); // Close DOMContentLoaded
+  </script>
+
+  <!-- Leaflet Map Initialization -->
+  <script>
+    import { initializeLeafletMap } from '../../scripts/leafletMap';
+
+    // Track when map shimmer started
+    const mapShimmerStartTime = Date.now();
+
+    // Wait for crimes data to be available
+    function waitForMapData() {
+      if (!window.__crimesData) {
+        setTimeout(waitForMapData, 100);
         return;
       }
 
-      // Initialize map centered on Trinidad
-      const map = L.map('leafletMap', {
-        dragging: true,
-        scrollWheelZoom: false,
-        fullscreenControl: true
-      }).setView([10.634963, -61.197207],9);
+      // Get current year
+      const availableYears = [...new Set(window.__crimesData.map((c: any) => c.year))].sort((a: number, b: number) => b - a);
+      const currentYear = availableYears[0];
+      const currentYearCrimes = window.__crimesData.filter((c: any) => c.year === currentYear);
 
-      // *** CRITICAL FIX: Force Leaflet to recalculate size ***
-      // This resolves the "map in pieces" or "gray tiles" issue.
-      map.invalidateSize();
+      initializeLeafletMap('leafletMap', currentYearCrimes, {
+        center: [10.634963, -61.197207],
+        zoom: 9,
+        country: 'Trinidad',
+        crimeDetailPath: '/trinidad/crime/',
+        onMapReady: async () => {
+          // Hide map shimmer with minimum display time (500ms)
+          const elapsed = Date.now() - mapShimmerStartTime;
+          const remaining = Math.max(0, 500 - elapsed);
 
-      // Store map instance globally for year filter access
-      window.__leafletMapInstance = map;
-
-      // Two-finger scroll/zoom implementation
-      const mapDiv = document.getElementById('leafletMap');
-      const hint = document.getElementById('mapZoomHintTrinidad');
-      let touchCount = 0;
-      let touchStartPos = null;
-      let hintTimeout = null;
-
-      mapDiv.addEventListener('touchstart', (e) => {
-        touchCount = e.touches.length;
-        touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-
-        if (touchCount === 2) {
-          map.dragging.enable();
-          map.scrollWheelZoom.enable();
-        } else if (touchCount === 1) {
-          map.dragging.disable();
-          map.scrollWheelZoom.disable();
-        }
-      }, { passive: true });
-
-      mapDiv.addEventListener('touchmove', (e) => {
-        if (touchCount === 1 && touchStartPos) {
-          const distance = Math.sqrt(
-            Math.pow(e.touches[0].clientX - touchStartPos.x, 2) +
-            Math.pow(e.touches[0].clientY - touchStartPos.y, 2)
-          );
-
-          if (distance > 10) {
-            hint.style.opacity = '1';
-            hint.style.pointerEvents = 'none';
-
-            clearTimeout(hintTimeout);
-            hintTimeout = setTimeout(() => {
-              hint.style.opacity = '0';
-            }, 2000);
+          if (remaining > 0) {
+            await new Promise(resolve => setTimeout(resolve, remaining));
           }
+
+          const mapShimmer = document.getElementById('mapShimmer');
+          const leafletMap = document.getElementById('leafletMap');
+
+          if (mapShimmer) mapShimmer.style.display = 'none';
+          if (leafletMap) leafletMap.style.opacity = '1';
+
+          console.log('✅ Map shimmer hidden, map visible');
         }
-      }, { passive: true });
-
-      mapDiv.addEventListener('touchend', () => {
-        touchCount = 0;
-        map.dragging.enable();
-      }, { passive: true });
-
-      // Add OpenStreetMap tiles
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains: 'abcd',
-      maxZoom: 18
-      }).addTo(map);
-
-      // Create marker cluster group
-      const markers = L.markerClusterGroup({
-        chunkedLoading: true,
-        spiderfyOnMaxZoom: true,
-        showCoverageOnHover: false,
-        zoomToBoundsOnClick: true,
-        maxClusterRadius: 50,
-        iconCreateFunction: function(cluster) {
-          const count = cluster.getChildCount();
-          let size = 'small';
-          if (count > 50) size = 'large';
-          else if (count > 10) size = 'medium';
-
-          return L.divIcon({
-            html: `<div class="cluster-${size}">${count}</div>`,
-            className: 'custom-cluster-icon',
-            iconSize: L.point(40, 40)
-          });
-        } 
       });
+    }
 
-      // Custom marker icons by crime type
-      const getCrimeIcon = (crimeType) => {
-        const colors = {
-          'Murder': '#e11d48',
-          'Shooting': '#dc2626',
-          'Robbery': '#f97316',
-          'Home Invasion': '#9333ea',
-          'Theft': '#06b6d4',
-          'Kidnapping': '#ec4899',
-          'Sexual Assault': '#c026d3',
-          'Assault': '#8b5cf6',
-          'Seizures': '#3b82f6',
-          'Burglary': '#eab308'
-        };
-
-        const color = colors[crimeType] || '#64748b';
-
-        return L.divIcon({
-          html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
-          className: 'custom-crime-marker',
-          iconSize: [12, 12],
-          iconAnchor: [6, 6],
-          popupAnchor: [0, -6]
-        });
-      };
-
-      // Add crime markers
-      crimes.forEach(crime => {
-        // 1. Validate that the crime object has valid coordinates
-        // We check if crime.latitude and crime.longitude exist and are finite numbers.
-        const latitude = Number(crime.latitude);
-        const longitude = Number(crime.longitude);
-
-        if (isNaN(latitude) || isNaN(longitude) || !isFinite(latitude) || !isFinite(longitude)) {
-            // Optional: Log a message for incidents being skipped due to missing data
-            // console.warn(`Skipping crime incident ${crime.slug} due to invalid coordinates: ${crime.latitude}, ${crime.longitude}`);
-            return; // Skip this iteration if coordinates are invalid or missing
-        }
-
-        // 2. Use the actual coordinates from the crime object with custom icon
-        const marker = L.marker([latitude, longitude], {
-          icon: getCrimeIcon(crime.crimeType)
-        });
-
-        marker.bindPopup(`
-          <div class="p-2">
-            <div class="text-xs text-slate-500 mb-2">${crime.date}</div>
-            <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
-            <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
-            <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
-            <div class="text-xs text-rose-600">${crime.area}</div>
-            <a href="/trinidad/crime/${crime.slug}" class="text-tiny text-rose-600 hover:underline mt-4 inline-block">View Details →</a>
-          </div>
-        `);
-        markers.addLayer(marker);
-      });
-
-      map.addLayer(markers);
-
-      // Store markers group globally for year filter updates
-      window.__leafletMarkersGroup = markers;
-      }
-    })(); // Invoke the IIFE
-  }); // Close DOMContentLoaded
+    waitForMapData();
   </script>
 
   <!-- Year Filtering Script -->
   <script>
+    import { initializeYearFilter } from '../../scripts/yearFilter';
+    import { updateLeafletMap } from '../../scripts/leafletMap';
+
     console.log('🚀 Year filter script starting...');
 
     // Wait for crimes data to be available
@@ -743,135 +488,105 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
         return;
       }
 
-      initializeYearFilter(window.__crimesData);
-    }
+      // Initialize year filter with callbacks
+      initializeYearFilter(window.__crimesData, {
+        updateStatsCards: (crimes) => {
+          // Show shimmer before update
+          const statsShimmer = document.getElementById('statsShimmer');
+          const statsContainer = document.querySelector('.stats-scroll-container');
 
-    function initializeYearFilter(crimes) {
+          if (statsShimmer) statsShimmer.style.display = 'flex';
+          if (statsContainer) statsContainer.style.opacity = '0';
 
-    // Validate crimes data
-    if (!crimes || !Array.isArray(crimes)) {
-      console.error('❌ Invalid crimes data');
-      throw new Error('Crimes data is not an array');
-    }
+          // Update after short delay
+          setTimeout(async () => {
+            const updateStart = Date.now();
+            updateStatsCards(crimes);
 
-    console.log('📅 Year filter initialized with', crimes.length, 'crimes');
+            // Hide shimmer with minimum time
+            await window.hideShimmerWithMinTime(statsShimmer, statsContainer, updateStart);
+          }, 100);
+        },
+        updateQuickInsights: (crimes) => {
+          // Show shimmer before update
+          const insightsShimmer = document.getElementById('insightsShimmer');
+          const insightsCards = document.getElementById('insightsCards');
 
-    // Store original crimes data
-    const allCrimes = crimes;
+          if (insightsShimmer) insightsShimmer.style.display = 'contents';
+          if (insightsCards) insightsCards.style.opacity = '0';
 
-    // Get available years from data
-    const availableYears = [...new Set(allCrimes.map(c => new Date(c.date).getFullYear()))].sort((a, b) => b - a);
-    console.log('Available years:', availableYears);
+          // Update after short delay
+          setTimeout(async () => {
+            const updateStart = Date.now();
+            updateQuickInsights(crimes);
+            updateTopRegions(crimes);
 
-    // Default to current year (highest year number)
-    const currentYear = availableYears[0];
-    console.log('🎯 Defaulting to current year:', currentYear);
+            // Hide shimmer with minimum time
+            await window.hideShimmerWithMinTime(insightsShimmer, insightsCards, updateStart);
+          }, 100);
+        },
+        updateTopRegions: () => {}, // Already handled in updateQuickInsights
+        updateLeafletMap: (crimes) => {
+          // Show shimmer before update
+          const mapShimmer = document.getElementById('mapShimmer');
+          const leafletMap = document.getElementById('leafletMap');
 
-    // Filter to show only current year by default
-    let filteredCrimes = allCrimes.filter(c => {
-      const crimeYear = new Date(c.date).getFullYear();
-      return crimeYear === currentYear;
-    });
-    console.log(`📊 Showing ${filteredCrimes.length} crimes from ${currentYear}`);
+          if (mapShimmer) mapShimmer.style.display = 'block';
+          if (leafletMap) leafletMap.style.opacity = '0';
 
-    // Wait for DOM to be ready before attaching event listeners
-    function initYearFilter() {
-      console.log('🔧 Initializing year filter...');
+          // Update after short delay
+          setTimeout(async () => {
+            const updateStart = Date.now();
+            updateLeafletMap(crimes, '/trinidad/crime/');
 
-      const yearFilterElement = document.getElementById('yearFilter');
-      if (!yearFilterElement) {
-        console.error('❌ Year filter dropdown not found!');
-        return;
-      }
-
-      console.log('✅ Year filter dropdown found');
-
-      // Populate dropdown with available years
-      yearFilterElement.innerHTML = '';
-
-      // Add current year option (selected by default)
-      const currentOption = document.createElement('option');
-      currentOption.value = currentYear.toString();
-      currentOption.textContent = `${currentYear} Data`;
-      currentOption.selected = true;
-      yearFilterElement.appendChild(currentOption);
-
-      // Add other years (if any)
-      availableYears.forEach(year => {
-        if (year !== currentYear) {
-          const option = document.createElement('option');
-          option.value = year.toString();
-          option.textContent = `${year} Data`;
-          yearFilterElement.appendChild(option);
+            // Hide shimmer with minimum time
+            await window.hideShimmerWithMinTime(mapShimmer, leafletMap, updateStart);
+          }, 100);
         }
       });
-
-      // Add "All Years" option
-      const allOption = document.createElement('option');
-      allOption.value = 'all';
-      allOption.textContent = 'All Years';
-      yearFilterElement.appendChild(allOption);
-
-      console.log('✅ Year filter dropdown populated');
-
-      // Initial update with current year data
-      updateStatsCards(filteredCrimes);
-      updateQuickInsights(filteredCrimes);
-      updateTopRegions(filteredCrimes);
-      console.log('✅ Initial dashboard updated with current year data');
-
-      // Listen for year filter changes
-      yearFilterElement.addEventListener('change', (e) => {
-        const selectedValue = e.target.value;
-        console.log('🔄 Year filter changed to:', selectedValue);
-
-        // Filter crimes based on selection
-        if (selectedValue === 'all') {
-          filteredCrimes = allCrimes;
-          console.log('Showing all years');
-        } else {
-          const selectedYears = selectedValue.split(',').map(y => parseInt(y.trim()));
-          console.log('Selected years:', selectedYears);
-
-          filteredCrimes = allCrimes.filter(crime => {
-            const crimeYear = new Date(crime.date).getFullYear();
-            return selectedYears.includes(crimeYear);
-          });
-        }
-
-        console.log('Filtered to', filteredCrimes.length, 'crimes out of', allCrimes.length, 'total');
-
-        // Update all dashboard components
-        updateStatsCards(filteredCrimes);
-        updateQuickInsights(filteredCrimes);
-        updateTopRegions(filteredCrimes);
-        updateLeafletMap(filteredCrimes);
-      });
-
-      console.log('✅ Year filter event listener attached');
     }
 
   // Update stats cards
   function updateStatsCards(crimes) {
-    document.getElementById('totalIncidents').textContent = crimes.length;
+    // Update Total Incidents - target the value element inside the card
+    const totalIncidentsCard = document.getElementById('totalIncidents');
+    if (totalIncidentsCard) {
+      const valueEl = totalIncidentsCard.querySelector('.text-3xl');
+      if (valueEl) valueEl.textContent = crimes.length;
+    }
 
-    // Update individual crime type cards (if they exist)
+    // Update individual crime type cards
     const murders = crimes.filter(c => c.crimeType === 'Murder').length;
     const robberies = crimes.filter(c => c.crimeType === 'Robbery').length;
     const homeInvasions = crimes.filter(c => c.crimeType === 'Home Invasion').length;
     const thefts = crimes.filter(c => c.crimeType === 'Theft').length;
+    const shootings = crimes.filter(c => c.crimeType === 'Shooting').length;
+    const assaults = crimes.filter(c => c.crimeType === 'Assault').length;
+    const burglaries = crimes.filter(c => c.crimeType === 'Burglary').length;
+    const seizures = crimes.filter(c => c.crimeType === 'Seizures').length;
+    const kidnappings = crimes.filter(c => c.crimeType === 'Kidnapping').length;
 
-    // Find and update each stat card
+    // Find and update each stat card by index
     const statCards = document.querySelectorAll('.stat-card');
     const murdersEl = statCards[1]?.querySelector('.text-3xl');
     const robberiesEl = statCards[2]?.querySelector('.text-3xl');
     const homeInvasionsEl = statCards[3]?.querySelector('.text-3xl');
     const theftsEl = statCards[4]?.querySelector('.text-3xl');
+    const shootingsEl = statCards[5]?.querySelector('.text-3xl');
+    const assaultsEl = statCards[6]?.querySelector('.text-3xl');
+    const burglariesEl = statCards[7]?.querySelector('.text-3xl');
+    const seizuresEl = statCards[8]?.querySelector('.text-3xl');
+    const kidnappingsEl = statCards[9]?.querySelector('.text-3xl');
 
     if (murdersEl) murdersEl.textContent = murders;
     if (robberiesEl) robberiesEl.textContent = robberies;
     if (homeInvasionsEl) homeInvasionsEl.textContent = homeInvasions;
     if (theftsEl) theftsEl.textContent = thefts;
+    if (shootingsEl) shootingsEl.textContent = shootings;
+    if (assaultsEl) assaultsEl.textContent = assaults;
+    if (burglariesEl) burglariesEl.textContent = burglaries;
+    if (seizuresEl) seizuresEl.textContent = seizures;
+    if (kidnappingsEl) kidnappingsEl.textContent = kidnappings;
 
     console.log('✅ Stats cards updated');
   }
@@ -904,23 +619,23 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     });
     const busiestMonth = Array.from(monthCount.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
 
-    // Regional stats
-    const regionCount = new Map();
+    // Area stats
+    const areaCount = new Map();
     crimes.forEach(crime => {
-      const region = crime.region || 'Unknown';
-      regionCount.set(region, (regionCount.get(region) || 0) + 1);
+      const area = crime.area || 'Unknown';
+      areaCount.set(area, (areaCount.get(area) || 0) + 1);
     });
-    const regionArray = Array.from(regionCount.entries()).sort((a, b) => b[1] - a[1]);
-    const top3Count = regionArray.slice(0, 3).reduce((sum, [_, count]) => sum + count, 0);
+    const areaArray = Array.from(areaCount.entries()).sort((a, b) => b[1] - a[1]);
+    const top3Count = areaArray.slice(0, 3).reduce((sum, [_, count]) => sum + count, 0);
     const top3Percentage = ((top3Count / crimes.length) * 100).toFixed(0);
 
-    // Find safest region (exclude "Unknown" and empty values)
-    const validRegions = regionArray.filter(([region]) => region && region !== 'Unknown' && region.trim() !== '');
-    const safestRegion = validRegions[validRegions.length - 1]?.[0] || 'N/A';
-    const safestRegionCount = validRegions[validRegions.length - 1]?.[1] || 0;
+    // Find safest area (exclude "Unknown" and empty values)
+    const validAreas = areaArray.filter(([area]) => area && area !== 'Unknown' && area.trim() !== '');
+    const safestRegion = validAreas[validAreas.length - 1]?.[0] || 'N/A';
+    const safestRegionCount = validAreas[validAreas.length - 1]?.[1] || 0;
 
-    const mostDangerousRegion = regionArray[0]?.[0] || 'N/A';
-    const mostDangerousRegionCount = regionArray[0]?.[1] || 0;
+    const mostDangerousRegion = areaArray[0]?.[0] || 'N/A';
+    const mostDangerousRegionCount = areaArray[0]?.[1] || 0;
 
     // Update DOM using IDs
     const avgPerDayEl = document.getElementById('avgPerDay');
@@ -935,7 +650,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     if (avgPerDayEl) avgPerDayEl.textContent = `${avgPerDay} crimes/day`;
     if (mostDangerousDayEl) mostDangerousDayEl.textContent = mostDangerousDay;
     if (busiestMonthEl) busiestMonthEl.textContent = busiestMonth;
-    if (top3PercentageEl) top3PercentageEl.textContent = `Top 3 regions: ${top3Percentage}%`;
+    if (top3PercentageEl) top3PercentageEl.textContent = `Top 3 areas: ${top3Percentage}%`;
     if (mostDangerousRegionEl) mostDangerousRegionEl.textContent = mostDangerousRegion;
     if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = `${mostDangerousRegionCount} incidents`;
     if (safestRegionEl) safestRegionEl.textContent = safestRegion;
@@ -944,24 +659,24 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     console.log('✅ Quick Insights updated');
   }
 
-  // Update Top Regions
+  // Update Top Areas
   function updateTopRegions(crimes) {
-    const regionCount = new Map();
+    const areaCount = new Map();
     crimes.forEach(crime => {
-      const region = crime.region || 'Unknown';
-      regionCount.set(region, (regionCount.get(region) || 0) + 1);
+      const area = crime.area || 'Unknown';
+      areaCount.set(area, (areaCount.get(area) || 0) + 1);
     });
 
-    const topRegions = Array.from(regionCount.entries())
+    const topAreas = Array.from(areaCount.entries())
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10);
 
     // Update using ID selector
     const container = document.getElementById('topRegionsContainer');
     if (container) {
-      container.innerHTML = topRegions.map(([region, count]) => `
+      container.innerHTML = topAreas.map(([area, count]) => `
         <div class="flex justify-between items-center pb-2 border-b border-slate-200 last:border-0">
-          <span class="text-xs text-slate-500">${region}</span>
+          <span class="text-xs text-slate-500">${area}</span>
           <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
             ${count}
           </span>
@@ -969,187 +684,19 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       `).join('');
     }
 
-    console.log('✅ Top Regions updated');
+    console.log('✅ Top Areas updated');
   }
 
-  // Update Leaflet Map
-  function updateLeafletMap(crimes) {
-    // Use global map reference
-    const leafletMapInstance = window.__leafletMapInstance;
-
-    if (!leafletMapInstance) {
-      console.warn('⚠️ Leaflet map not ready yet');
-      return;
-    }
-
-    // Clear existing markers
-    if (window.__leafletMarkersGroup) {
-      leafletMapInstance.removeLayer(window.__leafletMarkersGroup);
-    }
-
-    // Create new marker cluster group
-    const leafletMarkersGroup = window.L.markerClusterGroup({
-      chunkedLoading: true,
-      spiderfyOnMaxZoom: true,
-      showCoverageOnHover: false,
-      zoomToBoundsOnClick: true,
-      maxClusterRadius: 50,
-      iconCreateFunction: function(cluster) {
-        const count = cluster.getChildCount();
-        let size = 'small';
-        if (count > 50) size = 'large';
-        else if (count > 10) size = 'medium';
-
-        return window.L.divIcon({
-          html: `<div class="cluster-${size}">${count}</div>`,
-          className: 'custom-cluster-icon',
-          iconSize: window.L.point(40, 40)
-        });
-      }
-    });
-
-    // Add filtered crime markers
-    crimes.forEach(crime => {
-      const latitude = Number(crime.latitude);
-      const longitude = Number(crime.longitude);
-
-      if (isNaN(latitude) || isNaN(longitude) || !isFinite(latitude) || !isFinite(longitude)) {
-        return;
-      }
-
-      const getCrimeIcon = (crimeType) => {
-        const colors = {
-          'Murder': '#e11d48',
-          'Shooting': '#dc2626',
-          'Robbery': '#f97316',
-          'Home Invasion': '#9333ea',
-          'Theft': '#06b6d4',
-          'Kidnapping': '#ec4899',
-          'Sexual Assault': '#c026d3',
-          'Assault': '#8b5cf6',
-          'Seizures': '#3b82f6',
-          'Burglary': '#eab308'
-        };
-        const color = colors[crimeType] || '#64748b';
-        return window.L.divIcon({
-          html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
-          className: 'custom-crime-marker',
-          iconSize: [12, 12],
-          iconAnchor: [6, 6],
-          popupAnchor: [0, -6]
-        });
-      };
-
-      const marker = window.L.marker([latitude, longitude], {
-        icon: getCrimeIcon(crime.crimeType)
-      });
-
-      marker.bindPopup(`
-        <div class="p-2">
-          <div class="text-xs text-slate-500 mb-2">${crime.date}</div>
-          <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
-          <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
-          <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
-          <div class="text-xs text-rose-600">${crime.area}</div>
-          <a href="/trinidad/crime/${crime.slug}" class="text-tiny text-rose-600 hover:underline mt-4 inline-block">View Details →</a>
-        </div>
-      `);
-
-      leafletMarkersGroup.addLayer(marker);
-    });
-
-    leafletMapInstance.addLayer(leafletMarkersGroup);
-
-    // Store updated markers group globally
-    window.__leafletMarkersGroup = leafletMarkersGroup;
-
-    console.log('✅ Leaflet map updated with', crimes.length, 'markers');
-    }
-
-    // Initialize year filter when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initYearFilter);
-    } else {
-      // DOM already loaded
-      initYearFilter();
-    }
-
-    console.log('📌 Year filter setup complete');
-  }
-
-  // Start waiting for crimes data
-  waitForCrimesData();
+    // Start waiting for crimes data
+    waitForCrimesData();
   </script>
 
-  <!-- Filters Tray -->
-  <div id="filtersTray" class="fixed inset-0 z-50 pointer-events-none">
-    <!-- Backdrop -->
-    <div id="filtersBackdrop" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+  <!-- Filters Tray Component -->
+  <FiltersTray showYearFilter={true} />
 
-    <!-- Tray Content -->
-    <div id="filtersTrayContent" class="absolute right-0 top-0 h-full w-80 bg-white/60 rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto">
-      <div class="p-6">
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-lg font-bold text-slate-700">Filters</h2>
-          <button id="closeFiltersBtn" class="text-slate-400 hover:text-slate-600 transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-          </button>
-        </div>
-
-        <!-- Filter Options -->
-        <div class="space-y-4">
-          <!-- Year Filter -->
-          <div>
-            <label for="yearFilter" class="block text-sm font-medium text-slate-700 mb-2">Select Year</label>
-            <select id="yearFilter" class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50">
-              <!-- Options populated dynamically by JavaScript -->
-            </select>
-          </div>
-
-          <!-- Future filters can be added here -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filters Tray Script -->
+  <!-- Mouse Wheel Horizontal Scroll for Stats Cards -->
   <script>
-    const filtersBtn = document.getElementById('filtersBtn');
-    const filtersTray = document.getElementById('filtersTray');
-    const filtersTrayContent = document.getElementById('filtersTrayContent');
-    const filtersBackdrop = document.getElementById('filtersBackdrop');
-    const closeFiltersBtn = document.getElementById('closeFiltersBtn');
-
-    function openFiltersTray() {
-      filtersTray.classList.remove('pointer-events-none');
-      filtersBackdrop.classList.remove('pointer-events-none');
-      setTimeout(() => {
-        filtersBackdrop.classList.remove('opacity-0');
-        filtersTrayContent.classList.remove('translate-x-full');
-      }, 10);
-    }
-
-    function closeFiltersTray() {
-      filtersBackdrop.classList.add('opacity-0');
-      filtersTrayContent.classList.add('translate-x-full');
-      setTimeout(() => {
-        filtersTray.classList.add('pointer-events-none');
-        filtersBackdrop.classList.add('pointer-events-none');
-      }, 300);
-    }
-
-    filtersBtn.addEventListener('click', openFiltersTray);
-    closeFiltersBtn.addEventListener('click', closeFiltersTray);
-    filtersBackdrop.addEventListener('click', closeFiltersTray);
-
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !filtersTray.classList.contains('pointer-events-none')) {
-        closeFiltersTray();
-      }
-    });
+    import { initializeStatsScroll } from '../../scripts/statsScroll';
+    initializeStatsScroll();
   </script>
 </Layout>

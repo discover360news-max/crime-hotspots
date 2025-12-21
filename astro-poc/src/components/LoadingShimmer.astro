@@ -1,0 +1,74 @@
+---
+/**
+ * LoadingShimmer Component
+ * Facebook-style shimmer effect for loading states
+ *
+ * Usage:
+ * <LoadingShimmer height="400px" /> (for map)
+ * <LoadingShimmer height="120px" rounded="lg" /> (for cards)
+ */
+
+interface Props {
+  height?: string;
+  width?: string;
+  rounded?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  className?: string;
+}
+
+const {
+  height = '200px',
+  width = '100%',
+  rounded = 'lg',
+  className = ''
+} = Astro.props;
+
+const roundedClass = {
+  'none': '',
+  'sm': 'rounded-sm',
+  'md': 'rounded-md',
+  'lg': 'rounded-lg',
+  'xl': 'rounded-xl',
+  'full': 'rounded-full'
+}[rounded];
+---
+
+<div
+  class={`shimmer-container ${roundedClass} ${className}`}
+  style={`height: ${height}; width: ${width};`}
+>
+  <div class="shimmer-wave"></div>
+</div>
+
+<style>
+  .shimmer-container {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(90deg, #f0f0f0 0%, #f0f0f0 100%);
+  }
+
+  .shimmer-wave {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.4) 20%,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0.4) 80%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+</style>

@@ -1,0 +1,148 @@
+---
+/**
+ * InfoPopup Component
+ * Reusable click-based info popup with top-center positioning
+ *
+ * Usage:
+ * <InfoPopup id="unique-id">
+ *   <p>Your content here</p>
+ *   <a href="#">Links work too</a>
+ * </InfoPopup>
+ */
+
+interface Props {
+  id: string; // Unique ID for this popup instance
+}
+
+const { id } = Astro.props;
+---
+
+<div class="info-popup-wrapper inline-block">
+  <!-- Info Icon Trigger -->
+  <button
+    type="button"
+    class="info-popup-trigger cursor-pointer p-1 rounded hover:bg-slate-100 transition"
+    data-popup-id={id}
+    aria-label="Show information"
+  >
+    <svg class="w-5 h-5 text-slate-500 hover:text-slate-700 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  </button>
+
+  <!-- Popup Overlay (hidden by default) -->
+  <div
+    class="info-popup-overlay fixed inset-0 bg-black/30 z-50 opacity-0 invisible transition-opacity duration-300"
+    data-popup-overlay={id}
+  >
+    <!-- Popup Content -->
+    <div
+      class="info-popup-content absolute top-4 left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] md:w-auto md:max-w-md bg-white/80 backdrop-blur-md border border-slate-200 rounded-lg shadow-xl p-4 opacity-0 invisible transition-all duration-300"
+      data-popup-content={id}
+    >
+      <!-- Close Button -->
+      <button
+        type="button"
+        class="info-popup-close absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded hover:bg-slate-200 transition text-slate-500 hover:text-slate-700"
+        data-popup-close={id}
+        aria-label="Close"
+      >
+        <span class="text-lg leading-none">×</span>
+      </button>
+
+      <!-- Content Slot -->
+      <div class="text-sm text-slate-600 pr-6">
+        <slot />
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Global state to track currently open popup
+  let currentlyOpenPopup: string | null = null;
+
+  function closePopup(popupId: string) {
+    const overlay = document.querySelector(`[data-popup-overlay="${popupId}"]`) as HTMLElement;
+    const content = document.querySelector(`[data-popup-content="${popupId}"]`) as HTMLElement;
+
+    if (overlay && content) {
+      overlay.classList.remove('opacity-100', 'visible');
+      overlay.classList.add('opacity-0', 'invisible');
+      content.classList.remove('opacity-100', 'visible');
+      content.classList.add('opacity-0', 'invisible');
+    }
+
+    if (currentlyOpenPopup === popupId) {
+      currentlyOpenPopup = null;
+    }
+  }
+
+  function openPopup(popupId: string) {
+    // Close any currently open popup
+    if (currentlyOpenPopup && currentlyOpenPopup !== popupId) {
+      closePopup(currentlyOpenPopup);
+    }
+
+    const overlay = document.querySelector(`[data-popup-overlay="${popupId}"]`) as HTMLElement;
+    const content = document.querySelector(`[data-popup-content="${popupId}"]`) as HTMLElement;
+
+    if (overlay && content) {
+      overlay.classList.remove('opacity-0', 'invisible');
+      overlay.classList.add('opacity-100', 'visible');
+      content.classList.remove('opacity-0', 'invisible');
+      content.classList.add('opacity-100', 'visible');
+    }
+
+    currentlyOpenPopup = popupId;
+  }
+
+  // Initialize all info popups on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    // Trigger buttons
+    const triggers = document.querySelectorAll('.info-popup-trigger');
+    triggers.forEach(trigger => {
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const popupId = (trigger as HTMLElement).dataset.popupId;
+        if (popupId) {
+          openPopup(popupId);
+        }
+      });
+    });
+
+    // Close buttons
+    const closeButtons = document.querySelectorAll('.info-popup-close');
+    closeButtons.forEach(button => {
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const popupId = (button as HTMLElement).dataset.popupClose;
+        if (popupId) {
+          closePopup(popupId);
+        }
+      });
+    });
+
+    // Close on overlay click (click outside)
+    const overlays = document.querySelectorAll('.info-popup-overlay');
+    overlays.forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        // Only close if clicking the overlay itself, not the content
+        if (e.target === overlay) {
+          const popupId = (overlay as HTMLElement).dataset.popupOverlay;
+          if (popupId) {
+            closePopup(popupId);
+          }
+        }
+      });
+    });
+
+    // Prevent clicks inside content from closing the popup
+    const contents = document.querySelectorAll('.info-popup-content');
+    contents.forEach(content => {
+      content.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    });
+  });
+</script>
