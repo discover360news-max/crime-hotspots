@@ -1,0 +1,93 @@
+---
+/**
+ * FiltersTray Component
+ * Reusable slide-out filter tray for dashboards and headlines
+ * Includes year filter and can be extended with additional filters
+ */
+
+interface Props {
+  showYearFilter?: boolean;
+}
+
+const { showYearFilter = true } = Astro.props;
+---
+
+<!-- Filters Tray -->
+<div id="filtersTray" class="fixed inset-0 z-50 pointer-events-none">
+  <!-- Backdrop -->
+  <div id="filtersBackdrop" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+
+  <!-- Tray Content -->
+  <div id="filtersTrayContent" class="absolute right-0 top-0 h-full w-80 bg-white/60 rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto">
+    <div class="p-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-bold text-slate-700">Filters</h2>
+        <button id="closeFiltersBtn" class="text-slate-400 hover:text-slate-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Filter Options -->
+      <div class="space-y-4">
+        <!-- Year Filter -->
+        {showYearFilter && (
+          <div>
+            <label for="yearFilter" class="block text-sm font-medium text-slate-700 mb-2">Select Year</label>
+            <select id="yearFilter" class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50">
+              <!-- Options populated dynamically by JavaScript -->
+            </select>
+          </div>
+        )}
+
+        <!-- Future filters can be added here via slots -->
+        <slot />
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const filtersBtn = document.getElementById('filtersBtn');
+  const filtersTray = document.getElementById('filtersTray');
+  const filtersTrayContent = document.getElementById('filtersTrayContent');
+  const filtersBackdrop = document.getElementById('filtersBackdrop');
+  const closeFiltersBtn = document.getElementById('closeFiltersBtn');
+
+  function openFiltersTray() {
+    if (!filtersTray || !filtersBackdrop || !filtersTrayContent) return;
+
+    filtersTray.classList.remove('pointer-events-none');
+    filtersBackdrop.classList.remove('pointer-events-none');
+    setTimeout(() => {
+      filtersBackdrop.classList.remove('opacity-0');
+      filtersTrayContent.classList.remove('translate-x-full');
+    }, 10);
+  }
+
+  function closeFiltersTray() {
+    if (!filtersTray || !filtersBackdrop || !filtersTrayContent) return;
+
+    filtersBackdrop.classList.add('opacity-0');
+    filtersTrayContent.classList.add('translate-x-full');
+    setTimeout(() => {
+      filtersTray.classList.add('pointer-events-none');
+      filtersBackdrop.classList.add('pointer-events-none');
+    }, 300);
+  }
+
+  if (filtersBtn && closeFiltersBtn && filtersBackdrop) {
+    filtersBtn.addEventListener('click', openFiltersTray);
+    closeFiltersBtn.addEventListener('click', closeFiltersTray);
+    filtersBackdrop.addEventListener('click', closeFiltersTray);
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && filtersTray && !filtersTray.classList.contains('pointer-events-none')) {
+        closeFiltersTray();
+      }
+    });
+  }
+</script>

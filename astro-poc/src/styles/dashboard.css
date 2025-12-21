@@ -1,0 +1,121 @@
+/**
+ * Dashboard Page Styles
+ * Trinidad & Tobago Crime Dashboard
+ */
+
+/* Desktop only: Show faded background image */
+@media (min-width: 768px) {
+  body {
+    background-image:
+      linear-gradient(to bottom,
+        rgba(241, 245, 249, 0.7) 0%,
+        rgba(241, 245, 249, 0.85) 15%,
+        #f1f5f9 30%
+      ),
+      url('/assets/images/trinidad-page-bg.png');
+
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: 100% auto;
+    background-attachment: fixed;
+  }
+}
+
+/* Trinidad SVG Map Styles */
+.region-path {
+  fill: #e5e7eb;
+  stroke: #9ca3af;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.region-path:hover {
+  fill: #d1d5db;
+  stroke: #6b7280;
+  stroke-width: 2.5;
+}
+
+.region-path.active {
+  fill: #e11d48;
+  stroke: #be123c;
+  stroke-width: 3;
+}
+
+.region-label {
+  fill: #374151;
+  font-size: 12px;
+  font-weight: 700;
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+/* Fix map z-index to stay below header */
+#leafletMap {
+  z-index: 1 !important;
+  position: relative;
+}
+
+.leaflet-pane,
+.leaflet-map-pane {
+  z-index: 1 !important;
+}
+
+.leaflet-control-container {
+  z-index: 10 !important;
+}
+
+/* Horizontal scrolling cards wrapper */
+.stats-wrapper {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.stats-scroll-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  gap: 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: #e11d48 #f1f5f9;
+  padding-bottom: 1rem;
+}
+
+.stats-scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.stats-scroll-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.stats-scroll-container::-webkit-scrollbar-thumb {
+  background: #e11d48;
+  border-radius: 3px;
+}
+
+.stat-card {
+  flex: 0 0 auto;
+  min-width: 160px;
+  scroll-snap-align: start;
+}
+
+/* Fade gradient on wrapper (shows when scrollable) */
+.stats-wrapper::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 1rem; /* Account for scrollbar */
+  width: 60px;
+  background: linear-gradient(to right, rgba(241, 245, 249, 0), rgba(241, 245, 249, 0.95));
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.stats-wrapper:hover::after {
+  opacity: 1;
+}
