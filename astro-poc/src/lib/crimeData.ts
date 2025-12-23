@@ -23,14 +23,22 @@ export interface Crime {
   day: number;
 }
 
-const TRINIDAD_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv';
+// Year-specific CSV URLs for Trinidad
+const TRINIDAD_CSV_URLS = {
+  2025: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv',
+  // 2026: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
+
+  // Production sheet (current year - currently 2025, will be 2026 after archival)
+  current: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv'
+  // Test 2026: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv'
+};
 
 /**
- * Fetch and parse Trinidad crime data from Google Sheets CSV
+ * Fetch and parse crime data from a CSV URL
  */
-export async function getTrinidadCrimes(): Promise<Crime[]> {
+async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
   try {
-    const response = await fetch(TRINIDAD_CSV_URL);
+    const response = await fetch(csvUrl);
     const csvText = await response.text();
 
     const lines = csvText.split('\n');
@@ -88,11 +96,36 @@ export async function getTrinidadCrimes(): Promise<Crime[]> {
       });
     }
 
-    return crimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
+    return crimes;
   } catch (error) {
-    console.error('Error fetching Trinidad crimes:', error);
+    console.error('Error fetching crime data from URL:', csvUrl, error);
     return [];
   }
+}
+
+/**
+ * Fetch and parse Trinidad crime data from ALL year sheets
+ * Returns all years combined and sorted by date (newest first)
+ */
+export async function getTrinidadCrimes(): Promise<Crime[]> {
+  const allCrimes: Crime[] = [];
+
+  // Fetch 2025 data (only if it's different from current sheet)
+  if (TRINIDAD_CSV_URLS[2025] && TRINIDAD_CSV_URLS[2025] !== TRINIDAD_CSV_URLS.current) {
+    const crimes2025 = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS[2025]);
+    allCrimes.push(...crimes2025);
+    console.log(`Loaded ${crimes2025.length} crimes from 2025 sheet`);
+  }
+
+  // Fetch current/production sheet (always load this)
+  const currentCrimes = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS.current);
+  allCrimes.push(...currentCrimes);
+  console.log(`Loaded ${currentCrimes.length} crimes from current sheet`);
+
+  console.log(`Total crimes loaded: ${allCrimes.length}`);
+
+  // Sort all crimes by date (newest first)
+  return allCrimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
 }
 
 /**

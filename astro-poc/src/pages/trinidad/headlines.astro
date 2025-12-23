@@ -10,15 +10,22 @@ import CrimeCard from '../../components/CrimeCard.astro';
 import { getTrinidadCrimes, type Crime } from '../../lib/crimeData';
 
 // Fetch all crimes (server-side)
-const allCrimes = await getTrinidadCrimes();
+const allCrimesData = await getTrinidadCrimes();
 
-// Get unique areas and crime types for filters
+// Filter to current year only (highest year in dataset)
+const availableYears = [...new Set(allCrimesData.map(c => c.year))].sort((a, b) => b - a);
+const currentYear = availableYears[0];
+const allCrimes = allCrimesData.filter(c => c.year === currentYear);
+
+console.log(`📰 Headlines showing ${allCrimes.length} crimes from ${currentYear} (current year)`);
+
+// Get unique areas and crime types for filters (from current year only)
 const areas = [...new Set(allCrimes.map(c => c.area).filter(Boolean))].sort();
 const crimeTypes = [...new Set(allCrimes.map(c => c.crimeType).filter(Boolean))].sort();
 
 // SEO
-const title = "Trinidad & Tobago Crime Headlines 2025 — Latest Reports";
-const description = "Trinidad & Tobago crime headlines updated daily. Filter the latest incidents (Murder, Robbery, etc.) by area, sourced from Guardian, Express, and Newsday.";
+const title = `Trinidad & Tobago Crime Headlines ${currentYear} — Latest Reports`;
+const description = `Trinidad & Tobago crime headlines updated daily. Filter ${currentYear} incidents (Murder, Robbery, etc.) by area, sourced from Guardian, Express, and Newsday.`;
 
 // Breadcrumbs
 const breadcrumbs = [
@@ -34,96 +41,33 @@ const breadcrumbs = [
     <Breadcrumbs items={breadcrumbs} />
 
     <!-- Page Header -->
-    <div class="mb-4">
-      <h1 class="text-h1 font-bold text-slate-700 mb-2">
-        Trinidad Crime Headlines:
-      </h1>
-    </div>
-
-    <!-- Mobile Filter Toggle Button -->
-    <div class="mb-4 md:hidden">
-      <button
-        id="filterToggle"
-        class="w-full px-4 py-2.5 bg-white/50 text-rose-600 rounded-lg hover:bg-rose-700 transition font-medium text-xs flex items-center justify-between"
-      >
-        <span>Filters</span>
-        <svg id="filterToggleIcon" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-    </div>
-
-    <!-- Filters Container -->
-    <div id="filtersContainer" class="bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 mb-6 hidden md:block">
-      <div class="flex flex-col md:flex-row md:flex-wrap md:items-end gap-3">
-        <!-- Date Range -->
-        <div class="flex-1 min-w-[140px]">
-          <label for="dateFrom" class="block text-xs font-medium text-slate-600 mb-1">
-            From:
-          </label>
-          <input
-            type="date"
-            id="dateFrom"
-            class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
-          />
-        </div>
-
-        <div class="flex-1 min-w-[140px]">
-          <label for="dateTo" class="block text-xs font-medium text-slate-600 mb-1">
-            To:
-          </label>
-          <input
-            type="date"
-            id="dateTo"
-            class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
-          />
-        </div>
-
-        <!-- Crime Type -->
-        <div class="flex-1 min-w-[160px]">
-          <label for="crimeType" class="block text-xs font-medium text-slate-600 mb-1">
-            Crime Type
-          </label>
-          <select
-            id="crimeType"
-            class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
-          >
-            <option value="">All Types</option>
-            {crimeTypes.map(type => (
-              <option value={type}>{type}</option>
-            ))}
-          </select>
-        </div>
-
-        <!-- Area -->
-        <div class="flex-1 min-w-[160px]">
-          <label for="area" class="block text-xs font-medium text-slate-600 mb-1">
-            Area
-          </label>
-          <select
-            id="area"
-            class="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500"
-          >
-            <option value="">All Areas</option>
-            {areas.map(area => (
-              <option value={area}>{area}</option>
-            ))}
-          </select>
-        </div>
-
-        <!-- Clear Filters -->
-        <button
-          id="clearFilters"
-          class="px-4 py-1.5 text-xs text-rose-600 hover:text-rose-700 font-medium border-2 border-rose-600 rounded-lg hover:bg-rose-50 transition"
+    <div class="mb-4 flex items-start justify-between gap-4">
+      <div>
+        <h1 class="text-h1 font-bold text-slate-700 mb-2">
+          Trinidad Crime Headlines {currentYear}
+        </h1>
+        <p class="text-xs text-slate-500">Latest crime reports from {currentYear}</p>
+      </div>
+      <div class="flex flex-col gap-2">
+        
+        <a
+          href={`/trinidad/archive/${currentYear}/${new Date().getMonth() + 1}`}
+          class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
         >
-          Clear Filters
+          View Archive
+        </a>
+        <button
+          id="filtersBtn"
+          class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
+        >
+          Filters ›
         </button>
       </div>
+    </div>
 
-      <!-- Results Count -->
-      <div class="mt-3 text-xs text-slate-500">
-        Showing <span id="resultsCount">{allCrimes.length}</span> of {allCrimes.length} crimes
-      </div>
+    <!-- Results Count -->
+    <div class="mb-6 text-xs text-slate-500">
+      Showing <span id="resultsCount">{allCrimes.length}</span> of {allCrimes.length} crimes
     </div>
 
     <!-- Crime Cards Grid -->
@@ -152,6 +96,85 @@ const breadcrumbs = [
       </button>
     </div>
   </main>
+
+  <!-- Filters Tray -->
+  <div id="filtersTray" class="fixed inset-0 z-50 pointer-events-none">
+    <!-- Backdrop -->
+    <div id="filtersBackdrop" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+
+    <!-- Tray Content -->
+    <div id="filtersTrayContent" class="absolute right-0 top-0 h-full w-80 bg-white/60 rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto">
+      <div class="p-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-bold text-slate-700">Filters</h2>
+          <button id="closeFiltersBtn" class="text-slate-400 hover:text-slate-600 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Filter Options -->
+        <div class="space-y-4">
+          <!-- Date Range -->
+          <div>
+            <label for="dateFrom" class="block text-sm font-medium text-slate-700 mb-2">From Date</label>
+            <input
+              type="date"
+              id="dateFrom"
+              class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50"
+            />
+          </div>
+
+          <div>
+            <label for="dateTo" class="block text-sm font-medium text-slate-700 mb-2">To Date</label>
+            <input
+              type="date"
+              id="dateTo"
+              class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50"
+            />
+          </div>
+
+          <!-- Crime Type -->
+          <div>
+            <label for="crimeType" class="block text-sm font-medium text-slate-700 mb-2">Crime Type</label>
+            <select
+              id="crimeType"
+              class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50"
+            >
+              <option value="">All Types</option>
+              {crimeTypes.map(type => (
+                <option value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+
+          <!-- Area -->
+          <div>
+            <label for="area" class="block text-sm font-medium text-slate-700 mb-2">Area</label>
+            <select
+              id="area"
+              class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50"
+            >
+              <option value="">All Areas</option>
+              {areas.map(area => (
+                <option value={area}>{area}</option>
+              ))}
+            </select>
+          </div>
+
+          <!-- Clear Filters Button -->
+          <button
+            id="clearFilters"
+            class="w-full px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium text-xs"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Client-side filtering script -->
   <script define:vars={{ allCrimes }}>
@@ -199,7 +222,7 @@ const breadcrumbs = [
             <span class="inline-block px-3 py-1 rounded-full text-white text-xs font-medium" style="background-color: ${getCrimeColorHex(crime.crimeType)}">
               ${crime.crimeType}
             </span>
-            <span class="text-xs text-slate-400">
+            <span class="text-xs text-slate-500">
               ${formatDate(crime.date)}
             </span>
           </div>
@@ -323,5 +346,49 @@ const breadcrumbs = [
 
     // Apply default filters
     applyFilters();
+
+    // Filters Tray Controls
+    const filtersBtn = document.getElementById('filtersBtn');
+    const filtersTray = document.getElementById('filtersTray');
+    const filtersTrayContent = document.getElementById('filtersTrayContent');
+    const filtersBackdrop = document.getElementById('filtersBackdrop');
+    const closeFiltersBtn = document.getElementById('closeFiltersBtn');
+
+    function openFiltersTray() {
+      filtersTray.classList.remove('pointer-events-none');
+      filtersBackdrop.classList.remove('pointer-events-none');
+      setTimeout(() => {
+        filtersBackdrop.classList.remove('opacity-0');
+        filtersTrayContent.classList.remove('translate-x-full');
+      }, 10);
+    }
+
+    function closeFiltersTray() {
+      filtersBackdrop.classList.add('opacity-0');
+      filtersTrayContent.classList.add('translate-x-full');
+      setTimeout(() => {
+        filtersTray.classList.add('pointer-events-none');
+        filtersBackdrop.classList.add('pointer-events-none');
+      }, 300);
+    }
+
+    if (filtersBtn) {
+      filtersBtn.addEventListener('click', openFiltersTray);
+    }
+
+    if (closeFiltersBtn) {
+      closeFiltersBtn.addEventListener('click', closeFiltersTray);
+    }
+
+    if (filtersBackdrop) {
+      filtersBackdrop.addEventListener('click', closeFiltersTray);
+    }
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !filtersTray.classList.contains('pointer-events-none')) {
+        closeFiltersTray();
+      }
+    });
   </script>
 </Layout>

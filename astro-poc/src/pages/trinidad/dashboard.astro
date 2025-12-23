@@ -86,6 +86,7 @@ const title = "Trinidad & Tobago Crime Dashboard — Regional Statistics";
 const description = "Real-time Trinidad crime statistics on our interactive map. View Port of Spain data and regional safety trends. Check the live dashboard now.";
 ---
 
+
 <Layout title={title} description={description}>
 
   <div class="container mx-auto px-4 py-2 max-w-7xl">
@@ -99,7 +100,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       <div class="flex items-start justify-between gap-10 pt-4">
         <div>
           <h1 class="text-2xl font-bold text-slate-700">Trinidad & Tobago</h1>
-          <p class="text-small text-slate-500">Crime Statistics Dashboard</p>
+          <p class="text-xs text-slate-500">Crime Statistics Dashboard</p>
         </div>
         <div class="flex flex-col gap-2">
           <a href="/trinidad/headlines"
@@ -119,9 +120,9 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-4"></div>
 
     <!-- Statistics Cards - Horizontal Scroll -->
-    <div class="stats-wrapper">
+    <div class="stats-wrapper relative min-h-[140px]">
       <!-- Stats Shimmer (shown during loading) -->
-      <div id="statsShimmer" class="flex gap-4 overflow-x-auto pb-4">
+      <div id="statsShimmer" class="absolute inset-0 flex gap-4 overflow-x-auto pb-4 transition-opacity duration-300">
         {[...Array(10)].map(() => (
           <div class="flex-shrink-0" style="width: 180px;">
             <LoadingShimmer height="120px" />
@@ -130,7 +131,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       </div>
 
       <!-- Actual Stats (hidden initially) -->
-      <div class="stats-scroll-container opacity-0 transition-opacity duration-300">
+      <div class="stats-scroll-container absolute inset-0 opacity-0 transition-opacity duration-300">
         <StatCard value={crimes.length} label="Total Incidents" id="totalIncidents" crimeType="All" />
         <StatCard value={crimes.filter(c => c.crimeType === 'Murder').length} label="Murders" crimeType="Murder" />
         <StatCard value={crimes.filter(c => c.crimeType === 'Robbery').length} label="Robberies" crimeType="Robbery" />
@@ -150,7 +151,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     <!-- Leaflet Map -->
     <div class="mb-6">
       <div class="flex items-center gap-2">
-        <h2 class="text-h2 font-bold text-slate-700 pt-4 px-4 mb-4">Crime Incidents Map</h2>
+        <h2 class="text-h2 font-bold text-slate-500 pt-4 px-4 mb-4">Crime Incidents Map</h2>
         <InfoPopup id="map-info">
           <p class="font-semibold mb-2 text-slate-700">Understanding the Map</p>
           <p class="mb-3">This map shows estimated/reported locations of crimes and is updated daily.</p>
@@ -162,14 +163,14 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
           </ul>
         </InfoPopup>
       </div>
-      <div class="relative">
+      <div class="relative min-h-[600px]">
         <!-- Map Shimmer (shown during loading) -->
-        <div id="mapShimmer" class="w-full">
+        <div id="mapShimmer" class="absolute inset-0 w-full transition-opacity duration-300">
           <LoadingShimmer height="600px" />
         </div>
 
         <!-- Actual Map (hidden initially) -->
-        <div id="leafletMap" class="w-full h-150 rounded-lg opacity-0 transition-opacity duration-300"></div>
+        <div id="leafletMap" class="absolute inset-0 w-full h-150 rounded-lg opacity-0 transition-opacity duration-300"></div>
 
         <!-- Pan instruction overlay (shown on single finger touch) -->
         <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-10">
@@ -183,16 +184,24 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 
     <!-- Quick Insights & Top Regions -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <!-- Insight Cards Shimmer (shown during loading) -->
-      <div id="insightsShimmer" class="contents">
-        <LoadingShimmer height="400px" />
-        <LoadingShimmer height="400px" />
+      <!-- Quick Insights Container -->
+      <div class="relative min-h-[400px]">
+        <div id="insightsShimmer" class="absolute inset-0 transition-opacity duration-300">
+          <LoadingShimmer height="400px" />
+        </div>
+        <div id="insightsCards" class="absolute inset-0 opacity-0 transition-opacity duration-300">
+          <QuickInsightsCard insights={insights} />
+        </div>
       </div>
 
-      <!-- Actual Insight Cards (hidden initially) -->
-      <div id="insightsCards" class="contents opacity-0 transition-opacity duration-300">
-        <QuickInsightsCard insights={insights} />
-        <TopRegionsCard crimes={crimes} />
+      <!-- Top Regions Container -->
+      <div class="relative min-h-[400px]">
+        <div id="topRegionsShimmer" class="absolute inset-0 transition-opacity duration-300">
+          <LoadingShimmer height="400px" />
+        </div>
+        <div id="topRegionsCard" class="absolute inset-0 opacity-0 transition-opacity duration-300">
+          <TopRegionsCard crimes={crimes} />
+        </div>
       </div>
     </div>
 
@@ -364,8 +373,8 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
         await new Promise(resolve => setTimeout(resolve, remaining));
       }
 
-      // Hide shimmer, show content
-      if (shimmerEl) shimmerEl.style.display = 'none';
+      // Hide shimmer, show content (opacity only - no layout shift)
+      if (shimmerEl) shimmerEl.style.opacity = '0';
       if (contentEl) {
         contentEl.style.opacity = '1';
       }
@@ -420,6 +429,12 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       await window.hideShimmerWithMinTime(
         document.getElementById('insightsShimmer'),
         document.getElementById('insightsCards'),
+        shimmerStartTime
+      );
+
+      await window.hideShimmerWithMinTime(
+        document.getElementById('topRegionsShimmer'),
+        document.getElementById('topRegionsCard'),
         shimmerStartTime
       );
 
@@ -478,6 +493,8 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
   <script>
     import { initializeYearFilter } from '../../scripts/yearFilter';
     import { updateLeafletMap } from '../../scripts/leafletMap';
+    import { updateStatsCards, updateQuickInsights, updateTopRegions } from '../../scripts/dashboardUpdates';
+    import { initializeStatCardFiltering, initializeTraySync } from '../../scripts/statCardFiltering';
 
     console.log('🚀 Year filter script starting...');
 
@@ -495,7 +512,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
           const statsShimmer = document.getElementById('statsShimmer');
           const statsContainer = document.querySelector('.stats-scroll-container');
 
-          if (statsShimmer) statsShimmer.style.display = 'flex';
+          if (statsShimmer) statsShimmer.style.opacity = '1';
           if (statsContainer) statsContainer.style.opacity = '0';
 
           // Update after short delay
@@ -512,26 +529,41 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
           const insightsShimmer = document.getElementById('insightsShimmer');
           const insightsCards = document.getElementById('insightsCards');
 
-          if (insightsShimmer) insightsShimmer.style.display = 'contents';
+          if (insightsShimmer) insightsShimmer.style.opacity = '1';
           if (insightsCards) insightsCards.style.opacity = '0';
 
           // Update after short delay
           setTimeout(async () => {
             const updateStart = Date.now();
             updateQuickInsights(crimes);
-            updateTopRegions(crimes);
 
             // Hide shimmer with minimum time
             await window.hideShimmerWithMinTime(insightsShimmer, insightsCards, updateStart);
           }, 100);
         },
-        updateTopRegions: () => {}, // Already handled in updateQuickInsights
+        updateTopRegions: (crimes) => {
+          // Show shimmer before update
+          const topRegionsShimmer = document.getElementById('topRegionsShimmer');
+          const topRegionsCard = document.getElementById('topRegionsCard');
+
+          if (topRegionsShimmer) topRegionsShimmer.style.opacity = '1';
+          if (topRegionsCard) topRegionsCard.style.opacity = '0';
+
+          // Update after short delay
+          setTimeout(async () => {
+            const updateStart = Date.now();
+            updateTopRegions(crimes);
+
+            // Hide shimmer with minimum time
+            await window.hideShimmerWithMinTime(topRegionsShimmer, topRegionsCard, updateStart);
+          }, 100);
+        },
         updateLeafletMap: (crimes) => {
           // Show shimmer before update
           const mapShimmer = document.getElementById('mapShimmer');
           const leafletMap = document.getElementById('leafletMap');
 
-          if (mapShimmer) mapShimmer.style.display = 'block';
+          if (mapShimmer) mapShimmer.style.opacity = '1';
           if (leafletMap) leafletMap.style.opacity = '0';
 
           // Update after short delay
@@ -546,265 +578,24 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       });
     }
 
-  // Update stats cards
-  function updateStatsCards(crimes) {
-    // Update Total Incidents - target the value element inside the card
-    const totalIncidentsCard = document.getElementById('totalIncidents');
-    if (totalIncidentsCard) {
-      const valueEl = totalIncidentsCard.querySelector('.text-3xl');
-      if (valueEl) valueEl.textContent = crimes.length;
-    }
-
-    // Update individual crime type cards
-    const murders = crimes.filter(c => c.crimeType === 'Murder').length;
-    const robberies = crimes.filter(c => c.crimeType === 'Robbery').length;
-    const homeInvasions = crimes.filter(c => c.crimeType === 'Home Invasion').length;
-    const thefts = crimes.filter(c => c.crimeType === 'Theft').length;
-    const shootings = crimes.filter(c => c.crimeType === 'Shooting').length;
-    const assaults = crimes.filter(c => c.crimeType === 'Assault').length;
-    const burglaries = crimes.filter(c => c.crimeType === 'Burglary').length;
-    const seizures = crimes.filter(c => c.crimeType === 'Seizures').length;
-    const kidnappings = crimes.filter(c => c.crimeType === 'Kidnapping').length;
-
-    // Find and update each stat card by index
-    const statCards = document.querySelectorAll('.stat-card');
-    const murdersEl = statCards[1]?.querySelector('.text-3xl');
-    const robberiesEl = statCards[2]?.querySelector('.text-3xl');
-    const homeInvasionsEl = statCards[3]?.querySelector('.text-3xl');
-    const theftsEl = statCards[4]?.querySelector('.text-3xl');
-    const shootingsEl = statCards[5]?.querySelector('.text-3xl');
-    const assaultsEl = statCards[6]?.querySelector('.text-3xl');
-    const burglariesEl = statCards[7]?.querySelector('.text-3xl');
-    const seizuresEl = statCards[8]?.querySelector('.text-3xl');
-    const kidnappingsEl = statCards[9]?.querySelector('.text-3xl');
-
-    if (murdersEl) murdersEl.textContent = murders;
-    if (robberiesEl) robberiesEl.textContent = robberies;
-    if (homeInvasionsEl) homeInvasionsEl.textContent = homeInvasions;
-    if (theftsEl) theftsEl.textContent = thefts;
-    if (shootingsEl) shootingsEl.textContent = shootings;
-    if (assaultsEl) assaultsEl.textContent = assaults;
-    if (burglariesEl) burglariesEl.textContent = burglaries;
-    if (seizuresEl) seizuresEl.textContent = seizures;
-    if (kidnappingsEl) kidnappingsEl.textContent = kidnappings;
-
-    console.log('✅ Stats cards updated');
-  }
-
-  // Update Quick Insights
-  function updateQuickInsights(crimes) {
-    if (crimes.length === 0) return;
-
-    const dates = crimes.map(c => new Date(c.date)).filter(d => !isNaN(d.getTime()));
-    const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
-    const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
-    const daysDiff = Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-
-    const avgPerDay = (crimes.length / daysDiff).toFixed(1);
-
-    // Most dangerous day
-    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const dayCount = new Map();
-    dates.forEach(date => {
-      const day = dayNames[date.getDay()];
-      dayCount.set(day, (dayCount.get(day) || 0) + 1);
-    });
-    const mostDangerousDay = Array.from(dayCount.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
-
-    // Busiest month
-    const monthCount = new Map();
-    dates.forEach(date => {
-      const month = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      monthCount.set(month, (monthCount.get(month) || 0) + 1);
-    });
-    const busiestMonth = Array.from(monthCount.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
-
-    // Area stats
-    const areaCount = new Map();
-    crimes.forEach(crime => {
-      const area = crime.area || 'Unknown';
-      areaCount.set(area, (areaCount.get(area) || 0) + 1);
-    });
-    const areaArray = Array.from(areaCount.entries()).sort((a, b) => b[1] - a[1]);
-    const top3Count = areaArray.slice(0, 3).reduce((sum, [_, count]) => sum + count, 0);
-    const top3Percentage = ((top3Count / crimes.length) * 100).toFixed(0);
-
-    // Find safest area (exclude "Unknown" and empty values)
-    const validAreas = areaArray.filter(([area]) => area && area !== 'Unknown' && area.trim() !== '');
-    const safestRegion = validAreas[validAreas.length - 1]?.[0] || 'N/A';
-    const safestRegionCount = validAreas[validAreas.length - 1]?.[1] || 0;
-
-    const mostDangerousRegion = areaArray[0]?.[0] || 'N/A';
-    const mostDangerousRegionCount = areaArray[0]?.[1] || 0;
-
-    // Update DOM using IDs
-    const avgPerDayEl = document.getElementById('avgPerDay');
-    const mostDangerousDayEl = document.getElementById('mostDangerousDay');
-    const busiestMonthEl = document.getElementById('busiestMonth');
-    const top3PercentageEl = document.getElementById('top3Percentage');
-    const mostDangerousRegionEl = document.getElementById('mostDangerousRegion');
-    const mostDangerousRegionCountEl = document.getElementById('mostDangerousRegionCount');
-    const safestRegionEl = document.getElementById('safestRegion');
-    const safestRegionCountEl = document.getElementById('safestRegionCount');
-
-    if (avgPerDayEl) avgPerDayEl.textContent = `${avgPerDay} crimes/day`;
-    if (mostDangerousDayEl) mostDangerousDayEl.textContent = mostDangerousDay;
-    if (busiestMonthEl) busiestMonthEl.textContent = busiestMonth;
-    if (top3PercentageEl) top3PercentageEl.textContent = `Top 3 areas: ${top3Percentage}%`;
-    if (mostDangerousRegionEl) mostDangerousRegionEl.textContent = mostDangerousRegion;
-    if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = `${mostDangerousRegionCount} incidents`;
-    if (safestRegionEl) safestRegionEl.textContent = safestRegion;
-    if (safestRegionCountEl) safestRegionCountEl.textContent = `${safestRegionCount} incidents`;
-
-    console.log('✅ Quick Insights updated');
-  }
-
-  // Update Top Areas
-  function updateTopRegions(crimes) {
-    const areaCount = new Map();
-    crimes.forEach(crime => {
-      const area = crime.area || 'Unknown';
-      areaCount.set(area, (areaCount.get(area) || 0) + 1);
-    });
-
-    const topAreas = Array.from(areaCount.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
-
-    // Update using ID selector
-    const container = document.getElementById('topRegionsContainer');
-    if (container) {
-      container.innerHTML = topAreas.map(([area, count]) => `
-        <div class="flex justify-between items-center pb-2 border-b border-slate-200 last:border-0">
-          <span class="text-xs text-slate-500">${area}</span>
-          <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
-            ${count}
-          </span>
-        </div>
-      `).join('');
-    }
-
-    console.log('✅ Top Areas updated');
-  }
-
-  // ===========================
-  // STAT CARD CLICK FILTERING
-  // ===========================
-
-  let activeCrimeTypeFilter = null;
-  let scrollResetTimer = null;
-
-  function initializeStatCardFiltering() {
-    const statCards = document.querySelectorAll('.stat-card');
-    const statsScrollContainer = document.querySelector('.stats-scroll-container');
-
-    statCards.forEach(card => {
-      card.addEventListener('click', function() {
-        const crimeType = this.getAttribute('data-crime-type');
-
-        if (!crimeType) return;
-
-        // Toggle behavior: if clicking same card, clear filter
-        if (activeCrimeTypeFilter === crimeType) {
-          activeCrimeTypeFilter = null;
-          statCards.forEach(c => c.classList.remove('active'));
-          console.log('🔄 Crime type filter cleared');
-
-          // Sync checkbox state
-          if (window.syncCrimeTypeCheckbox) {
-            window.syncCrimeTypeCheckbox(crimeType, false);
-          }
-        } else {
-          activeCrimeTypeFilter = crimeType;
-
-          // Update visual state
-          statCards.forEach(c => c.classList.remove('active'));
-          this.classList.add('active');
-
-          console.log(`🎯 Filtering by crime type: ${crimeType}`);
-
-          // Sync checkbox state
-          if (window.syncCrimeTypeCheckbox) {
-            window.syncCrimeTypeCheckbox(crimeType, true);
-          }
-        }
-
-        // Scroll active card into view
-        scrollCardIntoView(this, statsScrollContainer);
-
-        // Re-filter all dashboard components
-        applyAllFilters();
-      });
-    });
-
-    // Auto-scroll back to active card after user scrolls away
-    if (statsScrollContainer) {
-      statsScrollContainer.addEventListener('scroll', () => {
-        if (activeCrimeTypeFilter) {
-          clearTimeout(scrollResetTimer);
-          scrollResetTimer = setTimeout(() => {
-            const activeCard = document.querySelector('.stat-card.active');
-            if (activeCard) {
-              scrollCardIntoView(activeCard, statsScrollContainer);
-            }
-          }, 3000); // 3 seconds after user stops scrolling
-        }
-      });
-    }
-
-    console.log('✅ Stat card filtering initialized');
-  }
-
-  function scrollCardIntoView(card, container) {
-    if (!card || !container) return;
-
-    const cardRect = card.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-    const cardCenter = cardRect.left + cardRect.width / 2;
-    const containerCenter = containerRect.left + containerRect.width / 2;
-    const scrollOffset = cardCenter - containerCenter;
-
-    container.scrollBy({
-      left: scrollOffset,
-      behavior: 'smooth'
-    });
-  }
-
-  function applyAllFilters() {
-    if (!window.__crimesData) return;
-
-    let filteredCrimes = window.__crimesData;
-
-    // Apply year filter (if any)
-    const yearFilter = document.getElementById('yearFilter');
-    if (yearFilter && yearFilter.value !== 'all') {
-      const selectedYears = yearFilter.value.split(',').map(y => parseInt(y.trim()));
-      filteredCrimes = filteredCrimes.filter(crime => {
-        const crimeYear = new Date(crime.date).getFullYear();
-        return selectedYears.includes(crimeYear);
-      });
-    }
-
-    // Apply crime type filter
-    if (activeCrimeTypeFilter && activeCrimeTypeFilter !== 'All') {
-      filteredCrimes = filteredCrimes.filter(crime => crime.crimeType === activeCrimeTypeFilter);
-      console.log(`📊 Filtered to ${filteredCrimes.length} ${activeCrimeTypeFilter} incidents`);
-    }
-
-    // Update dashboard components (but NOT stats cards - they show year totals)
-    updateQuickInsights(filteredCrimes);
-    updateTopRegions(filteredCrimes);
-    updateLeafletMap(filteredCrimes, '/trinidad/crime/');
-  }
-
     // Start waiting for crimes data
     waitForCrimesData();
 
     // Initialize stat card filtering after DOM is ready
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initializeStatCardFiltering);
+      document.addEventListener('DOMContentLoaded', () => {
+        initializeStatCardFiltering({
+          updateQuickInsights,
+          updateTopRegions,
+          updateLeafletMap
+        });
+      });
     } else {
-      initializeStatCardFiltering();
+      initializeStatCardFiltering({
+        updateQuickInsights,
+        updateTopRegions,
+        updateLeafletMap
+      });
     }
   </script>
 
@@ -813,52 +604,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 
   <!-- Sync Stat Cards with Tray Checkboxes -->
   <script>
-    // Global function to sync checkbox state with stat card
-    window.syncCrimeTypeCheckbox = function(crimeType, isActive) {
-      const checkboxes = document.querySelectorAll('.crime-type-checkbox');
-      checkboxes.forEach(checkbox => {
-        if (checkbox.getAttribute('data-crime-type') === crimeType) {
-          checkbox.checked = isActive;
-        } else if (crimeType === 'All') {
-          checkbox.checked = false; // Clear all checkboxes when "All" is selected
-        }
-      });
-    };
-
-    // Listen for checkbox changes in tray
-    function initializeTraySync() {
-      const checkboxes = document.querySelectorAll('.crime-type-checkbox');
-
-      checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-          const crimeType = this.getAttribute('data-crime-type');
-          const isChecked = this.checked;
-
-          // Uncheck all other checkboxes (single selection to match stat card behavior)
-          checkboxes.forEach(cb => {
-            if (cb !== this) cb.checked = false;
-          });
-
-          // Find and click the corresponding stat card
-          const statCards = document.querySelectorAll('.stat-card');
-          statCards.forEach(card => {
-            const cardType = card.getAttribute('data-crime-type');
-
-            if (isChecked && cardType === crimeType) {
-              // Activate this card
-              card.click();
-            } else if (!isChecked && cardType === crimeType) {
-              // Deactivate this card (click again to toggle off)
-              if (card.classList.contains('active')) {
-                card.click();
-              }
-            }
-          });
-        });
-      });
-
-      console.log('✅ Tray checkbox sync initialized');
-    }
+    import { initializeTraySync } from '../../scripts/statCardFiltering';
 
     // Initialize after DOM is ready
     if (document.readyState === 'loading') {
