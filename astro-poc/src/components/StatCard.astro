@@ -3,18 +3,35 @@
  * StatCard Component
  * Displays a single crime statistic with large number and label
  * Used in the horizontal scrolling stats section on dashboard
+ * Clickable to filter dashboard by crime type
  */
 
 interface Props {
   value: number;
   label: string;
   id?: string;
+  crimeType?: string; // Crime type to filter by (e.g., "Murder", "Robbery")
 }
 
-const { value, label, id } = Astro.props;
+const { value, label, id, crimeType } = Astro.props;
 ---
 
-<div class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm" id={id}>
+<div
+  class="stat-card bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-sm cursor-pointer transition-all duration-200 hover:shadow-lg"
+  id={id}
+  data-crime-type={crimeType}
+>
   <div class="text-3xl font-bold text-rose-600">{value}</div>
   <div class="text-xs text-slate-500">{label}</div>
 </div>
+
+<style>
+  .stat-card:hover {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.15);
+  }
+
+  .stat-card.active {
+    border: 2px solid #e11d48;
+    background: rgba(255, 255, 255, 0.7);
+  }
+</style>

@@ -131,16 +131,16 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 
       <!-- Actual Stats (hidden initially) -->
       <div class="stats-scroll-container opacity-0 transition-opacity duration-300">
-        <StatCard value={crimes.length} label="Total Incidents" id="totalIncidents" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Murder').length} label="Murders" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Robbery').length} label="Robberies" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Home Invasion').length} label="Home Invasions" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Theft').length} label="Thefts" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Shooting').length} label="Shootings" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Assault').length} label="Assaults" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Burglary').length} label="Burglaries" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Seizures').length} label="Seizures" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Kidnapping').length} label="Kidnappings" />
+        <StatCard value={crimes.length} label="Total Incidents" id="totalIncidents" crimeType="All" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Murder').length} label="Murders" crimeType="Murder" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Robbery').length} label="Robberies" crimeType="Robbery" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Home Invasion').length} label="Home Invasions" crimeType="Home Invasion" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Theft').length} label="Thefts" crimeType="Theft" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Shooting').length} label="Shootings" crimeType="Shooting" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Assault').length} label="Assaults" crimeType="Assault" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Burglary').length} label="Burglaries" crimeType="Burglary" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Seizures').length} label="Seizures" crimeType="Seizures" />
+        <StatCard value={crimes.filter(c => c.crimeType === 'Kidnapping').length} label="Kidnappings" crimeType="Kidnapping" />
       </div>
     </div>
 
@@ -687,12 +687,186 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     console.log('✅ Top Areas updated');
   }
 
+  // ===========================
+  // STAT CARD CLICK FILTERING
+  // ===========================
+
+  let activeCrimeTypeFilter = null;
+  let scrollResetTimer = null;
+
+  function initializeStatCardFiltering() {
+    const statCards = document.querySelectorAll('.stat-card');
+    const statsScrollContainer = document.querySelector('.stats-scroll-container');
+
+    statCards.forEach(card => {
+      card.addEventListener('click', function() {
+        const crimeType = this.getAttribute('data-crime-type');
+
+        if (!crimeType) return;
+
+        // Toggle behavior: if clicking same card, clear filter
+        if (activeCrimeTypeFilter === crimeType) {
+          activeCrimeTypeFilter = null;
+          statCards.forEach(c => c.classList.remove('active'));
+          console.log('🔄 Crime type filter cleared');
+
+          // Sync checkbox state
+          if (window.syncCrimeTypeCheckbox) {
+            window.syncCrimeTypeCheckbox(crimeType, false);
+          }
+        } else {
+          activeCrimeTypeFilter = crimeType;
+
+          // Update visual state
+          statCards.forEach(c => c.classList.remove('active'));
+          this.classList.add('active');
+
+          console.log(`🎯 Filtering by crime type: ${crimeType}`);
+
+          // Sync checkbox state
+          if (window.syncCrimeTypeCheckbox) {
+            window.syncCrimeTypeCheckbox(crimeType, true);
+          }
+        }
+
+        // Scroll active card into view
+        scrollCardIntoView(this, statsScrollContainer);
+
+        // Re-filter all dashboard components
+        applyAllFilters();
+      });
+    });
+
+    // Auto-scroll back to active card after user scrolls away
+    if (statsScrollContainer) {
+      statsScrollContainer.addEventListener('scroll', () => {
+        if (activeCrimeTypeFilter) {
+          clearTimeout(scrollResetTimer);
+          scrollResetTimer = setTimeout(() => {
+            const activeCard = document.querySelector('.stat-card.active');
+            if (activeCard) {
+              scrollCardIntoView(activeCard, statsScrollContainer);
+            }
+          }, 3000); // 3 seconds after user stops scrolling
+        }
+      });
+    }
+
+    console.log('✅ Stat card filtering initialized');
+  }
+
+  function scrollCardIntoView(card, container) {
+    if (!card || !container) return;
+
+    const cardRect = card.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const cardCenter = cardRect.left + cardRect.width / 2;
+    const containerCenter = containerRect.left + containerRect.width / 2;
+    const scrollOffset = cardCenter - containerCenter;
+
+    container.scrollBy({
+      left: scrollOffset,
+      behavior: 'smooth'
+    });
+  }
+
+  function applyAllFilters() {
+    if (!window.__crimesData) return;
+
+    let filteredCrimes = window.__crimesData;
+
+    // Apply year filter (if any)
+    const yearFilter = document.getElementById('yearFilter');
+    if (yearFilter && yearFilter.value !== 'all') {
+      const selectedYears = yearFilter.value.split(',').map(y => parseInt(y.trim()));
+      filteredCrimes = filteredCrimes.filter(crime => {
+        const crimeYear = new Date(crime.date).getFullYear();
+        return selectedYears.includes(crimeYear);
+      });
+    }
+
+    // Apply crime type filter
+    if (activeCrimeTypeFilter && activeCrimeTypeFilter !== 'All') {
+      filteredCrimes = filteredCrimes.filter(crime => crime.crimeType === activeCrimeTypeFilter);
+      console.log(`📊 Filtered to ${filteredCrimes.length} ${activeCrimeTypeFilter} incidents`);
+    }
+
+    // Update dashboard components (but NOT stats cards - they show year totals)
+    updateQuickInsights(filteredCrimes);
+    updateTopRegions(filteredCrimes);
+    updateLeafletMap(filteredCrimes, '/trinidad/crime/');
+  }
+
     // Start waiting for crimes data
     waitForCrimesData();
+
+    // Initialize stat card filtering after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeStatCardFiltering);
+    } else {
+      initializeStatCardFiltering();
+    }
   </script>
 
   <!-- Filters Tray Component -->
-  <FiltersTray showYearFilter={true} />
+  <FiltersTray showYearFilter={true} showCrimeTypeFilter={true} />
+
+  <!-- Sync Stat Cards with Tray Checkboxes -->
+  <script>
+    // Global function to sync checkbox state with stat card
+    window.syncCrimeTypeCheckbox = function(crimeType, isActive) {
+      const checkboxes = document.querySelectorAll('.crime-type-checkbox');
+      checkboxes.forEach(checkbox => {
+        if (checkbox.getAttribute('data-crime-type') === crimeType) {
+          checkbox.checked = isActive;
+        } else if (crimeType === 'All') {
+          checkbox.checked = false; // Clear all checkboxes when "All" is selected
+        }
+      });
+    };
+
+    // Listen for checkbox changes in tray
+    function initializeTraySync() {
+      const checkboxes = document.querySelectorAll('.crime-type-checkbox');
+
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const crimeType = this.getAttribute('data-crime-type');
+          const isChecked = this.checked;
+
+          // Uncheck all other checkboxes (single selection to match stat card behavior)
+          checkboxes.forEach(cb => {
+            if (cb !== this) cb.checked = false;
+          });
+
+          // Find and click the corresponding stat card
+          const statCards = document.querySelectorAll('.stat-card');
+          statCards.forEach(card => {
+            const cardType = card.getAttribute('data-crime-type');
+
+            if (isChecked && cardType === crimeType) {
+              // Activate this card
+              card.click();
+            } else if (!isChecked && cardType === crimeType) {
+              // Deactivate this card (click again to toggle off)
+              if (card.classList.contains('active')) {
+                card.click();
+              }
+            }
+          });
+        });
+      });
+
+      console.log('✅ Tray checkbox sync initialized');
+    }
+
+    // Initialize after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeTraySync);
+    } else {
+      initializeTraySync();
+    }
+  </script>
 
   <!-- Mouse Wheel Horizontal Scroll for Stats Cards -->
   <script>
