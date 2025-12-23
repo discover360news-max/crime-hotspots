@@ -103,11 +103,8 @@ export function initializeYearFilter(
 
     console.log('✅ Year filter dropdown populated');
 
-    // Initial update with current year data
-    callbacks.updateStatsCards(filteredCrimes);
-    callbacks.updateQuickInsights(filteredCrimes);
-    callbacks.updateTopRegions(filteredCrimes);
-    console.log('✅ Initial dashboard updated with current year data');
+    // Note: No initial update needed - data already rendered server-side
+    // Callbacks only fire on user interaction (year filter changes)
 
     // Listen for year filter changes
     yearFilterElement.addEventListener('change', (e) => {
