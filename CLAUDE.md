@@ -9,12 +9,19 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Current Status:** ✅ Production - Trinidad & Tobago LIVE (Astro-powered)
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
-**Focus:** Trinidad-only implementation (Guyana expansion deferred)
-**Last Updated:** December 18, 2025
+**Focus:** Trinidad-only implementation (Other islands expansion deferred)
+**Last Updated:** December 23, 2025
 
 ---
 ## Kavell Forde - Owner - Guidance
 My thought are just my thought process and is always open to critisism and can be urged to be modified for the success of the project. 
+
+## MAIN GOAL - Guidance
+To find a way to get goals accomplished efficiently and by using the least tokens possible by:
+- Employing Kavell to do some tasks manually (with guidance)
+- Have Kavell use Gemini for content where necessary (Provide prompt)
+- Always ask probing questions to clear up ambiguities in requests.
+- Focus and implement once, so no bugs show up unecessarily
 
 
 ## Tech Stack
@@ -89,8 +96,14 @@ astro-poc/
 ├── src/
 │   ├── components/           # Reusable Astro components
 │   │   ├── Header.astro      # Navigation with mobile menu + subscribe tray
-│   │   ├── CrimeCard.astro   # Crime card component
-│   │   └── Breadcrumbs.astro # SEO breadcrumb navigation
+│   │   ├── Breadcrumbs.astro # SEO breadcrumb navigation
+│   │   ├── InfoPopup.astro   # Click-based help tooltips (modal)
+│   │   ├── LoadingShimmer.astro # Facebook-style shimmer loading
+│   │   ├── ReportIssueModal.astro # Crime issue reporting modal
+│   │   ├── FiltersTray.astro # Dashboard slide-out filters
+│   │   ├── StatCard.astro    # Dashboard stat cards
+│   │   ├── QuickInsightsCard.astro # Dashboard insights
+│   │   └── TopRegionsCard.astro # Top areas ranking
 │   ├── content/              # Astro Content Collections
 │   │   ├── config.ts         # Blog schema (TypeScript validation)
 │   │   └── blog/             # Markdown blog posts
@@ -143,17 +156,10 @@ google-apps-script/          # (Unchanged - same automation)
 2. **Facebook sources** (manual collection): Ian Alleyne Network, DJ Sherrif
    - These Facebook pages post verified info that doesn't make mainstream media
    - Currently collected manually (automation pending)
-3. Full article text fetched every hour
+3. Full article text fetched every 8 hours
 4. Gemini AI extracts crime data every hour
-5. Data published to Production sheet (public CSV)
-6. **Update frequency:** Data refreshed every 24 hours
-
-### Guyana
-1. **RSS feeds** collected hourly (Stabroek News, Kaieteur News, Guyana Chronicle)
-2. Full article text fetched every hour
-3. Gemini AI extracts crime data every hour
-4. Data published to Production sheet (public CSV)
-5. **Update frequency:** Data refreshed every 24 hours
+5. Data published to duplicated Production sheet (public CSV)
+6. **Update frequency:** Live Data refreshed every 24 hours
 
 **Critical Configuration (NEVER change):**
 - `maxOutputTokens: 4096` - Must stay at 4096 to prevent truncation
@@ -162,29 +168,85 @@ google-apps-script/          # (Unchanged - same automation)
 
 **Documentation:**
 - `google-apps-script/trinidad/README.md`
-- `google-apps-script/guyana/README.md`
 - `docs/FACEBOOK-DATA-COLLECTION.md` (Facebook sources)
 
 ---
 
 ## Weekly Blog Reports
 
-**Location:** `google-apps-script/weekly-reports/weeklyReportGenerator-IMPROVED.gs`
-
-**Runs:** Every Monday at 10 AM
-
-**Safeguards:**
-- Minimum 10 crimes required
-- Data freshness check (3+ recent crimes)
-- Duplicate detection
-- Backlog check (skips if > 50 pending)
-- Email notifications when skipped
+**Needs to be updated and fixed (future To-Do)
 
 **Documentation:** `docs/automation/WEEKLY-REPORT-SAFEGUARDS.md`
 
 ---
 
 ## Recent Features (Nov-Dec 2025)
+
+### Dashboard UX & Loading States (Dec 23, 2025)
+**Status:** 🚧 In Progress (not yet deployed)
+**Location:** Dashboard, Crime Detail Pages
+
+**New Components Created:**
+- **InfoPopup.astro** - Click-based help tooltips with modal overlay
+  - Top-center positioning, mobile-responsive
+  - Fade in/out animations
+  - Used on dashboard map info icon
+- **LoadingShimmer.astro** - Facebook-style shimmer loading animation
+  - Configurable height, width, border radius
+  - 1.5s gradient wave animation
+- **ReportIssueModal.astro** - Crime data issue reporting system
+  - Pre-fills crime metadata (slug, headline, date, area, etc.)
+  - Issue type checkboxes (Incorrect headline, Wrong date, Duplicate)
+  - Information source dropdown (Eye-witness, News article, etc.)
+  - Form validation and submission to existing Google Apps Script endpoint
+
+**Dashboard Improvements:**
+- **Loading States:** Added shimmer effects to stats cards, map, and insight cards
+  - 500ms minimum display time prevents flash on fast loads
+  - Shimmers appear on initial load AND year filter changes
+  - Smooth opacity transitions (300ms)
+- **Area vs Region:** Changed all dashboard stats from "regions" to "areas"
+  - More culturally accurate for Trinidad (Port of Spain vs Cova-Tabaquite-Talparo)
+  - Updated TopRegionsCard → shows actual areas now
+  - Updated QuickInsightsCard "Top 3" stat
+- **Map Touch Controls:** Fixed one-finger scroll issue
+  - Vertical swipe = page scroll (works normally)
+  - Horizontal swipe on map = hint appears ("Use two fingers")
+  - Fixed z-index: hint stays below header (z-10 instead of z-1000)
+- **Button Layout:** Headlines + Filters buttons stack vertically (better spacing)
+
+**Crime Detail Page Improvements:**
+- **Report Issue Feature:** Button appears after Related Crimes section
+  - Opens modal with pre-filled crime data
+  - Users select issue types, provide source, describe problem
+  - Optional contact email field
+- **Location Display:** Header now shows "Street, Area" instead of "Area, Region"
+  - Removed redundant fields from details section (Street, Area)
+  - Kept only Region and Source
+- **Clickable Source:** Source name now links to original article
+  - Dotted underline styling (border-dotted)
+  - Removed redundant "Read original article" button
+- **Fixed Related Crimes Links:**
+  - "All crimes in December 2025" → Monthly archive
+  - "View [Region] on interactive map" → Dashboard
+  - "Browse recent [CrimeType] incidents" → Headlines
+
+**Technical Notes:**
+- Extracted `leafletMap.ts` for reusable map functionality
+- Added `onMapReady` callback to hide shimmer when map initializes
+- Year filter no longer triggers callbacks on init (prevents shimmer flash)
+- All components follow DESIGN-TOKENS.md (Rose + Slate palette, rounded-lg, px-4 py-1.5 buttons)
+
+**Files Modified:**
+- `astro-poc/src/components/InfoPopup.astro` (new)
+- `astro-poc/src/components/LoadingShimmer.astro` (new)
+- `astro-poc/src/components/ReportIssueModal.astro` (new)
+- `astro-poc/src/components/TopRegionsCard.astro` (region → area)
+- `astro-poc/src/components/QuickInsightsCard.astro` (region → area)
+- `astro-poc/src/pages/trinidad/dashboard.astro` (shimmers, button layout)
+- `astro-poc/src/pages/trinidad/crime/[slug].astro` (Report Issue, location display, source link)
+- `astro-poc/src/scripts/leafletMap.ts` (onMapReady callback, touch controls)
+- `astro-poc/src/scripts/yearFilter.ts` (removed initial callbacks)
 
 ### Year Filter System (Dec 18, 2025)
 **Status:** ✅ LIVE in Production
@@ -220,72 +282,10 @@ See **Critical Rules > CSV URL Synchronization** for detailed guidelines.
 
 ---
 
-### Astro Migration (Dec 16, 2025)
-**Status:** ✅ LIVE in Production
-**Location:** `astro-poc/` directory
-
-**What Changed:**
-- **Complete framework migration** from Vite to Astro 5.16.5
-- **1,300+ auto-generated crime pages** with SEO optimization
-- **Static Site Generation (SSG)** - All pages pre-rendered at build time
-- **File-based routing** - No more manual HTML files
-- **Content Collections** - Type-safe blog system with Markdown
-
-**Key Benefits:**
-- **SEO Explosion:** 1,300+ indexed pages (was ~15 pages in Vite)
-- **Unique URLs per crime:** `/trinidad/crime/murder-port-of-spain-2025-12-15`
-- **Monthly archives:** `/trinidad/archive/2025/12` with statistics
-- **Schema.org markup:** NewsArticle, BreadcrumbList, FAQPage
-- **Lightning fast:** Static HTML = <1s load times
-
-**Pages Implemented:**
-- ✅ Homepage with country cards
-- ✅ Trinidad Dashboard (Leaflet map functional, minor bugs acceptable)
-- ✅ Trinidad Headlines (`/trinidad/headlines`)
-- ✅ 1,300+ individual crime pages with related crimes sidebar
-- ✅ Monthly archive pages with statistics
-- ✅ Blog system (index + individual posts)
-- ✅ Static pages (About, FAQ, Methodology, 404)
-
-**Missing Features (To-Do):**
-- ❌ **Breadcrumbs** - Missing on some pages
-- ❌ **Report form** - Needs recreation from `report.html` to Astro
-- ❌ **Report Issue feature** - Crime pages need "Report Issue" button
-  - Should reuse pattern from `src/js/reportStandalone.js`
-  - Allow users to flag incorrect crime data
-  - Similar to existing issue reporting modal
-
-**Technical Details:**
-- **Build:** `cd astro-poc && npm run build`
-- **Dev server:** Port 4321 (not 5173)
-- **Build output:** `astro-poc/dist/`
-- **Build time:** ~30-60 seconds (generates 1,300+ pages)
-- **Deployment:** GitHub Actions → Cloudflare Pages
-  - Build command: `cd astro-poc && npm ci && npm run build`
-  - Output directory: `astro-poc/dist`
-
-**Focus:** Trinidad-only implementation. Guyana expansion deferred until Trinidad is perfected.
-
-**Vite Version:** Deprecated and no longer deployed.
-
----
-
 ### Enhanced Duplicate Detection (Dec 3, 2025)
 **Location:** `google-apps-script/guyana/processor.gs`, `google-apps-script/trinidad/processor.gs`
 
 **Problem:** Duplicates slipping through when older crimes have been archived from Production to Production Archive
-
-**Solution:** Duplicate detection now checks BOTH sheets
-- Checks Production sheet first (recent data, fast)
-- Checks Production Archive second (historical data)
-- Skips crime if duplicate found in either sheet
-- Gracefully handles missing archive sheet
-
-**Implementation:**
-- Added `PRODUCTION_ARCHIVE` to `SHEET_NAMES` config
-- Sequential duplicate checks with early exit
-- Clear logging shows which sheet had the duplicate
-- Both Trinidad and Guyana automation updated
 
 **Documentation:** `docs/automation/DUPLICATE-DETECTION-ARCHIVE.md`
 
@@ -294,249 +294,10 @@ See **Critical Rules > CSV URL Synchronization** for detailed guidelines.
 
 **Problem:** Gun/ammunition seizure stories were incorrectly classified as "Theft"
 
-**Solution:** Added new "Seizures" crime type for police enforcement actions
-- Police seizures of illegal items (guns, drugs, contraband)
-- Recovery of stolen goods
-- Distinct from actual thefts (crimes against victims)
-- Blue color (#3b82f6) for visual association with law enforcement
-
-**Implementation:**
-- Updated Gemini prompts with clear "Seizures vs Theft" rules
-- Added to crime color configuration (`src/js/config/crimeColors.js`)
-- Both Trinidad and Guyana automation updated
-
 **Documentation:** `docs/automation/SEIZURES-CRIME-TYPE.md`
-
-### Custom Interactive Dashboards
-**Completed Nov 22-24, 2025**
-**Location:** `dashboard-trinidad.html`, `dashboard-guyana.html`
-
-**What Changed:**
-- **Replaced Google Looker Studio iframes** with custom-built dashboards
-- Full control over design, performance, and user experience
-- No more slow loading times or iframe restrictions
-
-**Technology:**
-- Leaflet.js for interactive maps
-- OpenStreetMap tiles (free, no API keys)
-- Leaflet.markercluster for crime density visualization
-- Custom SVG regional maps (clickable regions)
-- Native Fetch API for CSV data processing
-
-**Features:**
-- **Interactive regional maps:** Click regions to filter data
-- **Year filtering:** View specific years or all years combined (defaults to current year)
-- **Crime statistics widgets:** Total crimes, top areas, crime type breakdowns
-- **Crime density heatmap:** Visual clustering on map
-- **Mobile-optimized:** Slide-up tray for map on mobile
-- **Direct link to headlines:** Seamless navigation between dashboard and headlines
-
-**Trinidad Dashboard (dashboard-trinidad.html):**
-- Regional map with 15 municipal districts
-- Click region to filter statistics
-- Compact "Select Region" button for mobile
-- Outline-style "View Headlines" button
-- Clean header without background color
-
-**Guyana Dashboard (dashboard-guyana.html):**
-- Administrative regions (Region 1-10)
-- Identical layout to Trinidad (matched Dec 2, 2025)
-- Mobile region selector
-- All styling synchronized with Trinidad standard
-
-### Issue Reporting System
-**Location:** Headlines summary modal
-**Implementation:** Web3Forms API (free, no CORS issues)
-**Features:**
-- Native OS dropdown for issue type selection
-- Optional 500-char details textarea
-- Session rate limiting (3 reports max)
-- Text sanitization + honeypot protection
-- Email notifications to discover360news@gmail.com
-
-**Why Web3Forms (not Google Apps Script):**
-- No CORS/CSP complications
-- No deployment/authorization complexity
-- Free unlimited submissions
-- Instant email delivery
-
-### Typography Framework
-**Location:** `/src/css/styles.css`
-**Implementation:** CSS custom properties with semantic classes
-**Classes:** `.text-display`, `.text-h1`, `.text-h2`, `.text-h3`, `.text-body`, `.text-small`, `.text-tiny`, `.text-nav`
-**Benefit:** Single-source-of-truth for all text sizing, mobile-first responsive
 
 ### Dashboard UI Enhancements (Dec 2, 2025)
 
-**Navigation Improvements:**
-- Added Dashboard dropdown to header (auto-populates from countries.js)
-- Dropdown conditionally appears when NOT on homepage
-- Mirrors Headlines dropdown pattern for consistency
-- Fixed blog filter buttons - proper active/inactive state toggle
-
-**Dashboard Standardization:**
-- Completed comprehensive audit: Trinidad set as standard, Guyana matched exactly
-- Unified all structural differences (13 fixes total)
-- Standardized button sizing site-wide: `px-4 py-1.5` for all buttons
-- Primary CTAs: solid rose-600 background
-- Secondary CTAs: border-2 border-rose-600 outline
-
-**Widget Improvements:**
-- Transformed metrics cards from grid to horizontal scrollable layout
-- Added smooth snap scrolling with visual hints
-- Fade gradient indicator shows when more content is available
-- Animated rose-colored chevron arrow hint (pulsing)
-- Custom scrollbar styling for better UX
-
-**Visual Hierarchy:**
-- Added gradient separator lines between dashboard sections
-- Separator above "Crime Statistics Dashboard" heading
-- Clear separation: metrics → map → charts
-- Improved visual flow and content organization
-
-**Mobile Fixes:**
-- Fixed Guyana SVG map scaling in mobile tray (was cut off)
-- Compact "Select Region" button integrated in header
-- Proper z-index layering: tray (z-50) > overlay (z-40) > header (z-30) > leaflet map (z-1)
-- Fixed Leaflet incidents map scrolling over header
-
-**Date Picker Improvements:**
-- Added "From:" and "To:" labels for desktop date pickers
-- Added "From Date:" and "To Date:" labels for mobile
-- Title tooltips for accessibility
-- Region tray auto-closes after applying date filter
-
-**Homepage Cleanup:**
-- Removed flag emoji and "Nationwide Coverage" text from country cards
-- Cleaner, more minimal card design
-
-### Leaflet Map UX Overhaul (Dec 2, 2025)
-
-**Critical Mobile Scroll Fix:**
-- **Problem:** Single-finger scroll over map would zoom/pan map instead of scrolling page
-- **Solution:** Implemented two-finger pan requirement
-  - ONE finger = scrolls page (map doesn't intercept touch)
-  - TWO fingers = pans/drags map
-  - Desktop mouse = normal dragging enabled
-- Touch detection counts fingers and dynamically enables/disables map dragging
-- Prevents frustrating map interaction when user just wants to scroll
-
-**Smart Hint System:**
-- Shows "Use two fingers to move map" overlay ONLY when user tries to pan with one finger
-- Detects actual panning intent (movement > 10px)
-- Does NOT show on:
-  - Two-finger touches (correct behavior)
-  - Quick taps to select markers
-  - Any touch without significant drag movement
-- Auto-dismisses after 2 seconds
-- Prevents hint from blocking marker popups
-
-**Reset View Button:**
-- Returns map to original center coordinates and zoom level
-- Icon button in map header with "Reset View" label
-- Smooth transition animation
-
-**Date Filter Integration:**
-- Fixed critical bug: Leaflet map was showing ALL data regardless of date filter
-- Now properly filters markers by selected date range
-- Passes filtered data to map creation
-- Console logging: "📍 Map filtered by date: X records"
-- Synchronizes with other dashboard widgets
-
-**Applied to Both Dashboards:**
-- Trinidad Leaflet Map (src/js/components/trinidadLeafletMap.js)
-- Guyana Leaflet Map (src/js/components/guyanaLeafletMap.js)
-
-**Technical Implementation:**
-```javascript
-// Touch detection for smart panning
-mapDiv.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 2) {
-    mapInstance.dragging.enable(); // Two fingers = pan
-  } else if (e.touches.length === 1) {
-    mapInstance.dragging.disable(); // One finger = scroll page
-  }
-});
-
-// Movement detection for smart hints
-mapDiv.addEventListener('touchmove', (e) => {
-  const distance = calculateMovement(touchStart, currentPos);
-  if (distance > 10 && touchCount === 1) {
-    showHint(); // Only show if actually dragging with one finger
-  }
-});
-```
-
-### Header Navigation Enhancements (Dec 3, 2025)
-
-**Major UX Improvement:**
-- Added horizontal scrollable "quick access pills" below main header
-- Added "Subscribe" button with slide-out tray for social media links
-- Inspired by modern news apps (Ground News pattern)
-
-**Quick Access Pills:**
-- **Location:** Below main header, above page content
-- **Horizontal scroll:** Touch-friendly, snap-to-grid behavior
-- **No active states:** Pills remain static (no highlighting)
-- **Pills included:**
-  - Report a Crime (primary CTA - rose-600 background)
-  - Trinidad Headlines
-  - Guyana Headlines
-  - Trinidad Dashboard
-  - Guyana Dashboard
-  - Blog
-  - About
-
-**Subscribe Tray:**
-- **Trigger:** "Subscribe" button in desktop nav (outline style, rose-600 border)
-- **Pattern:** Reuses mobile menu slide-in tray design
-- **Social platforms:**
-  - X (Twitter): @crimehotspots
-  - Facebook: @crimehotspots
-  - WhatsApp: Direct messaging link
-- **UX:** Backdrop blur, smooth animations, Escape key closes
-
-**Technical Details:**
-- Pills use Tailwind snap scroll (`snap-x snap-mandatory`)
-- Z-index hierarchy maintained: tray (z-50) > backdrop (z-40) > header (z-40)
-- Custom scrollbar styling for pills container
-- Subscribe tray shares code pattern with mobile menu
-
-**File Modified:**
-- `src/js/components/header.js` (lines 136-628)
-
-**Why This Matters:**
-- Surfaces "Report a Crime" feature (previously buried in footer)
-- Quick navigation to key pages without dropdown hunting
-- Social media engagement now one tap away
-- Mobile-first design with horizontal scroll
-
----
-
-## Common Patterns (Astro)
-
-### Adding a New Page
-
-1. Create `.astro` file in `astro-poc/src/pages/`
-2. URL is auto-generated from file path:
-   - `src/pages/about.astro` → `/about`
-   - `src/pages/trinidad/headlines.astro` → `/trinidad/headlines`
-3. Use `Layout.astro` for consistent header/footer
-4. No configuration needed - Astro handles routing
-
-**Example:**
-```astro
----
-import Layout from '../layouts/Layout.astro';
-const title = "My New Page";
----
-
-<Layout title={title}>
-  <main>
-    <h1>My New Page</h1>
-  </main>
-</Layout>
-```
 
 ### Working with CSV Data (Server-Side)
 
@@ -612,6 +373,7 @@ This generates 1,300+ static HTML pages at build time.
 ### When Working on Astro Frontend
 
 **DO:**
+- **COMPONENT-FIRST PRINCIPLE:** Before adding any feature, ask: "Should this be a reusable component?" Create components for reusable UI patterns (filters, cards, modals, forms) before writing inline code. Store in `src/components/` or `src/scripts/` for TypeScript utilities. ⭐⭐⭐
 - **Check `docs/guides/DESIGN-TOKENS.md` BEFORE making any UI/styling changes** ⭐
 - Work in `astro-poc/` directory (NOT root)
 - Use Read, Edit, Write tools (not bash)
@@ -623,6 +385,7 @@ This generates 1,300+ static HTML pages at build time.
 - Always add explicit text colors (`text-slate-700`, `text-slate-400`)
 - Use Astro components (`.astro` files) for reusable UI
 - Put pages in `src/pages/` for auto-routing
+- Keep page files under 500 lines - extract to components/scripts if larger
 
 **DON'T:**
 - Use emojis unless requested
@@ -772,13 +535,30 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   - All dashboard components update when year changes (stats, map, insights)
   - Fixed "Map container already initialized" error via global map reference
   - Proper separation of concerns: map created once, markers updated on filter
+- **Dashboard Refactoring (Dec 19, 2025)**
+  - Reduced dashboard.astro from 1,011 lines to 579 lines (43% reduction)
+  - Extracted reusable scripts:
+    - `yearFilter.ts` - Year filtering logic with callbacks (159 lines)
+    - `leafletMap.ts` - Map initialization and updates (287 lines)
+    - `statsScroll.ts` - Horizontal scroll behavior (33 lines)
+  - Created `FiltersTray.astro` component for slide-out filters (87 lines)
+  - All scripts and components fully reusable across dashboards
+  - Fixed ES6 import syntax issues in Astro script tags
+  - Improved code maintainability and consistency
+- **Dashboard UX & Loading States (Dec 23, 2025)**
+  - Created `InfoPopup.astro` - Click-based help tooltips for mobile
+  - Created `LoadingShimmer.astro` - Facebook-style loading animations with 500ms minimum display
+  - Created `ReportIssueModal.astro` - Crime data issue reporting system
+  - Changed dashboard from "Regions" to "Areas" for cultural accuracy
+  - Fixed map touch controls (one-finger scroll, horizontal-only hint)
+  - Added Report Issue feature to all 1,300+ crime detail pages
+  - Improved crime detail page layout (Street/Area display, clickable sources, fixed Related Crimes links)
+  - Applied loading shimmers to stats cards, map, and insight cards
+  - Fixed shimmer flash bug by removing initial yearFilter callbacks
 
 ### 🔄 In Progress
 - **Astro Missing Features:**
   - Breadcrumbs missing on some pages
-  - Report form (needs Astro recreation from `report.html`)
-  - Report Issue feature for crime pages (flag incorrect data)
-- Facebook data collection automation (Ian Alleyne Network, DJ Sherrif)
 
 ### 🐛 Known Issues
 - Some pages missing breadcrumb navigation
@@ -787,10 +567,14 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 **Near-Term (Astro Completion):**
 - Complete breadcrumb navigation across all pages
-- Recreate report form in Astro (`/report`)
-- Add "Report Issue" button to crime pages
-  - Reuse pattern from `src/js/reportStandalone.js`
-  - Allow users to flag incorrect crime summaries
+- **Division/Area Filter Enhancement**
+  - Problem: 159 areas in Trinidad = long scrolling list
+  - Solution: Hierarchical filtering via 11 divisions (Northern, Central, Eastern, etc.)
+  - Recommended approach: Search box + accordion of divisions
+    - Power users: Type area name → instant filter
+    - Browsers: Expand division → see areas within
+  - Create reusable `AreaFilter.astro` component for FiltersTray
+  - Mobile-optimized for narrow tray width
 
 **Long-Term:**
 - Guyana expansion (mirror Trinidad structure)
@@ -800,29 +584,20 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - SEO Phase 2: Complete internal linking, sitemaps
 - SEO Phase 3: Submit to search engines, local SEO
 
-**Data Scalability & Analytics (Long-Term Vision)**
-
-**Current Status (Dec 2025):**
-- Trinidad LIVE: 1,201 rows ≈ 120 KB CSV ✅ Healthy
-- Guyana LIVE: ~400-600 rows (estimated)
-- Performance: Excellent, no issues
-- Growth Rate: ~1,500 rows/year per country
-
 **Vision:** Build Crime Hotspots as the authoritative data hub for Caribbean crime analytics - serving students, policymakers, researchers, news outlets, and the general public.
 
 **Phased Implementation Plan:**
 
 **Phase 1: Current Architecture (Years 1-3, 2025-2028)**
 - Status: ✅ Active
-- Approach: Single CSV export per country
-- Trigger: Monitor until 5,000 rows
+- Approach: Multiple CSV export per country
+- Trigger: Monitor mulitiple sheet to keep row count from growing beyond the necessary needed to store crime incidents for the year
 - Action: None needed, system scales well
 
 **Phase 2: Smart Pagination (Years 3-5, 2028-2030)**
-- Trigger: When LIVE sheet reaches 5,000 rows
 - Approach: Split data by year (Recent + Historical sheets)
 - Benefit: Fast initial loads, historical data on demand
-- Cost: Free (additional Google Sheets tabs)
+- Cost: Free (additional Google Sheets tabs being implemented NOW)
 - Features: Year-over-year comparisons
 
 **Phase 3: API + Advanced Analytics (Years 5+, 2030+)**
@@ -843,7 +618,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 **Monitoring Strategy:**
 - Monthly check: LIVE sheet row count and CSV size
 - Alert triggers:
-  - >5,000 rows → Plan Phase 2 implementation
+  - Code files for pages surpases 500 lines (Refactor)
   - CSV >500 KB → Consider optimization
   - Load time >3 seconds → User impact detected
 
@@ -857,8 +632,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - README.md - Project overview
 - This file (CLAUDE.md) - Architecture & current status
 - google-apps-script/trinidad/README.md - Trinidad automation
-- google-apps-script/guyana/README.md - Guyana automation
-- docs/FACEBOOK-DATA-COLLECTION.md - Facebook sources documentation
 
 **For Design & SEO:**
 - docs/guides/DESIGN-TOKENS.md - **Official Design System (v1.0, Dec 2025)** ⭐ CHECK THIS FIRST
@@ -888,58 +661,11 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 ---
 
-## Development Sessions
 
-### December 2, 2025 - Dashboard Polish & Leaflet Map UX
-
-**Major Accomplishments:**
-- ✅ Dashboard standardization complete (Trinidad as standard, Guyana matched)
-- ✅ Leaflet map UX overhaul with smart touch detection
-- ✅ Critical mobile scroll fix (two-finger pan requirement)
-- ✅ Date filter integration for Leaflet maps
-
-**Commits:**
-1. `e46e88a` - Dashboard improvements and UI standardization
-2. `31ec2bd` - Update CLAUDE.md with Dec 2 dashboard improvements
-3. `8e730f1` - Urgent dashboard fixes (charts, widgets, z-index)
-4. `dd08691` - Fix Leaflet incidents map z-index issue
-5. `4e58dba` - UX improvements (tray auto-close, date labels, red scroll cue, separator)
-6. `77515bb` - Major Leaflet map UX improvements (two-finger zoom, reset, alerts)
-7. `4cabbc1` - CRITICAL FIX: Corrected map scrolling and date filter updates
-8. `6e1891c` - Fix map hint to only show when actually panning with one finger
-
-**Key Features Delivered:**
-- Horizontal scrollable widgets with visual cues (rose chevron, fade gradient)
-- Dashboard dropdown navigation (auto-populates from countries.js)
-- Two-finger pan requirement for Leaflet maps (prevents scroll hijacking)
-- Smart hint system (movement detection, 10px threshold)
-- Date filter synchronization across all widgets including Leaflet map
-- Reset View button for map navigation
-- Z-index hierarchy fixes (tray > overlay > header > leaflet map)
-- Date picker labels and accessibility improvements
-
-**Bug Fixes:**
-- Fixed 7-day trend chart duplicate dates (autoSkip with maxTicksLimit: 7)
-- Fixed stacked bars visualization
-- Fixed Leaflet map not updating when date filter applied
-- Fixed hint appearing on every touch (now only on actual pan attempts)
-- Fixed map hint blocking marker popups
-- Fixed Guyana SVG map scaling in mobile tray
-
-**UX Improvements:**
-- Region tray auto-closes after applying filter
-- Site-wide button standardization (px-4 py-1.5)
-- Visual hierarchy with gradient separators
-- Cleaner homepage cards (removed emoji and subtitle)
-
-**Status:** Production ready, all features tested and deployed
-
----
 
 ### December 16, 2025 - Dashboard Trend Comparisons & Auto-Rebuild
 
 **Major Accomplishments:**
-- ✅ Implemented trend indicators for Trinidad dashboard
 - ✅ Added daily automatic rebuilds at 6 AM UTC
 - ✅ Added manual workflow trigger via GitHub UI
 
@@ -947,14 +673,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - `78b5e5c` - Add dashboard trend comparisons and daily auto-rebuild
 
 **Feature Details:**
-
-**Trend Comparisons:**
-- Displays "vs last week" and "vs last month" trends on Total Incidents card
-- Compares last 7 days vs previous 7 days (from today)
-- Compares last 30 days vs previous 30 days (from today)
-- Color coding: Red arrow (↑) for crime increase, Green arrow (↓) for crime decrease
-- JavaScript runs in browser using current date, no rebuild needed for daily updates
-- Fixed Date validation bug preventing `toISOString is not a function` error
 
 **Auto-Rebuild System:**
 - GitHub Actions workflow updated with `schedule` trigger
@@ -967,9 +685,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - Trend calculation logic in `astro-poc/src/pages/trinidad/dashboard.astro` (lines 298-356)
 - Workflow configuration in `.github/workflows/deploy.yml`
 - Comprehensive documentation in `docs/archive/Development Progress/December-16-2025-Trend-Comparisons.md`
-
-**Console Logging:**
-- Added emoji-prefixed debugging: 🔍 (load), 🚀 (init), 📅 (dates), 📊 (data), ✅ (success)
 
 **Status:** Production ready, deployed to main branch
 
@@ -1007,7 +722,6 @@ Dashboard was showing ALL years combined (2025 + 2026 data) on page load. User w
 
 **Technical Details:**
 - Client-side data loading with dual-sheet fetching (2025 + current)
-- Deduplication by slug before filtering
 - All dashboard widgets update synchronously on year change
 - No server rebuild needed when years change
 
@@ -1020,16 +734,120 @@ Dashboard was showing ALL years combined (2025 + 2026 data) on page load. User w
 - ✅ Dropdown population confirmation
 - 🔄 Year filter change detection
 
-**User Feedback Addressed:**
-> "I am not sure why we are getting so many issues for a simple addition. This method is using up way more tokens with the back an forth. Take your time, Go through code properly to create the desired outcome."
-
-- Took comprehensive approach analyzing entire map lifecycle
-- Identified root cause: attempting to create map instead of referencing it
-- Single-pass fix eliminated the error completely
-
-**Status:** Production ready, thoroughly tested
+**Version:** 2.0.0 (Astro)
+**Last Updated:** December 19, 2025
 
 ---
 
-**Version:** 2.0.0 (Astro)
-**Last Updated:** December 17, 2025
+### December 23, 2025 - Dashboard UX & Loading States
+
+**Major Accomplishments:**
+- ✅ Created InfoPopup component for mobile-friendly help tooltips
+- ✅ Implemented Facebook-style loading shimmer animations
+- ✅ Changed dashboard from "Regions" to "Areas" for cultural accuracy
+- ✅ Fixed map touch controls for better mobile UX
+- ✅ Added Report Issue feature to crime detail pages
+- ✅ Improved crime detail page layout and navigation
+
+**Components Created:**
+
+1. **InfoPopup.astro** - Reusable click-based help tooltip component
+   - Replaces broken hover-based tooltips
+   - Modal overlay with backdrop blur
+   - Top-center positioning on all screen sizes
+   - Global state management (only one popup open at a time)
+   - Fade in/out animations
+   - Close button + click-outside-to-close
+   - Mobile-responsive (full-width on mobile, fixed width on desktop)
+
+2. **LoadingShimmer.astro** - Facebook-style loading animation
+   - Prevents jarring blank screens during data loading
+   - Animated gradient wave effect
+   - Configurable height/width
+   - 500ms minimum display time to prevent UI flashing
+   - Applied to: Stats cards, map, insight cards
+
+3. **ReportIssueModal.astro** - Crime data issue reporting system
+   - Integrated into individual crime detail pages
+   - Pre-fills crime metadata (slug, headline, date, type, area, region, etc.)
+   - Issue type checkboxes (Incorrect headline, Wrong date, Duplicate)
+   - Information source dropdown (Eye-witness, News article, Social media, Local knowledge, Other)
+   - Form validation (minimum 20 characters, at least one issue selected)
+   - Optional contact email field
+   - Submits to existing Google Apps Script endpoint
+   - Success/error feedback with auto-close
+
+**Dashboard Improvements:**
+
+1. **Loading States**
+   - Shimmer animations for stats cards, map, and insights
+   - Minimum 500ms display time prevents flashing
+   - Smooth fade transitions between shimmer and content
+   - Fixed shimmer flash bug by removing initial callbacks from yearFilter.ts
+
+2. **Data Display Changes**
+   - Top Regions Card → Top Areas Card (using crime.area instead of crime.region)
+   - Quick Insights: "Top 3 regions" → "Top 3 areas"
+   - Updated both server-side calculations and client-side year filter updates
+
+3. **Button Layout**
+   - Headlines/Filters buttons changed from horizontal to vertical stacking
+   - Prevents button stretching on desktop
+   - Better mobile responsiveness
+
+4. **Map Touch Controls**
+   - Fixed one-finger scroll blocking issue
+   - Hint only shows when user attempts horizontal map panning (not vertical page scrolling)
+   - Uses deltaX > deltaY detection to distinguish map pan from page scroll
+   - Fixed z-index issue (changed from z-1000 to z-10)
+   - Allows normal page scrolling with one finger even when map fills screen
+
+**Crime Detail Page Improvements:**
+
+1. **Report Issue Integration**
+   - Added "Report Issue" section after Related Crimes
+   - Frosted glass container with CTA text
+   - Opens ReportIssueModal with pre-filled crime data
+   - Helps maintain data accuracy through user feedback
+
+2. **Location Display**
+   - Header now shows: Street, Area (was showing Area, Region)
+   - Removed redundant Street/Area fields from details section
+   - Kept only essential info: Region and Source
+
+3. **Clickable Source**
+   - Source name is now a clickable link with dotted underline
+   - Removed redundant "Read original article" button
+   - Better visual hierarchy
+
+4. **Fixed Related Crimes Links**
+   - "All crimes in [month/year]" → Points to actual monthly archive
+   - "View [region] on interactive map" → Points to dashboard
+   - "Browse recent [crime type] incidents" → Points to headlines
+   - Previous implementation had all links going to generic /trinidad/archive
+
+**Files Modified:**
+- `astro-poc/src/components/InfoPopup.astro` (NEW)
+- `astro-poc/src/components/LoadingShimmer.astro` (NEW)
+- `astro-poc/src/components/ReportIssueModal.astro` (NEW)
+- `astro-poc/src/components/TopRegionsCard.astro` (changed to use areas)
+- `astro-poc/src/components/QuickInsightsCard.astro` (text updates)
+- `astro-poc/src/pages/trinidad/dashboard.astro` (loading states, button layout)
+- `astro-poc/src/pages/trinidad/crime/[slug].astro` (Report Issue, layout improvements)
+- `astro-poc/src/scripts/yearFilter.ts` (removed initial callbacks causing shimmer flash)
+- `astro-poc/src/scripts/leafletMap.ts` (onMapReady callback, touch controls fix)
+
+**Technical Notes:**
+- Global window functions used for shimmer control (`window.hideShimmerWithMinTime`)
+- Minimum shimmer display time prevents UI flashing (500ms)
+- InfoPopup uses global state to ensure only one popup open at a time
+- Map touch detection distinguishes horizontal (pan map) from vertical (scroll page) gestures
+- ReportIssueModal reuses existing Google Apps Script backend endpoint
+
+**Bug Fixes:**
+- ✅ Fixed shimmer flash after map loads (removed yearFilter initial callbacks)
+- ✅ Fixed map hint appearing above header (z-index z-1000 → z-10)
+- ✅ Fixed one-finger scroll blocking (deltaX > deltaY detection)
+- ✅ Fixed missing components in Cloudflare build (added StatCard, FiltersTray, etc.)
+
+**Status:** ✅ Implemented and tested locally, ready for production deployment
