@@ -555,34 +555,60 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   - Improved crime detail page layout (Street/Area display, clickable sources, fixed Related Crimes links)
   - Applied loading shimmers to stats cards, map, and insight cards
   - Fixed shimmer flash bug by removing initial yearFilter callbacks
+- **Dashboard Refactoring & Zero Layout Shift (Dec 23, 2025)**
+  - Reduced dashboard from 876 lines → 592 lines (32% reduction)
+  - Created `statCardFiltering.ts` (200+ lines) - Clickable stat card logic with tray sync
+  - Created `dashboardUpdates.ts` (160+ lines) - All dashboard update functions
+  - Implemented zero CLS (Cumulative Layout Shift) using absolute positioning overlays
+  - Fixed-height containers prevent jarring shifts: Stats (140px), Map (600px), Insights/Top Regions (400px each)
+  - Changed shimmer control from display:none → opacity:0 (no layout reflows)
+  - All scripts reusable for future Guyana/Barbados dashboards
+- **Clickable Stat Cards (Dec 23, 2025)**
+  - One-click crime type filtering (Murders, Robberies, etc.)
+  - Toggle on/off behavior with heavy shadow hover effect
+  - Active filter: rose-600 border + auto-scroll to center
+  - Auto-return after 3 seconds if user scrolls away
+  - Perfect sync with filter tray checkboxes
+  - Works alongside year filter (combined filtering)
+- **Homepage Improvements (Dec 23, 2025)**
+  - Added InfoPopup component for "What is Crime Hotspots" (progressive disclosure)
+  - Removed duplicate feature section below country cards
+  - Cleaner landing page with reduced scroll depth
 
 ### 🔄 In Progress
-- **Astro Missing Features:**
-  - Breadcrumbs missing on some pages
+- None - Approaching 2026 with intentional, focused development
 
 ### 🐛 Known Issues
-- Some pages missing breadcrumb navigation
+- Minor: Some pages missing breadcrumb navigation (low priority)
 
-### 📋 Planned
+### 📋 Next To-Do (2026)
 
-**Near-Term (Astro Completion):**
-- Complete breadcrumb navigation across all pages
-- **Division/Area Filter Enhancement**
-  - Problem: 159 areas in Trinidad = long scrolling list
-  - Solution: Hierarchical filtering via 11 divisions (Northern, Central, Eastern, etc.)
-  - Recommended approach: Search box + accordion of divisions
-    - Power users: Type area name → instant filter
-    - Browsers: Expand division → see areas within
-  - Create reusable `AreaFilter.astro` component for FiltersTray
-  - Mobile-optimized for narrow tray width
+**Development Philosophy:**
+From 2026 forward, we're adopting a **slow, intentional development approach**. Each feature will be carefully planned, fully tested, and deployed only when ready. Quality over velocity.
 
-**Long-Term:**
+**Priority Queue:**
+1. **Division/Area Filter Enhancement**
+   - Problem: 159 areas in Trinidad = long scrolling list in filter tray
+   - Solution: Hierarchical filtering via 11 divisions (Northern, Central, Eastern, etc.)
+   - Recommended approach: Search box + accordion of divisions
+   - Mobile-optimized for narrow tray width
+
+2. **Complete Breadcrumb Navigation**
+   - Add breadcrumbs to remaining pages for better navigation hierarchy
+
+3. **SEO Phase 2**
+   - Complete internal linking strategy
+   - Generate comprehensive sitemaps
+   - Submit to search engines
+
+4. **Social Media Integration**
+   - Open Graph images for social sharing (WhatsApp, Facebook, X)
+   - Auto-posting capability (optional, low priority)
+
+**Future Expansion (When Ready):**
 - Guyana expansion (mirror Trinidad structure)
 - Barbados automation
-- Social media auto-posting (Facebook, X, WhatsApp)
-- Open Graph images for social sharing (social media cards)
-- SEO Phase 2: Complete internal linking, sitemaps
-- SEO Phase 3: Submit to search engines, local SEO
+- Public API for researchers (Phase 3)
 
 **Vision:** Build Crime Hotspots as the authoritative data hub for Caribbean crime analytics - serving students, policymakers, researchers, news outlets, and the general public.
 
