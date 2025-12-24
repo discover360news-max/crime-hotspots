@@ -50,10 +50,11 @@
   text-anchor: middle;
 }
 
-/* Fix map z-index to stay below header */
+/* Fix map z-index to stay below header and allow vertical scroll */
 #leafletMap {
   z-index: 1 !important;
   position: relative;
+  touch-action: pan-y pinch-zoom; /* Allow vertical scroll and two-finger zoom */
 }
 
 .leaflet-pane,
@@ -102,20 +103,41 @@
   scroll-snap-align: start;
 }
 
-/* Fade gradient on wrapper (shows when scrollable) */
+/* Fade gradient on wrapper (always visible to indicate scrollability) */
 .stats-wrapper::after {
   content: '';
   position: absolute;
   right: 0;
   top: 0;
   bottom: 1rem; /* Account for scrollbar */
-  width: 60px;
-  background: linear-gradient(to right, rgba(241, 245, 249, 0), rgba(241, 245, 249, 0.95));
+  width: 80px;
+  background: linear-gradient(to right, rgba(241, 245, 249, 0), rgba(241, 245, 249, 0.98));
   pointer-events: none;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.3s;
 }
 
-.stats-wrapper:hover::after {
-  opacity: 1;
+/* Scroll arrow indicator (like header pills) */
+.stats-wrapper::before {
+  content: '›';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 28px;
+  font-weight: bold;
+  color: #94a3b8;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0.8;
+  animation: pulse-arrow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-arrow {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }

@@ -108,7 +108,8 @@ export function initializeLeafletMap(
     const map = L.map(containerId, {
       dragging: true,
       scrollWheelZoom: false,
-      fullscreenControl: true
+      fullscreenControl: true,
+      tap: false  // Disable tap handler to prevent blocking touch scroll
     }).setView(config.center, config.zoom);
 
     // Force Leaflet to recalculate size (fixes gray tiles issue)

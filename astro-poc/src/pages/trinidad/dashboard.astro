@@ -148,6 +148,18 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     <!-- Separator -->
         <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-4"></div>
 
+    <!-- Quick Insights -->
+    <div class="mb-6">
+      <div class="relative min-h-[400px]">
+        <div id="insightsShimmer" class="absolute inset-0 transition-opacity duration-300">
+          <LoadingShimmer height="400px" />
+        </div>
+        <div id="insightsCards" class="absolute inset-0 opacity-0 transition-opacity duration-300">
+          <QuickInsightsCard insights={insights} />
+        </div>
+      </div>
+    </div>
+
     <!-- Leaflet Map -->
     <div class="mb-6">
       <div class="flex items-center gap-2">
@@ -182,31 +194,18 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       </div>
     </div>
 
-    <!-- Quick Insights & Top Regions -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <!-- Quick Insights Container -->
-      <div class="relative min-h-[400px]">
-        <div id="insightsShimmer" class="absolute inset-0 transition-opacity duration-300">
-          <LoadingShimmer height="400px" />
-        </div>
-        <div id="insightsCards" class="absolute inset-0 opacity-0 transition-opacity duration-300">
-          <QuickInsightsCard insights={insights} />
-        </div>
+    <!-- Top Areas -->
+    <div class="mb-12 relative z-0">
+      <div id="topRegionsShimmer" class="transition-opacity duration-300">
+        <LoadingShimmer height="400px" />
       </div>
-
-      <!-- Top Regions Container -->
-      <div class="relative min-h-[400px]">
-        <div id="topRegionsShimmer" class="absolute inset-0 transition-opacity duration-300">
-          <LoadingShimmer height="400px" />
-        </div>
-        <div id="topRegionsCard" class="absolute inset-0 opacity-0 transition-opacity duration-300">
-          <TopRegionsCard crimes={crimes} />
-        </div>
+      <div id="topRegionsCard" class="opacity-0 transition-opacity duration-300">
+        <TopRegionsCard crimes={crimes} />
       </div>
     </div>
 
     <!-- Info Cards -->
-    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
       <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
         <div class="flex items-start gap-3">
           <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -432,11 +431,19 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
         shimmerStartTime
       );
 
-      await window.hideShimmerWithMinTime(
-        document.getElementById('topRegionsShimmer'),
-        document.getElementById('topRegionsCard'),
-        shimmerStartTime
-      );
+      // Hide Top Regions shimmer (no overlay pattern - sequential display)
+      const topRegionsShimmer = document.getElementById('topRegionsShimmer');
+      const topRegionsCard = document.getElementById('topRegionsCard');
+
+      const elapsed = Date.now() - shimmerStartTime;
+      const remaining = Math.max(0, MINIMUM_SHIMMER_TIME - elapsed);
+
+      if (remaining > 0) {
+        await new Promise(resolve => setTimeout(resolve, remaining));
+      }
+
+      if (topRegionsShimmer) topRegionsShimmer.style.display = 'none';
+      if (topRegionsCard) topRegionsCard.style.opacity = '1';
 
     // Map will be initialized by separate script below
   }); // Close DOMContentLoaded
@@ -542,11 +549,11 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
           }, 100);
         },
         updateTopRegions: (crimes) => {
-          // Show shimmer before update
+          // Show shimmer before update (sequential display - no overlay)
           const topRegionsShimmer = document.getElementById('topRegionsShimmer');
           const topRegionsCard = document.getElementById('topRegionsCard');
 
-          if (topRegionsShimmer) topRegionsShimmer.style.opacity = '1';
+          if (topRegionsShimmer) topRegionsShimmer.style.display = 'block';
           if (topRegionsCard) topRegionsCard.style.opacity = '0';
 
           // Update after short delay
@@ -555,7 +562,15 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
             updateTopRegions(crimes);
 
             // Hide shimmer with minimum time
-            await window.hideShimmerWithMinTime(topRegionsShimmer, topRegionsCard, updateStart);
+            const elapsed = Date.now() - updateStart;
+            const remaining = Math.max(0, 500 - elapsed);
+
+            if (remaining > 0) {
+              await new Promise(resolve => setTimeout(resolve, remaining));
+            }
+
+            if (topRegionsShimmer) topRegionsShimmer.style.display = 'none';
+            if (topRegionsCard) topRegionsCard.style.opacity = '1';
           }, 100);
         },
         updateLeafletMap: (crimes) => {

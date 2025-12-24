@@ -27,6 +27,34 @@ let activeCrimeTypeFilter: string | null = null;
 let scrollResetTimer: NodeJS.Timeout | null = null;
 
 /**
+ * Update Quick Insights title based on active filter
+ */
+function updateQuickInsightsTitle(crimeType: string | null) {
+  const titleEl = document.getElementById('quickInsightsTitle');
+  if (!titleEl) return;
+
+  if (crimeType === null || crimeType === 'All') {
+    titleEl.textContent = 'Quick Insights';
+  } else {
+    // Handle pluralization
+    const pluralMap: Record<string, string> = {
+      'Murder': 'Murders',
+      'Robbery': 'Robberies',
+      'Home Invasion': 'Home Invasions',
+      'Theft': 'Thefts',
+      'Shooting': 'Shootings',
+      'Assault': 'Assaults',
+      'Burglary': 'Burglaries',
+      'Seizures': 'Seizures',
+      'Kidnapping': 'Kidnappings'
+    };
+
+    const plural = pluralMap[crimeType] || crimeType;
+    titleEl.textContent = `${plural} Insights`;
+  }
+}
+
+/**
  * Scroll active card to center of container
  */
 function scrollCardIntoView(card: HTMLElement, container: HTMLElement) {
@@ -101,6 +129,9 @@ export function initializeStatCardFiltering(callbacks: {
         statCards.forEach(c => c.classList.remove('active'));
         console.log('🔄 Crime type filter cleared');
 
+        // Reset Quick Insights title
+        updateQuickInsightsTitle(null);
+
         // Sync checkbox state
         if ((window as any).syncCrimeTypeCheckbox) {
           (window as any).syncCrimeTypeCheckbox(crimeType, false);
@@ -113,6 +144,9 @@ export function initializeStatCardFiltering(callbacks: {
         this.classList.add('active');
 
         console.log(`🎯 Filtering by crime type: ${crimeType}`);
+
+        // Update Quick Insights title
+        updateQuickInsightsTitle(crimeType);
 
         // Sync checkbox state
         if ((window as any).syncCrimeTypeCheckbox) {
