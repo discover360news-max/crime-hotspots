@@ -1,0 +1,20 @@
+# Sample Facebook Posts for Testing
+# Use these to test the extractor before processing real data
+
+# Post 1: Murder in Laventille
+BREAKING: Police are investigating a shooting incident that occurred in Laventille this morning around 3:00 AM. A 32-year-old man was found dead with multiple gunshot wounds on Upper Sixth Street. Residents reported hearing several gunshots. The victim has been identified as Marcus Johnson of Laventille. No arrests have been made. Police are asking anyone with information to come forward.
+
+# Post 2: Robbery in Port of Spain
+Two men robbed a grocery store on Charlotte Street in Port of Spain yesterday evening. The suspects, both armed with firearms, demanded cash from the register and escaped with approximately $8,000 TTD. No one was injured during the incident. CCTV footage is being reviewed by police.
+
+# Post 3: Home Invasion in Diego Martin
+ALERT: Four armed men broke into a home on Blue Range Road in Diego Martin early this morning. The family of three was held at gunpoint while the suspects ransacked the house, stealing cash, jewelry, and electronics. The victims were shaken but unharmed. Police are searching for the suspects.
+
+# Post 4: Shooting in San Fernando
+Breaking News - A shooting incident in San Fernando has left two people wounded. The incident occurred on Harris Promenade around 9 PM tonight. Both victims were rushed to San Fernando General Hospital where they are listed in stable condition. Police are investigating.
+
+# Post 5: Not a crime (should be skipped)
+Good morning Trinidad! Don't forget to stay hydrated today. It's going to be a hot one. Remember to check on your elderly neighbors and make sure they have water. Stay safe everyone!
+
+# Post 6: Seizure of firearms
+MAJOR BUST: Police seized 5 illegal firearms and over 200 rounds of ammunition during a raid in Morvant this afternoon. Three suspects were arrested and are assisting with investigations. Well done to our officers for getting these weapons off the streets!

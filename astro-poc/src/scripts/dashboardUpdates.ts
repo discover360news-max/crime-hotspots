@@ -155,13 +155,13 @@ export function updateTopRegions(crimes: Crime[]) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
 
-  // Update using ID selector
+  // Update using ID selector (2-column grid)
   const container = document.getElementById('topRegionsContainer');
   if (container) {
     container.innerHTML = topAreas.map(([area, count]) => `
-      <div class="flex justify-between items-center pb-2 border-b border-slate-200 last:border-0">
-        <span class="text-xs text-slate-500">${area}</span>
-        <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
+      <div class="flex justify-between items-center gap-2 pb-2 border-b border-slate-200">
+        <span class="text-xs text-slate-500 truncate flex-1">${area}</span>
+        <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium flex-shrink-0">
           ${count}
         </span>
       </div>

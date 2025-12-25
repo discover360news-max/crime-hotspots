@@ -1,0 +1,11 @@
+# Crime Hotspots - Robots.txt
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://crimehotspots.com/sitemap-index.xml
+
+# Crawl delay to prevent overwhelming the server
+Crawl-delay: 1

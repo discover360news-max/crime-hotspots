@@ -1,0 +1,28 @@
+{
+  "name": "crime-hotspots-archive-scraper",
+  "version": "1.0.0",
+  "description": "Archive URL scraper for Trinidad news sources (Playwright version)",
+  "main": "archive-scraper-playwright.js",
+  "scripts": {
+    "install-browser": "npx playwright install chromium",
+    "scrape:all": "node archive-scraper-playwright.js --source all --output archive_review.csv",
+    "scrape:express": "node archive-scraper-playwright.js --source express --max-pages 50",
+    "scrape:guardian": "node archive-scraper-playwright.js --source guardian --start-date 2024-01-01",
+    "scrape:newsday": "node archive-scraper-playwright.js --source newsday --max-pages 50",
+    "scrape:debug": "node archive-scraper-playwright.js --source all --headless false"
+  },
+  "keywords": [
+    "scraper",
+    "playwright",
+    "news",
+    "trinidad",
+    "crime"
+  ],
+  "author": "Crime Hotspots",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "csv-writer": "^1.6.0",
+    "playwright": "^1.57.0"
+  }
+}

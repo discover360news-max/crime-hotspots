@@ -227,6 +227,9 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
      - ❌ EXCLUDE: Academic/educational articles mentioning crimes as examples
      - ❌ EXCLUDE: Articles about OTHER topics that mention crimes in passing
      - ❌ EXCLUDE: Social commentary articles that reference past crimes
+     - ❌ EXCLUDE: Photo captions mentioning crimes (usually 1-2 sentences with "—Photo: Name")
+     - ❌ EXCLUDE: "In a separate incident" brief mentions (< 2 sentences, no full details)
+     - ❌ EXCLUDE: Crimes mentioned in passing without full details (date, location, victim)
      - If article is primarily about court proceedings, verdict, or corporate fraud, return {"crimes": [], "confidence": 0}
      - If article mentions crimes as EXAMPLES or CONTEXT (not the main subject), return {"crimes": [], "confidence": 0}
      - Examples to EXCLUDE:
@@ -236,9 +239,13 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
        * "New app helps victims sell safely" with past examples → Product launch, NOT crime report
        * "New frontiers...in academia" mentioning pastor incident → Academic article, NOT crime report
        * "Crime wave analysis: Why violence is rising" with example crimes → Analysis, NOT crime report
-     - CRITICAL: Check if crime is MAIN SUBJECT or just mentioned as CONTEXT/EXAMPLE
+       * "Confiscated: Vehicles seized —Photo: Richard Charan" → Photo caption, NOT main article
+       * "In a separate incident, a man was injured" → Brief mention, no details, NOT main subject
+     - CRITICAL: Check if crime is MAIN SUBJECT or just mentioned as CONTEXT/EXAMPLE/CAPTION
        * Main subject: "Pastor attacks man with cutlass over parking dispute" → INCLUDE
        * Context/example: "New academic programs aim to reduce crime. Recently, a pastor attacked..." → EXCLUDE
+       * Photo caption: "Arrested: Police took suspect into custody" → EXCLUDE
+       * Brief mention: "In another incident, a man was robbed" (no full details) → EXCLUDE
 
   3. EXCLUDE UNCERTAIN DEATHS: DO NOT classify as "Murder" if:
      - "No visible signs of violence"

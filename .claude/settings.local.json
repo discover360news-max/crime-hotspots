@@ -59,7 +59,13 @@
       "WebFetch(domain:barbadostoday.bb)",
       "WebFetch(domain:nationnews.com)",
       "WebFetch(domain:barbadosunderground.net)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(grep:*)",
+      "Bash(done)",
+      "Bash(npx astro:*)",
+      "Bash(ipconfig getifaddr:*)",
+      "Bash(ls:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []

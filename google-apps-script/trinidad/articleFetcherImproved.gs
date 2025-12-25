@@ -318,6 +318,16 @@ function cleanText(text) {
   text = text.replace(/\[cat_[^\]]+\]/g, '');
   text = text.replace(/=>/g, '');
 
+  // Remove photo captions (Trinidad Express pattern)
+  // Pattern: "Caption: Description —Photo: Name" or "Caption: Description - Photo: Name"
+  // Usually at the start or contains photographer credit
+  text = text.replace(/^[^.!?]+?:([^.!?]+?)(?:—|–|-)\s*Photo:\s*[^.!?]+?[.!?]\s*/i, '');
+  text = text.replace(/\b(?:Confiscated|Scene|Arrested|Injured|Victim|Investigation|Evidence):\s*[^.!?]+?(?:—|–|-)\s*Photo:\s*[^.!?]+?[.!?]\s*/gi, '');
+
+  // Remove social media buttons text that sometimes bleeds through
+  text = text.replace(/\s*(Facebook|Twitter|WhatsApp|SMS|Email|Print|Copy article link|Save)\s+/gi, ' ');
+  text = text.replace(/\s*(TO SUBSCRIBE CLICK HERE|Comments?\s+\d+\s+min to read)\s*/gi, ' ');
+
   // Remove "RECOMMENDED FOR YOU" sections and everything after
   // Pattern: "RECOMMENDED FOR YOU" followed by article titles/links
   const recommendedIndex = text.search(/RECOMMENDED FOR YOU/i);
@@ -330,6 +340,17 @@ function cleanText(text) {
 
   // Also remove common recommendation markers
   text = text.replace(/\s*(MORE FROM|TRENDING|YOU MAY ALSO LIKE|RELATED ARTICLES?|READ ALSO)[:\s].*/gi, '');
+
+  // Remove "In a separate incident" paragraphs that are brief mentions (< 150 chars)
+  // These are usually sidebar mentions of other crimes, not the main article
+  text = text.replace(/In a separate incident,?\s+[^.!?]{0,150}[.!?]/gi, function(match) {
+    // Only remove if it's a short mention (less than 150 chars)
+    if (match.length < 150) {
+      Logger.log(`⚠️ Removed brief separate incident mention: "${match.substring(0, 50)}..."`);
+      return '';
+    }
+    return match;
+  });
 
   // Limit to first 5000 characters
   if (text.length > 5000) {
@@ -467,7 +488,7 @@ function fetchPendingArticlesImproved() {
   let success = 0;
   let failed = 0;
 
-  const BATCH_SIZE = 10;
+  const BATCH_SIZE = 30;
 
   Logger.log('=== IMPROVED ARTICLE FETCHER ===\n');
 

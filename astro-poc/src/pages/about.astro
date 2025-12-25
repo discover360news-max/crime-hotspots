@@ -5,6 +5,7 @@
  */
 
 import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 const title = "About Crime Hotspots — Caribbean Crime Data Transparency & Methodology";
 const description = "Learn about Crime Hotspots Caribbean and our rigorous data methodology. We provide verified crime statistics to empower communities. Read our mission.";
@@ -12,7 +13,11 @@ const description = "Learn about Crime Hotspots Caribbean and our rigorous data 
 
 <Layout title={title} description={description}>
   <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-12 text-slate-700">
-    <h1 class="text-h1 font-semibold mb-3 text-center">About Crime Hotspots</h1>
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: 'About' }
+    ]} />
+    <h1 class="text-h1 font-semibold mb-3 text-center pt-4">About Crime Hotspots</h1>
     <div class="bg-white/50 backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 leading-relaxed">
       <h2 class="text-h2 font-semibold mb-3 text-slate-700">Our Mission</h2>
       <p class="text-xs text-slate-500 mb-6">

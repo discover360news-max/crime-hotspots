@@ -146,24 +146,6 @@ font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe
 
 ## Visual Effects
 
-### Frosted Glass Effect
-
-**Implementation:** `src/css/styles.css` (lines 200-206)
-
-The signature visual style of Crime Hotspots — translucent backgrounds with blur.
-
-```css
-/* Applied to region tray, mobile menu */
-background: rgba(255, 255, 255, 0.75); /* or bg-white/60 in Tailwind */
--webkit-backdrop-filter: blur(16px) saturate(180%);
-backdrop-filter: blur(16px) saturate(180%);
-```
-
-**Usage:**
-- Dashboard panel trays
-- Mobile navigation overlay (`header.js:101`)
-- Modal overlays
-- Slide-out sheets
 
 **Browser Support:**
 - Use `@supports` to gracefully degrade
@@ -210,8 +192,6 @@ box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 
 ### Buttons
 
-**Implementation:** `src/css/styles.css` (lines 420-503)
-
 We use a unified button system with semantic classes.
 
 #### Button Variants
@@ -223,31 +203,11 @@ We use a unified button system with semantic classes.
 </button>
 ```
 
-```css
-.btn-primary {
-  background: #e11d48; /* rose-600 */
-  color: white;
-  padding: 0.5rem 1rem;
-}
-.btn-primary:hover {
-  background: #be123c; /* rose-700 */
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-```
-
 **Secondary (Less Emphasis):**
 ```html
 <button class="btn btn-secondary">
   Cancel
 </button>
-```
-
-```css
-.btn-secondary {
-  background: #f1f5f9; /* slate-100 */
-  color: #475569; /* slate-600 */
-}
 ```
 
 **Outline (Dashboard View Headlines):**
@@ -274,15 +234,13 @@ We use a unified button system with semantic classes.
 ```
 
 **Specifications:**
-- Minimum size: 44x44px (iOS touch target)
+- Minimum size: 22x22px (touch target)
 - Border radius: `rounded-lg` (8px)
 - Transition: `0.2s ease` for all properties
 - Hover: Lift up 1px + add shadow
 - Active: Return to baseline (pressed feel)
 
 ### Loading States
-
-**Implementation:** `src/css/styles.css` (lines 286-418)
 
 We use **skeleton screens** (not spinners) to reduce perceived load time.
 
@@ -369,79 +327,6 @@ Automatically adjusts shimmer colors via `@media (prefers-color-scheme: dark)`.
 - Quick but not instant (0.3s-0.6s)
 - Smooth easing curves, never linear
 
-### Core Animations
-
-**Implementation:** `src/css/styles.css` (lines 134-168)
-
-#### fadeInCard
-
-```css
-@keyframes fadeInCard {
-  from {
-    opacity: 0;
-    transform: translateY(40px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.animate-fadeInCard {
-  animation: fadeInCard 0.8s ease-out forwards;
-}
-```
-
-**Usage:** Country cards on homepage, blog post cards
-
-#### slideUpBounce
-
-```css
-@keyframes slideUpBounce {
-  0% { transform: translateY(100%); opacity: 0; }
-  60% { transform: translateY(-4%); opacity: 1; }
-  80% { transform: translateY(2%); }
-  100% { transform: translateY(0); }
-}
-
-.animate-slideUpBounce {
-  animation: slideUpBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-```
-
-**Usage:** Dashboard panel tray, success messages
-
-### Transition Standards
-
-```css
-/* Global button/link transitions */
-button, a {
-  transition: all 0.2s ease;
-}
-
-/* Specific transitions */
-#mobile-menu {
-  transition: all 0.3s ease;
-}
-
-#navHeadlinesMenu {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-```
-
-### Interaction States
-
-**Button Press Feedback:**
-```css
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-button:active {
-  transform: translateY(0);
-}
-```
 
 **Touch Response (iOS-like):**
 - Scale down to 96% on press
@@ -450,57 +335,6 @@ button:active {
 - **Note:** Haptic feedback not available in web; simulate with visual cues
 
 ---
-
-## Layout Patterns
-
-### Dashboard Panel
-
-**Implementation:** `src/js/components/dashboardPanel.js`
-
-**Structure:**
-```
-[Backdrop (black/50 blur)] z-40
-  └─ [Dashboard Panel Tray] z-50
-       ├─ Header (rounded-t-2xl)
-       ├─ Frosted glass background
-       ├─ Dashboard iframe
-       └─ Footer (View Headlines link)
-```
-
-**Key Features:**
-- **Slide-up animation** with overshoot
-- **Backdrop blur** to maintain context
-- **Escape key** to close
-- **Click outside** to dismiss
-- **Shimmer loading** for 5+ seconds minimum
-- **Cached views** skip shimmer
-
-**Z-Index Hierarchy:**
-```css
-#regionTray: z-50
-#trayOverlay (backdrop): z-40
-#guyanaMapContainer: z-10 (desktop), z-1 (mobile)
-```
-
-### Mobile Navigation
-
-**Implementation:** `src/js/components/header.js`
-
-**Structure:**
-```
-[Backdrop (black/50 blur)] z-40
-  └─ [Mobile Menu Overlay] z-50
-       ├─ Frosted glass (white/60 blur)
-       ├─ Rounded left corners (rounded-l-2xl)
-       ├─ Slide from right
-       └─ Icon-based navigation
-```
-
-**Animations:**
-- Slide in from right: `translate-x-full` → `translate-x-0`
-- Backdrop fade: `opacity-0` → `opacity-100`
-- Duration: 300ms
-- Close on link click, backdrop click, or Escape key
 
 ### Header (Sticky)
 
@@ -516,27 +350,18 @@ button:active {
 - Shadow: `shadow-sm`
 - Background: Solid white (not transparent)
 
-### Region Tray (Guyana Map Filter)
-
-**Features:**
-- Frosted glass slide-up tray
-- Interactive SVG map
-- Click region to filter dashboard
-- Scroll-friendly (custom scrollbar styling)
-
----
 
 ## Mobile Design Principles
 
 ### Touch Targets
 
-**Critical Rule:** Minimum 44x44px for all interactive elements.
+**Critical Rule:** Minimum 22x22px for all interactive elements.
 
 ```css
-/* Even if text is small (11px), the clickable area must be 44px */
+/* Even if text is small (11px), the clickable area must be 22px */
 .btn-icon {
-  width: 2.5rem;  /* 40px */
-  height: 2.5rem; /* 40px */
+  width: 2.5rem;  /* 22px */
+  height: 2.5rem; /* 22px */
   padding: 0.5rem;
 }
 ```
@@ -554,18 +379,7 @@ Our mobile-first approach uses these breakpoints:
 | Medium | `md:` | ≥ 768px | Desktop nav visible |
 | Large | `lg:` | ≥ 1024px | Desktop layout, maps visible |
 
-**Typography Example:**
-```css
-/* Mobile: 20px */
---text-display: 1.25rem;
 
-/* Desktop (640px+): 28px */
-@media (min-width: 640px) {
-  .text-display {
-    font-size: var(--text-display-sm);
-  }
-}
-```
 
 ### Mobile-Specific Features
 
@@ -631,7 +445,7 @@ Use this checklist when building new features or pages.
 
 ### Mobile-First
 
-- [ ] Minimum 44x44px touch targets
+- [ ] Minimum 22x22px touch targets
 - [ ] Typography scales from mobile to desktop via CSS custom properties
 - [ ] Mobile menu slides in from right with frosted glass
 - [ ] Backdrops use `bg-black/50 backdrop-blur-sm`
@@ -659,46 +473,14 @@ Use this checklist when building new features or pages.
 
 ---
 
-## Reference Files
-
-**Typography Framework:**
-- `src/css/styles.css` (lines 20-128)
-
-**Button System:**
-- `src/css/styles.css` (lines 420-503)
-
-**Animations:**
-- `src/css/styles.css` (lines 134-168)
-
-**Skeleton Loaders:**
-- `src/css/styles.css` (lines 286-418)
-- `src/js/components/loadingStates.js`
-
-**Dashboard Panel:**
-- `src/js/components/dashboardPanel.js`
-
-**Header & Mobile Menu:**
-- `src/js/components/header.js`
-
-**Country Configuration:**
-- `src/js/data/countries.js` (single source of truth)
-
----
-
 ## Version History
 
-**v2.0 (Nov 29, 2025):**
+**v3.0 (Dec 21, 2025):**
 - Merged aspirational guidelines with implemented features
 - Added comprehensive component documentation
 - Documented typography framework (CSS custom properties)
 - Expanded animation and interaction patterns
 - Added implementation checklist
 
-**v1.0 (Initial):**
-- High-Density Glass philosophy
-- iOS-inspired interaction concepts
-- Color palette and mobile principles
-
----
 
 **Questions?** Reference `CLAUDE.md` for project-wide instructions and architecture overview.

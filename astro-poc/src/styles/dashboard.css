@@ -3,24 +3,6 @@
  * Trinidad & Tobago Crime Dashboard
  */
 
-/* Desktop only: Show faded background image */
-@media (min-width: 768px) {
-  body {
-    background-image:
-      linear-gradient(to bottom,
-        rgba(241, 245, 249, 0.7) 0%,
-        rgba(241, 245, 249, 0.85) 15%,
-        #f1f5f9 30%
-      ),
-      url('/assets/images/trinidad-page-bg.png');
-
-    background-repeat: no-repeat;
-    background-position: top center;
-    background-size: 100% auto;
-    background-attachment: fixed;
-  }
-}
-
 /* Trinidad SVG Map Styles */
 .region-path {
   fill: #e5e7eb;

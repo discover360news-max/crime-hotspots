@@ -1,351 +1,249 @@
-# SOCIAL MEDIA AUTOMATION GUIDE
+# Social Media Stats Automation - Zero Budget Solution
 
-Complete setup guide for automated social media posting using **100% free tools**.
+**Last Updated:** December 13, 2025
+**Status:** Ready for Implementation  
+**Budget:** $0/month (100% Free)  
+**Approach:** Auto-generate stats → Manual posting with templates
 
-## ARCHITECTURE
+---
 
+## 🎯 Goal
+
+Automatically calculate daily crime statistics and generate visual graphics, then post manually to social media using ready-made templates. No API costs, no paid tools, full control.
+
+**What's Automated:**
+- ✅ Daily stats calculation (6 AM)
+- ✅ Chart image generation (QuickChart - free)
+- ✅ Copy-paste ready text
+
+**What's Manual:**
+- 📱 Posting to X/Twitter, Facebook, Instagram, WhatsApp
+- 🎨 Customizing graphics (optional)
+
+---
+
+## 📊 What Gets Posted
+
+### Daily Posts (Mon-Sat)
 ```
-RSS Feed (rss.xml)
-    ↓
-IFTTT/Zapier (Free Tier)
-    ↓
-├─→ Facebook Page
-├─→ Twitter/X
-├─→ Instagram (via Buffer)
-└─→ WhatsApp Business API (optional)
+🚨 Trinidad Crime Update - Dec 13, 2025
+
+📊 Last 24 Hours:
+• Total Incidents: 12 ↑
+• Murders: 2 ↓
+• Robberies: 7 ↑
+• Hotspot: Laventille
+
+Full dashboard: https://crimehotspots.com/trinidad/dashboard
+
+#TrinidadCrime #CaribbeanSafety #CrimeStats
 ```
+**Includes:** Bar chart image (auto-generated)
 
 ---
 
-## OPTION 1: IFTTT (Recommended - Easiest Setup)
+## 🛠️ Setup (30 minutes one-time)
 
-**Free Tier:** 2 applets unlimited runs
+### Step 1: Install Apps Script
 
-### Setup Steps:
+1. Open Trinidad Google Sheet
+2. Extensions → Apps Script
+3. Create file: `socialMediaStats.gs`
+4. Copy code from `google-apps-script/trinidad/socialMediaStats.gs`
+5. Update `SOCIAL_CONFIG`:
+   ```javascript
+   const SOCIAL_CONFIG = {
+     PRODUCTION_SHEET: 'Production',  // Your sheet name
+     COLUMNS: {
+       DATE: 0,        // Column A
+       CRIME_TYPE: 2,  // Column C  
+       AREA: 5         // Column F
+     }
+   };
+   ```
 
-1. **Create IFTTT Account**
-   - Go to https://ifttt.com/join
-   - Sign up (free account)
+### Step 2: Test & Activate
 
-2. **Create Facebook Applet**
-   - Click "Create" → "If This"
-   - Search "RSS Feed" → Select "New feed item"
-   - Enter feed URL: `https://crimehotspots.com/rss.xml`
-   - Click "Then That"
-   - Search "Facebook Pages" → Select "Create a link post"
-   - Configure:
-     - Message: `{{EntryTitle}}`
-     - Link URL: `{{EntryUrl}}`
-   - Click "Create action"
+```javascript
+// Test stats calculation
+testStatsCalculation()
 
-3. **Create Twitter Applet**
-   - Same process as Facebook
-   - Search "Twitter" → Select "Post a tweet"
-   - Tweet text: `{{EntryTitle}} {{EntryUrl}}`
-   - Create action
+// Create stats sheet + first row
+updateSocialStats()
 
-**Limitations:**
-- Only 2 free applets (Facebook + Twitter)
-- For Instagram, use Option 2
-
----
-
-## OPTION 2: ZAPIER (More Flexible)
-
-**Free Tier:** 5 Zaps, 100 tasks/month
-
-### Setup Steps:
-
-1. **Create Zapier Account**
-   - Go to https://zapier.com/sign-up
-   - Sign up (free account)
-
-2. **Create Facebook Zap**
-   - Click "Create Zap"
-   - **Trigger:** RSS by Zapier
-     - Event: New Item in Feed
-     - Feed URL: `https://crimehotspots.com/rss.xml`
-   - **Action:** Facebook Pages
-     - Event: Create Page Post
-     - Page: Select your Crime Hotspots page
-     - Message: Use RSS feed title + excerpt
-     - Link: Use RSS feed URL
-   - Test and activate
-
-3. **Create Twitter Zap**
-   - Same trigger (RSS)
-   - Action: Twitter → Create Tweet
-   - Tweet text: Combine title + URL (max 280 chars)
-
-4. **Create Instagram Zap (via Buffer)**
-   - Create Buffer account (free: 10 posts/month)
-   - Trigger: RSS
-   - Action: Buffer → Add to Queue
-   - Format post with image from blog post
-
-**Advantages:**
-- 5 free Zaps (can automate more platforms)
-- More customization options
-- Can add filters (e.g., only certain countries)
-
----
-
-## OPTION 3: GOOGLE APPS SCRIPT (Most Powerful, No Limits)
-
-**Cost:** 100% free, unlimited automations
-
-### Why This Is The Best Option:
-
-1. No applet/zap limits
-2. Complete customization
-3. Can post to multiple platforms
-4. Can generate custom images with crime statistics
-5. Can vary posting times for optimization
-6. Already have Google Apps Script infrastructure
-
-### Implementation:
-
-See `socialMediaPoster.gs` in this directory.
-
-**Features:**
-- Reads RSS feed
-- Posts to Facebook, Twitter using native APIs
-- Generates custom Open Graph images
-- Tracks what's been posted (no duplicates)
-- Runs on schedule (daily or weekly)
-
-**Setup Steps:**
-
-1. Add `socialMediaPoster.gs` to your Google Apps Script project
-2. Set Script Properties:
-   - `FACEBOOK_PAGE_ID`: Your Facebook Page ID
-   - `FACEBOOK_ACCESS_TOKEN`: Long-lived page access token
-   - `TWITTER_API_KEY`: Twitter API credentials
-   - `TWITTER_API_SECRET`
-   - `TWITTER_ACCESS_TOKEN`
-   - `TWITTER_ACCESS_TOKEN_SECRET`
-3. Create time-based trigger (daily at 9 AM Caribbean time)
-4. Run once to test
-
----
-
-## SOCIAL MEDIA CONTENT STRATEGY
-
-### Posting Schedule:
-
-**Optimal Times for Caribbean Audience:**
-- Facebook: 7:00 AM, 12:00 PM, 7:00 PM AST
-- Twitter: 8:00 AM, 1:00 PM, 6:00 PM AST
-- Instagram: 11:00 AM, 5:00 PM AST
-
-### Content Templates:
-
-**Weekly Report Announcement:**
-```
-New Crime Report: Trinidad & Tobago - Week of Nov 10
-
-47 incidents reported this week:
-- Murder: ⬇️ 12% decrease
-- Robbery: ⬆️ 50% increase (Port of Spain)
-- Theft: Stable at 18 incidents
-
-Read the full analysis: [LINK]
-
-#TrinidadCrime #PublicSafety #DataDriven
+// Set up 6 AM daily trigger
+setupDailyTrigger()
 ```
 
-**Trending Area Alert:**
+Done! Stats now calculate automatically every morning.
+
+---
+
+## 📱 Daily Workflow (5 min/day)
+
+**Every Morning:**
+
+1. Open "Social Media Stats" sheet
+2. Copy latest row data
+3. Replace placeholders in template:
+   ```
+   🚨 Trinidad Crime Update - {{DATE}}
+   
+   📊 Last 24 Hours:
+   • Total: {{TOTAL}} {{TREND}}
+   • Murders: {{MURDERS}}
+   • Robberies: {{ROBBERIES}}
+   • Hotspot: {{TOP_AREA}}
+   
+   https://crimehotspots.com/trinidad/dashboard
+   
+   #TrinidadCrime #CrimeStats
+   ```
+4. Download chart image (click Chart URL column)
+5. Post to X, Facebook, Instagram, WhatsApp
+6. Mark as "Posted" in sheet
+
+**That's it!** 5 minutes total.
+
+---
+
+## 🎨 Chart Image Generation (Free)
+
+**QuickChart** generates chart images automatically:
+
+```javascript
+// Already included in socialMediaStats.gs
+function generateChartUrl(stats) {
+  const config = {
+    type: 'bar',
+    data: {
+      labels: ['Murders', 'Robberies', 'Burglaries', 'Thefts'],
+      datasets: [{
+        data: [stats.murders, stats.robberies, stats.burglaries, stats.thefts],
+        backgroundColor: ['#e11d48', '#f97316', '#eab308', '#06b6d4']
+      }]
+    },
+    options: {
+      title: { text: `Trinidad Crime Stats - ${stats.date}` }
+    }
+  };
+  
+  return `https://quickchart.io/chart?c=${encodeURI(JSON.stringify(config))}&width=1200&height=675`;
+}
 ```
-Crime Hotspot Alert: Port of Spain
 
-34% of this week's crimes occurred in Port of Spain area.
-Robbery incidents up significantly in downtown district.
+**Chart URL saved automatically in stats sheet → Click to download**
 
-Stay vigilant. View live dashboard: [LINK]
+---
 
-#PortOfSpain #Trinidad #SafetyAlert
+## 📋 Post Templates
+
+### Template 1: Daily (Mon-Sat)
+```
+🚨 Trinidad Crime Update - {{DATE}}
+
+📊 Last 24 Hours:
+• Total: {{TOTAL}} {{TREND}}
+• Murders: {{MURDERS}}
+• Robberies: {{ROBBERIES}}
+• Hotspot: {{TOP_AREA}}
+
+https://crimehotspots.com/trinidad/dashboard
+
+#TrinidadCrime #CaribbeanSafety
 ```
 
-**Data Insight:**
+### Template 2: Weekly (Sunday)
 ```
-Did you know? 📊
+📈 Trinidad Weekly Report
 
-Vehicle theft in Arima increased 60% this week compared to last week.
+This Week vs Last Week:
+• Total: {{THIS_WEEK}} ({{CHANGE}}%)
+• Murders: {{MURDERS}} ({{TREND}})  
+• Top Area: {{TOP_AREA}}
 
-Residents urged to use secured parking and anti-theft devices.
+Read analysis: {{BLOG_LINK}}
 
-View full statistics: [LINK]
-
-#CrimePrevention #DataAnalytics
+#WeeklyCrimeStats #Trinidad
 ```
 
-### Hashtag Strategy:
+### Template 3: Monthly (1st)
+```
+🗓️ {{MONTH}} 2025 Summary
 
-**Country-Specific:**
-- Trinidad: `#Trinidad #TrinidadTobago #TriniCrime #TnT`
-- Guyana: `#Guyana #GuyanaCrime #Georgetown #GuyanaNews`
-- Barbados: `#Barbados #Bdos #BajanNews`
+• Total: {{TOTAL}}
+• Deadliest Day: {{DATE}} ({{COUNT}})
+• Rate: {{CHANGE}}% vs last month
 
-**General:**
-- `#CaribbeanCrime #PublicSafety #CrimeStats`
-- `#DataDriven #CrimeAnalytics #SafetyCommunity`
-- `#CrimePrevention #CommunityWatch`
+https://crimehotspots.com/trinidad/dashboard
 
-### Image Strategy:
-
-**Post Types:**
-1. **Weekly Stats Card** - Infographic with key numbers
-2. **Area Heatmap** - Visual showing crime hotspots
-3. **Trend Chart** - Line graph showing week-over-week changes
-4. **Quote Card** - Safety tip with branded background
-
-**Tool for Image Generation:**
-- Canva Free Tier (2,000+ templates)
-- Or generate programmatically with Google Apps Script + Google Slides API
+#MonthlyCrimeStats
+```
 
 ---
 
-## PLATFORM-SPECIFIC BEST PRACTICES
+## 💰 Cost: $0/month
 
-### Facebook:
-- Use Open Graph tags for rich previews
-- Post 1-2 times daily (morning + evening)
-- Use Facebook Insights to track engagement
-- Reply to comments within 1 hour (use notifications)
-- Create Facebook Group for community discussion
-
-### Twitter/X:
-- Tweet 3-5 times daily
-- Use threads for weekly reports (better engagement)
-- Retweet news sources you analyze
-- Use polls for community engagement
-- Pin weekly report to profile
-
-### Instagram:
-- Post 3-4 times weekly
-- Use carousel posts for statistics
-- Stories for quick updates
-- Reels for monthly trend reviews
-- Use location tags for virality
-
-### WhatsApp Business (Optional):
-- Broadcast lists for subscribers
-- Daily headline summary (text-based)
-- No automation available (manual posting)
-- Direct link to headlines page
+| Service | Cost |
+|---------|------|
+| Google Apps Script | Free |
+| QuickChart API | Free (50K/mo) |
+| Google Sheets | Free |
+| Manual Posting | Free |
+| **TOTAL** | **$0** ✅ |
 
 ---
 
-## TRACKING & OPTIMIZATION
+## 🚀 Advanced: Weekly & Monthly Stats
 
-### Metrics to Monitor:
+Add to `socialMediaStats.gs`:
 
-1. **Engagement Rate**
-   - Likes, shares, comments per post
-   - Click-through rate to website
+```javascript
+function calculateWeeklyStats() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    .getSheetByName('Production');
+  const data = sheet.getDataRange().getValues();
+  
+  const now = new Date();
+  const weekAgo = new Date(now - 7*24*60*60*1000);
+  const twoWeeksAgo = new Date(now - 14*24*60*60*1000);
+  
+  const thisWeek = data.filter(r => {
+    const d = new Date(r[0]);
+    return d >= weekAgo && d <= now;
+  });
+  
+  const lastWeek = data.filter(r => {
+    const d = new Date(r[0]);
+    return d >= twoWeeksAgo && d < weekAgo;
+  });
+  
+  const change = ((thisWeek.length - lastWeek.length) / lastWeek.length * 100).toFixed(1);
+  
+  Logger.log(`This week: ${thisWeek.length}, Last week: ${lastWeek.length}, Change: ${change}%`);
+}
+```
 
-2. **Follower Growth**
-   - Track weekly gains/losses
-   - Correlate with posting frequency
-
-3. **Top Performing Content**
-   - Which crime types get most engagement?
-   - Which countries get most shares?
-   - Best posting times
-
-4. **Referral Traffic**
-   - Use UTM parameters: `?utm_source=facebook&utm_medium=social&utm_campaign=weekly_report`
-   - Track in Google Analytics
-
-### Free Analytics Tools:
-
-- **Facebook Insights**: Built-in to Facebook Pages
-- **Twitter Analytics**: Built-in to Twitter
-- **Instagram Insights**: Built-in to Instagram Business accounts
-- **Google Analytics**: Track social referral traffic
-- **Bitly**: Track link clicks (free tier: 1,500 links/month)
-
----
-
-## VIRAL GROWTH TACTICS
-
-### 1. Collaborate with News Outlets
-- Tag major news sources in posts
-- Offer to be data source for journalists
-- Provide embeddable widgets for their sites
-
-### 2. Community Engagement
-- Run weekly polls: "What's your biggest safety concern?"
-- Feature user-submitted safety tips
-- Highlight positive policing initiatives
-
-### 3. Influencer Partnerships
-- Reach out to Caribbean influencers
-- Provide them with exclusive data insights
-- Co-create content on crime prevention
-
-### 4. Controversy Hooks (Use Carefully)
-- Compare crime rates between islands
-- Highlight unusual crime trends
-- Fact-check politician claims about crime
-
-### 5. Interactive Content
-- "Guess the crime hotspot" quiz
-- "How safe is your neighborhood?" tool
-- Crime prediction polls
-
-### 6. Media Outreach
-- Send weekly press releases to Caribbean media
-- Offer expert commentary on crime trends
-- Pitch stories to international outlets (BBC, Al Jazeera)
+**Run manually on Sundays for weekly report**
 
 ---
 
-## AUTOMATION WORKFLOW
+## ✅ Quick Start Checklist
 
-**Recommended Setup:**
-
-1. **Monday 8 AM:** Google Apps Script generates weekly reports → commits to GitHub
-2. **Monday 8:30 AM:** GitHub Actions builds site → deploys to Cloudflare Pages
-3. **Monday 9 AM:** RSS feed updates with new posts
-4. **Monday 9:15 AM:** IFTTT/Zapier detects new RSS item → posts to Facebook
-5. **Monday 9:30 AM:** IFTTT/Zapier posts to Twitter
-6. **Monday 10 AM:** Manual Instagram post (or via Buffer)
-7. **Throughout week:** Share individual headlines on social media
-
-**Manual Tasks (15 min/day):**
-- Reply to comments/DMs
-- Share trending headlines
-- Engage with news outlet posts
+- [ ] Copy `socialMediaStats.gs` to Apps Script
+- [ ] Update `SOCIAL_CONFIG` (sheet name, columns)
+- [ ] Test with `testStatsCalculation()`
+- [ ] Run `updateSocialStats()` once
+- [ ] Set up trigger with `setupDailyTrigger()`
+- [ ] Verify "Social Media Stats" sheet created
+- [ ] Test chart URL (click link, see image)
+- [ ] Make first manual post
+- [ ] Establish daily 5-min routine
 
 ---
 
-## COST BREAKDOWN
+**Setup Time:** 30 minutes  
+**Daily Time:** 5 minutes  
+**Monthly Cost:** $0
 
-| Service | Free Tier Limit | Sufficient for Project? |
-|---------|----------------|-------------------------|
-| IFTTT | 2 applets | ✅ Yes (FB + Twitter) |
-| Zapier | 5 zaps, 100 tasks/month | ✅ Yes (5 platforms) |
-| Google Apps Script | 6 hours runtime/day | ✅ Yes (unlimited) |
-| Buffer | 10 posts/month | ⚠️ Limited (Instagram only) |
-| Canva | 2,000+ templates | ✅ Yes |
-| Bitly | 1,500 links/month | ✅ Yes |
-
-**Total Cost:** $0/month
-
-**Recommendation:** Use Google Apps Script for maximum flexibility and no limits.
-
----
-
-## NEXT STEPS
-
-1. ✅ Set up Facebook Page
-2. ✅ Set up Twitter account
-3. ✅ Set up Instagram Business account
-4. ✅ Choose automation tool (IFTTT vs Zapier vs Google Apps Script)
-5. ✅ Configure RSS-to-Social automation
-6. ✅ Create content calendar
-7. ✅ Set up UTM tracking
-8. ✅ Monitor analytics weekly
-
-**Target:** 1,000 followers per platform within 3 months
+Simple, effective, no budget needed! 🎉

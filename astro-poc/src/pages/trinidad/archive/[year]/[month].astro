@@ -114,17 +114,17 @@ const topRegions = Object.entries(crimesByRegion)
 
     <!-- Statistics Cards -->
     <section class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-      <div class="bg-white-100/50 rounded-lg shadow-sm border border-slate-200 p-6 text-center">
+      <div class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6 text-center">
         <div class="text-display font-bold text-rose-600">{crimes.length}</div>
         <div class="text-xs text-slate-500 mt-2">Total Crimes</div>
       </div>
 
-      <div class="bg-white-100/50 rounded-lg shadow-sm border border-slate-200 p-6 text-center">
+      <div class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6 text-center">
         <div class="text-display font-bold text-rose-600">{Object.keys(crimesByType).length}</div>
         <div class="text-xs text-slate-500 mt-2">Crime Types</div>
       </div>
 
-      <div class="bg-white-100/50 rounded-lg shadow-sm border border-slate-200 p-6 text-center">
+      <div class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6 text-center">
         <div class="text-display font-bold text-rose-600">{Object.keys(crimesByRegion).length}</div>
         <div class="text-xs text-slate-500 mt-2">Regions Affected</div>
       </div>
@@ -135,7 +135,7 @@ const topRegions = Object.entries(crimesByRegion)
       <h2 class="text-h2 font-bold text-slate-700 mb-4">Crime Breakdown</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white-100/50 rounded-lg shadow-sm border border-slate-200 p-6">
+        <div class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6">
           <h3 class="text-h3 font-semibold text-slate-500 mb-4">By Type</h3>
           <ul class="space-y-2">
             {Object.entries(crimesByType)
@@ -154,7 +154,7 @@ const topRegions = Object.entries(crimesByRegion)
           </ul>
         </div>
 
-        <div class="bg-white-100/50 rounded-lg shadow-sm border border-slate-200 p-6">
+        <div class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6">
           <h3 class="text-h3 font-semibold text-slate-700 mb-4">Top 5 Regions</h3>
           <ul class="space-y-2">
             {topRegions.map(([region, count]) => (

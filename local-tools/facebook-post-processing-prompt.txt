@@ -1,0 +1,6 @@
+cd ~/Documents/Side\ Projects/Crime\ Hotspots/local-tools/
+  python3 fb_crime_extractor.py < facebook-posts.txt
+
+
+
+python3 fb_crime_extractor.py < facebook-posts.txt

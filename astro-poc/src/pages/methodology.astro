@@ -5,6 +5,7 @@
  */
 
 import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
 
 const title = "Our Methodology — How We Collect and Verify Caribbean Crime Data | Crime Hotspots";
 const description = "Learn how Crime Hotspots Caribbean collects, verifies, and publishes crime statistics. Our data comes from Trinidad Express, Guardian TT, Newsday, Stabroek News, and Kaieteur News, processed with Google Gemini AI and human oversight.";
@@ -12,7 +13,11 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
 
 <Layout title={title} description={description}>
   <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4 animate-fadeIn">
-    <div class="bg-white/70 backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100">
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: 'Methodology' }
+    ]} />
+    <div class="bg-white/70 backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 mt-4">
       <!-- Introduction -->
       <section class="mb-5">
         <h1 class="text-display font-bold mb-4">How We Collect and Verify Crime Data for Trinidad & Tobago and Guyana</h1>
