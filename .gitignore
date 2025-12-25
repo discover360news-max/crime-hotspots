@@ -34,3 +34,10 @@ yarn-error.log*
 google-credentials.json
 **/crime-hotspots-local-tools-*.json
 local-fb-extractor-files/*.json
+
+# API Keys and Secrets (NEVER commit)
+**/API Keys.md
+**/api-keys.md
+**/*secret*.md
+**/*credentials*.md
+**/*.key
