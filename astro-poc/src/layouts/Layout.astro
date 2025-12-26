@@ -1,6 +1,7 @@
 ---
 import Header from '../components/Header.astro';
 import HeadlinesModal from '../components/HeadlinesModal.astro';
+import ArchivesModal from '../components/ArchivesModal.astro';
 
 interface Props {
   title: string;
@@ -191,6 +192,9 @@ const isHomepage = Astro.url.pathname === '/';
 
   <!-- Headlines Selection Modal -->
   <HeadlinesModal />
+
+  <!-- Archives Selection Modal -->
+  <ArchivesModal />
 
   <!-- Main Content -->
   <main>
