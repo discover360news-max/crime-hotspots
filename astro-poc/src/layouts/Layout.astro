@@ -1,5 +1,6 @@
 ---
 import Header from '../components/Header.astro';
+import HeadlinesModal from '../components/HeadlinesModal.astro';
 
 interface Props {
   title: string;
@@ -187,6 +188,9 @@ const isHomepage = Astro.url.pathname === '/';
 <body class="bg-slate-100 text-slate-700 min-h-screen font-sans">
   <!-- Header Component -->
   <Header isHomepage={isHomepage} />
+
+  <!-- Headlines Selection Modal -->
+  <HeadlinesModal />
 
   <!-- Main Content -->
   <main>

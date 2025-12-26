@@ -48,9 +48,9 @@ const { isHomepage = false } = Astro.props;
             <a href="/trinidad/dashboard" class="text-xs text-slate-700 hover:text-rose-600 font-medium">
               Dashboard
             </a>
-            <a href="/headlines" class="text-xs text-slate-700 hover:text-rose-600 font-medium">
+            <button onclick="window.openHeadlinesModal()" class="text-xs text-slate-700 hover:text-rose-600 font-medium cursor-pointer">
               Headlines
-            </a>
+            </button>
             <a href="/trinidad/archive" class="text-xs text-slate-700 hover:text-rose-600 font-medium">
               Archives
             </a>
@@ -92,10 +92,10 @@ const { isHomepage = false } = Astro.props;
           </a>
           {!isHomepage && (
             <>
-              <a href="/headlines"
-                 class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
+              <button onclick="window.openHeadlinesModal()"
+                 class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap cursor-pointer">
                 Headlines
-              </a>
+              </button>
               <a href="/trinidad/dashboard"
                  class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
                 Dashboard
