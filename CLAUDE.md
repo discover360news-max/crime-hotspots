@@ -10,7 +10,7 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Focus:** Trinidad-only implementation (Other islands expansion deferred)
-**Last Updated:** December 23, 2025
+**Last Updated:** December 26, 2025
 
 ---
 ## Kavell Forde - Owner - Guidance
@@ -247,6 +247,92 @@ google-apps-script/          # (Unchanged - same automation)
 - `astro-poc/src/pages/trinidad/crime/[slug].astro` (Report Issue, location display, source link)
 - `astro-poc/src/scripts/leafletMap.ts` (onMapReady callback, touch controls)
 - `astro-poc/src/scripts/yearFilter.ts` (removed initial callbacks)
+
+### Dashboard Trend Indicators + Modal Navigation (Dec 26, 2025)
+**Status:** ✅ LIVE in Production
+**Commit:** `073952f`
+
+**Features Implemented:**
+
+**1. Dashboard Stat Card Trends**
+- Added 30-day trend comparisons to all dashboard stat cards
+- Shows full year totals (e.g., 1535 total incidents) + trend indicator below
+- Trends compare last 30 days vs previous 30 days from entire database
+- **3-day lag offset** accounts for processing delay (crimes posted with crime date, not report date)
+- Color-coded: Red ↑ for increases, Green ↓ for decreases
+- Format: "↑ 25 (8%) vs prev 30 days"
+
+**Why 3-Day Lag Matters:**
+- Crimes are posted with **crime date** (not report date)
+- 3-day processing lag means recent days have incomplete data
+- Without offset: Trends would compare incomplete vs complete data (misleading stats)
+- With offset: Always compares complete 30-day periods (accurate trends)
+
+**Example Calculation (Dec 26, 2025):**
+- Last 30 days: Nov 23 - Dec 23 (ending 3 days ago)
+- Previous 30 days: Oct 24 - Nov 22 (33-63 days ago)
+
+**2. Modal-First Navigation (Headlines + Archives)**
+- Created HeadlinesModal and ArchivesModal components
+- Instant popups instead of page navigation (mobile-first UX)
+- Island selector shows active islands (Trinidad) vs "Coming Soon" (Guyana, Barbados, Jamaica)
+- Driven by `countries.ts` configuration
+- Saves one page load per user journey
+
+**3. Monthly Archive Redesign**
+- Replaced static crime list with dashboard-style insights
+- Horizontal scroll stat cards with trend arrows (month-over-month, year-over-year)
+- Quick Insights section: Deadliest day, Trending crime type, Overall trend
+- Value-driven data presentation (not just numbers)
+
+**4. Cloudflare Turnstile Integration**
+- Fixed ReportIssueModal and /report page CAPTCHA integration
+- **Key Learning:** Invisible mode requires async token generation
+- Added 1.5s wait time for token generation
+- Backend expects `cf-token` field (not `cf-turnstile-response`)
+- Callback tracking with `onReportTurnstileSuccess` for invisible mode
+
+**Turnstile Best Practices:**
+```javascript
+// Wait for invisible widget to generate token
+if (!token || token === '') {
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  const newFormData = new FormData(form);
+  token = newFormData.get('cf-turnstile-response');
+}
+
+// Backend expects 'cf-token' field
+const payload = {
+  'cf-token': turnstileToken,
+  // ... other fields
+};
+```
+
+**5. Report Confirmation Screen Redesign**
+- Added success checkmark icon (emerald green)
+- "What's Next?" section with actionable buttons
+- Browse Headlines + Submit Another buttons
+- Full-width Copy ID button
+
+**Files Modified:**
+- `astro-poc/src/components/StatCard.astro` (trend-indicator div)
+- `astro-poc/src/scripts/dashboardUpdates.ts` (trend calculation with 3-day lag)
+- `astro-poc/src/pages/trinidad/dashboard.astro` (pass allCrimes, initialize trends)
+- `astro-poc/src/components/HeadlinesModal.astro` (NEW)
+- `astro-poc/src/components/ArchivesModal.astro` (NEW)
+- `astro-poc/src/components/Header.astro` (modal triggers)
+- `astro-poc/src/layouts/Layout.astro` (added modals globally)
+- `astro-poc/src/components/ReportIssueModal.astro` (Turnstile integration)
+- `astro-poc/src/pages/report.astro` (Turnstile async handling, confirmation screen)
+- `astro-poc/src/pages/trinidad/archive/[year]/[month].astro` (value-driven redesign)
+- `astro-poc/src/data/countries.ts` (added Guyana, Barbados, Jamaica with available: false)
+
+**Technical Notes:**
+- Trend calculations separated: Display value (filtered crimes) vs Trend data (30-day periods from all crimes)
+- Helper function `updateCardWithTrend()` accepts 3 parameters: displayValue, last30Count, prev30Count
+- Trends hide automatically if no previous period data available
+- Modal state uses global window functions for cross-component communication
+- Turnstile site key: `0x4AAAAAAB_ThEy2ACY1KEYQ`
 
 ### Year Filter System (Dec 18, 2025)
 **Status:** ✅ LIVE in Production
