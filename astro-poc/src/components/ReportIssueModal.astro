@@ -51,7 +51,7 @@ const {
   <!-- Modal Content -->
   <div
     id="reportIssueContent"
-    class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto opacity-0 scale-95 transition-all duration-300"
+    class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto opacity-0 scale-95 transition-all duration-300"
   >
     <!-- Modal Header -->
     <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
@@ -203,6 +203,16 @@ const {
 </div>
 
 <script>
+  // Turnstile TypeScript declaration
+  declare global {
+    interface Window {
+      turnstile: {
+        render: (container: Element, options: { sitekey: string; theme: string }) => string;
+        reset: (widgetId: string) => void;
+      };
+    }
+  }
+
   // Google Apps Script endpoint (same as reportStandalone.js)
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysi5VEpdS2nL9Ci9BWTn0ydXWA_IdR7j_3MR_EW5uK92N62xbt5OB0sKu2wMLGhkb7/exec";
 
@@ -215,6 +225,8 @@ const {
   const resultBox = document.getElementById('reportIssueResult');
   const submitBtn = document.getElementById('submitReportBtn');
 
+  let turnstileWidgetId: string | null = null;
+
   // Open modal
   openBtn?.addEventListener('click', () => {
     if (modal && modalContent) {
@@ -223,6 +235,17 @@ const {
       setTimeout(() => {
         modalContent.classList.remove('opacity-0', 'scale-95');
         modalContent.classList.add('opacity-100', 'scale-100');
+
+        // Render Turnstile widget when modal becomes visible
+        if (typeof window.turnstile !== 'undefined' && !turnstileWidgetId) {
+          const turnstileContainer = document.querySelector('.cf-turnstile');
+          if (turnstileContainer && !turnstileContainer.hasChildNodes()) {
+            turnstileWidgetId = window.turnstile.render(turnstileContainer, {
+              sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
+              theme: 'light',
+            });
+          }
+        }
       }, 50);
     }
   });
@@ -235,6 +258,11 @@ const {
       setTimeout(() => {
         modal.classList.remove('visible', 'opacity-100');
         modal.classList.add('invisible', 'opacity-0');
+
+        // Reset Turnstile widget when modal closes
+        if (typeof window.turnstile !== 'undefined' && turnstileWidgetId) {
+          window.turnstile.reset(turnstileWidgetId);
+        }
       }, 300);
     }
   }
@@ -303,8 +331,8 @@ const {
       crimeSummary: formData.get('crimeSummary'),
       crimeSource: formData.get('crimeSource'),
       crimeUrl: formData.get('crimeUrl'),
-      // Security
-      'cf-turnstile-response': turnstileToken,
+      // Security (backend expects 'cf-token')
+      'cf-token': turnstileToken,
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent
     };
