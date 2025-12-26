@@ -111,9 +111,11 @@ const description = "Help build safer communities: report crime anonymously via 
         </div>
       </div>
 
-      <div class="cf-turnstile"
+      <div id="reportTurnstile"
+           class="cf-turnstile"
            data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ"
-           data-theme="light"></div>
+           data-theme="light"
+           data-callback="onReportTurnstileSuccess"></div>
       <div class="flex items-center justify-between mt-4">
         <div class="text-xs text-slate-500">
           You'll receive a unique anonymous report ID.
@@ -162,6 +164,15 @@ const description = "Help build safer communities: report crime anonymously via 
   </main>
 
   <!-- Client-side form logic -->
+  <script is:inline>
+    // Global callback for Turnstile - tracks when invisible widget completes
+    let turnstileReady = false;
+    window.onReportTurnstileSuccess = function(token) {
+      console.log('Turnstile ready:', token ? 'Yes' : 'No');
+      turnstileReady = true;
+    };
+  </script>
+
   <script>
     import { COUNTRIES, APPS_SCRIPT_URL } from '../data/countries';
 
@@ -425,23 +436,28 @@ const description = "Help build safer communities: report crime anonymously via 
       }
 
       // Get Turnstile token
-      const token = formData.get('cf-turnstile-response');
+      let token = formData.get('cf-turnstile-response');
 
-      // Check if Turnstile loaded and generated a token
+      // For invisible mode, wait a moment if token not ready
       if (!token || token === '') {
-        resultBox.classList.remove("hidden");
-        resultBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-700');
-        resultBox.textContent = "❌ Security verification failed. Please wait a moment for the security check to load, then try again.";
-        return;
-      }
+        // Give invisible widget a moment to generate token
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Verifying...";
 
-      // Additional check: Ensure Turnstile widget is present
-      const turnstileWidget = document.querySelector('.cf-turnstile');
-      if (!turnstileWidget) {
-        resultBox.classList.remove("hidden");
-        resultBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-700');
-        resultBox.textContent = "❌ Security widget not loaded. Please refresh the page and try again.";
-        return;
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        // Re-check token after wait
+        const newFormData = new FormData(form);
+        token = newFormData.get('cf-turnstile-response');
+
+        if (!token || token === '') {
+          resultBox.classList.remove("hidden");
+          resultBox.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-700');
+          resultBox.textContent = "❌ Security verification failed. Please refresh the page and try again.";
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Submit";
+          return;
+        }
       }
 
       const countryId = countrySelect.value;
