@@ -418,6 +418,10 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       const currentYearCrimes = crimes.filter(c => c.year === currentYear);
       console.log(`📊 Showing ${currentYearCrimes.length} crimes from ${currentYear} (filtered from ${crimes.length} total)`);
 
+      // Update stats with trends (need to import the function)
+      const { updateStatsCards } = await import('../../scripts/dashboardUpdates');
+      updateStatsCards(currentYearCrimes, crimes);
+
       // Hide stats and insights shimmers with minimum display time
       await window.hideShimmerWithMinTime(
         document.getElementById('statsShimmer'),
@@ -525,7 +529,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
           // Update after short delay
           setTimeout(async () => {
             const updateStart = Date.now();
-            updateStatsCards(crimes);
+            updateStatsCards(crimes, window.__crimesData);
 
             // Hide shimmer with minimum time
             await window.hideShimmerWithMinTime(statsShimmer, statsContainer, updateStart);

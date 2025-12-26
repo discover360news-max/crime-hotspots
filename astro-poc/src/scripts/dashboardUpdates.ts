@@ -24,50 +24,112 @@ interface Crime {
 }
 
 /**
- * Update stats cards with filtered crime data
+ * Update stats cards with filtered crime data and trends
  */
-export function updateStatsCards(crimes: Crime[]) {
-  // Update Total Incidents - target the value element inside the card
-  const totalIncidentsCard = document.getElementById('totalIncidents');
-  if (totalIncidentsCard) {
-    const valueEl = totalIncidentsCard.querySelector('.text-3xl');
-    if (valueEl) valueEl.textContent = crimes.length.toString();
+export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
+  // Calculate time periods for trend comparison with 3-day lag
+  // (crimes are posted with crime date, not report date, so we have a 3-day processing lag)
+  const now = new Date();
+  const threeDaysAgo = new Date(now);
+  threeDaysAgo.setDate(now.getDate() - 3);
+
+  const thirtyThreeDaysAgo = new Date(now);
+  thirtyThreeDaysAgo.setDate(now.getDate() - 33); // 3 + 30 days
+
+  const sixtyThreeDaysAgo = new Date(now);
+  sixtyThreeDaysAgo.setDate(now.getDate() - 63); // 3 + 60 days
+
+  // Trend data: last 30 days (ending 3 days ago) from ALL crimes
+  const last30DaysCrimes = allCrimes
+    ? allCrimes.filter(c => {
+        const crimeDate = new Date(c.date);
+        return crimeDate >= thirtyThreeDaysAgo && crimeDate <= threeDaysAgo;
+      })
+    : [];
+
+  // Trend data: previous 30 days (33-63 days ago) from ALL crimes
+  const prev30DaysCrimes = allCrimes
+    ? allCrimes.filter(c => {
+        const crimeDate = new Date(c.date);
+        return crimeDate >= sixtyThreeDaysAgo && crimeDate < thirtyThreeDaysAgo;
+      })
+    : [];
+
+  // Helper function to update card with trend
+  function updateCardWithTrend(card: Element | null, displayValue: number, last30Count: number, prev30Count: number) {
+    if (!card) return;
+
+    const valueEl = card.querySelector('.text-3xl');
+    const trendEl = card.querySelector('.trend-indicator');
+
+    // Update the main display value (full dataset)
+    if (valueEl) valueEl.textContent = displayValue.toString();
+
+    // Update trend indicator (30-day comparison)
+    if (trendEl && prev30Count > 0) {
+      const change = last30Count - prev30Count;
+      const percent = Math.round((change / prev30Count) * 100);
+      const arrow = change >= 0 ? '↑' : '↓';
+      const color = change >= 0 ? 'text-red-600' : 'text-emerald-600';
+
+      trendEl.innerHTML = `<span class="${color}">${arrow} ${Math.abs(change)} (${Math.abs(percent)}%)</span> vs prev 30 days`;
+      trendEl.classList.remove('hidden');
+    } else if (trendEl) {
+      // Hide trend if no previous data
+      trendEl.classList.add('hidden');
+    }
   }
 
-  // Update individual crime type cards
-  const murders = crimes.filter(c => c.crimeType === 'Murder').length;
-  const robberies = crimes.filter(c => c.crimeType === 'Robbery').length;
-  const homeInvasions = crimes.filter(c => c.crimeType === 'Home Invasion').length;
-  const thefts = crimes.filter(c => c.crimeType === 'Theft').length;
-  const shootings = crimes.filter(c => c.crimeType === 'Shooting').length;
-  const assaults = crimes.filter(c => c.crimeType === 'Assault').length;
-  const burglaries = crimes.filter(c => c.crimeType === 'Burglary').length;
-  const seizures = crimes.filter(c => c.crimeType === 'Seizures').length;
-  const kidnappings = crimes.filter(c => c.crimeType === 'Kidnapping').length;
+  // Calculate display counts (from filtered crimes parameter)
+  const displayTotal = crimes.length;
+  const displayMurders = crimes.filter(c => c.crimeType === 'Murder').length;
+  const displayRobberies = crimes.filter(c => c.crimeType === 'Robbery').length;
+  const displayHomeInvasions = crimes.filter(c => c.crimeType === 'Home Invasion').length;
+  const displayThefts = crimes.filter(c => c.crimeType === 'Theft').length;
+  const displayShootings = crimes.filter(c => c.crimeType === 'Shooting').length;
+  const displayAssaults = crimes.filter(c => c.crimeType === 'Assault').length;
+  const displayBurglaries = crimes.filter(c => c.crimeType === 'Burglary').length;
+  const displaySeizures = crimes.filter(c => c.crimeType === 'Seizures').length;
+  const displayKidnappings = crimes.filter(c => c.crimeType === 'Kidnapping').length;
 
-  // Find and update each stat card by index
+  // Calculate trend counts (last 30 days from ALL crimes)
+  const last30Total = last30DaysCrimes.length;
+  const last30Murders = last30DaysCrimes.filter(c => c.crimeType === 'Murder').length;
+  const last30Robberies = last30DaysCrimes.filter(c => c.crimeType === 'Robbery').length;
+  const last30HomeInvasions = last30DaysCrimes.filter(c => c.crimeType === 'Home Invasion').length;
+  const last30Thefts = last30DaysCrimes.filter(c => c.crimeType === 'Theft').length;
+  const last30Shootings = last30DaysCrimes.filter(c => c.crimeType === 'Shooting').length;
+  const last30Assaults = last30DaysCrimes.filter(c => c.crimeType === 'Assault').length;
+  const last30Burglaries = last30DaysCrimes.filter(c => c.crimeType === 'Burglary').length;
+  const last30Seizures = last30DaysCrimes.filter(c => c.crimeType === 'Seizures').length;
+  const last30Kidnappings = last30DaysCrimes.filter(c => c.crimeType === 'Kidnapping').length;
+
+  // Calculate previous 30-day counts
+  const prev30Total = prev30DaysCrimes.length;
+  const prev30Murders = prev30DaysCrimes.filter(c => c.crimeType === 'Murder').length;
+  const prev30Robberies = prev30DaysCrimes.filter(c => c.crimeType === 'Robbery').length;
+  const prev30HomeInvasions = prev30DaysCrimes.filter(c => c.crimeType === 'Home Invasion').length;
+  const prev30Thefts = prev30DaysCrimes.filter(c => c.crimeType === 'Theft').length;
+  const prev30Shootings = prev30DaysCrimes.filter(c => c.crimeType === 'Shooting').length;
+  const prev30Assaults = prev30DaysCrimes.filter(c => c.crimeType === 'Assault').length;
+  const prev30Burglaries = prev30DaysCrimes.filter(c => c.crimeType === 'Burglary').length;
+  const prev30Seizures = prev30DaysCrimes.filter(c => c.crimeType === 'Seizures').length;
+  const prev30Kidnappings = prev30DaysCrimes.filter(c => c.crimeType === 'Kidnapping').length;
+
+  // Update all cards with trends
   const statCards = document.querySelectorAll('.stat-card');
-  const murdersEl = statCards[1]?.querySelector('.text-3xl');
-  const robberiesEl = statCards[2]?.querySelector('.text-3xl');
-  const homeInvasionsEl = statCards[3]?.querySelector('.text-3xl');
-  const theftsEl = statCards[4]?.querySelector('.text-3xl');
-  const shootingsEl = statCards[5]?.querySelector('.text-3xl');
-  const assaultsEl = statCards[6]?.querySelector('.text-3xl');
-  const burglariesEl = statCards[7]?.querySelector('.text-3xl');
-  const seizuresEl = statCards[8]?.querySelector('.text-3xl');
-  const kidnappingsEl = statCards[9]?.querySelector('.text-3xl');
+  updateCardWithTrend(document.getElementById('totalIncidents'), displayTotal, last30Total, prev30Total);
+  updateCardWithTrend(statCards[1], displayMurders, last30Murders, prev30Murders);
+  updateCardWithTrend(statCards[2], displayRobberies, last30Robberies, prev30Robberies);
+  updateCardWithTrend(statCards[3], displayHomeInvasions, last30HomeInvasions, prev30HomeInvasions);
+  updateCardWithTrend(statCards[4], displayThefts, last30Thefts, prev30Thefts);
+  updateCardWithTrend(statCards[5], displayShootings, last30Shootings, prev30Shootings);
+  updateCardWithTrend(statCards[6], displayAssaults, last30Assaults, prev30Assaults);
+  updateCardWithTrend(statCards[7], displayBurglaries, last30Burglaries, prev30Burglaries);
+  updateCardWithTrend(statCards[8], displaySeizures, last30Seizures, prev30Seizures);
+  updateCardWithTrend(statCards[9], displayKidnappings, last30Kidnappings, prev30Kidnappings);
 
-  if (murdersEl) murdersEl.textContent = murders.toString();
-  if (robberiesEl) robberiesEl.textContent = robberies.toString();
-  if (homeInvasionsEl) homeInvasionsEl.textContent = homeInvasions.toString();
-  if (theftsEl) theftsEl.textContent = thefts.toString();
-  if (shootingsEl) shootingsEl.textContent = shootings.toString();
-  if (assaultsEl) assaultsEl.textContent = assaults.toString();
-  if (burglariesEl) burglariesEl.textContent = burglaries.toString();
-  if (seizuresEl) seizuresEl.textContent = seizures.toString();
-  if (kidnappingsEl) kidnappingsEl.textContent = kidnappings.toString();
-
-  console.log('✅ Stats cards updated');
+  console.log('✅ Stats cards updated with trends');
 }
 
 /**
