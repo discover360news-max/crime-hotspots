@@ -1,0 +1,71 @@
+---
+/**
+ * Headlines Landing Page
+ * Displays island selection buttons for browsing crime headlines
+ * Active islands link to their headlines pages
+ */
+import Layout from '../layouts/Layout.astro';
+import { COUNTRIES } from '../data/countries';
+---
+
+<Layout title="Crime Headlines | Crime Hotspots">
+  <main class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pt-24 pb-16 px-4">
+    <div class="max-w-4xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-12">
+        <h1 class="text-h1 font-bold text-slate-700 mb-3">Crime Headlines</h1>
+        <p class="text-body text-slate-600 max-w-2xl mx-auto">
+          Browse recent crime incidents from across the Caribbean. Select an island to view detailed headlines and reports.
+        </p>
+      </div>
+
+      <!-- Island Buttons -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+        {COUNTRIES.map((country) => (
+          country.available ? (
+            <!-- Active Island Button -->
+            <a
+              href={country.headlinesUrl}
+              class="group relative bg-white/80 backdrop-blur-md border-2 border-slate-200 rounded-lg p-6 hover:border-rose-600 hover:shadow-lg transition-all duration-300"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-h2 font-bold text-slate-700 group-hover:text-rose-600 transition mb-1">
+                    {country.name}
+                  </h2>
+                  <p class="text-xs text-slate-500">{country.short}</p>
+                </div>
+                <svg class="w-6 h-6 text-slate-400 group-hover:text-rose-600 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </a>
+          ) : (
+            <!-- Coming Soon Button (Disabled) -->
+            <div class="relative bg-white/50 backdrop-blur-md border-2 border-slate-200 rounded-lg p-6 opacity-60 cursor-not-allowed">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-h2 font-bold text-slate-500 mb-1">
+                    {country.name}
+                  </h2>
+                  <p class="text-xs text-slate-400">{country.short}</p>
+                </div>
+                <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+            </div>
+          )
+        ))}
+      </div>
+
+      <!-- Help Text -->
+      <div class="mt-12 text-center">
+        <p class="text-small text-slate-500">
+          Don't see your island? We're expanding coverage.
+          <a href="/report" class="text-rose-600 hover:text-rose-700 underline">Submit a crime report</a> to help us grow.
+        </p>
+      </div>
+    </div>
+  </main>
+</Layout>

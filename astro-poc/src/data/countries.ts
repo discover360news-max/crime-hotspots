@@ -23,6 +23,33 @@ export const COUNTRIES: Country[] = [
     headlinesUrl: '/trinidad/headlines',
     dashboardUrl: '/trinidad/dashboard',
   },
+  {
+    id: 'gy',
+    name: 'Guyana',
+    short: 'Coming Soon',
+    csvUrl: "",
+    available: false,
+    headlinesUrl: '/guyana/headlines',
+    dashboardUrl: '/guyana/dashboard',
+  },
+  {
+    id: 'bb',
+    name: 'Barbados',
+    short: 'Coming Soon',
+    csvUrl: "",
+    available: false,
+    headlinesUrl: '/barbados/headlines',
+    dashboardUrl: '/barbados/dashboard',
+  },
+  {
+    id: 'jm',
+    name: 'Jamaica',
+    short: 'Coming Soon',
+    csvUrl: "",
+    available: false,
+    headlinesUrl: '/jamaica/headlines',
+    dashboardUrl: '/jamaica/dashboard',
+  },
 ];
 
 export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysi5VEpdS2nL9Ci9BWTn0ydXWA_IdR7j_3MR_EW5uK92N62xbt5OB0sKu2wMLGhkb7/exec";
