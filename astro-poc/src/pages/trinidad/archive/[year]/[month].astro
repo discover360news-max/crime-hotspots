@@ -1,11 +1,12 @@
 ---
 /**
- * Monthly Archive Page
+ * Monthly Archive Page - Redesigned with Dashboard-Style Insights
  * Auto-generates archive pages for each month that has crimes
  * URL: /trinidad/archive/2025/12
  */
 
 import Layout from '../../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import { getTrinidadCrimes, type Crime } from '../../../../lib/crimeData';
 
 export async function getStaticPaths() {
@@ -22,225 +23,256 @@ export async function getStaticPaths() {
     monthsMap.get(key)!.push(crime);
   });
 
-  // Generate paths
-  return Array.from(monthsMap.entries()).map(([key, crimes]) => {
+  // Generate paths with all crimes for comparisons
+  return Array.from(monthsMap.entries()).map(([key, monthCrimes]) => {
     const [year, month] = key.split('-');
     return {
       params: { year, month },
-      props: { crimes, year: parseInt(year), month: parseInt(month) },
+      props: {
+        crimes: monthCrimes,
+        allCrimes: crimes, // Need all crimes for comparisons
+        year: parseInt(year),
+        month: parseInt(month)
+      },
     };
   });
 }
 
 interface Props {
   crimes: Crime[];
+  allCrimes: Crime[];
   year: number;
   month: number;
 }
 
-const { crimes, year, month } = Astro.props;
+const { crimes, allCrimes, year, month } = Astro.props;
 
 const monthName = new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long' });
-const title = `${monthName} ${year} Crime Report | Trinidad & Tobago`;
-const description = `Complete list of ${crimes.length} crimes reported in Trinidad & Tobago during ${monthName} ${year}. View details, statistics, and trends.`;
+const title = `${monthName} ${year} Crime Archive | Trinidad & Tobago`;
+const description = `${crimes.length} crimes reported in Trinidad & Tobago during ${monthName} ${year}. Month-over-month trends, year-over-year comparisons, and detailed statistics.`;
 
-// Group by crime type for stats
+// Group by crime type
 const crimesByType = crimes.reduce((acc, crime) => {
   acc[crime.crimeType] = (acc[crime.crimeType] || 0) + 1;
   return acc;
 }, {} as Record<string, number>);
 
-// Group by region for stats
-const crimesByRegion = crimes.reduce((acc, crime) => {
-  if (crime.region) {
-    acc[crime.region] = (acc[crime.region] || 0) + 1;
-  }
+const topCrimeTypes = Object.entries(crimesByType)
+  .sort(([, a], [, b]) => b - a)
+  .slice(0, 5);
+
+// Get previous month's data for comparison
+const prevMonth = month === 1 ? 12 : month - 1;
+const prevYear = month === 1 ? year - 1 : year;
+const prevMonthCrimes = allCrimes.filter(c => c.year === prevYear && c.month === prevMonth);
+
+// Get same month from previous year
+const lastYearCrimes = allCrimes.filter(c => c.year === year - 1 && c.month === month);
+
+// Calculate month-over-month change
+const momChange = crimes.length - prevMonthCrimes.length;
+const momPercent = prevMonthCrimes.length > 0
+  ? Math.round((momChange / prevMonthCrimes.length) * 100)
+  : 0;
+
+// Calculate year-over-year change
+const yoyChange = crimes.length - lastYearCrimes.length;
+const yoyPercent = lastYearCrimes.length > 0
+  ? Math.round((yoyChange / lastYearCrimes.length) * 100)
+  : 0;
+
+// Find deadliest day
+const crimesByDay = crimes.reduce((acc, crime) => {
+  const day = new Date(crime.date).getDate();
+  acc[day] = (acc[day] || 0) + 1;
+  return acc;
+}, {} as Record<number, number>);
+
+const deadliestDay = Object.entries(crimesByDay)
+  .sort(([, a], [, b]) => b - a)[0];
+
+// Calculate top trending crime type (biggest increase from prev month)
+const prevMonthByType = prevMonthCrimes.reduce((acc, crime) => {
+  acc[crime.crimeType] = (acc[crime.crimeType] || 0) + 1;
   return acc;
 }, {} as Record<string, number>);
 
-const topRegions = Object.entries(crimesByRegion)
-  .sort(([, a], [, b]) => b - a)
-  .slice(0, 5);
+const trendingCrime = Object.entries(crimesByType)
+  .map(([type, count]) => {
+    const prevCount = prevMonthByType[type] || 0;
+    const change = count - prevCount;
+    const percent = prevCount > 0 ? ((change / prevCount) * 100) : 0;
+    return { type, count, change, percent };
+  })
+  .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))[0];
+
+// Breadcrumbs
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard' },
+  { label: 'Archives', href: '/trinidad/archive' },
+  { label: `${monthName} ${year}` }
+];
 ---
 
 <Layout title={title} description={description}>
-  <!-- Breadcrumb Schema.org -->
-  <script type="application/ld+json" slot="head">
-    {
-      JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": "https://crimehotspots.com/"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Trinidad Archives",
-            "item": "https://crimehotspots.com/trinidad/archive"
-          },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "name": `${monthName} ${year}`,
-            "item": `https://crimehotspots.com/trinidad/archive/${year}/${String(month).padStart(2, '0')}`
-          }
-        ]
-      })
-    }
-  </script>
-
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
     <!-- Breadcrumbs -->
-    <nav aria-label="Breadcrumb" class="mb-6">
-      <ol class="flex items-center gap-2 text-xs text-slate-500">
-        <li><a href="/" class="hover:text-rose-600 transition">Home</a></li>
-        <li>/</li>
-        <li><a href="/trinidad/archive" class="hover:text-rose-600 transition">Trinidad Archives</a></li>
-        <li>/</li>
-        <li class="text-rose-600 font-medium">{monthName} {year}</li>
-      </ol>
-    </nav>
+    <Breadcrumbs items={breadcrumbs} />
 
     <!-- Page Header -->
-    <div class="mb-8">
-      <h1 class="text-display font-bold text-slate-700 mb-2">{monthName} {year} Crime Report</h1>
-      <p class="text-body text-slate-500">Trinidad & Tobago</p>
+    <div class="mb-6">
+      <h1 class="text-h1 font-bold text-slate-700 mb-2">{monthName} {year} Archive</h1>
+      <p class="text-body text-slate-500">{crimes.length} crimes reported in Trinidad & Tobago</p>
     </div>
 
-    <!-- Statistics Cards -->
-    <section class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-      <div class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6 text-center">
-        <div class="text-display font-bold text-rose-600">{crimes.length}</div>
-        <div class="text-xs text-slate-500 mt-2">Total Crimes</div>
-      </div>
-
-      <div class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6 text-center">
-        <div class="text-display font-bold text-rose-600">{Object.keys(crimesByType).length}</div>
-        <div class="text-xs text-slate-500 mt-2">Crime Types</div>
-      </div>
-
-      <div class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6 text-center">
-        <div class="text-display font-bold text-rose-600">{Object.keys(crimesByRegion).length}</div>
-        <div class="text-xs text-slate-500 mt-2">Regions Affected</div>
-      </div>
-    </section>
-
-    <!-- Crime Breakdown -->
-    <section class="mb-8">
-      <h2 class="text-h2 font-bold text-slate-700 mb-4">Crime Breakdown</h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6">
-          <h3 class="text-h3 font-semibold text-slate-500 mb-4">By Type</h3>
-          <ul class="space-y-2">
-            {Object.entries(crimesByType)
-              .sort(([, a], [, b]) => b - a)
-              .map(([type, count]) => (
-                <li class="flex justify-between items-center pb-2 border-b border-slate-200 last:border-0">
-                  <a href={`/trinidad/archive`} class="text-xs text-rose-600 hover:text-rose-700 hover:underline">
-                    {type}
-                  </a>
-                  <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
-                    {count}
-                  </span>
-                </li>
-              ))
-            }
-          </ul>
+    <!-- Horizontal Scroll Stats Cards (Dashboard Style) -->
+    <div class="relative mb-8">
+      <div class="flex items-center gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar">
+        <!-- Total Crimes Card -->
+        <div class="flex-shrink-0 snap-start bg-white/70 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 p-6 w-64">
+          <div class="text-xs font-semibold text-slate-500 mb-2">Total Crimes</div>
+          <div class="text-display font-bold text-slate-700">{crimes.length}</div>
+          {prevMonthCrimes.length > 0 && (
+            <div class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+              <span class={momChange >= 0 ? 'text-red-600' : 'text-emerald-600'}>
+                {momChange >= 0 ? '↑' : '↓'} {Math.abs(momChange)} ({Math.abs(momPercent)}%)
+              </span>
+              <span>vs prev month</span>
+            </div>
+          )}
         </div>
 
-        <div class="bg-white/50 rounded-lg shadow-sm border border-slate-200 p-6">
-          <h3 class="text-h3 font-semibold text-slate-700 mb-4">Top 5 Regions</h3>
-          <ul class="space-y-2">
-            {topRegions.map(([region, count]) => (
-              <li class="flex justify-between items-center pb-2 border-b border-slate-200 last:border-0">
-                <a href={`/trinidad/archive`} class="text-xs text-rose-600 hover:text-rose-700 hover:underline">
-                  {region}
-                </a>
-                <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
-                  {count}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </section>
+        <!-- Year-over-Year Card -->
+        {lastYearCrimes.length > 0 && (
+          <div class="flex-shrink-0 snap-start bg-white/70 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 p-6 w-64">
+            <div class="text-xs font-semibold text-slate-500 mb-2">vs {monthName} {year - 1}</div>
+            <div class="text-display font-bold text-slate-700">{lastYearCrimes.length}</div>
+            <div class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+              <span class={yoyChange >= 0 ? 'text-red-600' : 'text-emerald-600'}>
+                {yoyChange >= 0 ? '↑' : '↓'} {Math.abs(yoyChange)} ({Math.abs(yoyPercent)}%)
+              </span>
+              <span>year-over-year</span>
+            </div>
+          </div>
+        )}
 
-    <!-- Crime List -->
+        <!-- Top Crime Types (scrollable cards) -->
+        {topCrimeTypes.map(([type, count]) => (
+          <div class="flex-shrink-0 snap-start bg-white/70 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 p-6 w-64">
+            <div class="text-xs font-semibold text-slate-500 mb-2">{type}</div>
+            <div class="text-display font-bold text-slate-700">{count}</div>
+            {prevMonthByType[type] && (
+              <div class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                {(() => {
+                  const prevCount = prevMonthByType[type] || 0;
+                  const change = count - prevCount;
+                  const percent = prevCount > 0 ? Math.round((change / prevCount) * 100) : 0;
+                  return (
+                    <span class={change >= 0 ? 'text-red-600' : 'text-emerald-600'}>
+                      {change >= 0 ? '↑' : '↓'} {Math.abs(change)} ({Math.abs(percent)}%)
+                    </span>
+                  );
+                })()}
+                <span>vs prev month</span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <!-- Scroll Hint (right side) -->
+      <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-100 via-slate-100/90 to-transparent pointer-events-none flex items-center justify-end pr-2">
+        <svg class="w-4 h-4 text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Quick Insights Section -->
+    <div class="bg-white/70 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 p-6 mb-8">
+      <h2 class="text-h2 font-bold text-slate-700 mb-4">Quick Insights</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Deadliest Day -->
+        {deadliestDay && (
+          <div class="text-center">
+            <div class="text-display font-bold text-rose-600 mb-1">
+              {monthName} {deadliestDay[0]}
+            </div>
+            <div class="text-small text-slate-700 font-medium mb-1">Deadliest Day</div>
+            <div class="text-xs text-slate-500">{deadliestDay[1]} crimes reported</div>
+          </div>
+        )}
+
+        <!-- Trending Crime Type -->
+        {trendingCrime && Math.abs(trendingCrime.change) > 0 && (
+          <div class="text-center">
+            <div class={`text-display font-bold mb-1 ${trendingCrime.change >= 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+              {trendingCrime.change >= 0 ? '↑' : '↓'} {Math.abs(Math.round(trendingCrime.percent))}%
+            </div>
+            <div class="text-small text-slate-700 font-medium mb-1">{trendingCrime.type}</div>
+            <div class="text-xs text-slate-500">
+              {trendingCrime.change >= 0 ? 'Increased' : 'Decreased'} from prev month
+            </div>
+          </div>
+        )}
+
+        <!-- Month-over-Month Trend -->
+        {prevMonthCrimes.length > 0 && (
+          <div class="text-center">
+            <div class={`text-display font-bold mb-1 ${momChange >= 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+              {momChange >= 0 ? '↑' : '↓'} {Math.abs(momPercent)}%
+            </div>
+            <div class="text-small text-slate-700 font-medium mb-1">Overall Trend</div>
+            <div class="text-xs text-slate-500">
+              {momChange >= 0 ? 'More' : 'Fewer'} crimes than prev month
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+
+    <!-- Crime Headlines List -->
     <section>
-      <h2 class="text-h2 font-bold text-slate-700 mb-4">All ({crimes.length}) Crime Headlines</h2>
+      <h2 class="text-h2 font-bold text-slate-700 mb-4">All Headlines ({crimes.length})</h2>
 
-      <div class="grid gap-8 sm:grid-cols-1 lg:grid-cols-2">
+      <div class="space-y-3">
         {crimes.map(crime => (
           <a
             href={`/trinidad/crime/${crime.slug}`}
-            class="bg-white/50 backdrop-blur-md rounded-lg shadow-md p-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-2 border-transparent hover:border-rose-200 group block"
+            class="flex items-center justify-between bg-white/70 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 p-4 hover:border-rose-600 hover:shadow-md transition group"
           >
-            <!-- Date and Crime Type -->
-            <div class="flex justify-between items-center mb-3">
-              <span class="text-xs text-slate-500">{crime.date}</span>
-              <div class="flex items-center gap-1 bg-white/50 shadow-sm px-4 py-2 rounded-full text-xs font-semibold text-rose-600 uppercase">
-                {crime.crimeType}
+            <div class="flex-1 min-w-0 pr-4">
+              <div class="flex items-center gap-3 mb-2">
+                <span class="px-3 py-1 rounded-full text-white text-xs font-medium bg-rose-600">
+                  {crime.crimeType}
+                </span>
+                <span class="text-xs text-slate-500">{crime.date}</span>
               </div>
+              <h3 class="text-small font-semibold text-slate-700 line-clamp-2 group-hover:text-rose-600 transition">
+                {crime.headline}
+              </h3>
+              {crime.area && (
+                <p class="text-xs text-slate-500 mt-1">{crime.area}</p>
+              )}
             </div>
-
-            <!-- Headline -->
-            <h3 class="mb-4 text-small text-slate-900 line-clamp-2 font-bold">
-              {crime.headline}
-            </h3>
-
-            <!-- Street Address -->
-            {crime.street && (
-              <p class="text-xs text-slate-500 mb-2"><strong>Location:</strong> {crime.street}</p>
-            )}
-
-            <!-- Area -->
-            <div class="flex items-center gap-1 text-xs text-rose-600">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              {crime.area}
-            </div>
-
-            <!-- Read hint (appears on hover) -->
-            <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-rose-600 font-medium flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <span>View Details</span>
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-rose-600 group-hover:translate-x-1 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
           </a>
         ))}
       </div>
     </section>
-
-    <!-- Navigation -->
-    <nav class="flex flex-wrap justify-between items-center gap-4 mt-8 pt-8 border-t border-slate-200">
-      <a
-        href={`/trinidad/archive/${month === 1 ? year - 1 : year}/${month === 1 ? '12' : String(month - 1).padStart(2, '0')}`}
-        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-lg border-2 border-rose-600 text-rose-600 hover:bg-rose-50 transition text-nav font-medium"
-      >
-        ← Previous Month
-      </a>
-      <a
-        href="/trinidad/archive"
-        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-lg border-2 border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-nav font-medium"
-      >
-        All Archives
-      </a>
-      <a
-        href={`/trinidad/archive/${month === 12 ? year + 1 : year}/${month === 12 ? '01' : String(month + 1).padStart(2, '0')}`}
-        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-lg border-2 border-rose-600 text-rose-600 hover:bg-rose-50 transition text-nav font-medium"
-      >
-        Next Month →
-      </a>
-    </nav>
-  </div>
+  </main>
 </Layout>
+
+<style>
+  /* Hide scrollbar but keep functionality */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+</style>
