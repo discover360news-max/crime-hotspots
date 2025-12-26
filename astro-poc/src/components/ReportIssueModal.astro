@@ -174,9 +174,11 @@ const {
       {crimeUrl && <input type="hidden" name="crimeUrl" value={crimeUrl} />}
 
       <!-- Cloudflare Turnstile CAPTCHA -->
-      <div class="cf-turnstile"
+      <div id="reportIssueTurnstile"
+           class="cf-turnstile"
            data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ"
-           data-theme="light"></div>
+           data-theme="light"
+           data-callback="onTurnstileSuccess"></div>
 
       <!-- Result Message -->
       <div id="reportIssueResult" class="hidden p-4 rounded-lg border"></div>
@@ -202,17 +204,14 @@ const {
   </div>
 </div>
 
-<script>
-  // Turnstile TypeScript declaration
-  declare global {
-    interface Window {
-      turnstile: {
-        render: (container: Element, options: { sitekey: string; theme: string }) => string;
-        reset: (widgetId: string) => void;
-      };
-    }
-  }
+<script is:inline>
+  // Global callback for Turnstile success
+  window.onTurnstileSuccess = function(token) {
+    console.log('Turnstile verified:', token ? 'Success' : 'Failed');
+  };
+</script>
 
+<script>
   // Google Apps Script endpoint (same as reportStandalone.js)
   const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysi5VEpdS2nL9Ci9BWTn0ydXWA_IdR7j_3MR_EW5uK92N62xbt5OB0sKu2wMLGhkb7/exec";
 
@@ -225,8 +224,6 @@ const {
   const resultBox = document.getElementById('reportIssueResult');
   const submitBtn = document.getElementById('submitReportBtn');
 
-  let turnstileWidgetId: string | null = null;
-
   // Open modal
   openBtn?.addEventListener('click', () => {
     if (modal && modalContent) {
@@ -235,17 +232,6 @@ const {
       setTimeout(() => {
         modalContent.classList.remove('opacity-0', 'scale-95');
         modalContent.classList.add('opacity-100', 'scale-100');
-
-        // Render Turnstile widget when modal becomes visible
-        if (typeof window.turnstile !== 'undefined' && !turnstileWidgetId) {
-          const turnstileContainer = document.querySelector('.cf-turnstile');
-          if (turnstileContainer && !turnstileContainer.hasChildNodes()) {
-            turnstileWidgetId = window.turnstile.render(turnstileContainer, {
-              sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
-              theme: 'light',
-            });
-          }
-        }
       }, 50);
     }
   });
@@ -258,11 +244,6 @@ const {
       setTimeout(() => {
         modal.classList.remove('visible', 'opacity-100');
         modal.classList.add('invisible', 'opacity-0');
-
-        // Reset Turnstile widget when modal closes
-        if (typeof window.turnstile !== 'undefined' && turnstileWidgetId) {
-          window.turnstile.reset(turnstileWidgetId);
-        }
       }, 300);
     }
   }
