@@ -6,7 +6,9 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://crimehotspots.com',
-  integrations: [sitemap()],
+  integrations: [
+    sitemap()
+  ],
   vite: {
     plugins: [tailwindcss()]
   }
