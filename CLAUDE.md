@@ -16,6 +16,57 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 
 ---
 
+## Recent Accomplishments
+
+### December 27, 2025 - Search Index Cleanup & Pagefind Production Fix
+
+**Problem Solved:**
+Site-wide search was showing unwanted UI content (modals, footers, headers) in results, and Pagefind wasn't generating search index files in production (404 errors on `/pagefind/*` files).
+
+**Accomplishments:**
+1. **Search Index Cleanup** ✅
+   - Added `data-pagefind-ignore` to all modal components (Dashboard, Headlines, Archives, Search)
+   - Added `data-pagefind-ignore` to header subscribe tray and mobile menu
+   - Added `data-pagefind-ignore` to footer in Layout.astro
+   - Added `data-pagefind-ignore` to crime detail page metadata sections (crime type badges, location details, metadata grids, Related Crimes, Report Issue sections)
+   - Search results now show ONLY crime headlines and summaries (clean, focused results)
+
+2. **Pagefind Production Fix** ✅
+   - **Root Cause:** `astro-pagefind` integration wasn't running on Cloudflare Pages during build
+   - **Solution:** Switched from integration-based to manual CLI approach
+   - Added `data-pagefind-body` attribute to `<main>` tag in Layout.astro (tells Pagefind what to index)
+   - Removed `astro-pagefind` integration from astro.config.mjs
+   - Updated Cloudflare build command: `npm ci && npm run build && npx pagefind --site dist`
+   - **Result:** Successfully indexing **1,581 pages** with **4,967 words** in production
+
+3. **TextInfoPopup Component** 🔄 (Created but not deployed)
+   - Built reusable component for clickable text with dashed underlines that opens info popups
+   - Encountered DOM nesting issue when used inside SearchModal (popup content visible in parent modal)
+   - Component saved in `src/components/TextInfoPopup.astro` for future use with different approach
+
+**Key Learnings:**
+- **Astro integrations may not run on all hosting platforms** - Cloudflare Pages doesn't execute all Astro build hooks reliably
+- **Manual CLI approach is more reliable** - Running `npx pagefind --site dist` ensures indexing happens regardless of platform
+- **`data-pagefind-body` is required** - Pagefind needs an explicit marker to know which content to index
+- **DOM nesting affects portal-style components** - Fixed positioning doesn't prevent content from rendering within parent containers; need to use HTML `<template>` tags or append directly to `document.body`
+
+**Files Modified:**
+- `src/components/DashboardModal.astro` (added `data-pagefind-ignore`)
+- `src/components/HeadlinesModal.astro` (added `data-pagefind-ignore`)
+- `src/components/ArchivesModal.astro` (added `data-pagefind-ignore`)
+- `src/components/SearchModal.astro` (added `data-pagefind-ignore`, removed TextInfoPopup usage)
+- `src/components/Header.astro` (added `data-pagefind-ignore` to subscribe tray and mobile menu)
+- `src/layouts/Layout.astro` (added `data-pagefind-ignore` to footer, added `data-pagefind-body` to main)
+- `src/pages/trinidad/crime/[slug].astro` (added `data-pagefind-ignore` to metadata sections)
+- `astro.config.mjs` (removed pagefind integration)
+- `src/components/TextInfoPopup.astro` (created, not deployed)
+
+**Commits:**
+- `0889528` - Clean up search index and add modal navigation system
+- `c92d731` - Fix Pagefind search indexing for production
+
+---
+
 ## Owner Guidance
 
 **Kavell Forde - Owner**
