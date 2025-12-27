@@ -1,6 +1,6 @@
 ---
 /**
- * Headlines Selection Modal
+ * Dashboard Selection Modal
  * Quick island selector for mobile-first navigation
  * Opens from header pills/nav instead of navigating to separate page
  */
@@ -9,20 +9,20 @@ import { COUNTRIES } from '../data/countries';
 
 <!-- Modal Overlay -->
 <div
-  id="headlinesModal"
+  id="dashboardModal"
   class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4"
   data-pagefind-ignore
 >
   <!-- Modal Content -->
   <div
-    id="headlinesModalContent"
+    id="dashboardModalContent"
     class="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full opacity-0 scale-95 transition-all duration-300"
   >
     <!-- Header -->
     <div class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
       <h2 class="text-h2 font-bold text-slate-700">Select Island</h2>
       <button
-        id="closeHeadlinesModal"
+        id="closeDashboardModal"
         class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition text-slate-500 hover:text-slate-700"
         aria-label="Close"
       >
@@ -36,7 +36,7 @@ import { COUNTRIES } from '../data/countries';
         country.available ? (
           <!-- Active Island Button -->
           <a
-            href={country.headlinesUrl}
+            href={country.dashboardUrl}
             class="group relative bg-white/80 backdrop-blur-md border-2 border-slate-200 rounded-lg p-4 hover:border-rose-600 hover:shadow-lg transition-all duration-300 flex items-center justify-between"
           >
             <div>
@@ -76,12 +76,12 @@ import { COUNTRIES } from '../data/countries';
 </div>
 
 <script>
-  const modal = document.getElementById('headlinesModal');
-  const modalContent = document.getElementById('headlinesModalContent');
-  const closeBtn = document.getElementById('closeHeadlinesModal');
+  const modal = document.getElementById('dashboardModal');
+  const modalContent = document.getElementById('dashboardModalContent');
+  const closeBtn = document.getElementById('closeDashboardModal');
 
   // Global function to open modal (called from Header)
-  window.openHeadlinesModal = function() {
+  window.openDashboardModal = function() {
     if (modal && modalContent) {
       modal.classList.remove('invisible', 'opacity-0');
       modal.classList.add('visible', 'opacity-100');

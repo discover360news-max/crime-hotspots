@@ -1,0 +1,222 @@
+---
+/**
+ * Search Modal
+ * Site-wide search powered by Pagefind
+ * Searches crime headlines, locations, and crime types
+ */
+---
+
+<!-- Modal Overlay -->
+<div
+  id="searchModal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4"
+  data-pagefind-ignore
+>
+  <!-- Modal Content -->
+  <div
+    id="searchModalContent"
+    class="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] opacity-0 scale-95 transition-all duration-300 flex flex-col"
+  >
+    <!-- Header -->
+    <div class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+      <h2 class="text-h2 font-bold text-slate-700">Search Crime Hotspots</h2>
+      <button
+        id="closeSearchModal"
+        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition text-slate-500 hover:text-slate-700"
+        aria-label="Close"
+      >
+        <span class="text-2xl leading-none">×</span>
+      </button>
+    </div>
+
+    <!-- Search Container -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <div id="search"></div>
+    </div>
+
+    <!-- Footer Help Text -->
+    <div class="px-6 pb-6 pt-2 border-t border-slate-200">
+      <p class="text-xs text-slate-500 text-center">
+        Search through all crime incidents • Search by location, crime type, or keywords
+      </p>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  const modal = document.getElementById('searchModal');
+  const modalContent = document.getElementById('searchModalContent');
+  const closeBtn = document.getElementById('closeSearchModal');
+  let pagefindUI = null;
+
+  // Global function to open modal (called from Header)
+  window.openSearchModal = function() {
+    if (modal && modalContent) {
+      modal.classList.remove('invisible', 'opacity-0');
+      modal.classList.add('visible', 'opacity-100');
+      setTimeout(() => {
+        modalContent.classList.remove('opacity-0', 'scale-95');
+        modalContent.classList.add('opacity-100', 'scale-100');
+      }, 50);
+
+      // Initialize Pagefind UI on first open
+      if (!pagefindUI && window.PagefindUI) {
+        try {
+          pagefindUI = new window.PagefindUI({
+            element: "#search",
+            showSubResults: true,
+            showImages: false,
+            excerptLength: 30,
+            resetStyles: false,
+            bundlePath: "/pagefind/"
+          });
+
+          // Focus search input after initialization
+          setTimeout(() => {
+            const searchInput = document.querySelector('#search input');
+            if (searchInput) {
+              searchInput.focus();
+            }
+          }, 200);
+        } catch (error) {
+          console.error('Failed to initialize Pagefind UI:', error);
+          const searchDiv = document.getElementById('search');
+          if (searchDiv) {
+            searchDiv.innerHTML = '<p class="text-center text-slate-500 p-4">Search is currently unavailable. Please try again later.</p>';
+          }
+        }
+      } else if (pagefindUI) {
+        // Focus existing search input
+        setTimeout(() => {
+          const searchInput = document.querySelector('#search input');
+          if (searchInput) {
+            searchInput.focus();
+          }
+        }, 100);
+      }
+    }
+  };
+
+  // Close modal function
+  function closeModal() {
+    if (modal && modalContent) {
+      modalContent.classList.remove('opacity-100', 'scale-100');
+      modalContent.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => {
+        modal.classList.remove('visible', 'opacity-100');
+        modal.classList.add('invisible', 'opacity-0');
+      }, 300);
+    }
+  }
+
+  // Close button
+  closeBtn?.addEventListener('click', closeModal);
+
+  // Close on overlay click
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('visible')) {
+      closeModal();
+    }
+  });
+
+  // Keyboard shortcut: Cmd/Ctrl + K to open search
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      window.openSearchModal();
+    }
+  });
+</script>
+
+<style>
+  /* Pagefind UI Styling - Match Crime Hotspots design system */
+  :global(#search .pagefind-ui__search-input) {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: #334155;
+    background: white;
+    transition: all 0.2s;
+  }
+
+  :global(#search .pagefind-ui__search-input:focus) {
+    outline: none;
+    border-color: #e11d48;
+    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1);
+  }
+
+  :global(#search .pagefind-ui__result) {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background: white;
+    transition: all 0.2s;
+  }
+
+  :global(#search .pagefind-ui__result:hover) {
+    border-color: #e11d48;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  :global(#search .pagefind-ui__result-title) {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.5rem;
+  }
+
+  :global(#search .pagefind-ui__result-link) {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  :global(#search .pagefind-ui__result-link:hover .pagefind-ui__result-title) {
+    color: #e11d48;
+  }
+
+  :global(#search .pagefind-ui__result-excerpt) {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  :global(#search .pagefind-ui__message) {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+    font-size: 0.875rem;
+  }
+
+  :global(#search mark) {
+    background-color: #fef3c7;
+    color: #92400e;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+  }
+
+  :global(#search .pagefind-ui__button) {
+    background: #e11d48;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  :global(#search .pagefind-ui__button:hover) {
+    background: #be123c;
+  }
+</style>

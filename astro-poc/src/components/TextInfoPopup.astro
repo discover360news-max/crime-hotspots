@@ -1,0 +1,135 @@
+---
+/**
+ * TextInfoPopup Component
+ * Clickable text with dashed underline that opens an info popup
+ *
+ * Usage:
+ * <TextInfoPopup id="crime-types" triggerText="crime type">
+ *   <p>Content goes here</p>
+ * </TextInfoPopup>
+ */
+
+interface Props {
+  id: string; // Unique ID for this popup instance
+  triggerText: string; // The text to display (will have dashed underline)
+}
+
+const { id, triggerText } = Astro.props;
+---
+
+<!-- Only render the trigger button, popup will be created dynamically -->
+<button
+  type="button"
+  class="text-info-popup-trigger cursor-pointer border-b-2 border-dotted border-slate-400 hover:border-rose-600 hover:text-rose-600 transition inline"
+  data-text-popup-id={id}
+  aria-label={`Show information about ${triggerText}`}
+>
+  {triggerText}
+</button>
+
+<!-- Hidden template for popup content (not rendered in DOM until needed) -->
+<template data-text-popup-template={id} data-pagefind-ignore>
+  <div class="text-sm text-slate-600 pr-6">
+    <slot />
+  </div>
+</template>
+
+<script>
+  // Global state to track currently open text popup
+  let currentlyOpenPopupId: string | null = null;
+  let currentPopupOverlay: HTMLElement | null = null;
+
+  function closeTextPopup() {
+    if (currentPopupOverlay) {
+      // Fade out
+      currentPopupOverlay.style.opacity = '0';
+
+      // Remove from DOM after animation
+      setTimeout(() => {
+        if (currentPopupOverlay && currentPopupOverlay.parentNode) {
+          currentPopupOverlay.parentNode.removeChild(currentPopupOverlay);
+        }
+        currentPopupOverlay = null;
+        currentlyOpenPopupId = null;
+      }, 300);
+    }
+  }
+
+  function openTextPopup(popupId: string) {
+    // Close any currently open popup
+    if (currentlyOpenPopupId) {
+      closeTextPopup();
+    }
+
+    // Get the template content
+    const template = document.querySelector(`[data-text-popup-template="${popupId}"]`) as HTMLTemplateElement;
+    if (!template) return;
+
+    const content = template.content.cloneNode(true);
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black/30 z-[60] transition-opacity duration-300';
+    overlay.style.opacity = '0';
+    overlay.dataset.popupId = popupId;
+
+    // Create content container
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'absolute top-4 left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] md:w-auto md:max-w-md bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl shadow-xl p-8 transition-all duration-300';
+    contentDiv.style.opacity = '0';
+    contentDiv.style.transform = 'translateX(-50%) scale(0.95)';
+
+    // Create close button
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded hover:bg-slate-200 transition text-slate-500 hover:text-slate-700';
+    closeBtn.innerHTML = '<span class="text-lg leading-none">×</span>';
+    closeBtn.onclick = (e) => {
+      e.stopPropagation();
+      closeTextPopup();
+    };
+
+    // Assemble popup
+    contentDiv.appendChild(closeBtn);
+    contentDiv.appendChild(content);
+    overlay.appendChild(contentDiv);
+
+    // Close on overlay click
+    overlay.onclick = (e) => {
+      if (e.target === overlay) {
+        closeTextPopup();
+      }
+    };
+
+    // Prevent clicks inside content from closing
+    contentDiv.onclick = (e) => {
+      e.stopPropagation();
+    };
+
+    // Append to body (NOT inside any modal)
+    document.body.appendChild(overlay);
+    currentPopupOverlay = overlay;
+    currentlyOpenPopupId = popupId;
+
+    // Animate in
+    setTimeout(() => {
+      overlay.style.opacity = '1';
+      contentDiv.style.opacity = '1';
+      contentDiv.style.transform = 'translateX(-50%) scale(1)';
+    }, 10);
+  }
+
+  // Initialize all text info popups on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    const triggers = document.querySelectorAll('.text-info-popup-trigger');
+    triggers.forEach(trigger => {
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const popupId = (trigger as HTMLElement).dataset.textPopupId;
+        if (popupId) {
+          openTextPopup(popupId);
+        }
+      });
+    });
+  });
+</script>

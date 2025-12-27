@@ -12,7 +12,7 @@ interface Props {
 const { isHomepage = false } = Astro.props;
 ---
 
-<header class="bg-white shadow-sm sticky top-0 z-40">
+<header class="bg-white shadow-sm sticky top-0 z-40" data-pagefind-ignore>
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <!-- Logo -->
@@ -20,7 +20,7 @@ const { isHomepage = false } = Astro.props;
         <img src="/assets/images/logo.png" alt="Crime Hotspots logo" class="h-12 md:h-14 w-auto" />
       </a>
 
-      <!-- Mobile subscribe + hamburger menu -->
+      <!-- Mobile subscribe + search + hamburger menu -->
       <div class="flex md:hidden items-center gap-2 ml-auto">
         <button
           id="subscribeToggleMobile"
@@ -28,6 +28,16 @@ const { isHomepage = false } = Astro.props;
           aria-label="Subscribe to our channels"
         >
           Subscribe
+        </button>
+        <button
+          onclick="window.openSearchModal()"
+          class="p-2 rounded-lg hover:bg-slate-100 transition text-slate-700 hover:text-rose-600"
+          aria-label="Search"
+          title="Search"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
         </button>
         <button
           id="menuToggle"
@@ -45,9 +55,9 @@ const { isHomepage = false } = Astro.props;
       <nav id="mainNav" class="hidden md:flex items-center gap-4" role="navigation" aria-label="Primary">
         {!isHomepage && (
           <>
-            <a href="/trinidad/dashboard" class="text-xs text-slate-700 hover:text-rose-600 font-medium">
+            <button onclick="window.openDashboardModal()" class="text-xs text-slate-700 hover:text-rose-600 font-medium cursor-pointer">
               Dashboard
-            </a>
+            </button>
             <button onclick="window.openHeadlinesModal()" class="text-xs text-slate-700 hover:text-rose-600 font-medium cursor-pointer">
               Headlines
             </button>
@@ -68,6 +78,17 @@ const { isHomepage = false } = Astro.props;
         <a href="/about" class="text-xs text-slate-700 hover:text-rose-600 font-medium">
           About
         </a>
+
+        <button
+          onclick="window.openSearchModal()"
+          class="p-2 rounded-lg hover:bg-slate-100 transition text-slate-700 hover:text-rose-600"
+          aria-label="Search"
+          title="Search (Ctrl+K)"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
 
         <button
           id="subscribeToggle"
@@ -96,10 +117,10 @@ const { isHomepage = false } = Astro.props;
                  class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap cursor-pointer">
                 Headlines
               </button>
-              <a href="/trinidad/dashboard"
-                 class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
+              <button onclick="window.openDashboardModal()"
+                 class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap cursor-pointer">
                 Dashboard
-              </a>
+              </button>
             </>
           )}
           <a href="/blog"
@@ -135,10 +156,10 @@ const { isHomepage = false } = Astro.props;
 </header>
 
 <!-- Subscribe tray backdrop -->
-<div id="subscribeBackdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
+<div id="subscribeBackdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" data-pagefind-ignore></div>
 
 <!-- Subscribe tray -->
-<div id="subscribeTray" class="fixed top-0 right-0 bottom-0 w-80 bg-white/60 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto">
+<div id="subscribeTray" class="fixed top-0 right-0 bottom-0 w-80 bg-white/60 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto" data-pagefind-ignore>
   <div class="p-6">
     <div class="flex items-center justify-between mb-8">
       <h2 class="text-h3 font-bold text-slate-800">Follow Us</h2>
@@ -202,10 +223,10 @@ const { isHomepage = false } = Astro.props;
 </div>
 
 <!-- Mobile menu backdrop -->
-<div id="mobileMenuBackdrop" class="fixed inset-0 bg-white/25 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 md:hidden"></div>
+<div id="mobileMenuBackdrop" class="fixed inset-0 bg-white/25 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 md:hidden" data-pagefind-ignore></div>
 
 <!-- Mobile menu overlay -->
-<nav id="mobileNav" class="fixed top-0 right-0 bottom-0 w-72 bg-white/25 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out md:hidden overflow-y-auto" role="navigation" aria-label="Mobile menu">
+<nav id="mobileNav" class="fixed top-0 right-0 bottom-0 w-72 bg-white/25 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out md:hidden overflow-y-auto" role="navigation" aria-label="Mobile menu" data-pagefind-ignore>
   <div class="p-6">
     <div class="flex items-center justify-end mb-8">
       <button id="mobileMenuClose" class="p-2 rounded-full text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-all" aria-label="Close menu">
@@ -218,12 +239,12 @@ const { isHomepage = false } = Astro.props;
     <div class="space-y-1">
       {!isHomepage && (
         <>
-          <a href="/trinidad/dashboard" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+          <button onclick="window.openDashboardModal()" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200 w-full text-left cursor-pointer">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
             Dashboard
-          </a>
+          </button>
 
           <button onclick="window.openHeadlinesModal()" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200 w-full text-left cursor-pointer">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
