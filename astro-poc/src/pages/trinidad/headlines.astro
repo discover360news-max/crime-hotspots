@@ -7,7 +7,10 @@
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CrimeCard from '../../components/CrimeCard.astro';
+import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
+import CrimeDetailModal from '../../components/CrimeDetailModal.astro';
 import { getTrinidadCrimes, type Crime } from '../../lib/crimeData';
+import { dataUpdateNotice } from '../../config/siteNotifications';
 
 // Fetch all crimes (server-side)
 const allCrimesData = await getTrinidadCrimes();
@@ -51,7 +54,7 @@ const breadcrumbs = [
       <div class="flex flex-col gap-2">
         
         <a
-          href={`/trinidad/archive/${currentYear}/${new Date().getMonth() + 1}`}
+          href="/trinidad/archive"
           class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
         >
           View Archive
@@ -64,6 +67,9 @@ const breadcrumbs = [
         </button>
       </div>
     </div>
+
+    <!-- Site Notification Banner -->
+    <SiteNotificationBanner notification={dataUpdateNotice} />
 
     <!-- Results Count -->
     <div class="mb-6 text-xs text-slate-500">
@@ -100,10 +106,10 @@ const breadcrumbs = [
   <!-- Filters Tray -->
   <div id="filtersTray" class="fixed inset-0 z-50 pointer-events-none">
     <!-- Backdrop -->
-    <div id="filtersBackdrop" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+    <div id="filtersBackdrop" class="absolute inset-0 bg-white/25 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
 
     <!-- Tray Content -->
-    <div id="filtersTrayContent" class="absolute right-0 top-0 h-full w-80 bg-white/60 rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto">
+    <div id="filtersTrayContent" class="absolute right-0 top-0 h-full w-80 bg-white/25 backdrop-blur-lg rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto">
       <div class="p-6">
         <!-- Header -->
         <div class="flex items-center justify-between mb-6">
@@ -216,10 +222,10 @@ const breadcrumbs = [
       const grid = document.getElementById('crimeGrid');
       const crimes = filteredCrimes.slice(0, currentPage * perPage);
 
-      grid.innerHTML = crimes.map(crime => `
-        <article class="bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 hover:shadow-lg transition cursor-pointer group" onclick="window.location.href='/trinidad/crime/${crime.slug}'">
+      grid.innerHTML = crimes.map((crime, index) => `
+        <article class="crime-card bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 hover:shadow-lg transition cursor-pointer group" data-crime-slug="${crime.slug}">
           <div class="flex items-start justify-between mb-3">
-            <span class="inline-block px-3 py-1 rounded-full text-white text-xs font-medium" style="background-color: ${getCrimeColorHex(crime.crimeType)}">
+            <span class="inline-block px-3 py-1 rounded-full bg-rose-600 text-white text-xs font-medium">
               ${crime.crimeType}
             </span>
             <span class="text-xs text-slate-500">
@@ -347,6 +353,27 @@ const breadcrumbs = [
     // Apply default filters
     applyFilters();
 
+    // Event delegation for crime card clicks
+    const crimeGrid = document.getElementById('crimeGrid');
+    if (crimeGrid) {
+      crimeGrid.addEventListener('click', (e) => {
+        // Don't open modal if clicking on a link
+        if (e.target.closest('a')) {
+          return;
+        }
+
+        const card = e.target.closest('.crime-card');
+        if (card) {
+          e.preventDefault();
+          const slug = card.dataset.crimeSlug;
+          const crime = allCrimes.find(c => c.slug === slug);
+          if (crime && window.openCrimeModal) {
+            window.openCrimeModal(crime);
+          }
+        }
+      });
+    }
+
     // Filters Tray Controls
     const filtersBtn = document.getElementById('filtersBtn');
     const filtersTray = document.getElementById('filtersTray');
@@ -391,4 +418,7 @@ const breadcrumbs = [
       }
     });
   </script>
+
+  <!-- Crime Detail Modal -->
+  <CrimeDetailModal />
 </Layout>

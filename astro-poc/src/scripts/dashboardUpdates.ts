@@ -8,6 +8,8 @@ interface Crime {
   date: string;
   headline: string;
   crimeType: string;
+  primaryCrimeType?: string; // New 2026 field
+  relatedCrimeTypes?: string; // New 2026 field (comma-separated)
   street: string;
   area: string;
   region: string;
@@ -21,6 +23,27 @@ interface Crime {
   year: number;
   month: number;
   day: number;
+}
+
+/**
+ * Count crimes by type across both primaryCrimeType and relatedCrimeTypes
+ */
+function countCrimeType(crimeData: Crime[], targetType: string): number {
+  return crimeData.filter(crime => {
+    // Check if primaryCrimeType matches
+    if (crime.primaryCrimeType === targetType) return true;
+
+    // Check if crimeType matches (fallback for old data)
+    if (crime.crimeType === targetType) return true;
+
+    // Check if relatedCrimeTypes contains the target type
+    if (crime.relatedCrimeTypes) {
+      const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
+      if (relatedTypes.includes(targetType)) return true;
+    }
+
+    return false;
+  }).length;
 }
 
 /**
@@ -81,40 +104,41 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
   }
 
   // Calculate display counts (from filtered crimes parameter)
+  // Uses countCrimeType to count across both primaryCrimeType and relatedCrimeTypes
   const displayTotal = crimes.length;
-  const displayMurders = crimes.filter(c => c.crimeType === 'Murder').length;
-  const displayRobberies = crimes.filter(c => c.crimeType === 'Robbery').length;
-  const displayHomeInvasions = crimes.filter(c => c.crimeType === 'Home Invasion').length;
-  const displayThefts = crimes.filter(c => c.crimeType === 'Theft').length;
-  const displayShootings = crimes.filter(c => c.crimeType === 'Shooting').length;
-  const displayAssaults = crimes.filter(c => c.crimeType === 'Assault').length;
-  const displayBurglaries = crimes.filter(c => c.crimeType === 'Burglary').length;
-  const displaySeizures = crimes.filter(c => c.crimeType === 'Seizures').length;
-  const displayKidnappings = crimes.filter(c => c.crimeType === 'Kidnapping').length;
+  const displayMurders = countCrimeType(crimes, 'Murder');
+  const displayRobberies = countCrimeType(crimes, 'Robbery');
+  const displayHomeInvasions = countCrimeType(crimes, 'Home Invasion');
+  const displayThefts = countCrimeType(crimes, 'Theft');
+  const displayShootings = countCrimeType(crimes, 'Shooting');
+  const displayAssaults = countCrimeType(crimes, 'Assault');
+  const displayBurglaries = countCrimeType(crimes, 'Burglary');
+  const displaySeizures = countCrimeType(crimes, 'Seizures');
+  const displayKidnappings = countCrimeType(crimes, 'Kidnapping');
 
   // Calculate trend counts (last 30 days from ALL crimes)
   const last30Total = last30DaysCrimes.length;
-  const last30Murders = last30DaysCrimes.filter(c => c.crimeType === 'Murder').length;
-  const last30Robberies = last30DaysCrimes.filter(c => c.crimeType === 'Robbery').length;
-  const last30HomeInvasions = last30DaysCrimes.filter(c => c.crimeType === 'Home Invasion').length;
-  const last30Thefts = last30DaysCrimes.filter(c => c.crimeType === 'Theft').length;
-  const last30Shootings = last30DaysCrimes.filter(c => c.crimeType === 'Shooting').length;
-  const last30Assaults = last30DaysCrimes.filter(c => c.crimeType === 'Assault').length;
-  const last30Burglaries = last30DaysCrimes.filter(c => c.crimeType === 'Burglary').length;
-  const last30Seizures = last30DaysCrimes.filter(c => c.crimeType === 'Seizures').length;
-  const last30Kidnappings = last30DaysCrimes.filter(c => c.crimeType === 'Kidnapping').length;
+  const last30Murders = countCrimeType(last30DaysCrimes, 'Murder');
+  const last30Robberies = countCrimeType(last30DaysCrimes, 'Robbery');
+  const last30HomeInvasions = countCrimeType(last30DaysCrimes, 'Home Invasion');
+  const last30Thefts = countCrimeType(last30DaysCrimes, 'Theft');
+  const last30Shootings = countCrimeType(last30DaysCrimes, 'Shooting');
+  const last30Assaults = countCrimeType(last30DaysCrimes, 'Assault');
+  const last30Burglaries = countCrimeType(last30DaysCrimes, 'Burglary');
+  const last30Seizures = countCrimeType(last30DaysCrimes, 'Seizures');
+  const last30Kidnappings = countCrimeType(last30DaysCrimes, 'Kidnapping');
 
   // Calculate previous 30-day counts
   const prev30Total = prev30DaysCrimes.length;
-  const prev30Murders = prev30DaysCrimes.filter(c => c.crimeType === 'Murder').length;
-  const prev30Robberies = prev30DaysCrimes.filter(c => c.crimeType === 'Robbery').length;
-  const prev30HomeInvasions = prev30DaysCrimes.filter(c => c.crimeType === 'Home Invasion').length;
-  const prev30Thefts = prev30DaysCrimes.filter(c => c.crimeType === 'Theft').length;
-  const prev30Shootings = prev30DaysCrimes.filter(c => c.crimeType === 'Shooting').length;
-  const prev30Assaults = prev30DaysCrimes.filter(c => c.crimeType === 'Assault').length;
-  const prev30Burglaries = prev30DaysCrimes.filter(c => c.crimeType === 'Burglary').length;
-  const prev30Seizures = prev30DaysCrimes.filter(c => c.crimeType === 'Seizures').length;
-  const prev30Kidnappings = prev30DaysCrimes.filter(c => c.crimeType === 'Kidnapping').length;
+  const prev30Murders = countCrimeType(prev30DaysCrimes, 'Murder');
+  const prev30Robberies = countCrimeType(prev30DaysCrimes, 'Robbery');
+  const prev30HomeInvasions = countCrimeType(prev30DaysCrimes, 'Home Invasion');
+  const prev30Thefts = countCrimeType(prev30DaysCrimes, 'Theft');
+  const prev30Shootings = countCrimeType(prev30DaysCrimes, 'Shooting');
+  const prev30Assaults = countCrimeType(prev30DaysCrimes, 'Assault');
+  const prev30Burglaries = countCrimeType(prev30DaysCrimes, 'Burglary');
+  const prev30Seizures = countCrimeType(prev30DaysCrimes, 'Seizures');
+  const prev30Kidnappings = countCrimeType(prev30DaysCrimes, 'Kidnapping');
 
   // Update all cards with trends
   const statCards = document.querySelectorAll('.stat-card');

@@ -7,6 +7,8 @@ export interface Crime {
   date: string;
   headline: string;
   crimeType: string;
+  primaryCrimeType?: string; // New 2026 field
+  relatedCrimeTypes?: string; // New 2026 field (comma-separated)
   street: string;
   area: string;
   region: string;
@@ -35,6 +37,7 @@ const TRINIDAD_CSV_URLS = {
 
 /**
  * Fetch and parse crime data from a CSV URL
+ * Uses column header mapping to support different CSV layouts
  */
 async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
   try {
@@ -42,7 +45,15 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
     const csvText = await response.text();
 
     const lines = csvText.split('\n');
-    const headers = lines[0].split(',');
+
+    // Parse headers and create column mapping
+    const headerValues = parseCSVLine(lines[0]);
+    const columnMap = new Map<string, number>();
+    headerValues.forEach((header, index) => {
+      // Normalize header names (trim, lowercase)
+      const normalizedHeader = header.trim().toLowerCase();
+      columnMap.set(normalizedHeader, index);
+    });
 
     const crimes: Crime[] = [];
 
@@ -52,17 +63,26 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
 
       const values = parseCSVLine(line);
 
-      const date = values[0] || '';
-      const headline = values[1] || '';
-      const crimeType = values[2] || '';
-      const street = values[3] || '';
-      const area = values[5] || '';
-      const region = values[6] || '';
-      const url = values[8] || '';
-      const source = values[9] || '';
-      const latitude = values[10] || '';
-      const longitude = values[11] || '';
-      const summary = values[12] || '';
+      // Helper function to get value by column name
+      const getColumn = (columnName: string): string => {
+        const index = columnMap.get(columnName.toLowerCase());
+        return index !== undefined ? (values[index] || '') : '';
+      };
+
+      // Extract values using column mapping
+      const headline = getColumn('Headline');
+      const summary = getColumn('Summary');
+      const primaryCrimeType = getColumn('primaryCrimeType');
+      const relatedCrimeTypes = getColumn('relatedCrimeTypes');
+      const crimeType = getColumn('Crime Type') || getColumn('crimeType');
+      const date = getColumn('Date');
+      const street = getColumn('Street Address') || getColumn('Street');
+      const area = getColumn('Area');
+      const region = getColumn('Region');
+      const url = getColumn('URL');
+      const source = getColumn('Source');
+      const latitude = getColumn('Latitude');
+      const longitude = getColumn('Longitude');
 
       if (!headline || !date) continue;
 
@@ -79,6 +99,8 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
         date,
         headline,
         crimeType,
+        primaryCrimeType: primaryCrimeType || undefined,
+        relatedCrimeTypes: relatedCrimeTypes || undefined,
         street,
         area,
         region,

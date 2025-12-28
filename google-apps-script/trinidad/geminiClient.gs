@@ -182,13 +182,13 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
     "crimes": [
       {
         "crime_date": "YYYY-MM-DD (calculate from article, NOT published date)",
-        "crime_type": "Murder|Shooting|Robbery|Assault|Theft|Home Invasion|Sexual Assault|Kidnapping|Police-Involved Shooting|Seizures",
+        "all_crime_types": ["Murder", "Shooting"], // ← ALL types involved
         "area": "Neighborhood (e.g., Maraval, Port of Spain)",
-        "street": "Street address INCLUDING business names/landmarks (e.g., 'KFC Arima', 'Grand Bazaar, Churchill Roosevelt Highway')",
+        "street": "Street address INCLUDING business names/landmarks (e.g.,'KFC Arima', 'Grand Bazaar, Churchill Roosevelt Highway')",
         "headline": "Brief headline with victim name/age in parentheses if known",
         "details": "2-3 sentence summary. Include crime type, location, and key details. Make it informative and engaging for readers. Use proper grammar and complete sentences.",
         "victims": [{"name": "Name or null", "age": number, "aliases": []}],
-        "location_country": "Trinidad|Venezuela|Guyana|Other"
+        "location_country": "Trinidad and Tobago|Venezuela|Guyana|Other"
       }
     ],
     "confidence": 1-10,
@@ -304,30 +304,30 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
      - If article is from Demerara Waves / INews Guyana → very likely NOT Trinidad
      - Only mark as "Trinidad" if crime occurred in Trinidad or Tobago islands
 
-  9. MULTI-CRIME INCIDENTS: Handle overlapping crimes correctly
-     - Home Invasion + Robbery = ONE "Home Invasion" (robbery is implied)
-     - Home Invasion + Murder = TWO separate crimes
-     - Shooting + Murder = ONE "Murder" (shooting is the method)
-     - Robbery + Assault = ONE "Robbery" (assault during robbery)
-     - Police operation + gun seizure = ONE "Seizures" (enforcement action)
+  9. MULTI-CRIME TYPES: Extract ALL crime types involved in a single incident
+       - Use "all_crime_types" array to list EVERY applicable crime type
+       - Examples:
+         * Man shot dead → ["Murder", "Shooting"]
+         * Armed home invasion + murder → ["Murder", "Home Invasion", "Shooting"]
+         * Robbery with assault → ["Robbery", "Assault"]
+         * Police gun seizure → ["Seizures"]
+       - List from most to least severe
+       - DO NOT duplicate/inflate - ONE incident with multiple types
+       - The system will auto-determine primary vs related types
 
   10. MULTI-VICTIM MURDERS: Extract EACH victim as SEPARATE crime entry
-     - Double murder = TWO "Murder" entries (one per victim)
-     - Triple murder = THREE "Murder" entries (one per victim)
-     - Each entry: same date/location, different victim name
-     - Example: "Husband and wife killed" = 2 Murder entries
-     - CRITICAL: This ensures accurate murder statistics
+     - Double murder = TWO separate entries (one per victim)
+     - Triple murder = THREE separate entries (one per victim)
+     - IMPORTANT: Each entry gets the SAME "all_crime_types" array
+       * Example: "Couple shot dead" = 2 entries, both with ["Murder", "Shooting"]
+     - Each entry: same date/location/crime types, different victim name
+     - CRITICAL: This ensures accurate murder victim counts without losing crime type details
 
-  11. CRIME TYPE PRIORITY: When same incident has multiple crime labels
-     - If murder occurred, use "Murder" (not "Home Invasion" or "Shooting")
-     - Murder is the PRIMARY crime type when someone dies
-     - Exception: If victims include both dead and alive, split into separate crimes
-
-  12. DUPLICATE DETECTION: Include victim details for deduplication
+  11. DUPLICATE DETECTION: Include victim details for deduplication
       - Always include victim name, age, aliases if mentioned
       - Include specific location details (street + area)
 
-  13. Not a crime article? Return {"crimes": [], "confidence": 0}
+  12. Not a crime article? Return {"crimes": [], "confidence": 0}
 
   JSON only, no markdown.`;
   }

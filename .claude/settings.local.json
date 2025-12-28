@@ -65,7 +65,13 @@
       "Bash(npx astro:*)",
       "Bash(ipconfig getifaddr:*)",
       "Bash(ls:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch:*)",
+      "Bash(git update-index:*)",
+      "WebFetch(domain:developers.cloudflare.com)",
+      "Bash(npm run preview:*)",
+      "Bash(pkill:*)",
+      "Bash(npx pagefind:*)"
     ],
     "deny": [],
     "ask": []

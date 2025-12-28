@@ -1,0 +1,152 @@
+---
+/**
+ * Site Notification Banner Component
+ *
+ * Displays dismissible notification banners for site-wide announcements
+ * - Checks if notification is enabled in config
+ * - Persists dismiss state in localStorage
+ * - Follows design system (rose palette, rounded-lg)
+ *
+ * Usage:
+ *   import { dataUpdateNotice } from '@/config/siteNotifications';
+ *   <SiteNotificationBanner notification={dataUpdateNotice} />
+ */
+
+import type { SiteNotification } from '@/config/siteNotifications';
+
+interface Props {
+  notification: SiteNotification;
+}
+
+const { notification } = Astro.props;
+
+// Don't render if notification is disabled
+if (!notification.enabled) {
+  return null;
+}
+
+// Style variants based on type
+const styleVariants = {
+  info: {
+    bg: 'bg-rose-50',
+    border: 'border-rose-200',
+    text: 'text-slate-700',
+    icon: 'text-rose-600'
+  },
+  warning: {
+    bg: 'bg-amber-50',
+    border: 'border-amber-200',
+    text: 'text-slate-700',
+    icon: 'text-amber-600'
+  },
+  success: {
+    bg: 'bg-emerald-50',
+    border: 'border-emerald-200',
+    text: 'text-slate-700',
+    icon: 'text-emerald-600'
+  }
+};
+
+const styles = styleVariants[notification.type];
+---
+
+<div
+  data-notification-banner
+  data-notification-id={notification.id}
+  class={`${styles.bg} ${styles.border} border rounded-lg p-4 mb-6 relative`}
+  data-pagefind-ignore
+  style="display: none;"
+>
+  <div class="flex items-start gap-3">
+    <!-- Info Icon -->
+    <svg
+      class={`${styles.icon} flex-shrink-0 w-5 h-5 mt-0.5`}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      ></path>
+    </svg>
+
+    <!-- Message Content -->
+    <div class="flex-1 pr-8">
+      <p class={`${styles.text} font-medium text-sm md:text-base`}>
+        {notification.message}
+      </p>
+      {notification.subMessage && (
+        <p class="text-slate-600 text-xs md:text-sm mt-1.5">
+          {notification.subMessage}
+        </p>
+      )}
+    </div>
+
+    <!-- Dismiss Button -->
+    <button
+      data-dismiss-notification
+      class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 transition-colors"
+      aria-label="Dismiss notification"
+    >
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        ></path>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  /**
+   * Notification Banner Client-Side Logic
+   * - Checks localStorage for dismissed notifications
+   * - Handles dismiss button click
+   * - Persists dismissal across sessions
+   */
+
+  // Check if notification has been dismissed and show if not
+  function checkDismissed() {
+    const banner = document.querySelector('[data-notification-banner]');
+    if (!banner) return;
+
+    const notificationId = banner.getAttribute('data-notification-id');
+    if (!notificationId) return;
+
+    const dismissed = localStorage.getItem(`notification-dismissed-${notificationId}`);
+    if (dismissed !== 'true') {
+      // Show banner if not dismissed
+      banner.style.display = 'block';
+    }
+  }
+
+  // Handle dismiss button click
+  function handleDismiss() {
+    const dismissBtn = document.querySelector('[data-dismiss-notification]');
+    if (!dismissBtn) return;
+
+    dismissBtn.addEventListener('click', () => {
+      const banner = document.querySelector('[data-notification-banner]');
+      if (!banner) return;
+
+      const notificationId = banner.getAttribute('data-notification-id');
+      if (!notificationId) return;
+
+      // Save dismissal to localStorage
+      localStorage.setItem(`notification-dismissed-${notificationId}`, 'true');
+
+      // Hide banner immediately (no flash on subsequent page loads)
+      banner.style.display = 'none';
+    });
+  }
+
+  // Initialize on page load
+  checkDismissed();
+  handleDismiss();
+</script>

@@ -13,9 +13,30 @@ import TopRegionsCard from '../../components/TopRegionsCard.astro';
 import FiltersTray from '../../components/FiltersTray.astro';
 import InfoPopup from '../../components/InfoPopup.astro';
 import LoadingShimmer from '../../components/LoadingShimmer.astro';
+import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
+import { dataUpdateNotice } from '../../config/siteNotifications';
 import '../../styles/dashboard.css';
 
 const crimes = await getTrinidadCrimes();
+
+// Helper function to count crimes by type across both primaryCrimeType and relatedCrimeTypes
+const countCrimeType = (crimeData: typeof crimes, targetType: string): number => {
+  return crimeData.filter(crime => {
+    // Check if primaryCrimeType matches
+    if (crime.primaryCrimeType === targetType) return true;
+
+    // Check if crimeType matches (fallback for old data)
+    if (crime.crimeType === targetType) return true;
+
+    // Check if relatedCrimeTypes contains the target type
+    if (crime.relatedCrimeTypes) {
+      const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
+      if (relatedTypes.includes(targetType)) return true;
+    }
+
+    return false;
+  }).length;
+};
 
 // Calculate insights
 const calculateInsights = (crimeData: typeof crimes) => {
@@ -119,6 +140,9 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     <!-- Separator -->
     <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-4"></div>
 
+    <!-- Site Notification Banner -->
+    <SiteNotificationBanner notification={dataUpdateNotice} />
+
     <!-- Statistics Cards - Horizontal Scroll -->
     <div class="stats-wrapper relative min-h-[140px]">
       <!-- Stats Shimmer (shown during loading) -->
@@ -133,15 +157,15 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       <!-- Actual Stats (hidden initially) -->
       <div class="stats-scroll-container absolute inset-0 opacity-0 transition-opacity duration-300">
         <StatCard value={crimes.length} label="Total Incidents" id="totalIncidents" crimeType="All" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Murder').length} label="Murders" crimeType="Murder" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Robbery').length} label="Robberies" crimeType="Robbery" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Home Invasion').length} label="Home Invasions" crimeType="Home Invasion" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Theft').length} label="Thefts" crimeType="Theft" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Shooting').length} label="Shootings" crimeType="Shooting" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Assault').length} label="Assaults" crimeType="Assault" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Burglary').length} label="Burglaries" crimeType="Burglary" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Seizures').length} label="Seizures" crimeType="Seizures" />
-        <StatCard value={crimes.filter(c => c.crimeType === 'Kidnapping').length} label="Kidnappings" crimeType="Kidnapping" />
+        <StatCard value={countCrimeType(crimes, 'Murder')} label="Murders" crimeType="Murder" />
+        <StatCard value={countCrimeType(crimes, 'Robbery')} label="Robberies" crimeType="Robbery" />
+        <StatCard value={countCrimeType(crimes, 'Home Invasion')} label="Home Invasions" crimeType="Home Invasion" />
+        <StatCard value={countCrimeType(crimes, 'Theft')} label="Thefts" crimeType="Theft" />
+        <StatCard value={countCrimeType(crimes, 'Shooting')} label="Shootings" crimeType="Shooting" />
+        <StatCard value={countCrimeType(crimes, 'Assault')} label="Assaults" crimeType="Assault" />
+        <StatCard value={countCrimeType(crimes, 'Burglary')} label="Burglaries" crimeType="Burglary" />
+        <StatCard value={countCrimeType(crimes, 'Seizures')} label="Seizures" crimeType="Seizures" />
+        <StatCard value={countCrimeType(crimes, 'Kidnapping')} label="Kidnappings" crimeType="Kidnapping" />
       </div>
     </div>
 
@@ -206,7 +230,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 
     <!-- Info Cards -->
     <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
-      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
+      <div class="bg-white/70 backdrop-blur-md rounded-lg p-4 shadow-md">
         <div class="flex items-start gap-3">
           <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -218,7 +242,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
         </div>
       </div>
 
-      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
+      <div class="bg-white/70 backdrop-blur-md rounded-lg p-4 shadow-md">
         <div class="flex items-start gap-3">
           <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
@@ -230,7 +254,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
         </div>
       </div>
 
-      <div class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
+      <div class="bg-white/70 backdrop-blur-md rounded-lg p-4 shadow-md">
         <div class="flex items-start gap-3">
           <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -299,11 +323,22 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     }
 
     // Fetch and parse crimes from a CSV URL
+    // Uses column header mapping to support different CSV layouts
     async function fetchCrimesFromURL(url) {
       try {
         const response = await fetch(url);
         const csvText = await response.text();
         const lines = csvText.split('\n');
+
+        // Parse headers and create column mapping
+        const headerValues = parseCSVLine(lines[0]);
+        const columnMap = new Map();
+        headerValues.forEach((header, index) => {
+          // Normalize header names (trim, lowercase)
+          const normalizedHeader = header.trim().toLowerCase();
+          columnMap.set(normalizedHeader, index);
+        });
+
         const crimes = [];
 
         for (let i = 1; i < lines.length; i++) {
@@ -311,17 +346,27 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
           if (!line.trim()) continue;
 
           const values = parseCSVLine(line);
-          const date = values[0] || '';
-          const headline = values[1] || '';
-          const crimeType = values[2] || '';
-          const street = values[3] || '';
-          const area = values[5] || '';
-          const region = values[6] || '';
-          const url = values[8] || '';
-          const source = values[9] || '';
-          const latitude = values[10] || '';
-          const longitude = values[11] || '';
-          const summary = values[12] || '';
+
+          // Helper function to get value by column name
+          const getColumn = (columnName) => {
+            const index = columnMap.get(columnName.toLowerCase());
+            return index !== undefined ? (values[index] || '') : '';
+          };
+
+          // Extract values using column mapping
+          const headline = getColumn('Headline');
+          const summary = getColumn('Summary');
+          const primaryCrimeType = getColumn('primaryCrimeType');
+          const relatedCrimeTypes = getColumn('relatedCrimeTypes');
+          const crimeType = getColumn('Crime Type') || getColumn('crimeType');
+          const date = getColumn('Date');
+          const street = getColumn('Street Address') || getColumn('Street');
+          const area = getColumn('Area');
+          const region = getColumn('Region');
+          const url = getColumn('URL');
+          const source = getColumn('Source');
+          const latitude = getColumn('Latitude');
+          const longitude = getColumn('Longitude');
 
           if (!headline || !date) continue;
 
@@ -336,6 +381,8 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
             date,
             headline,
             crimeType,
+            primaryCrimeType: primaryCrimeType || undefined,
+            relatedCrimeTypes: relatedCrimeTypes || undefined,
             street,
             area,
             region,

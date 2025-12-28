@@ -12,11 +12,72 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Focus:** Trinidad-only implementation (Other islands expansion deferred)
-**Last Updated:** December 27, 2025
+**Last Updated:** December 28, 2025
 
 ---
 
 ## Recent Accomplishments
+
+### December 28, 2025 - Site Notification Banner & 2026 Crime Type System
+
+**Problem Solved:**
+Need to notify users about ongoing 2025 data updates, and need better crime type tracking for 2026 (currently submitting duplicate rows for multi-crime incidents).
+
+**Accomplishments:**
+1. **Site Notification Banner System** ✅
+   - Created toggle-based notification system (`src/config/siteNotifications.ts`)
+   - Built dismissible banner component (`src/components/SiteNotificationBanner.astro`)
+   - Persists dismiss state in localStorage
+   - Added to Dashboard, Headlines, Archives, Crime detail pages
+   - Simple on/off toggle: `enabled: true/false`
+   - Current message: "2025 crime data is currently being updated"
+
+2. **2026 Primary + Related Crime Types** ✅ (Complete - Ready for Jan 1)
+   - **Goal:** One incident = one row, but track ALL crime types involved
+   - **Example:** Murder by shooting = 1 row with primary="Murder", related="Shooting" (no duplicates!)
+   - **Backend (Apps Script):**
+     - Created implementation guide: `docs/implementation/2026-PRIMARY-RELATED-CRIME-TYPES.md`
+     - Created crime type processor: `google-apps-script/trinidad/crimeTypeProcessor.gs`
+     - Updated Gemini prompt to extract `all_crime_types` array
+     - Updated `processor.gs` to use new crime type logic (both `appendToProduction` and `appendToReviewQueue`)
+   - **Frontend (Astro):**
+     - Implemented column header mapping (resilient to column reordering)
+     - Created `countCrimeType()` helper that counts across both `primaryCrimeType` and `relatedCrimeTypes`
+     - Updated Dashboard StatCards to use new counting logic
+     - Updated all filtering/trend calculations in `dashboardUpdates.ts`
+     - **Result:** Incidents counted once, crime types counted accurately across primary + related fields
+   - **Google Form:** Updated with dual dropdowns (Primary Crime Type + Related Crime Types)
+   - **Next:** User tests pipeline on Dec 31, goes live Jan 1, 2026
+
+**Key Learnings:**
+- **Toggle-based notifications are user-friendly** - Single config change controls site-wide messaging
+- **Backward compatibility is critical** - Keeping old `crimeType` column means frontend works immediately
+- **2025 data stays untouched** - No manual cleanup needed, focus on getting 2026 right
+- **Column header mapping prevents breakage** - Parsing CSV by column name (not index) makes system resilient to column reordering
+- **Counting logic must handle multiple sources** - Crime types appear in primary, related, AND legacy fields during transition
+
+**Files Created:**
+- `src/config/siteNotifications.ts` (notification config)
+- `src/components/SiteNotificationBanner.astro` (dismissible banner component)
+- `docs/implementation/2026-PRIMARY-RELATED-CRIME-TYPES.md` (complete implementation guide)
+- `google-apps-script/trinidad/crimeTypeProcessor.gs` (crime type processor with severity ranking)
+
+**Files Modified:**
+- `src/pages/trinidad/dashboard.astro` (added notification banner, column header mapping, countCrimeType helper)
+- `src/pages/trinidad/headlines.astro` (added notification banner)
+- `src/pages/trinidad/archive/[year]/[month].astro` (added notification banner)
+- `src/pages/trinidad/archive/index.astro` (added notification banner)
+- `src/pages/trinidad/crime/[slug].astro` (added notification banner)
+- `src/lib/crimeData.ts` (column header mapping, primaryCrimeType/relatedCrimeTypes fields)
+- `src/scripts/dashboardUpdates.ts` (countCrimeType helper, updated filtering/trend logic)
+- `google-apps-script/trinidad/geminiClient.gs` (updated prompt for all_crime_types array)
+- `google-apps-script/trinidad/processor.gs` (updated appendToProduction & appendToReviewQueue)
+
+**Status:**
+- ✅ Notification banner: Deployed and ready to use
+- ✅ 2026 crime types: Complete (backend + frontend), ready for Jan 1 launch
+
+---
 
 ### December 27, 2025 - Search Index Cleanup & Pagefind Production Fix
 

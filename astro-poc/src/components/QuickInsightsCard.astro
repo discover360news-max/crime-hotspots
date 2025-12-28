@@ -16,12 +16,13 @@ interface Props {
     safestRegion: string;
     safestRegionCount: number;
   };
+  busiestLabel?: string; // Optional custom label for the busiest field
 }
 
-const { insights } = Astro.props;
+const { insights, busiestLabel = 'Busiest Month' } = Astro.props;
 ---
 
-<div id="quickInsightsCard" class="bg-white/50 backdrop-blur-md rounded-lg p-4 shadow-md">
+<div id="quickInsightsCard" class="bg-white/70 backdrop-blur-md rounded-lg p-4 shadow-md">
   <h3 id="quickInsightsTitle" class="text-h3 font-bold text-slate-600 mb-4">Quick Insights</h3>
 
   <!-- 2x2 Grid Layout (Always 2 columns, even on mobile) -->
@@ -48,13 +49,13 @@ const { insights } = Astro.props;
       </div>
     </div>
 
-    <!-- Busiest Month -->
+    <!-- Busiest Month / Deadliest Day -->
     <div class="flex items-start gap-2">
       <svg class="w-4 h-4 md:w-5 md:h-5 text-rose-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
       <div class="flex-1 min-w-0">
-        <div class="text-xs text-slate-500 mb-1">Busiest Month</div>
+        <div class="text-xs text-slate-500 mb-1">{busiestLabel}</div>
         <div id="busiestMonth" class="text-sm md:text-lg font-bold text-slate-600 break-words">{insights.busiestMonth}</div>
       </div>
     </div>

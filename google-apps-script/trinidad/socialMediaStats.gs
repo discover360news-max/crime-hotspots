@@ -218,12 +218,31 @@ function calculateStats(currentWeekCrimes, previousWeekCrimes) {
 
 /**
  * Count crimes by type
+ * Supports both old format (Crime Type) and new format (primaryCrimeType + relatedCrimeTypes)
  */
 function countByCrimeType(crimes) {
   const counts = {};
   crimes.forEach(crime => {
-    const type = crime['Crime Type'] || 'Other';
-    counts[type] = (counts[type] || 0) + 1;
+    // Try new format first (2026+ data with primary + related crime types)
+    const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'];
+    const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || '';
+
+    if (primaryType && primaryType.trim() !== '') {
+      // New format: count primary type
+      counts[primaryType] = (counts[primaryType] || 0) + 1;
+
+      // New format: count related types (pipe-separated)
+      if (relatedTypes && relatedTypes.trim() !== '') {
+        const related = relatedTypes.split('|').map(t => t.trim()).filter(t => t !== '');
+        related.forEach(type => {
+          counts[type] = (counts[type] || 0) + 1;
+        });
+      }
+    } else {
+      // Fallback to old format (2025 and earlier data)
+      const type = crime['Crime Type'] || crime['crimeType'] || 'Other';
+      counts[type] = (counts[type] || 0) + 1;
+    }
   });
   return counts;
 }

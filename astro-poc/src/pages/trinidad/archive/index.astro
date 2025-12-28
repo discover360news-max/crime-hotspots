@@ -6,7 +6,9 @@
  */
 
 import Layout from '../../../layouts/Layout.astro';
+import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
 import { getTrinidadCrimes } from '../../../lib/crimeData';
+import { dataUpdateNotice } from '../../../config/siteNotifications';
 
 const crimes = await getTrinidadCrimes();
 
@@ -40,6 +42,11 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
       <p class="text-xs text-slate-500 mt-2">
         Browse {crimes.length} crime incidents organized by month
       </p>
+    </div>
+
+    <!-- Site Notification Banner -->
+    <div class="max-w-4xl mx-auto">
+      <SiteNotificationBanner notification={dataUpdateNotice} />
     </div>
 
     <!-- Archive List -->

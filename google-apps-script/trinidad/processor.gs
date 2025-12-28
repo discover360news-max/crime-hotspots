@@ -271,10 +271,14 @@ function processReadyArticles() {
       // Validate and format crime date
       const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
+      const crimeTypes = processLegacyCrimeType(crime);
+
       prodSheet.appendRow([
         validatedDate,
         crime.headline || 'No headline',
-        crime.crime_type || 'Other',
+        crimeTypes.primary,         // ← NEW: primaryCrimeType column
+        crimeTypes.related,         // ← NEW: relatedCrimeTypes column
+        crimeTypes.primary,         // ← NEW: crimeType column (backward compat)
         crime.street || '',
         geocoded.plus_code || '',
         crime.area || '',
@@ -314,10 +318,15 @@ function processReadyArticles() {
     // Validate and format crime date
     const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
+    // Process crime types (2026+ with backward compatibility)
+    const crimeTypes = processLegacyCrimeType(crime);
+
     reviewSheet.appendRow([
       validatedDate,
       crime.headline || 'Needs headline',
-      crime.crime_type || 'Unknown',
+      crimeTypes.primary,         // ← NEW: primaryCrimeType column
+      crimeTypes.related,         // ← NEW: relatedCrimeTypes column
+      crimeTypes.primary,         // ← NEW: crimeType column (backward compat)
       crime.street || '',
       geocoded.plus_code || '',
       crime.area || '',
