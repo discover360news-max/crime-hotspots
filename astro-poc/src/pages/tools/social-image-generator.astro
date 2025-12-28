@@ -1,0 +1,651 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const pageTitle = "Social Media Image Generator - Crime Hotspots";
+const pageDescription = "Generate branded social media images for weekly crime statistics";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4">
+    <div class="max-w-7xl mx-auto">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-slate-800 mb-3">
+          Social Media Image Generator
+        </h1>
+        <p class="text-lg text-slate-600">
+          Create branded images for weekly crime statistics - Download as 1080x1080px PNG
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-8">
+        <!-- Form Section -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-2xl font-bold text-slate-800 mb-6">Input Data</h2>
+
+          <form id="stats-form" class="space-y-6">
+            <!-- Country/Island -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">
+                Country/Island
+              </label>
+              <input
+                type="text"
+                id="countryName"
+                value="Trinidad & Tobago"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                placeholder="e.g., Trinidad & Tobago"
+              />
+            </div>
+
+            <!-- Date Range -->
+            <div>
+              <label class="block text-sm font-semibold text-slate-700 mb-2">
+                Date Range
+              </label>
+              <input
+                type="text"
+                id="dateRange"
+                value="Dec 18 - Dec 24"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                placeholder="e.g., Dec 18 - Dec 24"
+              />
+            </div>
+
+            <!-- Total Incidents -->
+            <div class="border-t border-slate-200 pt-6">
+              <h3 class="text-lg font-semibold text-slate-800 mb-4">Total Incidents</h3>
+              <div class="grid grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-2">
+                    Count
+                  </label>
+                  <input
+                    type="number"
+                    id="totalCount"
+                    value="61"
+                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-2">
+                    Change
+                  </label>
+                  <input
+                    type="number"
+                    id="totalChange"
+                    value="-9"
+                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-2">
+                    % Change
+                  </label>
+                  <input
+                    type="number"
+                    id="totalPercent"
+                    value="-13"
+                    class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Crime Types -->
+            <div class="border-t border-slate-200 pt-6">
+              <h3 class="text-lg font-semibold text-slate-800 mb-4">Top Crime Types (Max 5)</h3>
+              <div id="crime-types-container" class="space-y-4">
+                <!-- Crime Type 1 -->
+                <div class="grid grid-cols-4 gap-2 items-end">
+                  <div class="col-span-2">
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Type</label>
+                    <input
+                      type="text"
+                      class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="Robbery"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Count</label>
+                    <input
+                      type="number"
+                      class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="22"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-700 mb-1">Change</label>
+                    <input
+                      type="number"
+                      class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="0"
+                    />
+                  </div>
+                </div>
+
+                <!-- Crime Type 2 -->
+                <div class="grid grid-cols-4 gap-2 items-end">
+                  <div class="col-span-2">
+                    <input
+                      type="text"
+                      class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="Theft"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="10"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="-7"
+                    />
+                  </div>
+                </div>
+
+                <!-- Crime Type 3 -->
+                <div class="grid grid-cols-4 gap-2 items-end">
+                  <div class="col-span-2">
+                    <input
+                      type="text"
+                      class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="Murder"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="7"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="2"
+                    />
+                  </div>
+                </div>
+
+                <!-- Crime Type 4 -->
+                <div class="grid grid-cols-4 gap-2 items-end">
+                  <div class="col-span-2">
+                    <input
+                      type="text"
+                      class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="Shooting"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="6"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="-1"
+                    />
+                  </div>
+                </div>
+
+                <!-- Crime Type 5 -->
+                <div class="grid grid-cols-4 gap-2 items-end">
+                  <div class="col-span-2">
+                    <input
+                      type="text"
+                      class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="Home Invasion"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="6"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
+                      value="0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hotspots -->
+            <div class="border-t border-slate-200 pt-6">
+              <h3 class="text-lg font-semibold text-slate-800 mb-4">Top Hotspots (Max 3)</h3>
+              <div id="hotspots-container" class="space-y-3">
+                <!-- Hotspot 1 -->
+                <div class="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    class="hotspot-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                    value="Port of Spain"
+                    placeholder="Location"
+                  />
+                  <input
+                    type="number"
+                    class="hotspot-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                    value="10"
+                    placeholder="Count"
+                  />
+                </div>
+
+                <!-- Hotspot 2 -->
+                <div class="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    class="hotspot-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                    value="San Juan"
+                    placeholder="Location"
+                  />
+                  <input
+                    type="number"
+                    class="hotspot-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                    value="6"
+                    placeholder="Count"
+                  />
+                </div>
+
+                <!-- Hotspot 3 -->
+                <div class="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    class="hotspot-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                    value="Arima"
+                    placeholder="Location"
+                  />
+                  <input
+                    type="number"
+                    class="hotspot-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                    value="5"
+                    placeholder="Count"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Dashboard Link -->
+            <div class="border-t border-slate-200 pt-6">
+              <label class="block text-sm font-semibold text-slate-700 mb-2">
+                Dashboard Link
+              </label>
+              <input
+                type="url"
+                id="dashboardLink"
+                value="https://crimehotspots.com/trinidad/dashboard"
+                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                placeholder="https://crimehotspots.com/trinidad/dashboard"
+              />
+            </div>
+
+            <!-- Generate Button -->
+            <div class="border-t border-slate-200 pt-6">
+              <button
+                type="button"
+                id="updatePreview"
+                class="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+              >
+                Update Preview
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="space-y-6">
+          <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-2xl font-bold text-slate-800">Preview</h2>
+              <button
+                id="downloadImage"
+                class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors"
+              >
+                Download PNG
+              </button>
+            </div>
+
+            <!-- Preview Canvas (1080x1080 scaled to 540x540) -->
+            <div class="flex justify-center overflow-hidden">
+              <div style="width: 540px; height: 540px; overflow: hidden; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <div
+                  id="preview-canvas"
+                  style="width: 1080px; height: 1080px; transform: scale(0.5); transform-origin: top left; background: #f1f5f9;"
+                >
+                  <!-- Content will be generated by JavaScript -->
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 text-center text-sm text-slate-600">
+              Preview shown at 50% size. Downloaded image will be 2160x2160px (high quality).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- html2canvas library -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <script>
+    // Helper function to get arrow and color based on change value
+    function getChangeIndicator(change: number): { arrow: string; color: string; bgColor: string; direction: string; label: string } {
+      if (change > 0) {
+        return { arrow: '↑', color: '#dc2626', bgColor: '#ef4444', direction: 'Up', label: 'Rise' };
+      } else if (change < 0) {
+        return { arrow: '↓', color: '#059669', bgColor: '#10b981', direction: 'Down', label: 'Drop' };
+      } else {
+        return { arrow: '→', color: '#64748b', bgColor: '#94a3b8', direction: 'No change', label: '' };
+      }
+    }
+
+    // Calculate percentage change
+    function calculatePercent(change: number, previousCount: number): number {
+      if (previousCount === 0) return 0;
+      return Math.round((Math.abs(change) / previousCount) * 100);
+    }
+
+    // Format change text with descriptive labels
+    function formatChangeText(change: number, percent: number, indicator: any): string {
+      if (change === 0) {
+        return `No change → 0 incidents, 0%`;
+      }
+      const sign = change > 0 ? '+' : '-';
+      return `${indicator.direction} ${indicator.arrow} ${Math.abs(change)} incidents, ${sign}${Math.abs(percent)}% ${indicator.label}`;
+    }
+
+    // Update preview function
+    function updatePreview() {
+      const countryName = (document.getElementById('countryName') as HTMLInputElement).value;
+      const dateRange = (document.getElementById('dateRange') as HTMLInputElement).value;
+      const totalCount = parseInt((document.getElementById('totalCount') as HTMLInputElement).value);
+      const totalChange = parseInt((document.getElementById('totalChange') as HTMLInputElement).value);
+      const totalPercent = parseInt((document.getElementById('totalPercent') as HTMLInputElement).value);
+      const dashboardLink = (document.getElementById('dashboardLink') as HTMLInputElement).value;
+
+      // Get crime types
+      const crimeTypes: Array<{ name: string; count: number; change: number }> = [];
+      const crimeTypeInputs = document.querySelectorAll('#crime-types-container > div');
+      crimeTypeInputs.forEach((row) => {
+        const name = (row.querySelector('.crime-type-name') as HTMLInputElement)?.value || '';
+        const count = parseInt((row.querySelector('.crime-type-count') as HTMLInputElement)?.value || '0');
+        const change = parseInt((row.querySelector('.crime-type-change') as HTMLInputElement)?.value || '0');
+
+        if (name.trim()) {
+          crimeTypes.push({ name, count, change });
+        }
+      });
+
+      // Get hotspots
+      const hotspots: Array<{ name: string; count: number }> = [];
+      const hotspotInputs = document.querySelectorAll('#hotspots-container > div');
+      hotspotInputs.forEach((row) => {
+        const name = (row.querySelector('.hotspot-name') as HTMLInputElement)?.value || '';
+        const count = parseInt((row.querySelector('.hotspot-count') as HTMLInputElement)?.value || '0');
+
+        if (name.trim()) {
+          hotspots.push({ name, count });
+        }
+      });
+
+      // Build the preview
+      const totalIndicator = getChangeIndicator(totalChange);
+
+      // Build crime types in 2-column layout
+      let crimeTypesHTML = '<div style="display: flex; gap: 40px;">';
+
+      // Split into two columns
+      const halfLength = Math.ceil(crimeTypes.length / 2);
+      const leftColumn = crimeTypes.slice(0, halfLength);
+      const rightColumn = crimeTypes.slice(halfLength);
+
+      // Left column
+      crimeTypesHTML += '<div style="flex: 1;">';
+      leftColumn.forEach((crime) => {
+        const indicator = getChangeIndicator(crime.change);
+        const previousCount = crime.count - crime.change;
+        const changePercent = calculatePercent(crime.change, previousCount);
+        crimeTypesHTML += `
+          <div style="margin-bottom: 24px;">
+            <div style="color: #1e293b; font-size: 26px; font-weight: 700; margin-bottom: 4px;">
+              ${crime.name}
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 12px;">
+              <span style="color: #475569; font-size: 22px; font-weight: 600;">Count: ${crime.count}</span>
+              <span style="color: ${indicator.color}; font-size: 28px; font-weight: 800;">
+                ${indicator.arrow}${Math.abs(changePercent)}%
+              </span>
+              <span style="color: ${indicator.color}; font-size: 20px; font-weight: 500;">
+                ${indicator.label}
+              </span>
+            </div>
+          </div>
+        `;
+      });
+      crimeTypesHTML += '</div>';
+
+      // Right column
+      crimeTypesHTML += '<div style="flex: 1;">';
+      rightColumn.forEach((crime) => {
+        const indicator = getChangeIndicator(crime.change);
+        const previousCount = crime.count - crime.change;
+        const changePercent = calculatePercent(crime.change, previousCount);
+        crimeTypesHTML += `
+          <div style="margin-bottom: 24px;">
+            <div style="color: #1e293b; font-size: 26px; font-weight: 700; margin-bottom: 4px;">
+              ${crime.name}
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 12px;">
+              <span style="color: #475569; font-size: 22px; font-weight: 600;">Count: ${crime.count}</span>
+              <span style="color: ${indicator.color}; font-size: 28px; font-weight: 800;">
+                ${indicator.arrow}${Math.abs(changePercent)}%
+              </span>
+              <span style="color: ${indicator.color}; font-size: 20px; font-weight: 500;">
+                ${indicator.label}
+              </span>
+            </div>
+          </div>
+        `;
+      });
+      crimeTypesHTML += '</div></div>';
+
+      let hotspotsHTML = '';
+      hotspots.forEach((hotspot) => {
+        hotspotsHTML += `
+          <div style="margin-bottom: 16px;">
+            <div style="color: #64748b; font-size: 18px; font-weight: 500; margin-bottom: 4px;">${hotspot.name}</div>
+            <div style="color: #0f172a; font-size: 24px; font-weight: 800;">${hotspot.count} crimes</div>
+          </div>
+        `;
+      });
+
+      const totalChangeText = formatChangeText(totalChange, totalPercent, totalIndicator);
+
+      // Determine solid background color for total section (no gradients to avoid oklch)
+      let totalBgColor = '#ffffff'; // default white
+      if (totalChange > 0) {
+        // Light red for increases (bad news)
+        totalBgColor = '#fee2e2';
+      } else if (totalChange < 0) {
+        // Light green for decreases (good news)
+        totalBgColor = '#dcfce7';
+      }
+
+      const previewHTML = `
+        <div style="all: initial; display: block; width: 1080px; height: 1080px; padding: 20px 40px 40px 40px; background: #f1f5f9; font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box;">
+          <!-- Top Row: Logo + Country Name -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <img src="/assets/images/logo.png" alt="Crime Hotspots" style="display: block; height: 120px; width: auto; border: none;" />
+            <div style="text-align: right;">
+              <div style="color: #0f172a; font-size: 38px; font-weight: 800; line-height: 1.2;">
+                ${countryName}
+              </div>
+            </div>
+          </div>
+
+          <!-- Header: Date Range + Total + Hotspots (3 columns: 40% + 30% + 30%) -->
+          <div style="background: ${totalBgColor}; padding: 40px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #e5e7eb; display: flex; gap: 30px;">
+            <!-- Left: Date Range (40%) -->
+            <div style="flex: 0 0 40%; display: flex; flex-direction: column; justify-content: center;">
+              <div style="color: #64748b; font-size: 22px; font-weight: 700; margin-bottom: 8px;">
+                📊 WEEKLY CRIME STATS
+              </div>
+              <div style="color: #0f172a; font-size: 42px; font-weight: 800; margin-bottom: 8px;">
+                ${dateRange}
+              </div>
+              <div style="color: #64748b; font-size: 24px; font-weight: 600;">
+                VS PREVIOUS 7 DAYS
+              </div>
+            </div>
+
+            <!-- Center: Total Incidents + Change (30%) -->
+            <div style="flex: 0 0 30%; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+              <div style="color: #64748b; font-size: 22px; font-weight: 700; margin-bottom: 12px;">
+                Total Incidents
+              </div>
+              <div style="color: #0f172a; font-size: 72px; font-weight: 900; line-height: 1; margin-bottom: 16px;">
+                ${totalCount}
+              </div>
+              <div style="color: ${totalIndicator.color}; font-size: 52px; font-weight: 900; line-height: 1;">
+                ${totalIndicator.arrow}${Math.abs(totalPercent)}%
+              </div>
+            </div>
+
+            <!-- Right: Hotspots (30%) -->
+            <div style="flex: 0 0 30%; border-left: 2px solid #e5e7eb; padding-left: 30px; display: flex; flex-direction: column; justify-content: center;">
+              <div style="color: #0f172a; font-size: 24px; font-weight: 800; margin-bottom: 16px;">
+                🔥 Hotspots
+              </div>
+              ${hotspotsHTML}
+            </div>
+          </div>
+
+          <!-- Top Crime Types -->
+          <div style="background: #ffffff; padding: 40px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 30px; display: block;">
+            <div style="color: #0f172a; font-size: 32px; font-weight: 800; margin-bottom: 28px; display: block;">
+              Top Crime Types
+            </div>
+            ${crimeTypesHTML}
+          </div>
+
+          <!-- Footer -->
+          <div style="text-align: center; margin-top: 20px;">
+            <div style="color: #64748b; font-size: 22px; font-weight: 600; margin-bottom: 8px;">
+              View interactive dashboard:
+            </div>
+            <div style="color: #e11d48; font-size: 32px; font-weight: 800;">
+              ${dashboardLink.replace('https://', '')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      const canvas = document.getElementById('preview-canvas');
+      if (canvas) {
+        canvas.innerHTML = previewHTML;
+      }
+    }
+
+    // Download image function
+    async function downloadImage() {
+      const canvas = document.getElementById('preview-canvas');
+      if (!canvas) {
+        alert('Preview canvas not found. Please refresh the page.');
+        return;
+      }
+
+      // Check if html2canvas is loaded
+      if (typeof html2canvas === 'undefined') {
+        alert('Image library not loaded. Please check your internet connection and refresh the page.');
+        return;
+      }
+
+      // Temporarily remove scale for capture
+      const originalTransform = canvas.style.transform;
+      canvas.style.transform = 'scale(1)';
+
+      try {
+        // @ts-ignore - html2canvas is loaded via CDN
+        // Using scale: 2 to generate 2160x2160 image for better quality
+        const canvasElement = await html2canvas(canvas, {
+          scale: 2,
+          width: 1080,
+          height: 1080,
+          backgroundColor: '#f1f5f9',
+          useCORS: true,
+          allowTaint: true,
+          logging: false,
+          ignoreElements: (element) => {
+            // Skip elements that might have problematic styles
+            const style = window.getComputedStyle(element);
+            const hasOklch = style.cssText && style.cssText.includes('oklch');
+            return hasOklch;
+          },
+          onclone: (clonedDoc) => {
+            // Remove all Tailwind-generated stylesheets from clone to avoid oklch
+            const styleSheets = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
+            styleSheets.forEach(sheet => {
+              if (sheet.textContent && sheet.textContent.includes('oklch')) {
+                sheet.remove();
+              }
+            });
+          }
+        });
+
+        // Convert to blob and download with maximum quality
+        canvasElement.toBlob((blob: Blob | null) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const dateRange = (document.getElementById('dateRange') as HTMLInputElement).value;
+            const filename = `crime-stats-${dateRange.replace(/\s+/g, '-').toLowerCase()}.png`;
+            link.download = filename;
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
+          } else {
+            alert('Failed to create image blob. Please try again.');
+          }
+        }, 'image/png');
+      } catch (error) {
+        console.error('Error generating image:', error);
+        alert('Error generating image: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      } finally {
+        // Restore original scale
+        canvas.style.transform = originalTransform;
+      }
+    }
+
+    // Event listeners
+    document.getElementById('updatePreview')?.addEventListener('click', updatePreview);
+    document.getElementById('downloadImage')?.addEventListener('click', downloadImage);
+
+    // Auto-update on input change
+    const form = document.getElementById('stats-form');
+    form?.addEventListener('input', () => {
+      // Debounce the update
+      clearTimeout((window as any).updateTimeout);
+      (window as any).updateTimeout = setTimeout(updatePreview, 300);
+    });
+
+    // Initial preview
+    updatePreview();
+  </script>
+</Layout>

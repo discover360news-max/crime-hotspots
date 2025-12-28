@@ -70,7 +70,6 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
 
       // Skip entries with invalid dates
       if (isNaN(dateObj.getTime())) {
-        console.warn(`Skipping entry with invalid date: ${date} - ${headline}`);
         continue;
       }
 

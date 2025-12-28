@@ -89,7 +89,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 
 <Layout title={title} description={description}>
 
-  <div class="container mx-auto px-4 py-2 max-w-7xl">
+  <div class="container mx-auto px-4 py-2 max-w-7xl" data-pagefind-ignore>
     <!-- Page Header -->
     <div class="pt-4 mb-4">
       <Breadcrumbs items={[
@@ -327,7 +327,6 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 
           const dateObj = parseDate(date);
           if (isNaN(dateObj.getTime())) {
-            console.warn(`Skipping entry with invalid date: ${date} - ${headline}`);
             continue;
           }
 

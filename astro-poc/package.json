@@ -12,8 +12,10 @@
     "@astrojs/sitemap": "^3.6.0",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.16.5",
+    "astro-pagefind": "^1.8.5",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
+    "pagefind": "^1.4.0",
     "tailwindcss": "^4.1.18"
   }
 }

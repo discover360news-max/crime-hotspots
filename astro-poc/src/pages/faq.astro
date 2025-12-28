@@ -76,7 +76,7 @@ const faqData = [
     questions: [
       {
         question: "Does Crime Hotspots protect privacy?",
-        answer: "Yes, we adhere to strict ethical standards. Our platform focuses on crime statistics and trends. We do not solicit or publish private, unverified information. We only reflect details that have already been made public by the originating news source, maintaining data fidelity to the public record."
+        answer: "Yes, we adhere to strict ethical standards. Our platform focuses on crime statistics and trends. We do not solicit or publish private, unverified information. We only reflect details that have already been made public by the originating news source, maintaining data fidelity to the public record. For complete details on how we collect and protect your data,"
       },
       {
         question: "Do you offer a way to report crime or submit a tip?",
@@ -141,6 +141,11 @@ const allQuestions = faqData.flatMap(category => category.questions);
                   {item.question.includes("report crime") && (
                     <span>
                       {' '}<a href="/report" class="text-rose-600 hover:text-rose-700 font-medium underline">Submit a report here</a>.
+                    </span>
+                  )}
+                  {item.question.includes("protect privacy") && (
+                    <span>
+                      {' '}<a href="/privacy" class="text-rose-600 hover:text-rose-700 font-medium underline">Read our Privacy Policy</a>.
                     </span>
                   )}
                 </div>

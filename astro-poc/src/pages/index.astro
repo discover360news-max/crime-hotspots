@@ -69,14 +69,14 @@ const countries = [
           <div
             class={`w-full max-w-[200px] sm:max-w-[220px] rounded-2xl shadow-sm overflow-hidden
               ${country.available
-                ? 'bg-white/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer'
-                : 'bg-white/50 opacity-60 cursor-not-allowed'}`}
+                ? 'bg-white/70 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer'
+                : 'bg-white/70 opacity-60 cursor-not-allowed'}`}
             role="listitem"
           >
             {country.available ? (
               <a href={country.dashboard} class="block">
                 <!-- Country Image -->
-                <div class="w-full aspect-square overflow-hidden bg-white/50">
+                <div class="w-full aspect-square overflow-hidden bg-white/70">
                   <img
                     src={country.image}
                     alt={`${country.name} map`}

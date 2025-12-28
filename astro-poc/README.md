@@ -6,7 +6,7 @@ This is the **Astro-based rebuild** of Crime Hotspots Caribbean, migrating from 
 
 **Current Status:** ✅ In Active Development (December 2025)
 
-**The Power:** Transform crime data CSV into **1,300+ SEO-optimized pages automatically** + static content pages + blog system.
+**The Power:** Transform crime data CSV into **1,500+ SEO-optimized pages automatically** + static content pages + blog system.
 
 ---
 
