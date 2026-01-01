@@ -20,8 +20,12 @@ const faqData = [
         answer: "Our crime data is sourced exclusively from public reports by established media outlets like the Trinidad Express, Guardian TT, Newsday, Stabroek News, and Kaieteur News. For Trinidad, we also monitor specific high-traffic community social media feeds. This ensures we provide real-time crime statistics reflecting the public record."
       },
       {
-        question: "How often is the crime map updated for any island??",
-        answer: "We are committed to providing the freshest data possible. Our automated systems check Guyana crime reports hourly and Trinidad crime data every two hours. High-severity incidents undergo immediate human validation. This near real-time crime data ensures you're viewing the latest available public safety information."
+        question: "How often is the crime map updated?",
+        answer: "We are committed to providing the freshest data possible. Our automated systems check Guyana crime reports hourly and Trinidad crime data every two hours. However, we display data with a 3-day lag to ensure completeness and accuracy. This means when you visit the site on January 4th, you'll see complete data through January 1st. This lag accounts for delayed media reporting and allows our AI validation systems to process incidents thoroughly. High-severity incidents undergo immediate human validation."
+      },
+      {
+        question: "What year of data am I viewing when I first visit the site?",
+        answer: "By default, all dashboards and maps show data from the current year (e.g., 2026 data in 2026). This ensures you're seeing the most recent crime trends and statistics. You can easily switch to view previous years' data using the year filter available in the Filters menu on each dashboard."
       },
       {
         question: "Is your data based on official police statistics?",
@@ -41,12 +45,20 @@ const faqData = [
         answer: "Use the interactive crime map on the Dashboard page. You can filter by Crime Type (e.g., Murder, Robbery) and select your specific town or area in the Caribbean from the drop-down menu. The map aggregates incidents, helping you visualize local crime hotspots."
       },
       {
+        question: "How do I view data from previous years?",
+        answer: "Click the 'Filters' button on any dashboard or headlines page. In the filters menu, use the 'Select Year' dropdown to choose which year's data you want to view (e.g., 2025, 2024). You can also access our comprehensive archive by clicking 'View Archive' to browse crime data organized by year and month."
+      },
+      {
         question: "Can I filter the data by specific dates or crime types?",
-        answer: "Yes. All crime dashboards offer advanced filtering tools. You can narrow down the data to view specific periods, such as the last 30 days, or focus on a single category, such as vehicle theft statistics."
+        answer: "Yes. All dashboards offer advanced filtering tools. On the Dashboard, you can filter by year and crime type. On the Headlines page, you can filter by date range (from/to dates), crime type, and area. The filters update your view in real-time, showing you exactly the data you need."
       },
       {
         question: "How do I read the crime map?",
         answer: "The map uses incident markers placed at the generalized location of the reported crime. Clusters of markers indicate a crime hotspot. Tap on any marker to view the source article and all structured details, including the Crime Type and the date of the incident."
+      },
+      {
+        question: "Is historical crime data still available after a new year starts?",
+        answer: "Yes! All historical data remains permanently accessible. When a new year begins (e.g., 2027), the dashboard will automatically default to showing the current year's data, but you can access any previous year (2026, 2025, etc.) using the year filter or by visiting our archive section. We maintain complete records from when we started tracking each island."
       }
     ]
   },

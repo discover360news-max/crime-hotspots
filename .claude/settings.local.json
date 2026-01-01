@@ -71,7 +71,9 @@
       "WebFetch(domain:developers.cloudflare.com)",
       "Bash(npm run preview:*)",
       "Bash(pkill:*)",
-      "Bash(npx pagefind:*)"
+      "Bash(npx pagefind:*)",
+      "WebFetch(domain:www.cnc3.co.tt)",
+      "Bash(cd:*)"
     ],
     "deny": [],
     "ask": []

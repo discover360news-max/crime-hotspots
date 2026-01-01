@@ -9,6 +9,7 @@ export interface Crime {
   crimeType: string;
   primaryCrimeType?: string; // New 2026 field
   relatedCrimeTypes?: string; // New 2026 field (comma-separated)
+  victimCount?: number; // New 2026 field (applies to primary crime only)
   street: string;
   area: string;
   region: string;
@@ -76,6 +77,7 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
       const summary = getColumn('Summary');
       const primaryCrimeType = getColumn('primaryCrimeType');
       const relatedCrimeTypes = getColumn('relatedCrimeType') || getColumn('relatedCrimeTypes');
+      const victimCountStr = getColumn('victimCount') || getColumn('victimcount') || getColumn('Victim Count');
       const crimeType = getColumn('Crime Type') || getColumn('crimeType');
       const date = getColumn('Date');
       const street = getColumn('Street Address') || getColumn('Street');
@@ -97,12 +99,17 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
 
       const slug = generateSlug(headline, dateObj);
 
+      // Parse victim count (default to 1 if not provided or invalid)
+      const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
+      const validVictimCount = !isNaN(victimCount) && victimCount > 0 ? victimCount : 1;
+
       crimes.push({
         date,
         headline,
         crimeType,
         primaryCrimeType: primaryCrimeType || undefined,
         relatedCrimeTypes: relatedCrimeTypes || undefined,
+        victimCount: validVictimCount,
         street,
         area,
         region,

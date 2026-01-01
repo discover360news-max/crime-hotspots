@@ -59,19 +59,18 @@ const crimeTypes = [
         <!-- Crime Type Filter -->
         {showCrimeTypeFilter && (
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-3">Crime Types</label>
-            <div class="space-y-2 max-h-60 overflow-y-auto pr-2">
+            <label for="crimeTypeFilter" class="block text-sm font-medium text-slate-700 mb-2">Crime Types</label>
+            <select
+              id="crimeTypeFilter"
+              class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50"
+            >
+              <option value="" selected>All Crime Types</option>
               {crimeTypes.map((crimeType) => (
-                <label class="flex items-center gap-2 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    class="crime-type-checkbox w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500"
-                    data-crime-type={crimeType}
-                  />
-                  <span class="text-xs text-slate-700 group-hover:text-rose-600 transition">{crimeType}</span>
-                </label>
+                <option value={crimeType}>
+                  {crimeType}
+                </option>
               ))}
-            </div>
+            </select>
           </div>
         )}
 

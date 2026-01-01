@@ -4,12 +4,15 @@
  * Used by year filter and stat card filtering
  */
 
+import { usesVictimCount } from '../config/crimeTypeConfig';
+
 interface Crime {
   date: string;
   headline: string;
   crimeType: string;
   primaryCrimeType?: string; // New 2026 field
   relatedCrimeTypes?: string; // New 2026 field (comma-separated)
+  victimCount?: number; // New 2026 field (applies to primary crime only)
   street: string;
   area: string;
   region: string;
@@ -27,48 +30,64 @@ interface Crime {
 
 /**
  * Count crimes by type across both primaryCrimeType and relatedCrimeTypes
+ *
+ * VICTIM COUNT RULES:
+ * - Only applies to PRIMARY crime type (not related crimes)
+ * - Only for crime types configured with useVictimCount=true
+ * - Related crimes ALWAYS count as +1 (incident-based)
+ *
+ * Example:
+ * - Primary: Murder, victimCount: 3, Related: [Shooting]
+ * - Result: Murder +3, Shooting +1
  */
 function countCrimeType(crimeData: Crime[], targetType: string): number {
+  let totalCount = 0;
   let primaryCount = 0;
   let legacyCount = 0;
   let relatedCount = 0;
 
-  const matchingCrimes = crimeData.filter(crime => {
+  crimeData.forEach(crime => {
     // Check if primaryCrimeType matches
     if (crime.primaryCrimeType === targetType) {
-      primaryCount++;
-      return true;
+      // Apply victim count ONLY if this crime type uses it AND it's the primary crime
+      if (usesVictimCount(targetType) && crime.victimCount && crime.victimCount > 1) {
+        totalCount += crime.victimCount;
+        primaryCount += crime.victimCount;
+      } else {
+        totalCount += 1;
+        primaryCount += 1;
+      }
+      return;
     }
 
-    // Check if crimeType matches (fallback for old data)
+    // Check if crimeType matches (fallback for old data - always count as 1)
     if (crime.crimeType === targetType) {
-      legacyCount++;
-      return true;
+      totalCount += 1;
+      legacyCount += 1;
+      return;
     }
 
-    // Check if relatedCrimeTypes contains the target type
+    // Check if relatedCrimeTypes contains the target type (always count as 1)
     if (crime.relatedCrimeTypes) {
       const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
       if (relatedTypes.includes(targetType)) {
-        relatedCount++;
+        totalCount += 1;
+        relatedCount += 1;
         console.log(`🔍 Found ${targetType} in relatedCrimeTypes:`, {
           headline: crime.headline,
           primaryCrimeType: crime.primaryCrimeType,
           relatedCrimeTypes: crime.relatedCrimeTypes,
           parsed: relatedTypes
         });
-        return true;
       }
     }
-
-    return false;
   });
 
   if (relatedCount > 0 || primaryCount > 0) {
-    console.log(`📊 ${targetType} count breakdown: Primary=${primaryCount}, Legacy=${legacyCount}, Related=${relatedCount}, Total=${matchingCrimes.length}`);
+    console.log(`📊 ${targetType} count breakdown: Primary=${primaryCount}, Legacy=${legacyCount}, Related=${relatedCount}, Total=${totalCount}`);
   }
 
-  return matchingCrimes.length;
+  return totalCount;
 }
 
 /**

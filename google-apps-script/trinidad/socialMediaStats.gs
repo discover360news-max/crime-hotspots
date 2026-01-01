@@ -493,10 +493,12 @@ function parseCSVLine(line) {
 
 /**
  * Filter crimes by date range
+ * IMPORTANT: Normalizes crime dates to noon (12:00:00) to match boundary date format
  */
 function filterCrimesByDateRange(crimes, startDate, endDate) {
   return crimes.filter(crime => {
-    const incidentDate = new Date(crime['Date']); // Changed from 'Incident Date' to 'Date'
+    const incidentDate = new Date(crime['Date']); // Parses as midnight (00:00:00)
+    incidentDate.setHours(12, 0, 0, 0); // Normalize to noon to match startDate/endDate
     return incidentDate >= startDate && incidentDate <= endDate;
   });
 }

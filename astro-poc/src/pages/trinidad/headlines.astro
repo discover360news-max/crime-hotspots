@@ -72,7 +72,7 @@ const breadcrumbs = [
 
     <!-- Results Count -->
     <div class="mb-6 text-xs text-slate-500">
-      Showing <span id="resultsCount">{allCrimes.length}</span> of {allCrimes.length} crimes
+      Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of <span id="resultsTotal">{allCrimes.length}</span> crimes
     </div>
 
     <!-- Crime Cards Grid -->
@@ -224,7 +224,7 @@ const breadcrumbs = [
       grid.innerHTML = crimes.map((crime, index) => `
         <article class="crime-card bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 hover:shadow-lg transition cursor-pointer group" data-crime-slug="${crime.slug}">
           <div class="flex items-start justify-between mb-3">
-            <span class="inline-block px-3 py-1 rounded-full bg-rose-600 text-white text-xs font-medium">
+            <span class="inline-block px-3 py-1 rounded-full text-white text-xs font-medium opacity-70" style="background-color: ${getCrimeColorHex(crime.crimeType)}">
               ${crime.crimeType}
             </span>
             <span class="text-xs text-slate-500">
@@ -273,7 +273,9 @@ const breadcrumbs = [
 
     // Update results count
     function updateResultsCount() {
-      document.getElementById('resultsCount').textContent = filteredCrimes.length;
+      const showing = Math.min(currentPage * perPage, filteredCrimes.length);
+      document.getElementById('resultsShowing').textContent = showing;
+      document.getElementById('resultsTotal').textContent = filteredCrimes.length;
     }
 
     // Helper: Get crime color (hex for inline styles)
@@ -339,11 +341,20 @@ const breadcrumbs = [
     document.getElementById('loadMore').addEventListener('click', () => {
       currentPage++;
       renderCrimes();
+      updateResultsCount();
     });
 
-    // Initial render - show all crimes (no default date filter)
-    renderCrimes();
+    // Initial render - don't re-render (server already rendered first 30 cards)
+    // Only update the count and set up load more button visibility
     updateResultsCount();
+
+    // Check if Load More button should be visible
+    const loadMore = document.getElementById('loadMore');
+    if (filteredCrimes.length <= perPage) {
+      loadMore.style.display = 'none';
+    } else {
+      loadMore.style.display = 'block';
+    }
 
     // Event delegation for crime card clicks
     const crimeGrid = document.getElementById('crimeGrid');

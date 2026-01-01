@@ -148,9 +148,9 @@ export function initializeStatCardFiltering(callbacks: {
         // Reset Quick Insights title
         updateQuickInsightsTitle(null);
 
-        // Sync checkbox state
-        if ((window as any).syncCrimeTypeCheckbox) {
-          (window as any).syncCrimeTypeCheckbox(crimeType, false);
+        // Sync dropdown state
+        if ((window as any).syncCrimeTypeDropdown) {
+          (window as any).syncCrimeTypeDropdown(crimeType, false);
         }
       } else {
         activeCrimeTypeFilter = crimeType;
@@ -164,9 +164,9 @@ export function initializeStatCardFiltering(callbacks: {
         // Update Quick Insights title
         updateQuickInsightsTitle(crimeType);
 
-        // Sync checkbox state
-        if ((window as any).syncCrimeTypeCheckbox) {
-          (window as any).syncCrimeTypeCheckbox(crimeType, true);
+        // Sync dropdown state
+        if ((window as any).syncCrimeTypeDropdown) {
+          (window as any).syncCrimeTypeDropdown(crimeType, true);
         }
       }
 
@@ -197,54 +197,59 @@ export function initializeStatCardFiltering(callbacks: {
 }
 
 /**
- * Initialize tray checkbox sync with stat cards
+ * Initialize tray dropdown sync with stat cards
  */
 export function initializeTraySync() {
-  // Global function to sync checkbox state with stat card
-  (window as any).syncCrimeTypeCheckbox = function(crimeType: string, isActive: boolean) {
-    const checkboxes = document.querySelectorAll('.crime-type-checkbox');
-    checkboxes.forEach(checkbox => {
-      const checkboxType = checkbox.getAttribute('data-crime-type');
-      if (checkboxType === crimeType) {
-        (checkbox as HTMLInputElement).checked = isActive;
-      } else if (crimeType === 'All') {
-        (checkbox as HTMLInputElement).checked = false; // Clear all checkboxes when "All" is selected
-      }
-    });
+  const crimeTypeDropdown = document.getElementById('crimeTypeFilter') as HTMLSelectElement;
+
+  if (!crimeTypeDropdown) {
+    console.log('⚠️ Crime type filter dropdown not found');
+    return;
+  }
+
+  // Global function to sync dropdown with stat card selection
+  (window as any).syncCrimeTypeDropdown = function(crimeType: string, isActive: boolean) {
+    if (isActive) {
+      crimeTypeDropdown.value = crimeType;
+    } else {
+      // If deactivating, reset to "All Crime Types"
+      crimeTypeDropdown.value = '';
+    }
   };
 
-  // Listen for checkbox changes in tray
-  const checkboxes = document.querySelectorAll('.crime-type-checkbox');
+  // Listen for dropdown changes in tray
+  crimeTypeDropdown.addEventListener('change', function(this: HTMLSelectElement) {
+    const selectedCrimeType = this.value;
 
-  checkboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', function(this: HTMLInputElement) {
-      const crimeType = this.getAttribute('data-crime-type');
-      const isChecked = this.checked;
+    // Find all stat cards
+    const statCards = document.querySelectorAll('.stat-card');
 
-      if (!crimeType) return;
-
-      // Uncheck all other checkboxes (single selection to match stat card behavior)
-      checkboxes.forEach(cb => {
-        if (cb !== this) (cb as HTMLInputElement).checked = false;
+    if (selectedCrimeType === '') {
+      // "All Crime Types" selected - deactivate all stat cards
+      statCards.forEach(card => {
+        if (card.classList.contains('active')) {
+          (card as HTMLElement).click(); // Click to deactivate
+        }
       });
-
-      // Find and click the corresponding stat card
-      const statCards = document.querySelectorAll('.stat-card');
+    } else {
+      // Specific crime type selected
       statCards.forEach(card => {
         const cardType = card.getAttribute('data-crime-type');
 
-        if (isChecked && cardType === crimeType) {
-          // Activate this card
-          (card as HTMLElement).click();
-        } else if (!isChecked && cardType === crimeType) {
-          // Deactivate this card (click again to toggle off)
+        if (cardType === selectedCrimeType) {
+          // Activate this card if not already active
+          if (!card.classList.contains('active')) {
+            (card as HTMLElement).click();
+          }
+        } else {
+          // Deactivate all other cards
           if (card.classList.contains('active')) {
             (card as HTMLElement).click();
           }
         }
       });
-    });
+    }
   });
 
-  console.log('✅ Tray checkbox sync initialized');
+  console.log('✅ Tray dropdown sync initialized');
 }

@@ -18,6 +18,61 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 
 ## Recent Accomplishments
 
+### January 1, 2026 - Victim Count System & Manual Workflow Transition
+
+**Problem Solved:**
+Double/triple murders were counted as single incidents, losing critical victim data. Gemini AI automation faced quota limits and accuracy issues, making manual entry more reliable.
+
+**Accomplishments:**
+1. **Victim Count Multiplier System** ✅
+   - Added `victimCount` field to crime data schema
+   - **Configurable per crime type:** Murder, Assault, Sexual Assault, Kidnapping use victim count
+   - **Critical rule:** Victim count ONLY applies to PRIMARY crime type (related crimes always count as +1)
+   - **Example:** Primary: Murder (victimCount=3), Related: [Shooting] → Murder +3, Shooting +1
+   - **Config file:** `astro-poc/src/config/crimeTypeConfig.ts` - toggle victim counting per crime type
+
+2. **Frontend Integration** ✅
+   - Updated CSV parser to read `victimCount` column
+   - Updated dashboard counting logic to apply multipliers correctly
+   - Backward compatible: Old data without victimCount defaults to 1
+   - Stats cards now show accurate victim counts for configured crime types
+
+3. **Manual Workflow Transition** ✅
+   - **Decision:** Retired Gemini AI automation (quota limits, accuracy issues)
+   - **New workflow:** Manual Google Form entry for complete data control
+   - **Optional:** Keep RSS headline collection to assist with finding crimes
+   - **Archive plan:** Created `google-apps-script/trinidad/ARCHIVE-PLAN.md` with clear archiving instructions
+
+4. **Google Form Enhancement** ✅
+   - Added "Number of Victims" field (numeric, default: 1, required)
+   - Validation: Must be ≥ 1
+   - Description explains which crime types use victim count
+   - Setup guide: `docs/implementation/VICTIM-COUNT-SETUP.md`
+
+**Key Learnings:**
+- **Automation isn't always better** - Manual entry provides complete data control and accuracy
+- **Victim count for life-impact crimes matters** - Counting lives lost vs. incidents gives true picture
+- **Primary vs. related distinction is critical** - Prevents double-counting in complex incidents
+- **Configuration > hardcoding** - Crime type config file allows easy toggling without code changes
+
+**Files Created:**
+- `astro-poc/src/config/crimeTypeConfig.ts` (crime type configuration)
+- `docs/implementation/VICTIM-COUNT-SETUP.md` (setup instructions)
+- `google-apps-script/trinidad/ARCHIVE-PLAN.md` (Gemini archive plan)
+
+**Files Modified:**
+- `astro-poc/src/lib/crimeData.ts` (added victimCount parsing)
+- `astro-poc/src/scripts/dashboardUpdates.ts` (victim count logic in countCrimeType)
+
+**Status:**
+- ✅ Victim count system: Complete and working
+- ✅ Frontend integration: Complete
+- ✅ Archive plan: Documented (user to execute manually)
+- 🔜 Google Form update: User action required
+- 🔜 Google Sheet column: User action required
+
+---
+
 ### January 1, 2026 - Social Media Stats Triple-Mode System
 
 **Problem Solved:**
