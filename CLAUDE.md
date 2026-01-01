@@ -12,11 +12,93 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Focus:** Trinidad-only implementation (Other islands expansion deferred)
-**Last Updated:** December 28, 2025
+**Last Updated:** January 1, 2026
 
 ---
 
 ## Recent Accomplishments
+
+### January 1, 2026 - Social Media Stats Triple-Mode System
+
+**Problem Solved:**
+Social media stats generation had critical bugs: (1) date range calculations were off by 1 day (using midnight instead of end-of-day), (2) timezone issues caused wrong date boundaries, (3) no support for monthly reviews or custom date ranges, (4) manual fiddling with `lagDays` required to get correct dates.
+
+**Accomplishments:**
+1. **Fixed Date Range Calculation Bug** ✅
+   - **Root cause:** End dates set to `00:00:00` (midnight) instead of `23:59:59` (end-of-day)
+   - **Impact:** Missing last day's crimes (e.g., Dec 21-27 only counted through midnight of Dec 27)
+   - **Fix:** Changed all date boundaries to use **noon (12:00:00)** to avoid timezone edge cases
+   - **Result:** Weekly stats now accurately capture full 7-day periods
+
+2. **Fixed Timezone Boundary Issues** ✅
+   - **Root cause:** JavaScript `Date` objects created at midnight UTC → off-by-1-day in Trinidad timezone (UTC-4)
+   - **Example:** `new Date(2025, 11, 1)` = Dec 1 00:00 UTC → Nov 30 20:00 Trinidad time
+   - **Fix:** All dates now created at noon instead of midnight
+   - **Result:** Logs show correct dates (Dec 1 - Dec 31, not Nov 30 - Dec 31)
+
+3. **Triple-Mode Stats System** ✅
+   - **MODE 1: Daily Weekly Stats (Automated with 3-day lag)**
+     - Function: `generateDailyStats()`
+     - Uses fixed 3-day lag to ensure complete data
+     - On Dec 31: Compares Dec 21-27 vs Dec 14-20
+     - Optional automation: `setupDailyTrigger()` (runs 3 PM daily)
+
+   - **MODE 2: Monthly Stats (Automated, no lag)**
+     - Function: `generateMonthlyStats(year, month)` or `generateMonthlyStatsWithPrompt()` (with UI)
+     - Compares full months (e.g., December vs November)
+     - Run on 5th of month to ensure previous month is complete
+     - Optional automation: `setupMonthlyTrigger()` (runs 5th at 9 AM)
+
+   - **MODE 3: Custom Stats (Manual, no lag)**
+     - Function: `generateCustomStats(startDate, endDate)` or `generateCustomStatsWithPrompt()` (with UI)
+     - Analyze ANY date range specified
+     - Compares against previous period of same duration
+     - Perfect for ad-hoc analysis
+
+4. **User-Friendly Popup Functions** ✅
+   - `generateMonthlyStatsWithPrompt()` - Prompts for year/month with validation
+   - `generateCustomStatsWithPrompt()` - Prompts for start/end dates with validation
+   - Built-in validation:
+     - Year range: 2020-2030
+     - Month range: 1-12
+     - Date format: YYYY-MM-DD
+     - End date must be after start date
+   - Confirmation dialogs before execution
+   - Success messages with results location
+
+5. **Comprehensive Documentation Update** ✅
+   - Updated file header with complete 3-mode usage guide
+   - Clear examples for each mode
+   - Setup instructions for automation triggers
+   - Parameter validation with helpful error messages
+
+**Key Learnings:**
+- **Midnight boundaries cause timezone bugs** - Using noon (12:00) instead of midnight (00:00) prevents off-by-1-day errors when timezone conversions occur
+- **End-of-day means 23:59:59, not 00:00:00** - Critical distinction that caused missing data
+- **Reporting lag needs to account for COMPLETE days** - Formula: `today - lagDays - 1` ensures full data availability
+- **Multi-mode systems need clear documentation** - Different use cases (daily/monthly/custom) require different approaches
+- **UI prompts improve usability** - Popup dialogs with validation prevent parameter errors
+
+**Files Modified:**
+- `google-apps-script/trinidad/socialMediaStats.gs` (complete rewrite of date logic, added 2 new modes, added UI prompt functions, added automation triggers)
+
+**Functions Added:**
+- `generateMonthlyStats(year, month)` - Monthly comparison stats
+- `generateMonthlyStatsWithPrompt()` - UI-driven monthly stats
+- `generateCustomStats(startDate, endDate)` - Custom date range stats
+- `generateCustomStatsWithPrompt()` - UI-driven custom stats
+- `generateMonthlyPostTexts()` - Monthly post formatting
+- `setupMonthlyTrigger()` - Automation setup for monthly stats
+- `generateMonthlyStatsAuto()` - Auto-triggered monthly stats
+
+**Status:**
+- ✅ Daily stats: Fixed and working with correct 3-day lag
+- ✅ Monthly stats: Complete with automation option
+- ✅ Custom stats: Complete for ad-hoc analysis
+- ✅ Timezone issues: Resolved across all modes
+- ✅ UI prompts: Complete with validation
+
+---
 
 ### December 28, 2025 - Site Notification Banner & 2026 Crime Type System
 

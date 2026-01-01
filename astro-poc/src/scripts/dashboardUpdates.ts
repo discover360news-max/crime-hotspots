@@ -29,21 +29,46 @@ interface Crime {
  * Count crimes by type across both primaryCrimeType and relatedCrimeTypes
  */
 function countCrimeType(crimeData: Crime[], targetType: string): number {
-  return crimeData.filter(crime => {
+  let primaryCount = 0;
+  let legacyCount = 0;
+  let relatedCount = 0;
+
+  const matchingCrimes = crimeData.filter(crime => {
     // Check if primaryCrimeType matches
-    if (crime.primaryCrimeType === targetType) return true;
+    if (crime.primaryCrimeType === targetType) {
+      primaryCount++;
+      return true;
+    }
 
     // Check if crimeType matches (fallback for old data)
-    if (crime.crimeType === targetType) return true;
+    if (crime.crimeType === targetType) {
+      legacyCount++;
+      return true;
+    }
 
     // Check if relatedCrimeTypes contains the target type
     if (crime.relatedCrimeTypes) {
       const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
-      if (relatedTypes.includes(targetType)) return true;
+      if (relatedTypes.includes(targetType)) {
+        relatedCount++;
+        console.log(`🔍 Found ${targetType} in relatedCrimeTypes:`, {
+          headline: crime.headline,
+          primaryCrimeType: crime.primaryCrimeType,
+          relatedCrimeTypes: crime.relatedCrimeTypes,
+          parsed: relatedTypes
+        });
+        return true;
+      }
     }
 
     return false;
-  }).length;
+  });
+
+  if (relatedCount > 0 || primaryCount > 0) {
+    console.log(`📊 ${targetType} count breakdown: Primary=${primaryCount}, Legacy=${legacyCount}, Related=${relatedCount}, Total=${matchingCrimes.length}`);
+  }
+
+  return matchingCrimes.length;
 }
 
 /**
@@ -62,21 +87,18 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
   const sixtyThreeDaysAgo = new Date(now);
   sixtyThreeDaysAgo.setDate(now.getDate() - 63); // 3 + 60 days
 
-  // Trend data: last 30 days (ending 3 days ago) from ALL crimes
-  const last30DaysCrimes = allCrimes
-    ? allCrimes.filter(c => {
-        const crimeDate = new Date(c.date);
-        return crimeDate >= thirtyThreeDaysAgo && crimeDate <= threeDaysAgo;
-      })
-    : [];
+  // Trend data: last 30 days (ending 3 days ago) from FILTERED crimes
+  // This ensures trends match the active year filter
+  const last30DaysCrimes = crimes.filter(c => {
+    const crimeDate = new Date(c.date);
+    return crimeDate >= thirtyThreeDaysAgo && crimeDate <= threeDaysAgo;
+  });
 
-  // Trend data: previous 30 days (33-63 days ago) from ALL crimes
-  const prev30DaysCrimes = allCrimes
-    ? allCrimes.filter(c => {
-        const crimeDate = new Date(c.date);
-        return crimeDate >= sixtyThreeDaysAgo && crimeDate < thirtyThreeDaysAgo;
-      })
-    : [];
+  // Trend data: previous 30 days (33-63 days ago) from FILTERED crimes
+  const prev30DaysCrimes = crimes.filter(c => {
+    const crimeDate = new Date(c.date);
+    return crimeDate >= sixtyThreeDaysAgo && crimeDate < thirtyThreeDaysAgo;
+  });
 
   // Helper function to update card with trend
   function updateCardWithTrend(card: Element | null, displayValue: number, last30Count: number, prev30Count: number) {
@@ -160,7 +182,29 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
  * Update Quick Insights card with filtered crime data
  */
 export function updateQuickInsights(crimes: Crime[]) {
-  if (crimes.length === 0) return;
+  // If no crimes, show "No data" message
+  if (crimes.length === 0) {
+    const avgPerDayEl = document.getElementById('avgPerDay');
+    const mostDangerousDayEl = document.getElementById('mostDangerousDay');
+    const busiestMonthEl = document.getElementById('busiestMonth');
+    const top3PercentageEl = document.getElementById('top3Percentage');
+    const mostDangerousRegionEl = document.getElementById('mostDangerousRegion');
+    const mostDangerousRegionCountEl = document.getElementById('mostDangerousRegionCount');
+    const safestRegionEl = document.getElementById('safestRegion');
+    const safestRegionCountEl = document.getElementById('safestRegionCount');
+
+    if (avgPerDayEl) avgPerDayEl.textContent = 'No data';
+    if (mostDangerousDayEl) mostDangerousDayEl.textContent = 'N/A';
+    if (busiestMonthEl) busiestMonthEl.textContent = 'N/A';
+    if (top3PercentageEl) top3PercentageEl.textContent = 'N/A';
+    if (mostDangerousRegionEl) mostDangerousRegionEl.textContent = 'N/A';
+    if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = '0 incidents';
+    if (safestRegionEl) safestRegionEl.textContent = 'N/A';
+    if (safestRegionCountEl) safestRegionCountEl.textContent = '0 incidents';
+
+    console.log('✅ Quick Insights cleared (no data)');
+    return;
+  }
 
   const dates = crimes.map(c => new Date(c.date)).filter(d => !isNaN(d.getTime()));
   const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
@@ -230,6 +274,16 @@ export function updateQuickInsights(crimes: Crime[]) {
  * Update Top Areas card with filtered crime data
  */
 export function updateTopRegions(crimes: Crime[]) {
+  const container = document.getElementById('topRegionsContainer');
+  if (!container) return;
+
+  // If no crimes, show "No data" message
+  if (crimes.length === 0) {
+    container.innerHTML = '<div class="text-xs text-slate-400 text-center py-4">No data available</div>';
+    console.log('✅ Top Areas cleared (no data)');
+    return;
+  }
+
   // Calculate top 10 areas
   const areaCount = crimes.reduce((acc, crime) => {
     const area = crime.area || 'Unknown';
@@ -242,17 +296,14 @@ export function updateTopRegions(crimes: Crime[]) {
     .slice(0, 10);
 
   // Update using ID selector (2-column grid)
-  const container = document.getElementById('topRegionsContainer');
-  if (container) {
-    container.innerHTML = topAreas.map(([area, count]) => `
-      <div class="flex justify-between items-center gap-2 pb-2 border-b border-slate-200">
-        <span class="text-xs text-slate-500 truncate flex-1">${area}</span>
-        <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium flex-shrink-0">
-          ${count}
-        </span>
-      </div>
-    `).join('');
-  }
+  container.innerHTML = topAreas.map(([area, count]) => `
+    <div class="flex justify-between items-center gap-2 pb-2 border-b border-slate-200">
+      <span class="text-xs text-slate-500 truncate flex-1">${area}</span>
+      <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium flex-shrink-0">
+        ${count}
+      </span>
+    </div>
+  `).join('');
 
   console.log('✅ Top Areas updated');
 }

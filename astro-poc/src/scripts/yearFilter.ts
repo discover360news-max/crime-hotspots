@@ -35,6 +35,7 @@ export function initializeYearFilter(
     updateQuickInsights: (filteredCrimes: Crime[]) => void;
     updateTopRegions: (filteredCrimes: Crime[]) => void;
     updateLeafletMap?: (filteredCrimes: Crime[]) => void;
+    updateSubtitleYear?: (selectedValue: string) => void;
   }
 ) {
   // Validate crimes data
@@ -133,6 +134,9 @@ export function initializeYearFilter(
       callbacks.updateTopRegions(filteredCrimes);
       if (callbacks.updateLeafletMap) {
         callbacks.updateLeafletMap(filteredCrimes);
+      }
+      if (callbacks.updateSubtitleYear) {
+        callbacks.updateSubtitleYear(selectedValue);
       }
     });
 

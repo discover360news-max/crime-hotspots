@@ -6,17 +6,19 @@
  */
 
 // Crime severity ranking (higher = more severe)
+// Updated Dec 30, 2025: Home Invasion > Robbery, added Burglary, deprioritized Police-Involved Shooting
 const CRIME_SEVERITY = {
   'Murder': 10,
   'Kidnapping': 9,
-  'Police-Involved Shooting': 8,
+  'Home Invasion': 8,        // ← UPDATED: Moved up from 3 to 8 (more severe than Robbery)
   'Shooting': 7,
   'Sexual Assault': 6,
   'Assault': 5,
   'Robbery': 4,
-  'Home Invasion': 3,
+  'Burglary': 3,             // ← NEW: Added Burglary (between Robbery and Theft)
   'Theft': 2,
-  'Seizures': 1
+  'Seizures': 1,
+  'Police-Involved Shooting': 0  // ← UPDATED: Not a crime, set to 0 (backward compat only)
 };
 
 /**

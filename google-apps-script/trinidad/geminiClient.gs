@@ -188,7 +188,7 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
         "headline": "Brief headline with victim name/age in parentheses if known",
         "details": "2-3 sentence summary. Include crime type, location, and key details. Make it informative and engaging for readers. Use proper grammar and complete sentences.",
         "victims": [{"name": "Name or null", "age": number, "aliases": []}],
-        "location_country": "Trinidad and Tobago|Venezuela|Guyana|Other"
+        "location_country": "Trinidad|Venezuela|Guyana|Other"
       }
     ],
     "confidence": 1-10,
@@ -216,6 +216,10 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
      - ✅ INCLUDE: Breaking news about recent violent crimes (murder, shooting, robbery, assault)
      - ✅ INCLUDE: Police reports of crimes affecting public safety
      - ✅ INCLUDE: Property crimes affecting individuals (home invasion, burglary, car theft)
+     - ❌ EXCLUDE: Traffic accidents and vehicular deaths (runaway vehicles, brake failures, collisions, hit-and-run)
+     - ❌ EXCLUDE: Accidental deaths (drownings, falls, electrocution, workplace accidents)
+     - ❌ EXCLUDE: Deaths caused by negligence without intentional criminal act
+     - ❌ EXCLUDE: Vehicular manslaughter/homicide (accidents, not intentional crimes)
      - ❌ EXCLUDE: Court/trial/verdict articles (found guilty, convicted, sentenced, liable, ruling)
      - ❌ EXCLUDE: Court appearances/arraignments unless reporting NEW details of the original crime
      - ❌ EXCLUDE: White-collar/corporate crime (bank fraud, embezzlement, tax evasion, securities violations)
@@ -233,6 +237,11 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
      - If article is primarily about court proceedings, verdict, or corporate fraud, return {"crimes": [], "confidence": 0}
      - If article mentions crimes as EXAMPLES or CONTEXT (not the main subject), return {"crimes": [], "confidence": 0}
      - Examples to EXCLUDE:
+       * "Child killed by runaway truck while playing at home" → Traffic accident, NOT intentional crime
+       * "Man dies in hit-and-run accident" → Traffic accident, NOT murder
+       * "Driver loses control, kills pedestrian" → Vehicular accident, NOT intentional crime
+       * "Teen drowns at beach" → Accidental death, NOT crime
+       * "Worker falls from scaffolding" → Workplace accident, NOT crime
        * "Former bank officer found liable for fraud" → Court verdict, NOT crime report
        * "Man convicted in 2023 murder case" → Court verdict, NOT new crime
        * "Company employee embezzled $30M over 5 years" → Corporate fraud, NOT public safety crime
@@ -246,6 +255,10 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
        * Context/example: "New academic programs aim to reduce crime. Recently, a pastor attacked..." → EXCLUDE
        * Photo caption: "Arrested: Police took suspect into custody" → EXCLUDE
        * Brief mention: "In another incident, a man was robbed" (no full details) → EXCLUDE
+     - CRITICAL: Traffic accidents and accidental deaths = {"crimes": [], "confidence": 0}
+       * Even if death occurred, if it was an ACCIDENT (not intentional), exclude it
+       * "Runaway vehicle kills child" = ACCIDENT → return zero crimes
+       * "Man shot and killed" = INTENTIONAL CRIME → include
 
   3. EXCLUDE UNCERTAIN DEATHS: DO NOT classify as "Murder" if:
      - "No visible signs of violence"
@@ -299,7 +312,7 @@ function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
 
   8. LOCATION FILTER: Set "location_country" for each crime
      - ✅ INCLUDE: Crimes in Trinidad (Port of Spain, San Fernando, Arima, etc.)
-     - ✅ INCLUDE: Crimes in Tobago (Scarborough, Crown Point, etc.) → mark as "Trinidad" (Tobago is part of Trinidad & Tobago)
+     - ✅ INCLUDE: Crimes in Tobago (Scarborough, Crown Point, etc.) → mark as "Trinidad and Tobago" (Tobago is part of Trinidad & Tobago)
      - ❌ EXCLUDE: Crimes in Guyana, Venezuela, Barbados, Jamaica, other countries → mark as "Other"
      - If article is from Demerara Waves / INews Guyana → very likely NOT Trinidad
      - Only mark as "Trinidad" if crime occurred in Trinidad or Tobago islands

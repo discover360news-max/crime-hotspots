@@ -28,11 +28,10 @@ export interface Crime {
 // Year-specific CSV URLs for Trinidad
 const TRINIDAD_CSV_URLS = {
   2025: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv',
-  // 2026: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
+  2026: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
 
-  // Production sheet (current year - currently 2025, will be 2026 after archival)
-  current: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv'
-  // Test 2026: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv'
+  // Production sheet (current year - switched to 2026 on Jan 1, 2026)
+  current: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv'
 };
 
 /**
@@ -55,6 +54,9 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
       columnMap.set(normalizedHeader, index);
     });
 
+    // Debug: Log all column headers found
+    console.log('📋 CSV Column Headers:', Array.from(columnMap.keys()));
+
     const crimes: Crime[] = [];
 
     for (let i = 1; i < lines.length; i++) {
@@ -73,7 +75,7 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
       const headline = getColumn('Headline');
       const summary = getColumn('Summary');
       const primaryCrimeType = getColumn('primaryCrimeType');
-      const relatedCrimeTypes = getColumn('relatedCrimeTypes');
+      const relatedCrimeTypes = getColumn('relatedCrimeType') || getColumn('relatedCrimeTypes');
       const crimeType = getColumn('Crime Type') || getColumn('crimeType');
       const date = getColumn('Date');
       const street = getColumn('Street Address') || getColumn('Street');

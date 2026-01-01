@@ -17,7 +17,18 @@ import SiteNotificationBanner from '../../components/SiteNotificationBanner.astr
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import '../../styles/dashboard.css';
 
-const crimes = await getTrinidadCrimes();
+// Get all crimes (will be used for year filtering on client-side)
+const allCrimes = await getTrinidadCrimes();
+
+// Get available years for dropdown (sorted descending)
+const availableYears = [...new Set(allCrimes.map(c => c.year))].sort((a, b) => b - a);
+
+// Use the highest year in the data as "current" (not calendar year)
+// This ensures we show the latest data, even if it's from a different year
+const currentYear = availableYears[0];
+
+// Filter to current year by default (server-side initial render)
+const crimes = allCrimes.filter(crime => crime.year === currentYear);
 
 // Helper function to count crimes by type across both primaryCrimeType and relatedCrimeTypes
 const countCrimeType = (crimeData: typeof crimes, targetType: string): number => {
@@ -121,7 +132,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       <div class="flex items-start justify-between gap-10 pt-4">
         <div>
           <h1 class="text-2xl font-bold text-slate-700">Trinidad & Tobago</h1>
-          <p class="text-xs text-slate-500">Crime Statistics Dashboard</p>
+          <p class="text-xs text-slate-500">Crime Statistics Dashboard <span id="dashboardYear" class="font-medium text-slate-600">for {currentYear}</span></p>
         </div>
         <div class="flex flex-col gap-2">
           <a href="/trinidad/headlines"
@@ -273,9 +284,9 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     // CSV URLs - MUST match server-side crimeData.ts
     const TRINIDAD_CSV_URLS = {
       '2025': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv',
-      // Current sheet (currently 2025, will be 2026 after archival)
-      current: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv'
-      // Test 2026: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv'
+      '2026': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
+      // Current sheet (switched to 2026 on Jan 1, 2026)
+      current: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv'
     };
 
     // Parse CSV line handling quoted commas
@@ -339,6 +350,9 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
           columnMap.set(normalizedHeader, index);
         });
 
+        // Debug: Log all column headers found
+        console.log('📋 CSV Column Headers:', Array.from(columnMap.keys()));
+
         const crimes = [];
 
         for (let i = 1; i < lines.length; i++) {
@@ -357,7 +371,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
           const headline = getColumn('Headline');
           const summary = getColumn('Summary');
           const primaryCrimeType = getColumn('primaryCrimeType');
-          const relatedCrimeTypes = getColumn('relatedCrimeTypes');
+          const relatedCrimeTypes = getColumn('relatedCrimeType') || getColumn('relatedCrimeTypes');
           const crimeType = getColumn('Crime Type') || getColumn('crimeType');
           const date = getColumn('Date');
           const street = getColumn('Street Address') || getColumn('Street');
@@ -463,10 +477,18 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
       // Filter to show only current year by default
       const currentYearCrimes = crimes.filter(c => c.year === currentYear);
       console.log(`📊 Showing ${currentYearCrimes.length} crimes from ${currentYear} (filtered from ${crimes.length} total)`);
+      console.log(`📊 Current year crimes sample:`, currentYearCrimes.slice(0, 3).map(c => ({
+        year: c.year,
+        headline: c.headline,
+        primaryCrimeType: c.primaryCrimeType,
+        relatedCrimeTypes: c.relatedCrimeTypes
+      })));
 
       // Update stats with trends (need to import the function)
       const { updateStatsCards } = await import('../../scripts/dashboardUpdates');
+      console.log(`📊 About to call updateStatsCards with ${currentYearCrimes.length} current year crimes`);
       updateStatsCards(currentYearCrimes, crimes);
+      console.log(`📊 updateStatsCards completed`);
 
       // Hide stats and insights shimmers with minimum display time
       await window.hideShimmerWithMinTime(
@@ -639,6 +661,17 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
             // Hide shimmer with minimum time
             await window.hideShimmerWithMinTime(mapShimmer, leafletMap, updateStart);
           }, 100);
+        },
+        updateSubtitleYear: (selectedValue) => {
+          const dashboardYear = document.getElementById('dashboardYear');
+          if (!dashboardYear) return;
+
+          // Update year display based on selection
+          if (selectedValue === 'all') {
+            dashboardYear.textContent = '(All Years)';
+          } else {
+            dashboardYear.textContent = `for ${selectedValue}`;
+          }
         }
       });
     }

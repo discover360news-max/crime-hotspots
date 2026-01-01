@@ -43,13 +43,25 @@ const pageDescription = "Generate branded social media images for weekly crime s
               <label class="block text-sm font-semibold text-slate-700 mb-2">
                 Date Range
               </label>
-              <input
-                type="text"
-                id="dateRange"
-                value="Dec 18 - Dec 24"
-                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
-                placeholder="e.g., Dec 18 - Dec 24"
-              />
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Start Date</label>
+                  <input
+                    type="date"
+                    id="startDate"
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-600 mb-1">End Date</label>
+                  <input
+                    type="date"
+                    id="endDate"
+                    class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
+                  />
+                </div>
+              </div>
+              <input type="hidden" id="dateRange" value="Dec 21 - Dec 27" />
             </div>
 
             <!-- Total Incidents -->
@@ -94,133 +106,148 @@ const pageDescription = "Generate branded social media images for weekly crime s
 
             <!-- Top Crime Types -->
             <div class="border-t border-slate-200 pt-6">
-              <h3 class="text-lg font-semibold text-slate-800 mb-4">Top Crime Types (Max 5)</h3>
+              <h3 class="text-lg font-semibold text-slate-800 mb-4">Top Crime Types (Max 5) <span class="text-xs text-slate-500 font-normal">- Drag to reorder</span></h3>
               <div id="crime-types-container" class="space-y-4">
                 <!-- Crime Type 1 -->
-                <div class="grid grid-cols-4 gap-2 items-end">
-                  <div class="col-span-2">
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Type</label>
-                    <input
-                      type="text"
-                      class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="Robbery"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Count</label>
-                    <input
-                      type="number"
-                      class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="22"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-xs font-medium text-slate-700 mb-1">Change</label>
-                    <input
-                      type="number"
-                      class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="0"
-                    />
+                <div class="crime-type-row flex items-end gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200" draggable="true">
+                  <div class="drag-handle cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 text-xl px-2 flex items-center" style="user-select: none;">⋮⋮</div>
+                  <div class="flex-1 grid grid-cols-3 gap-2">
+                    <div>
+                      <label class="block text-xs font-medium text-slate-700 mb-1">Type</label>
+                      <input
+                        type="text"
+                        class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="Robbery"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-slate-700 mb-1">Count</label>
+                      <input
+                        type="number"
+                        class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="22"
+                      />
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-slate-700 mb-1">Change</label>
+                      <input
+                        type="number"
+                        class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="0"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <!-- Crime Type 2 -->
-                <div class="grid grid-cols-4 gap-2 items-end">
-                  <div class="col-span-2">
-                    <input
-                      type="text"
-                      class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="Theft"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="10"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="-7"
-                    />
+                <div class="crime-type-row flex items-end gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200" draggable="true">
+                  <div class="drag-handle cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 text-xl px-2 flex items-center" style="user-select: none;">⋮⋮</div>
+                  <div class="flex-1 grid grid-cols-3 gap-2">
+                    <div>
+                      <input
+                        type="text"
+                        class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="Theft"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="10"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="-7"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <!-- Crime Type 3 -->
-                <div class="grid grid-cols-4 gap-2 items-end">
-                  <div class="col-span-2">
-                    <input
-                      type="text"
-                      class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="Murder"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="7"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="2"
-                    />
+                <div class="crime-type-row flex items-end gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200" draggable="true">
+                  <div class="drag-handle cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 text-xl px-2 flex items-center" style="user-select: none;">⋮⋮</div>
+                  <div class="flex-1 grid grid-cols-3 gap-2">
+                    <div>
+                      <input
+                        type="text"
+                        class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="Murder"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="7"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="2"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <!-- Crime Type 4 -->
-                <div class="grid grid-cols-4 gap-2 items-end">
-                  <div class="col-span-2">
-                    <input
-                      type="text"
-                      class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="Shooting"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="6"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="-1"
-                    />
+                <div class="crime-type-row flex items-end gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200" draggable="true">
+                  <div class="drag-handle cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 text-xl px-2 flex items-center" style="user-select: none;">⋮⋮</div>
+                  <div class="flex-1 grid grid-cols-3 gap-2">
+                    <div>
+                      <input
+                        type="text"
+                        class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="Shooting"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="6"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="-1"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <!-- Crime Type 5 -->
-                <div class="grid grid-cols-4 gap-2 items-end">
-                  <div class="col-span-2">
-                    <input
-                      type="text"
-                      class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="Home Invasion"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="6"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm"
-                      value="0"
-                    />
+                <div class="crime-type-row flex items-end gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200" draggable="true">
+                  <div class="drag-handle cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 text-xl px-2 flex items-center" style="user-select: none;">⋮⋮</div>
+                  <div class="flex-1 grid grid-cols-3 gap-2">
+                    <div>
+                      <input
+                        type="text"
+                        class="crime-type-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="Home Invasion"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        class="crime-type-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="6"
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        class="crime-type-change w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 text-sm bg-white"
+                        value="0"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -228,54 +255,63 @@ const pageDescription = "Generate branded social media images for weekly crime s
 
             <!-- Hotspots -->
             <div class="border-t border-slate-200 pt-6">
-              <h3 class="text-lg font-semibold text-slate-800 mb-4">Top Hotspots (Max 3)</h3>
+              <h3 class="text-lg font-semibold text-slate-800 mb-4">Top Hotspots (Max 3) <span class="text-xs text-slate-500 font-normal">- Drag to reorder</span></h3>
               <div id="hotspots-container" class="space-y-3">
                 <!-- Hotspot 1 -->
-                <div class="grid grid-cols-2 gap-3">
-                  <input
-                    type="text"
-                    class="hotspot-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
-                    value="Port of Spain"
-                    placeholder="Location"
-                  />
-                  <input
-                    type="number"
-                    class="hotspot-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
-                    value="10"
-                    placeholder="Count"
-                  />
+                <div class="hotspot-row flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200" draggable="true">
+                  <div class="drag-handle cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 text-xl px-2" style="user-select: none;">⋮⋮</div>
+                  <div class="flex-1 grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      class="hotspot-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 bg-white"
+                      value="Port of Spain"
+                      placeholder="Location"
+                    />
+                    <input
+                      type="number"
+                      class="hotspot-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 bg-white"
+                      value="10"
+                      placeholder="Count"
+                    />
+                  </div>
                 </div>
 
                 <!-- Hotspot 2 -->
-                <div class="grid grid-cols-2 gap-3">
-                  <input
-                    type="text"
-                    class="hotspot-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
-                    value="San Juan"
-                    placeholder="Location"
-                  />
-                  <input
-                    type="number"
-                    class="hotspot-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
-                    value="6"
-                    placeholder="Count"
-                  />
+                <div class="hotspot-row flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200" draggable="true">
+                  <div class="drag-handle cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 text-xl px-2" style="user-select: none;">⋮⋮</div>
+                  <div class="flex-1 grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      class="hotspot-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 bg-white"
+                      value="San Juan"
+                      placeholder="Location"
+                    />
+                    <input
+                      type="number"
+                      class="hotspot-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 bg-white"
+                      value="6"
+                      placeholder="Count"
+                    />
+                  </div>
                 </div>
 
                 <!-- Hotspot 3 -->
-                <div class="grid grid-cols-2 gap-3">
-                  <input
-                    type="text"
-                    class="hotspot-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
-                    value="Arima"
-                    placeholder="Location"
-                  />
-                  <input
-                    type="number"
-                    class="hotspot-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700"
-                    value="5"
-                    placeholder="Count"
-                  />
+                <div class="hotspot-row flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200" draggable="true">
+                  <div class="drag-handle cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600 text-xl px-2" style="user-select: none;">⋮⋮</div>
+                  <div class="flex-1 grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      class="hotspot-name w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 bg-white"
+                      value="Arima"
+                      placeholder="Location"
+                    />
+                    <input
+                      type="number"
+                      class="hotspot-count w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-slate-700 bg-white"
+                      value="5"
+                      placeholder="Count"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -345,6 +381,96 @@ const pageDescription = "Generate branded social media images for weekly crime s
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
+    // Initialize date pickers with current week (Dec 21-27, 2025)
+    function initializeDatePickers() {
+      const startDateInput = document.getElementById('startDate') as HTMLInputElement;
+      const endDateInput = document.getElementById('endDate') as HTMLInputElement;
+
+      // Set default dates (Dec 21-27, 2025)
+      if (startDateInput && endDateInput) {
+        startDateInput.value = '2025-12-21';
+        endDateInput.value = '2025-12-27';
+        updateDateRange();
+      }
+    }
+
+    // Update the hidden dateRange field when date pickers change
+    function updateDateRange() {
+      const startDateInput = document.getElementById('startDate') as HTMLInputElement;
+      const endDateInput = document.getElementById('endDate') as HTMLInputElement;
+      const dateRangeInput = document.getElementById('dateRange') as HTMLInputElement;
+
+      if (startDateInput?.value && endDateInput?.value) {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+
+        // Format as "Dec 21 - Dec 27"
+        const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+        const startFormatted = startDate.toLocaleDateString('en-US', options);
+        const endFormatted = endDate.toLocaleDateString('en-US', options);
+
+        dateRangeInput.value = `${startFormatted} - ${endFormatted}`;
+
+        // Trigger preview update
+        updatePreview();
+      }
+    }
+
+    // Drag and drop functionality
+    let draggedElement: HTMLElement | null = null;
+
+    function enableDragAndDrop(containerSelector: string, rowSelector: string) {
+      const container = document.querySelector(containerSelector);
+      if (!container) return;
+
+      const rows = container.querySelectorAll(rowSelector);
+
+      rows.forEach((row) => {
+        const element = row as HTMLElement;
+
+        element.addEventListener('dragstart', (e) => {
+          draggedElement = element;
+          element.style.opacity = '0.5';
+          element.style.border = '2px dashed #cbd5e1';
+        });
+
+        element.addEventListener('dragend', (e) => {
+          element.style.opacity = '1';
+          element.style.border = '1px solid #e2e8f0';
+        });
+
+        element.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          const afterElement = getDragAfterElement(container, e.clientY);
+          if (draggedElement && afterElement == null) {
+            container.appendChild(draggedElement);
+          } else if (draggedElement && afterElement) {
+            container.insertBefore(draggedElement, afterElement);
+          }
+        });
+      });
+
+      // Update preview after drag
+      container.addEventListener('dragend', () => {
+        setTimeout(() => updatePreview(), 100);
+      });
+    }
+
+    function getDragAfterElement(container: Element, y: number) {
+      const draggableElements = [...container.querySelectorAll('[draggable="true"]:not(.dragging)')];
+
+      return draggableElements.reduce((closest: any, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
     // Helper function to get arrow and color based on change value
     function getChangeIndicator(change: number): { arrow: string; color: string; bgColor: string; direction: string; label: string } {
       if (change > 0) {
@@ -380,9 +506,9 @@ const pageDescription = "Generate branded social media images for weekly crime s
       const totalPercent = parseInt((document.getElementById('totalPercent') as HTMLInputElement).value);
       const dashboardLink = (document.getElementById('dashboardLink') as HTMLInputElement).value;
 
-      // Get crime types
+      // Get crime types (in current DOM order after drag-and-drop)
       const crimeTypes: Array<{ name: string; count: number; change: number }> = [];
-      const crimeTypeInputs = document.querySelectorAll('#crime-types-container > div');
+      const crimeTypeInputs = document.querySelectorAll('.crime-type-row');
       crimeTypeInputs.forEach((row) => {
         const name = (row.querySelector('.crime-type-name') as HTMLInputElement)?.value || '';
         const count = parseInt((row.querySelector('.crime-type-count') as HTMLInputElement)?.value || '0');
@@ -393,9 +519,9 @@ const pageDescription = "Generate branded social media images for weekly crime s
         }
       });
 
-      // Get hotspots
+      // Get hotspots (in current DOM order after drag-and-drop)
       const hotspots: Array<{ name: string; count: number }> = [];
-      const hotspotInputs = document.querySelectorAll('#hotspots-container > div');
+      const hotspotInputs = document.querySelectorAll('.hotspot-row');
       hotspotInputs.forEach((row) => {
         const name = (row.querySelector('.hotspot-name') as HTMLInputElement)?.value || '';
         const count = parseInt((row.querySelector('.hotspot-count') as HTMLInputElement)?.value || '0');
@@ -637,6 +763,10 @@ const pageDescription = "Generate branded social media images for weekly crime s
     document.getElementById('updatePreview')?.addEventListener('click', updatePreview);
     document.getElementById('downloadImage')?.addEventListener('click', downloadImage);
 
+    // Date picker listeners
+    document.getElementById('startDate')?.addEventListener('change', updateDateRange);
+    document.getElementById('endDate')?.addEventListener('change', updateDateRange);
+
     // Auto-update on input change
     const form = document.getElementById('stats-form');
     form?.addEventListener('input', () => {
@@ -644,6 +774,13 @@ const pageDescription = "Generate branded social media images for weekly crime s
       clearTimeout((window as any).updateTimeout);
       (window as any).updateTimeout = setTimeout(updatePreview, 300);
     });
+
+    // Initialize drag and drop for crime types and hotspots
+    enableDragAndDrop('#crime-types-container', '.crime-type-row');
+    enableDragAndDrop('#hotspots-container', '.hotspot-row');
+
+    // Initialize date pickers
+    initializeDatePickers();
 
     // Initial preview
     updatePreview();

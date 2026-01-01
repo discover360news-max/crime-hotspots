@@ -89,15 +89,18 @@ function processReadyArticles() {
             extracted.crimes.forEach((crime, index) => {
               Logger.log(`  Processing crime ${index + 1}/${extracted.crimes.length}: ${crime.headline}`);
 
+              // ← CRITICAL FIX: Process crime types FIRST (converts all_crime_types array → primary/related)
+              const crimeTypes = processLegacyCrimeType(crime);
+
               // ← NEW: Filter out crimes outside Trinidad
               if (crime.location_country && crime.location_country !== 'Trinidad') {
                 Logger.log(`    ⏭️ Skipped: Crime occurred in ${crime.location_country}, not Trinidad`);
                 return; // Skip this crime
               }
 
-              // ← NEW: Filter out "Other" crime types (should be caught by prompt, but double-check)
-              if (crime.crime_type === 'Other' || !crime.crime_type) {
-                Logger.log(`    ⏭️ Skipped: Invalid crime type "${crime.crime_type}"`);
+              // ← UPDATED: Validate using processed primary crime type (not crime.crime_type which doesn't exist)
+              if (crimeTypes.primary === 'Other' || !crimeTypes.primary || crimeTypes.primary === 'Unknown') {
+                Logger.log(`    ⏭️ Skipped: Invalid crime type "${crimeTypes.primary}"`);
                 return; // Skip this crime
               }
 
@@ -124,11 +127,11 @@ function processReadyArticles() {
 
               // Use overall confidence for routing decision
               if (extracted.confidence >= PROCESSING_CONFIG.CONFIDENCE_THRESHOLD) {
-                appendToProduction(crime, publishedDate);
+                appendToProduction(crime, publishedDate, crimeTypes);
                 highConfCrimes++;
                 Logger.log(`    ✅ Added to Production`);
               } else if (extracted.confidence > 0) {
-                appendToReviewQueue(crime, extracted.confidence,extracted.ambiguities, publishedDate);
+                appendToReviewQueue(crime, extracted.confidence,extracted.ambiguities, publishedDate, crimeTypes);
                 lowConfCrimes++;
                 Logger.log(`    ⚠️ Added to Review Queue`);
               }
@@ -235,8 +238,9 @@ function processReadyArticles() {
    * Append extracted data to production sheet
    * @param {Object} crime - Crime data from Gemini
    * @param {Date} publishedDate - Article publication date (fallback)
+   * @param {Object} crimeTypes - Pre-calculated crime types (primary/related)
    */
-  function appendToProduction(crime, publishedDate) {
+  function appendToProduction(crime, publishedDate, crimeTypes) {
     // Acquire lock to prevent race conditions when multiple processes run simultaneously
     const lock = LockService.getScriptLock();
 
@@ -271,22 +275,24 @@ function processReadyArticles() {
       // Validate and format crime date
       const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
-      const crimeTypes = processLegacyCrimeType(crime);
+      // ← REMOVED: No need to call processLegacyCrimeType again, we already have it
 
       prodSheet.appendRow([
-        validatedDate,
-        crime.headline || 'No headline',
-        crimeTypes.primary,         // ← NEW: primaryCrimeType column
-        crimeTypes.related,         // ← NEW: relatedCrimeTypes column
-        crimeTypes.primary,         // ← NEW: crimeType column (backward compat)
-        crime.street || '',
-        geocoded.plus_code || '',
-        crime.area || '',
-        'Trinidad',
-        crime.source_url || '',
-        geocoded.lat || '',
-        geocoded.lng || '',
-        crime.details || '' // Summary for SEO and UX
+        crime.headline || 'No headline',        // 1. Headline
+        crime.details || '',                     // 2. Summary
+        crimeTypes.primary,                      // 3. primaryCrimeType
+        crimeTypes.related,                      // 4. relatedCrimeTypes
+        crimeTypes.primary,                      // 5. crimeType (backward compat)
+        validatedDate,                           // 6. Date
+        crime.street || '',                      // 7. Street Address
+        geocoded.lat || '',                      // 8. Latitude
+        geocoded.lng || '',                      // 9. Longitude
+        geocoded.plus_code || '',                // 10. Location (Plus Code)
+        crime.area || '',                        // 11. Area
+        '',                                      // 12. Region (formula fills this)
+        'Trinidad',                              // 13. Island
+        crime.source_url || '',                  // 14. URL
+        ''                                       // 15. Source (formula fills this)
       ]);
 
       Logger.log(`✅ Added to production: ${crime.headline}
@@ -307,8 +313,9 @@ function processReadyArticles() {
    * @param {number} confidence - Confidence score
    * @param {Array} ambiguities - Array of ambiguity strings
    * @param {Date} publishedDate - Article publication date (fallback)
+   * @param {Object} crimeTypes - Pre-calculated crime types (primary/related)
    */
-  function appendToReviewQueue(crime, confidence, ambiguities, publishedDate) {
+  function appendToReviewQueue(crime, confidence, ambiguities, publishedDate, crimeTypes) {
     const reviewSheet = getActiveSheet(SHEET_NAMES.REVIEW_QUEUE);
 
     const fullAddress = `${crime.street || ''}, ${crime.area || ''},
@@ -318,27 +325,28 @@ function processReadyArticles() {
     // Validate and format crime date
     const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
-    // Process crime types (2026+ with backward compatibility)
-    const crimeTypes = processLegacyCrimeType(crime);
+    // ← REMOVED: No need to call processLegacyCrimeType again, we already have it
 
     reviewSheet.appendRow([
-      validatedDate,
-      crime.headline || 'Needs headline',
-      crimeTypes.primary,         // ← NEW: primaryCrimeType column
-      crimeTypes.related,         // ← NEW: relatedCrimeTypes column
-      crimeTypes.primary,         // ← NEW: crimeType column (backward compat)
-      crime.street || '',
-      geocoded.plus_code || '',
-      crime.area || '',
-      'Trinidad',
-      crime.source_url || '',
-      geocoded.lat || '',
-      geocoded.lng || '',
-      crime.details || '', // Summary for SEO and UX
-      confidence,
-      (ambiguities || []).join('; '),
-      'pending',
-      ''
+      crime.headline || 'Needs headline',      // 1. Headline
+      crime.details || '',                     // 2. Summary
+      crimeTypes.primary,                      // 3. primaryCrimeType
+      crimeTypes.related,                      // 4. relatedCrimeTypes
+      crimeTypes.primary,                      // 5. crimeType (backward compat)
+      validatedDate,                           // 6. Date
+      crime.street || '',                      // 7. Street Address
+      geocoded.lat || '',                      // 8. Latitude
+      geocoded.lng || '',                      // 9. Longitude
+      geocoded.plus_code || '',                // 10. Location (Plus Code)
+      crime.area || '',                        // 11. Area
+      '',                                      // 12. Region (formula fills this)
+      'Trinidad',                              // 13. Island
+      crime.source_url || '',                  // 14. URL
+      '',                                      // 15. Source (formula fills this)
+      confidence,                              // 16. Confidence
+      (ambiguities || []).join('; '),          // 17. Ambiguities
+      'pending',                               // 18. Status
+      ''                                       // 19. Notes
     ]);
 
     Logger.log(`⚠️ Added to review queue: ${crime.headline}`);
@@ -357,7 +365,8 @@ function processReadyArticles() {
  * @returns {string} Normalized URL (article ID for Trinidad Express, original URL otherwise)
  */
 function normalizeUrl(url) {
-  if (!url) return url;
+  // ← CRITICAL FIX: Ensure url is a string before calling .match()
+  if (!url || typeof url !== 'string') return url;
 
   // Trinidad Express: Extract article ID (article_UUID.html)
   const expressMatch = url.match(/article_([a-f0-9-]+)\.html/i);
@@ -383,7 +392,7 @@ function isDuplicateCrime(sheet, crime, geocoded) {
       return false; // Empty sheet
     }
 
-    const dataRange = sheet.getRange(2, 1, lastRow - 1, 10);
+    const dataRange = sheet.getRange(2, 1, lastRow - 1, 15);
     const data = dataRange.getValues();
 
     // Extract victim name from crime if available
@@ -392,13 +401,15 @@ function isDuplicateCrime(sheet, crime, geocoded) {
                        : null;
 
     for (let row of data) {
-      const existingDate = row[0];
-      const existingHeadline = row[1];
-      const existingCrimeType = row[2];
-      const existingArea = row[5];
-      const existingUrl = row[7];
-      const existingLat = row[8];
-      const existingLng = row[9];
+      // ← UPDATED column indices to match new order
+      const existingHeadline = row[0];  // Column A: Headline
+      const existingCrimeType = row[4];  // Column E: crimeType (backward compat)
+      const existingDate = row[5];       // Column F: Date
+      const existingStreet = row[6];     // Column G: Street Address
+      const existingLat = row[7];        // Column H: Latitude
+      const existingLng = row[8];        // Column I: Longitude
+      const existingArea = row[10];      // Column K: Area
+      const existingUrl = row[13];       // Column N: URL
 
       // ═══════════════════════════════════════════════════════════
       // PRE-CHECK: Same exact coordinates + same date + same crime type + some headline similarity
@@ -482,7 +493,7 @@ function isDuplicateCrime(sheet, crime, geocoded) {
       const normalizedNewUrl = normalizeUrl(crime.source_url);
 
       if (normalizedExistingUrl === normalizedNewUrl && normalizedExistingUrl && normalizedNewUrl) {
-        const existingStreet = row[6] || '';
+        // existingStreet already defined above (row[6])
         const existingLocationText = `${existingArea} ${existingStreet}`.toLowerCase();
         const newLocationText = `${crime.area || ''} ${crime.street || ''}`.toLowerCase();
 
@@ -606,8 +617,7 @@ function isDuplicateCrime(sheet, crime, geocoded) {
         const existingDateStr = Utilities.formatDate(new Date(existingDate), Session.getScriptTimeZone(), 'yyyy-MM-dd');
 
         if (existingDateStr === crime.crime_date && existingCrimeType === crime.crime_type) {
-          // Get all location text from both crimes
-          const existingStreet = row[6] || '';
+          // Get all location text from both crimes (existingStreet already defined above)
           const existingLocationText = `${existingArea} ${existingStreet}`.toLowerCase();
           const newLocationText = `${crime.area || ''} ${crime.street || ''}`.toLowerCase();
 

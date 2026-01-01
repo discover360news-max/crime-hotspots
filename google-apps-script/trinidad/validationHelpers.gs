@@ -87,9 +87,9 @@ function spotCheckProduction(numToCheck = 10) {
       rowIssues.push(`❌ MAJOR: Invalid or missing date`);
     } else {
       const year = crimeDate.getFullYear();
-      if (year < 2024 || year > 2026) {
-        rowIssues.push(`❌ MAJOR: Date is ${year}, expected 2024-2026`);
-      } else if (year !== 2025) {
+      if (year < 2024 || year > 2027) {
+        rowIssues.push(`❌ MAJOR: Date is ${year}, expected 2024-2027`);
+      } else if (year !== 2026) {
         rowIssues.push(`⚠️ Minor: Date is ${year}, verify if correct`);
       }
     }

@@ -8,6 +8,8 @@ interface Crime {
   date: string;
   headline: string;
   crimeType: string;
+  primaryCrimeType?: string; // New 2026 field
+  relatedCrimeTypes?: string; // New 2026 field (comma-separated)
   street: string;
   area: string;
   region: string;
@@ -94,9 +96,23 @@ function applyAllFilters(callbacks: {
     });
   }
 
-  // Apply crime type filter
+  // Apply crime type filter (check primary, legacy, and related crime types)
   if (activeCrimeTypeFilter && activeCrimeTypeFilter !== 'All') {
-    filteredCrimes = filteredCrimes.filter((crime: Crime) => crime.crimeType === activeCrimeTypeFilter);
+    filteredCrimes = filteredCrimes.filter((crime: Crime) => {
+      // Check if primaryCrimeType matches
+      if (crime.primaryCrimeType === activeCrimeTypeFilter) return true;
+
+      // Check if crimeType matches (fallback for old data)
+      if (crime.crimeType === activeCrimeTypeFilter) return true;
+
+      // Check if relatedCrimeTypes contains the target type
+      if (crime.relatedCrimeTypes) {
+        const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
+        if (relatedTypes.includes(activeCrimeTypeFilter)) return true;
+      }
+
+      return false;
+    });
     console.log(`📊 Filtered to ${filteredCrimes.length} ${activeCrimeTypeFilter} incidents`);
   }
 

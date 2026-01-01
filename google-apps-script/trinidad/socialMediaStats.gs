@@ -1,32 +1,83 @@
 /**
  * SOCIAL MEDIA STATS GENERATOR
  *
- * Automatically generates social media post text with crime statistics
- * Calculates current 7 days vs previous 7 days comparison
- * Outputs to "Social Posts" sheet for easy copy/paste
+ * THREE MODES FOR GENERATING CRIME STATISTICS:
+ * 1. Daily Stats (Automatic with 3-day lag)
+ * 2. Monthly Stats (Automatic on 5th of month)
+ * 3. Custom Stats (Manual for any date range)
  *
  * SETUP:
  * 1. Copy this script to your Trinidad Google Apps Script project
- * 2. Set Script Property:
- *    - TRINIDAD_CSV_URL: Your published Production sheet CSV URL
- *      Example: https://docs.google.com/spreadsheets/d/e/.../pub?gid=1749261532&single=true&output=csv
- * 3. Run setupSocialPostsSheet() once to create the output sheet
- * 4. Optional: Create time-based trigger for generateDailyStats() at 3 PM daily
+ * 2. Run setupScriptProperties() to set CSV URL
+ * 3. Run setupSocialPostsSheet() to create output sheet
+ * 4. Optional automation:
+ *    - Run setupDailyTrigger() for weekly stats at 3 PM daily
+ *    - Run setupMonthlyTrigger() for monthly stats on 5th at 9 AM
  *
- * USAGE:
- * - Manual: Run generateDailyStats() anytime you want fresh stats
- * - Automatic: Set up daily trigger (see setupDailyTrigger function below)
- * - View results in "Social Posts" sheet tab
+ * ========================================
+ * MODE 1: DAILY WEEKLY STATS (WITH LAG)
+ * ========================================
+ * Function: generateDailyStats()
+ * Purpose: Weekly crime comparison with 3-day reporting lag
+ * Schedule: Daily at 3 PM (optional trigger)
  *
- * REPORTING LAG:
- * - Accounts for 2-day reporting delay (crimes happen before they're reported)
- * - On Dec 25, generates stats for Dec 17-23 (ending 2 days ago)
- * - Ensures comparison uses COMPLETE data for both weeks
- * - Adjust SOCIAL_CONFIG.lagDays if your reporting delay changes
+ * How it works:
+ * - Uses 3-day lag to ensure complete data
+ * - On Dec 31: Compares Dec 21-27 vs Dec 14-20
+ * - Both weeks are complete (crimes have had 4+ days to be reported)
  *
+ * Usage:
+ * - Manual: Run generateDailyStats() anytime
+ * - Auto: Run setupDailyTrigger() once to enable daily automation
+ *
+ * ========================================
+ * MODE 2: MONTHLY STATS (NO LAG)
+ * ========================================
+ * Function: generateMonthlyStats(year, month)
+ * Purpose: Full month comparison for comprehensive reviews
+ * Schedule: 5th of month at 9 AM (optional trigger)
+ *
+ * How it works:
+ * - Run on 5th of month to get complete previous month data
+ * - On Jan 5: Compares Dec 1-31 vs Nov 1-30
+ * - Gives 5 days for December crimes to be fully reported
+ *
+ * Usage:
+ * - Easy mode: Run generateMonthlyStatsWithPrompt() - prompts for year/month
+ * - Script mode: generateMonthlyStats(2025, 12) for December 2025
+ * - Auto: Run setupMonthlyTrigger() once to enable monthly automation
+ *
+ * ========================================
+ * MODE 3: CUSTOM STATS (NO LAG)
+ * ========================================
+ * Function: generateCustomStats(startDateStr, endDateStr)
+ * Purpose: Analyze any specific date range
+ * Schedule: Manual only
+ *
+ * How it works:
+ * - You specify exact start and end dates
+ * - No lag applied - uses dates you provide
+ * - Compares against previous period of same duration
+ *
+ * Usage:
+ * - Easy mode: Run generateCustomStatsWithPrompt() - prompts for dates
+ * - Script mode: generateCustomStats('2025-12-01', '2025-12-31') - Full December
+ * - Script mode: generateCustomStats('2025-12-21', '2025-12-27') - Specific week
+ *
+ * ========================================
+ * OUTPUT:
+ * ========================================
+ * All modes save to "Social Posts" sheet with three versions:
+ * - Long (Facebook/WhatsApp)
+ * - Medium (Instagram)
+ * - Short (Twitter/X)
+ *
+ * ========================================
  * YEAR TRANSITIONS:
- * - When year changes (e.g., 2025 → 2026), update TRINIDAD_CSV_URL to point to new year sheet
- * - First 2 weeks of new year may have incomplete data (this is acceptable)
+ * ========================================
+ * When year changes (e.g., 2025 → 2026):
+ * - Update TRINIDAD_CSV_URL Script Property to point to new year sheet
+ * - First 2 weeks of new year may have incomplete data (acceptable)
  */
 
 const SOCIAL_CONFIG = {
@@ -34,7 +85,7 @@ const SOCIAL_CONFIG = {
   sheetName: 'Social Posts',
   dashboardUrl: 'https://crimehotspots.com/trinidad/dashboard',
   timezone: 'America/Port_of_Spain', // Trinidad timezone
-  lagDays: 3 // Typical reporting delay: crimes from 3 days ago
+  lagDays: 3 // Reporting delay: crimes take ~3 days to be fully reported
 };
 
 /**
@@ -52,17 +103,23 @@ function generateDailyStats() {
     // Calculate date ranges (accounting for reporting lag)
     const now = new Date();
 
-    // Account for 2-day reporting lag
+    // Account for reporting lag: end week on (today - lagDays - 1) to ensure complete data
+    // Example: On Dec 31 with 3-day lag, end on Dec 27 (giving time for Dec 27 crimes to be reported by Dec 30)
     const currentWeekEnd = new Date(now);
-    currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays);
+    currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays - 1);
+    currentWeekEnd.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
 
     const currentWeekStart = new Date(currentWeekEnd);
-    currentWeekStart.setDate(currentWeekStart.getDate() - 6); // Last 7 days
+    currentWeekStart.setDate(currentWeekStart.getDate() - 6); // 7-day week
+    currentWeekStart.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
 
     const previousWeekEnd = new Date(currentWeekStart);
     previousWeekEnd.setDate(previousWeekEnd.getDate() - 1); // Day before current week
+    previousWeekEnd.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+
     const previousWeekStart = new Date(previousWeekEnd);
     previousWeekStart.setDate(previousWeekStart.getDate() - 6); // Previous 7 days
+    previousWeekStart.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
 
     Logger.log(`📅 Current week: ${formatDateShort(currentWeekStart)} - ${formatDateShort(currentWeekEnd)}`);
     Logger.log(`📅 Previous week: ${formatDateShort(previousWeekStart)} - ${formatDateShort(previousWeekEnd)}`);
@@ -84,6 +141,276 @@ function generateDailyStats() {
     saveToSheet(posts, stats);
 
     Logger.log('✅ Social media stats generated successfully!');
+    Logger.log(`📝 Check the "${SOCIAL_CONFIG.sheetName}" sheet for results`);
+
+    return posts;
+
+  } catch (error) {
+    Logger.log(`❌ Error: ${error.message}`);
+    Logger.log(error.stack);
+    throw error;
+  }
+}
+
+/**
+ * Generate monthly stats with UI prompts (run this from menu)
+ * Prompts you to enter year and month
+ */
+function generateMonthlyStatsWithPrompt() {
+  const ui = SpreadsheetApp.getUi();
+
+  // Prompt for year
+  const yearResult = ui.prompt(
+    'Generate Monthly Stats - Step 1 of 2',
+    'Enter the year (e.g., 2025):',
+    ui.ButtonSet.OK_CANCEL
+  );
+
+  if (yearResult.getSelectedButton() !== ui.Button.OK) {
+    ui.alert('Cancelled', 'Monthly stats generation cancelled.', ui.ButtonSet.OK);
+    return;
+  }
+
+  const year = parseInt(yearResult.getResponseText().trim());
+
+  if (isNaN(year) || year < 2020 || year > 2030) {
+    ui.alert('Invalid Year', 'Please enter a valid year between 2020 and 2030.', ui.ButtonSet.OK);
+    return;
+  }
+
+  // Prompt for month
+  const monthResult = ui.prompt(
+    'Generate Monthly Stats - Step 2 of 2',
+    'Enter the month (1-12, where 1=January, 12=December):',
+    ui.ButtonSet.OK_CANCEL
+  );
+
+  if (monthResult.getSelectedButton() !== ui.Button.OK) {
+    ui.alert('Cancelled', 'Monthly stats generation cancelled.', ui.ButtonSet.OK);
+    return;
+  }
+
+  const month = parseInt(monthResult.getResponseText().trim());
+
+  if (isNaN(month) || month < 1 || month > 12) {
+    ui.alert('Invalid Month', 'Please enter a valid month between 1 and 12.', ui.ButtonSet.OK);
+    return;
+  }
+
+  // Get month name for confirmation
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthName = monthNames[month - 1];
+
+  // Confirm before running
+  const confirm = ui.alert(
+    'Confirm',
+    `Generate stats for ${monthName} ${year}?`,
+    ui.ButtonSet.YES_NO
+  );
+
+  if (confirm === ui.Button.YES) {
+    generateMonthlyStats(year, month);
+    ui.alert('✅ Success!',
+             `Monthly stats for ${monthName} ${year} generated successfully!\n\nCheck the "Social Posts" sheet for results.`,
+             ui.ButtonSet.OK);
+  } else {
+    ui.alert('Cancelled', 'Monthly stats generation cancelled.', ui.ButtonSet.OK);
+  }
+}
+
+/**
+ * Generate monthly stats comparing current month vs previous month
+ * Run this on the 5th of each month to get complete previous month data
+ *
+ * @param {number} year - Year (e.g., 2025)
+ * @param {number} month - Month (1-12, where 1 = January)
+ *
+ * Example usage:
+ *   generateMonthlyStats(2025, 12)  // December 2025 stats
+ *   OR use generateMonthlyStatsWithPrompt() for UI prompts
+ */
+function generateMonthlyStats(year, month) {
+  // Validate parameters
+  if (!year || !month) {
+    throw new Error('Missing parameters! Use generateMonthlyStatsWithPrompt() for UI prompts, or call generateMonthlyStats(year, month) with parameters.');
+  }
+
+  Logger.log(`🚀 Generating monthly stats for ${year}-${month}...`);
+
+  try {
+    // Fetch and parse CSV data
+    const crimes = fetchCrimeData();
+    Logger.log(`📊 Fetched ${crimes.length} total crimes from CSV`);
+
+    // Current month date range (use noon to avoid timezone issues)
+    const currentMonthStart = new Date(year, month - 1, 1, 12, 0, 0, 0); // First day at noon
+    const currentMonthEnd = new Date(year, month, 0, 12, 0, 0, 0); // Last day at noon
+
+    // Previous month date range (use noon to avoid timezone issues)
+    const previousMonthStart = new Date(year, month - 2, 1, 12, 0, 0, 0); // First day at noon
+    const previousMonthEnd = new Date(year, month - 1, 0, 12, 0, 0, 0); // Last day at noon
+
+    Logger.log(`📅 Current month: ${formatDateShort(currentMonthStart)} - ${formatDateShort(currentMonthEnd)}`);
+    Logger.log(`📅 Previous month: ${formatDateShort(previousMonthStart)} - ${formatDateShort(previousMonthEnd)}`);
+
+    // Filter crimes for each period
+    const currentMonthCrimes = filterCrimesByDateRange(crimes, currentMonthStart, currentMonthEnd);
+    const previousMonthCrimes = filterCrimesByDateRange(crimes, previousMonthStart, previousMonthEnd);
+
+    Logger.log(`✅ Current month: ${currentMonthCrimes.length} crimes`);
+    Logger.log(`✅ Previous month: ${previousMonthCrimes.length} crimes`);
+
+    // Calculate statistics
+    const stats = calculateStats(currentMonthCrimes, previousMonthCrimes);
+
+    // Generate post texts with month names
+    const posts = generateMonthlyPostTexts(stats, currentMonthStart, currentMonthEnd, previousMonthStart);
+
+    // Save to sheet
+    saveToSheet(posts, stats);
+
+    Logger.log('✅ Monthly stats generated successfully!');
+    Logger.log(`📝 Check the "${SOCIAL_CONFIG.sheetName}" sheet for results`);
+
+    return posts;
+
+  } catch (error) {
+    Logger.log(`❌ Error: ${error.message}`);
+    Logger.log(error.stack);
+    throw error;
+  }
+}
+
+/**
+ * Generate custom stats with UI prompts (run this from menu)
+ * Prompts you to enter start and end dates
+ */
+function generateCustomStatsWithPrompt() {
+  const ui = SpreadsheetApp.getUi();
+
+  // Prompt for start date
+  const startResult = ui.prompt(
+    'Generate Custom Stats - Step 1 of 2',
+    'Enter start date (YYYY-MM-DD format, e.g., 2025-12-21):',
+    ui.ButtonSet.OK_CANCEL
+  );
+
+  if (startResult.getSelectedButton() !== ui.Button.OK) {
+    ui.alert('Cancelled', 'Custom stats generation cancelled.', ui.ButtonSet.OK);
+    return;
+  }
+
+  const startDateStr = startResult.getResponseText().trim();
+
+  // Validate start date format
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(startDateStr)) {
+    ui.alert('Invalid Format', 'Please enter date in YYYY-MM-DD format (e.g., 2025-12-21).', ui.ButtonSet.OK);
+    return;
+  }
+
+  // Prompt for end date
+  const endResult = ui.prompt(
+    'Generate Custom Stats - Step 2 of 2',
+    'Enter end date (YYYY-MM-DD format, e.g., 2025-12-27):',
+    ui.ButtonSet.OK_CANCEL
+  );
+
+  if (endResult.getSelectedButton() !== ui.Button.OK) {
+    ui.alert('Cancelled', 'Custom stats generation cancelled.', ui.ButtonSet.OK);
+    return;
+  }
+
+  const endDateStr = endResult.getResponseText().trim();
+
+  // Validate end date format
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(endDateStr)) {
+    ui.alert('Invalid Format', 'Please enter date in YYYY-MM-DD format (e.g., 2025-12-27).', ui.ButtonSet.OK);
+    return;
+  }
+
+  // Validate end date is after start date
+  if (new Date(endDateStr) < new Date(startDateStr)) {
+    ui.alert('Invalid Range', 'End date must be after start date.', ui.ButtonSet.OK);
+    return;
+  }
+
+  // Confirm before running
+  const confirm = ui.alert(
+    'Confirm',
+    `Generate stats for ${startDateStr} to ${endDateStr}?`,
+    ui.ButtonSet.YES_NO
+  );
+
+  if (confirm === ui.Button.YES) {
+    generateCustomStats(startDateStr, endDateStr);
+    ui.alert('✅ Success!',
+             `Custom stats for ${startDateStr} to ${endDateStr} generated successfully!\n\nCheck the "Social Posts" sheet for results.`,
+             ui.ButtonSet.OK);
+  } else {
+    ui.alert('Cancelled', 'Custom stats generation cancelled.', ui.ButtonSet.OK);
+  }
+}
+
+/**
+ * Generate custom stats for any date range (NO lag applied)
+ * Use this for manual analysis of specific periods
+ *
+ * @param {string} startDateStr - Start date in YYYY-MM-DD format (e.g., '2025-12-01')
+ * @param {string} endDateStr - End date in YYYY-MM-DD format (e.g., '2025-12-31')
+ *
+ * Example usage:
+ *   generateCustomStats('2025-12-01', '2025-12-31')  // Full December
+ *   generateCustomStats('2025-12-21', '2025-12-27')  // Specific week
+ *   OR use generateCustomStatsWithPrompt() for UI prompts
+ */
+function generateCustomStats(startDateStr, endDateStr) {
+  // Validate parameters
+  if (!startDateStr || !endDateStr) {
+    throw new Error('Missing parameters! Use generateCustomStatsWithPrompt() for UI prompts, or call generateCustomStats(startDate, endDate) with parameters.');
+  }
+
+  Logger.log(`🚀 Generating custom stats for ${startDateStr} to ${endDateStr}...`);
+
+  try {
+    // Fetch and parse CSV data
+    const crimes = fetchCrimeData();
+    Logger.log(`📊 Fetched ${crimes.length} total crimes from CSV`);
+
+    // Parse dates (use noon to avoid timezone issues)
+    const currentStart = new Date(startDateStr + 'T12:00:00');
+    const currentEnd = new Date(endDateStr + 'T12:00:00');
+
+    // Calculate previous period (same duration, immediately before)
+    const duration = Math.ceil((currentEnd - currentStart) / (1000 * 60 * 60 * 24)); // Days
+    const previousEnd = new Date(currentStart);
+    previousEnd.setDate(previousEnd.getDate() - 1);
+    previousEnd.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+
+    const previousStart = new Date(previousEnd);
+    previousStart.setDate(previousStart.getDate() - duration + 1);
+    previousStart.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+
+    Logger.log(`📅 Current period: ${formatDateShort(currentStart)} - ${formatDateShort(currentEnd)} (${duration} days)`);
+    Logger.log(`📅 Previous period: ${formatDateShort(previousStart)} - ${formatDateShort(previousEnd)} (${duration} days)`);
+
+    // Filter crimes for each period
+    const currentCrimes = filterCrimesByDateRange(crimes, currentStart, currentEnd);
+    const previousCrimes = filterCrimesByDateRange(crimes, previousStart, previousEnd);
+
+    Logger.log(`✅ Current period: ${currentCrimes.length} crimes`);
+    Logger.log(`✅ Previous period: ${previousCrimes.length} crimes`);
+
+    // Calculate statistics
+    const stats = calculateStats(currentCrimes, previousCrimes);
+
+    // Generate post texts
+    const posts = generatePostTexts(stats, currentStart, currentEnd);
+
+    // Save to sheet
+    saveToSheet(posts, stats);
+
+    Logger.log('✅ Custom stats generated successfully!');
     Logger.log(`📝 Check the "${SOCIAL_CONFIG.sheetName}" sheet for results`);
 
     return posts;
@@ -373,6 +700,115 @@ ${SOCIAL_CONFIG.dashboardUrl}
 }
 
 /**
+ * Generate monthly post texts (similar to generatePostTexts but with month names)
+ */
+function generateMonthlyPostTexts(stats, currentMonthStart, currentMonthEnd, previousMonthStart) {
+  // Format month names
+  const currentMonthName = Utilities.formatDate(currentMonthStart, SOCIAL_CONFIG.timezone, 'MMMM yyyy');
+  const previousMonthName = Utilities.formatDate(previousMonthStart, SOCIAL_CONFIG.timezone, 'MMMM yyyy');
+
+  // Top 3-5 crime types for display
+  const topCrimes = stats.changes.slice(0, 5).filter(c => c.current > 0);
+
+  // Calculate total incidents comparison
+  const totalDiff = stats.totalCurrent - stats.totalPrevious;
+  const totalPercentChange = stats.totalPrevious > 0 ? ((totalDiff / stats.totalPrevious) * 100) : 0;
+  const totalArrow = totalDiff > 0 ? '↑' : (totalDiff < 0 ? '↓' : '→');
+  const totalSign = totalDiff >= 0 ? '+' : '';
+  const totalTrend = `${stats.totalCurrent} incidents (${totalSign}${totalDiff}, ${totalArrow}${Math.abs(Math.round(totalPercentChange))}% vs ${previousMonthName})`;
+
+  // Build crime type lines
+  const crimeLines = topCrimes.map(c => {
+    const sign = c.diff >= 0 ? '+' : '';
+    return `• ${c.type}: ${c.current} incidents (${sign}${c.diff}, ${c.arrow}${Math.abs(Math.round(c.percentChange))}%)`;
+  }).join('\n');
+
+  // Build hotspots line
+  const hotspots = stats.topAreas.map(a => `${a.area} (${a.count})`).join(', ');
+
+  // LONG VERSION (Facebook, WhatsApp)
+  const longPost = `🇹🇹 Trinidad Crime Report - ${currentMonthName}
+
+📊 Total: ${totalTrend}
+
+Top Crime Types:
+${crimeLines}
+
+🔥 Hotspots: ${hotspots}
+
+View interactive dashboard: ${SOCIAL_CONFIG.dashboardUrl}
+
+#Trinidad #TnT #CrimeStats #PublicSafety #CaribbeanCrime`;
+
+  // Handle empty data case
+  if (topCrimes.length === 0 || stats.topAreas.length === 0) {
+    const emptyPost = `🇹🇹 Trinidad Crime Report - ${currentMonthName}
+
+✅ No crimes reported in this period.
+
+This is excellent news for public safety!
+
+View dashboard: ${SOCIAL_CONFIG.dashboardUrl}
+
+#Trinidad #TnT #CrimeStats #PublicSafety`;
+
+    return {
+      long: emptyPost,
+      medium: emptyPost,
+      short: emptyPost,
+      charCounts: {
+        long: emptyPost.length,
+        medium: emptyPost.length,
+        short: emptyPost.length
+      }
+    };
+  }
+
+  // MEDIUM VERSION (Instagram)
+  const mediumCrimeLines = topCrimes.slice(0, 3).map(c => {
+    const sign = c.diff >= 0 ? '+' : '';
+    return `• ${c.type}: ${c.current} (${sign}${c.diff}, ${c.arrow}${Math.abs(Math.round(c.percentChange))}%)`;
+  }).join('\n');
+
+  const mediumPost = `🇹🇹 ${currentMonthName} Crime Report
+
+📊 Total: ${totalTrend}
+
+${mediumCrimeLines}
+
+🔥 Top: ${stats.topAreas[0].area} (${stats.topAreas[0].count})
+
+View dashboard: ${SOCIAL_CONFIG.dashboardUrl}
+
+#Trinidad #CrimeStats #PublicSafety`;
+
+  // SHORT VERSION (Twitter/X - must be under 280 chars)
+  const topCrime = topCrimes[0];
+  const sign = topCrime.diff >= 0 ? '+' : '';
+
+  const shortPost = `🇹🇹 ${currentMonthName} Crime
+
+Total: ${stats.totalCurrent} (${totalSign}${totalDiff})
+Top: ${topCrime.type} (${topCrime.current})
+Hotspot: ${stats.topAreas[0].area}
+
+${SOCIAL_CONFIG.dashboardUrl}
+
+#Trinidad #CrimeStats`;
+
+  return {
+    long: longPost,
+    medium: mediumPost,
+    short: shortPost,
+    charCounts: {
+      long: longPost.length,
+      medium: mediumPost.length,
+      short: shortPost.length
+    }
+  };
+}
+
+/**
  * Save generated posts to sheet
  */
 function saveToSheet(posts, stats) {
@@ -524,6 +960,52 @@ function setupDailyTrigger() {
 }
 
 /**
+ * SETUP FUNCTION: Create monthly trigger (runs on 5th of month at 9 AM Trinidad time)
+ * Run this once to enable automatic monthly stats
+ */
+function setupMonthlyTrigger() {
+  // Delete existing monthly triggers first
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(trigger => {
+    if (trigger.getHandlerFunction() === 'generateMonthlyStatsAuto') {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  });
+
+  // Create new trigger: Monthly on the 5th at 9 AM
+  ScriptApp.newTrigger('generateMonthlyStatsAuto')
+    .timeBased()
+    .onMonthDay(5) // Run on the 5th of each month
+    .atHour(9) // 9 AM
+    .inTimezone(SOCIAL_CONFIG.timezone)
+    .create();
+
+  Logger.log('✅ Monthly trigger created (5th of month at 9 AM Trinidad time)');
+
+  const ui = SpreadsheetApp.getUi();
+  ui.alert('✅ Monthly Automation Enabled!',
+           'Stats will auto-generate on the 5th of each month at 9 AM Trinidad time.\n\nResults appear in the "Social Posts" sheet.',
+           ui.ButtonSet.OK);
+}
+
+/**
+ * AUTO FUNCTION: Called by monthly trigger
+ * Automatically generates stats for previous month
+ */
+function generateMonthlyStatsAuto() {
+  const now = new Date();
+
+  // Get previous month
+  const previousMonth = now.getMonth(); // 0-11 (current month is Jan, we want Dec)
+  const year = previousMonth === 0 ? now.getFullYear() - 1 : now.getFullYear();
+  const month = previousMonth === 0 ? 12 : previousMonth;
+
+  Logger.log(`🤖 Auto-generating monthly stats for ${year}-${month}...`);
+
+  generateMonthlyStats(year, month);
+}
+
+/**
  * DIAGNOSTIC FUNCTION: Check what dates are in your CSV
  * Run this to debug date filtering issues
  */
@@ -559,9 +1041,11 @@ function debugDates() {
   // Show what the script is looking for (with lag adjustment)
   const now = new Date();
   const currentWeekEnd = new Date(now);
-  currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays);
+  currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays - 1);
+  currentWeekEnd.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
   const currentWeekStart = new Date(currentWeekEnd);
   currentWeekStart.setDate(currentWeekStart.getDate() - 6);
+  currentWeekStart.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
 
   Logger.log(`\n🎯 Script is looking for crimes between:`);
   Logger.log(`  ${currentWeekStart} and ${currentWeekEnd}`);
@@ -585,9 +1069,11 @@ function testStatsGeneration() {
 
   const now = new Date();
   const currentWeekEnd = new Date(now);
-  currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays);
+  currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays - 1);
+  currentWeekEnd.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
   const currentWeekStart = new Date(currentWeekEnd);
   currentWeekStart.setDate(currentWeekStart.getDate() - 6);
+  currentWeekStart.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
 
   const currentWeekCrimes = filterCrimesByDateRange(crimes, currentWeekStart, currentWeekEnd);
   Logger.log(`✅ Current week: ${currentWeekCrimes.length} crimes`);

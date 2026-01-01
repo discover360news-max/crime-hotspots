@@ -1,14 +1,30 @@
 # Social Media Stats Generator - Setup Guide
 
 **Created:** December 25, 2025
+**Updated:** January 1, 2026
 **Purpose:** Automatically generate social media post text from Trinidad crime data
 
 ---
 
 ## 📋 What This Does
 
-Generates ready-to-copy social media posts with:
-- **Last 7 days vs Previous 7 days** crime comparison
+**THREE MODES FOR GENERATING STATS:**
+
+1. **Daily Weekly Stats** (Automated with 3-day lag)
+   - Last 7 days vs Previous 7 days comparison
+   - Uses reporting lag to ensure complete data
+   - Optional automation: runs daily at 3 PM
+
+2. **Monthly Stats** (Automated, no lag)
+   - Full month vs previous month comparison
+   - Perfect for comprehensive monthly reviews
+   - Optional automation: runs 5th of month at 9 AM
+
+3. **Custom Stats** (Manual, no lag)
+   - ANY date range you specify
+   - Perfect for ad-hoc analysis
+
+**All modes generate:**
 - **Top 5 crime types** with percentage changes (↑ or ↓)
 - **Top 3 hotspot areas**
 - **3 formats:** Long (Facebook/WhatsApp), Medium (Instagram), Short (Twitter/X)
@@ -115,19 +131,73 @@ View interactive dashboard: https://crimehotspots.com/trinidad/dashboard
 
 ## 📱 How to Use
 
-### Manual Generation (Anytime)
+### MODE 1: Daily Weekly Stats
+
+**Easy Mode (UI Prompts):**
+- Not needed - just run `generateDailyStats()` directly
+
+**Manual Generation:**
+1. In Apps Script, find function: `generateDailyStats`
+2. Click **Run** (▶️)
+3. Automatically uses 3-day lag for complete data
+4. Example: On Jan 1, generates Dec 25-31 vs Dec 18-24
+
+**Automation (Optional):**
+1. Run `setupDailyTrigger()`
+2. Stats auto-generate daily at 3 PM Trinidad time
+
+---
+
+### MODE 2: Monthly Stats
+
+**Easy Mode (UI Prompts):**
+1. In Apps Script, find function: `generateMonthlyStatsWithPrompt`
+2. Click **Run** (▶️)
+3. Enter year when prompted (e.g., 2025)
+4. Enter month when prompted (1-12, where 12 = December)
+5. Confirm and generate!
+
+**Script Mode:**
+1. In Apps Script, find function: `generateMonthlyStats`
+2. Edit the function call to: `generateMonthlyStats(2025, 12)` for December 2025
+3. Click **Run** (▶️)
+
+**Automation (Optional):**
+1. Run `setupMonthlyTrigger()`
+2. Stats auto-generate on 5th of month at 9 AM Trinidad time
+3. Always generates previous month (e.g., on Jan 5, generates December stats)
+
+---
+
+### MODE 3: Custom Stats
+
+**Easy Mode (UI Prompts):**
+1. In Apps Script, find function: `generateCustomStatsWithPrompt`
+2. Click **Run** (▶️)
+3. Enter start date when prompted (format: YYYY-MM-DD, e.g., 2025-12-01)
+4. Enter end date when prompted (format: YYYY-MM-DD, e.g., 2025-12-31)
+5. Confirm and generate!
+
+**Script Mode:**
+1. In Apps Script, find function: `generateCustomStats`
+2. Edit the function call to: `generateCustomStats('2025-12-01', '2025-12-31')`
+3. Click **Run** (▶️)
+
+**Examples:**
+- Full December: `generateCustomStats('2025-12-01', '2025-12-31')`
+- Specific week: `generateCustomStats('2025-12-21', '2025-12-27')`
+- Holiday period: `generateCustomStats('2025-12-23', '2026-01-02')`
+
+---
+
+### Viewing Your Generated Posts
+
+**All modes save results to the same place:**
 
 1. Open your Trinidad Google Sheet
-2. Click **Extensions** → **Apps Script**
-3. Find function: `generateDailyStats`
-4. Click **Run** (▶️)
-5. Go to "Social Posts" sheet and copy the text you need
-
-### Automatic Generation (If trigger is set up)
-
-1. Every day at 3 PM, check the "Social Posts" sheet
-2. Copy the latest row (top row below headers)
-3. Paste to your platforms:
+2. Click the **"Social Posts"** tab
+3. Copy the latest row (top row below headers)
+4. Use the appropriate column for each platform:
    - **Facebook/WhatsApp:** Column B (Long Post)
    - **Instagram:** Column C (Medium Post)
    - **Twitter/X:** Column D (Short Post)
