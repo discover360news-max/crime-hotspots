@@ -204,6 +204,7 @@ export function updateQuickInsights(crimes: Crime[]) {
   // If no crimes, show "No data" message
   if (crimes.length === 0) {
     const avgPerDayEl = document.getElementById('avgPerDay');
+    const totalVictimsEl = document.getElementById('totalVictims');
     const mostDangerousDayEl = document.getElementById('mostDangerousDay');
     const busiestMonthEl = document.getElementById('busiestMonth');
     const top3PercentageEl = document.getElementById('top3Percentage');
@@ -213,6 +214,7 @@ export function updateQuickInsights(crimes: Crime[]) {
     const safestRegionCountEl = document.getElementById('safestRegionCount');
 
     if (avgPerDayEl) avgPerDayEl.textContent = 'No data';
+    if (totalVictimsEl) totalVictimsEl.textContent = '0 total victims';
     if (mostDangerousDayEl) mostDangerousDayEl.textContent = 'N/A';
     if (busiestMonthEl) busiestMonthEl.textContent = 'N/A';
     if (top3PercentageEl) top3PercentageEl.textContent = 'N/A';
@@ -230,7 +232,37 @@ export function updateQuickInsights(crimes: Crime[]) {
   const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
   const daysDiff = Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-  const avgPerDay = (crimes.length / daysDiff).toFixed(1);
+  // Calculate total crimes (primary + related)
+  const totalCrimes = crimes.reduce((sum, crime) => {
+    let crimeCount = 0;
+
+    // Count primary crime type
+    if (crime.primaryCrimeType || crime.crimeType) {
+      crimeCount += 1;
+    }
+
+    // Count related crimes
+    if (crime.relatedCrimeTypes) {
+      const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim()).filter(t => t);
+      crimeCount += relatedTypes.length;
+    }
+
+    return sum + crimeCount;
+  }, 0);
+
+  // Calculate total victims (respecting victimCount config)
+  const totalVictims = crimes.reduce((sum, crime) => {
+    const primaryType = crime.primaryCrimeType || crime.crimeType;
+
+    if (primaryType && usesVictimCount(primaryType)) {
+      const victimCount = Number(crime.victimCount) || 1;
+      return sum + victimCount;
+    }
+
+    return sum + 1; // Count as 1 if crime type doesn't use victim count
+  }, 0);
+
+  const avgPerDay = (totalCrimes / daysDiff).toFixed(1);
 
   // Most dangerous day
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -269,6 +301,7 @@ export function updateQuickInsights(crimes: Crime[]) {
 
   // Update DOM using IDs
   const avgPerDayEl = document.getElementById('avgPerDay');
+  const totalVictimsEl = document.getElementById('totalVictims');
   const mostDangerousDayEl = document.getElementById('mostDangerousDay');
   const busiestMonthEl = document.getElementById('busiestMonth');
   const top3PercentageEl = document.getElementById('top3Percentage');
@@ -278,6 +311,7 @@ export function updateQuickInsights(crimes: Crime[]) {
   const safestRegionCountEl = document.getElementById('safestRegionCount');
 
   if (avgPerDayEl) avgPerDayEl.textContent = `${avgPerDay} crimes/day`;
+  if (totalVictimsEl) totalVictimsEl.textContent = `${totalVictims} total victims`;
   if (mostDangerousDayEl) mostDangerousDayEl.textContent = mostDangerousDay;
   if (busiestMonthEl) busiestMonthEl.textContent = busiestMonth;
   if (top3PercentageEl) top3PercentageEl.textContent = `Top 3 areas: ${top3Percentage}%`;

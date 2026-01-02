@@ -8,6 +8,7 @@
 interface Props {
   insights: {
     avgPerDay: string;
+    totalVictims: number;
     mostDangerousDay: string;
     busiestMonth: string;
     top3Percentage: string;
@@ -35,6 +36,7 @@ const { insights, busiestLabel = 'Busiest Month' } = Astro.props;
       <div class="flex-1 min-w-0">
         <div class="text-xs text-slate-500 mb-1">Daily Avg</div>
         <div id="avgPerDay" class="text-sm md:text-lg font-bold text-slate-600 break-words">{insights.avgPerDay} crimes/day</div>
+        <div id="totalVictims" class="text-xs text-slate-500 mt-0.5">{insights.totalVictims} total victims</div>
       </div>
     </div>
 

@@ -4,6 +4,7 @@ import DashboardModal from '../components/DashboardModal.astro';
 import HeadlinesModal from '../components/HeadlinesModal.astro';
 import ArchivesModal from '../components/ArchivesModal.astro';
 import SearchModal from '../components/SearchModal.astro';
+import CrimeDetailModal from '../components/CrimeDetailModal.astro';
 
 interface Props {
   title: string;
@@ -211,6 +212,9 @@ const isHomepage = Astro.url.pathname === '/';
 
   <!-- Archives Selection Modal -->
   <ArchivesModal />
+
+  <!-- Crime Detail Modal -->
+  <CrimeDetailModal />
 
   <!-- Main Content -->
   <main data-pagefind-body>

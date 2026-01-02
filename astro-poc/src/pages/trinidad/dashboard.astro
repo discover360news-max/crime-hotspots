@@ -8,6 +8,7 @@ import Layout from '../../layouts/Layout.astro';
 import { getTrinidadCrimes } from '../../lib/crimeData';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import StatCard from '../../components/StatCard.astro';
+import { usesVictimCount } from '../../config/crimeTypeConfig';
 import QuickInsightsCard from '../../components/QuickInsightsCard.astro';
 import TopRegionsCard from '../../components/TopRegionsCard.astro';
 import FiltersTray from '../../components/FiltersTray.astro';
@@ -57,8 +58,38 @@ const calculateInsights = (crimeData: typeof crimes) => {
   const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
   const daysDiff = Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
+  // Calculate total crimes (primary + related)
+  const totalCrimes = crimeData.reduce((sum, crime) => {
+    let crimeCount = 0;
+
+    // Count primary crime type
+    if (crime.primaryCrimeType || crime.crimeType) {
+      crimeCount += 1;
+    }
+
+    // Count related crimes
+    if (crime.relatedCrimeTypes) {
+      const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim()).filter(t => t);
+      crimeCount += relatedTypes.length;
+    }
+
+    return sum + crimeCount;
+  }, 0);
+
+  // Calculate total victims (respecting victimCount config)
+  const totalVictims = crimeData.reduce((sum, crime) => {
+    const primaryType = crime.primaryCrimeType || crime.crimeType;
+
+    if (primaryType && usesVictimCount(primaryType)) {
+      const victimCount = Number(crime.victimCount) || 1;
+      return sum + victimCount;
+    }
+
+    return sum + 1; // Count as 1 if crime type doesn't use victim count
+  }, 0);
+
   // Average crimes per day
-  const avgPerDay = (crimeData.length / daysDiff).toFixed(1);
+  const avgPerDay = (totalCrimes / daysDiff).toFixed(1);
 
   // Most dangerous day of week
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -101,6 +132,7 @@ const calculateInsights = (crimeData: typeof crimes) => {
 
   return {
     avgPerDay,
+    totalVictims,
     mostDangerousDay,
     busiestMonth,
     safestRegion,
