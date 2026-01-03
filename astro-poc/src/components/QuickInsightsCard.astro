@@ -79,12 +79,12 @@ const { insights, busiestLabel = 'Busiest Month' } = Astro.props;
   <div class="pt-4 border-t border-slate-200">
     <div class="grid grid-cols-2 gap-4">
       <div>
-        <div class="text-xs text-slate-400 mb-1">Most Dangerous</div>
+        <div class="text-xs text-slate-400 mb-1">Highest Crimes</div>
         <div id="mostDangerousRegion" class="text-sm font-semibold text-rose-600">{insights.mostDangerousRegion}</div>
         <div id="mostDangerousRegionCount" class="text-xs text-slate-500">{insights.mostDangerousRegionCount} incidents</div>
       </div>
       <div>
-        <div class="text-xs text-slate-400 mb-1">Safest Area</div>
+        <div class="text-xs text-slate-400 mb-1">Lowest Crimes</div>
         <div id="safestRegion" class="text-sm font-semibold text-emerald-600">{insights.safestRegion}</div>
         <div id="safestRegionCount" class="text-xs text-slate-500">{insights.safestRegionCount} incidents</div>
       </div>

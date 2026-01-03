@@ -12,11 +12,109 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Focus:** Trinidad-only implementation (Other islands expansion deferred)
-**Last Updated:** January 1, 2026
+**Last Updated:** January 3, 2026
 
 ---
 
 ## Recent Accomplishments
+
+### January 3, 2026 - Area Tooltips: Dashboard Integration & Mobile Fix
+
+**Problem Solved:**
+Dashboard's "Top Areas" section showed official area names without local aliases. Mobile tooltips had critical bugs: viewport overflow (cut off on left edge) and flash on first click requiring second tap to stay visible.
+
+**Accomplishments:**
+1. **Dashboard Top Areas Integration** ✅
+   - Added `AreaNameTooltip` component to Top Areas card (server-side)
+   - Created `renderAreaName()` helper in `dashboardUpdates.ts` for client-side updates
+   - Dispatches `topAreasRendered` event to reinitialize tooltips after year filter changes
+   - Tooltips show local names (e.g., "Diego Martin North") for official Google Maps names
+
+2. **Mobile Viewport Boundary Detection** ✅
+   - Tooltips now stay within screen bounds with 8px padding
+   - Smart repositioning when tooltip would overflow left or right edge
+   - **Dynamic arrow positioning** - arrow adjusts to point at trigger even when tooltip shifts
+   - Works for both mobile (below) and desktop (above) positioning
+
+3. **Mobile Click Flash Bug Fix** ✅
+   - **Root cause 1:** Duplicate event listeners - `initAreaTooltips()` called multiple times added new listeners without removing old ones
+   - **Root cause 2:** Complex toggle logic with state management caused race conditions between show/hide
+   - **Fix 1:** Added `data-tooltip-initialized` flag to prevent duplicate listener attachment
+   - **Fix 2:** Simplified click logic - tap always shows, tap outside hides (no toggle state)
+   - **Fix 3:** Proper timeout management with `hideTimeout` variable to prevent state clearing race conditions
+
+**Key Learnings:**
+- **Portal pattern is essential** - Appending tooltips to `document.body` with `position: fixed` escapes parent overflow constraints
+- **Prevent duplicate listeners** - Use data attributes to track initialization state when functions run multiple times
+- **Simpler is better** - Complex toggle logic (if showing, hide; else show) causes timing issues. Better: always show on click, let document handler hide
+- **Viewport math matters** - Calculate `leftPos - halfWidth < padding` to detect overflow, adjust position, then recalculate arrow offset
+- **Arrow positioning formula** - `arrowOffset = ((triggerCenter - tooltipLeft) / tooltipWidth) * 100` keeps arrow pointing at trigger
+- **Timeout cleanup prevents bugs** - Clear pending timeouts before creating new ones to avoid state clearing race conditions
+- **Event listener lifecycle** - When dynamically rendering content, either remove old listeners or use flags to prevent duplicate attachment
+
+**Files Modified:**
+- `astro-poc/src/components/TopRegionsCard.astro` (added tooltip integration)
+- `astro-poc/src/scripts/dashboardUpdates.ts` (renderAreaName helper, topAreasRendered event)
+- `astro-poc/src/components/AreaNameTooltip.astro` (viewport detection, duplicate listener prevention, simplified click logic)
+
+**Status:**
+- ✅ Dashboard Top Areas tooltips: Complete
+- ✅ Mobile viewport overflow: Fixed
+- ✅ Mobile click flash bug: Fixed
+
+---
+
+### January 3, 2026 - Headlines Date Accordion & Victim Count Display
+
+**Problem Solved:**
+Headlines page showed flat list of crimes with no date grouping, making it hard to scan chronologically. Accordion headers showed redundant crime counts that didn't emphasize human impact.
+
+**Accomplishments:**
+1. **Date Accordion Grouping** ✅
+   - Created reusable `DateAccordion` component for grouping crimes by date
+   - Accordions show formatted date (e.g., "Friday, January 3, 2026") with expandable crime cards
+   - Most recent date expanded by default, older dates collapsed
+   - Smooth animations with chevron rotation indicators
+   - Bottom padding added to prevent shadow clipping on cards
+
+2. **Smart Display Modes** ✅
+   - **No filters active:** Crimes grouped in date accordions (chronological organization)
+   - **Filters active:** Flat grid view (all matching crimes visible for easy scanning)
+   - Automatic mode switching based on filter state
+   - Event listeners re-attached after dynamic rendering
+
+3. **Victim Count Display** ✅
+   - Replaced "X crimes" with "X victims" in accordion headers
+   - Uses `victimCount` field when available (2026+ data)
+   - Defaults to 1 victim per row for backward compatibility (2025 data)
+   - Calculation: `victimCount > 0 ? victimCount : 1`
+   - Shows human impact instead of incident count
+
+4. **Backward Compatibility** ✅
+   - Server-side and client-side victim count calculation functions
+   - Works seamlessly with both 2025 (no victimCount) and 2026+ (with victimCount) data
+   - No breaking changes to existing crime data structure
+
+**Key Learnings:**
+- **Accordion grouping improves UX** - Date-based organization makes chronological scanning easier
+- **Context-aware UI modes** - Show accordions for browsing, flat grid for searching
+- **Victim count emphasizes impact** - Counting lives affected vs. incidents tells the real story
+- **Reusable components save time** - DateAccordion can be used on archive pages if needed
+- **Shadow clipping is common with overflow:hidden** - Always add bottom padding to accordion content
+
+**Files Created:**
+- `astro-poc/src/components/DateAccordion.astro` (reusable date accordion component)
+
+**Files Modified:**
+- `astro-poc/src/pages/trinidad/headlines.astro` (accordion integration, victim count display, dual-mode rendering)
+
+**Status:**
+- ✅ Date accordion grouping: Complete
+- ✅ Victim count display: Complete
+- ✅ Smart filtering modes: Complete
+- ✅ Shadow padding fix: Complete
+
+---
 
 ### January 1, 2026 - Victim Count System & Manual Workflow Transition
 
@@ -404,6 +502,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   - Button variants, frosted glass, typography, color palette, copy-paste templates
 - `docs/guides/DESIGN-Guidelines.md` - Complete design framework (v2.0)
 - `docs/guides/SEO-Framework.md` - Complete SEO strategy, phased roadmap
+
+**🧩 UI Patterns**
+- `docs/guides/ACCORDION-PATTERN.md` - Date accordion component pattern
+- `docs/guides/INFO-ICON-PATTERN.md` - Info icon hover pattern
 
 **🤖 Automation**
 - `google-apps-script/trinidad/README.md` - Trinidad automation

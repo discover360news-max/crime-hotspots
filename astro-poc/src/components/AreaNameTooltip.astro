@@ -1,0 +1,239 @@
+---
+/**
+ * AreaNameTooltip Component
+ *
+ * Displays an area name with a dotted underline.
+ * Desktop: Hover to show tooltip
+ * Mobile: Tap to toggle tooltip (prevents card click)
+ *
+ * Tooltip is appended to document.body to avoid overflow clipping issues.
+ *
+ * Usage:
+ * <AreaNameTooltip area="Warrenville" localName="Diego Martin North" />
+ *
+ * If localName is empty or same as area, shows plain text (no underline/tooltip).
+ */
+
+interface Props {
+  area: string; // Official Google Maps name
+  localName?: string; // Locally-known name (optional)
+}
+
+const { area, localName } = Astro.props;
+
+// Only show tooltip if localName exists AND is different from area
+const showTooltip = localName && localName.trim() !== '' && localName.trim() !== area.trim();
+---
+
+{showTooltip ? (
+  <span
+    class="area-tooltip-trigger inline-block border-b-2 border-dotted border-slate-400 hover:border-rose-600 cursor-help transition-colors"
+    data-area={area}
+    data-local-name={localName}
+  >
+    {area}
+  </span>
+
+  <script>
+    // Global tooltip element (appended to body to avoid overflow clipping)
+    let currentTooltip: HTMLElement | null = null;
+    let currentTrigger: HTMLElement | null = null;
+    let hideTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    function createTooltip(trigger: HTMLElement): HTMLElement {
+      const localName = trigger.dataset.localName;
+      const tooltip = document.createElement('div');
+
+      tooltip.className = 'area-tooltip-portal fixed bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[13px] leading-snug whitespace-nowrap text-slate-600 shadow-lg z-[9999] pointer-events-none opacity-0 transition-opacity duration-200';
+      tooltip.innerHTML = `
+        Also known as: ${localName}
+        <div class="absolute left-1/2 -translate-x-1/2 border-[5px] border-transparent tooltip-arrow"></div>
+      `;
+
+      document.body.appendChild(tooltip);
+      return tooltip;
+    }
+
+    function positionTooltip(trigger: HTMLElement, tooltip: HTMLElement) {
+      const rect = trigger.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+      const isMobile = window.innerWidth < 640;
+      const viewportWidth = window.innerWidth;
+      const padding = 8; // Minimum padding from viewport edges
+
+      if (isMobile) {
+        // Mobile: Show below
+        let leftPos = rect.left + rect.width / 2;
+        const tooltipWidth = tooltipRect.width;
+        const halfWidth = tooltipWidth / 2;
+
+        // Check if tooltip would go off left edge
+        if (leftPos - halfWidth < padding) {
+          leftPos = padding + halfWidth;
+        }
+        // Check if tooltip would go off right edge
+        else if (leftPos + halfWidth > viewportWidth - padding) {
+          leftPos = viewportWidth - padding - halfWidth;
+        }
+
+        tooltip.style.left = `${leftPos}px`;
+        tooltip.style.top = `${rect.bottom + 8}px`;
+        tooltip.style.transform = 'translateX(-50%)';
+
+        // Arrow points up - adjust arrow position based on trigger location
+        const arrow = tooltip.querySelector('.tooltip-arrow') as HTMLElement;
+        arrow.style.top = '-5px';
+        arrow.style.bottom = 'auto';
+        arrow.style.borderTopColor = 'transparent';
+        arrow.style.borderBottomColor = 'white';
+
+        // Adjust arrow left position to point at trigger
+        const arrowOffset = ((rect.left + rect.width / 2) - leftPos) / tooltipWidth * 100;
+        arrow.style.left = `${50 + arrowOffset}%`;
+      } else {
+        // Desktop: Show above
+        let leftPos = rect.left + rect.width / 2;
+        const tooltipWidth = tooltipRect.width;
+        const halfWidth = tooltipWidth / 2;
+
+        // Check if tooltip would go off left edge
+        if (leftPos - halfWidth < padding) {
+          leftPos = padding + halfWidth;
+        }
+        // Check if tooltip would go off right edge
+        else if (leftPos + halfWidth > viewportWidth - padding) {
+          leftPos = viewportWidth - padding - halfWidth;
+        }
+
+        tooltip.style.left = `${leftPos}px`;
+        tooltip.style.top = `${rect.top - 8}px`;
+        tooltip.style.transform = 'translate(-50%, -100%)';
+
+        // Arrow points down - adjust arrow position based on trigger location
+        const arrow = tooltip.querySelector('.tooltip-arrow') as HTMLElement;
+        arrow.style.bottom = '-5px';
+        arrow.style.top = 'auto';
+        arrow.style.borderBottomColor = 'transparent';
+        arrow.style.borderTopColor = 'white';
+
+        // Adjust arrow left position to point at trigger
+        const arrowOffset = ((rect.left + rect.width / 2) - leftPos) / tooltipWidth * 100;
+        arrow.style.left = `${50 + arrowOffset}%`;
+      }
+
+      // Fade in
+      requestAnimationFrame(() => {
+        tooltip.style.opacity = '1';
+      });
+    }
+
+    function showTooltip(trigger: HTMLElement) {
+      // Clear any pending hide timeout
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+
+      // Immediately remove any existing tooltip without animation
+      if (currentTooltip && currentTooltip.parentNode) {
+        currentTooltip.parentNode.removeChild(currentTooltip);
+        currentTooltip = null;
+        currentTrigger = null;
+      }
+
+      // Create and show new tooltip
+      currentTrigger = trigger;
+      currentTooltip = createTooltip(trigger);
+      positionTooltip(trigger, currentTooltip);
+    }
+
+    function hideTooltip() {
+      // Clear any pending timeout
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+        hideTimeout = null;
+      }
+
+      if (currentTooltip) {
+        currentTooltip.style.opacity = '0';
+        const tooltipToHide = currentTooltip;
+
+        hideTimeout = setTimeout(() => {
+          if (tooltipToHide && tooltipToHide.parentNode) {
+            tooltipToHide.parentNode.removeChild(tooltipToHide);
+          }
+          hideTimeout = null;
+        }, 200);
+
+        currentTooltip = null;
+        currentTrigger = null;
+      }
+    }
+
+    function initAreaTooltips() {
+      const triggers = document.querySelectorAll('.area-tooltip-trigger');
+
+      triggers.forEach(trigger => {
+        const el = trigger as HTMLElement;
+
+        // Skip if this element already has listeners attached
+        if (el.dataset.tooltipInitialized === 'true') {
+          return;
+        }
+
+        // Mark as initialized to prevent duplicate listeners
+        el.dataset.tooltipInitialized = 'true';
+
+        // Desktop: Hover
+        el.addEventListener('mouseenter', () => showTooltip(el));
+        el.addEventListener('mouseleave', hideTooltip);
+
+        // Mobile: Touch/Click - just show tooltip, let document handler close it
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          showTooltip(el);
+        });
+      });
+    }
+
+    // Close tooltip when clicking/touching outside
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      // Only hide if clicking outside both trigger and tooltip
+      if (!target.closest('.area-tooltip-trigger') && !target.closest('.area-tooltip-portal')) {
+        hideTooltip();
+      }
+    }, { passive: true });
+
+    // Reposition on scroll/resize
+    window.addEventListener('scroll', () => {
+      if (currentTooltip && currentTrigger) {
+        positionTooltip(currentTrigger, currentTooltip);
+      }
+    }, { passive: true });
+
+    window.addEventListener('resize', () => {
+      if (currentTooltip && currentTrigger) {
+        positionTooltip(currentTrigger, currentTooltip);
+      }
+    }, { passive: true });
+
+    // Initialize on page load
+    initAreaTooltips();
+
+    // Re-initialize after client-side filtering (Headlines page)
+    window.addEventListener('crimesRendered', () => {
+      hideTooltip(); // Close any open tooltips
+      initAreaTooltips();
+    });
+
+    // Re-initialize after Top Areas update (Dashboard page)
+    window.addEventListener('topAreasRendered', () => {
+      hideTooltip(); // Close any open tooltips
+      initAreaTooltips();
+    });
+  </script>
+) : (
+  <span>{area}</span>
+)}

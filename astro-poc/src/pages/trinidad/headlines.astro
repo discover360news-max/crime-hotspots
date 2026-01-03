@@ -7,12 +7,17 @@
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CrimeCard from '../../components/CrimeCard.astro';
+import DateAccordion from '../../components/DateAccordion.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
 import { getTrinidadCrimes, type Crime } from '../../lib/crimeData';
 import { dataUpdateNotice } from '../../config/siteNotifications';
+import { loadAreaAliases, getLocalName } from '../../lib/areaAliases';
 
 // Fetch all crimes (server-side) - include all years for filtering
 const allCrimes = await getTrinidadCrimes();
+
+// Load area aliases for tooltips
+const areaAliases = await loadAreaAliases();
 
 // Get available years for filters
 const availableYears = [...new Set(allCrimes.map(c => c.year))].sort((a, b) => b - a);
@@ -23,6 +28,31 @@ console.log(`📰 Headlines loaded ${allCrimes.length} total crimes (${available
 // Get unique areas and crime types for filters (from all years)
 const areas = [...new Set(allCrimes.map(c => c.area).filter(Boolean))].sort();
 const crimeTypes = [...new Set(allCrimes.map(c => c.crimeType).filter(Boolean))].sort();
+
+// Group crimes by date for initial render (first 30 crimes)
+const initialCrimes = allCrimes.slice(0, 30);
+const crimesByDate = new Map<string, Crime[]>();
+
+initialCrimes.forEach(crime => {
+  const dateKey = crime.date; // YYYY-MM-DD format
+  if (!crimesByDate.has(dateKey)) {
+    crimesByDate.set(dateKey, []);
+  }
+  crimesByDate.get(dateKey)!.push(crime);
+});
+
+// Sort dates descending (most recent first)
+const sortedDates = Array.from(crimesByDate.keys()).sort((a, b) =>
+  new Date(b).getTime() - new Date(a).getTime()
+);
+
+// Helper function to calculate victim count
+function calculateVictimCount(crimes: Crime[]): number {
+  return crimes.reduce((total, crime) => {
+    const victimCount = crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1;
+    return total + victimCount;
+  }, 0);
+}
 
 // SEO
 const title = `Trinidad & Tobago Crime Headlines — Latest Reports`;
@@ -50,12 +80,12 @@ const breadcrumbs = [
         <p class="text-xs text-slate-500">Latest crime reports from all years</p>
       </div>
       <div class="flex flex-col gap-2">
-        
+
         <a
-          href="/trinidad/archive"
+          href="/trinidad/dashboard"
           class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
         >
-          View Archive
+          Dashboard
         </a>
         <button
           id="filtersBtn"
@@ -70,15 +100,64 @@ const breadcrumbs = [
     <SiteNotificationBanner notification={dataUpdateNotice} />
 
     <!-- Results Count -->
-    <div class="mb-6 text-xs text-slate-500">
-      Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of <span id="resultsTotal">{allCrimes.length}</span> crimes
+    <div class="mb-6 text-xs text-rose-600 flex items-center justify-between">
+      <div>
+        Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of all <a href="/trinidad/archive" class="border-b border-dotted border-rose-600 hover:border-rose-700 hover:text-rose-700 transition"><span id="resultsTotal">{allCrimes.length}</span></a> listed crimes
+      </div>
+      <a href="/trinidad/archive" class="text-rose-600 hover:text-rose-700 transition">View Archive</a>
     </div>
 
-    <!-- Crime Cards Grid -->
-    <div id="crimeGrid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {allCrimes.slice(0, 30).map(crime => (
-        <CrimeCard crime={crime} />
-      ))}
+    <!-- Crime Accordions by Date -->
+    <div id="crimeAccordions">
+      {sortedDates.map((date, index) => {
+        const crimes = crimesByDate.get(date)!;
+        const victimCount = calculateVictimCount(crimes);
+        const isExpanded = index === 0;
+        const formattedDate = new Date(date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
+
+        return (
+          <div class="date-accordion mb-4" data-date={date}>
+            <button
+              class={`accordion-header w-full px-4 py-3 bg-white/70 backdrop-blur-md rounded-lg hover:bg-white/90 transition flex items-center justify-between group ${isExpanded ? 'border border-rose-600' : 'border border-slate-200'}`}
+              aria-expanded={isExpanded}
+            >
+              <div class="flex items-center gap-3">
+                <svg
+                  class={`chevron w-5 h-5 text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+
+                <div class="text-left">
+                  <h3 class={`accordion-title text-small font-semibold ${isExpanded ? 'text-rose-600' : 'text-slate-700'}`}>{formattedDate}</h3>
+                  <p class="text-xs text-slate-500">{victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+                </div>
+              </div>
+
+              <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-medium">
+                {victimCount}
+              </span>
+            </button>
+
+            <div class={`accordion-content overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[10000px] mt-3' : 'max-h-0'}`}>
+              <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
+                {crimes.map(crime => {
+                  const localName = getLocalName(areaAliases, crime.area);
+                  return <CrimeCard crime={crime} localName={localName} />;
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
 
     <!-- Load More -->
@@ -172,10 +251,11 @@ const breadcrumbs = [
   </div>
 
   <!-- Client-side filtering script -->
-  <script define:vars={{ allCrimes }}>
+  <script define:vars={{ allCrimes, areaAliases: Object.fromEntries(areaAliases) }}>
     let currentPage = 1;
     const perPage = 30;
     let filteredCrimes = [...allCrimes];
+    let isFiltered = false;
 
     // Filter function
     function applyFilters() {
@@ -183,6 +263,9 @@ const breadcrumbs = [
       const dateTo = document.getElementById('dateTo').value;
       const crimeType = document.getElementById('crimeType').value;
       const area = document.getElementById('area').value;
+
+      // Check if any filter is active
+      isFiltered = !!(dateFrom || dateTo || crimeType || area);
 
       filteredCrimes = allCrimes.filter(crime => {
         const crimeDate = new Date(crime.date);
@@ -206,12 +289,74 @@ const breadcrumbs = [
       updateResultsCount();
     }
 
-    // Render crimes
+    // Render crimes (accordion mode when no filters, grid mode when filtered)
     function renderCrimes() {
-      const grid = document.getElementById('crimeGrid');
+      const container = document.getElementById('crimeAccordions');
       const crimes = filteredCrimes.slice(0, currentPage * perPage);
 
-      grid.innerHTML = crimes.map((crime, index) => `
+      if (isFiltered) {
+        // FILTERED MODE: Show flat grid (no accordions)
+        container.innerHTML = `
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            ${crimes.map(crime => createCrimeCardHTML(crime)).join('')}
+          </div>
+        `;
+      } else {
+        // ACCORDION MODE: Group by date
+        const crimesByDate = new Map();
+
+        crimes.forEach(crime => {
+          const dateKey = crime.date;
+          if (!crimesByDate.has(dateKey)) {
+            crimesByDate.set(dateKey, []);
+          }
+          crimesByDate.get(dateKey).push(crime);
+        });
+
+        // Sort dates descending
+        const sortedDates = Array.from(crimesByDate.keys()).sort((a, b) =>
+          new Date(b).getTime() - new Date(a).getTime()
+        );
+
+        // Render accordions
+        container.innerHTML = sortedDates.map((date, index) => {
+          const dateCrimes = crimesByDate.get(date);
+          const isExpanded = index === 0;
+          return createAccordionHTML(date, dateCrimes, isExpanded);
+        }).join('');
+
+        // Reattach accordion event listeners
+        attachAccordionListeners();
+      }
+
+      // Show/hide load more button
+      const loadMore = document.getElementById('loadMore');
+      if (crimes.length >= filteredCrimes.length) {
+        loadMore.style.display = 'none';
+      } else {
+        loadMore.style.display = 'block';
+      }
+
+      // Dispatch event to re-initialize area tooltips
+      window.dispatchEvent(new CustomEvent('crimesRendered'));
+    }
+
+    // Helper to render area name with tooltip (if local name exists)
+    function renderAreaName(area) {
+      const localName = areaAliases[area];
+
+      // If no local name or same as area, show plain text
+      if (!localName || localName === area) {
+        return `<span>${area}</span>`;
+      }
+
+      // Show area with tooltip trigger (tooltip appended to body via JS)
+      return `<span class="area-tooltip-trigger inline-block border-b-2 border-dotted border-slate-400 hover:border-rose-600 cursor-help transition-colors" data-area="${area}" data-local-name="${localName}">${area}</span>`;
+    }
+
+    // Create crime card HTML
+    function createCrimeCardHTML(crime) {
+      return `
         <article class="crime-card bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 hover:shadow-lg transition cursor-pointer group" data-crime-slug="${crime.slug}">
           <div class="flex items-start justify-between mb-3">
             <span class="inline-block px-3 py-1 rounded-full text-white text-xs font-medium opacity-70" style="background-color: ${getCrimeColorHex(crime.crimeType)}">
@@ -231,7 +376,7 @@ const breadcrumbs = [
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            ${crime.area}
+            ${renderAreaName(crime.area)}
           </p>
 
           <div class="flex items-center justify-between pt-3 border-t border-slate-200">
@@ -250,15 +395,107 @@ const breadcrumbs = [
             </a>
           </div>
         </article>
-      `).join('');
+      `;
+    }
 
-      // Show/hide load more button
-      const loadMore = document.getElementById('loadMore');
-      if (crimes.length >= filteredCrimes.length) {
-        loadMore.style.display = 'none';
-      } else {
-        loadMore.style.display = 'block';
-      }
+    // Calculate victim count for a group of crimes
+    function calculateVictimCount(crimes) {
+      return crimes.reduce((total, crime) => {
+        const victimCount = crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1;
+        return total + victimCount;
+      }, 0);
+    }
+
+    // Create accordion HTML
+    function createAccordionHTML(date, crimes, isExpanded) {
+      const formattedDate = new Date(date).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+
+      const victimCount = calculateVictimCount(crimes);
+      const expandedClass = isExpanded ? 'max-h-[10000px] mt-3' : 'max-h-0';
+      const chevronClass = isExpanded ? 'rotate-90' : '';
+      const borderClass = isExpanded ? 'border border-rose-600' : 'border border-slate-200';
+      const textClass = isExpanded ? 'text-rose-600' : 'text-slate-700';
+
+      return `
+        <div class="date-accordion mb-4" data-date="${date}">
+          <button
+            class="accordion-header w-full px-4 py-3 bg-white/70 backdrop-blur-md rounded-lg hover:bg-white/90 transition flex items-center justify-between group ${borderClass}"
+            aria-expanded="${isExpanded}"
+          >
+            <div class="flex items-center gap-3">
+              <svg
+                class="chevron w-5 h-5 text-slate-400 transition-transform duration-200 ${chevronClass}"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+
+              <div class="text-left">
+                <h3 class="accordion-title text-small font-semibold ${textClass}">${formattedDate}</h3>
+                <p class="text-xs text-slate-500">${victimCount} ${victimCount === 1 ? 'victim' : 'victims'}</p>
+              </div>
+            </div>
+
+            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-medium">
+              ${victimCount}
+            </span>
+          </button>
+
+          <div class="accordion-content overflow-hidden transition-all duration-300 ${expandedClass}">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
+              ${crimes.map(crime => createCrimeCardHTML(crime)).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Attach accordion click listeners
+    function attachAccordionListeners() {
+      const headers = document.querySelectorAll('.accordion-header');
+
+      headers.forEach(header => {
+        header.addEventListener('click', () => {
+          const accordion = header.closest('.date-accordion');
+          const content = accordion?.querySelector('.accordion-content');
+          const chevron = header.querySelector('.chevron');
+          const title = header.querySelector('.accordion-title');
+          const isExpanded = header.getAttribute('aria-expanded') === 'true';
+
+          if (content && chevron && title) {
+            if (isExpanded) {
+              // Collapse
+              header.setAttribute('aria-expanded', 'false');
+              content.classList.remove('max-h-[10000px]', 'mt-3');
+              content.classList.add('max-h-0');
+              chevron.classList.remove('rotate-90');
+              // Reset to grey border and text
+              header.classList.remove('border-rose-600');
+              header.classList.add('border-slate-200');
+              title.classList.remove('text-rose-600');
+              title.classList.add('text-slate-700');
+            } else {
+              // Expand
+              header.setAttribute('aria-expanded', 'true');
+              content.classList.add('max-h-[10000px]', 'mt-3');
+              content.classList.remove('max-h-0');
+              chevron.classList.add('rotate-90');
+              // Set to red border and text
+              header.classList.remove('border-slate-200');
+              header.classList.add('border-rose-600');
+              title.classList.remove('text-slate-700');
+              title.classList.add('text-rose-600');
+            }
+          }
+        });
+      });
     }
 
     // Update results count
@@ -346,10 +583,13 @@ const breadcrumbs = [
       loadMore.style.display = 'block';
     }
 
+    // Attach accordion listeners to initial server-rendered accordions
+    attachAccordionListeners();
+
     // Event delegation for crime card clicks
-    const crimeGrid = document.getElementById('crimeGrid');
-    if (crimeGrid) {
-      crimeGrid.addEventListener('click', (e) => {
+    const crimeAccordions = document.getElementById('crimeAccordions');
+    if (crimeAccordions) {
+      crimeAccordions.addEventListener('click', (e) => {
         // Don't open modal if clicking on a link
         if (e.target.closest('a')) {
           return;

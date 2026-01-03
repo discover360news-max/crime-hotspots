@@ -35,6 +35,22 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
 
 <Layout title={title} description={description}>
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <!-- Navigation Buttons -->
+    <div class="flex gap-2 mb-6">
+      <a
+        href="/trinidad/dashboard"
+        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
+      >
+        Dashboard
+      </a>
+      <a
+        href="/trinidad/headlines"
+        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
+      >
+        Headlines
+      </a>
+    </div>
+
     <!-- Page Header -->
     <div class="text-center mb-8">
       <h1 class="text-display text-slate-700 mb-2">Crime Archives</h1>

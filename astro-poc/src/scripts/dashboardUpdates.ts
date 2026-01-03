@@ -324,6 +324,22 @@ export function updateQuickInsights(crimes: Crime[]) {
 }
 
 /**
+ * Helper function to render area name with tooltip if local name exists
+ */
+function renderAreaName(area: string): string {
+  const areaAliases = (window as any).__areaAliases || {};
+  const localName = areaAliases[area];
+
+  // If no local name or it's the same as official name, show plain text
+  if (!localName || localName.trim() === '' || localName.trim() === area.trim()) {
+    return `<span>${area}</span>`;
+  }
+
+  // Show with tooltip trigger
+  return `<span class="area-tooltip-trigger inline-block border-b-2 border-dotted border-slate-400 hover:border-rose-600 cursor-help transition-colors" data-area="${area}" data-local-name="${localName}">${area}</span>`;
+}
+
+/**
  * Update Top Areas card with filtered crime data
  */
 export function updateTopRegions(crimes: Crime[]) {
@@ -351,12 +367,15 @@ export function updateTopRegions(crimes: Crime[]) {
   // Update using ID selector (2-column grid)
   container.innerHTML = topAreas.map(([area, count]) => `
     <div class="flex justify-between items-center gap-2 pb-2 border-b border-slate-200">
-      <span class="text-xs text-slate-500 truncate flex-1">${area}</span>
+      <span class="text-xs text-slate-500 truncate flex-1">${renderAreaName(area)}</span>
       <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium flex-shrink-0">
         ${count}
       </span>
     </div>
   `).join('');
+
+  // Dispatch event to re-initialize tooltips
+  window.dispatchEvent(new CustomEvent('topAreasRendered'));
 
   console.log('✅ Top Areas updated');
 }

@@ -1,0 +1,97 @@
+---
+/**
+ * Date Accordion Component
+ * Collapsible section for grouping crimes by date
+ */
+
+interface Props {
+  date: string;
+  crimeCount: number;
+  victimCount: number;
+  isExpanded?: boolean;
+}
+
+const { date, crimeCount, victimCount, isExpanded = false } = Astro.props;
+
+// Format date for display
+const formattedDate = new Date(date).toLocaleDateString('en-US', {
+  weekday: 'long',
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric'
+});
+---
+
+<div class="date-accordion mb-4" data-date={date}>
+  <!-- Accordion Header -->
+  <button
+    class="accordion-header w-full px-4 py-3 bg-white/70 backdrop-blur-md rounded-lg border border-slate-200 hover:bg-white/90 transition flex items-center justify-between group"
+    aria-expanded={isExpanded ? 'true' : 'false'}
+  >
+    <div class="flex items-center gap-3">
+      <!-- Chevron Icon -->
+      <svg
+        class="chevron w-5 h-5 text-slate-400 transition-transform duration-200"
+        class:list={[isExpanded && 'rotate-90']}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+
+      <!-- Date & Victim Count -->
+      <div class="text-left">
+        <h3 class="text-small font-semibold text-slate-700">{formattedDate}</h3>
+        <p class="text-xs text-slate-500">{victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+      </div>
+    </div>
+
+    <!-- Badge -->
+    <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-medium">
+      {victimCount}
+    </span>
+  </button>
+
+  <!-- Accordion Content -->
+  <div
+    class="accordion-content overflow-hidden transition-all duration-300"
+    class:list={[isExpanded ? 'max-h-[10000px] mt-3' : 'max-h-0']}
+  >
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<script>
+  // Add click handlers to all accordion headers
+  document.addEventListener('DOMContentLoaded', () => {
+    const headers = document.querySelectorAll('.accordion-header');
+
+    headers.forEach(header => {
+      header.addEventListener('click', () => {
+        const accordion = header.closest('.date-accordion');
+        const content = accordion?.querySelector('.accordion-content');
+        const chevron = header.querySelector('.chevron');
+        const isExpanded = header.getAttribute('aria-expanded') === 'true';
+
+        if (content && chevron) {
+          if (isExpanded) {
+            // Collapse
+            header.setAttribute('aria-expanded', 'false');
+            content.classList.remove('max-h-[10000px]', 'mt-3');
+            content.classList.add('max-h-0');
+            chevron.classList.remove('rotate-90');
+          } else {
+            // Expand
+            header.setAttribute('aria-expanded', 'true');
+            content.classList.add('max-h-[10000px]', 'mt-3');
+            content.classList.remove('max-h-0');
+            chevron.classList.add('rotate-90');
+          }
+        }
+      });
+    });
+  });
+</script>

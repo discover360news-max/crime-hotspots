@@ -203,13 +203,20 @@ export function initializeLeafletMap(
         icon: getCrimeIcon(crime.crimeType)
       });
 
+      // Get local name for area if available
+      const areaAliases = (window as any).__areaAliases || {};
+      const localName = areaAliases[crime.area];
+      const areaDisplay = localName && localName !== crime.area
+        ? `${crime.area} (${localName})`
+        : crime.area;
+
       marker.bindPopup(`
         <div class="p-2">
           <div class="text-xs text-slate-500 mb-2">${crime.date}</div>
           <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
           <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
           <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
-          <div class="text-xs text-rose-600">${crime.area}</div>
+          <div class="text-xs text-rose-600">${areaDisplay}</div>
           <a href="${config.crimeDetailPath}${crime.slug}" class="text-tiny text-rose-600 hover:underline mt-4 inline-block">View Details →</a>
         </div>
       `);
@@ -284,13 +291,20 @@ export function updateLeafletMap(crimes: Crime[], crimeDetailPath: string) {
       icon: getCrimeIcon(crime.crimeType)
     });
 
+    // Get local name for area if available
+    const areaAliases = (window as any).__areaAliases || {};
+    const localName = areaAliases[crime.area];
+    const areaDisplay = localName && localName !== crime.area
+      ? `${crime.area} (${localName})`
+      : crime.area;
+
     marker.bindPopup(`
       <div class="p-2">
         <div class="text-xs text-slate-500 mb-2">${crime.date}</div>
         <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
         <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
         <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
-        <div class="text-xs text-rose-600">${crime.area}</div>
+        <div class="text-xs text-rose-600">${areaDisplay}</div>
         <a href="${crimeDetailPath}${crime.slug}" class="text-tiny text-rose-600 hover:underline mt-4 inline-block">View Details →</a>
       </div>
     `);

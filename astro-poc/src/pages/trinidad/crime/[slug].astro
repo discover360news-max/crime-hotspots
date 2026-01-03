@@ -10,7 +10,9 @@ import { getTrinidadCrimes, type Crime } from '../../../lib/crimeData';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import ReportIssueModal from '../../../components/ReportIssueModal.astro';
 import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
+import AreaNameTooltip from '../../../components/AreaNameTooltip.astro';
 import { dataUpdateNotice } from '../../../config/siteNotifications';
+import { loadAreaAliases, getLocalName } from '../../../lib/areaAliases';
 
 // This tells Astro to generate a static page for each crime
 export async function getStaticPaths() {
@@ -27,6 +29,10 @@ interface Props {
 }
 
 const { crime } = Astro.props;
+
+// Load area aliases for tooltip
+const areaAliases = await loadAreaAliases();
+const localName = getLocalName(areaAliases, crime.area);
 
 // SEO Meta Tags
 const title = `${crime.headline} | Crime Hotspots Trinidad`;
@@ -107,6 +113,22 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
       { label: crime.year }
     ]} />
 
+    <!-- Navigation Buttons -->
+    <div class="flex gap-2 mb-6">
+      <a
+        href="/trinidad/dashboard"
+        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
+      >
+        Dashboard
+      </a>
+      <a
+        href="/trinidad/headlines"
+        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
+      >
+        Headlines
+      </a>
+    </div>
+
     <!-- Site Notification Banner -->
     <SiteNotificationBanner notification={dataUpdateNotice} />
 
@@ -123,7 +145,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
             {crime.crimeType}
           </span>
           <span class="text-slate-500" data-pagefind-ignore>
-            {crime.street ? `${crime.street}, ` : ''}{crime.area}
+            {crime.street ? `${crime.street}, ` : ''}<AreaNameTooltip area={crime.area} localName={localName} />
           </span>
         </div>
       </header>
