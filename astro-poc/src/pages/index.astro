@@ -20,7 +20,7 @@ const countries = [
     flag: '🇹🇹',
     dashboard: '/trinidad/dashboard',
     available: true,
-    image: '/assets/images/trinidad.png',
+    image: '/assets/images/trinidad.jpg',
   },
   {
     id: 'gy',
@@ -43,7 +43,7 @@ const countries = [
 ];
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} includeLeaflet={false} includePagefind={false}>
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
     <!-- Hero Section -->
     <section class="flex flex-col items-center justify-center text-center mb-12">
@@ -81,9 +81,11 @@ const countries = [
                     src={country.image}
                     alt={`${country.name} map`}
                     class="w-full h-full object-cover"
-                    loading="lazy"
+                    loading={country.id === 'tt' ? 'eager' : 'lazy'}
+                    fetchpriority={country.id === 'tt' ? 'high' : 'auto'}
                     width="220"
                     height="220"
+                    decoding="async"
                   />
                 </div>
 
@@ -118,6 +120,7 @@ const countries = [
                     loading="lazy"
                     width="220"
                     height="220"
+                    decoding="async"
                   />
                   <div class="absolute inset-0 bg-slate-300/20"></div>
                 </div>

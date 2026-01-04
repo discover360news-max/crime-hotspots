@@ -232,6 +232,20 @@
     });
   }
 
-  // Expose function globally so cards can call it
+  // Function to open modal by slug (for map markers and other external calls)
+  function openCrimeDetailModal(slug) {
+    // Get crimes from global variable (set by dashboardDataLoader)
+    const crimes = window.__crimesData || [];
+    const crime = crimes.find(c => c.slug === slug);
+
+    if (crime) {
+      openCrimeModal(crime);
+    } else {
+      console.error('Crime not found:', slug);
+    }
+  }
+
+  // Expose functions globally so cards/markers can call them
   window.openCrimeModal = openCrimeModal;
+  window.openCrimeDetailModal = openCrimeDetailModal;
 </script>

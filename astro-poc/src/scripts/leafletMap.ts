@@ -217,7 +217,12 @@ export function initializeLeafletMap(
           <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
           <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
           <div class="text-xs text-rose-600">${areaDisplay}</div>
-          <a href="${config.crimeDetailPath}${crime.slug}" class="text-tiny text-rose-600 hover:underline mt-4 inline-block">View Details →</a>
+          <button
+            onclick="window.openCrimeDetailModal('${crime.slug}')"
+            class="text-tiny text-rose-600 border border-rose-600 hover:bg-rose-600 hover:text-white transition px-3 py-1.5 rounded-lg mt-4 inline-block font-medium"
+          >
+            View Details
+          </button>
         </div>
       `);
       markers.addLayer(marker);
@@ -305,7 +310,12 @@ export function updateLeafletMap(crimes: Crime[], crimeDetailPath: string) {
         <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
         <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
         <div class="text-xs text-rose-600">${areaDisplay}</div>
-        <a href="${crimeDetailPath}${crime.slug}" class="text-tiny text-rose-600 hover:underline mt-4 inline-block">View Details →</a>
+        <button
+          onclick="window.openCrimeDetailModal('${crime.slug}')"
+          class="text-tiny text-rose-600 border border-rose-600 hover:bg-rose-600 hover:text-white transition px-3 py-1.5 rounded-lg mt-4 inline-block font-medium"
+        >
+          View Details
+        </button>
       </div>
     `);
 
