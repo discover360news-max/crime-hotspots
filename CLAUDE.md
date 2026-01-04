@@ -12,11 +12,109 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Focus:** Trinidad-only implementation (Other islands expansion deferred)
-**Last Updated:** January 3, 2026
+**Last Updated:** January 4, 2026
 
 ---
 
 ## Recent Accomplishments
+
+### January 4, 2026 - LCP Performance Optimization & Map Modal UX
+
+**Problem Solved:**
+Cloudflare Analytics showed LCP (Largest Contentful Paint) at 2035ms on homepage and methodology pages. Goal was to reduce page load to under 1 second through aggressive optimization. Additionally, map marker popups navigated away from dashboard, disrupting user workflow.
+
+**Accomplishments:**
+1. **Conditional Resource Loading System** ✅
+   - Created `includeLeaflet` and `includePagefind` props in Layout.astro (default: false/true)
+   - Leaflet CSS/JS now only loads on pages with maps (~150KB savings on non-map pages)
+   - Homepage and methodology pages load without unnecessary map libraries
+   - Dashboard explicitly enables Leaflet with `includeLeaflet={true}`
+
+2. **Image Optimization** ✅
+   - Converted Trinidad country card image from PNG (75KB) to JPG (41KB) - **45% reduction (34KB savings)**
+   - Added `fetchpriority="high"` to Trinidad image (LCP element)
+   - Added `loading="eager"` for above-fold Trinidad card
+   - Other country cards use `loading="lazy"` for performance
+
+3. **Resource Hints & Font Optimization** ✅
+   - Added `dns-prefetch` for fonts.googleapis.com, fonts.gstatic.com, cloudflareinsights.com
+   - Added `preconnect` for Google Fonts domains with crossorigin
+   - Implemented non-blocking font loading with `preload` + `onload` trick
+   - Noscript fallback ensures fonts load even without JavaScript
+
+4. **Non-blocking CSS Loading** ✅
+   - Leaflet CSS files load with `media="print" onload="this.media='all'"` pattern
+   - Prevents render-blocking on map pages while ensuring styles apply when ready
+   - Applied to all 4 Leaflet stylesheets (leaflet.css, markercluster, fullscreen)
+
+5. **Map Modal UX Enhancement** ✅
+   - Changed map marker popup "View Details" from navigation link to modal
+   - Styled button with red border (`border border-rose-600`) matching site theme
+   - Added `window.openCrimeDetailModal(slug)` function to CrimeDetailModal.astro
+   - Function retrieves crime from `window.__crimesData` and opens modal overlay
+   - Users stay on dashboard when viewing crime details
+
+6. **Footer Search Button Mobile Layout** ✅
+   - Right-aligned footer search button on mobile while keeping inline with social icons
+   - Solution: Made Social section `col-span-2` on mobile with `justify-between` flex
+   - Social icons on left, search button on right, same row
+   - Hidden on desktop (`md:hidden`) where header search is available
+
+**Key Learnings:**
+- **Conditional loading saves massive bandwidth** - 150KB+ savings on non-map pages by only loading Leaflet where needed
+- **Props-based resource control** - Layout component props allow per-page optimization without code duplication
+- **Image format matters for LCP** - Converting PNG to JPG saved 34KB on critical LCP element
+- **fetchpriority="high" signals browser** - Explicit priority hints improve LCP timing
+- **Non-blocking CSS pattern** - `media="print" onload="this.media='all'"` loads CSS without blocking render
+- **Preload + preconnect = faster fonts** - Resource hints + preload reduce font loading waterfall
+- **Default prop values prevent breakage** - `includeLeaflet={false}` default means pages work without explicit prop
+- **Modal UX keeps users in context** - Opening modal instead of navigating preserves dashboard state
+- **Global variable naming matters** - Must use exact variable name (`window.__crimesData`, not `__allCrimes`)
+- **Flexbox justify-between + col-span** - Keeps elements inline while positioning left/right on mobile
+
+**Bugs Encountered & Fixed:**
+1. **Dashboard Map Tiles Misaligned**
+   - **Cause:** Dashboard didn't request Leaflet CSS after implementing conditional loading
+   - **Fix:** Added `includeLeaflet={true}` to dashboard.astro line 43
+
+2. **Modal Function Not Found**
+   - **Cause:** CrimeDetailModal only exposed `openCrimeModal(crime)`, but map called `openCrimeDetailModal(slug)`
+   - **Fix:** Added new function that retrieves crime by slug from `window.__crimesData`
+
+3. **Wrong Global Variable Name**
+   - **Cause:** Initially used `window.__allCrimes` instead of `window.__crimesData`
+   - **Fix:** Verified dashboardDataLoader.ts sets `__crimesData` and corrected reference
+
+4. **Footer Search Button Position** (3 iterations)
+   - **Attempt 1:** Added `ml-auto` (pushed too far right, not inline)
+   - **Attempt 2:** Created separate div with `justify-end` (not inline with social icons)
+   - **Final solution:** Made Social section full-width on mobile with `justify-between` flex
+
+**Performance Impact:**
+- **Estimated page load reduction:** 500-900ms on homepage and methodology pages
+- **Resource savings:** ~184KB total (150KB Leaflet + 34KB image)
+- **LCP improvement:** Smaller image + fetchpriority="high" should significantly reduce LCP
+- **Build verification:** 1,700+ pages built successfully with zero errors
+
+**Files Modified:**
+- `astro-poc/src/layouts/Layout.astro` (conditional loading, resource hints, fonts, footer)
+- `astro-poc/src/pages/index.astro` (disabled Leaflet/Pagefind, optimized image)
+- `astro-poc/src/pages/methodology.astro` (disabled Leaflet/Pagefind)
+- `astro-poc/src/pages/trinidad/dashboard.astro` (enabled Leaflet)
+- `astro-poc/src/scripts/leafletMap.ts` (modal button in popups)
+- `astro-poc/src/components/CrimeDetailModal.astro` (slug-based modal opener)
+- `astro-poc/src/components/QuickInsightsCard.astro` (minor formatting)
+
+**Status:**
+- ✅ Conditional resource loading: Complete and deployed
+- ✅ Image optimization: Complete (PNG→JPG conversion)
+- ✅ Resource hints & fonts: Complete
+- ✅ Map modal UX: Complete and working
+- ✅ Footer search button: Complete
+- ✅ All bugs fixed: Dashboard map, modal function, footer layout
+- ✅ Deployed to production: Commit 61c1ba8
+
+---
 
 ### January 3, 2026 - Area Tooltips: Dashboard Integration & Mobile Fix
 
