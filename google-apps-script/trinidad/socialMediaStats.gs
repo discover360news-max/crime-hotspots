@@ -89,6 +89,42 @@ const SOCIAL_CONFIG = {
 };
 
 /**
+ * CRIME TYPE CONFIGURATION
+ * Controls which crime types use victim count multipliers
+ *
+ * useVictimCount Rules:
+ * - true: Multiply PRIMARY crime type by victimCount (e.g., double murder = 2)
+ * - false: Count as 1 incident regardless of victim count
+ *
+ * IMPORTANT: Victim count ONLY applies to PRIMARY crime type.
+ * Related crimes ALWAYS count as +1 (incident-based).
+ *
+ * NOTE: Incidents (row count) always remain as-is. This only affects crime type counts.
+ */
+const SOCIAL_CRIME_TYPE_CONFIG = {
+  // Victim-count crimes (count each victim for PRIMARY crime only)
+  'Murder': { useVictimCount: true },
+  'Assault': { useVictimCount: true },
+  'Sexual Assault': { useVictimCount: true },
+  'Kidnapping': { useVictimCount: true },
+  'Robbery': { useVictimCount: true },
+  'Shooting': { useVictimCount: true },
+
+  // Incident-count crimes (always count as 1 incident)
+  'Burglary': { useVictimCount: false },
+  'Home Invasion': { useVictimCount: false },
+  'Seizures': { useVictimCount: false },
+  'Theft': { useVictimCount: false }
+};
+
+/**
+ * Helper: Check if crime type uses victim count
+ */
+function usesVictimCount(crimeType) {
+  return SOCIAL_CRIME_TYPE_CONFIG[crimeType]?.useVictimCount || false;
+}
+
+/**
  * Main function - generates social media stats and saves to sheet
  * Run this manually or via daily trigger
  */
@@ -548,6 +584,7 @@ function calculateStats(currentWeekCrimes, previousWeekCrimes) {
 /**
  * Count crimes by type
  * Supports both old format (Crime Type) and new format (primaryCrimeType + relatedCrimeTypes)
+ * Applies victim count multipliers for configured crime types (primary only)
  */
 function countByCrimeType(crimes) {
   const counts = {};
@@ -555,22 +592,29 @@ function countByCrimeType(crimes) {
     // Try new format first (2026+ data with primary + related crime types)
     const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'];
     const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || '';
+    const victimCount = parseInt(crime['victimCount'] || crime['Victim Count'] || '1', 10) || 1;
 
     if (primaryType && primaryType.trim() !== '') {
-      // New format: count primary type
-      counts[primaryType] = (counts[primaryType] || 0) + 1;
+      // New format: count primary type with victim multiplier if configured
+      if (!counts[primaryType]) counts[primaryType] = 0;
 
-      // New format: count related types (pipe-separated)
+      if (usesVictimCount(primaryType)) {
+        counts[primaryType] += victimCount; // Multiply by victim count
+      } else {
+        counts[primaryType] += 1; // Count as 1 incident
+      }
+
+      // New format: count related types (pipe-separated, always +1 each)
       if (relatedTypes && relatedTypes.trim() !== '') {
         const related = relatedTypes.split('|').map(t => t.trim()).filter(t => t !== '');
         related.forEach(type => {
-          counts[type] = (counts[type] || 0) + 1;
+          counts[type] = (counts[type] || 0) + 1; // Related crimes always +1
         });
       }
     } else {
       // Fallback to old format (2025 and earlier data)
       const type = crime['Crime Type'] || crime['crimeType'] || 'Other';
-      counts[type] = (counts[type] || 0) + 1;
+      counts[type] = (counts[type] || 0) + 1; // 2025 data doesn't have victim count
     }
   });
   return counts;

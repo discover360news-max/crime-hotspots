@@ -12,11 +12,205 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Focus:** Trinidad-only implementation (Other islands expansion deferred)
-**Last Updated:** January 4, 2026
+**Last Updated:** January 5, 2026 (Blog banner & headlines timeline UX improvements)
 
 ---
 
 ## Recent Accomplishments
+
+### January 5, 2026 - Blog Banner & Headlines Timeline UX
+
+**Problem Solved:**
+Need to drive traffic to blog content and improve visual hierarchy on Headlines page to show relationship between dates and crime incidents.
+
+**Accomplishments:**
+1. **Blog Rotating Banner Component** ✅
+   - Created reusable `BlogRotatingBanner.astro` component
+   - Auto-rotates through latest 3 blog posts (5-second intervals)
+   - Smooth slide-up animation with fade effect
+   - Country-filtered (shows only Trinidad blog posts on Trinidad pages)
+   - Links to main blog page on click
+   - **Design:** Horn/megaphone icon, red text (rose-600), 1px rose border, frosted glass background
+   - **Mobile optimized:** Half height on mobile (`py-1` vs `py-2`, smaller icons/text)
+   - Added to Trinidad Headlines page above accordion section
+
+2. **Headlines Timeline Visual** ✅
+   - Added vertical timeline to mobile accordion view (hidden on desktop grid)
+   - **Visual design:** Subtle dotted line (slate-300) with small filled red dots (rose-600, 6px)
+   - **Positioning:** Dots centered on line, positioned at top of each crime card
+   - **Smart display modes:**
+     - Mobile/tablet: Single column with timeline when accordion expanded
+     - Desktop: Multi-column grid view (no timeline)
+   - Shows hierarchical relationship between date header and crime incidents
+
+**Key Learnings:**
+- **Auto-rotation enhances discoverability** - Cycling blog titles increases visibility without user interaction
+- **Timeline improves visual hierarchy** - Dotted line + dots clearly connect date header to child crimes
+- **Mobile-first timeline works** - Desktop grid layout doesn't need timeline (visual hierarchy is clear)
+- **Component reusability** - BlogRotatingBanner can be added to Dashboard, Archive pages if needed
+- **Subtle design wins** - Small dots (6px) + gray line (slate-300) provide structure without overwhelming content
+
+**Design Decisions:**
+- **Timeline on mobile only** - Desktop grid layout has clear visual grouping already
+- **Dots at card top vs. center** - Top positioning emphasizes chronological ordering
+- **Gray line vs. red** - Slate-300 is subtle; red dots provide accent without competing with crime type badges
+- **Banner height** - Half height on mobile prevents banner from dominating screen space
+
+**Files Created:**
+- `astro-poc/src/components/BlogRotatingBanner.astro` (rotating blog banner component)
+
+**Files Modified:**
+- `astro-poc/src/pages/trinidad/headlines.astro` (added banner, timeline view for mobile, dual-mode accordion rendering)
+
+**Status:**
+- ✅ Blog rotating banner: Complete and deployed
+- ✅ Headlines timeline: Complete on mobile/tablet
+- ✅ Mobile optimization: Banner height reduced
+- 🔜 Potential expansion: Add banner to Dashboard, Archive pages
+
+---
+
+### January 5, 2026 - Traffic Analysis & SEO Foundation Complete
+
+**Problem Solved:**
+Cloudflare Analytics showed 524 "unique visitors" per day, but GA4/Web Analytics showed only ~4 real visitors. Need to understand traffic composition and establish Google Search Console foundation for organic growth.
+
+**Accomplishments:**
+1. **Traffic Composition Analysis** ✅
+   - **Cloudflare Analytics:** 524 visitors/day (includes ALL traffic - humans + bots)
+   - **Cloudflare Web Analytics + GA4:** ~4 real human visitors/day
+   - **Bot Fight Mode Analysis:** 1,150 malicious bot requests blocked in 24 hours
+   - **Conclusion:** 99% of Cloudflare traffic is bots (search engines + malicious scrapers)
+   - Bot Fight Mode working perfectly - protecting site from automated attacks
+
+2. **Google Search Console Setup** ✅
+   - Domain verification: Automatic (DNS already configured)
+   - Sitemap submission: `https://crimehotspots.com/sitemap-index.xml` + `sitemap-0.xml`
+   - **Status:** Success - 1,728 pages discovered by Google (Jan 5, 2026)
+   - Includes: 1,300+ crime detail pages, blog posts, dashboard, archives, static pages
+   - Expected indexing timeline: 3-5 days for initial crawling, 2-4 weeks for organic traffic to start
+
+3. **Social Media Growth Strategy Planned** ✅
+   - **Current state:** Facebook, X (Twitter), Instagram accounts active, posting regularly
+   - **Content creation:** Already have `socialMediaStats.gs` automation + branded image generator
+   - **Posting stats:** Generating professional 1080x1080px images + text posts weekly
+   - **Zero-budget growth plan:** Reddit launch, Facebook groups, X news outlet tagging
+   - **Week 1 action plan:** Reddit post (r/TrinidadandTobago), join 3-5 Facebook groups, tag Trinidad news outlets on X
+
+4. **Performance Validation** ✅
+   - **Cloudflare Web Analytics:** LCP 534ms (73% improvement from 2035ms)
+   - **Core Web Vitals:** 100% Good scores
+   - **Page load time:** Avg 534ms (down from 2035ms pre-optimization)
+   - Site ready for traffic influx
+
+**Key Learnings:**
+- **Bot traffic is normal for large sites** - 1,728 pages attract search engine crawlers (Google, Bing) + malicious scrapers
+- **Cloudflare Analytics counts everything** - Use GA4/Web Analytics for real human visitor count
+- **Bot Fight Mode is essential** - Blocking 1,150 malicious requests/day automatically
+- **Google Search Console is critical** - Foundation for ALL organic traffic growth
+- **Content creation infrastructure exists** - Already have automation, just need distribution
+- **Zero budget growth is possible** - Reddit, Facebook groups, news outlet tagging all free
+
+**Traffic Analysis Breakdown:**
+- **Total requests (24h):** 3,680
+- **Verified search engine crawlers:** 166 (Google, Bing, etc.)
+- **Malicious bots blocked:** 1,150 (AWS/Azure/datacenter IPs)
+- **Real human visitors:** ~4 per day
+- **Bot Fight Mode success rate:** 100% mitigation
+
+**SEO Timeline (Expected):**
+- **Week 1 (Jan 6-12):** Google crawlers start visiting pages
+- **Week 2-3 (Jan 13-24):** First pages appear in search results, 1-5 organic visitors/day
+- **Month 2-3 (Feb-Mar):** Google traffic grows to 10-20 organic visitors/day
+- **Goal by March:** 50-100 real visitors/day (combined SEO + social media)
+
+**Social Media Accounts:**
+- ✅ Facebook: Active (Crime Hotspots page)
+- ✅ X (Twitter): Active (@crimehotspots_tt)
+- ✅ Instagram: Active (1 follower, posting weekly stats)
+- **Content workflow:** Google Apps Script generates stats → Image generator creates branded PNG → Post to all platforms
+
+**Next Steps (Week of Jan 6-12):**
+1. **Monday:** Generate weekly stats via `generateDailyStats()`, create branded image
+2. **Tuesday:** Reddit launch post to r/TrinidadandTobago
+3. **Wednesday:** Join 3-5 Trinidad Facebook groups (Crime Watch, community groups)
+4. **Friday:** X post tagging Trinidad news outlets (@GuardianTT, @ExpressTT, @Newsday_TT)
+
+**Files/Tools Involved:**
+- `google-apps-script/trinidad/socialMediaStats.gs` (stats automation)
+- `astro-poc/src/pages/tools/social-image-generator.astro` (image generator)
+- Google Search Console (sitemap submission)
+- Cloudflare Bot Fight Mode (bot protection)
+
+**Status:**
+- ✅ Traffic analysis: Complete
+- ✅ Google Search Console: Verified and sitemap submitted (1,728 pages discovered)
+- ✅ Bot protection: Working (1,150 blocks/day)
+- ✅ Social media strategy: Planned
+- ✅ Content creation workflow: Ready
+- 🔜 Social media execution: Week of Jan 6-12
+
+---
+
+### January 5, 2026 - Automation Scripts Updated for 2026 Crime Format & Victim Count
+
+**Problem Solved:**
+Google Apps Script automation files (`blogDataGenerator.gs` and `socialMediaStats.gs`) were using 2025 crime data format. Needed to update for 2026 format (primaryCrimeType + relatedCrimeTypes) and add victim count multiplier support.
+
+**Accomplishments:**
+1. **Blog Data Generator Updated** ✅
+   - Added `BLOG_CRIME_TYPE_CONFIG` for victim count multipliers
+   - Updated `getDetailedAreaBreakdown()` to support 2026 format (primaryCrimeType + relatedCrimeTypes)
+   - Added victim count tracking: incidents vs. victims per area
+   - Updated `formatBlogData()` to output comprehensive statistics with both incident and victim counts
+   - Created helper functions: `calculateTotalVictims()`, `calculateVictimsForCrimeType()`
+   - **Result:** Gemini receives complete data for high-quality blog generation
+
+2. **Social Media Stats Updated** ✅
+   - Added `SOCIAL_CRIME_TYPE_CONFIG` for victim count multipliers
+   - Updated `countByCrimeType()` to apply victim multipliers for primary crimes
+   - **Crime type counts now reflect victims** (e.g., double murder = +2 for Murder count)
+   - **Incident counts remain row-based** (total incidents stays accurate)
+   - Backward compatible with 2025 data
+
+3. **Victim Count Configuration** ✅
+   - Configurable per crime type (easy to update)
+   - **Enabled for:** Murder, Assault, Sexual Assault, Kidnapping, Robbery, Shooting
+   - **Disabled for:** Burglary, Home Invasion, Seizures, Theft
+   - Primary crimes use multiplier, related crimes always +1
+
+**Key Learnings:**
+- **Victim count for primary crimes only** - Related crimes always count as +1 to prevent double-counting
+- **Configuration-based approach** - Easy to enable/disable victim count for any crime type
+- **Backward compatibility essential** - Falls back to 2025 `Crime Type` field when new fields missing
+- **Incidents vs. crime type counts** - Total incidents (rows) vs. crime type totals (with multipliers) are different metrics
+
+**Example Impact:**
+```
+2026 Data Row: Murder (victimCount=3) + Shooting (related)
+
+Results:
+- Total Incidents: +1 (one row)
+- Murder count: +3 (victim multiplier)
+- Shooting count: +1 (related, no multiplier)
+
+Social Media Post:
+"📊 Total: 45 incidents this week
+• Murder: 12 (+4, ↑50%)  ← victim count, not incident count
+• Shooting: 10 (-1, ↓9%)"
+```
+
+**Files Modified:**
+- `google-apps-script/trinidad/blogDataGenerator.gs` (crime type config, area breakdown, output formatting, victim calculation helpers)
+- `google-apps-script/trinidad/socialMediaStats.gs` (crime type config, countByCrimeType function)
+
+**Status:**
+- ✅ Blog data generator: Updated for 2026 format + victim count
+- ✅ Social media stats: Updated for 2026 format + victim count
+- ✅ Backward compatibility: Both scripts work with 2025 data
+- ✅ Configuration system: Easy to update which crimes use victim count
+
+---
 
 ### January 4, 2026 - LCP Performance Optimization & Map Modal UX
 
@@ -623,23 +817,32 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 ## Current Status (Brief)
 
 ### ✅ Production Ready
-- Astro 5.16.5 framework (1,300+ static pages)
+- Astro 5.16.5 framework (1,728 static pages)
 - Trinidad & Tobago automation (100% functional)
 - Dashboard with Leaflet maps, year filtering, trend comparisons
-- Site-wide search (Pagefind, 1,584 pages indexed)
-- SEO Phase 1 complete (sitemap, structured data, breadcrumbs)
+- Site-wide search (Pagefind, 1,728 pages indexed)
+- SEO Phase 1 complete (sitemap, structured data, breadcrumbs, Google Search Console verified)
 - Google Analytics 4, cookie consent, user reporting
+- Social media accounts active (Facebook, X, Instagram) with content automation
 
 ### 🔄 In Progress
-- None - Approaching 2026 with intentional, focused development
+- **Traffic Growth Strategy (Week of Jan 6-12)** - Launching zero-budget social media distribution plan
+  - Reddit launch: r/TrinidadandTobago
+  - Facebook groups: Join 3-5 Trinidad crime/community groups
+  - X/Twitter: Tag Trinidad news outlets
+  - Goal: 50-100 real visitors/day by March 2026
 
 ### 📋 Priority Queue (2026)
-1. Division/Area filter enhancement (hierarchical filtering)
-2. Complete breadcrumb navigation
-3. **SEO Phase 2: Social Media Dominance** (HIGH PRIORITY)
-   - Open Graph preview images
-   - Auto-post to Facebook/X APIs
-   - Social sharing buttons
+1. **SEO Phase 2: Social Media Dominance** (ACTIVE - Week of Jan 6-12)
+   - ✅ Social accounts ready (Facebook, X, Instagram)
+   - ✅ Content automation (Google Apps Script + image generator)
+   - 🔜 Reddit launch
+   - 🔜 Facebook groups distribution
+   - 🔜 News outlet tagging strategy
+2. Division/Area filter enhancement (hierarchical filtering)
+3. Complete breadcrumb navigation
+4. Open Graph preview images (once traffic is established)
+5. Auto-post to Facebook/X APIs (future enhancement)
 
 See `docs/claude-context/status-and-roadmap.md` for complete details.
 

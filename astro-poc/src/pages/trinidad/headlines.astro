@@ -9,6 +9,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import CrimeCard from '../../components/CrimeCard.astro';
 import DateAccordion from '../../components/DateAccordion.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
+import BlogRotatingBanner from '../../components/BlogRotatingBanner.astro';
 import { getTrinidadCrimes, type Crime } from '../../lib/crimeData';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../lib/areaAliases';
@@ -107,6 +108,9 @@ const breadcrumbs = [
       <a href="/trinidad/archive" class="text-rose-600 hover:text-rose-700 transition">View Archive</a>
     </div>
 
+    <!-- Blog Rotating Banner -->
+    <BlogRotatingBanner country="tt" limit={3} />
+
     <!-- Crime Accordions by Date -->
     <div id="crimeAccordions">
       {sortedDates.map((date, index) => {
@@ -148,7 +152,28 @@ const breadcrumbs = [
             </button>
 
             <div class={`accordion-content overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[10000px] mt-3' : 'max-h-0'}`}>
-              <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
+              <!-- Mobile/Tablet Timeline View (single column with timeline) -->
+              <div class="relative pl-8 pb-4 sm:hidden">
+                {/* Vertical dotted line */}
+                <div class="absolute left-3 top-0 bottom-4 w-px border-l-2 border-dotted border-slate-300"></div>
+
+                {/* Crime cards with timeline dots */}
+                <div class="space-y-4">
+                  {crimes.map(crime => {
+                    const localName = getLocalName(areaAliases, crime.area);
+                    return (
+                      <div class="relative">
+                        {/* Timeline dot (filled red circle) - small dot at top of card */}
+                        <div class="absolute -left-[23px] top-4 w-1.5 h-1.5 rounded-full bg-rose-600"></div>
+                        <CrimeCard crime={crime} localName={localName} />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <!-- Desktop Grid View (no timeline) -->
+              <div class="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
                 {crimes.map(crime => {
                   const localName = getLocalName(areaAliases, crime.area);
                   return <CrimeCard crime={crime} localName={localName} />;
@@ -449,7 +474,25 @@ const breadcrumbs = [
           </button>
 
           <div class="accordion-content overflow-hidden transition-all duration-300 ${expandedClass}">
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
+            <!-- Mobile/Tablet Timeline View (single column with timeline) -->
+            <div class="relative pl-8 pb-4 sm:hidden">
+              <!-- Vertical dotted line -->
+              <div class="absolute left-3 top-0 bottom-4 w-px border-l-2 border-dotted border-slate-300"></div>
+
+              <!-- Crime cards with timeline dots -->
+              <div class="space-y-4">
+                ${crimes.map(crime => `
+                  <div class="relative">
+                    <!-- Timeline dot (filled red circle) - small dot at top of card -->
+                    <div class="absolute -left-[23px] top-4 w-1.5 h-1.5 rounded-full bg-rose-600"></div>
+                    ${createCrimeCardHTML(crime)}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Desktop Grid View (no timeline) -->
+            <div class="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
               ${crimes.map(crime => createCrimeCardHTML(crime)).join('')}
             </div>
           </div>

@@ -1,15 +1,21 @@
 ---
 /**
  * TopRegionsCard Component
- * Displays top 10 areas ranked by crime count
+ * Displays top 10 areas ranked by crime count with risk level bars
  * Data updates dynamically via JavaScript when filters change
  */
 
 import AreaNameTooltip from './AreaNameTooltip.astro';
 import { loadAreaAliases, getLocalName } from '../lib/areaAliases';
+import { getRiskWeight } from '../config/riskWeights';
+import { usesVictimCount } from '../config/crimeTypeConfig';
 
 interface Crime {
   area: string;
+  primaryCrimeType?: string;
+  crimeType?: string;
+  relatedCrimeTypes?: string;
+  victimCount?: number;
   [key: string]: any;
 }
 
@@ -22,7 +28,42 @@ const { crimes } = Astro.props;
 // Load area aliases for tooltips
 const areaAliases = await loadAreaAliases();
 
-// Calculate top areas
+// Calculate risk score for a single crime
+function calculateCrimeRisk(crime: Crime): number {
+  let riskScore = 0;
+
+  // Calculate primary crime risk
+  const primaryType = crime.primaryCrimeType || crime.crimeType;
+  if (primaryType) {
+    const weight = getRiskWeight(primaryType);
+    const victimCount = usesVictimCount(primaryType) && crime.victimCount ? crime.victimCount : 1;
+    riskScore += weight * victimCount;
+  }
+
+  // Calculate related crimes risk (always × 1, no victim multiplier)
+  if (crime.relatedCrimeTypes) {
+    const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim()).filter(t => t);
+    relatedTypes.forEach(relatedType => {
+      const weight = getRiskWeight(relatedType);
+      riskScore += weight * 1; // Always count as 1 for related crimes
+    });
+  }
+
+  return riskScore;
+}
+
+// Calculate risk scores for all areas
+const areaRiskScores = new Map<string, number>();
+crimes.forEach(crime => {
+  const area = crime.area || 'Unknown';
+  const riskScore = calculateCrimeRisk(crime);
+  areaRiskScores.set(area, (areaRiskScores.get(area) || 0) + riskScore);
+});
+
+// Find maximum risk score for normalization
+const maxRiskScore = Math.max(...Array.from(areaRiskScores.values()), 0);
+
+// Calculate top areas with risk percentages
 const areaCounts = Array.from(
   crimes.reduce((acc, crime) => {
     const area = crime.area || 'Unknown';
@@ -31,22 +72,69 @@ const areaCounts = Array.from(
   }, new Map<string, number>())
 )
   .sort((a, b) => b[1] - a[1])
-  .slice(0, 10);
+  .slice(0, 10)
+  .map(([area, count]) => {
+    const riskScore = areaRiskScores.get(area) || 0;
+    const riskPercentage = maxRiskScore > 0 ? Math.round((riskScore / maxRiskScore) * 100) : 0;
+    return { area, count, riskPercentage };
+  });
+
+// Get risk level text based on percentage
+function getRiskLevelText(percentage: number): string {
+  if (percentage <= 16) {
+    return 'Low';
+  } else if (percentage <= 33) {
+    return 'Medium';
+  } else if (percentage <= 50) {
+    return 'Concerning';
+  } else if (percentage <= 66) {
+    return 'High';
+  } else if (percentage <= 83) {
+    return 'Dangerous';
+  } else {
+    return 'Extremely Dangerous';
+  }
+}
+
+// Get text color based on risk level
+function getRiskTextColor(percentage: number): string {
+  if (percentage <= 33) {
+    return 'text-green-600';
+  } else if (percentage <= 66) {
+    return 'text-yellow-600';
+  } else {
+    return 'text-rose-600';
+  }
+}
 ---
 
 <div id="topRegionsCard" class="bg-white/70 backdrop-blur-md rounded-lg p-4 shadow-md">
   <h3 class="text-h3 font-bold text-slate-700 mb-4">Top Areas</h3>
-  <div id="topRegionsContainer" class="grid grid-cols-2 gap-x-4 gap-y-2">
-    {areaCounts.map(([area, count]) => {
+  <div id="topRegionsContainer" class="grid grid-cols-2 gap-x-4 gap-y-3">
+    {areaCounts.map(({ area, count, riskPercentage }) => {
       const localName = getLocalName(areaAliases, area);
+      const riskLevelText = getRiskLevelText(riskPercentage);
+      const riskTextColor = getRiskTextColor(riskPercentage);
       return (
-        <div class="flex justify-between items-center gap-2 pb-2 border-b border-slate-200">
-          <span class="text-xs text-slate-500 truncate flex-1">
-            <AreaNameTooltip area={area} localName={localName} />
-          </span>
-          <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium flex-shrink-0">
-            {count}
-          </span>
+        <div class="flex flex-col gap-1 pb-3 border-b border-slate-200">
+          <div class="flex justify-between items-center gap-2">
+            <span class="text-xs text-slate-500 truncate flex-1">
+              <AreaNameTooltip area={area} localName={localName} />
+            </span>
+            <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium flex-shrink-0">
+              {count}
+            </span>
+          </div>
+          <!-- Gradient reveal bar -->
+          <div class="relative w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+            <!-- Gradient bar wrapper (clips at percentage) -->
+            <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style={`width: ${riskPercentage}%`}>
+              <!-- Gradient spans full container width, clipped by wrapper -->
+              <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style={`width: ${riskPercentage > 0 ? (100 / riskPercentage) * 100 : 100}%`}></div>
+            </div>
+          </div>
+          <!-- Risk level text -->
+          <span class={`text-xs font-medium ${riskTextColor}`}>Risk: {riskLevelText}</span>
         </div>
       );
     })}
