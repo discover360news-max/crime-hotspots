@@ -6,6 +6,7 @@
  */
 
 import AreaNameTooltip from './AreaNameTooltip.astro';
+import InfoPopup from './InfoPopup.astro';
 import { loadAreaAliases, getLocalName } from '../lib/areaAliases';
 import { getRiskWeight } from '../config/riskWeights';
 import { usesVictimCount } from '../config/crimeTypeConfig';
@@ -109,7 +110,26 @@ function getRiskTextColor(percentage: number): string {
 ---
 
 <div id="topRegionsCard" class="bg-white/70 backdrop-blur-md rounded-lg p-4 shadow-md">
-  <h3 class="text-h3 font-bold text-slate-700 mb-4">Top Areas</h3>
+  <div class="flex items-center gap-2 mb-4">
+    <h3 class="text-h3 font-bold text-slate-700">Top Areas</h3>
+    <InfoPopup id="top-areas-risk-info">
+      <p class="font-semibold mb-2 text-slate-700">Understanding Risk Assessment</p>
+      <p class="mb-3">Each area's risk level is calculated based on crime severity and victim impact.</p>
+      <p class="font-semibold mb-2 text-slate-700">How It Works:</p>
+      <ul class="list-disc list-inside space-y-1 mb-3">
+        <li>Each crime type has a severity weight (Murder=10, Theft=2, etc.)</li>
+        <li>Victim counts multiply risk for serious crimes</li>
+        <li>Area risk = sum of all crime risk scores</li>
+        <li>Bar shows percentage relative to highest-risk area</li>
+      </ul>
+      <p class="font-semibold mb-2 text-slate-700">Color Guide:</p>
+      <ul class="list-disc list-inside space-y-1">
+        <li><span class="text-green-600 font-medium">Green</span>: Low risk (0-33%)</li>
+        <li><span class="text-yellow-600 font-medium">Yellow</span>: Medium risk (34-66%)</li>
+        <li><span class="text-rose-600 font-medium">Red</span>: High risk (67-100%)</li>
+      </ul>
+    </InfoPopup>
+  </div>
   <div id="topRegionsContainer" class="grid grid-cols-2 gap-x-4 gap-y-3">
     {areaCounts.map(({ area, count, riskPercentage }) => {
       const localName = getLocalName(areaAliases, area);
