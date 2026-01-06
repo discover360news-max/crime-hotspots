@@ -105,6 +105,7 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
       const summary = getColumn('Summary');
       const primaryCrimeType = getColumn('primaryCrimeType');
       const relatedCrimeTypes = getColumn('relatedCrimeType') || getColumn('relatedCrimeTypes');
+      const victimCountStr = getColumn('victimCount') || getColumn('victimcount') || getColumn('Victim Count');
       const crimeType = getColumn('Crime Type') || getColumn('crimeType');
       const date = getColumn('Date');
       const street = getColumn('Street Address') || getColumn('Street');
@@ -124,12 +125,17 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
 
       const slug = generateSlug(headline, dateObj);
 
+      // Parse victim count (default to 1 if not provided or invalid)
+      const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
+      const validVictimCount = !isNaN(victimCount) && victimCount > 0 ? victimCount : 1;
+
       crimes.push({
         date,
         headline,
         crimeType,
         primaryCrimeType: primaryCrimeType || undefined,
         relatedCrimeTypes: relatedCrimeTypes || undefined,
+        victimCount: validVictimCount,
         street,
         area,
         region,

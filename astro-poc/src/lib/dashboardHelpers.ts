@@ -8,26 +8,51 @@ import { usesVictimCount } from '../config/crimeTypeConfig';
 
 /**
  * Count crimes by type across both primaryCrimeType and relatedCrimeTypes
+ *
+ * VICTIM COUNT RULES:
+ * - Only applies to PRIMARY crime type (not related crimes)
+ * - Only for crime types configured with useVictimCount=true
+ * - Related crimes ALWAYS count as +1 (incident-based)
+ *
+ * Example:
+ * - Primary: Murder, victimCount: 3, Related: [Shooting]
+ * - Result: Murder +3, Shooting +1
+ *
  * @param crimeData - Array of crime data
  * @param targetType - Crime type to count (e.g., "Murder", "Robbery")
- * @returns Count of crimes matching the target type
+ * @returns Count of crimes matching the target type (with victim multiplier if applicable)
  */
 export const countCrimeType = (crimeData: Crime[], targetType: string): number => {
-  return crimeData.filter(crime => {
+  let totalCount = 0;
+
+  crimeData.forEach(crime => {
     // Check if primaryCrimeType matches
-    if (crime.primaryCrimeType === targetType) return true;
-
-    // Check if crimeType matches (fallback for old data)
-    if (crime.crimeType === targetType) return true;
-
-    // Check if relatedCrimeTypes contains the target type
-    if (crime.relatedCrimeTypes) {
-      const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
-      if (relatedTypes.includes(targetType)) return true;
+    if (crime.primaryCrimeType === targetType) {
+      // Apply victim count ONLY if this crime type uses it AND it's the primary crime
+      if (usesVictimCount(targetType) && crime.victimCount && crime.victimCount > 1) {
+        totalCount += crime.victimCount;
+      } else {
+        totalCount += 1;
+      }
+      return; // Don't check related types if primary matches
     }
 
-    return false;
-  }).length;
+    // Check if crimeType matches (fallback for old data - always count as 1)
+    if (crime.crimeType === targetType) {
+      totalCount += 1;
+      return;
+    }
+
+    // Check if relatedCrimeTypes contains the target type (always count as 1)
+    if (crime.relatedCrimeTypes) {
+      const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
+      if (relatedTypes.includes(targetType)) {
+        totalCount += 1;
+      }
+    }
+  });
+
+  return totalCount;
 };
 
 /**
@@ -60,16 +85,12 @@ export const calculateInsights = (crimeData: Crime[]) => {
     return sum + crimeCount;
   }, 0);
 
-  // Calculate total victims (respecting victimCount config)
+  // Calculate total victims (victimCount is per INCIDENT, not per crime type)
+  // Each row counts as victimCount victims, regardless of how many crime types it has
   const totalVictims = crimeData.reduce((sum, crime) => {
-    const primaryType = crime.primaryCrimeType || crime.crimeType;
-
-    if (primaryType && usesVictimCount(primaryType)) {
-      const victimCount = Number(crime.victimCount) || 1;
-      return sum + victimCount;
-    }
-
-    return sum + 1; // Count as 1 if crime type doesn't use victim count
+    // Use victimCount if present, otherwise default to 1
+    const victimCount = Number(crime.victimCount) || 1;
+    return sum + victimCount;
   }, 0);
 
   // Average crimes per day
