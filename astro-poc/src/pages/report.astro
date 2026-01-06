@@ -111,9 +111,12 @@ const description = "Help build safer communities: report crime anonymously via 
         </div>
       </div>
 
+      <!-- CRITICAL: data-size="invisible" is REQUIRED - DO NOT REMOVE -->
+      <!-- If missing, Turnstile fails with error 600010 -->
       <div id="reportTurnstile"
            class="cf-turnstile"
            data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ"
+           data-size="invisible"
            data-theme="light"
            data-callback="onReportTurnstileSuccess"></div>
       <div class="flex items-center justify-between mt-4">
