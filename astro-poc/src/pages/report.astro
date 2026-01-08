@@ -112,13 +112,8 @@ const description = "Help build safer communities: report crime anonymously via 
       </div>
 
       <!-- Cloudflare Turnstile Widget -->
-      <!-- With ?render=explicit mode, data attributes define config, render() triggers initialization -->
-      <div id="reportTurnstile"
-           class="cf-turnstile"
-           data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ"
-           data-size="invisible"
-           data-theme="light"
-           data-callback="onReportTurnstileSuccess"></div>
+      <!-- With ?render=explicit mode, config is passed to render() function, NOT via data attributes -->
+      <div id="reportTurnstile" class="cf-turnstile"></div>
       <div class="flex items-center justify-between mt-4">
         <div class="text-xs text-slate-500">
           You'll receive a unique anonymous report ID.
@@ -577,8 +572,8 @@ const description = "Help build safer communities: report crime anonymously via 
     }
 
     // --- Explicit Turnstile Rendering ---
-    // With ?render=explicit mode, we call render() to trigger initialization
-    // Data attributes on the div provide all configuration
+    // With ?render=explicit mode, pass ALL config to render() function
+    // Do NOT use data attributes when using explicit rendering
     function renderTurnstile() {
       if (typeof (window as any).turnstile === 'undefined') {
         console.warn('Turnstile not loaded yet, retrying...');
@@ -589,8 +584,13 @@ const description = "Help build safer communities: report crime anonymously via 
       try {
         const container = document.getElementById('reportTurnstile');
         if (container && !container.hasAttribute('data-rendered')) {
-          // Pass container only - data attributes handle config
-          (window as any).turnstile.render(container);
+          // Pass selector and full config object
+          (window as any).turnstile.render('#reportTurnstile', {
+            sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
+            size: 'invisible',
+            theme: 'light',
+            callback: (window as any).onReportTurnstileSuccess  // Function reference
+          });
           container.setAttribute('data-rendered', 'true');
           console.log('Turnstile widget rendered explicitly');
         }
