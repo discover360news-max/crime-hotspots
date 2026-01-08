@@ -173,12 +173,8 @@ const {
       {crimeSource && <input type="hidden" name="crimeSource" value={crimeSource} />}
       {crimeUrl && <input type="hidden" name="crimeUrl" value={crimeUrl} />}
 
-      <!-- Cloudflare Turnstile CAPTCHA -->
-      <div id="reportIssueTurnstile"
-           class="cf-turnstile"
-           data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ"
-           data-theme="light"
-           data-callback="onTurnstileSuccess"></div>
+      <!-- Turnstile container - widget will be rendered explicitly when modal opens -->
+      <div id="reportIssueTurnstile"></div>
 
       <!-- Result Message -->
       <div id="reportIssueResult" class="hidden p-4 rounded-lg border"></div>
@@ -224,6 +220,35 @@ const {
   const resultBox = document.getElementById('reportIssueResult');
   const submitBtn = document.getElementById('submitReportBtn');
 
+  let turnstileRendered = false;
+
+  // Render Turnstile widget explicitly
+  function renderTurnstileWidget() {
+    if (turnstileRendered) return;
+
+    if (typeof (window as any).turnstile === 'undefined') {
+      console.warn('Turnstile not loaded yet, retrying...');
+      setTimeout(renderTurnstileWidget, 100);
+      return;
+    }
+
+    try {
+      const container = document.getElementById('reportIssueTurnstile');
+      if (container && !container.hasAttribute('data-rendered')) {
+        (window as any).turnstile.render('#reportIssueTurnstile', {
+          sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
+          theme: 'light',
+          callback: (window as any).onTurnstileSuccess
+        });
+        container.setAttribute('data-rendered', 'true');
+        turnstileRendered = true;
+        console.log('Report Issue Turnstile widget rendered');
+      }
+    } catch (error) {
+      console.error('Turnstile render error:', error);
+    }
+  }
+
   // Open modal
   openBtn?.addEventListener('click', () => {
     if (modal && modalContent) {
@@ -233,6 +258,9 @@ const {
         modalContent.classList.remove('opacity-0', 'scale-95');
         modalContent.classList.add('opacity-100', 'scale-100');
       }, 50);
+
+      // Render Turnstile when modal opens
+      renderTurnstileWidget();
     }
   });
 

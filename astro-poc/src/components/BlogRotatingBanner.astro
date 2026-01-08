@@ -25,14 +25,14 @@ if (latestPosts.length === 0) return null;
 ---
 
 <div
-  class="blog-rotating-banner border border-rose-600 rounded-lg px-3 py-1 md:px-4 md:py-2 mb-4 overflow-hidden"
+  class="blog-rotating-banner border border-slate-600 rounded-lg px-3 py-1 md:px-4 md:py-2 mb-4 overflow-hidden"
   data-post-count={latestPosts.length}
 >
   <a href="/blog" class="flex items-center gap-2 md:gap-3 group">
     <!-- Horn Icon -->
     <div class="flex-shrink-0">
       <svg
-        class="w-4 h-4 md:w-5 md:h-5 text-rose-600"
+        class="w-4 h-4 md:w-5 md:h-5 text-slate-600"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -55,7 +55,7 @@ if (latestPosts.length === 0) return null;
           data-index={index}
           style={index === 0 ? 'opacity: 1; transform: translateY(0);' : 'opacity: 0; transform: translateY(100%);'}
         >
-          <span class="text-xs md:text-sm font-medium text-rose-600 group-hover:underline truncate">
+          <span class="text-xs md:text-sm font-medium text-slate-600 group-hover:underline truncate">
             {post.data.title}
           </span>
         </div>
@@ -65,7 +65,7 @@ if (latestPosts.length === 0) return null;
     <!-- Arrow Icon (indicates clickable) -->
     <div class="flex-shrink-0">
       <svg
-        class="w-4 h-4 text-rose-600 group-hover:translate-x-1 transition-transform"
+        class="w-4 h-4 text-slate-600 group-hover:translate-x-1 transition-transform"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"

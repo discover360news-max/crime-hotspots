@@ -93,9 +93,9 @@ const isHomepage = Astro.url.pathname === '/';
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet"></noscript>
 
-  <!-- Cloudflare Turnstile (loaded globally for all pages) -->
-  <!-- CRITICAL: Remove async/defer to ensure script loads before widget renders -->
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js"></script>
+  <!-- Cloudflare Turnstile (loaded globally with explicit rendering) -->
+  <!-- CRITICAL: render=explicit prevents auto-rendering, giving us control over when widgets initialize -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
 
   <!-- Cloudflare Web Analytics (cookieless, no consent needed, tracks all real visitors) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "9edc1888af84466fa5b067943e7c6f99"}'></script>

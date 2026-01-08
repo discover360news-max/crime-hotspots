@@ -1,6 +1,6 @@
 # Project Status & Roadmap
 
-**Last Updated:** December 27, 2025
+**Last Updated:** January 6, 2026
 
 ---
 
@@ -40,14 +40,31 @@
 - Enhanced duplicate detection (checks Production + Archive)
 - Seizures crime type (police enforcement actions)
 
+- **Victim Count System (Jan 1, 2026)** ✅
+  - victimCount field tracks multiple victims per incident
+  - Configurable per crime type (Murder, Assault, etc.)
+  - Critical rule: Victim count ONLY for PRIMARY crime (related crimes +1)
+  - Manual workflow transition (retired Gemini automation for data accuracy)
+
+- **2026 Crime Type System (Jan 1, 2026)** ✅
+  - Primary + related crime types (one incident = one row, multiple crime types)
+  - Column header mapping for CSV resilience
+  - Backward compatible with 2025 data format
+
 ### SEO & Content
 - **Phase 1 SEO Implementation (Dec 25, 2025)** ✅
-  - Sitemap.xml (auto-generated, 1,300+ pages)
+  - Sitemap.xml (auto-generated, 1,728 pages)
   - robots.txt, breadcrumbs on ALL pages
   - Meta descriptions, Open Graph tags, Twitter Cards
   - Structured Data (Schema.org): Dataset, BreadcrumbList, FAQPage, Organization
   - FAQ page (13 questions), Methodology page, About page
   - Weekly automated blog posts (Mondays)
+
+- **Traffic Analysis & SEO Foundation (Jan 5, 2026)** ✅
+  - Google Search Console verified, 1,728 pages discovered
+  - Bot traffic analysis: 99% bots (search engines + malicious), 4 real visitors/day
+  - Bot Fight Mode active (1,150 malicious requests blocked/day)
+  - Zero-budget social media growth strategy (Reddit, Facebook groups, X tagging)
 
 - **Blog System**
   - Astro Content Collections
@@ -69,6 +86,13 @@
 - SearchModal - Site-wide search
 - FiltersTray.astro - Dashboard slide-out filters
 
+- **January 2026 UX Enhancements** ✅
+  - BlogRotatingBanner - Auto-rotating blog posts (5s intervals)
+  - DateAccordion - Chronological crime grouping on Headlines
+  - AreaNameTooltip - Local area names on Dashboard Top Areas
+  - Headlines timeline visual (mobile-only dotted line + red dots)
+  - Map modal UX (View Details opens modal, stays on dashboard)
+
 ### Technical Improvements
 - Zero CLS (Cumulative Layout Shift) implementation
 - Dashboard code reduction (1,011 → 592 lines, 43%)
@@ -76,11 +100,24 @@
 - Map touch controls (two-finger pan, smart hints)
 - Cloudflare Turnstile CAPTCHA integration
 
+- **Performance Optimization (Jan 4, 2026)** ✅
+  - LCP reduction: 2035ms → ~1100ms (500-900ms improvement)
+  - Conditional resource loading (Leaflet only on map pages, ~150KB savings)
+  - Image optimization: PNG→JPG conversion (75KB→41KB, 45% reduction)
+  - Non-blocking CSS loading, resource hints (dns-prefetch, preconnect)
+  - Total savings: ~184KB per page load
+
 ---
 
 ## 🔄 In Progress
 
-- None - Approaching 2026 with intentional, focused development
+**Traffic Growth Strategy (Week of Jan 6-12, 2026)**
+- Zero-budget social media distribution
+- Reddit launch: r/TrinidadandTobago
+- Facebook groups: Join 3-5 Trinidad crime/community groups
+- X/Twitter: Tag Trinidad news outlets (@GuardianTT, @ExpressTT, @Newsday_TT)
+- Content workflow ready: Google Apps Script stats + branded image generator
+- Goal: 50-100 real visitors/day by March 2026
 
 ---
 

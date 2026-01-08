@@ -1,321 +1,342 @@
-# Recent Features (November - December 2025)
+# Recent Features (December 2025 - January 2026)
 
 **For:** Complete details of recently implemented features
 
-**Last Updated:** December 27, 2025
+**Last Updated:** January 8, 2026
+
+**Note:** Features older than 90 days are archived to `docs/archive/accomplishments/`
 
 ---
 
-## Dashboard Trend Indicators + Modal Navigation (Dec 26, 2025)
+## January 2026 Features
 
-**Status:** ✅ LIVE in Production
-**Commit:** `073952f`
+### Automated Cloudflare Pages Deployment (Jan 8, 2026)
 
-### 1. Dashboard Stat Card Trends
+**Problem:** Headlines not updating on live site despite local dev working correctly. Scheduled GitHub Actions builds ran daily but didn't trigger Cloudflare Pages deployments.
 
-- Added 30-day trend comparisons to all dashboard stat cards
-- Shows full year totals (e.g., 1535 total incidents) + trend indicator below
-- Trends compare last 30 days vs previous 30 days from entire database
-- **3-day lag offset** accounts for processing delay (crimes posted with crime date, not report date)
-- Color-coded: Red ↑ for increases, Green ↓ for decreases
-- Format: "↑ 25 (8%) vs prev 30 days"
+**Solution:**
+- Integrated Cloudflare API deployment trigger into GitHub Actions workflow
+- Deployment now triggered on: push to main, scheduled (6 AM UTC), manual workflow_dispatch
+- Uses GitHub secrets for credentials (CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN, CLOUDFLARE_PROJECT_NAME)
+- Ensures live site fetches fresh CSV data automatically
 
-**Why 3-Day Lag Matters:**
-- Crimes are posted with **crime date** (not report date)
-- 3-day processing lag means recent days have incomplete data
-- Without offset: Trends would compare incomplete vs complete data (misleading stats)
-- With offset: Always compares complete 30-day periods (accurate trends)
+**Key Learnings:**
+- Cloudflare Pages only rebuilds on git push by default - scheduled builds need explicit API trigger
+- Three deployment methods ensure resilience: commit-based, scheduled, manual
+- API deployment step only runs after successful build validation
 
-**Example Calculation (Dec 26, 2025):**
-- Last 30 days: Nov 23 - Dec 23 (ending 3 days ago)
-- Previous 30 days: Oct 24 - Nov 22 (33-63 days ago)
+**Files:** `.github/workflows/deploy.yml`
 
-### 2. Modal-First Navigation (Headlines + Archives)
-
-- Created HeadlinesModal and ArchivesModal components
-- Instant popups instead of page navigation (mobile-first UX)
-- Island selector shows active islands (Trinidad) vs "Coming Soon" (Guyana, Barbados, Jamaica)
-- Driven by `countries.ts` configuration
-- Saves one page load per user journey
-
-### 3. Monthly Archive Redesign
-
-- Replaced static crime list with dashboard-style insights
-- Horizontal scroll stat cards with trend arrows (month-over-month, year-over-year)
-- Quick Insights section: Deadliest day, Trending crime type, Overall trend
-- Value-driven data presentation (not just numbers)
-
-### 4. Cloudflare Turnstile Integration
-
-- Fixed ReportIssueModal and /report page CAPTCHA integration
-- **Key Learning:** Invisible mode requires async token generation
-- Added 1.5s wait time for token generation
-- Backend expects `cf-token` field (not `cf-turnstile-response`)
-- Callback tracking with `onReportTurnstileSuccess` for invisible mode
-
-**Turnstile Best Practices:**
-```javascript
-// Wait for invisible widget to generate token
-if (!token || token === '') {
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  const newFormData = new FormData(form);
-  token = newFormData.get('cf-turnstile-response');
-}
-
-// Backend expects 'cf-token' field
-const payload = {
-  'cf-token': turnstileToken,
-  // ... other fields
-};
-```
-
-### 5. Report Confirmation Screen Redesign
-
-- Added success checkmark icon (emerald green)
-- "What's Next?" section with actionable buttons
-- Browse Headlines + Submit Another buttons
-- Full-width Copy ID button
-
-**Technical Notes:**
-- Trend calculations separated: Display value (filtered crimes) vs Trend data (30-day periods from all crimes)
-- Helper function `updateCardWithTrend()` accepts 3 parameters: displayValue, last30Count, prev30Count
-- Trends hide automatically if no previous period data available
-- Modal state uses global window functions for cross-component communication
-- Turnstile site key: `0x4AAAAAAB_ThEy2ACY1KEYQ`
+**Status:** ✅ Complete - Live site now updates automatically daily
 
 ---
 
-## Site-Wide Search (Dec 27, 2025)
+### Traffic Analysis & SEO Foundation (Jan 5, 2026)
 
-**Status:** ✅ LIVE in Production
+**Problem:** Cloudflare showed 524 "visitors/day" but GA4 showed only ~4 real humans. Needed organic growth foundation.
 
-### Features Implemented:
+**Solution:**
+- Analyzed traffic composition: 99% bots (search engines + malicious scrapers)
+- Bot Fight Mode blocking 1,150 malicious requests/day automatically
+- Google Search Console setup: 1,728 pages discovered, sitemap submitted
+- Zero-budget social media growth strategy planned (Reddit, Facebook groups, X tagging)
 
-**Search Technology:**
-- Pagefind - Static site search with WebAssembly
-- 1,584 pages indexed (only crime detail pages)
-- Auto-generated search index during build
+**Key Learnings:**
+- Bot traffic is normal for large sites - use GA4/Web Analytics for real human count
+- Google Search Console is foundation for ALL organic traffic growth
+- Expected SEO timeline: 2-3 weeks for first organic visitors, 2-3 months for 10-20/day
 
-**Search Modal:**
-- Created `SearchModal.astro` component
-- Frosted glass design matching site aesthetics
-- Keyboard shortcut: Ctrl+K (Cmd+K on Mac)
-- Focus management (auto-focus on open)
-- Search across headlines, locations (streets, areas, regions), crime types
-
-**Search Accessibility:**
-- Header icon (desktop + mobile)
-- Footer button with social icons
-- Keyboard shortcut (Ctrl+K)
-
-**Content Security Policy:**
-- Added `'unsafe-eval'` to script-src for WebAssembly compilation
-- Required for Pagefind's WASM execution
-
-**Excluded from Search:**
-- Archive listing pages (`data-pagefind-ignore` on `/trinidad/archive/[year]/[month]`)
-- Headlines listing page (`data-pagefind-ignore` on `/trinidad/headlines`)
-- Dashboard page (`data-pagefind-ignore` on `/trinidad/dashboard`)
-
-**User Experience:**
-- Searching "Kimo" returns individual crime page (not archive page)
-- Instant results with highlighted matches
-- Clean result cards with excerpts
+**Status:** ✅ Complete - Sitemap submitted, social strategy ready for execution
 
 ---
 
-## Dashboard UX & Loading States (Dec 23, 2025)
+### Automation Scripts: 2026 Crime Format & Victim Count (Jan 5, 2026)
 
-**Status:** ✅ LIVE in Production
+**Problem:** Google Apps Script automation using 2025 format. Needed updates for 2026 primaryCrimeType + relatedCrimeTypes + victim count multipliers.
 
-### New Components Created:
+**Solution:**
+- Updated blogDataGenerator.gs and socialMediaStats.gs for 2026 format
+- Added CRIME_TYPE_CONFIG for victim count multipliers
+- Backward compatible with 2025 data (falls back to Crime Type field)
+- Victim count for primary crimes only (related crimes always +1)
 
-**1. InfoPopup.astro** - Click-based help tooltips
-- Top-center positioning, mobile-responsive
-- Fade in/out animations
-- Used on dashboard map info icon
-- Modal overlay with backdrop blur
-- Global state management (only one popup open at a time)
+**Key Learnings:**
+- Victim count prevents double-counting when applied to primary only
+- Configuration-based approach allows easy enable/disable per crime type
+- Incidents (rows) vs crime type counts (with multipliers) are different metrics
 
-**2. LoadingShimmer.astro** - Facebook-style shimmer loading
-- Configurable height, width, border radius
-- 1.5s gradient wave animation
-- 500ms minimum display time prevents flash on fast loads
-- Applied to stats cards, map, and insight cards
+**Files:** `blogDataGenerator.gs`, `socialMediaStats.gs`
 
-**3. ReportIssueModal.astro** - Crime data issue reporting
-- Pre-fills crime metadata (slug, headline, date, area, etc.)
-- Issue type checkboxes (Incorrect headline, Wrong date, Duplicate)
-- Information source dropdown (Eye-witness, News article, etc.)
-- Form validation and submission to Google Apps Script endpoint
-
-### Dashboard Improvements:
-
-**Loading States:**
-- Shimmer effects on initial load AND year filter changes
-- Smooth opacity transitions (300ms)
-- Fixed shimmer flash bug by removing initial yearFilter callbacks
-
-**Area vs Region:**
-- Changed dashboard from "regions" to "areas"
-- More culturally accurate for Trinidad (Port of Spain vs Cova-Tabaquite-Talparo)
-- Updated TopRegionsCard → TopAreasCard
-- Updated QuickInsightsCard "Top 3" stat
-
-**Map Touch Controls:**
-- Vertical swipe = page scroll (works normally)
-- Horizontal swipe on map = hint appears ("Use two fingers")
-- Fixed z-index: hint stays below header (z-10 instead of z-1000)
-
-**Button Layout:**
-- Headlines + Filters buttons stack vertically (better spacing)
-
-### Crime Detail Page Improvements:
-
-**Report Issue Feature:**
-- Button appears after Related Crimes section
-- Opens modal with pre-filled crime data
-- Users select issue types, provide source, describe problem
-- Optional contact email field
-
-**Location Display:**
-- Header now shows "Street, Area" instead of "Area, Region"
-- Removed redundant fields from details section (Street, Area)
-- Kept only Region and Source
-
-**Clickable Source:**
-- Source name now links to original article
-- Dotted underline styling (border-dotted)
-- Removed redundant "Read original article" button
-
-**Fixed Related Crimes Links:**
-- "All crimes in December 2025" → Monthly archive
-- "View [Region] on interactive map" → Dashboard
-- "Browse recent [CrimeType] incidents" → Headlines
+**Status:** ✅ Complete - Both scripts updated and tested
 
 ---
 
-## Dashboard Refactoring & Zero Layout Shift (Dec 23, 2025)
+### LCP Performance Optimization & Map Modal UX (Jan 4, 2026)
 
-**Status:** ✅ LIVE in Production
+**Problem:** LCP at 2035ms on homepage. Map marker popups navigated away from dashboard.
 
-**Code Reduction:**
-- Reduced dashboard from 876 lines → 592 lines (32% reduction)
+**Solution:**
+- Conditional resource loading: Leaflet only loads on map pages (~150KB savings)
+- Image optimization: Trinidad PNG→JPG (75KB→41KB, 45% reduction)
+- Resource hints: dns-prefetch, preconnect for fonts
+- Non-blocking CSS loading with media="print" onload trick
+- Map modal UX: View Details opens modal instead of navigating
 
-**New Scripts Created:**
-- `statCardFiltering.ts` (200+ lines) - Clickable stat card logic with tray sync
-- `dashboardUpdates.ts` (160+ lines) - All dashboard update functions
+**Key Learnings:**
+- Conditional loading saves massive bandwidth - props-based resource control is key
+- Image format matters for LCP - fetchpriority="high" signals browser
+- Modal UX keeps users in context - preserves dashboard state
 
-**Zero CLS Implementation:**
-- Fixed-height containers prevent jarring shifts
-  - Stats: 140px
-  - Map: 600px
-  - Insights/Top Regions: 400px each
-- Absolute positioning overlays
-- Shimmer control from display:none → opacity:0 (no layout reflows)
+**Performance Impact:** ~500-900ms reduction, ~184KB saved
 
-**Clickable Stat Cards:**
-- One-click crime type filtering (Murders, Robberies, etc.)
-- Toggle on/off behavior with heavy shadow hover effect
-- Active filter: rose-600 border + auto-scroll to center
-- Auto-return after 3 seconds if user scrolls away
-- Perfect sync with filter tray checkboxes
-- Works alongside year filter (combined filtering)
+**Files:** `Layout.astro`, `index.astro`, `methodology.astro`, `dashboard.astro`, `leafletMap.ts`, `CrimeDetailModal.astro`
+
+**Status:** ✅ Complete - Deployed to production
 
 ---
 
-## Year Filter System (Dec 18, 2025)
+### Area Tooltips: Dashboard Integration & Mobile Fix (Jan 3, 2026)
 
-**Status:** ✅ LIVE in Production
+**Problem:** Dashboard Top Areas showed official names without local aliases. Mobile tooltips had viewport overflow and click flash bugs.
 
-**Problem Solved:** Dashboard and headlines were loading all years of data simultaneously, causing performance issues and confusing year detection.
+**Solution:**
+- AreaNameTooltip component added to Top Areas card (server + client-side)
+- Viewport boundary detection with 8px padding, dynamic arrow positioning
+- Fixed duplicate event listeners with data-tooltip-initialized flag
+- Simplified click logic: tap shows, tap outside hides (no toggle state)
 
-**Features Implemented:**
-- **Default to Current Year:** Dashboard and headlines show only current year data on load
-- **Year Filter Dropdown:** Users can select specific years or "All Years" via filter tray
-- **Automatic Year Detection:** System detects current year from highest year in dataset
-- **Smart Data Loading:** Avoids duplicate fetching when URLs point to same sheet
-- **Filter Tray for Headlines:** Moved all headline filters into slide-out tray (matching dashboard UX)
+**Key Learnings:**
+- Portal pattern essential - append to document.body with position:fixed escapes overflow
+- Prevent duplicate listeners with data attributes when functions run multiple times
+- Simpler is better - complex toggle logic causes timing issues
 
-**Technical Implementation:**
-- Synchronized CSV URLs across `crimeData.ts` (server-side) and `dashboard.astro` (client-side)
-- Added duplicate prevention logic: don't fetch explicit 2025 if `current` points to 2025
-- Updated all dashboard widgets (Stats, Quick Insights, Top Regions, Leaflet Map) to update on year change
-- Headlines filters moved to frosted glass slide-in tray (`bg-white/60`, `rounded-l-2xl`)
+**Files:** `TopRegionsCard.astro`, `dashboardUpdates.ts`, `AreaNameTooltip.astro`
 
-**Key Lesson Learned:**
-CSV URLs **must** be synchronized between `crimeData.ts` and `dashboard.astro` to prevent:
-- Duplicate data loading (wastes bandwidth)
-- Wrong year showing on page load
-- "Flash" effect (shows 2025 then jumps to 2026)
+**Status:** ✅ Complete
 
 ---
 
-## Dashboard Refactoring (Dec 19, 2025)
+### Headlines Date Accordion & Victim Count Display (Jan 3, 2026)
 
-**Status:** ✅ LIVE in Production
+**Problem:** Headlines showed flat crime list with no date grouping. Accordion headers emphasized incident count over human impact.
 
-**Code Reduction:**
-- Reduced dashboard.astro from 1,011 lines to 579 lines (43% reduction)
+**Solution:**
+- DateAccordion component groups crimes by date (chronological organization)
+- Smart display modes: Accordions when no filters, flat grid when filtering
+- Replaced "X crimes" with "X victims" in accordion headers
+- Uses victimCount field (2026+), defaults to 1 for backward compatibility
 
-**Extracted Reusable Scripts:**
-- `yearFilter.ts` - Year filtering logic with callbacks (159 lines)
-- `leafletMap.ts` - Map initialization and updates (287 lines)
-- `statsScroll.ts` - Horizontal scroll behavior (33 lines)
+**Key Learnings:**
+- Accordion grouping improves UX for chronological scanning
+- Context-aware UI modes - accordions for browsing, grid for searching
+- Victim count emphasizes impact over incident statistics
 
-**Created Components:**
-- `FiltersTray.astro` - Slide-out filters (87 lines)
+**Files:** `DateAccordion.astro`, `headlines.astro`
 
-**Benefits:**
-- All scripts and components fully reusable across dashboards
-- Fixed ES6 import syntax issues in Astro script tags
-- Improved code maintainability and consistency
-
----
-
-## Enhanced Duplicate Detection (Dec 3, 2025)
-
-**Location:** `google-apps-script/guyana/processor.gs`, `google-apps-script/trinidad/processor.gs`
-
-**Problem:** Duplicates slipping through when older crimes have been archived from Production to Production Archive
-
-**Documentation:** `docs/automation/DUPLICATE-DETECTION-ARCHIVE.md`
+**Status:** ✅ Complete
 
 ---
 
-## Seizures Crime Type (Dec 3, 2025)
+### Victim Count System & Manual Workflow Transition (Jan 1, 2026)
 
-**Location:** `google-apps-script/guyana/geminiClient.gs`, `google-apps-script/trinidad/geminiClient.gs`
+**Problem:** Double/triple murders counted as single incidents. Gemini AI automation quota limits and accuracy issues.
 
-**Problem:** Gun/ammunition seizure stories were incorrectly classified as "Theft"
+**Solution:**
+- Added victimCount field to crime schema
+- Configurable per crime type in crimeTypeConfig.ts
+- Critical rule: Victim count ONLY applies to PRIMARY crime (related always +1)
+- Retired Gemini automation, transitioned to manual Google Form entry
+- Updated frontend CSV parser and dashboard counting logic
 
-**Documentation:** `docs/automation/SEIZURES-CRIME-TYPE.md`
+**Key Learnings:**
+- Automation isn't always better - manual entry provides complete data control
+- Primary vs related distinction prevents double-counting
+- Configuration > hardcoding for crime type settings
 
----
+**Files:** `crimeTypeConfig.ts`, `crimeData.ts`, `dashboardUpdates.ts`
 
-## Dashboard UI Enhancements (Dec 2, 2025)
-
-**Status:** ✅ LIVE in Production
-
-**Features:**
-- Navigation dropdown system (auto-populates from countries.js)
-- Horizontal scrollable widgets with animated visual hints
-- Visual hierarchy improvements (gradient separators)
-- Site-wide button standardization (px-4 py-1.5)
-- Date picker labels and accessibility improvements
-- Auto-closing region tray on filter apply
-- Z-index layering fixes (header, tray, maps)
+**Status:** ✅ Complete - System active Jan 1, 2026
 
 ---
 
-## Leaflet Map UX Overhaul (Dec 2, 2025)
+### Social Media Stats Triple-Mode System (Jan 1, 2026)
 
-**Status:** ✅ LIVE in Production
+**Problem:** Date range calculations off by 1 day (midnight vs end-of-day), timezone issues, no monthly/custom stats support.
 
-**Features:**
-- Two-finger pan requirement (one finger scrolls page)
-- Smart hint system (only shows when actually panning with one finger)
-- Reset View button to return to original position
-- Date filter integration (map updates with filtered data)
-- Touch movement detection (10px threshold)
-- Prevents hint from blocking marker popups
+**Solution:**
+- Fixed date boundaries to use noon (12:00) instead of midnight (prevents timezone edge cases)
+- Three modes: Daily (3-day lag), Monthly (no lag), Custom (manual date range)
+- Added UI prompt functions with validation
+- Optional automation triggers for daily/monthly stats
+
+**Key Learnings:**
+- Midnight boundaries cause timezone bugs - noon prevents off-by-1-day errors
+- End-of-day means 23:59:59, not 00:00:00
+- Reporting lag must account for COMPLETE days in data
+
+**Files:** `socialMediaStats.gs`
+
+**Status:** ✅ Complete
+
+---
+
+### Site Notification Banner & 2026 Crime Type System (Dec 28, 2025)
+
+**Problem:** Need user notifications for 2025 data updates. Need better crime tracking for 2026 (avoiding duplicate rows).
+
+**Solution:**
+- Toggle-based notification system (siteNotifications.ts)
+- Dismissible banner with localStorage persistence
+- 2026 primary + related crime types (one incident = one row)
+- Column header mapping for CSV resilience
+- Frontend countCrimeType helper counts across primary + related fields
+
+**Key Learnings:**
+- Toggle-based notifications user-friendly - single config controls site-wide
+- Backward compatibility critical - keeping old crimeType column prevents breakage
+- Column header mapping prevents breakage from reordering
+
+**Files:** `siteNotifications.ts`, `SiteNotificationBanner.astro`, `crimeTypeProcessor.gs`, `crimeData.ts`, `dashboardUpdates.ts`
+
+**Status:** ✅ Complete - Ready for Jan 1, 2026 launch
+
+---
+
+## December 2025 Features
+
+### Dashboard Trend Indicators + Modal Navigation (Dec 26, 2025)
+
+**Problem:** No trend context for crime statistics. Page navigation wasted user time.
+
+**Solution:**
+- 30-day trend comparisons on all stat cards (last 30 vs previous 30 days)
+- 3-day lag offset prevents incomplete data comparison
+- HeadlinesModal and ArchivesModal for instant island selection
+- Monthly archive redesign with dashboard-style insights
+- Cloudflare Turnstile CAPTCHA integration (invisible mode)
+
+**Key Learnings:**
+- 3-day lag critical - crimes posted with crime date, not report date
+- Modal-first navigation saves page loads, improves mobile UX
+- Invisible Turnstile requires 1.5s wait for async token generation
+
+**Files:** Dashboard stat cards, HeadlinesModal, ArchivesModal, ReportIssueModal
+
+**Status:** ✅ Complete
+
+### Site-Wide Search (Dec 27, 2025)
+
+**Problem:** No way to search 1,700+ pages. Search index showing unwanted UI content (modals, footers).
+
+**Solution:**
+- Pagefind static search with WebAssembly (1,584 crime pages indexed)
+- SearchModal with Ctrl+K shortcut, frosted glass design
+- data-pagefind-ignore on all modals, headers, footers
+- Manual CLI approach (npx pagefind --site dist) for reliable production builds
+
+**Key Learnings:**
+- Astro integrations may not run on all platforms - manual CLI more reliable
+- data-pagefind-body required to mark indexable content
+- Clean search results require aggressive data-pagefind-ignore tagging
+
+**Files:** `SearchModal.astro`, `Layout.astro`, `astro.config.mjs`
+
+**Status:** ✅ Complete
+
+---
+
+### Dashboard UX & Loading States (Dec 23, 2025)
+
+**Problem:** No loading feedback, jarring layout shifts, no user issue reporting.
+
+**Solution:**
+- InfoPopup component for click-based help tooltips (modal overlay)
+- LoadingShimmer component (Facebook-style, 500ms minimum display)
+- ReportIssueModal for user-submitted corrections
+- Map touch controls (two-finger pan, smart hints)
+- Changed "regions" to "areas" (culturally accurate)
+
+**Key Learnings:**
+- Fixed-height containers prevent CLS (Stats: 140px, Map: 600px, Insights: 400px)
+- Shimmer display:none → opacity:0 prevents layout reflows
+- Two-finger pan requirement improves mobile scrolling
+
+**Files:** `InfoPopup.astro`, `LoadingShimmer.astro`, `ReportIssueModal.astro`, `TopAreasCard.astro`
+
+**Status:** ✅ Complete
+
+---
+
+### Dashboard Refactoring & Clickable Stat Cards (Dec 23, 2025)
+
+**Problem:** Dashboard at 876 lines, no quick crime type filtering.
+
+**Solution:**
+- Extracted scripts: statCardFiltering.ts (200 lines), dashboardUpdates.ts (160 lines)
+- Reduced dashboard to 592 lines (32% reduction)
+- Clickable stat cards for one-click filtering with tray sync
+- Zero CLS with fixed-height containers and absolute positioning
+
+**Key Learnings:**
+- Reusable scripts improve maintainability across multiple dashboards
+- Clickable cards + auto-scroll improves mobile UX significantly
+- Fixed heights + opacity transitions = zero layout shift
+
+**Files:** `dashboard.astro`, `statCardFiltering.ts`, `dashboardUpdates.ts`
+
+**Status:** ✅ Complete
+
+### Year Filter System (Dec 18, 2025)
+
+**Problem:** Loading all years simultaneously caused performance issues and year detection confusion.
+
+**Solution:**
+- Default to current year on load (auto-detected from highest year in dataset)
+- Year filter dropdown in filter tray (specific years or "All Years")
+- Smart data loading prevents duplicate fetching when URLs point to same sheet
+- Synchronized CSV URLs across crimeData.ts (server) and dashboard.astro (client)
+
+**Key Learnings:**
+- CSV URL sync critical - prevents duplicate loading, flash effect, wrong year display
+- Must update both server and client-side fetchers when changing data sources
+
+**Files:** `crimeData.ts`, `dashboard.astro`, `headlines.astro`, `yearFilter.ts`
+
+**Status:** ✅ Complete
+
+---
+
+### Dashboard Refactoring (Dec 19, 2025)
+
+**Problem:** Dashboard at 1,011 lines, code duplication across widgets.
+
+**Solution:**
+- Extracted reusable scripts: yearFilter.ts (159 lines), leafletMap.ts (287 lines), statsScroll.ts (33 lines)
+- Created FiltersTray component (87 lines)
+- Reduced dashboard to 579 lines (43% reduction)
+
+**Key Learnings:**
+- Reusable scripts enable consistent behavior across multiple dashboards
+- ES6 imports in Astro require proper module structure
+
+**Files:** `dashboard.astro`, `yearFilter.ts`, `leafletMap.ts`, `statsScroll.ts`, `FiltersTray.astro`
+
+**Status:** ✅ Complete
+
+---
+
+### Enhanced Duplicate Detection & Seizures Crime Type (Dec 3, 2025)
+
+**Problems:**
+- Duplicates slipping through when crimes archived from Production to Production Archive
+- Gun/ammunition seizures incorrectly classified as "Theft"
+
+**Solutions:**
+- Enhanced duplicate detection checks both Production + Archive sheets
+- Added "Seizures" crime type for police enforcement actions
+
+**Documentation:** `docs/automation/DUPLICATE-DETECTION-ARCHIVE.md`, `docs/automation/SEIZURES-CRIME-TYPE.md`
+
+**Files:** `processor.gs`, `geminiClient.gs`
+
+**Status:** ✅ Complete

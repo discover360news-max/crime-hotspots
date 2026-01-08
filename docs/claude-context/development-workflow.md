@@ -21,17 +21,26 @@ npm run preview  # Preview production build
 
 ## Deployment
 
-**Manual Deployment:**
-1. Push to `main` branch
-2. GitHub Actions builds from `astro-poc/`
-3. Cloudflare Pages deploys automatically
+**Automated Deployment System (Jan 8, 2026):**
 
-**Automatic Deployment:**
-- Daily rebuild at 6 AM UTC (2 AM Trinidad time) via GitHub Actions schedule
-- Ensures new crime detail pages are generated for CSV updates
+The site deploys automatically via three methods:
 
-**Manual Trigger:**
-- GitHub Actions UI → "Build and Validate" workflow → "Run workflow" button
+1. **Push to main:** Commit triggers GitHub Actions → Cloudflare API deployment
+2. **Daily scheduled:** 6 AM UTC (2 AM Trinidad) automatic rebuild → Cloudflare API deployment
+3. **Manual trigger:** GitHub Actions UI → "Build and Validate" → "Run workflow" button
+
+**How It Works:**
+- GitHub Actions builds site from `astro-poc/`
+- On success, triggers Cloudflare Pages deployment via API
+- Uses GitHub secrets: CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN, CLOUDFLARE_PROJECT_NAME
+- Ensures live site fetches fresh CSV data automatically
+
+**Why This Was Needed:**
+- Cloudflare Pages only rebuilds on git push by default
+- Scheduled builds ran daily but didn't trigger deployments
+- This caused stale data on live site despite CSV updates
+
+**Workflow File:** `.github/workflows/deploy.yml`
 
 ---
 

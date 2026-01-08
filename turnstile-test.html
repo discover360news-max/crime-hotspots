@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloudflare Turnstile Local Testing</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #1f2937;
+      margin-bottom: 8px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .info-box {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 16px;
+      margin-bottom: 24px;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .warning-box {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 16px;
+      margin-bottom: 24px;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .test-section {
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      color: #374151;
+      margin-bottom: 12px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .badge-error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .badge-invisible {
+      background: #ddd6fe;
+      color: #5b21b6;
+    }
+
+    .description {
+      color: #6b7280;
+      font-size: 14px;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    form {
+      margin-top: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      color: #374151;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    button:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .result.success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .result.error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .code-block {
+      background: #1f2937;
+      color: #10b981;
+      padding: 16px;
+      border-radius: 6px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    .key-info {
+      background: #f3f4f6;
+      padding: 12px;
+      border-radius: 6px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+
+    .key-info strong {
+      color: #1f2937;
+    }
+
+    .key-info code {
+      background: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #dc2626;
+      font-family: 'Monaco', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>🔒 Cloudflare Turnstile Local Testing</h1>
+      <p class="subtitle">Test Turnstile widgets locally before deploying to production</p>
+
+      <div class="info-box">
+        <strong>ℹ️ About This Page:</strong><br>
+        This file allows you to test Cloudflare Turnstile locally without waiting for 12-minute production builds.
+        It uses test site keys that always pass/fail for predictable testing.
+      </div>
+
+      <div class="warning-box">
+        <strong>⚠️ Important:</strong> This page uses Cloudflare's <strong>TEST site keys</strong>.
+        These keys ALWAYS pass/fail regardless of actual verification. Do NOT use these keys in production!
+      </div>
+
+      <div class="key-info">
+        <strong>Test Keys Used:</strong><br>
+        • Always Passes: <code>1x00000000000000000000AA</code><br>
+        • Always Fails: <code>2x00000000000000000000AB</code><br>
+        • Production Key: <code>0x4AAAAAAB_ThEy2ACY1KEYQ</code> (use on live site)
+      </div>
+    </div>
+
+    <!-- Test 1: Visible Widget (Always Passes) -->
+    <div class="card">
+      <div class="test-section">
+        <h2>
+          <span>Test 1: Visible Widget</span>
+          <span class="badge badge-success">Always Passes</span>
+        </h2>
+        <p class="description">
+          This widget shows a visual checkbox that users must click. It uses the test key that always passes verification.
+          Used in: <strong>ReportIssueModal.astro</strong>
+        </p>
+
+        <form id="form1">
+          <div class="form-group">
+            <label for="name1">Your Name</label>
+            <input type="text" id="name1" placeholder="John Doe" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email1">Email Address</label>
+            <input type="email" id="email1" placeholder="john@example.com" required>
+          </div>
+
+          <!-- Turnstile Widget Container -->
+          <div id="turnstile-visible"></div>
+
+          <button type="submit">Submit Form (Should Pass)</button>
+        </form>
+
+        <div id="result1" class="result" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Test 2: Visible Widget (Always Fails) -->
+    <div class="card">
+      <div class="test-section">
+        <h2>
+          <span>Test 2: Visible Widget</span>
+          <span class="badge badge-error">Always Fails</span>
+        </h2>
+        <p class="description">
+          This widget uses the test key that always fails verification. Use this to test error handling.
+        </p>
+
+        <form id="form2">
+          <div class="form-group">
+            <label for="name2">Your Name</label>
+            <input type="text" id="name2" placeholder="Jane Smith" required>
+          </div>
+
+          <!-- Turnstile Widget Container -->
+          <div id="turnstile-fail"></div>
+
+          <button type="submit">Submit Form (Should Fail)</button>
+        </form>
+
+        <div id="result2" class="result" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Test 3: Invisible Widget (Auto-passes) -->
+    <div class="card">
+      <div class="test-section">
+        <h2>
+          <span>Test 3: Invisible Widget</span>
+          <span class="badge badge-invisible">Auto-Verifies</span>
+        </h2>
+        <p class="description">
+          This widget is invisible and verifies automatically in the background. No user interaction required.
+          Used in: <strong>report.astro</strong>
+        </p>
+
+        <form id="form3">
+          <div class="form-group">
+            <label for="name3">Your Name</label>
+            <input type="text" id="name3" placeholder="Test User" required>
+          </div>
+
+          <!-- Invisible Turnstile Widget -->
+          <div id="turnstile-invisible"></div>
+
+          <button type="submit">Submit Form (Auto-verifies)</button>
+        </form>
+
+        <div id="result3" class="result" style="display: none;"></div>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="card">
+      <h2>📖 How to Use This File</h2>
+      <div class="description">
+        <ol style="margin-left: 20px; line-height: 1.8;">
+          <li>Open this file directly in your browser (no server required)</li>
+          <li>Test all three widgets to ensure they render correctly</li>
+          <li>Check browser console for any errors or warnings</li>
+          <li>Verify tokens are generated and captured properly</li>
+          <li>Once everything works here, deploy to production with confidence</li>
+        </ol>
+      </div>
+
+      <div class="code-block">
+# Open this file locally
+open turnstile-test.html
+
+# Or from project root
+open /path/to/Crime\ Hotspots/turnstile-test.html
+      </div>
+    </div>
+  </div>
+
+  <!-- Cloudflare Turnstile Script with Explicit Rendering -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
+
+  <script>
+    // Wait for Turnstile to load
+    function waitForTurnstile(callback) {
+      if (typeof window.turnstile !== 'undefined') {
+        callback();
+      } else {
+        setTimeout(() => waitForTurnstile(callback), 100);
+      }
+    }
+
+    // Initialize widgets when Turnstile is ready
+    waitForTurnstile(() => {
+      console.log('✅ Turnstile API loaded successfully');
+
+      // Render Widget 1: Visible (Always Passes)
+      const widgetId1 = window.turnstile.render('#turnstile-visible', {
+        sitekey: '1x00000000000000000000AA', // Test key - always passes
+        theme: 'light',
+        callback: function(token) {
+          console.log('Widget 1 verified:', token);
+        }
+      });
+      console.log('Rendered widget 1 (visible, always passes):', widgetId1);
+
+      // Render Widget 2: Visible (Always Fails)
+      const widgetId2 = window.turnstile.render('#turnstile-fail', {
+        sitekey: '2x00000000000000000000AB', // Test key - always fails
+        theme: 'light',
+        'error-callback': function() {
+          console.log('Widget 2 failed as expected');
+        }
+      });
+      console.log('Rendered widget 2 (visible, always fails):', widgetId2);
+
+      // Render Widget 3: Invisible (Always Passes)
+      const widgetId3 = window.turnstile.render('#turnstile-invisible', {
+        sitekey: '1x00000000000000000000AA', // Test key - always passes
+        size: 'invisible',
+        callback: function(token) {
+          console.log('Widget 3 verified (invisible):', token);
+        }
+      });
+      console.log('Rendered widget 3 (invisible, auto-passes):', widgetId3);
+    });
+
+    // Form 1 Handler (Should Pass)
+    document.getElementById('form1').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const token = formData.get('cf-turnstile-response');
+      const result = document.getElementById('result1');
+
+      if (token) {
+        result.className = 'result success';
+        result.textContent = '✓ Success! Token captured: ' + token.substring(0, 20) + '...';
+        result.style.display = 'block';
+        console.log('Form 1 token:', token);
+      } else {
+        result.className = 'result error';
+        result.textContent = '✗ Error: No Turnstile token found';
+        result.style.display = 'block';
+      }
+    });
+
+    // Form 2 Handler (Should Fail)
+    document.getElementById('form2').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const token = formData.get('cf-turnstile-response');
+      const result = document.getElementById('result2');
+
+      // This should fail because we're using the always-fail test key
+      result.className = 'result error';
+      result.textContent = '✗ Expected behavior: This test key always fails verification';
+      result.style.display = 'block';
+      console.log('Form 2 intentionally uses failing test key');
+    });
+
+    // Form 3 Handler (Invisible)
+    document.getElementById('form3').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const token = formData.get('cf-turnstile-response');
+      const result = document.getElementById('result3');
+
+      if (token) {
+        result.className = 'result success';
+        result.textContent = '✓ Success! Invisible widget auto-verified: ' + token.substring(0, 20) + '...';
+        result.style.display = 'block';
+        console.log('Form 3 invisible token:', token);
+      } else {
+        result.className = 'result error';
+        result.textContent = '✗ Error: Invisible widget did not generate token';
+        result.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -111,14 +111,8 @@ const description = "Help build safer communities: report crime anonymously via 
         </div>
       </div>
 
-      <!-- CRITICAL: data-size="invisible" is REQUIRED - DO NOT REMOVE -->
-      <!-- If missing, Turnstile fails with error 600010 -->
-      <div id="reportTurnstile"
-           class="cf-turnstile"
-           data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ"
-           data-size="invisible"
-           data-theme="light"
-           data-callback="onReportTurnstileSuccess"></div>
+      <!-- Turnstile container - widget will be rendered explicitly via JavaScript -->
+      <div id="reportTurnstile"></div>
       <div class="flex items-center justify-between mt-4">
         <div class="text-xs text-slate-500">
           You'll receive a unique anonymous report ID.
@@ -576,8 +570,36 @@ const description = "Help build safer communities: report crime anonymously via 
       }
     }
 
+    // --- Explicit Turnstile Rendering ---
+    function renderTurnstile() {
+      if (typeof (window as any).turnstile === 'undefined') {
+        console.warn('Turnstile not loaded yet, retrying...');
+        setTimeout(renderTurnstile, 100);
+        return;
+      }
+
+      try {
+        const container = document.getElementById('reportTurnstile');
+        if (container && !container.hasAttribute('data-rendered')) {
+          (window as any).turnstile.render('#reportTurnstile', {
+            sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
+            size: 'invisible',
+            theme: 'light',
+            callback: (window as any).onReportTurnstileSuccess
+          });
+          container.setAttribute('data-rendered', 'true');
+          console.log('Turnstile widget rendered explicitly');
+        }
+      } catch (error) {
+        console.error('Turnstile render error:', error);
+      }
+    }
+
     // --- Initialize ---
     document.addEventListener("DOMContentLoaded", () => {
+      // Render Turnstile widget
+      renderTurnstile();
+
       // Initialize honeypot tracking
       sessionStorage.setItem('formLoadTime', Date.now().toString());
       sessionStorage.setItem('mouseMovements', '0');

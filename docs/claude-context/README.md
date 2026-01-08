@@ -2,11 +2,28 @@
 
 **Purpose:** Detailed reference documentation for Claude Code to understand Crime Hotspots codebase.
 
-**Last Updated:** December 27, 2025
+**Last Updated:** January 6, 2026
 
 ---
 
 ## File Structure
+
+### 🔧 MAINTENANCE-RULES.md
+**What it contains:**
+- Rules for keeping project memory files slim and purposeful
+- What to keep vs remove from documentation
+- Consolidation strategy and templates
+- Anti-patterns to avoid
+- Monthly maintenance checklist
+- File size limits (CLAUDE.md: 300 lines, context files: 400 lines)
+
+**When to reference:**
+- Before adding accomplishments to any documentation
+- Monthly review of file sizes
+- When consolidating old features
+- Creating new context documentation
+
+---
 
 ### 📐 architecture.md
 **What it contains:**
@@ -130,18 +147,30 @@
 
 ## Maintenance
 
+**📋 See `MAINTENANCE-RULES.md` for complete guidelines on keeping project memory slim.**
+
 **When to update these files:**
 - New major features implemented (update recent-features.md and status-and-roadmap.md)
 - Architecture changes (update architecture.md)
 - Workflow changes (update development-workflow.md)
 - Automation changes (update automation.md)
+- Monthly consolidation (follow MAINTENANCE-RULES.md checklist)
 
 **File size limits:**
-- Keep each file under 500 lines
-- If a file grows too large, consider splitting into sub-topics
+- CLAUDE.md: Max 300 lines (reference index only)
+- Context files: Max 400 lines each
+- If a file grows too large, consolidate or archive old content
 - Maintain clear, scannable structure with headings
+
+**Monthly Checklist:**
+- [ ] Check file sizes (use `wc -l` command)
+- [ ] Consolidate accomplishments in recent-features.md
+- [ ] Archive items older than 90 days to `docs/archive/accomplishments/`
+- [ ] Remove code examples (keep file references)
+- [ ] Update status-and-roadmap.md with current priorities
 
 ---
 
-**Last Refactor:** December 27, 2025
-**Reduced CLAUDE.md from:** 965 lines → 216 lines (78% reduction)
+**Refactor History:**
+- **January 6, 2026:** CLAUDE.md 965→260 lines (73% reduction), created MAINTENANCE-RULES.md
+- **December 27, 2025:** Initial context file structure created (78% reduction from original)

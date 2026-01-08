@@ -73,7 +73,13 @@
       "Bash(pkill:*)",
       "Bash(npx pagefind:*)",
       "WebFetch(domain:www.cnc3.co.tt)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "WebFetch(domain:crimehotspots.com)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_close"
     ],
     "deny": [],
     "ask": []

@@ -78,7 +78,7 @@ Bulleted list based on the data:
 
 ## Methodology Note
 Use this exact text:
-"All data is sourced from verified media reports published by Trinidad Express, Guardian TT, Newsday, and CNC3 between [dates]. Each incident has been cross-referenced with original source articles."
+"All data is sourced from verified media reports that may have been published by Trinidad Express, Guardian TT, Newsday, and CNC3 and reputable local Facebook Pages like Crime Watch between [dates]. Each incident has been cross-referenced with original source articles."
 
 ---
 *Crime Hotspots provides data-driven insights to enhance public safety awareness. View our interactive dashboard for real-time statistics and detailed geographic analysis.*
