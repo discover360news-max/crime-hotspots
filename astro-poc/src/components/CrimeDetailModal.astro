@@ -4,6 +4,7 @@
  * Modal that displays full crime details without navigating away
  * Keeps SEO benefits while improving UX
  */
+import ReportIssueModal from './ReportIssueModal.astro';
 ---
 
 <!-- Modal Backdrop -->
@@ -50,6 +51,14 @@
           </a>
         </div>
 
+        <!-- Report Issue Button -->
+        <button id="modalReportIssueBtn" class="w-full px-4 py-1.5 min-h-[22px] flex items-center justify-center gap-2 border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          Report Issue with This Crime
+        </button>
+
         <!-- Share Section -->
         <div class="flex items-center gap-2">
           <span class="text-xs text-slate-500">Share:</span>
@@ -80,6 +89,20 @@
   </div>
 </div>
 
+<!-- Hidden ReportIssueModal - Values will be updated dynamically -->
+<ReportIssueModal
+  crimeSlug=""
+  crimeHeadline=""
+  crimeDate=""
+  crimeType=""
+  crimeArea=""
+  crimeRegion=""
+  crimeStreet=""
+  crimeSummary=""
+  crimeSource=""
+  crimeUrl=""
+/>
+
 <script>
   const backdrop = document.getElementById('crimeDetailBackdrop');
   const modal = document.getElementById('crimeDetailModal');
@@ -88,6 +111,7 @@
 
   let currentCrimeUrl = '';
   let currentCrimeHeadline = '';
+  let currentCrimeData = null; // Store full crime object
 
   // Function to open modal with crime data
   function openCrimeModal(crime) {
@@ -140,9 +164,10 @@
       sourceBtn.style.display = 'none';
     }
 
-    // Store for sharing
+    // Store for sharing and reporting
     currentCrimeUrl = `https://crimehotspots.com/trinidad/crime/${crime.slug}`;
     currentCrimeHeadline = crime.headline;
+    currentCrimeData = crime; // Store full crime object for Report Issue
 
     // Show modal
     backdrop.classList.remove('hidden', 'pointer-events-none');
@@ -243,6 +268,57 @@
     } else {
       console.error('Crime not found:', slug);
     }
+  }
+
+  // Handle Report Issue button click
+  const modalReportIssueBtn = document.getElementById('modalReportIssueBtn');
+  if (modalReportIssueBtn) {
+    modalReportIssueBtn.addEventListener('click', () => {
+      if (!currentCrimeData) return;
+
+      // Update hidden form fields with current crime data
+      const form = document.getElementById('reportIssueForm') as HTMLFormElement;
+      if (form) {
+        // Update hidden fields
+        (form.querySelector('input[name="crimeSlug"]') as HTMLInputElement).value = currentCrimeData.slug || '';
+        (form.querySelector('input[name="crimeHeadline"]') as HTMLInputElement).value = currentCrimeData.headline || '';
+        (form.querySelector('input[name="crimeDate"]') as HTMLInputElement).value = currentCrimeData.date || '';
+        (form.querySelector('input[name="crimeType"]') as HTMLInputElement).value = currentCrimeData.crimeType || '';
+        (form.querySelector('input[name="crimeArea"]') as HTMLInputElement).value = currentCrimeData.area || '';
+        (form.querySelector('input[name="crimeRegion"]') as HTMLInputElement).value = currentCrimeData.region || '';
+
+        const streetInput = form.querySelector('input[name="crimeStreet"]') as HTMLInputElement;
+        if (streetInput) streetInput.value = currentCrimeData.street || '';
+
+        const summaryInput = form.querySelector('input[name="crimeSummary"]') as HTMLInputElement;
+        if (summaryInput) summaryInput.value = currentCrimeData.summary || '';
+
+        const sourceInput = form.querySelector('input[name="crimeSource"]') as HTMLInputElement;
+        if (sourceInput) sourceInput.value = currentCrimeData.source || '';
+
+        const urlInput = form.querySelector('input[name="crimeUrl"]') as HTMLInputElement;
+        if (urlInput) urlInput.value = currentCrimeData.url || '';
+
+        // Update preview text in the modal
+        const previewHeadline = form.querySelector('.text-sm.font-semibold.text-slate-700');
+        if (previewHeadline) previewHeadline.textContent = currentCrimeData.headline || '';
+
+        const previewMeta = form.querySelector('.text-xs.text-slate-500.mt-1');
+        if (previewMeta) previewMeta.textContent = `${currentCrimeData.date || ''} • ${currentCrimeData.area || ''}`;
+      }
+
+      // Trigger the built-in button click to open the modal
+      const reportIssueBtn = document.getElementById('reportIssueBtn');
+      if (reportIssueBtn) {
+        reportIssueBtn.click();
+      }
+    });
+  }
+
+  // Hide the built-in Report Issue button (we're using the custom one in CrimeDetailModal)
+  const builtInReportBtn = document.getElementById('reportIssueBtn');
+  if (builtInReportBtn) {
+    builtInReportBtn.style.display = 'none';
   }
 
   // Expose functions globally so cards/markers can call them
