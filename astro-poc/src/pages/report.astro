@@ -112,7 +112,8 @@ const description = "Help build safer communities: report crime anonymously via 
       </div>
 
       <!-- Turnstile container - widget will be rendered explicitly via JavaScript -->
-      <div id="reportTurnstile"></div>
+      <!-- CRITICAL: cf-turnstile class is REQUIRED even with explicit rendering -->
+      <div id="reportTurnstile" class="cf-turnstile"></div>
       <div class="flex items-center justify-between mt-4">
         <div class="text-xs text-slate-500">
           You'll receive a unique anonymous report ID.

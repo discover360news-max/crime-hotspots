@@ -174,7 +174,8 @@ const {
       {crimeUrl && <input type="hidden" name="crimeUrl" value={crimeUrl} />}
 
       <!-- Turnstile container - widget will be rendered explicitly when modal opens -->
-      <div id="reportIssueTurnstile"></div>
+      <!-- CRITICAL: cf-turnstile class is REQUIRED even with explicit rendering -->
+      <div id="reportIssueTurnstile" class="cf-turnstile"></div>
 
       <!-- Result Message -->
       <div id="reportIssueResult" class="hidden p-4 rounded-lg border"></div>
