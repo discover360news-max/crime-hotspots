@@ -50,8 +50,14 @@ function handleRequest(e) {
       }, 403);
     }
 
-    sendCrimeReportEmail(payload);
-    saveToSheet(payload);
+    // Handle different report types
+    if (payload.reportType === 'crime-issue') {
+      sendIssueReportEmail(payload);
+      saveIssueToSheet(payload);
+    } else {
+      sendCrimeReportEmail(payload);
+      saveToSheet(payload);
+    }
 
     return createResponse({
       success: true,
@@ -122,6 +128,81 @@ function saveToSheet(data) {
     Logger.log('Report saved to sheet: ' + data.id);
   } catch (error) {
     Logger.log('Error saving to sheet: ' + error.toString());
+    Logger.log('Stack trace: ' + error.stack);
+  }
+}
+
+// === SEND ISSUE REPORT EMAIL ===
+function sendIssueReportEmail(data) {
+  const subject = 'Crime Report Issue: ' + data.crimeType + ' in ' + (data.crimeArea || data.crimeRegion);
+
+  const issueTypes = Array.isArray(data.issueTypes) ? data.issueTypes.join(', ') : 'Not specified';
+
+  const htmlBody = '<html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #e11d48;">Crime Report Issue Submitted</h2><table style="width: 100%; border-collapse: collapse;"><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Slug</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeSlug || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Headline</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeHeadline || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Date of Incident</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeDate || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Type</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeType || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Region</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeRegion || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Area</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeArea || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Street</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeStreet || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Source URL</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeUrl || 'Not specified') + '</td></tr><tr style="background-color: #fffbeb;"><td colspan="2" style="padding: 15px; border: 1px solid #f59e0b;"><h3 style="margin: 0 0 10px 0; color: #92400e;">Issue Details</h3><p style="margin: 5px 0;"><strong>Issue Types:</strong> ' + issueTypes + '</p><p style="margin: 5px 0;"><strong>Information Source:</strong> ' + (data.informationSource || 'Not specified') + '</p><p style="margin: 5px 0;"><strong>Description:</strong></p><p style="margin: 5px 0; white-space: pre-wrap;">' + (data.description || 'No description provided') + '</p><p style="margin: 5px 0;"><strong>Contact Email:</strong> ' + (data.contactEmail || 'Not provided') + '</p></td></tr></table><p style="margin-top: 20px; font-size: 12px; color: #6c757d;"><strong>Submitted:</strong> ' + (data.timestamp || new Date().toLocaleString()) + '<br><strong>User Agent:</strong> ' + (data.userAgent || 'Unknown') + '</p></body></html>';
+
+  const textBody = 'CRIME REPORT ISSUE SUBMITTED\n\nCrime Slug: ' + (data.crimeSlug || 'Not specified') + '\nHeadline: ' + (data.crimeHeadline || 'Not specified') + '\nDate: ' + (data.crimeDate || 'Not specified') + '\nType: ' + (data.crimeType || 'Not specified') + '\nRegion: ' + (data.crimeRegion || 'Not specified') + '\nArea: ' + (data.crimeArea || 'Not specified') + '\nStreet: ' + (data.crimeStreet || 'Not specified') + '\nSource: ' + (data.crimeUrl || 'Not specified') + '\n\n--- ISSUE DETAILS ---\nIssue Types: ' + issueTypes + '\nInformation Source: ' + (data.informationSource || 'Not specified') + '\n\nDescription:\n' + (data.description || 'No description provided') + '\n\nContact Email: ' + (data.contactEmail || 'Not provided') + '\n\n---\nSubmitted: ' + (data.timestamp || new Date().toLocaleString()) + '\nUser Agent: ' + (data.userAgent || 'Unknown');
+
+  MailApp.sendEmail({
+    to: RECIPIENT_EMAIL,
+    subject: subject,
+    body: textBody,
+    htmlBody: htmlBody
+  });
+}
+
+// === SAVE ISSUE REPORT TO SHEET ===
+function saveIssueToSheet(data) {
+  try {
+    Logger.log('Attempting to save issue report: ' + JSON.stringify(data));
+
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Issue Reports');
+
+    // Create sheet if it doesn't exist
+    if (!sheet) {
+      const ss = SpreadsheetApp.openById(SHEET_ID);
+      const newSheet = ss.insertSheet('Issue Reports');
+      newSheet.appendRow([
+        'Timestamp',
+        'Crime Slug',
+        'Crime Headline',
+        'Crime Date',
+        'Crime Type',
+        'Region',
+        'Area',
+        'Street',
+        'Source URL',
+        'Issue Types',
+        'Information Source',
+        'Description',
+        'Contact Email',
+        'User Agent'
+      ]);
+    }
+
+    const issueSheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Issue Reports');
+    const timestamp = new Date();
+    const issueTypes = Array.isArray(data.issueTypes) ? data.issueTypes.join(', ') : '';
+
+    issueSheet.appendRow([
+      timestamp,
+      data.crimeSlug || '',
+      data.crimeHeadline || '',
+      data.crimeDate || '',
+      data.crimeType || '',
+      data.crimeRegion || '',
+      data.crimeArea || '',
+      data.crimeStreet || '',
+      data.crimeUrl || '',
+      issueTypes,
+      data.informationSource || '',
+      data.description || '',
+      data.contactEmail || '',
+      data.userAgent || 'Unknown'
+    ]);
+
+    Logger.log('Issue report saved to sheet');
+  } catch (error) {
+    Logger.log('Error saving issue to sheet: ' + error.toString());
     Logger.log('Stack trace: ' + error.stack);
   }
 }
