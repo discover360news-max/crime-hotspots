@@ -582,11 +582,11 @@ const description = "Help build safer communities: report crime anonymously via 
       try {
         const container = document.getElementById('reportTurnstile');
         if (container && !container.hasAttribute('data-rendered')) {
-          (window as any).turnstile.render('#reportTurnstile', {
+          (window as any).turnstile.render(container, {
             sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
             size: 'invisible',
             theme: 'light',
-            callback: (window as any).onReportTurnstileSuccess
+            callback: 'onReportTurnstileSuccess'  // String name, not function reference
           });
           container.setAttribute('data-rendered', 'true');
           console.log('Turnstile widget rendered explicitly');

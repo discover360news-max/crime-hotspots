@@ -236,10 +236,10 @@ const {
     try {
       const container = document.getElementById('reportIssueTurnstile');
       if (container && !container.hasAttribute('data-rendered')) {
-        (window as any).turnstile.render('#reportIssueTurnstile', {
+        (window as any).turnstile.render(container, {
           sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
           theme: 'light',
-          callback: (window as any).onTurnstileSuccess
+          callback: 'onTurnstileSuccess'  // String name, not function reference
         });
         container.setAttribute('data-rendered', 'true');
         turnstileRendered = true;
