@@ -111,9 +111,14 @@ const description = "Help build safer communities: report crime anonymously via 
         </div>
       </div>
 
-      <!-- Turnstile container - widget will be rendered explicitly via JavaScript -->
-      <!-- CRITICAL: cf-turnstile class is REQUIRED even with explicit rendering -->
-      <div id="reportTurnstile" class="cf-turnstile"></div>
+      <!-- Cloudflare Turnstile Widget -->
+      <!-- With ?render=explicit mode, data attributes define config, render() triggers initialization -->
+      <div id="reportTurnstile"
+           class="cf-turnstile"
+           data-sitekey="0x4AAAAAAB_ThEy2ACY1KEYQ"
+           data-size="invisible"
+           data-theme="light"
+           data-callback="onReportTurnstileSuccess"></div>
       <div class="flex items-center justify-between mt-4">
         <div class="text-xs text-slate-500">
           You'll receive a unique anonymous report ID.
@@ -572,6 +577,8 @@ const description = "Help build safer communities: report crime anonymously via 
     }
 
     // --- Explicit Turnstile Rendering ---
+    // With ?render=explicit mode, we call render() to trigger initialization
+    // Data attributes on the div provide all configuration
     function renderTurnstile() {
       if (typeof (window as any).turnstile === 'undefined') {
         console.warn('Turnstile not loaded yet, retrying...');
@@ -582,12 +589,8 @@ const description = "Help build safer communities: report crime anonymously via 
       try {
         const container = document.getElementById('reportTurnstile');
         if (container && !container.hasAttribute('data-rendered')) {
-          (window as any).turnstile.render(container, {
-            sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
-            size: 'invisible',
-            theme: 'light',
-            callback: 'onReportTurnstileSuccess'  // String name, not function reference
-          });
+          // Pass container only - data attributes handle config
+          (window as any).turnstile.render(container);
           container.setAttribute('data-rendered', 'true');
           console.log('Turnstile widget rendered explicitly');
         }
