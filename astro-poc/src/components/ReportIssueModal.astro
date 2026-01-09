@@ -16,6 +16,8 @@ interface Props {
   crimeSummary?: string;
   crimeSource?: string;
   crimeUrl?: string;
+  idPrefix?: string; // Unique prefix for IDs to prevent duplicates when multiple instances exist
+  showButton?: boolean; // Whether to render the trigger button (default: false)
 }
 
 const {
@@ -28,36 +30,40 @@ const {
   crimeStreet,
   crimeSummary,
   crimeSource,
-  crimeUrl
+  crimeUrl,
+  idPrefix = '', // Default to empty string
+  showButton = false // Default to not showing button
 } = Astro.props;
 ---
 
-<!-- Report Issue Button -->
-<button
-  id="reportIssueBtn"
-  class="px-4 py-1.5 min-h-[22px] flex items-center justify-center gap-2 border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
->
-  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-  </svg>
-  Report Issue
-</button>
+<!-- Report Issue Button (only render if showButton is true) -->
+{showButton && (
+  <button
+    id={`${idPrefix}reportIssueBtn`}
+    class="px-4 py-1.5 min-h-[22px] flex items-center justify-center gap-2 border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
+  >
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+    Report Issue
+  </button>
+)}
 
 <!-- Modal Overlay -->
 <div
-  id="reportIssueModal"
+  id={`${idPrefix}reportIssueModal`}
   class="fixed inset-0 bg-black/50 z-50 opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4"
 >
   <!-- Modal Content -->
   <div
-    id="reportIssueContent"
+    id={`${idPrefix}reportIssueContent`}
     class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto opacity-0 scale-95 transition-all duration-300"
   >
     <!-- Modal Header -->
     <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
       <h2 class="text-h2 font-bold text-slate-700">Report Issue</h2>
       <button
-        id="closeModalBtn"
+        id={`${idPrefix}closeModalBtn`}
         class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 transition text-slate-500 hover:text-slate-700"
         aria-label="Close"
       >
@@ -66,7 +72,7 @@ const {
     </div>
 
     <!-- Form -->
-    <form id="reportIssueForm" class="p-6 space-y-6">
+    <form id={`${idPrefix}reportIssueForm`} class="p-6 space-y-6">
       <!-- Crime Info Preview -->
       <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
         <p class="text-xs font-semibold text-slate-500 mb-2">Reporting issue for:</p>
@@ -175,23 +181,23 @@ const {
 
       <!-- Turnstile container - widget will be rendered explicitly when modal opens -->
       <!-- CRITICAL: cf-turnstile class is REQUIRED even with explicit rendering -->
-      <div id="reportIssueTurnstile" class="cf-turnstile"></div>
+      <div id={`${idPrefix}reportIssueTurnstile`} class="cf-turnstile"></div>
 
       <!-- Result Message -->
-      <div id="reportIssueResult" class="hidden p-4 rounded-lg border"></div>
+      <div id={`${idPrefix}reportIssueResult`} class="hidden p-4 rounded-lg border"></div>
 
       <!-- Submit Button -->
       <div class="flex gap-3 justify-end">
         <button
           type="button"
-          id="cancelReportBtn"
+          id={`${idPrefix}cancelReportBtn`}
           class="px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition font-medium text-xs"
         >
           Cancel
         </button>
         <button
           type="submit"
-          id="submitReportBtn"
+          id={`${idPrefix}submitReportBtn`}
           class="px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition font-medium text-xs"
         >
           Submit Report
@@ -202,48 +208,57 @@ const {
 </div>
 
 <script is:inline>
-  // Global callback for Turnstile success
-  window.onTurnstileSuccess = function(token) {
-    console.log('Turnstile verified:', token ? 'Success' : 'Failed');
+  // Global callback for Turnstile success (Report Issue Modal)
+  window.onReportIssueTurnstileSuccess = function(token) {
+    console.log('Report Issue Turnstile ready:', token ? 'Yes' : 'No');
   };
 </script>
 
-<script>
-  // Google Apps Script endpoint (same as reportStandalone.js)
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_4stfkJGTTDvjZ62jVae-BqbvHLHscuMgX76q6oLV7ETCwE1esVj_co5bHTeG_gSl/exec";
+<script define:vars={{ idPrefix }}>
+  // Wrap everything in DOMContentLoaded to ensure DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    // Google Apps Script endpoint (same as reportStandalone.js)
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_4stfkJGTTDvjZ62jVae-BqbvHLHscuMgX76q6oLV7ETCwE1esVj_co5bHTeG_gSl/exec";
 
-  const openBtn = document.getElementById('reportIssueBtn');
-  const closeBtn = document.getElementById('closeModalBtn');
-  const cancelBtn = document.getElementById('cancelReportBtn');
-  const modal = document.getElementById('reportIssueModal');
-  const modalContent = document.getElementById('reportIssueContent');
-  const form = document.getElementById('reportIssueForm') as HTMLFormElement;
-  const resultBox = document.getElementById('reportIssueResult');
-  const submitBtn = document.getElementById('submitReportBtn');
+    const openBtn = document.getElementById(`${idPrefix}reportIssueBtn`);
+    const closeBtn = document.getElementById(`${idPrefix}closeModalBtn`);
+    const cancelBtn = document.getElementById(`${idPrefix}cancelReportBtn`);
+    const modal = document.getElementById(`${idPrefix}reportIssueModal`);
+    const modalContent = document.getElementById(`${idPrefix}reportIssueContent`);
+    const form = document.getElementById(`${idPrefix}reportIssueForm`);
+    const resultBox = document.getElementById(`${idPrefix}reportIssueResult`);
+    const submitBtn = document.getElementById(`${idPrefix}submitReportBtn`);
 
-  let turnstileRendered = false;
+    console.log('ReportIssueModal DEBUG:', {
+      idPrefix: idPrefix || '(empty)',
+      buttonId: `${idPrefix}reportIssueBtn`,
+      openBtn: openBtn,
+      modal: modal
+    });
+
+    let turnstileRendered = false;
 
   // Render Turnstile widget explicitly
   function renderTurnstileWidget() {
     if (turnstileRendered) return;
 
-    if (typeof (window as any).turnstile === 'undefined') {
+    if (typeof window.turnstile === 'undefined') {
       console.warn('Turnstile not loaded yet, retrying...');
       setTimeout(renderTurnstileWidget, 100);
       return;
     }
 
     try {
-      const container = document.getElementById('reportIssueTurnstile');
+      const container = document.getElementById(`${idPrefix}reportIssueTurnstile`);
       if (container && !container.hasAttribute('data-rendered')) {
-        (window as any).turnstile.render(container, {
+        window.turnstile.render(container, {
           sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
           theme: 'light',
-          callback: 'onTurnstileSuccess'  // String name, not function reference
+          callback: window.onReportIssueTurnstileSuccess  // Function reference, not string
         });
         container.setAttribute('data-rendered', 'true');
         turnstileRendered = true;
-        console.log('Report Issue Turnstile widget rendered');
+        console.log(`Report Issue Turnstile widget rendered (${idPrefix || 'default'})`);
       }
     } catch (error) {
       console.error('Turnstile render error:', error);
@@ -252,6 +267,7 @@ const {
 
   // Open modal
   openBtn?.addEventListener('click', () => {
+    console.log('Report Issue button clicked!', { modal, modalContent });
     if (modal && modalContent) {
       modal.classList.remove('invisible', 'opacity-0');
       modal.classList.add('visible', 'opacity-100');
@@ -263,6 +279,12 @@ const {
       // Render Turnstile when modal opens
       renderTurnstileWidget();
     }
+  });
+
+  // Listen for custom event from CrimeDetailModal to trigger Turnstile rendering
+  window.addEventListener('openReportIssueModal', (e) => {
+    console.log('openReportIssueModal event received', e.detail);
+    renderTurnstileWidget();
   });
 
   // Close modal function
@@ -306,8 +328,8 @@ const {
     }
 
     // Validate description length
-    const description = formData.get('issueDescription') as string;
-    if (description.trim().length < 20) {
+    const description = formData.get('issueDescription');
+    if (description && description.toString().trim().length < 20) {
       resultBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200');
       resultBox.classList.add('bg-rose-50', 'border-rose-200');
       resultBox.innerHTML = '<p class="text-rose-700 text-sm">Please provide at least 20 characters in the description</p>';
@@ -315,7 +337,7 @@ const {
     }
 
     // Validate Turnstile token
-    const turnstileToken = formData.get('cf-turnstile-response') as string;
+    const turnstileToken = formData.get('cf-turnstile-response');
     if (!turnstileToken) {
       resultBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200');
       resultBox.classList.add('bg-rose-50', 'border-rose-200');
@@ -384,4 +406,5 @@ const {
       submitBtn.textContent = 'Submit Report';
     }
   });
+  }); // End DOMContentLoaded
 </script>

@@ -91,6 +91,7 @@ import ReportIssueModal from './ReportIssueModal.astro';
 
 <!-- Hidden ReportIssueModal - Values will be updated dynamically -->
 <ReportIssueModal
+  idPrefix="modal"
   crimeSlug=""
   crimeHeadline=""
   crimeDate=""
@@ -277,26 +278,26 @@ import ReportIssueModal from './ReportIssueModal.astro';
       if (!currentCrimeData) return;
 
       // Update hidden form fields with current crime data
-      const form = document.getElementById('reportIssueForm') as HTMLFormElement;
+      const form = document.getElementById('modalreportIssueForm');
       if (form) {
         // Update hidden fields
-        (form.querySelector('input[name="crimeSlug"]') as HTMLInputElement).value = currentCrimeData.slug || '';
-        (form.querySelector('input[name="crimeHeadline"]') as HTMLInputElement).value = currentCrimeData.headline || '';
-        (form.querySelector('input[name="crimeDate"]') as HTMLInputElement).value = currentCrimeData.date || '';
-        (form.querySelector('input[name="crimeType"]') as HTMLInputElement).value = currentCrimeData.crimeType || '';
-        (form.querySelector('input[name="crimeArea"]') as HTMLInputElement).value = currentCrimeData.area || '';
-        (form.querySelector('input[name="crimeRegion"]') as HTMLInputElement).value = currentCrimeData.region || '';
+        form.querySelector('input[name="crimeSlug"]').value = currentCrimeData.slug || '';
+        form.querySelector('input[name="crimeHeadline"]').value = currentCrimeData.headline || '';
+        form.querySelector('input[name="crimeDate"]').value = currentCrimeData.date || '';
+        form.querySelector('input[name="crimeType"]').value = currentCrimeData.crimeType || '';
+        form.querySelector('input[name="crimeArea"]').value = currentCrimeData.area || '';
+        form.querySelector('input[name="crimeRegion"]').value = currentCrimeData.region || '';
 
-        const streetInput = form.querySelector('input[name="crimeStreet"]') as HTMLInputElement;
+        const streetInput = form.querySelector('input[name="crimeStreet"]');
         if (streetInput) streetInput.value = currentCrimeData.street || '';
 
-        const summaryInput = form.querySelector('input[name="crimeSummary"]') as HTMLInputElement;
+        const summaryInput = form.querySelector('input[name="crimeSummary"]');
         if (summaryInput) summaryInput.value = currentCrimeData.summary || '';
 
-        const sourceInput = form.querySelector('input[name="crimeSource"]') as HTMLInputElement;
+        const sourceInput = form.querySelector('input[name="crimeSource"]');
         if (sourceInput) sourceInput.value = currentCrimeData.source || '';
 
-        const urlInput = form.querySelector('input[name="crimeUrl"]') as HTMLInputElement;
+        const urlInput = form.querySelector('input[name="crimeUrl"]');
         if (urlInput) urlInput.value = currentCrimeData.url || '';
 
         // Update preview text in the modal
@@ -307,18 +308,22 @@ import ReportIssueModal from './ReportIssueModal.astro';
         if (previewMeta) previewMeta.textContent = `${currentCrimeData.date || ''} • ${currentCrimeData.area || ''}`;
       }
 
-      // Trigger the built-in button click to open the modal
-      const reportIssueBtn = document.getElementById('reportIssueBtn');
-      if (reportIssueBtn) {
-        reportIssueBtn.click();
+      // Directly open the ReportIssueModal
+      const reportIssueModal = document.getElementById('modalreportIssueModal');
+      const reportIssueContent = document.getElementById('modalreportIssueContent');
+
+      if (reportIssueModal && reportIssueContent) {
+        reportIssueModal.classList.remove('invisible', 'opacity-0');
+        reportIssueModal.classList.add('visible', 'opacity-100');
+        setTimeout(() => {
+          reportIssueContent.classList.remove('opacity-0', 'scale-95');
+          reportIssueContent.classList.add('opacity-100', 'scale-100');
+        }, 50);
+
+        // Trigger Turnstile rendering by dispatching a custom event
+        window.dispatchEvent(new CustomEvent('openReportIssueModal', { detail: { idPrefix: 'modal' } }));
       }
     });
-  }
-
-  // Hide the built-in Report Issue button (we're using the custom one in CrimeDetailModal)
-  const builtInReportBtn = document.getElementById('reportIssueBtn');
-  if (builtInReportBtn) {
-    builtInReportBtn.style.display = 'none';
   }
 
   // Expose functions globally so cards/markers can call them

@@ -219,6 +219,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
           <p class="text-xs text-slate-500 mt-1">Help us keep our data accurate by reporting issues.</p>
         </div>
         <ReportIssueModal
+          showButton={true}
           crimeSlug={crime.slug}
           crimeHeadline={crime.headline}
           crimeDate={crime.date}
