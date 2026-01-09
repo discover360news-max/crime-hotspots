@@ -275,19 +275,49 @@ import ReportIssueModal from './ReportIssueModal.astro';
   const modalReportIssueBtn = document.getElementById('modalReportIssueBtn');
   if (modalReportIssueBtn) {
     modalReportIssueBtn.addEventListener('click', () => {
-      if (!currentCrimeData) return;
+      if (!currentCrimeData) {
+        console.error('No crime data available');
+        return;
+      }
+
+      console.log('Opening report issue modal with crime data:', currentCrimeData);
 
       // Update hidden form fields with current crime data
       const form = document.getElementById('modalreportIssueForm');
-      if (form) {
-        // Update hidden fields
-        form.querySelector('input[name="crimeSlug"]').value = currentCrimeData.slug || '';
-        form.querySelector('input[name="crimeHeadline"]').value = currentCrimeData.headline || '';
-        form.querySelector('input[name="crimeDate"]').value = currentCrimeData.date || '';
-        form.querySelector('input[name="crimeType"]').value = currentCrimeData.crimeType || '';
-        form.querySelector('input[name="crimeArea"]').value = currentCrimeData.area || '';
-        form.querySelector('input[name="crimeRegion"]').value = currentCrimeData.region || '';
+      if (!form) {
+        console.error('Form not found: modalreportIssueForm');
+        return;
+      }
 
+      try {
+        // Update required hidden fields
+        const slugInput = form.querySelector('input[name="crimeSlug"]');
+        const headlineInput = form.querySelector('input[name="crimeHeadline"]');
+        const dateInput = form.querySelector('input[name="crimeDate"]');
+        const typeInput = form.querySelector('input[name="crimeType"]');
+        const areaInput = form.querySelector('input[name="crimeArea"]');
+        const regionInput = form.querySelector('input[name="crimeRegion"]');
+
+        if (!slugInput || !headlineInput || !dateInput || !typeInput || !areaInput || !regionInput) {
+          console.error('Required form fields not found', {
+            slug: !!slugInput,
+            headline: !!headlineInput,
+            date: !!dateInput,
+            type: !!typeInput,
+            area: !!areaInput,
+            region: !!regionInput
+          });
+          return;
+        }
+
+        slugInput.value = currentCrimeData.slug || '';
+        headlineInput.value = currentCrimeData.headline || '';
+        dateInput.value = currentCrimeData.date || '';
+        typeInput.value = currentCrimeData.crimeType || '';
+        areaInput.value = currentCrimeData.area || '';
+        regionInput.value = currentCrimeData.region || '';
+
+        // Update optional fields
         const streetInput = form.querySelector('input[name="crimeStreet"]');
         if (streetInput) streetInput.value = currentCrimeData.street || '';
 
@@ -306,6 +336,11 @@ import ReportIssueModal from './ReportIssueModal.astro';
 
         const previewMeta = form.querySelector('.text-xs.text-slate-500.mt-1');
         if (previewMeta) previewMeta.textContent = `${currentCrimeData.date || ''} • ${currentCrimeData.area || ''}`;
+
+        console.log('Form fields populated successfully');
+      } catch (error) {
+        console.error('Error populating form fields:', error);
+        return;
       }
 
       // Directly open the ReportIssueModal
