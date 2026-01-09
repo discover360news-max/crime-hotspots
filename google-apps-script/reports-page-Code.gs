@@ -236,3 +236,82 @@ function validateTurnstile(token) {
 function createResponse(data, statusCode) {
   return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
 }
+
+// === TEST FUNCTIONS ===
+/**
+ * Test issue report submission
+ * Run this from Apps Script editor to test
+ */
+function testIssueReport() {
+  const testPayload = {
+    reportType: 'crime-issue',
+    issueTypes: ['Incorrect Headline/Summary', 'Wrong Date/Location'],
+    informationSource: 'News Article',
+    description: 'This is a test issue report. The location is incorrect - it should be Port of Spain, not Arima.',
+    contactEmail: 'test@example.com',
+    crimeSlug: 'test-crime-slug-2026-01-09',
+    crimeHeadline: 'Test Crime Headline',
+    crimeDate: '1/9/2026',
+    crimeType: 'Robbery',
+    crimeArea: 'Port of Spain',
+    crimeRegion: 'Port of Spain',
+    crimeStreet: 'Test Street',
+    crimeSummary: 'Test summary of the crime',
+    crimeSource: 'Test Source',
+    crimeUrl: 'https://example.com/test',
+    'cf-token': 'SKIP_FOR_TEST',
+    timestamp: new Date().toISOString(),
+    userAgent: 'Test Agent'
+  };
+
+  Logger.log('Testing issue report submission...');
+
+  // Skip Turnstile validation for testing
+  try {
+    sendIssueReportEmail(testPayload);
+    Logger.log('✅ Email sent successfully');
+
+    saveIssueToSheet(testPayload);
+    Logger.log('✅ Saved to sheet successfully');
+
+    Logger.log('✅ Test passed!');
+  } catch (error) {
+    Logger.log('❌ Test failed: ' + error.toString());
+    Logger.log('Stack: ' + error.stack);
+  }
+}
+
+/**
+ * Test regular crime report submission
+ * Run this from Apps Script editor to test
+ */
+function testCrimeReport() {
+  const testPayload = {
+    id: 'TEST-' + Date.now(),
+    date: '2026-01-09',
+    crimeType: 'Theft',
+    countryName: 'Trinidad and Tobago',
+    area: 'Port of Spain',
+    street: 'Independence Square',
+    headline: 'Test Crime Report Headline',
+    details: 'This is a test crime report with detailed information about the incident.',
+    ua: 'Test User Agent',
+    'cf-token': 'SKIP_FOR_TEST',
+    timestamp: new Date().toISOString()
+  };
+
+  Logger.log('Testing crime report submission...');
+
+  try {
+    sendCrimeReportEmail(testPayload);
+    Logger.log('✅ Email sent successfully');
+
+    saveToSheet(testPayload);
+    Logger.log('✅ Saved to sheet successfully');
+
+    Logger.log('✅ Test passed!');
+  } catch (error) {
+    Logger.log('❌ Test failed: ' + error.toString());
+    Logger.log('Stack: ' + error.stack);
+  }
+}

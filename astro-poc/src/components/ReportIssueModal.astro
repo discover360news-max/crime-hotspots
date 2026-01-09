@@ -5,6 +5,8 @@
  * Pre-fills crime data and lets users describe the issue
  */
 
+import { APPS_SCRIPT_URL } from '../data/countries';
+
 interface Props {
   crimeSlug: string;
   crimeHeadline: string;
@@ -214,11 +216,9 @@ const {
   };
 </script>
 
-<script define:vars={{ idPrefix }}>
+<script define:vars={{ idPrefix, APPS_SCRIPT_URL }}>
   // Wrap everything in DOMContentLoaded to ensure DOM is ready
   document.addEventListener('DOMContentLoaded', () => {
-    // Google Apps Script endpoint (same as reportStandalone.js)
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_4stfkJGTTDvjZ62jVae-BqbvHLHscuMgX76q6oLV7ETCwE1esVj_co5bHTeG_gSl/exec";
 
     const openBtn = document.getElementById(`${idPrefix}reportIssueBtn`);
     const closeBtn = document.getElementById(`${idPrefix}closeModalBtn`);

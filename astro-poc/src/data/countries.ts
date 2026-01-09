@@ -52,4 +52,4 @@ export const COUNTRIES: Country[] = [
   },
 ];
 
-export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_4stfkJGTTDvjZ62jVae-BqbvHLHscuMgX76q6oLV7ETCwE1esVj_co5bHTeG_gSl/exec";
+export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2vo5sahU-YNY5S-HbB9Ryga_4v68NcR58k1UjPkEXijvxptIqHoUFGVR3uVUeCpP_/exec";
