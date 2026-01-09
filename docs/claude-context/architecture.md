@@ -52,6 +52,9 @@ astro-poc/
 │   │   ├── statsScroll.ts    # Horizontal scroll behavior
 │   │   ├── statCardFiltering.ts # Clickable stat card logic
 │   │   └── dashboardUpdates.ts # Dashboard update functions
+│   ├── utils/                # Form & validation utilities
+│   │   ├── formHelpers.ts    # generateId, cleanAreaName, localStorage, honeypot, rate limiter
+│   │   └── reportValidation.ts # Form validation functions
 │   ├── pages/                # File-based routing (auto-generates URLs)
 │   │   ├── index.astro       # Homepage
 │   │   ├── trinidad/

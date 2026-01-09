@@ -2,13 +2,181 @@
 
 **For:** Complete details of recently implemented features
 
-**Last Updated:** January 8, 2026
+**Last Updated:** January 9, 2026
 
 **Note:** Features older than 90 days are archived to `docs/archive/accomplishments/`
 
 ---
 
 ## January 2026 Features
+
+### Report Page Refactoring & Issue Reporting Fixes (Jan 9, 2026)
+
+**Problem:** Report page was 672 lines with inline utilities. Issue reporting emails showed "undefined" for crime fields. Turnstile widget had explicit rendering errors.
+
+**Solution:**
+- **Code Organization:** Extracted utilities into reusable TypeScript modules
+  - `src/utils/formHelpers.ts` (165 lines) - generateId(), cleanAreaName(), getValidatedLocalStorage(), validateHoneypot(), RateLimiter class
+  - `src/utils/reportValidation.ts` (146 lines) - validateForm(), validateDate(), validateHeadline(), validateDetails(), validateCountry(), validateCrimeType()
+  - Reduced report.astro from 672→522 lines (22% reduction)
+- **Issue Reporting UX:** Added "Report Issue" button to CrimeDetailModal
+  - Users can now report issues directly from headlines modal without navigation
+  - Accessible from both individual crime pages and headlines modal
+- **Backend Fixes:** Updated Google Apps Script to handle issue reports correctly
+  - Fixed field mapping for crime-issue reportType
+  - Issue reports save to separate "Issue Reports" sheet
+  - Email formatting shows all crime details (no more "undefined" values)
+- **Turnstile Fix:** Resolved explicit rendering mode error 600010
+  - Cannot mix data attributes with render() function in explicit mode
+  - Solution: Empty div + full render() config (no data attributes)
+
+**Key Learnings:**
+- Utility extraction improves code reusability and testability
+- Report page utilities can now be used in other forms
+- Explicit Turnstile rendering requires choosing ONE approach (data attributes OR render config, not both)
+- Modal-based issue reporting improves UX by keeping users in context
+
+**Benefits:**
+- ✅ Cleaner code - report.astro 150 lines shorter
+- ✅ Reusable - Utilities can be used in other forms
+- ✅ Testable - Functions can be unit tested independently
+- ✅ Maintainable - Validation logic centralized
+- ✅ Type-safe - Full TypeScript support
+- ✅ Better UX - Issue reporting accessible from headlines modal
+
+**Files:** `src/utils/formHelpers.ts`, `src/utils/reportValidation.ts`, `report.astro`, `CrimeDetailModal.astro`, `ReportIssueModal.astro`, `google-apps-script/reports-page-Code.gs`
+
+**Status:** ✅ Complete - Deployed to production
+
+---
+
+### Report Issue Modal Debugging & Fixes (Jan 9, 2026)
+
+**Problem:** After refactoring, Report Issue buttons stopped working in all contexts:
+- Individual crime pages: Button visible but clicking did nothing
+- Headlines modal: "Report Issue with This Crime" button non-functional
+- Unwanted buttons appearing on ALL pages (homepage, dashboard, blog)
+- Console errors: "Unexpected identifier 'as'" (TypeScript syntax errors)
+- Google Apps Script: "Cannot read properties of undefined (reading 'crimeType')"
+
+**Root Causes:**
+1. **Duplicate ID conflicts** - Component included twice on same page without unique IDs
+2. **TypeScript syntax in browser JavaScript** - Type assertions (`as Type`) not allowed in `<script define:vars>`
+3. **DOM not ready** - Event listeners attached before elements existed (missing DOMContentLoaded)
+4. **Unconditional button rendering** - Component rendered button by default
+5. **Multiple Apps Script deployments** - Old and new versions causing confusion
+6. **Hardcoded URLs** - Apps Script URL duplicated in 3+ files
+
+**Solutions Implemented:**
+1. **ID Prefix System:**
+   ```typescript
+   interface Props {
+     idPrefix?: string; // Unique prefix for IDs
+     showButton?: boolean; // Control button rendering
+   }
+   ```
+   - CrimeDetailModal: `idPrefix="modal"`, `showButton={false}`
+   - Individual pages: `idPrefix=""`, `showButton={true}`
+   - Result: `modalreportIssueBtn` vs `reportIssueBtn` (unique)
+
+2. **Removed ALL TypeScript Syntax:**
+   ```javascript
+   // ❌ BEFORE: const form = document.getElementById('form') as HTMLFormElement;
+   // ✅ AFTER: const form = document.getElementById('form');
+   ```
+
+3. **DOMContentLoaded Wrapper:**
+   ```javascript
+   document.addEventListener('DOMContentLoaded', () => {
+     // All event listener code here
+   });
+   ```
+
+4. **Conditional Button Rendering:**
+   ```astro
+   {showButton && <button>Report Issue</button>}
+   ```
+
+5. **Centralized Apps Script URL:**
+   - Single source of truth: `src/data/countries.ts` exports `APPS_SCRIPT_URL`
+   - All components import from there
+   - Easy to update in one place
+
+6. **Custom Event System for Turnstile:**
+   - CrimeDetailModal dispatches `openReportIssueModal` event
+   - ReportIssueModal listens and renders Turnstile widget
+   - Avoids clicking non-existent buttons
+
+7. **Added Error Handling & Logging:**
+   - Validate form fields exist before setting values
+   - Console logging at each step for debugging
+   - Try-catch blocks around critical operations
+
+8. **Google Apps Script Test Functions:**
+   ```javascript
+   function testIssueReport() { /* test data */ }
+   function testCrimeReport() { /* test data */ }
+   ```
+   - Test backend without frontend/Turnstile
+
+**Key Learnings:**
+- **Component reusability requires planning** - Add `idPrefix` for any component with IDs
+- **Astro script contexts matter** - TypeScript only in server-side `<script>` blocks
+- **Always use DOMContentLoaded** - Never assume DOM is ready
+- **Centralize configuration** - One source of truth for URLs/constants
+- **Test each layer separately** - Backend, frontend, integration
+- **Console logging is essential** - Strategic logging identifies failure points quickly
+- **Validate assumptions** - Check elements exist before using them
+
+**Best Practices Documented:**
+- ✅ Component development patterns (props, IDs, conditional rendering)
+- ✅ JavaScript in Astro rules (TypeScript vs plain JS)
+- ✅ Configuration management (centralized exports)
+- ✅ Google Apps Script integration patterns
+- ✅ Debugging process checklist
+- ✅ Testing checklist for report modals
+
+**Files:** `ReportIssueModal.astro`, `CrimeDetailModal.astro`, `[slug].astro`, `countries.ts`, `reports-page-Code.gs`
+
+**Documentation:** `docs/troubleshooting/REPORT-MODAL-DEBUGGING-2026-01.md` (comprehensive guide)
+
+**Testing Results:**
+- ✅ Individual crime pages - Report Issue button works
+- ✅ Headlines modal - "Report Issue with This Crime" works
+- ✅ Standalone report page - Form submissions succeed
+- ✅ Buttons appear ONLY where intended
+- ✅ Google Apps Script tests pass (testIssueReport, testCrimeReport)
+- ✅ Email notifications received correctly
+- ✅ Data saves to Google Sheets properly
+
+**Status:** ✅ Complete - All three contexts working in production
+
+---
+
+### Component Audit & Cleanup (Jan 9, 2026)
+
+**Problem:** Unused components creating maintenance overhead.
+
+**Solution:**
+- Audited all 21 components in codebase
+- Archived TextInfoPopup.astro to `src/components/archive/` (replaced by InfoPopup.astro)
+- Verified 20/21 components actively in use across the site
+
+**Active Components:**
+1. ArchivesModal, AreaNameTooltip, BlogRotatingBanner, Breadcrumbs, CrimeCard
+2. CrimeDetailModal, DashboardInfoCards, DashboardModal, DateAccordion, FiltersTray
+3. Header, HeadlinesModal, InfoPopup, LoadingShimmer, QuickInsightsCard
+4. ReportIssueModal, SearchModal, SiteNotificationBanner, StatCard, TopRegionsCard
+
+**Key Learnings:**
+- Regular component audits prevent bloat
+- Archive pattern preserves history without cluttering active codebase
+
+**Files:** `src/components/archive/TextInfoPopup.astro`
+
+**Status:** ✅ Complete
+
+---
 
 ### Automated Cloudflare Pages Deployment (Jan 8, 2026)
 
