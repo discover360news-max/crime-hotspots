@@ -89,7 +89,9 @@
       "Bash(timeout 15 npm run dev:*)",
       "mcp__playwright__browser_take_screenshot",
       "Bash(git diff:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh api:*)"
     ],
     "deny": [],
     "ask": []
