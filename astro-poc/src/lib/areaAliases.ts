@@ -42,6 +42,39 @@ export async function loadAreaAliases(): Promise<Map<string, string>> {
 }
 
 /**
+ * Helper function to parse a CSV line properly (handles quoted fields with commas)
+ */
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+
+  result.push(current.trim());
+  return result;
+}
+
+/**
+ * Strips surrounding quotes and smart quotes from a string
+ */
+function stripQuotes(str: string): string {
+  // Remove regular quotes, smart quotes, and any whitespace
+  return str.replace(/^[""\u201C\u201D]+|[""\u201C\u201D]+$/g, '').trim();
+}
+
+/**
  * Parses CSV text and creates area -> local name map
  */
 export function parseAreaAliases(csvText: string): Map<string, string> {
@@ -49,7 +82,7 @@ export function parseAreaAliases(csvText: string): Map<string, string> {
   if (lines.length < 2) return new Map();
 
   const headerLine = lines[0];
-  const headers = headerLine.split(',').map((h) => h.trim());
+  const headers = parseCSVLine(headerLine).map((h) => stripQuotes(h));
 
   // Find column indices
   const areaIndex = headers.indexOf('Area');
@@ -67,7 +100,7 @@ export function parseAreaAliases(csvText: string): Map<string, string> {
     const line = lines[i].trim();
     if (!line) continue;
 
-    const columns = line.split(',').map((col) => col.trim());
+    const columns = parseCSVLine(line).map((col) => stripQuotes(col));
 
     const area = columns[areaIndex];
     const knownAs = columns[knownAsIndex];

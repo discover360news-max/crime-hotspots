@@ -2,13 +2,47 @@
 
 **For:** Complete details of recently implemented features
 
-**Last Updated:** January 9, 2026
+**Last Updated:** January 10, 2026
 
 **Note:** Features older than 90 days are archived to `docs/archive/accomplishments/`
 
 ---
 
 ## January 2026 Features
+
+### Related Crime Pills Display & CSV Parsing Fix (Jan 10, 2026)
+
+**Context:** 2026 victim count system tracks multi-crime incidents (primary + related crimes). Related crimes were stored in data but not displayed to users.
+
+**Implementation:**
+- **Crime Pages Display:** Added visual pills for related crimes next to primary crime type
+  - Primary crime: Rose-600 pill (existing)
+  - Related crimes: Gray (slate-300) pills
+  - Only renders when `crime.relatedCrimeTypes` exists and isn't blank
+  - Auto-parses comma-separated values
+- **Modal Display:** Extended CrimeDetailModal to show same pill pattern
+  - Modified metadata display logic (lines 134-148)
+  - No changes to form/Turnstile functionality
+
+**CSV Parsing Bug Fix:**
+- **Problem:** Area aliases with commas (e.g., `"La Horquetta, Wallerfield"`) were split incorrectly
+  - CSV splitting on commas broke quoted fields
+  - Smart quotes (`"`) from Google Sheets displayed as `"name`
+- **Solution:** Added proper CSV parser to `areaAliases.ts`
+  - `parseCSVLine()` - Respects quoted fields containing commas
+  - `stripQuotes()` - Removes both regular and smart quotes (Unicode \u201C, \u201D)
+  - Preserves full multi-area names
+
+**Critical Rules:**
+- Related crimes display is automatic - no manual configuration needed
+- CSV data must wrap comma-separated values in quotes: `"Area 1, Area 2"`
+- Victim count applies ONLY to primary crime (related crimes always +1)
+
+**Files:** `src/pages/trinidad/crime/[slug].astro`, `src/components/CrimeDetailModal.astro`, `src/lib/areaAliases.ts`, `src/components/AreaNameTooltip.astro`
+
+**Status:** ✅ Complete - Ready for production
+
+---
 
 ### Report Page Refactoring & Issue Reporting Fixes (Jan 9, 2026)
 

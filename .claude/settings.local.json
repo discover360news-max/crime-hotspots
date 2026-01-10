@@ -79,7 +79,17 @@
       "mcp__playwright__browser_console_messages",
       "mcp__playwright__browser_click",
       "mcp__playwright__browser_snapshot",
-      "mcp__playwright__browser_close"
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_fill_form",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_evaluate",
+      "Bash(for component in ArchivesModal AreaNameTooltip BlogRotatingBanner Breadcrumbs CrimeCard CrimeDetailModal DashboardInfoCards DashboardModal DateAccordion FiltersTray Header HeadlinesModal InfoPopup LoadingShimmer QuickInsightsCard ReportIssueModal SearchModal SiteNotificationBanner StatCard TextInfoPopup TopRegionsCard)",
+      "Bash(do)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout 15 npm run dev:*)",
+      "mcp__playwright__browser_take_screenshot",
+      "Bash(git diff:*)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []

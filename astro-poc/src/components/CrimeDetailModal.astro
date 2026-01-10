@@ -130,9 +130,20 @@ import ReportIssueModal from './ReportIssueModal.astro';
 
     // Metadata (date, crime type, location)
     const metadata = document.getElementById('modalMetadata');
+
+    // Build related crimes pills if they exist
+    let relatedCrimesPills = '';
+    if (crime.relatedCrimeTypes && crime.relatedCrimeTypes.trim()) {
+      const relatedCrimes = crime.relatedCrimeTypes.split(',').map(c => c.trim());
+      relatedCrimesPills = relatedCrimes.map(relatedCrime =>
+        `<span class="px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-medium">${relatedCrime}</span>`
+      ).join('');
+    }
+
     metadata.innerHTML = `
       <time class="text-slate-500">${formattedDate}</time>
       <span class="px-3 py-1 rounded-full bg-rose-600 text-white font-medium">${crime.crimeType}</span>
+      ${relatedCrimesPills}
       <span class="text-slate-500">${crime.street ? `${crime.street}, ` : ''}${crime.area}</span>
     `;
 

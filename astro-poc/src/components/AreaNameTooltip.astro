@@ -44,11 +44,18 @@ const showTooltip = localName && localName.trim() !== '' && localName.trim() !==
       const localName = trigger.dataset.localName;
       const tooltip = document.createElement('div');
 
-      tooltip.className = 'area-tooltip-portal fixed bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[13px] leading-snug whitespace-nowrap text-slate-600 shadow-lg z-[9999] pointer-events-none opacity-0 transition-opacity duration-200';
+      tooltip.className = 'area-tooltip-portal fixed bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[13px] leading-snug text-slate-600 shadow-lg z-[9999] pointer-events-none opacity-0 transition-opacity duration-200';
       tooltip.innerHTML = `
-        Also known as: ${localName}
+        Includes other well known areas like:<br>
+        <span class="font-bold tooltip-local-name"></span>
         <div class="absolute left-1/2 -translate-x-1/2 border-[5px] border-transparent tooltip-arrow"></div>
       `;
+
+      // Use textContent to avoid HTML encoding issues with quotes
+      const localNameSpan = tooltip.querySelector('.tooltip-local-name');
+      if (localNameSpan) {
+        localNameSpan.textContent = localName || '';
+      }
 
       document.body.appendChild(tooltip);
       return tooltip;

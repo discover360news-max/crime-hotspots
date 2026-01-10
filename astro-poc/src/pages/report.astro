@@ -208,6 +208,8 @@ const description = "Help build safer communities: report crime anonymously via 
 
   <script>
     import { COUNTRIES, APPS_SCRIPT_URL } from '../data/countries';
+    import { generateId, cleanAreaName, getValidatedLocalStorage, validateHoneypot, RateLimiter } from '../utils/formHelpers';
+    import { validateForm } from '../utils/reportValidation';
 
     const countrySelect = document.getElementById("reportCountry") as HTMLSelectElement;
     const areaSelect = document.getElementById("reportArea") as HTMLSelectElement;
@@ -215,43 +217,6 @@ const description = "Help build safer communities: report crime anonymously via 
     const resultBox = document.getElementById("reportResult") as HTMLDivElement;
     const submitBtn = document.getElementById("reportSubmit") as HTMLButtonElement;
     const hp = document.getElementById("hp_field") as HTMLInputElement;
-
-    // --- Utility Functions ---
-    function generateId(prefix = "REP") {
-      const n = new Date();
-      const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
-      return `${prefix}-${n.getFullYear()}${String(n.getMonth() + 1).padStart(2, "0")}${String(n.getDate()).padStart(2, "0")}-${rand}`;
-    }
-
-    function cleanAreaName(str: string) {
-      return str.trim();
-    }
-
-    function getValidatedLocalStorage(key: string, validator?: (val: string) => boolean) {
-      try {
-        const value = localStorage.getItem(key);
-        if (!value) return null;
-
-        const clean = value.trim();
-
-        if (/<script|javascript:|data:|vbscript:/i.test(clean)) {
-          console.warn(`Blocked suspicious localStorage value for ${key}`);
-          localStorage.removeItem(key);
-          return null;
-        }
-
-        if (validator && !validator(clean)) {
-          console.warn(`Invalid localStorage value for ${key}`);
-          localStorage.removeItem(key);
-          return null;
-        }
-
-        return clean;
-      } catch (e) {
-        console.error('localStorage access error:', e);
-        return null;
-      }
-    }
 
     // --- Data Loading ---
     function loadCountries() {
@@ -319,123 +284,8 @@ const description = "Help build safer communities: report crime anonymously via 
       });
     }
 
-    // --- Validation ---
-    function validateHoneypot() {
-      if (hp && hp.value) {
-        console.warn('Honeypot: field filled');
-        return false;
-      }
-
-      const wasFocused = hp && hp.dataset.focused === 'true';
-      if (wasFocused) {
-        console.warn('Honeypot: field focused');
-        return false;
-      }
-
-      const formLoadTime = parseInt(sessionStorage.getItem('formLoadTime') || '0');
-      const timeDelta = Date.now() - formLoadTime;
-      if (timeDelta < 2000) {
-        console.warn('Honeypot: too fast submission');
-        return false;
-      }
-
-      const mouseMovements = parseInt(sessionStorage.getItem('mouseMovements') || '0');
-      if (mouseMovements < 3) {
-        console.warn('Honeypot: insufficient mouse activity');
-        return false;
-      }
-
-      return true;
-    }
-
-    // --- Rate Limiter ---
-    class RateLimiter {
-      maxRequests: number;
-      windowMs: number;
-      requests: number[];
-
-      constructor(maxRequests: number, windowMs: number) {
-        this.maxRequests = maxRequests;
-        this.windowMs = windowMs;
-        this.requests = [];
-      }
-
-      canMakeRequest() {
-        const now = Date.now();
-        this.requests = this.requests.filter(time => now - time < this.windowMs);
-
-        if (this.requests.length >= this.maxRequests) {
-          return false;
-        }
-
-        this.requests.push(now);
-        return true;
-      }
-
-      getTimeUntilNextRequest() {
-        if (this.requests.length === 0) return 0;
-        const now = Date.now();
-        const oldestRequest = this.requests[0];
-        return Math.max(0, this.windowMs - (now - oldestRequest));
-      }
-    }
-
+    // --- Rate Limiter Instance ---
     const submitLimiter = new RateLimiter(3, 3600000); // 3 per hour
-
-    function validateForm(formData: FormData) {
-      const errors: string[] = [];
-
-      // Date validation
-      const dateStr = formData.get('reportDate') as string;
-      const date = new Date(dateStr);
-      const today = new Date();
-      const oneYearAgo = new Date();
-      oneYearAgo.setFullYear(today.getFullYear() - 1);
-
-      if (isNaN(date.getTime())) {
-        errors.push('Invalid date format');
-      } else if (date > today) {
-        errors.push('Date cannot be in the future');
-      } else if (date < oneYearAgo) {
-        errors.push('Please report incidents from the past year only');
-      }
-
-      // Headline validation
-      const headline = formData.get('reportHeadline') as string;
-      if (!headline || headline.trim().length < 10) {
-        errors.push('Headline must be at least 10 characters');
-      }
-      if (headline && headline.length > 120) {
-        errors.push('Headline must be under 120 characters');
-      }
-      if (headline && /<script|javascript:|data:|vbscript:/i.test(headline)) {
-        errors.push('Headline contains invalid characters');
-      }
-
-      // Details validation
-      const details = formData.get('reportDetails') as string;
-      if (!details || details.trim().length < 20) {
-        errors.push('Please provide at least 20 characters of details');
-      }
-      if (details && details.length > 5000) {
-        errors.push('Details must be under 5000 characters');
-      }
-
-      // Country validation
-      const countryId = formData.get('reportCountry') as string;
-      if (!countryId || !COUNTRIES.some(c => c.id === countryId)) {
-        errors.push('Invalid country selection');
-      }
-
-      // Crime type validation
-      const validCrimes = ['Assault', 'Burglary', 'Home Invasion', 'Kidnapping', 'Murder', 'Robbery', 'Shooting', 'Theft', 'Other'];
-      const crimeType = formData.get('reportCrimeType') as string;
-      if (!crimeType || !validCrimes.includes(crimeType)) {
-        errors.push('Invalid crime type');
-      }
-
-      return errors;
-    }
 
     // --- Form Submission ---
     async function handleSubmit(e: Event) {
@@ -451,7 +301,7 @@ const description = "Help build safer communities: report crime anonymously via 
       }
 
       // Honeypot validation
-      if (!validateHoneypot()) {
+      if (!validateHoneypot(hp)) {
         console.warn('Bot detected by honeypot');
         return;
       }

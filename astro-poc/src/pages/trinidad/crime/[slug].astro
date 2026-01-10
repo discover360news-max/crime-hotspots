@@ -141,9 +141,23 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
           <time datetime={crime.dateObj.toISOString()} class="text-slate-500">
             {crime.dateObj.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </time>
+
+          <!-- Primary Crime Type -->
           <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white font-medium" data-pagefind-ignore>
             {crime.crimeType}
           </span>
+
+          <!-- Related Crime Types (2026+) -->
+          {crime.relatedCrimeTypes && crime.relatedCrimeTypes.trim() && (
+            <>
+              {crime.relatedCrimeTypes.split(',').map((relatedCrime) => (
+                <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-slate-300 text-slate-700 font-medium" data-pagefind-ignore>
+                  {relatedCrime.trim()}
+                </span>
+              ))}
+            </>
+          )}
+
           <span class="text-slate-500" data-pagefind-ignore>
             {crime.street ? `${crime.street}, ` : ''}<AreaNameTooltip area={crime.area} localName={localName} />
           </span>
