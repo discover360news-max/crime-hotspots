@@ -171,18 +171,36 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
   const sixtyThreeDaysAgo = new Date(now);
   sixtyThreeDaysAgo.setDate(now.getDate() - 63); // 3 + 60 days
 
-  // Trend data: last 30 days (ending 3 days ago) from FILTERED crimes
-  // This ensures trends match the active year filter
-  const last30DaysCrimes = crimes.filter(c => {
+  // Determine which dataset to use for trends based on active filter
+  // - If viewing "All Years" OR filtered data matches allCrimes: use allCrimes (includes historical)
+  // - If viewing specific year filter: use filtered data only (respects year filter)
+  const isViewingAllData = !allCrimes || crimes.length === allCrimes.length;
+  const crimesForTrends = isViewingAllData ? crimes : crimes;
+
+  // Special case: If user is viewing current year (2026), use allCrimes to include historical data
+  // This ensures trends work even in early 2026 when we don't have 63 days yet
+  const currentYear = new Date().getFullYear();
+  const viewingYears = [...new Set(crimes.map(c => c.year))];
+  const isViewingCurrentYear = viewingYears.length === 1 && viewingYears[0] === currentYear;
+
+  const finalCrimesForTrends = (isViewingAllData || isViewingCurrentYear) && allCrimes ? allCrimes : crimes;
+
+  console.log(`📊 Trend calculation: viewingAllData=${isViewingAllData}, isViewingCurrentYear=${isViewingCurrentYear}, using ${finalCrimesForTrends.length} crimes`);
+  console.log(`📅 Date ranges: Last 30 = ${thirtyThreeDaysAgo.toLocaleDateString()} to ${threeDaysAgo.toLocaleDateString()}, Prev 30 = ${sixtyThreeDaysAgo.toLocaleDateString()} to ${thirtyThreeDaysAgo.toLocaleDateString()}`);
+
+  // Trend data: last 30 days (ending 3 days ago)
+  const last30DaysCrimes = finalCrimesForTrends.filter(c => {
     const crimeDate = new Date(c.date);
     return crimeDate >= thirtyThreeDaysAgo && crimeDate <= threeDaysAgo;
   });
 
-  // Trend data: previous 30 days (33-63 days ago) from FILTERED crimes
-  const prev30DaysCrimes = crimes.filter(c => {
+  // Trend data: previous 30 days (33-63 days ago)
+  const prev30DaysCrimes = finalCrimesForTrends.filter(c => {
     const crimeDate = new Date(c.date);
     return crimeDate >= sixtyThreeDaysAgo && crimeDate < thirtyThreeDaysAgo;
   });
+
+  console.log(`📊 Trend data: Last 30 days = ${last30DaysCrimes.length} crimes, Previous 30 days = ${prev30DaysCrimes.length} crimes`);
 
   // Helper function to update card with trend
   function updateCardWithTrend(card: Element | null, displayValue: number, last30Count: number, prev30Count: number) {

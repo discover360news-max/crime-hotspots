@@ -131,14 +131,14 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
           </ul>
         </InfoPopup>
       </div>
-      <div class="relative min-h-[600px]">
+      <div class="relative min-h-[450px]">
         <!-- Map Shimmer (shown during loading) -->
         <div id="mapShimmer" class="absolute inset-0 w-full transition-opacity duration-300">
-          <LoadingShimmer height="600px" />
+          <LoadingShimmer height="450px" />
         </div>
 
         <!-- Actual Map (hidden initially) -->
-        <div id="leafletMap" class="absolute inset-0 w-full h-150 rounded-lg opacity-0 transition-opacity duration-300"></div>
+        <div id="leafletMap" class="absolute inset-0 w-full h-[450px] rounded-lg opacity-0 transition-opacity duration-300"></div>
 
         <!-- Pan instruction overlay (shown on single finger touch) -->
         <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-10">
@@ -215,7 +215,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
 
       initializeLeafletMap('leafletMap', currentYearCrimes, {
         center: [10.634963, -61.197207],
-        zoom: 9,
+        zoom: 8,
         country: 'Trinidad',
         crimeDetailPath: '/trinidad/crime/',
         onMapReady: async () => {

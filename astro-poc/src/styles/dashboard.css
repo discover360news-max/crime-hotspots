@@ -123,3 +123,26 @@
     opacity: 0.4;
   }
 }
+
+/* Leaflet popup z-index fix - ensure popups appear above zoom controls */
+.leaflet-popup-pane {
+  z-index: 1000 !important;
+}
+
+.leaflet-popup {
+  z-index: 1000 !important;
+}
+
+/* Ensure zoom controls stay below popups */
+.leaflet-control-zoom {
+  z-index: 500 !important;
+}
+
+/* Style zoom controls */
+.leaflet-control-zoom {
+  border-radius: 8px !important;
+}
+
+.leaflet-control-zoom a {
+  border-radius: 4px !important;
+}

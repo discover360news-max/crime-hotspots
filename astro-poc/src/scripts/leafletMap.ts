@@ -4,6 +4,19 @@
  * Handles map initialization, markers, clustering, and touch interactions
  */
 
+/**
+ * Format date for popup display
+ * @param dateObj - Date object
+ * @returns Formatted date string (e.g., "Jan 2, 2026")
+ */
+function formatPopupDate(dateObj: Date): string {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const month = months[dateObj.getMonth()];
+  const day = dateObj.getDate();
+  const year = dateObj.getFullYear();
+  return `${month} ${day}, ${year}`;
+}
+
 interface Crime {
   date: string;
   headline: string;
@@ -75,17 +88,11 @@ export function initializeLeafletMap(
   const leafletScript = document.createElement('script');
   leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
   leafletScript.onload = () => {
-    // Load fullscreen plugin first
-    const fullscreenScript = document.createElement('script');
-    fullscreenScript.src = 'https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.1/Control.FullScreen.js';
-    fullscreenScript.onload = () => {
-      // Then load marker cluster
-      const clusterScript = document.createElement('script');
-      clusterScript.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
-      clusterScript.onload = () => initMap();
-      document.head.appendChild(clusterScript);
-    };
-    document.head.appendChild(fullscreenScript);
+    // Load marker cluster plugin
+    const clusterScript = document.createElement('script');
+    clusterScript.src = 'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js';
+    clusterScript.onload = () => initMap();
+    document.head.appendChild(clusterScript);
   };
   document.head.appendChild(leafletScript);
 
@@ -108,7 +115,6 @@ export function initializeLeafletMap(
     const map = L.map(containerId, {
       dragging: true,
       scrollWheelZoom: false,
-      fullscreenControl: true,
       tap: false  // Disable tap handler to prevent blocking touch scroll
     }).setView(config.center, config.zoom);
 
@@ -212,7 +218,7 @@ export function initializeLeafletMap(
 
       marker.bindPopup(`
         <div class="p-2">
-          <div class="text-xs text-slate-500 mb-2">${crime.date}</div>
+          <div class="text-xs text-slate-500 mb-2">${formatPopupDate(crime.dateObj)}</div>
           <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
           <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
           <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
@@ -305,7 +311,7 @@ export function updateLeafletMap(crimes: Crime[], crimeDetailPath: string) {
 
     marker.bindPopup(`
       <div class="p-2">
-        <div class="text-xs text-slate-500 mb-2">${crime.date}</div>
+        <div class="text-xs text-slate-500 mb-2">${formatPopupDate(crime.dateObj)}</div>
         <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
         <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
         <div class="text-xs text-slate-500 mb-1">${crime.street}</div>

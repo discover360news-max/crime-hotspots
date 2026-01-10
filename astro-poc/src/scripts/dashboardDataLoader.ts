@@ -8,7 +8,9 @@ export const TRINIDAD_CSV_URLS = {
   '2025': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv',
   '2026': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
   // Current sheet (switched to 2026 on Jan 1, 2026)
-  current: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv'
+  current: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
+  // Historical snippet for trend calculations (Nov-Dec 2025, ~60 days)
+  historicalTrends: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1728695070&single=true&output=csv'
 };
 
 // RegionData CSV URL (for area aliases)
@@ -242,13 +244,11 @@ export async function initializeDashboardData(): Promise<void> {
 
   console.log('🔍 Loading crimes data and area aliases from CSV...');
 
-  // Fetch area aliases and crimes in parallel
-  const [areaAliases, crimes2025Data, crimesCurrentData] = await Promise.all([
+  // Fetch area aliases, historical trends, and current crimes in parallel
+  const [areaAliases, historicalTrendsData, crimesCurrentData] = await Promise.all([
     fetchAreaAliases(REGION_DATA_CSV_URL),
-    // Only fetch 2025 sheet if it's different from current sheet
-    TRINIDAD_CSV_URLS['2025'] && TRINIDAD_CSV_URLS['2025'] !== TRINIDAD_CSV_URLS.current
-      ? fetchCrimesFromURL(TRINIDAD_CSV_URLS['2025'])
-      : Promise.resolve([]),
+    // Fetch historical snippet (Nov-Dec 2025) for trend calculations only
+    fetchCrimesFromURL(TRINIDAD_CSV_URLS.historicalTrends),
     fetchCrimesFromURL(TRINIDAD_CSV_URLS.current)
   ]);
 
@@ -256,13 +256,14 @@ export async function initializeDashboardData(): Promise<void> {
   (window as any).__areaAliases = areaAliases;
 
   // Log loaded data
-  if (crimes2025Data.length > 0) {
-    console.log(`Loaded ${crimes2025Data.length} crimes from 2025 sheet`);
+  if (historicalTrendsData.length > 0) {
+    console.log(`✅ Loaded ${historicalTrendsData.length} historical crimes (Nov-Dec 2025) for trend calculations`);
   }
-  console.log(`Loaded ${crimesCurrentData.length} crimes from current sheet`);
+  console.log(`✅ Loaded ${crimesCurrentData.length} crimes from current sheet (2026)`);
 
-  // Combine all crimes (no deduplication needed - each crime only in one sheet)
-  const crimes = [...crimes2025Data, ...crimesCurrentData];
+  // Combine all crimes (historical + current)
+  // Historical data is used ONLY for trend calculations, not display
+  const crimes = [...historicalTrendsData, ...crimesCurrentData];
   crimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
 
   console.log(`✅ Total crimes loaded: ${crimes.length}`);
