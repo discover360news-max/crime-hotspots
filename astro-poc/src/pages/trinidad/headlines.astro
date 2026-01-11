@@ -62,7 +62,7 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
 // Breadcrumbs
 const breadcrumbs = [
   { label: 'Home', href: '/' },
-  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard' },
+  { label: 'Trinidad', href: '/trinidad/dashboard' },
   { label: 'Headlines' }
 ];
 ---
@@ -84,13 +84,13 @@ const breadcrumbs = [
 
         <a
           href="/trinidad/dashboard"
-          class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
+          class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap"
         >
           Dashboard
         </a>
         <button
           id="filtersBtn"
-          class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-medium text-xs whitespace-nowrap"
+          class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap"
         >
           Filters ›
         </button>
@@ -189,7 +189,7 @@ const breadcrumbs = [
     <div class="mt-8 text-center">
       <button
         id="loadMore"
-        class="px-6 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium text-xs"
+        class="px-6 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:bg-rose-800 transition font-medium text-xs"
       >
         Load More
       </button>
@@ -266,7 +266,7 @@ const breadcrumbs = [
           <!-- Clear Filters Button -->
           <button
             id="clearFilters"
-            class="w-full px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition font-medium text-xs"
+            class="w-full px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:bg-rose-800 transition font-medium text-xs"
           >
             Clear Filters
           </button>

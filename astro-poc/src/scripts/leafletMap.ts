@@ -225,7 +225,7 @@ export function initializeLeafletMap(
           <div class="text-xs text-rose-600">${areaDisplay}</div>
           <button
             onclick="window.openCrimeDetailModal('${crime.slug}')"
-            class="text-tiny text-rose-600 border border-rose-600 hover:bg-rose-600 hover:text-white transition px-3 py-1.5 rounded-lg mt-4 inline-block font-medium"
+            class="text-tiny text-rose-600 border border-rose-600 hover:bg-rose-600 hover:text-white active:bg-rose-700 transition px-3 py-1.5 rounded-lg mt-4 inline-block font-medium"
           >
             View Details
           </button>
@@ -318,7 +318,7 @@ export function updateLeafletMap(crimes: Crime[], crimeDetailPath: string) {
         <div class="text-xs text-rose-600">${areaDisplay}</div>
         <button
           onclick="window.openCrimeDetailModal('${crime.slug}')"
-          class="text-tiny text-rose-600 border border-rose-600 hover:bg-rose-600 hover:text-white transition px-3 py-1.5 rounded-lg mt-4 inline-block font-medium"
+          class="text-tiny text-rose-600 border border-rose-600 hover:bg-rose-600 hover:text-white active:bg-rose-700 transition px-3 py-1.5 rounded-lg mt-4 inline-block font-medium"
         >
           View Details
         </button>
