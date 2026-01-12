@@ -1,0 +1,28 @@
+# Cloudflare Pages Redirects
+# Format: source_path destination_path [status_code]
+
+# Old .html URLs to new Astro routes (301 permanent redirects)
+/dashboard-trinidad.html /trinidad/dashboard 301
+/dashboard-trinidad /trinidad/dashboard 301
+/headlines-trinidad-and-tobago.html /trinidad/headlines 301
+/headlines-trinidad-and-tobago /trinidad/headlines 301
+/headlines.html /headlines 301
+/about.html /about 301
+/blog.html /blog 301
+/report.html /report 301
+
+# Old blog post format to new format
+/blog-post.html /blog 301
+/blog-post /blog 301
+
+# Guyana pages (no longer exist - redirect to homepage)
+/dashboard-guyana.html / 301
+/dashboard-guyana / 301
+/headlines-guyana.html / 301
+/headlines-guyana / 301
+
+# Email protection (Cloudflare artifact)
+/cdn-cgi/l/email-protection / 301
+
+# Catch-all: redirect any remaining .html files to extensionless version
+/*.html /:splat 301
