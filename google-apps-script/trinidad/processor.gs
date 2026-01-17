@@ -92,8 +92,10 @@ function processReadyArticles() {
               // ← CRITICAL FIX: Process crime types FIRST (converts all_crime_types array → primary/related)
               const crimeTypes = processLegacyCrimeType(crime);
 
-              // ← NEW: Filter out crimes outside Trinidad
-              if (crime.location_country && crime.location_country !== 'Trinidad') {
+              // ← NEW: Filter out crimes outside Trinidad & Tobago
+              // Accept: "Trinidad", "Trinidad and Tobago", or "Trinidad & Tobago"
+              const validLocations = ['Trinidad', 'Trinidad and Tobago', 'Trinidad & Tobago', 'Tobago'];
+              if (crime.location_country && !validLocations.includes(crime.location_country)) {
                 Logger.log(`    ⏭️ Skipped: Crime occurred in ${crime.location_country}, not Trinidad`);
                 return; // Skip this crime
               }
@@ -275,24 +277,26 @@ function processReadyArticles() {
       // Validate and format crime date
       const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
-      // ← REMOVED: No need to call processLegacyCrimeType again, we already have it
+      // Calculate victim count from victims array
+      const victimCount = (crime.victims && Array.isArray(crime.victims)) ? crime.victims.length : 1;
 
       prodSheet.appendRow([
         crime.headline || 'No headline',        // 1. Headline
         crime.details || '',                     // 2. Summary
         crimeTypes.primary,                      // 3. primaryCrimeType
         crimeTypes.related,                      // 4. relatedCrimeTypes
-        crimeTypes.primary,                      // 5. crimeType (backward compat)
-        validatedDate,                           // 6. Date
-        crime.street || '',                      // 7. Street Address
-        geocoded.lat || '',                      // 8. Latitude
-        geocoded.lng || '',                      // 9. Longitude
-        geocoded.plus_code || '',                // 10. Location (Plus Code)
-        crime.area || '',                        // 11. Area
-        '',                                      // 12. Region (formula fills this)
-        'Trinidad',                              // 13. Island
-        crime.source_url || '',                  // 14. URL
-        ''                                       // 15. Source (formula fills this)
+        victimCount,                             // 5. victimCount ← ADDED
+        crimeTypes.primary,                      // 6. crimeType (backward compat)
+        validatedDate,                           // 7. Date
+        crime.street || '',                      // 8. Street Address
+        geocoded.lat || '',                      // 9. Latitude
+        geocoded.lng || '',                      // 10. Longitude
+        geocoded.plus_code || '',                // 11. Location (Plus Code)
+        crime.area || '',                        // 12. Area
+        '',                                      // 13. Region (formula fills this)
+        'Trinidad',                              // 14. Island
+        crime.source_url || '',                  // 15. URL
+        ''                                       // 16. Source (formula fills this)
       ]);
 
       Logger.log(`✅ Added to production: ${crime.headline}
@@ -325,27 +329,29 @@ function processReadyArticles() {
     // Validate and format crime date
     const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
-    // ← REMOVED: No need to call processLegacyCrimeType again, we already have it
+    // Calculate victim count from victims array
+    const victimCount = (crime.victims && Array.isArray(crime.victims)) ? crime.victims.length : 1;
 
     reviewSheet.appendRow([
       crime.headline || 'Needs headline',      // 1. Headline
       crime.details || '',                     // 2. Summary
       crimeTypes.primary,                      // 3. primaryCrimeType
       crimeTypes.related,                      // 4. relatedCrimeTypes
-      crimeTypes.primary,                      // 5. crimeType (backward compat)
-      validatedDate,                           // 6. Date
-      crime.street || '',                      // 7. Street Address
-      geocoded.lat || '',                      // 8. Latitude
-      geocoded.lng || '',                      // 9. Longitude
-      geocoded.plus_code || '',                // 10. Location (Plus Code)
-      crime.area || '',                        // 11. Area
-      '',                                      // 12. Region (formula fills this)
-      'Trinidad',                              // 13. Island
-      crime.source_url || '',                  // 14. URL
-      '',                                      // 15. Source (formula fills this)
-      confidence,                              // 16. Confidence
-      (ambiguities || []).join('; '),          // 17. Ambiguities
-      'pending',                               // 18. Status
+      victimCount,                             // 5. victimCount ← ADDED
+      crimeTypes.primary,                      // 6. crimeType (backward compat)
+      validatedDate,                           // 7. Date
+      crime.street || '',                      // 8. Street Address
+      geocoded.lat || '',                      // 9. Latitude
+      geocoded.lng || '',                      // 10. Longitude
+      geocoded.plus_code || '',                // 11. Location (Plus Code)
+      crime.area || '',                        // 12. Area
+      '',                                      // 13. Region (formula fills this)
+      'Trinidad',                              // 14. Island
+      crime.source_url || '',                  // 15. URL
+      '',                                      // 16. Source (formula fills this)
+      confidence,                              // 17. Confidence
+      (ambiguities || []).join('; '),          // 18. Ambiguities
+      'pending',                               // 19. Status
       ''                                       // 19. Notes
     ]);
 
@@ -909,50 +915,81 @@ function testProcessingPipeline() {
 // ARCHIVING FUNCTION
 // ============================================================================
 
+/**
+ * Archive old processed raw articles (7+ days old)
+ * Schedule: Daily trigger (recommended 3am-4am Trinidad time / 7am-8am UTC)
+ *
+ * Archives articles that are:
+ * - Older than 7 days AND
+ * - Status is: completed, skipped, or filtered_out
+ *
+ * Does NOT archive: pending, text_fetched, ready_for_processing, processing, failed, needs_review
+ * (These still need attention)
+ */
 function archiveProcessedArticles() {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Raw Articles');
-    const archiveSheet = getOrCreateArchiveSheet();
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log('   RAW ARTICLES ARCHIVE (Daily)                ');
+  Logger.log('═══════════════════════════════════════════════');
 
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - 90);
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Raw Articles');
+  const archiveSheet = getOrCreateArchiveSheet();
 
-    const data = sheet.getDataRange().getValues();
-    const toArchive = [];
-    const toKeep = [data[0]]; // Headers
+  // Archive articles older than 7 days
+  const DAYS_TO_KEEP = 7;
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_KEEP);
 
-    for (let i = 1; i < data.length; i++) {
-      const row = data[i];
-      const timestamp = new Date(row[0]);
-      const status = row[6]; // Column G: Status
+  Logger.log(`Cutoff date: ${cutoffDate.toLocaleDateString()}`);
+  Logger.log(`Archiving articles older than ${DAYS_TO_KEEP} days with finished status`);
 
-      // Archive if: old AND (completed or skipped)
-      const shouldArchive = timestamp < cutoffDate &&
-                           (status === 'completed' || status === 'skipped');
+  const data = sheet.getDataRange().getValues();
+  const toArchive = [];
+  const toKeep = [data[0]]; // Headers
 
-      if (shouldArchive) {
-        toArchive.push(row);
-      } else {
-        toKeep.push(row);
-      }
+  // Statuses that are safe to archive (processing is complete)
+  const archivableStatuses = ['completed', 'skipped', 'filtered_out'];
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const timestamp = new Date(row[0]);
+    const status = row[6]; // Column G: Status
+
+    // Archive if: old AND has a finished status
+    const isOld = timestamp < cutoffDate;
+    const isFinished = archivableStatuses.includes(status);
+
+    if (isOld && isFinished) {
+      toArchive.push(row);
+    } else {
+      toKeep.push(row);
     }
+  }
 
-    // Append to archive
-    if (toArchive.length > 0) {
-      archiveSheet.getRange(archiveSheet.getLastRow() + 1, 1,toArchive.length, 8)
-        .setValues(toArchive);
-    }
+  // Get the number of columns dynamically
+  const numColumns = data[0].length;
 
-    // Rewrite main sheet
-    sheet.clear();
-    sheet.getRange(1, 1, toKeep.length, 8).setValues(toKeep);
+  // Append to archive
+  if (toArchive.length > 0) {
+    archiveSheet.getRange(archiveSheet.getLastRow() + 1, 1, toArchive.length, numColumns)
+      .setValues(toArchive);
+  }
 
-    Logger.log(`✅ Archived: ${toArchive.length} articles (>90 days, completed/skipped)`);
-    Logger.log(`✅ Kept: ${toKeep.length - 1} articles (recent or pending review)`);
+  // Rewrite main sheet
+  sheet.clear();
+  sheet.getRange(1, 1, toKeep.length, numColumns).setValues(toKeep);
 
-    // Send email notification
+  Logger.log('');
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log(`✅ Archived: ${toArchive.length} articles (>${DAYS_TO_KEEP} days, finished)`);
+  Logger.log(`✅ Kept: ${toKeep.length - 1} articles (recent or still processing)`);
+  Logger.log('═══════════════════════════════════════════════');
+
+  // Only send email if something was archived
+  if (toArchive.length > 0) {
     GmailApp.sendEmail(
       NOTIFICATION_EMAIL,
-      '📦 Crime Hotspots - Quarterly Archive Complete',
-      `Archived ${toArchive.length} old articles.\nKept ${toKeep.length - 1}recent articles.`
+      `📦 Crime Hotspots - Archived ${toArchive.length} Raw Articles`,
+      `Daily archive complete.\n\nArchived: ${toArchive.length} articles (older than ${DAYS_TO_KEEP} days)\nKept: ${toKeep.length - 1} articles (recent or pending)\n\nView spreadsheet: ${SpreadsheetApp.getActiveSpreadsheet().getUrl()}`
     );
   }
+}

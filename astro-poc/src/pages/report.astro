@@ -435,8 +435,10 @@ const description = "Help build safer communities: report crime anonymously via 
         const container = document.getElementById('reportTurnstile');
         if (container && !container.hasAttribute('data-rendered')) {
           // Pass selector and full config object
+          // NOTE: Turnstile site key is PUBLIC by design (like reCAPTCHA site keys)
+          // The SECRET key for verification is stored securely in Google Apps Script
           (window as any).turnstile.render('#reportTurnstile', {
-            sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
+            sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ', // Public site key - safe to expose client-side
             size: 'invisible',
             theme: 'light',
             callback: (window as any).onReportTurnstileSuccess  // Function reference

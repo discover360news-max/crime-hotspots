@@ -3,6 +3,9 @@
  * Fetches and processes crime data from Google Sheets CSV
  */
 
+import { parseCSVLine, parseDate, generateSlug, createColumnMap, getColumnValue } from './csvParser';
+import { TRINIDAD_CSV_URLS } from '../config/csvUrls';
+
 export interface Crime {
   date: string;
   headline: string;
@@ -26,19 +29,6 @@ export interface Crime {
   day: number;
 }
 
-// Year-specific CSV URLs for Trinidad
-const TRINIDAD_CSV_URLS = {
-  2025: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv',
-  2026: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
-
-  // Production sheet (current year - switched to 2026 on Jan 1, 2026)
-  current: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
-
-  // Historical snippet for client-side trend calculations (Nov-Dec 2025, ~60 days)
-  // Note: Only used by dashboardDataLoader.ts, not used server-side
-  historicalTrends: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1728695070&single=true&output=csv'
-};
-
 /**
  * Fetch and parse crime data from a CSV URL
  * Uses column header mapping to support different CSV layouts
@@ -50,14 +40,8 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
 
     const lines = csvText.split('\n');
 
-    // Parse headers and create column mapping
-    const headerValues = parseCSVLine(lines[0]);
-    const columnMap = new Map<string, number>();
-    headerValues.forEach((header, index) => {
-      // Normalize header names (trim, lowercase)
-      const normalizedHeader = header.trim().toLowerCase();
-      columnMap.set(normalizedHeader, index);
-    });
+    // Parse headers and create column mapping using shared utility
+    const columnMap = createColumnMap(lines[0]);
 
     // Debug: Log all column headers found
     console.log('📋 CSV Column Headers:', Array.from(columnMap.keys()));
@@ -70,11 +54,8 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
 
       const values = parseCSVLine(line);
 
-      // Helper function to get value by column name
-      const getColumn = (columnName: string): string => {
-        const index = columnMap.get(columnName.toLowerCase());
-        return index !== undefined ? (values[index] || '') : '';
-      };
+      // Helper function using shared getColumnValue
+      const getColumn = (columnName: string): string => getColumnValue(values, columnMap, columnName);
 
       // Extract values using column mapping
       const headline = getColumn('Headline');
@@ -160,59 +141,6 @@ export async function getTrinidadCrimes(): Promise<Crime[]> {
 
   // Sort all crimes by date (newest first)
   return allCrimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
-}
-
-/**
- * Parse CSV line handling quoted commas
- */
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-
-  result.push(current.trim());
-  return result;
-}
-
-/**
- * Parse date string (handles M/D/YYYY format)
- */
-function parseDate(dateStr: string): Date {
-  const parts = dateStr.split('/');
-  if (parts.length === 3) {
-    const month = parseInt(parts[0]) - 1;
-    const day = parseInt(parts[1]);
-    const year = parseInt(parts[2]);
-    return new Date(year, month, day);
-  }
-  return new Date(dateStr);
-}
-
-/**
- * Generate SEO-friendly slug from headline and date
- */
-function generateSlug(headline: string, date: Date): string {
-  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  const slugText = headline
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 80);
-
-  return `${slugText}-${dateStr}`;
 }
 
 /**

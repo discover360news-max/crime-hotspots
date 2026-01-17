@@ -3,68 +3,13 @@
  * Handles CSV loading, parsing, and data initialization for the dashboard
  */
 
-// CSV URLs - MUST match server-side crimeData.ts
-export const TRINIDAD_CSV_URLS = {
-  '2025': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv',
-  '2026': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
-  // Current sheet (switched to 2026 on Jan 1, 2026)
-  current: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
-  // Historical snippet for trend calculations (Nov-Dec 2025, ~60 days)
-  historicalTrends: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1728695070&single=true&output=csv'
-};
+// Import shared utilities - SINGLE SOURCE OF TRUTH
+import { parseCSVLine, parseDate, generateSlug, createColumnMap, getColumnValue } from '../lib/csvParser';
+import { TRINIDAD_CSV_URLS, REGION_DATA_CSV_URL } from '../config/csvUrls';
 
-// RegionData CSV URL (for area aliases)
-export const REGION_DATA_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=910363151&single=true&output=csv';
-
-/**
- * Parse CSV line handling quoted commas
- */
-export function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  result.push(current.trim());
-  return result;
-}
-
-/**
- * Parse date string (M/D/YYYY format)
- */
-export function parseDate(dateStr: string): Date {
-  const parts = dateStr.split('/');
-  if (parts.length === 3) {
-    const month = parseInt(parts[0]) - 1;
-    const day = parseInt(parts[1]);
-    const year = parseInt(parts[2]);
-    return new Date(year, month, day);
-  }
-  return new Date(dateStr);
-}
-
-/**
- * Generate slug from headline and date
- */
-export function generateSlug(headline: string, date: Date): string {
-  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-  const slugText = headline
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 80);
-  return `${slugText}-${dateStr}`;
-}
+// Re-export for backwards compatibility with any code that imports from here
+export { parseCSVLine, parseDate, generateSlug };
+export { TRINIDAD_CSV_URLS, REGION_DATA_CSV_URL };
 
 /**
  * Fetch and parse crimes from a CSV URL
@@ -76,14 +21,8 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
     const csvText = await response.text();
     const lines = csvText.split('\n');
 
-    // Parse headers and create column mapping
-    const headerValues = parseCSVLine(lines[0]);
-    const columnMap = new Map<string, number>();
-    headerValues.forEach((header, index) => {
-      // Normalize header names (trim, lowercase)
-      const normalizedHeader = header.trim().toLowerCase();
-      columnMap.set(normalizedHeader, index);
-    });
+    // Parse headers and create column mapping using shared utility
+    const columnMap = createColumnMap(lines[0]);
 
     // Debug: Log all column headers found
     console.log('📋 CSV Column Headers:', Array.from(columnMap.keys()));
@@ -96,11 +35,8 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
 
       const values = parseCSVLine(line);
 
-      // Helper function to get value by column name
-      const getColumn = (columnName: string): string => {
-        const index = columnMap.get(columnName.toLowerCase());
-        return index !== undefined ? (values[index] || '') : '';
-      };
+      // Helper function using shared getColumnValue
+      const getColumn = (columnName: string): string => getColumnValue(values, columnMap, columnName);
 
       // Extract values using column mapping
       const headline = getColumn('Headline');
@@ -113,7 +49,7 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
       const street = getColumn('Street Address') || getColumn('Street');
       const area = getColumn('Area');
       const region = getColumn('Region');
-      const url = getColumn('URL');
+      const crimeUrl = getColumn('URL');
       const source = getColumn('Source');
       const latitude = getColumn('Latitude');
       const longitude = getColumn('Longitude');
@@ -141,7 +77,7 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
         street,
         area,
         region,
-        url,
+        url: crimeUrl,
         source,
         latitude: Number(latitude),
         longitude: Number(longitude),
@@ -170,13 +106,8 @@ export async function fetchAreaAliases(url: string): Promise<Record<string, stri
     const csvText = await response.text();
     const lines = csvText.split('\n');
 
-    // Parse headers
-    const headerValues = parseCSVLine(lines[0]);
-    const columnMap = new Map<string, number>();
-    headerValues.forEach((header, index) => {
-      const normalizedHeader = header.trim().toLowerCase();
-      columnMap.set(normalizedHeader, index);
-    });
+    // Parse headers using shared utility
+    const columnMap = createColumnMap(lines[0]);
 
     const areaIndex = columnMap.get('area');
     const knownAsIndex = columnMap.get('known_as');

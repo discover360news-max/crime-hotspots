@@ -12,13 +12,17 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Traffic:** ~4 real visitors/day, Google Search Console active (1,728 pages indexed)
-**Last Updated:** January 6, 2026
+**Last Updated:** January 17, 2026
 
 ---
 
 ## Recent Work (Last 30 Days)
 
 **January 2026:**
+- **Comprehensive audit** (Security, SEO, UX/UI, Code Quality) - see `docs/Website-Audits/`
+- **CSV consolidation** - Single source of truth (`csvUrls.ts`, `csvParser.ts`)
+- **Security hardening** - CSP headers, npm audit fix, Turnstile documentation
+- **SEO improvements** - BlogPosting schema, breadcrumbs on blog posts
 - Traffic analysis & SEO foundation (Google Search Console verified, social growth strategy)
 - Blog rotating banner + Headlines timeline UX (mobile-optimized)
 - LCP performance optimization (2035ms→1100ms, conditional resource loading)
@@ -121,20 +125,22 @@ Before adding any feature, ask: "Should this be a reusable component?" Create co
 - Test with `testRSSCollection()` functions
 - Verify Script Properties are set
 
-### CSV URL Synchronization (CRITICAL)
+### CSV URL Configuration (SINGLE SOURCE OF TRUTH)
 
-**⚠️ IMPORTANT:** CSV URLs must be synchronized across multiple files:
+**✅ UPDATED January 2026:** CSV URLs are now centralized.
 
-**Files That Must Match:**
-1. `astro-poc/src/lib/crimeData.ts` (lines 27-34)
-2. `astro-poc/src/pages/trinidad/dashboard.astro` (lines 400-405)
+**Single Source of Truth:**
+- `astro-poc/src/config/csvUrls.ts` - All CSV URLs defined here
+
+**Files That Import From Config:**
+- `src/lib/crimeData.ts` - Server-side SSG
+- `src/scripts/dashboardDataLoader.ts` - Client-side dashboard
+- `src/lib/areaAliases.ts` - Area name mapping
 
 **Rules:**
-- **ALWAYS update BOTH files** when changing CSV URLs
-- Both files must point `current` to the same year sheet
-- When `current` points to 2025 sheet, don't also load explicit 2025 sheet
-
-**Why:** Dashboard uses client-side CSV fetching, Headlines/archive use server-side fetching. Mismatch causes "flash" effect and duplicate loading.
+- **ONLY update `csvUrls.ts`** when changing CSV URLs
+- All other files import from this config
+- When `current` points to 2026 sheet, don't also load explicit 2026 sheet
 
 See `docs/claude-context/development-workflow.md` for details.
 
@@ -181,6 +187,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - `docs/claude-context/recent-features.md` - December 2025 - January 2026 implementations
 - `docs/claude-context/status-and-roadmap.md` - Completed features, next To-Do, vision
 - `docs/claude-context/MAINTENANCE-RULES.md` - **Rules for keeping project memory slim**
+
+**📊 Audits & Technical Debt**
+- `docs/Website-Audits/January-Audit-2026.md` - **Comprehensive audit with prioritized fixes** ⭐
+  - Security, SEO, UX/UI, Code Quality findings
+  - Priority matrix with timelines and seriousness levels
+  - Track completed vs pending items
 
 **🎨 Design & SEO**
 - `docs/guides/DESIGN-TOKENS.md` - **Official Design System (v1.0)** ⭐ CHECK THIS FIRST

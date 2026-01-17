@@ -251,8 +251,10 @@ const {
     try {
       const container = document.getElementById(`${idPrefix}reportIssueTurnstile`);
       if (container && !container.hasAttribute('data-rendered')) {
+        // NOTE: Turnstile site key is PUBLIC by design (like reCAPTCHA site keys)
+        // The SECRET key for verification is stored securely in Google Apps Script
         window.turnstile.render(container, {
-          sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ',
+          sitekey: '0x4AAAAAAB_ThEy2ACY1KEYQ', // Public site key - safe to expose client-side
           theme: 'light',
           callback: window.onReportIssueTurnstileSuccess  // Function reference, not string
         });

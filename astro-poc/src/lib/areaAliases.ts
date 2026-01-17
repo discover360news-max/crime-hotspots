@@ -11,8 +11,8 @@
  * const localName = aliases.get('Warrenville'); // Returns local name or undefined
  */
 
-const REGION_DATA_CSV_URL =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=910363151&single=true&output=csv';
+import { parseCSVLine, stripQuotes } from './csvParser';
+import { REGION_DATA_CSV_URL } from '../config/csvUrls';
 
 export interface AreaInfo {
   area: string;
@@ -39,39 +39,6 @@ export async function loadAreaAliases(): Promise<Map<string, string>> {
     console.error('Error loading area aliases:', error);
     return new Map();
   }
-}
-
-/**
- * Helper function to parse a CSV line properly (handles quoted fields with commas)
- */
-function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-
-  result.push(current.trim());
-  return result;
-}
-
-/**
- * Strips surrounding quotes and smart quotes from a string
- */
-function stripQuotes(str: string): string {
-  // Remove regular quotes, smart quotes, and any whitespace
-  return str.replace(/^[""\u201C\u201D]+|[""\u201C\u201D]+$/g, '').trim();
 }
 
 /**

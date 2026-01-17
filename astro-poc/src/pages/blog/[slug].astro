@@ -5,6 +5,7 @@
  */
 
 import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -34,6 +35,38 @@ function formatDate(date: Date) {
 const dashboardLink = post.data.country === 'tt'
   ? '/trinidad/dashboard'
   : '/guyana/dashboard';
+
+// Breadcrumb items
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Blog', href: '/blog' },
+  { label: post.data.title }
+];
+
+// BlogPosting Schema for SEO
+const blogPostingSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": post.data.title,
+  "description": post.data.excerpt,
+  "image": post.data.image,
+  "datePublished": post.data.date.toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": post.data.author
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Crime Hotspots",
+    "url": "https://crimehotspots.com"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": `https://crimehotspots.com/blog/${post.slug}`
+  },
+  "articleSection": post.data.countryName,
+  "keywords": ["crime statistics", post.data.countryName, "Caribbean crime data"]
+};
 ---
 
 <style>
@@ -201,7 +234,13 @@ const dashboardLink = post.data.country === 'tt'
 </style>
 
 <Layout title={title} description={description} ogImage={post.data.image}>
+  <!-- BlogPosting Schema for SEO -->
+  <script type="application/ld+json" set:html={JSON.stringify(blogPostingSchema)} />
+
   <main class="container mx-auto px-4 py-8 sm:py-12 max-w-4xl">
+    <!-- Breadcrumbs -->
+    <Breadcrumbs items={breadcrumbItems} />
+
     <article>
       <!-- Hero Image -->
       <div class="mb-6 sm:mb-8 rounded-lg overflow-hidden">

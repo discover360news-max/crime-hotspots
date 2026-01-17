@@ -1,17 +1,33 @@
 /**
- * MASTER ORCHESTRATOR (Manual Workflow - Updated Jan 1, 2026)
- * Runs article collection and filtering pipeline for manual review
+ * MASTER ORCHESTRATOR (Split Triggers - Updated Jan 17, 2026)
+ * Separates RSS collection from processing for optimal efficiency
  *
- * Workflow:
- * 1. Collect RSS feeds
- * 2. Fetch article text (removes sidebars, navigation)
- * 3. Pre-filter articles (keyword scoring + duplicate detection)
- * 4. [MANUAL REVIEW] - Review "ready_for_processing" articles and enter via Google Form
+ * ═══════════════════════════════════════════════════════════════════════════
+ * TRIGGER SCHEDULE (Set up in Apps Script Triggers):
+ * ═══════════════════════════════════════════════════════════════════════════
  *
- * NOTE: Gemini Stage 4 REMOVED - Manual data entry via Google Form now used
- * Articles scored high (10+) are marked "ready_for_processing" for your review
+ * 1. runRSSCollection()     → 3x daily (6am, 2pm, 10pm Trinidad / 10am, 6pm, 2am UTC)
+ *    - Fetches new articles from RSS feeds
+ *    - RSS feeds are ephemeral, so we grab them before they disappear
  *
- * Schedule: Every 8 hours (8am, 4pm, 12am)
+ * 2. runProcessingPipeline() → Every 2 hours (12 runs/day)
+ *    - Stage 2: Fetch article text
+ *    - Stage 3: Pre-filter (keywords + duplicates)
+ *    - Stage 4: Groq AI extraction
+ *    - Capacity: 5 articles/run × 12 runs = 60 articles/day
+ *
+ * 3. runFullPipeline()      → Manual only (for testing)
+ *    - Runs all stages sequentially
+ *
+ * ═══════════════════════════════════════════════════════════════════════════
+ * WHY SPLIT?
+ * ═══════════════════════════════════════════════════════════════════════════
+ * - RSS sources publish ~daily with some updates → 3x/day is sufficient
+ * - Processing backlog needs frequent attention → every 2 hours
+ * - Cleaner logs: know exactly what each run was doing
+ * - More efficient: don't fetch RSS when no new articles exist
+ *
+ * NOTE: Groq API (14,400 requests/day) with 30s delays = plenty of headroom
  */
 
 function runFullPipeline() {
@@ -28,7 +44,10 @@ function runFullPipeline() {
     textFetched: 0,
     preFilterPassed: 0,
     preFilterFiltered: 0,
-    readyForReview: 0,  // Articles needing manual review
+    groqProcessed: 0,        // Articles processed by Groq
+    toProduction: 0,         // High-confidence crimes → Production
+    toReviewQueue: 0,        // Low-confidence crimes → Review Queue
+    groqSkipped: 0,          // Not crime articles
     totalTime: 0
   };
 
@@ -94,28 +113,42 @@ function runFullPipeline() {
     Logger.log('');
 
     // ═══════════════════════════════════════════════════════════
-    // STAGE 4: MANUAL REVIEW (Replaces Gemini Processing)
+    // STAGE 4: GROQ AI PROCESSING (Re-enabled Jan 15, 2026)
     // ═══════════════════════════════════════════════════════════
     Logger.log('───────────────────────────────────────────────────');
-    Logger.log('STAGE 4: Manual Review');
+    Logger.log('STAGE 4: Groq AI Processing');
+    Logger.log('   - Extract crime data with llama-3.1-8b-instant');
+    Logger.log('   - High confidence (7+) → Production sheet');
+    Logger.log('   - Low confidence (<7) → Review Queue');
     Logger.log('───────────────────────────────────────────────────');
 
     const readyCount = countArticlesByStatus('ready_for_processing');
-    stats.readyForReview = readyCount;
 
     if (readyCount > 0) {
-      Logger.log(`📋 ${readyCount} articles ready for manual review`);
-      Logger.log('');
-      Logger.log('   ACTION REQUIRED:');
-      Logger.log('   1. Open "Raw Articles" sheet');
-      Logger.log('   2. Filter by status = "ready_for_processing"');
-      Logger.log('   3. Review each article');
-      Logger.log('   4. Submit crimes via Google Form:');
-      Logger.log('      https://docs.google.com/forms/d/e/1FAIpQLSdiEp6DGiXl58GoQSEnRBMOsFXY962pn8khgFKnApuCq6pVCg/viewform');
-      Logger.log('');
-      Logger.log('✅ Stage 4 ready: Articles filtered and awaiting your review');
+      Logger.log(`Found ${readyCount} articles ready for Groq processing`);
+
+      // Get counts before processing
+      const beforeProd = getSheetRowCount(SHEET_NAMES.PRODUCTION);
+      const beforeReview = getSheetRowCount(SHEET_NAMES.REVIEW_QUEUE);
+
+      // Run Groq processing
+      processReadyArticles();
+
+      // Get counts after processing
+      const afterProd = getSheetRowCount(SHEET_NAMES.PRODUCTION);
+      const afterReview = getSheetRowCount(SHEET_NAMES.REVIEW_QUEUE);
+
+      stats.groqProcessed = readyCount;
+      stats.toProduction = afterProd - beforeProd;
+      stats.toReviewQueue = afterReview - beforeReview;
+      stats.groqSkipped = readyCount - stats.toProduction - stats.toReviewQueue;
+
+      Logger.log(`✅ Stage 4 complete: ${stats.groqProcessed} articles processed`);
+      Logger.log(`   → Production: ${stats.toProduction} crimes`);
+      Logger.log(`   → Review Queue: ${stats.toReviewQueue} crimes`);
+      Logger.log(`   → Skipped (not crimes): ${stats.groqSkipped} articles`);
     } else {
-      Logger.log('ℹ️ No articles ready for review.');
+      Logger.log('ℹ️ No articles ready for processing.');
     }
     Logger.log('');
 
@@ -192,6 +225,21 @@ function getPreFilterStats() {
 }
 
 /**
+ * Get row count for a sheet (excluding header)
+ * Used to calculate how many crimes were added by Groq
+ */
+function getSheetRowCount(sheetName) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+
+  if (!sheet) {
+    return 0;
+  }
+
+  const lastRow = sheet.getLastRow();
+  return lastRow > 1 ? lastRow - 1 : 0; // Subtract 1 for header row
+}
+
+/**
  * Log pipeline summary
  */
 function logPipelineSummary(stats, startTime) {
@@ -207,10 +255,13 @@ function logPipelineSummary(stats, startTime) {
   Logger.log(`Pre-Filter Passed:    ${stats.preFilterPassed} articles`);
   Logger.log(`Pre-Filter Blocked:   ${stats.preFilterFiltered} articles`);
   Logger.log('');
-  Logger.log(`📋 READY FOR REVIEW:  ${stats.readyForReview} articles`);
+  Logger.log(`Groq Processed:       ${stats.groqProcessed} articles`);
+  Logger.log(`  → Production:       ${stats.toProduction} crimes (high confidence)`);
+  Logger.log(`  → Review Queue:     ${stats.toReviewQueue} crimes (low confidence)`);
+  Logger.log(`  → Skipped:          ${stats.groqSkipped} articles (not crimes)`);
   Logger.log('');
-  Logger.log(`Articles Saved:       ~${stats.preFilterFiltered} articles auto-filtered`);
-  Logger.log(`                      (saves ~${(stats.preFilterFiltered / (stats.preFilterPassed + stats.preFilterFiltered) * 100).toFixed(0)}% of manual review time)`);
+  Logger.log(`API Calls Saved:      ~${stats.preFilterFiltered} articles pre-filtered`);
+  Logger.log(`                      (saves ${(stats.preFilterFiltered / (stats.preFilterPassed + stats.preFilterFiltered) * 100).toFixed(0)}% of API calls)`);
   Logger.log('');
   Logger.log(`Total Time:           ${elapsedMinutes} minutes`);
   Logger.log(`Completed:            ${new Date().toLocaleString()}`);
@@ -218,11 +269,247 @@ function logPipelineSummary(stats, startTime) {
   Logger.log('═══════════════════════════════════════════════');
   Logger.log('');
   Logger.log('📝 NEXT STEPS:');
-  Logger.log('   1. Open Raw Articles sheet');
-  Logger.log('   2. Filter status = "ready_for_processing"');
-  Logger.log('   3. Review high-scoring articles');
-  Logger.log('   4. Submit crimes via Google Form');
+  Logger.log('   1. Open "Production" sheet → Review high-confidence crimes');
+  Logger.log('   2. Open "Review Queue" sheet → Review low-confidence crimes');
+  Logger.log('   3. Approve crimes → Move to Live sheet (feeds website)');
   Logger.log('');
+  Logger.log('═══════════════════════════════════════════════');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SPLIT TRIGGER FUNCTIONS (Added Jan 17, 2026)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * RSS COLLECTION ONLY
+ * Schedule: 3x daily (6am, 2pm, 10pm Trinidad time)
+ *
+ * - Fetches new articles from all enabled RSS feeds
+ * - RSS feeds are ephemeral, articles disappear after a few days
+ * - Tracks last fetch time for monitoring
+ */
+function runRSSCollection() {
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log('   RSS COLLECTION (Scheduled 3x Daily)         ');
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log('');
+  Logger.log(`Started: ${new Date().toLocaleString()}`);
+  Logger.log('');
+
+  const startTime = Date.now();
+
+  try {
+    // Collect RSS feeds
+    Logger.log('───────────────────────────────────────────────────');
+    Logger.log('Fetching RSS feeds from all sources...');
+    Logger.log('───────────────────────────────────────────────────');
+
+    const articlesCollected = collectAllFeeds();
+
+    // Track last RSS fetch time
+    setLastRSSFetchTime();
+
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+    Logger.log('');
+    Logger.log('═══════════════════════════════════════════════');
+    Logger.log('   RSS COLLECTION COMPLETE                     ');
+    Logger.log('═══════════════════════════════════════════════');
+    Logger.log(`Articles collected: ${articlesCollected}`);
+    Logger.log(`Time elapsed: ${elapsed}s`);
+    Logger.log(`Next processing run will handle these articles.`);
+    Logger.log('═══════════════════════════════════════════════');
+
+  } catch (error) {
+    Logger.log(`❌ RSS Collection Error: ${error.message}`);
+    Logger.log(`Stack: ${error.stack}`);
+    sendErrorNotification(error);
+  }
+}
+
+/**
+ * PROCESSING PIPELINE ONLY (Stages 2-4)
+ * Schedule: Every 2 hours (12 runs/day)
+ *
+ * - Stage 2: Fetch article text for "pending" articles
+ * - Stage 3: Pre-filter articles (keywords + duplicates)
+ * - Stage 4: Groq AI extraction → Production or Review Queue
+ *
+ * Capacity: 5 articles/run × 12 runs = 60 articles/day
+ */
+function runProcessingPipeline() {
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log('   PROCESSING PIPELINE (Scheduled Every 2hrs)  ');
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log('');
+  Logger.log(`Started: ${new Date().toLocaleString()}`);
+  Logger.log(`Last RSS fetch: ${getLastRSSFetchTime() || 'Never'}`);
+  Logger.log('');
+
+  const stats = {
+    textFetched: 0,
+    preFilterPassed: 0,
+    preFilterFiltered: 0,
+    groqProcessed: 0,
+    toProduction: 0,
+    toReviewQueue: 0,
+    groqSkipped: 0
+  };
+
+  const startTime = Date.now();
+
+  try {
+    // ═══════════════════════════════════════════════════════════
+    // STAGE 2: TEXT FETCHING
+    // ═══════════════════════════════════════════════════════════
+    Logger.log('───────────────────────────────────────────────────');
+    Logger.log('STAGE 2: Article Text Fetching');
+    Logger.log('───────────────────────────────────────────────────');
+
+    const pendingCount = countArticlesByStatus('pending');
+    Logger.log(`Found ${pendingCount} articles with status "pending"`);
+
+    if (pendingCount > 0) {
+      const fetchResult = fetchPendingArticlesImproved();
+      stats.textFetched = fetchResult.success;
+      Logger.log(`✅ Fetched: ${stats.textFetched} articles`);
+    } else {
+      Logger.log('ℹ️ No pending articles. Skipping Stage 2.');
+    }
+    Logger.log('');
+
+    // ═══════════════════════════════════════════════════════════
+    // STAGE 3: PRE-FILTERING
+    // ═══════════════════════════════════════════════════════════
+    Logger.log('───────────────────────────────────────────────────');
+    Logger.log('STAGE 3: Pre-Filtering (Keywords + Duplicates)');
+    Logger.log('───────────────────────────────────────────────────');
+
+    const textFetchedCount = countArticlesByStatus('text_fetched');
+    Logger.log(`Found ${textFetchedCount} articles with status "text_fetched"`);
+
+    if (textFetchedCount > 0) {
+      preFilterArticles();
+      const preFilterStats = getPreFilterStats();
+      stats.preFilterPassed = preFilterStats.readyForProcessing;
+      stats.preFilterFiltered = preFilterStats.filteredOut;
+      Logger.log(`✅ Passed: ${stats.preFilterPassed}, Filtered: ${stats.preFilterFiltered}`);
+    } else {
+      Logger.log('ℹ️ No text_fetched articles. Skipping Stage 3.');
+    }
+    Logger.log('');
+
+    // ═══════════════════════════════════════════════════════════
+    // STAGE 4: GROQ AI PROCESSING
+    // ═══════════════════════════════════════════════════════════
+    Logger.log('───────────────────────────────────────────────────');
+    Logger.log('STAGE 4: Groq AI Processing');
+    Logger.log('───────────────────────────────────────────────────');
+
+    const readyCount = countArticlesByStatus('ready_for_processing');
+    Logger.log(`Found ${readyCount} articles ready for Groq processing`);
+
+    if (readyCount > 0) {
+      const beforeProd = getSheetRowCount(SHEET_NAMES.PRODUCTION);
+      const beforeReview = getSheetRowCount(SHEET_NAMES.REVIEW_QUEUE);
+
+      processReadyArticles();
+
+      const afterProd = getSheetRowCount(SHEET_NAMES.PRODUCTION);
+      const afterReview = getSheetRowCount(SHEET_NAMES.REVIEW_QUEUE);
+
+      stats.groqProcessed = Math.min(readyCount, PROCESSING_CONFIG.MAX_ARTICLES_PER_RUN);
+      stats.toProduction = afterProd - beforeProd;
+      stats.toReviewQueue = afterReview - beforeReview;
+      stats.groqSkipped = stats.groqProcessed - stats.toProduction - stats.toReviewQueue;
+
+      Logger.log(`✅ Processed: ${stats.groqProcessed} articles`);
+      Logger.log(`   → Production: ${stats.toProduction}`);
+      Logger.log(`   → Review Queue: ${stats.toReviewQueue}`);
+      Logger.log(`   → Skipped: ${stats.groqSkipped}`);
+    } else {
+      Logger.log('ℹ️ No articles ready for processing.');
+    }
+    Logger.log('');
+
+  } catch (error) {
+    Logger.log(`❌ Processing Error: ${error.message}`);
+    Logger.log(`Stack: ${error.stack}`);
+    sendErrorNotification(error);
+  }
+
+  // Summary
+  const elapsed = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
+  const remainingReady = countArticlesByStatus('ready_for_processing');
+
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log('   PROCESSING PIPELINE COMPLETE                ');
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log(`Text fetched:     ${stats.textFetched}`);
+  Logger.log(`Pre-filter pass:  ${stats.preFilterPassed}`);
+  Logger.log(`Pre-filter block: ${stats.preFilterFiltered}`);
+  Logger.log(`Groq processed:   ${stats.groqProcessed}`);
+  Logger.log(`  → Production:   ${stats.toProduction}`);
+  Logger.log(`  → Review Queue: ${stats.toReviewQueue}`);
+  Logger.log('');
+  Logger.log(`Backlog remaining: ${remainingReady} articles ready_for_processing`);
+  Logger.log(`Time elapsed: ${elapsed} minutes`);
+  Logger.log('═══════════════════════════════════════════════');
+}
+
+/**
+ * Track last RSS fetch time (for monitoring)
+ */
+function setLastRSSFetchTime() {
+  PropertiesService.getScriptProperties().setProperty(
+    'LAST_RSS_FETCH',
+    new Date().toISOString()
+  );
+}
+
+/**
+ * Get last RSS fetch time
+ * @returns {string|null} ISO timestamp or null
+ */
+function getLastRSSFetchTime() {
+  const timestamp = PropertiesService.getScriptProperties().getProperty('LAST_RSS_FETCH');
+  if (timestamp) {
+    return new Date(timestamp).toLocaleString();
+  }
+  return null;
+}
+
+/**
+ * Check processing backlog status (useful for monitoring)
+ * Run manually to see current queue state
+ */
+function checkQueueStatus() {
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log('   QUEUE STATUS CHECK                          ');
+  Logger.log('═══════════════════════════════════════════════');
+
+  const pending = countArticlesByStatus('pending');
+  const textFetched = countArticlesByStatus('text_fetched');
+  const ready = countArticlesByStatus('ready_for_processing');
+  const processing = countArticlesByStatus('processing');
+
+  Logger.log(`Last RSS fetch: ${getLastRSSFetchTime() || 'Never'}`);
+  Logger.log('');
+  Logger.log('Queue Status:');
+  Logger.log(`  pending:              ${pending} (need text fetch)`);
+  Logger.log(`  text_fetched:         ${textFetched} (need pre-filter)`);
+  Logger.log(`  ready_for_processing: ${ready} (need Groq)`);
+  Logger.log(`  processing:           ${processing} (in progress)`);
+  Logger.log('');
+  Logger.log(`Total backlog: ${pending + textFetched + ready} articles`);
+
+  // Estimate time to clear
+  const totalBacklog = pending + textFetched + ready;
+  const runsNeeded = Math.ceil(totalBacklog / PROCESSING_CONFIG.MAX_ARTICLES_PER_RUN);
+  const hoursNeeded = runsNeeded * 2; // 2 hours between runs
+
+  Logger.log(`Estimated runs to clear: ${runsNeeded}`);
+  Logger.log(`Estimated time to clear: ~${hoursNeeded} hours`);
   Logger.log('═══════════════════════════════════════════════');
 }
 
