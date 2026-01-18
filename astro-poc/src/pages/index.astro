@@ -4,9 +4,14 @@
  * Caribbean-wide crime statistics portal
  */
 
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import InfoPopup from '../components/InfoPopup.astro';
 
+// Import optimized images (Astro converts to WebP automatically)
+import trinidadImg from '../assets/images/trinidad.jpg';
+import guyanaImg from '../assets/images/guyana.jpg';
+import barbadosImg from '../assets/images/barbados.jpg';
 
 const title = "Crime Hotspots Caribbean — Live Crime Statistics for the Caribbean";
 const description = "Live crime statistics and interactive maps for Trinidad & Tobago. Track murders, robberies, and incidents by location with verified data from Guardian, Express, and Newsday.";
@@ -20,7 +25,7 @@ const countries = [
     flag: '🇹🇹',
     dashboard: '/trinidad/dashboard',
     available: true,
-    image: '/assets/images/trinidad.jpg',
+    image: trinidadImg,
   },
   {
     id: 'gy',
@@ -29,7 +34,7 @@ const countries = [
     flag: '🇬🇾',
     dashboard: '/guyana/dashboard',
     available: false,
-    image: '/assets/images/guyana.jpg',
+    image: guyanaImg,
   },
   {
     id: 'bdos',
@@ -38,7 +43,7 @@ const countries = [
     flag: '🇧🇧',
     dashboard: '/barbados/dashboard',
     available: false,
-    image: '/assets/images/barbados.jpg',
+    image: barbadosImg,
   }
 ];
 ---
@@ -75,17 +80,17 @@ const countries = [
           >
             {country.available ? (
               <a href={country.dashboard} class="block">
-                <!-- Country Image -->
+                <!-- Country Image (Astro optimized WebP) -->
                 <div class="w-full aspect-square overflow-hidden bg-white/70">
-                  <img
+                  <Image
                     src={country.image}
                     alt={`${country.name} map`}
                     class="w-full h-full object-cover"
-                    loading={country.id === 'tt' ? 'eager' : 'lazy'}
-                    fetchpriority={country.id === 'tt' ? 'high' : 'auto'}
-                    width="220"
-                    height="220"
-                    decoding="async"
+                    loading="eager"
+                    width={220}
+                    height={220}
+                    format="webp"
+                    quality={80}
                   />
                 </div>
 
@@ -111,16 +116,17 @@ const countries = [
             ) : (
               <!-- Disabled Card (Coming Soon) -->
               <div class="block" aria-disabled="true" role="button" tabindex="-1">
-                <!-- Country Image (grayed out) -->
+                <!-- Country Image (grayed out, low priority) -->
                 <div class="w-full aspect-square overflow-hidden bg-slate-200 relative">
-                  <img
+                  <Image
                     src={country.image}
                     alt={`${country.name} map`}
                     class="w-full h-full object-cover grayscale"
                     loading="lazy"
-                    width="220"
-                    height="220"
-                    decoding="async"
+                    width={220}
+                    height={220}
+                    format="webp"
+                    quality={60}
                   />
                   <div class="absolute inset-0 bg-slate-300/20"></div>
                 </div>
