@@ -221,7 +221,7 @@ function processReadyArticles() {
     }
 
     // Format as MM/DD/YYYY (US standard - matches Production sheet format)
-    // Prefix with apostrophe to force plain text (prevents Sheets reformatting)
+    // Return as plain date string (no apostrophe prefix)
     const day = Utilities.formatDate(dateToFormat,
   Session.getScriptTimeZone(), 'dd');
     const month = Utilities.formatDate(dateToFormat,
@@ -229,7 +229,7 @@ function processReadyArticles() {
     const year = Utilities.formatDate(dateToFormat,
   Session.getScriptTimeZone(), 'yyyy');
 
-    return `'${month}/${day}/${year}`;
+    return `${month}/${day}/${year}`;
   }
 
 // ============================================================================
@@ -277,8 +277,9 @@ function processReadyArticles() {
       // Validate and format crime date
       const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
-      // Calculate victim count from victims array
-      const victimCount = (crime.victims && Array.isArray(crime.victims)) ? crime.victims.length : 1;
+      // Use victimCount from Claude if provided, otherwise calculate from victims array
+      const victimCount = crime.victimCount ||
+                          (crime.victims && Array.isArray(crime.victims) ? crime.victims.length : 1);
 
       prodSheet.appendRow([
         crime.headline || 'No headline',        // 1. Headline
@@ -329,8 +330,9 @@ function processReadyArticles() {
     // Validate and format crime date
     const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
-    // Calculate victim count from victims array
-    const victimCount = (crime.victims && Array.isArray(crime.victims)) ? crime.victims.length : 1;
+    // Use victimCount from Claude if provided, otherwise calculate from victims array
+    const victimCount = crime.victimCount ||
+                        (crime.victims && Array.isArray(crime.victims) ? crime.victims.length : 1);
 
     reviewSheet.appendRow([
       crime.headline || 'Needs headline',      // 1. Headline

@@ -12,20 +12,22 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Traffic:** ~4 real visitors/day, Google Search Console active (1,728 pages indexed)
-**Last Updated:** January 17, 2026
+**Last Updated:** January 18, 2026
 
 ---
 
 ## Recent Work (Last 30 Days)
 
 **January 2026:**
+- **XSS security fixes** - `escapeHtml.ts` utility, secured CrimeDetailModal + headlines (Jan 18)
+- **LCP optimization** - Astro Image component, 96% image size reduction (Jan 18)
+- **CSP completion** - Fixed googleusercontent.com for forms (Jan 18)
 - **Comprehensive audit** (Security, SEO, UX/UI, Code Quality) - see `docs/Website-Audits/`
 - **CSV consolidation** - Single source of truth (`csvUrls.ts`, `csvParser.ts`)
 - **Security hardening** - CSP headers, npm audit fix, Turnstile documentation
 - **SEO improvements** - BlogPosting schema, breadcrumbs on blog posts
 - Traffic analysis & SEO foundation (Google Search Console verified, social growth strategy)
 - Blog rotating banner + Headlines timeline UX (mobile-optimized)
-- LCP performance optimization (2035ms→1100ms, conditional resource loading)
 - Area tooltips with viewport detection (Dashboard Top Areas integration)
 - Headlines date accordion + victim count display
 - Victim count system + 2026 crime type format (primary + related crimes)
@@ -222,11 +224,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 ## Current Status (Brief)
 
 ### ✅ Production Ready
-- Astro 5.16.5 framework (1,728 static pages)
+- Astro 5.16.5 framework (1,889 static pages)
 - Trinidad & Tobago manual entry workflow (100% functional)
 - Dashboard with Leaflet maps, year filtering, trend comparisons
 - Site-wide search (Pagefind, 1,584 pages indexed)
 - SEO Phase 1 complete (sitemap, structured data, breadcrumbs, Google Search Console verified)
+- **Security Grade: A** - XSS fixed, CSP complete, npm vulnerabilities resolved
 - Google Analytics 4, cookie consent, user reporting
 - Social media accounts active (Facebook, X, Instagram) with content automation
 

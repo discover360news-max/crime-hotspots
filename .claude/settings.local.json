@@ -91,7 +91,18 @@
       "Bash(git diff:*)",
       "Bash(git mv:*)",
       "Bash(gh repo view:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(git log:*)",
+      "Bash(if [ -f \"astro-poc/dist/sitemap-index.xml\" ])",
+      "Bash(then cat \"astro-poc/dist/sitemap-index.xml\")",
+      "Bash(else echo \"No sitemap-index.xml found\")",
+      "Bash(if [ -f \"astro-poc/dist/sitemap-0.xml\" ])",
+      "Bash(then head -100 \"astro-poc/dist/sitemap-0.xml\")",
+      "Bash(else echo \"No sitemap-0.xml found\")",
+      "Bash(while ps aux)",
+      "Bash(do sleep 5)",
+      "Bash(kill:*)",
+      "Bash(unzip:*)"
     ],
     "deny": [],
     "ask": []

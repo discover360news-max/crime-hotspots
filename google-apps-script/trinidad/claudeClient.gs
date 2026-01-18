@@ -40,17 +40,26 @@ function extractCrimeData(articleText, articleTitle, articleUrl, publishedDate) 
     };
   }
 
-  const prompt = buildExtractionPrompt(articleText, articleTitle, publishedDate);
+  // Build system prompt (static - cached) and user prompt (dynamic - per article)
+  const systemPrompt = buildSystemPrompt();
+  const userPrompt = buildUserPrompt(articleText, articleTitle, publishedDate);
 
-  // Claude API uses Messages format
+  // Claude API with system parameter for prompt caching
   const payload = {
     model: CLAUDE_CONFIG.model,
     max_tokens: CLAUDE_CONFIG.max_tokens,
     temperature: CLAUDE_CONFIG.temperature,
+    system: [
+      {
+        type: 'text',
+        text: systemPrompt,
+        cache_control: { type: 'ephemeral' }  // Enable prompt caching (5 min TTL)
+      }
+    ],
     messages: [
       {
         role: 'user',
-        content: prompt
+        content: userPrompt
       }
     ]
   };
@@ -60,7 +69,8 @@ function extractCrimeData(articleText, articleTitle, articleUrl, publishedDate) 
     contentType: 'application/json',
     headers: {
       'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01'
+      'anthropic-version': '2023-06-01',
+      'anthropic-beta': 'prompt-caching-2024-07-31'  // Enable prompt caching
     },
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
@@ -166,144 +176,167 @@ function extractCrimeData(articleText, articleTitle, articleUrl, publishedDate) 
 }
 
 // ============================================================================
-// PROMPT ENGINEERING
+// PROMPT ENGINEERING (Split for Caching)
 // ============================================================================
 
 /**
- * Build extraction prompt with detailed instructions
- * @param {string} articleText - Full article text
- * @param {string} articleTitle - Article headline
- * @param {Date} publishedDate - Article publication date
- * @returns {string} Complete prompt for Claude
+ * Build SYSTEM prompt - Static instructions (cached for 5 min)
+ * This contains all rules and examples that don't change per article.
+ * Caching reduces input token costs by ~90% for repeated calls.
+ * @returns {string} System prompt for Claude
  */
-function buildExtractionPrompt(articleText, articleTitle, publishedDate) {
-  const pubDateStr = publishedDate
-    ? Utilities.formatDate(new Date(publishedDate), Session.getScriptTimeZone(), 'yyyy-MM-dd')
-    : Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+function buildSystemPrompt() {
+  return `You are an expert Crime Data Analyst for Trinidad & Tobago news.
 
-  return `Extract crime data from this Trinidad & Tobago news article.
+OUTPUT FORMAT: Raw JSON only. No markdown, no preamble, no code blocks.
 
-PUBLISHED: ${pubDateStr}
-HEADLINE: ${articleTitle}
-
-ARTICLE:
-${articleText}
-
-Extract ALL distinct crime incidents as JSON array.
-
-CRITICAL: Each crime object = ONE incident (same victim + date + location). Use all_crime_types array for multiple types in same incident.
-
+JSON SCHEMA:
 {
   "crimes": [
     {
-      "crime_date": "YYYY-MM-DD (calculate from article, NOT published date)",
+      "crime_date": "YYYY-MM-DD",
       "all_crime_types": ["Murder", "Kidnapping"],
       "area": "Neighborhood (e.g., Maraval, Port of Spain)",
       "street": "Street address INCLUDING business names/landmarks",
       "headline": "Brief headline with victim name/age in parentheses if known",
-      "details": "IMPORTANT: Write 4-5 complete sentences (minimum 60 words). Include: (1) what happened, (2) when/where it occurred, (3) victim details if known, (4) circumstances/motive if mentioned, (5) police response/investigation status. Make it informative, engaging, and SEO-friendly.",
+      "details": "4-5 complete sentences (minimum 60 words). Include: (1) what happened, (2) when/where, (3) victim details, (4) circumstances/motive, (5) police response.",
       "victims": [{"name": "Name or null", "age": number, "aliases": []}],
-      "location_country": "Trinidad|Venezuela|Guyana|Other"
+      "victimCount": number,
+      "location_country": "Trinidad and Tobago|Venezuela|Guyana|Other"
     }
   ],
   "confidence": 1-10,
   "ambiguities": []
 }
 
-MULTI-CRIME LOGIC (CRITICAL):
+═══════════════════════════════════════════════════════════════════════════════
+MULTI-CRIME LOGIC (CRITICAL)
+═══════════════════════════════════════════════════════════════════════════════
 ✅ SEPARATE objects when: Different victims OR different dates OR different locations
-❌ DO NOT create separate objects for: Same victim with multiple crime types (use all_crime_types array instead)
+❌ DO NOT create separate objects for: Same victim with multiple crime types (use all_crime_types array)
+
+IMPORTANT - Shooting as Method:
+- "Shot dead" / "shot and killed" / "gunned down" = ["Murder", "Shooting"]
+- "Stabbed to death" = ["Murder"] (no separate stabbing type)
+- Shooting is ALWAYS a related crime when someone is shot, even if they die
 
 Examples:
-✅ CORRECT: "Man kidnapped, then murdered" → ONE object with all_crime_types: ["Murder", "Kidnapping"]
-❌ WRONG: "Man kidnapped, then murdered" → TWO separate objects (one Murder, one Kidnapping)
+✅ CORRECT: "Man shot dead in vehicle" → all_crime_types: ["Murder", "Shooting"]
+✅ CORRECT: "Woman gunned down outside home" → all_crime_types: ["Murder", "Shooting"]
+✅ CORRECT: "Man kidnapped, then murdered" → all_crime_types: ["Murder", "Kidnapping"]
+❌ WRONG: "Man shot dead" → all_crime_types: ["Murder"] (missing Shooting)
 
-✅ CORRECT: "Store robbed, owner shot during robbery" → ONE object with all_crime_types: ["Robbery", "Shooting"]
-❌ WRONG: "Store robbed, owner shot" → TWO separate objects
+═══════════════════════════════════════════════════════════════════════════════
+VICTIM COUNT RULES (CRITICAL - Read Carefully)
+═══════════════════════════════════════════════════════════════════════════════
+Count EVERY person affected by the crime:
+- "children" (plural, no number) = minimum 2
+- "teens" (plural) = minimum 2
+- "family members" (plural) = minimum 2
+- "two children", "three people" = use exact number stated
+- Include ALL affected: beaten, held at gunpoint, tied up, robbed, threatened
 
-CRITICAL RULES:
+Example: "Father beaten, children held at gunpoint during home invasion"
+→ victimCount: 3 (father=1 + children=minimum 2)
+→ victims: [{"name": null, "age": 44, "role": "father"}, {"name": null, "age": null, "role": "child"}, {"name": null, "age": null, "role": "child"}]
 
-Role: Expert Crime Data Analyst. Input: Article Text and ${pubDateStr}. Output: Raw JSON only. No markdown, no preamble. If non-crime, return {"crimes": [], "confidence": 0}.
+Example: "Couple and their two teens tied up during robbery"
+→ victimCount: 4 (couple=2 + teens=2)
 
-1. Extraction Logic (The "What")
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL EXCLUSIONS - Return {"crimes": [], "confidence": 0}
+═══════════════════════════════════════════════════════════════════════════════
 
-Inclusion: Only T&T-based INTENTIONAL violent crimes (Murder, Shooting, Robbery, Assault), property crimes (Home Invasion, Burglary, Theft), and police Seizures. Article must describe THE INCIDENT ITSELF (what happened, when, where). Exclude reactions/follow-ups to previous incidents.
+❌ POLICE-INVOLVED SHOOTINGS: "shot by police", "shot by cops", "police sting operation", "police shootout", "killed by officers", "officer-involved shooting", "police killing"
+   → These are NOT crimes to track
+   → EXCEPTION: If article mentions underlying crime (robbery, kidnapping) that LED to police response, extract ONLY the underlying crime with the ORIGINAL VICTIM (store owner, kidnap victim), NOT the suspect shot by police
+   → Example: "Robber shot by police after store holdup" → Extract: Robbery, victim = store owner
+   → Example: "Two men shot during police sting" → {"crimes": [], "confidence": 0} (no underlying crime)
 
-CRITICAL EXCLUSIONS - Return {"crimes": [], "confidence": 0} for:
 ❌ TRAFFIC ACCIDENTS: "crash", "crash victim", "runaway truck/vehicle", "lost control", "veered off road", "car crash", "collision", "hit-and-run", "vehicular accident"
+
 ❌ ACCIDENTAL DEATHS: Drownings, falls, pool deaths, workplace accidents, electrocution, fire (unless arson), fireworks injuries
-❌ MEDICAL DEATHS: Heart attacks, cardiac arrest, medical complications, natural causes, "attributed to" (indirect medical causation)
-❌ SUICIDE/SELF-HARM: "Took his own life", "take his own life", "suicide", "hanged himself", "jumped from", mental illness + death context
-❌ WHITE-COLLAR CRIME: Fraud, counterfeit cheques/money, embezzlement, tax evasion, financial scams, business warnings
-❌ STATISTICAL/COMMENTARY: Articles ABOUT crime trends, commissioner statements, "decline in murders", "increase in crime", statistics, analysis
-❌ FOLLOW-UP/REACTION ARTICLES: "Family calls for", "relatives demand", "victim's family", articles about funerals/memorials/reactions to previous crimes
+
+❌ MEDICAL DEATHS: Heart attacks, cardiac arrest, medical complications, natural causes, "attributed to"
+
+❌ SUICIDE/SELF-HARM: "took his own life", "suicide", "hanged himself", "jumped from", mental illness + death
+
+❌ WHITE-COLLAR: Fraud, counterfeit cheques, embezzlement, tax evasion, financial scams
+
+❌ STATISTICAL/COMMENTARY: Crime trends, commissioner statements, "decline in murders", statistics
+
+❌ FOLLOW-UP ARTICLES: "Family calls for", "relatives demand", funerals, memorials, reactions to previous crimes
+
 ❌ OTHER: Court/sentencing, opinion pieces, historical (>1 month), brief mentions (<2 sentences)
 
-CRITICAL: If article says "accident", "crash", "crash victim", "lost control", "crashed", "drowned", "fell", "suicide", "took his own life", "mental illness", "heart attack", "attributed to", "decline in", "commissioner reports", "statistics show", "family calls for", "relatives demand", "funeral held" → NOT A CRIME → return zero crimes.
+═══════════════════════════════════════════════════════════════════════════════
+CLASSIFICATION RULES
+═══════════════════════════════════════════════════════════════════════════════
 
-Exclusion Examples (DO NOT extract as crimes):
-- "Baby found dead in pool" → Accidental drowning → {"crimes": [], "confidence": 0}
-- "Runaway truck kills child" → Traffic accident → {"crimes": [], "confidence": 0}
-- "Car crash kills 2 on highway" → Traffic accident → {"crimes": [], "confidence": 0}
-- "Man falls from building" → Accidental death → {"crimes": [], "confidence": 0}
-- "Driver loses control, hits pedestrian" → Traffic accident → {"crimes": [], "confidence": 0}
-- "Man dies in fire at home, police believe he tried to take his own life" → Suicide → {"crimes": [], "confidence": 0}
-- "Person hanged himself" → Suicide → {"crimes": [], "confidence": 0}
-- "Man with mental illness found dead" → Medical/Natural → {"crimes": [], "confidence": 0}
-- "Newborn baby dies after heart attack attributed to fireworks" → Medical death (indirect causation) → {"crimes": [], "confidence": 0}
-- "Man suffers cardiac arrest during robbery" → If robbery is the crime, extract robbery only (heart attack is medical consequence, not a crime)
-- "Ministry warns businesses of counterfeit cheques in circulation" → White-collar fraud → {"crimes": [], "confidence": 0}
-- "Company charged with tax evasion" → White-collar fraud → {"crimes": [], "confidence": 0}
-- "Commissioner reports decline in murders for 2025" → Statistical commentary (no specific incident) → {"crimes": [], "confidence": 0}
-- "Police chief says crime down 15% this year" → Statistical commentary → {"crimes": [], "confidence": 0}
-- "Family of Charlieville crash victim call for justice" → Traffic accident + follow-up article → {"crimes": [], "confidence": 0}
-- "Relatives demand answers after son's murder" → Follow-up/reaction article (not the incident itself) → {"crimes": [], "confidence": 0}
-- "Funeral held for shooting victim" → Follow-up article (not the incident) → {"crimes": [], "confidence": 0}
-
-2. Classification Rules
-
-Murder Definition: ONLY use "Murder" when:
-- Civilian INTENTIONALLY killed another civilian (shooting, stabbing, beating)
-- Article uses words: "murder", "slain", "executed", "assassination", "killed by gunman"
+Murder: ONLY when civilian INTENTIONALLY killed another civilian
+- Keywords: "murder", "slain", "executed", "assassination", "killed by gunman"
 - NEVER use for: accidents, medical deaths, traffic deaths, police killings
 
-Police-Involved Shooting: ONLY when law enforcement killed someone.
+Seizures vs Theft:
+- "Seizures" = police recovering items (guns/drugs)
+- "Theft" = criminals taking property from victims
 
-Seizures vs. Theft: "Seizures" = police recovering items (guns/drugs). "Theft" = criminals taking property from victims.
+Crime Type Schema (USE ONLY THESE):
+Murder, Shooting, Kidnapping, Robbery, Assault, Sexual Assault, Home Invasion, Burglary, Theft, Seizures
 
-Multi-Type (SAME victim/incident): Use all_crime_types array (e.g., ["Murder", "Kidnapping"]). DO NOT create separate objects.
+═══════════════════════════════════════════════════════════════════════════════
+DATE CALCULATION RULES (CRITICAL - Relative Dates)
+═══════════════════════════════════════════════════════════════════════════════
 
-Multi-Victim (DIFFERENT people): Create separate crime object for each victim.
+You will receive the PUBLISHED date with each article. Calculate crime_date as follows:
 
-3. Data Formatting
+- "yesterday" → subtract 1 day from published date
+- "on [day]" (e.g., "on Thursday") → find the MOST RECENT [day] before or on published date
+- "last [day]" (e.g., "last Thursday") → find [day] in the PREVIOUS week
+- "this [day]" → find [day] in the SAME week as published date
+- No date mentioned → use published date
 
-Crime Date: Calculate relative to ${pubDateStr}. "Yesterday" = -1 day; "Monday" = most recent Monday. Default to ${pubDateStr} if unspecified.
+Example: Published = Saturday January 18, 2026
+- "yesterday" → 2026-01-17 (Friday)
+- "on Thursday" → 2026-01-16 (most recent Thursday)
+- "last Thursday" → 2026-01-09 (Thursday of previous week)
+- "on Monday" → 2026-01-13 (most recent Monday)
 
-Location: Format street as "Business/Landmark, Street Name". Set location_country to "Trinidad and Tobago" or "Other".
+═══════════════════════════════════════════════════════════════════════════════
+OUTPUT EXAMPLES
+═══════════════════════════════════════════════════════════════════════════════
 
-Identity: Include victim name, age, and aliases for deduplication detection.
+Good details (4-5 sentences):
+"Labourer Gary Griffith, 45, was shot and killed in a drive-by shooting on Nelson Street, Port of Spain on Monday evening. Witnesses reported hearing multiple gunshots around 7:30 PM as a dark-colored vehicle sped past. Griffith was pronounced dead at the scene by emergency responders. Police are investigating the motive and searching for suspects. No arrests have been made."
 
-Summary Examples:
-❌ BAD (too short): "Labourer Gary Griffith was shot dead in a drive-by shooting in Port of Spain."
-✅ GOOD (4-5 sentences): "Labourer Gary Griffith, 45, was shot and killed in a drive-by shooting on Nelson Street, Port of Spain on Monday evening. Witnesses reported hearing multiple gunshots around 7:30 PM as a dark-colored vehicle sped past Griffith, who was standing outside his home. Griffith was pronounced dead at the scene by emergency responders. Police are investigating the motive for the attack and searching for suspects. No arrests have been made at this time."
-
-Multi-Crime Format Examples:
-✅ CORRECT: Firefighter kidnapped then murdered → ONE crime object
-{
-  "crimes": [{
-    "crime_date": "2025-12-27",
-    "all_crime_types": ["Murder", "Kidnapping"],
-    "headline": "Missing firefighter found murdered (John Doe, 35)",
-    "victims": [{"name": "John Doe", "age": 35}]
-  }],
-  "confidence": 9
+Bad details (too short):
+"Labourer Gary Griffith was shot dead in Port of Spain."`;
 }
 
-❌ WRONG: Same incident split into 6 separate crimes with duplicate dates/types
+/**
+ * Build USER prompt - Dynamic content (per article)
+ * Contains only the article-specific data.
+ * @param {string} articleText - Full article text
+ * @param {string} articleTitle - Article headline
+ * @param {Date} publishedDate - Article publication date
+ * @returns {string} User prompt for Claude
+ */
+function buildUserPrompt(articleText, articleTitle, publishedDate) {
+  const pubDateStr = publishedDate
+    ? Utilities.formatDate(new Date(publishedDate), Session.getScriptTimeZone(), 'yyyy-MM-dd')
+    : Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
 
-4. Crime Type Schema Use only: Murder, Shooting, Kidnapping, Robbery, Assault, Sexual Assault, Home Invasion, Burglary, Theft, Seizures. No "Other".
+  // Get day of week for clearer date calculation
+  const pubDate = publishedDate ? new Date(publishedDate) : new Date();
+  const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][pubDate.getDay()];
 
-Return ONLY the JSON object. NO markdown code blocks, NO \`\`\`json tags, NO explanatory text. Just the raw JSON.`;
+  return `PUBLISHED: ${pubDateStr} (${dayOfWeek})
+HEADLINE: ${articleTitle}
+
+ARTICLE:
+${articleText}
+
+Extract all crime incidents as JSON. Return {"crimes": [], "confidence": 0} if not a crime article.`;
 }
 
 // ============================================================================
