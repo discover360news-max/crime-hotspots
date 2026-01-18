@@ -114,6 +114,26 @@ import ReportIssueModal from './ReportIssueModal.astro';
   let currentCrimeHeadline = '';
   let currentCrimeData = null; // Store full crime object
 
+  // XSS Prevention: Escape HTML special characters
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // XSS Prevention: Sanitize URLs (only allow http/https/relative)
+  function sanitizeUrl(url) {
+    if (url == null) return '';
+    const trimmed = String(url).trim();
+    if (trimmed.startsWith('/')) return trimmed;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+    return ''; // Block javascript:, data:, etc.
+  }
+
   // Function to open modal with crime data
   function openCrimeModal(crime) {
     if (!backdrop || !modal || !content) return;
@@ -131,46 +151,47 @@ import ReportIssueModal from './ReportIssueModal.astro';
     // Metadata (date, crime type, location)
     const metadata = document.getElementById('modalMetadata');
 
-    // Build related crimes pills if they exist
+    // Build related crimes pills if they exist (with XSS escaping)
     let relatedCrimesPills = '';
     if (crime.relatedCrimeTypes && crime.relatedCrimeTypes.trim()) {
       const relatedCrimes = crime.relatedCrimeTypes.split(',').map(c => c.trim());
       relatedCrimesPills = relatedCrimes.map(relatedCrime =>
-        `<span class="px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-medium">${relatedCrime}</span>`
+        `<span class="px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-medium">${escapeHtml(relatedCrime)}</span>`
       ).join('');
     }
 
     metadata.innerHTML = `
-      <time class="text-slate-500">${formattedDate}</time>
-      <span class="px-3 py-1 rounded-full bg-rose-600 text-white font-medium">${crime.crimeType}</span>
+      <time class="text-slate-500">${escapeHtml(formattedDate)}</time>
+      <span class="px-3 py-1 rounded-full bg-rose-600 text-white font-medium">${escapeHtml(crime.crimeType)}</span>
       ${relatedCrimesPills}
-      <span class="text-slate-500">${crime.street ? `${crime.street}, ` : ''}${crime.area}</span>
+      <span class="text-slate-500">${crime.street ? `${escapeHtml(crime.street)}, ` : ''}${escapeHtml(crime.area)}</span>
     `;
 
-    // Summary
+    // Summary (with XSS escaping)
     const summaryEl = document.getElementById('modalSummary');
     if (crime.summary) {
-      summaryEl.innerHTML = `<p class="text-base text-slate-700 leading-relaxed">${crime.summary}</p>`;
+      summaryEl.innerHTML = `<p class="text-base text-slate-700 leading-relaxed">${escapeHtml(crime.summary)}</p>`;
     } else {
       summaryEl.innerHTML = '';
     }
 
-    // Details grid
+    // Details grid (with XSS escaping)
     const detailsEl = document.getElementById('modalDetails');
     detailsEl.innerHTML = `
       <dt class="text-xs font-semibold text-slate-500">Region:</dt>
-      <dd class="text-xs text-slate-700">${crime.region}</dd>
+      <dd class="text-xs text-slate-700">${escapeHtml(crime.region)}</dd>
       ${crime.source ? `
         <dt class="text-xs font-semibold text-slate-500">Source:</dt>
-        <dd class="text-xs text-slate-700">${crime.source}</dd>
+        <dd class="text-xs text-slate-700">${escapeHtml(crime.source)}</dd>
       ` : ''}
     `;
 
-    // Update button links
-    document.getElementById('modalViewFullBtn').href = `/trinidad/crime/${crime.slug}`;
+    // Update button links (with URL sanitization)
+    document.getElementById('modalViewFullBtn').href = `/trinidad/crime/${encodeURIComponent(crime.slug)}`;
     const sourceBtn = document.getElementById('modalSourceBtn');
-    if (crime.url) {
-      sourceBtn.href = crime.url;
+    const safeUrl = sanitizeUrl(crime.url);
+    if (safeUrl) {
+      sourceBtn.href = safeUrl;
       sourceBtn.style.display = 'flex';
     } else {
       sourceBtn.style.display = 'none';

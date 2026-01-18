@@ -53,3 +53,20 @@ export const COUNTRIES: Country[] = [
 ];
 
 export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw2vo5sahU-YNY5S-HbB9Ryga_4v68NcR58k1UjPkEXijvxptIqHoUFGVR3uVUeCpP_/exec";
+
+/**
+ * Get country by ID
+ * Provides single source of truth for country names in breadcrumbs and UI
+ */
+export function getCountryById(id: string): Country | undefined {
+  return COUNTRIES.find(country => country.id === id);
+}
+
+/**
+ * Get country name by ID
+ * Convenience function for breadcrumbs
+ */
+export function getCountryName(id: string): string {
+  const country = getCountryById(id);
+  return country?.name || id.toUpperCase();
+}

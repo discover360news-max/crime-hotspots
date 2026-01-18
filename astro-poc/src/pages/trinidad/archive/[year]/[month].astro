@@ -14,6 +14,7 @@ import AreaNameTooltip from '../../../../components/AreaNameTooltip.astro';
 import { getTrinidadCrimes, type Crime } from '../../../../lib/crimeData';
 import { dataUpdateNotice } from '../../../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../../../lib/areaAliases';
+import { getCountryName } from '../../../../data/countries';
 
 export async function getStaticPaths() {
   const crimes = await getTrinidadCrimes();
@@ -168,7 +169,7 @@ const insights = {
 // Breadcrumbs
 const breadcrumbs = [
   { label: 'Home', href: '/' },
-  { label: 'Trinidad', href: '/trinidad/dashboard' },
+  { label: getCountryName('tt'), href: '/trinidad/dashboard' },
   { label: 'Archive', href: '/trinidad/archive' },
   { label: String(year), href: `/trinidad/archive/${year}` },
   { label: monthName }

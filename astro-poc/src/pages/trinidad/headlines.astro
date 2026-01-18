@@ -13,6 +13,7 @@ import BlogRotatingBanner from '../../components/BlogRotatingBanner.astro';
 import { getTrinidadCrimes, type Crime } from '../../lib/crimeData';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../lib/areaAliases';
+import { getCountryName } from '../../data/countries';
 
 // Fetch all crimes (server-side) - include all years for filtering
 const allCrimes = await getTrinidadCrimes();
@@ -62,7 +63,7 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
 // Breadcrumbs
 const breadcrumbs = [
   { label: 'Home', href: '/' },
-  { label: 'Trinidad', href: '/trinidad/dashboard' },
+  { label: getCountryName('tt'), href: '/trinidad/dashboard' },
   { label: 'Headlines' }
 ];
 ---
@@ -277,6 +278,26 @@ const breadcrumbs = [
 
   <!-- Client-side filtering script -->
   <script define:vars={{ allCrimes, areaAliases: Object.fromEntries(areaAliases) }}>
+    // XSS Prevention: Escape HTML special characters
+    function escapeHtml(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // XSS Prevention: Sanitize URLs (only allow http/https/relative)
+    function sanitizeUrl(url) {
+      if (url == null) return '';
+      const trimmed = String(url).trim();
+      if (trimmed.startsWith('/')) return trimmed;
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+      return ''; // Block javascript:, data:, etc.
+    }
+
     let currentPage = 1;
     const perPage = 30;
     let filteredCrimes = [...allCrimes];
@@ -369,31 +390,34 @@ const breadcrumbs = [
     // Helper to render area name with tooltip (if local name exists)
     function renderAreaName(area) {
       const localName = areaAliases[area];
+      const safeArea = escapeHtml(area);
 
       // If no local name or same as area, show plain text
       if (!localName || localName === area) {
-        return `<span>${area}</span>`;
+        return `<span>${safeArea}</span>`;
       }
 
       // Show area with tooltip trigger (tooltip appended to body via JS)
-      return `<span class="area-tooltip-trigger inline-block border-b-2 border-dotted border-slate-400 hover:border-rose-600 cursor-help transition-colors" data-area="${area}" data-local-name="${localName}">${area}</span>`;
+      return `<span class="area-tooltip-trigger inline-block border-b-2 border-dotted border-slate-400 hover:border-rose-600 cursor-help transition-colors" data-area="${safeArea}" data-local-name="${escapeHtml(localName)}">${safeArea}</span>`;
     }
 
     // Create crime card HTML
     function createCrimeCardHTML(crime) {
+      const safeSlug = encodeURIComponent(crime.slug);
+      const safeUrl = sanitizeUrl(crime.url);
       return `
-        <article class="crime-card bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 hover:shadow-lg transition cursor-pointer group" data-crime-slug="${crime.slug}">
+        <article class="crime-card bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 hover:shadow-lg transition cursor-pointer group" data-crime-slug="${escapeHtml(crime.slug)}">
           <div class="flex items-start justify-between mb-3">
             <span class="inline-block px-3 py-1 rounded-full text-white text-xs font-medium opacity-70" style="background-color: ${getCrimeColorHex(crime.crimeType)}">
-              ${crime.crimeType}
+              ${escapeHtml(crime.crimeType)}
             </span>
             <span class="text-xs text-slate-500">
-              ${formatDate(crime.date)}
+              ${escapeHtml(formatDate(crime.date))}
             </span>
           </div>
 
           <h3 class="text-small font-semibold text-slate-700 mb-2">
-            ${crime.headline}
+            ${escapeHtml(crime.headline)}
           </h3>
 
           <p class="text-xs text-slate-500 mb-3 flex items-center gap-1">
@@ -405,19 +429,19 @@ const breadcrumbs = [
           </p>
 
           <div class="flex items-center justify-between pt-3 border-t border-slate-200">
-            <a href="/trinidad/crime/${crime.slug}" class="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1">
+            <a href="/trinidad/crime/${safeSlug}" class="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1">
               View Details
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </a>
 
-            <a href="${crime.url}" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1" title="Read original article">
+            ${safeUrl ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1" title="Read original article">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
               Source
-            </a>
+            </a>` : ''}
           </div>
         </article>
       `;
@@ -447,7 +471,7 @@ const breadcrumbs = [
       const textClass = isExpanded ? 'text-rose-600' : 'text-slate-700';
 
       return `
-        <div class="date-accordion mb-4" data-date="${date}">
+        <div class="date-accordion mb-4" data-date="${escapeHtml(date)}">
           <button
             class="accordion-header w-full px-4 py-3 bg-white/70 backdrop-blur-md rounded-lg hover:bg-white/90 transition flex items-center justify-between group ${borderClass}"
             aria-expanded="${isExpanded}"
@@ -463,7 +487,7 @@ const breadcrumbs = [
               </svg>
 
               <div class="text-left">
-                <h3 class="accordion-title text-small font-semibold ${textClass}">${formattedDate}</h3>
+                <h3 class="accordion-title text-small font-semibold ${textClass}">${escapeHtml(formattedDate)}</h3>
                 <p class="text-xs text-slate-500">${victimCount} ${victimCount === 1 ? 'victim' : 'victims'}</p>
               </div>
             </div>

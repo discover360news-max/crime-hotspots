@@ -17,6 +17,7 @@ import InfoPopup from '../../components/InfoPopup.astro';
 import LoadingShimmer from '../../components/LoadingShimmer.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
 import { dataUpdateNotice } from '../../config/siteNotifications';
+import { getCountryName } from '../../data/countries';
 import '../../styles/dashboard.css';
 
 // Get all crimes (will be used for year filtering on client-side)
@@ -47,7 +48,7 @@ const description = "Real-time Trinidad crime statistics on our interactive map.
     <div class="pt-4 mb-4">
       <Breadcrumbs items={[
         { label: 'Home', href: '/' },
-        { label: 'Trinidad' }
+        { label: getCountryName('tt') }
       ]} />
       <div class="flex items-start justify-between gap-10 pt-4">
         <div>

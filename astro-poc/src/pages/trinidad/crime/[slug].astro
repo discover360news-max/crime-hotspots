@@ -13,6 +13,7 @@ import SiteNotificationBanner from '../../../components/SiteNotificationBanner.a
 import AreaNameTooltip from '../../../components/AreaNameTooltip.astro';
 import { dataUpdateNotice } from '../../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../../lib/areaAliases';
+import { getCountryName } from '../../../data/countries';
 
 // This tells Astro to generate a static page for each crime
 export async function getStaticPaths() {
@@ -94,7 +95,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
     <!-- Breadcrumbs -->
     <Breadcrumbs items={[
       { label: 'Home', href: '/' },
-      { label: 'Trinidad', href: '/trinidad/dashboard' },
+      { label: getCountryName('tt'), href: '/trinidad/dashboard' },
       { label: 'Archive', href: '/trinidad/archive' },
       { label: String(crime.year), href: `/trinidad/archive/${crime.year}` },
       { label: monthName, href: `/trinidad/archive/${crime.year}/${String(crime.month).padStart(2, '0')}` },
