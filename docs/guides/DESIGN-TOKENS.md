@@ -1,7 +1,7 @@
 # Crime Hotspots Design Tokens
 
-**Version:** 1.0
-**Last Updated:** December 9, 2025
+**Version:** 1.1
+**Last Updated:** January 23, 2026
 **Status:** Living Document
 
 This document defines the design system for Crime Hotspots. All pages should follow these patterns for visual consistency.
@@ -236,6 +236,79 @@ body {
 
 ---
 
+## 🎭 Hero Sections
+
+### Full-Width Gradient Hero (Enterprise/Landing Pages)
+```html
+<!-- Breadcrumbs (Above Hero) -->
+<div class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-4">
+  <Breadcrumbs items={[
+    { label: 'Home', href: '/' },
+    { label: 'Page Title' }
+  ]} />
+</div>
+
+<!-- Hero Section (Full Width) -->
+<section class="w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 py-12 sm:py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+    <!-- Main Headline -->
+    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800 mb-4 sm:mb-6 leading-tight">
+      Main Value Proposition Headline
+    </h1>
+
+    <!-- Subheadline -->
+    <p class="text-base sm:text-lg text-slate-600 mb-6 max-w-3xl mx-auto leading-relaxed">
+      Supporting description that expands on the value proposition.
+      Keep it concise but compelling.
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+      <!-- Primary CTA -->
+      <a
+        href="#section"
+        class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 transition text-sm font-medium shadow-lg hover:shadow-xl min-h-[44px]"
+      >
+        Primary Action
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </a>
+
+      <!-- Secondary CTA -->
+      <a
+        href="mailto:discover360news@gmail.com?subject=Inquiry"
+        class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 active:bg-rose-50 transition text-sm font-medium min-h-[44px]"
+      >
+        Secondary Action
+      </a>
+    </div>
+  </div>
+</section>
+```
+
+### Hero Usage Rules
+- **Use for:** Landing pages, business pages, major feature announcements
+- **Gradient:** `from-rose-50 via-white to-slate-50` (subtle, professional)
+- **Typography Scale:** `text-3xl` (mobile) → `text-4xl` (tablet) → `text-5xl` (desktop)
+- **Subtitle Color:** `text-slate-600` (not 700, for hierarchy)
+- **CTA Hierarchy:** Primary (solid rose-600) + Secondary (outlined slate-300)
+- **Spacing:** `py-12 sm:py-20` (breathing room on hero)
+
+### Hero Button Sizing
+Hero CTAs use larger sizing than standard buttons:
+```html
+<!-- Hero Primary CTA -->
+<a class="px-6 py-3 min-h-[44px] bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition text-sm font-medium shadow-lg hover:shadow-xl">
+
+<!-- Hero Secondary CTA -->
+<a class="px-6 py-3 min-h-[44px] border-2 border-slate-300 text-slate-700 rounded-lg hover:border-rose-600 hover:text-rose-600 transition text-sm font-medium">
+```
+
+**Why Larger?** Hero CTAs need more visual weight to match the scale of large headlines.
+
+---
+
 ## 📋 Form Inputs
 
 ### Text Inputs & Date Pickers
@@ -381,6 +454,28 @@ body {
 </select>
 ```
 
+**Hero Section (Full-Width Gradient):**
+```html
+<section class="w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 py-12 sm:py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800 mb-4 sm:mb-6 leading-tight">
+      Headline
+    </h1>
+    <p class="text-base sm:text-lg text-slate-600 mb-6 max-w-3xl mx-auto leading-relaxed">
+      Subheadline
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
+      <a href="#" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition text-sm font-medium shadow-lg min-h-[44px]">
+        Primary Action
+      </a>
+      <a href="#" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 transition text-sm font-medium min-h-[44px]">
+        Secondary Action
+      </a>
+    </div>
+  </div>
+</section>
+```
+
 ---
 
 ## 🎨 Design Philosophy
@@ -412,4 +507,5 @@ body {
 ---
 
 **Version History:**
+- **v1.1 (Jan 23, 2026):** Added Hero Sections pattern (full-width gradient hero with enterprise CTAs)
 - **v1.0 (Dec 9, 2025):** Initial documentation based on index.html, dashboard-trinidad.html, and headlines-trinidad-and-tobago.html patterns
