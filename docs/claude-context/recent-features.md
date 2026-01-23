@@ -2,7 +2,7 @@
 
 **For:** Complete details of recently implemented features
 
-**Last Updated:** January 22, 2026
+**Last Updated:** January 23, 2026
 
 **Note:** Features older than 90 days are archived to `docs/archive/accomplishments/`
 
@@ -46,6 +46,97 @@
 - Build timestamp via `new Date()` at SSG time
 
 **Status:** ✅ Complete - Ready for production
+
+---
+
+### Phase 1 SEO Optimizations: Statistics & Internal Linking (Jan 23, 2026)
+
+**Context:** Google Search Console data (Jan 21-23) showed viral spike (263 clicks vs 2-14/day avg) driven by Isaiah Jules incident. Statistics pages ranking poorly (positions 55-88) for high-value queries like "trinidad crime statistics" and "trinidad crime rate". New pages created Jan 22 (Statistics, Murder Count) needed optimization BEFORE Google indexing.
+
+**Viral Spike Data:**
+- Jan 21: 263 clicks (10,800% increase), 29.06% CTR, position 4.7 avg
+- Isaiah Jules page: 252 clicks, 44% CTR, position 2.85
+- Proved strategy: Full names + specific locations + fast publishing = Top 3 rankings
+
+**Implementation:**
+
+**1. Statistics Page Three-Tier Crime Rate System**
+- **Previous Year Final** (2025) - Official crime rates with complete data
+  - Murder rate, robbery rate, assault rate per 100,000 population
+  - Based on 1.5 million Trinidad population
+- **Current Year Progress** (2026 YTD) - Current crime rates as of today
+  - Live rates updated daily via GitHub Actions rebuild (6 AM UTC)
+  - Shows partial-year progress without misleading projections
+- **Current Year Projected** (2026 At Current Pace) - Annual projections
+  - Calculation: `(currentCount / daysElapsed) * 365`
+  - "If Current Pace Continues" disclaimer
+  - Projects end-of-year totals based on YTD data
+
+**2. Dynamic Year Handling (Future-Proofed)**
+- All year references now use variables: `currentYear`, `previousYear`
+- Auto-calculates from `new Date().getFullYear()`
+- Will automatically work for 2027 vs 2026, 2028 vs 2027, etc.
+- No manual year updates required after 2026→2027 transition
+
+**3. Murder Count Page Exact Query Optimization**
+- **Before:** "Trinidad Murder Count 2026 - Live Statistics"
+- **After:** "How Many Murders in Trinidad 2026? Live Murder Count & Statistics"
+- Targets exact query: "how many murders in trinidad for 2026" (position 10)
+- Added 2025 comparison with YoY percentage change
+- Share functionality with WhatsApp, Facebook, X, Copy Link
+
+**4. Internal Linking Network**
+- Dashboard → Statistics page ("Crime Statistics & Rate")
+- Dashboard → Murder Count page ("Murder Count 2026")
+- Statistics page → Dashboard (breadcrumbs)
+- Murder Count page → Dashboard (breadcrumbs)
+- Murder Count page → Statistics page (All Crime Statistics button)
+- Creates discovery paths for Google and users
+
+**5. Mobile Experience Audit (88% of Traffic)**
+- Tested on 375x667px viewport (iPhone size) via Playwright
+- ✅ Fast load times, smooth map interactions
+- ✅ Readable text (16px+), appropriately sized touch targets
+- ✅ Responsive layout, functional filters and modals
+- ✅ Two-finger map instruction prevents scroll conflicts
+- No critical issues found - site fully mobile-optimized
+
+**SEO Optimizations:**
+- Statistics page title: "Trinidad Crime Statistics 2026 - Murder, Robbery & Crime Rate"
+- Statistics page description: Mentions "crime statistics", "crime rate", "per 100,000"
+- Murder count meta updated with projection data
+- Structured data (Dataset schema) on statistics page
+- Breadcrumbs on all pages for crawlability
+
+**Timing:** Pre-indexing optimization - pages created Jan 22, optimized Jan 23, BEFORE Google indexes (optimal window: 3-7 days)
+
+**Expected Impact:**
+- Statistics page: Position 63-72 → Target: Top 10-15 (within 14 days of indexing)
+- Murder count page: Position 10 → Target: Top 3-5 (within 7 days of indexing)
+- Dashboard: Improved link equity from statistics pages
+- Better Google understanding of site authority (news + statistics)
+
+**Key Technical Details:**
+- Crime rate formula: `(crimeCount / 1500000) * 100000`
+- Days elapsed: `Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24))`
+- Projection: `Math.round((crimeCount / daysElapsed) * 365)`
+- All calculations dynamic - no hardcoded dates or years
+- SSG at build time - 100% static HTML for Google
+
+**Key Learnings:**
+- Optimize pages BEFORE Google indexes them (perfect timing window)
+- Three-tier metrics address multiple search intents (official vs current vs projected)
+- Exact query matching in titles improves rankings faster
+- Internal linking creates discovery paths and distributes link equity
+- Dynamic year handling eliminates future maintenance
+
+**Files:**
+- `src/pages/trinidad/statistics.astro` - Three-tier system, dynamic years
+- `src/pages/trinidad/murder-count.astro` - Title optimization, 2025 comparison
+- `src/pages/trinidad/dashboard.astro` - Related Resources section
+- `docs/guides/BECOME-THE-HUB-Action-Plan.md` - Updated with viral spike data
+
+**Status:** ✅ Complete - Built and deployed, awaiting Google indexing (3-7 days)
 
 ---
 

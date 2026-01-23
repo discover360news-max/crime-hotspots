@@ -13,14 +13,36 @@ import FlipCounter from '../../components/FlipCounter.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getTrinidadCrimes } from '../../lib/crimeData';
 import { countCrimeType } from '../../lib/dashboardHelpers';
+import { getCollection } from 'astro:content';
 
 // Fetch current year's crime data
 const allCrimes = await getTrinidadCrimes();
 const currentYear = 2026;
-const crimes = allCrimes.filter(crime => crime.year === currentYear);
+const crimes2026 = allCrimes.filter(crime => crime.year === currentYear);
+const crimes2025 = allCrimes.filter(crime => crime.year === 2025);
 
-// Get murder count using the established helper
-const murderCount = countCrimeType(crimes, 'Murder');
+// Get murder counts for both years
+const murderCount = countCrimeType(crimes2026, 'Murder');
+const murderCount2025SamePeriod = countCrimeType(crimes2025.filter(crime => {
+  const now = new Date();
+  const crimeDate = new Date(crime.date);
+  const startOf2025 = new Date('2025-01-01');
+  const dayOfYear2026 = Math.floor((now - new Date('2026-01-01')) / (1000 * 60 * 60 * 24));
+  const samePeriodEnd2025 = new Date(startOf2025.getTime() + (dayOfYear2026 * 24 * 60 * 60 * 1000));
+  return crimeDate >= startOf2025 && crimeDate <= samePeriodEnd2025;
+}), 'Murder');
+
+// Calculate year-over-year change
+const yoyChange = murderCount2025SamePeriod > 0
+  ? ((murderCount - murderCount2025SamePeriod) / murderCount2025SamePeriod) * 100
+  : 0;
+const yoyDirection = yoyChange > 0.5 ? 'up' : yoyChange < -0.5 ? 'down' : 'same';
+
+// Get latest Trinidad blog post
+const blogPosts = await getCollection('blog', ({ data }) => data.country === 'tt');
+const latestPost = blogPosts.sort((a, b) =>
+  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+)[0];
 
 // Last updated = build time (when data was fetched from Google Sheets)
 // Daily GitHub Action rebuilds at 6 AM UTC, so this reflects actual data freshness
@@ -29,8 +51,8 @@ const lastUpdated = new Date().toLocaleDateString('en-US', {
   day: 'numeric'
 });
 
-const title = "Trinidad Murder Count 2026 - Live Statistics | Crime Hotspots";
-const description = "Track the Trinidad & Tobago murder toll for 2026. Live count updated daily. View statistics, trends, and detailed crime data.";
+const title = "How Many Murders in Trinidad 2026? Live Murder Count & Statistics";
+const description = `How many murders in Trinidad for 2026? ${murderCount} murders so far. Track the Trinidad & Tobago murder toll with live statistics updated daily. Compare to 2025 trends and view detailed crime data.`;
 ---
 
 <Layout title={title} description={description}>
@@ -70,6 +92,18 @@ const description = "Track the Trinidad & Tobago murder toll for 2026. Live coun
         Updated: {lastUpdated}
       </p>
 
+      <!-- 2025 Comparison -->
+      <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 max-w-md mx-auto">
+        <p class="text-sm text-slate-600 text-center">
+          Same period in 2025: <span class="font-semibold text-slate-800">{murderCount2025SamePeriod}</span> murders
+        </p>
+        {yoyDirection !== 'same' && (
+          <p class={`text-xs text-center mt-2 ${yoyDirection === 'down' ? 'text-emerald-600' : 'text-rose-600'}`}>
+            {yoyDirection === 'down' ? '↓' : '↑'} {Math.abs(yoyChange).toFixed(0)}% vs 2025
+          </p>
+        )}
+      </div>
+
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row gap-3 justify-center pt-4">
         <a
@@ -79,12 +113,23 @@ const description = "Track the Trinidad & Tobago murder toll for 2026. Live coun
           View Dashboard
         </a>
         <a
-          href="/methodology"
+          href="/trinidad/statistics"
           class="px-6 py-3 min-h-[44px] flex items-center justify-center border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition font-medium text-sm"
         >
-          Methodology
+          All Crime Statistics
         </a>
       </div>
+
+      <!-- Latest Analysis -->
+      {latestPost && (
+        <div class="mt-8 max-w-md mx-auto">
+          <p class="text-sm text-slate-500 mb-3">Latest Analysis</p>
+          <a href={`/blog/${latestPost.slug}/`} class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
+            <h3 class="font-semibold text-slate-800 text-sm mb-2">{latestPost.data.title}</h3>
+            <p class="text-xs text-slate-500">{latestPost.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} &bull; {latestPost.data.readTime}</p>
+          </a>
+        </div>
+      )}
 
       <!-- Share Section -->
       <div class="pt-6 border-t border-slate-200 mt-6">
