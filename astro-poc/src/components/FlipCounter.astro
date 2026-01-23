@@ -1,0 +1,133 @@
+---
+/**
+ * FlipCounter Component
+ * iOS-style split-flap counter display with animation
+ *
+ * Props:
+ * - value: The target number to display
+ * - animateOnLoad: Whether to animate from 0 on page load (default: true)
+ * - maxDigits: Maximum digits to display (default: auto based on value)
+ */
+
+interface Props {
+  value: number;
+  animateOnLoad?: boolean;
+  maxDigits?: number;
+  id?: string;
+}
+
+const {
+  value,
+  animateOnLoad = true,
+  maxDigits,
+  id = 'flip-counter'
+} = Astro.props;
+
+// Calculate digits needed (at least 2 for visual balance)
+const digitCount = maxDigits || Math.max(2, Math.floor(Math.log10(Math.abs(value || 1))) + 1);
+
+// Create array of digit positions
+const digits = Array.from({ length: digitCount }, (_, i) => {
+  const digitValue = Math.floor((value / Math.pow(10, digitCount - 1 - i)) % 10);
+  const isLeadingZero = i < digitCount - value.toString().length && digitValue === 0;
+  return { index: i, value: digitValue, isLeadingZero };
+});
+
+// Initial display value (0 if animating, actual if not)
+const initialDigits = animateOnLoad
+  ? digits.map(d => ({ ...d, displayValue: 0, isHidden: d.isLeadingZero }))
+  : digits.map(d => ({ ...d, displayValue: d.value, isHidden: d.isLeadingZero }));
+---
+
+<div class="flip-counter" id={id} data-target={value} data-digits={digitCount}>
+  {initialDigits.map((digit) => (
+    <div
+      class={`flip-digit ${digit.isHidden && animateOnLoad ? 'hidden' : ''}`}
+      data-target-digit={digit.value}
+      data-index={digit.index}
+    >
+      <div class="flip-digit-inner">
+        <div class="flip-digit-top">
+          {animateOnLoad ? '0' : digit.value}
+        </div>
+        <div class="flip-digit-bottom">
+          {animateOnLoad ? '0' : digit.value}
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+{animateOnLoad && (
+  <script define:vars={{ containerId: id, targetValue: value }}>
+    // Initialize flip counter animation on page load
+    function initFlipCounter() {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      const digits = container.querySelectorAll('.flip-digit');
+      const targetString = targetValue.toString();
+      const staggerDelay = 80;
+      const flipDuration = 250;
+
+      digits.forEach((digit, index) => {
+        const targetDigit = parseInt(digit.dataset.targetDigit || '0', 10);
+        const isLeadingZero = index < digits.length - targetString.length;
+
+        // Skip permanently hidden leading zeros
+        if (isLeadingZero && targetDigit === 0) {
+          return;
+        }
+
+        // Animate to target digit
+        let currentDigit = 0;
+
+        setTimeout(() => {
+          const flipInterval = setInterval(() => {
+            if (currentDigit >= targetDigit) {
+              clearInterval(flipInterval);
+              return;
+            }
+
+            currentDigit++;
+
+            // Show digit if it was hidden and now non-zero
+            if (isLeadingZero && currentDigit > 0) {
+              digit.classList.remove('hidden');
+            }
+
+            // Update digit display
+            const topHalf = digit.querySelector('.flip-digit-top');
+            const bottomHalf = digit.querySelector('.flip-digit-bottom');
+
+            if (topHalf && bottomHalf) {
+              // Add flip effect class
+              digit.classList.add('flipping');
+
+              // Update values
+              topHalf.textContent = currentDigit.toString();
+
+              setTimeout(() => {
+                bottomHalf.textContent = currentDigit.toString();
+                digit.classList.remove('flipping');
+              }, 150);
+            }
+          }, flipDuration);
+        }, index * staggerDelay);
+      });
+    }
+
+    // Run animation after page load with small delay for smooth effect
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initFlipCounter, 300);
+      });
+    } else {
+      setTimeout(initFlipCounter, 300);
+    }
+  </script>
+)}
+
+<style>
+  @import '../styles/flip-counter.css';
+</style>

@@ -5,10 +5,15 @@
  * URL: /trinidad/archive
  */
 
+// Keep archive index static (pre-rendered at build time)
+export const prerender = true;
+
 import Layout from '../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
 import { getTrinidadCrimes } from '../../../lib/crimeData';
 import { dataUpdateNotice } from '../../../config/siteNotifications';
+import { getCountryName } from '../../../data/countries';
 
 const crimes = await getTrinidadCrimes();
 
@@ -35,6 +40,13 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
 
 <Layout title={title} description={description}>
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <!-- Breadcrumbs -->
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: getCountryName('tt'), href: '/trinidad/dashboard' },
+      { label: 'Archive' }
+    ]} />
+
     <!-- Navigation Buttons -->
     <div class="flex gap-2 mb-6">
       <a

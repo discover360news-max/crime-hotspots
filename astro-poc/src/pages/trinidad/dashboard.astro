@@ -4,6 +4,9 @@
  * Interactive dashboard with regional SVG map and Leaflet incidents map
  */
 
+// Keep dashboard static (pre-rendered at build time)
+export const prerender = true;
+
 import Layout from '../../layouts/Layout.astro';
 import { getTrinidadCrimes } from '../../lib/crimeData';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
@@ -36,8 +39,8 @@ const crimes = allCrimes.filter(crime => crime.year === currentYear);
 // Calculate insights using imported helper
 const insights = calculateInsights(crimes);
 
-const title = "Trinidad & Tobago Crime Dashboard — Regional Statistics";
-const description = "Real-time Trinidad crime statistics on our interactive map. View Port of Spain data and regional safety trends. Check the live dashboard now.";
+const title = "Trinidad Crime Dashboard 2026 - Murder Count, Statistics & Live Map";
+const description = "Track Trinidad & Tobago crime statistics for 2026. Live murder count, robbery rates, and incident map. Updated daily with the latest crime data.";
 ---
 
 

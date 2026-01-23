@@ -88,8 +88,10 @@ export const calculateInsights = (crimeData: Crime[]) => {
   // Calculate total victims (victimCount is per INCIDENT, not per crime type)
   // Each row counts as victimCount victims, regardless of how many crime types it has
   const totalVictims = crimeData.reduce((sum, crime) => {
-    // Use victimCount if present, otherwise default to 1
-    const victimCount = Number(crime.victimCount) || 1;
+    // Use victimCount if present (including 0), otherwise default to 1
+    const victimCount = crime.victimCount !== undefined && crime.victimCount !== null
+      ? Number(crime.victimCount)
+      : 1;
     return sum + victimCount;
   }, 0);
 

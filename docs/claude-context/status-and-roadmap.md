@@ -1,6 +1,6 @@
 # Project Status & Roadmap
 
-**Last Updated:** January 6, 2026
+**Last Updated:** January 22, 2026
 
 ---
 
@@ -16,7 +16,9 @@
 
 - **Trinidad & Tobago Automation** (100% functional)
   - RSS feed collection (Trinidad Express, Guardian, Newsday)
-  - Gemini AI crime data extraction
+  - **Claude Haiku 4.5** crime data extraction (migrated from Gemini/Groq Jan 2026)
+    - Prompt caching enabled (~90% input token savings)
+    - Cost: ~$2.70/month
   - Google Sheets data storage + CSV export
   - Daily rebuild at 6 AM UTC
 
@@ -59,6 +61,13 @@
   - Structured Data (Schema.org): Dataset, BreadcrumbList, FAQPage, Organization
   - FAQ page (13 questions), Methodology page, About page
   - Weekly automated blog posts (Mondays)
+
+- **Murder Count 2026 Page (Jan 22, 2026)** ✅
+  - URL: `/trinidad/murder-count/` - SEO target: "how many murders in trinidad 2026"
+  - iOS-style flip counter with split-flap animation
+  - Responsive scaling (auto-shrinks for 3+ digits)
+  - Share buttons: WhatsApp, Facebook, X/Twitter, Copy Link
+  - Build-time "Updated" date reflects data freshness
 
 - **Traffic Analysis & SEO Foundation (Jan 5, 2026)** ✅
   - Google Search Console verified, 1,728 pages discovered

@@ -2,13 +2,52 @@
 
 **For:** Complete details of recently implemented features
 
-**Last Updated:** January 10, 2026
+**Last Updated:** January 22, 2026
 
 **Note:** Features older than 90 days are archived to `docs/archive/accomplishments/`
 
 ---
 
 ## January 2026 Features
+
+### Murder Count 2026 Page (Jan 22, 2026)
+
+**Context:** Need a mobile-first, SEO-optimized page to rank for "how many murders in trinidad 2026" searches. Trinidad audience is 88% mobile.
+
+**Implementation:**
+- **URL:** `/trinidad/murder-count/`
+- **iOS-style flip counter** with split-flap animation
+  - Animates from 0 to current count on page load
+  - Staggered digit flipping (80ms delay between digits)
+  - 3D perspective transforms for depth effect
+- **Responsive scaling** - Counter auto-shrinks for 3+ digits
+  - 2 digits: 120×180px (mobile), 200×300px (desktop)
+  - 3-4 digits: 80×120px (mobile), 140×210px (desktop)
+- **Share buttons** - WhatsApp, Facebook, X/Twitter, Copy Link
+  - Dynamic share text includes current count
+  - "Link copied!" feedback on copy
+- **Build-time "Updated" date** - Shows when data was fetched, not latest crime date
+
+**SEO:**
+- Title: "Trinidad Murder Count 2026 - Live Statistics | Crime Hotspots"
+- JSON-LD structured data (WebPage + BreadcrumbList schema)
+- Open Graph and Twitter Card meta tags (via Layout)
+
+**Files Created:**
+- `src/pages/trinidad/murder-count.astro` - Main page
+- `src/components/FlipCounter.astro` - Reusable counter component
+- `src/styles/flip-counter.css` - Split-flap animations
+- `src/scripts/flipCounter.ts` - Animation logic (optional module)
+
+**Key Technical Details:**
+- Counter uses CSS `line-height` clipping for split-digit effect (top half shows top of number, bottom half shows bottom)
+- `data-digits` attribute enables CSS-based responsive scaling
+- Share URLs use `encodeURIComponent()` for proper encoding
+- Build timestamp via `new Date()` at SSG time
+
+**Status:** ✅ Complete - Ready for production
+
+---
 
 ### Related Crime Pills Display & CSV Parsing Fix (Jan 10, 2026)
 

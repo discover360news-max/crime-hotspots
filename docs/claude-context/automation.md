@@ -2,6 +2,8 @@
 
 **For:** Google Apps Script automation details
 
+**Last Updated:** January 22, 2026
+
 ---
 
 ## Automated Data Collection
@@ -9,6 +11,12 @@
 **Location:** `google-apps-script/trinidad/` and `google-apps-script/guyana/`
 
 ### Trinidad & Tobago
+
+**AI Model:** Claude Haiku 4.5 (`claude-3-5-haiku-20241022`)
+- Migrated from Groq/Gemini in January 2026
+- Prompt caching enabled (5-min TTL, ~90% input token savings)
+- Cost: ~$2.70/month for 20 articles/day
+- **File:** `google-apps-script/trinidad/claudeClient.gs`
 
 **Data Sources:**
 1. **RSS feeds** collected every 2 hours (Trinidad Express, Guardian, Newsday)
@@ -19,7 +27,7 @@
 **Processing Pipeline:**
 1. RSS feeds collected every 2 hours
 2. Full article text fetched every 8 hours
-3. Gemini AI extracts crime data every hour
+3. **Claude AI extracts crime data** (replaced Gemini)
 4. Data published to duplicated Production sheet (public CSV)
 5. **Update frequency:** Live Data refreshed every 24 hours
 

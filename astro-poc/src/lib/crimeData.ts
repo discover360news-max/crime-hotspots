@@ -1,10 +1,23 @@
 /**
  * Crime Data Fetcher
  * Fetches and processes crime data from Google Sheets CSV
+ *
+ * BUILD-TIME CACHING:
+ * Data is cached at the module level during build. This means:
+ * - First page that calls getTrinidadCrimes() fetches from Google Sheets
+ * - All subsequent pages reuse the cached data (no additional HTTP requests)
+ * - This reduces build time significantly (from ~30 min to ~5-10 min)
  */
 
 import { parseCSVLine, parseDate, generateSlug, createColumnMap, getColumnValue } from './csvParser';
 import { TRINIDAD_CSV_URLS } from '../config/csvUrls';
+
+// ============================================================================
+// BUILD-TIME CACHE
+// Module-level cache persists across all page builds in a single Astro build
+// ============================================================================
+let cachedCrimes: Crime[] | null = null;
+let fetchPromise: Promise<Crime[]> | null = null;
 
 export interface Crime {
   date: string;
@@ -84,9 +97,9 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
 
       const slug = generateSlug(headline, dateObj);
 
-      // Parse victim count (default to 1 if not provided or invalid)
+      // Parse victim count (default to 1 if not provided, allow 0 for victimless crimes)
       const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
-      const validVictimCount = !isNaN(victimCount) && victimCount > 0 ? victimCount : 1;
+      const validVictimCount = !isNaN(victimCount) && victimCount >= 0 ? victimCount : 1;
 
       crimes.push({
         date,
@@ -121,26 +134,51 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
 /**
  * Fetch and parse Trinidad crime data from ALL year sheets
  * Returns all years combined and sorted by date (newest first)
+ *
+ * CACHING: Data is fetched once per build and cached for all subsequent calls.
+ * This dramatically reduces build time by avoiding repeated HTTP requests.
  */
 export async function getTrinidadCrimes(): Promise<Crime[]> {
-  const allCrimes: Crime[] = [];
-
-  // Fetch 2025 data (only if it's different from current sheet)
-  if (TRINIDAD_CSV_URLS[2025] && TRINIDAD_CSV_URLS[2025] !== TRINIDAD_CSV_URLS.current) {
-    const crimes2025 = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS[2025]);
-    allCrimes.push(...crimes2025);
-    console.log(`Loaded ${crimes2025.length} crimes from 2025 sheet`);
+  // Return cached data if available
+  if (cachedCrimes !== null) {
+    console.log(`📦 Using cached crime data (${cachedCrimes.length} crimes)`);
+    return cachedCrimes;
   }
 
-  // Fetch current/production sheet (always load this)
-  const currentCrimes = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS.current);
-  allCrimes.push(...currentCrimes);
-  console.log(`Loaded ${currentCrimes.length} crimes from current sheet`);
+  // If a fetch is already in progress, wait for it (prevents race conditions)
+  if (fetchPromise !== null) {
+    console.log('⏳ Waiting for in-progress data fetch...');
+    return fetchPromise;
+  }
 
-  console.log(`Total crimes loaded: ${allCrimes.length}`);
+  // Start fetching and store the promise
+  fetchPromise = (async () => {
+    console.log('🔄 Fetching crime data from Google Sheets (first request)...');
+    const allCrimes: Crime[] = [];
 
-  // Sort all crimes by date (newest first)
-  return allCrimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
+    // Fetch 2025 data (only if it's different from current sheet)
+    if (TRINIDAD_CSV_URLS[2025] && TRINIDAD_CSV_URLS[2025] !== TRINIDAD_CSV_URLS.current) {
+      const crimes2025 = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS[2025]);
+      allCrimes.push(...crimes2025);
+      console.log(`✅ Loaded ${crimes2025.length} crimes from 2025 sheet`);
+    }
+
+    // Fetch current/production sheet (always load this)
+    const currentCrimes = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS.current);
+    allCrimes.push(...currentCrimes);
+    console.log(`✅ Loaded ${currentCrimes.length} crimes from current sheet`);
+
+    // Sort all crimes by date (newest first)
+    const sortedCrimes = allCrimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
+
+    // Cache the result
+    cachedCrimes = sortedCrimes;
+    console.log(`💾 Cached ${cachedCrimes.length} total crimes for build`);
+
+    return sortedCrimes;
+  })();
+
+  return fetchPromise;
 }
 
 /**

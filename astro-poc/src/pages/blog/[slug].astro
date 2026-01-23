@@ -4,6 +4,9 @@
  * Dynamic route for individual blog posts
  */
 
+// Keep blog posts static (pre-rendered at build time)
+export const prerender = true;
+
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';

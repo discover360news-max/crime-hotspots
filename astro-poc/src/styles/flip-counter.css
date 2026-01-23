@@ -1,0 +1,246 @@
+/**
+ * Flip Counter CSS
+ * iOS-style split-flap display animations
+ */
+
+.flip-counter {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.flip-digit {
+  position: relative;
+  width: 160px;
+  height: 240px;
+  perspective: 400px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+  font-size: 144px;
+  line-height: 1;
+}
+
+/* Hidden state for leading zeros */
+.flip-digit.hidden {
+  display: none;
+}
+
+.flip-digit-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Base card styling for top and bottom halves */
+.flip-digit-top,
+.flip-digit-bottom {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #1e293b, #0f172a);
+  color: #f1f5f9;
+  backface-visibility: hidden;
+  /* Text spans full digit height, gets clipped by container */
+  line-height: 240px; /* Same as .flip-digit height */
+  text-align: center;
+}
+
+.flip-digit-top {
+  top: 0;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid #334155;
+  box-shadow:
+    0 -4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.flip-digit-bottom {
+  bottom: 0;
+  border-radius: 0 0 12px 12px;
+  /* Shift text up so bottom half of digit is visible */
+  line-height: 0;
+  padding-top: 2px;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Current number display */
+.flip-digit-current {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+/* Flip animation cards */
+.flip-card {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  transform-origin: bottom center;
+  transform-style: preserve-3d;
+}
+
+.flip-card-top {
+  top: 0;
+  transform-origin: bottom center;
+}
+
+.flip-card-bottom {
+  bottom: 0;
+  transform-origin: top center;
+}
+
+/* Flip animation keyframes */
+@keyframes flipTop {
+  0% {
+    transform: rotateX(0deg);
+  }
+  100% {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes flipBottom {
+  0% {
+    transform: rotateX(90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+.flip-card-top.flipping {
+  animation: flipTop 0.3s ease-in forwards;
+}
+
+.flip-card-bottom.flipping {
+  animation: flipBottom 0.3s ease-out forwards;
+  animation-delay: 0.15s;
+}
+
+/* Subtle shadow during flip */
+.flip-digit.flipping::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), transparent);
+  z-index: 10;
+  animation: shadowPulse 0.3s ease-out forwards;
+}
+
+@keyframes shadowPulse {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Responsive sizing */
+@media (max-width: 480px) {
+  .flip-digit {
+    width: 120px;
+    height: 180px;
+    font-size: 108px;
+  }
+
+  .flip-digit-top,
+  .flip-digit-bottom {
+    line-height: 180px;
+  }
+
+  .flip-digit-bottom {
+    line-height: 0;
+  }
+
+  .flip-counter {
+    gap: 0.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .flip-digit {
+    width: 200px;
+    height: 300px;
+    font-size: 180px;
+  }
+
+  .flip-digit-top,
+  .flip-digit-bottom {
+    line-height: 300px;
+  }
+
+  .flip-digit-bottom {
+    line-height: 0;
+  }
+
+  .flip-counter {
+    gap: 1rem;
+  }
+}
+
+/* Scale down for 3+ digits to fit mobile screens */
+.flip-counter[data-digits="3"] .flip-digit,
+.flip-counter[data-digits="4"] .flip-digit {
+  width: 100px;
+  height: 150px;
+  font-size: 90px;
+}
+
+.flip-counter[data-digits="3"] .flip-digit-top,
+.flip-counter[data-digits="3"] .flip-digit-bottom,
+.flip-counter[data-digits="4"] .flip-digit-top,
+.flip-counter[data-digits="4"] .flip-digit-bottom {
+  line-height: 150px;
+}
+
+.flip-counter[data-digits="3"] .flip-digit-bottom,
+.flip-counter[data-digits="4"] .flip-digit-bottom {
+  line-height: 0;
+}
+
+@media (max-width: 480px) {
+  .flip-counter[data-digits="3"] .flip-digit,
+  .flip-counter[data-digits="4"] .flip-digit {
+    width: 80px;
+    height: 120px;
+    font-size: 72px;
+  }
+
+  .flip-counter[data-digits="3"] .flip-digit-top,
+  .flip-counter[data-digits="3"] .flip-digit-bottom,
+  .flip-counter[data-digits="4"] .flip-digit-top,
+  .flip-counter[data-digits="4"] .flip-digit-bottom {
+    line-height: 120px;
+  }
+
+  .flip-counter[data-digits="3"] .flip-digit-bottom,
+  .flip-counter[data-digits="4"] .flip-digit-bottom {
+    line-height: 0;
+  }
+}
+
+@media (min-width: 768px) {
+  .flip-counter[data-digits="3"] .flip-digit,
+  .flip-counter[data-digits="4"] .flip-digit {
+    width: 140px;
+    height: 210px;
+    font-size: 126px;
+  }
+
+  .flip-counter[data-digits="3"] .flip-digit-top,
+  .flip-counter[data-digits="3"] .flip-digit-bottom,
+  .flip-counter[data-digits="4"] .flip-digit-top,
+  .flip-counter[data-digits="4"] .flip-digit-bottom {
+    line-height: 210px;
+  }
+
+  .flip-counter[data-digits="3"] .flip-digit-bottom,
+  .flip-counter[data-digits="4"] .flip-digit-bottom {
+    line-height: 0;
+  }
+}

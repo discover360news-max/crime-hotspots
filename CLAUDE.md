@@ -12,13 +12,15 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Traffic:** ~4 real visitors/day, Google Search Console active (1,728 pages indexed)
-**Last Updated:** January 18, 2026
+**Last Updated:** January 22, 2026
 
 ---
 
 ## Recent Work (Last 30 Days)
 
 **January 2026:**
+- **Murder Count 2026 page** - iOS-style flip counter, share buttons, SEO-optimized (Jan 22)
+- **Claude API migration** - Replaced Gemini/Groq with Claude Haiku 4.5 for crime extraction (Jan 2026)
 - **XSS security fixes** - `escapeHtml.ts` utility, secured CrimeDetailModal + headlines (Jan 18)
 - **LCP optimization** - Astro Image component, 96% image size reduction (Jan 18)
 - **CSP completion** - Fixed googleusercontent.com for forms (Jan 18)
@@ -71,7 +73,10 @@ To find a way to get goals accomplished efficiently and by using the least token
 
 **Backend/Automation:**
 - Google Apps Script (serverless)
-- Google Gemini AI (crime data extraction) - Currently paused, manual entry workflow active
+- **Claude Haiku 4.5** (crime data extraction) - Migrated from Gemini/Groq in January 2026
+  - Model: `claude-3-5-haiku-20241022`
+  - Prompt caching enabled (~90% input token savings)
+  - Cost: ~$2.70/month for 20 articles/day
 - Google Sheets (data storage + CSV export)
 - GitHub Actions (CI/CD)
 

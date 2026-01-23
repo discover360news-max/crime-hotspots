@@ -1,9 +1,13 @@
 ---
 /**
  * Individual Crime Page
- * Generates a unique SEO-optimized page for EACH crime
+ * Server-Side Rendered (SSR) for optimal build performance
+ * Pages are rendered on-demand and cached by Cloudflare CDN
  * URL: /trinidad/crime/murder-port-of-spain-2025-12-10
  */
+
+// Enable SSR for this page (hybrid mode)
+export const prerender = false;
 
 import Layout from '../../../layouts/Layout.astro';
 import { getTrinidadCrimes, type Crime } from '../../../lib/crimeData';
@@ -15,36 +19,25 @@ import { dataUpdateNotice } from '../../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../../lib/areaAliases';
 import { getCountryName } from '../../../data/countries';
 
-// This tells Astro to generate a static page for each crime
-export async function getStaticPaths() {
-  const crimes = await getTrinidadCrimes();
+// Get slug from URL params
+const { slug } = Astro.params;
 
-  // Sort crimes by date (newest first) for sequential navigation
-  const sortedCrimes = crimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
+// Fetch all crimes and find the requested one
+const crimes = await getTrinidadCrimes();
+const crime = crimes.find(c => c.slug === slug);
 
-  return sortedCrimes.map((crime, index) => {
-    // Get previous (newer) and next (older) crimes
-    const prevCrime = index > 0 ? sortedCrimes[index - 1] : null;
-    const nextCrime = index < sortedCrimes.length - 1 ? sortedCrimes[index + 1] : null;
-
-    return {
-      params: { slug: crime.slug },
-      props: {
-        crime,
-        prevCrime,
-        nextCrime
-      },
-    };
-  });
+// Handle 404 if crime not found
+if (!crime) {
+  return Astro.redirect('/404');
 }
 
-interface Props {
-  crime: Crime;
-  prevCrime?: Crime | null;
-  nextCrime?: Crime | null;
-}
+// Sort crimes by date (newest first) for sequential navigation
+const sortedCrimes = crimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
+const crimeIndex = sortedCrimes.findIndex(c => c.slug === slug);
 
-const { crime, prevCrime, nextCrime } = Astro.props;
+// Get previous (newer) and next (older) crimes
+const prevCrime = crimeIndex > 0 ? sortedCrimes[crimeIndex - 1] : null;
+const nextCrime = crimeIndex < sortedCrimes.length - 1 ? sortedCrimes[crimeIndex + 1] : null;
 
 // Load area aliases for tooltip
 const areaAliases = await loadAreaAliases();

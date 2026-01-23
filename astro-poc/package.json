@@ -17,5 +17,8 @@
     "leaflet.markercluster": "^1.5.3",
     "pagefind": "^1.4.0",
     "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@astrojs/cloudflare": "^12.6.12"
   }
 }

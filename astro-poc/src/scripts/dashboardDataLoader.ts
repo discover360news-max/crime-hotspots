@@ -63,9 +63,9 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
 
       const slug = generateSlug(headline, dateObj);
 
-      // Parse victim count (default to 1 if not provided or invalid)
+      // Parse victim count (default to 1 if not provided, allow 0 for victimless crimes)
       const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
-      const validVictimCount = !isNaN(victimCount) && victimCount > 0 ? victimCount : 1;
+      const validVictimCount = !isNaN(victimCount) && victimCount >= 0 ? victimCount : 1;
 
       crimes.push({
         date,

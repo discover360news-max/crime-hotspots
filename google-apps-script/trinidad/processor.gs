@@ -274,6 +274,52 @@ function processReadyArticles() {
         Logger.log(`ℹ️ Production Archive not found (may not exist yet): ${e.message}`);
       }
 
+      // ═══════════════════════════════════════════════════════════
+      // NEW: Check for POTENTIAL duplicates - redirect to Review Queue
+      // These are near-misses that a human should verify
+      // ═══════════════════════════════════════════════════════════
+      const potentialDupe = findPotentialDuplicate(prodSheet, crime, geocoded);
+      if (potentialDupe.isPotential) {
+        Logger.log(`⚠️ Potential duplicate detected, routing to Review Queue: ${crime.headline}`);
+        Logger.log(`   Reason: ${potentialDupe.reason}`);
+
+        // Route to review queue with duplicate warning
+        const reviewSheet = getActiveSheet(SHEET_NAMES.REVIEW_QUEUE);
+        const validatedDate = validateAndFormatDate(crime.crime_date, null);
+        const victimCount = crime.victimCount ||
+                            (crime.victims && Array.isArray(crime.victims) ? crime.victims.length : 1);
+
+        // Get crimeTypes if not already processed
+        const crimeTypesForReview = crimeTypes || processLegacyCrimeType(crime);
+
+        reviewSheet.appendRow([
+          crime.headline || 'Needs headline',
+          crime.details || '',
+          crimeTypesForReview.primary,
+          crimeTypesForReview.related,
+          victimCount,
+          crimeTypesForReview.primary,
+          validatedDate,
+          crime.street || '',
+          geocoded.lat || '',
+          geocoded.lng || '',
+          geocoded.plus_code || '',
+          crime.area || '',
+          '',
+          'Trinidad',
+          crime.source_url || '',
+          '',
+          6, // Confidence lowered due to potential duplicate
+          `POTENTIAL DUPLICATE: ${potentialDupe.reason}`,
+          'pending',
+          ''
+        ]);
+
+        // Release lock before returning
+        lock.releaseLock();
+        return;
+      }
+
       // Validate and format crime date
       const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
@@ -696,10 +742,178 @@ function isDuplicateCrime(sheet, crime, geocoded) {
           }
         }
       }
+
+      // ═══════════════════════════════════════════════════════════
+      // CHECK 7: Semantic keyword matching for cross-source duplicates
+      // Catches different headline styles reporting same incident
+      // Example: "Pregnant woman shot dead" vs "Venezuelan killed in shooting"
+      // ═══════════════════════════════════════════════════════════
+      if (existingDate && crime.crime_date) {
+        const existingDateStr = Utilities.formatDate(new Date(existingDate), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+
+        if (existingDateStr === crime.crime_date && existingCrimeType === crime.crime_type) {
+          const semanticMatch = checkSemanticDuplicate(existingHeadline, crime.headline, existingArea, crime.area);
+
+          if (semanticMatch.isMatch) {
+            Logger.log(`Duplicate found: Same date + crime type + semantic match (${semanticMatch.matchedKeywords.join(', ')}) + ${(semanticMatch.similarity * 100).toFixed(0)}% headline similarity`);
+            return true;
+          }
+        }
+      }
     }
 
     return false;
   }
+
+/**
+ * Check for semantic duplicate using victim descriptors and crime action keywords
+ * @param {string} headline1 - First headline
+ * @param {string} headline2 - Second headline
+ * @param {string} area1 - First area
+ * @param {string} area2 - Second area
+ * @returns {Object} {isMatch: boolean, matchedKeywords: string[], similarity: number}
+ */
+function checkSemanticDuplicate(headline1, headline2, area1, area2) {
+  const h1 = headline1.toLowerCase();
+  const h2 = headline2.toLowerCase();
+
+  // Victim descriptors that strongly identify the same person
+  const victimDescriptors = [
+    'pregnant', 'elderly', 'pensioner', 'teen', 'teenager', 'child', 'baby',
+    'toddler', 'minor', 'businessman', 'taxi driver', 'maxi driver', 'vendor',
+    'security guard', 'police officer', 'soldier', 'teacher', 'student'
+  ];
+
+  // Crime action words
+  const crimeActions = [
+    'shot', 'shooting', 'stabbed', 'stabbing', 'killed', 'murdered', 'slain',
+    'robbed', 'robbery', 'kidnapped', 'kidnapping', 'raped', 'beaten', 'chopped',
+    'gunned down', 'executed'
+  ];
+
+  // Find matching keywords
+  const matchedDescriptors = victimDescriptors.filter(kw => h1.includes(kw) && h2.includes(kw));
+  const matchedActions = crimeActions.filter(kw => h1.includes(kw) && h2.includes(kw));
+
+  const allMatched = [...matchedDescriptors, ...matchedActions];
+  const similarity = calculateSimilarity(headline1, headline2);
+
+  // Strong match: victim descriptor + action + (same area OR 50%+ similarity)
+  if (matchedDescriptors.length >= 1 && matchedActions.length >= 1) {
+    const sameArea = area1 && area2 && area1.toLowerCase() === area2.toLowerCase();
+    if (sameArea || similarity > 0.50) {
+      return { isMatch: true, matchedKeywords: allMatched, similarity };
+    }
+  }
+
+  // Medium match: 2+ descriptors/actions + 60%+ similarity
+  if (allMatched.length >= 2 && similarity > 0.60) {
+    return { isMatch: true, matchedKeywords: allMatched, similarity };
+  }
+
+  // Special case: Both mention specific victim type (pregnant, elderly) + any similarity
+  const highValueDescriptors = ['pregnant', 'elderly', 'pensioner', 'baby', 'toddler'];
+  const matchedHighValue = highValueDescriptors.filter(kw => h1.includes(kw) && h2.includes(kw));
+
+  if (matchedHighValue.length >= 1 && similarity > 0.40) {
+    const sameArea = area1 && area2 && area1.toLowerCase() === area2.toLowerCase();
+    if (sameArea) {
+      return { isMatch: true, matchedKeywords: matchedHighValue, similarity };
+    }
+  }
+
+  return { isMatch: false, matchedKeywords: allMatched, similarity };
+}
+
+/**
+ * Find potential duplicates that should go to Review Queue for human verification
+ * These are near-misses that don't meet the hard duplicate threshold
+ * @param {Sheet} sheet - Production sheet to check against
+ * @param {Object} crime - Crime data to check
+ * @param {Object} geocoded - Geocoded coordinates
+ * @returns {Object} {isPotential: boolean, reason: string, matchRow: number}
+ */
+function findPotentialDuplicate(sheet, crime, geocoded) {
+  const lastRow = sheet.getLastRow();
+
+  if (lastRow < 2) {
+    return { isPotential: false, reason: '', matchRow: -1 };
+  }
+
+  const dataRange = sheet.getRange(2, 1, lastRow - 1, 15);
+  const data = dataRange.getValues();
+
+  for (let i = 0; i < data.length; i++) {
+    const row = data[i];
+    const rowNumber = i + 2;
+
+    const existingHeadline = row[0];
+    const existingCrimeType = row[4];
+    const existingDate = row[5];
+    const existingArea = row[10];
+
+    if (!existingDate || !crime.crime_date) continue;
+
+    const existingDateStr = Utilities.formatDate(new Date(existingDate), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+
+    // ═══════════════════════════════════════════════════════════
+    // POTENTIAL 1: Same date + same crime type + 50-70% headline similarity
+    // (Below hard threshold but suspicious)
+    // ═══════════════════════════════════════════════════════════
+    if (existingDateStr === crime.crime_date && existingCrimeType === crime.crime_type) {
+      const similarity = calculateSimilarity(existingHeadline, crime.headline);
+
+      if (similarity > 0.50 && similarity < 0.70) {
+        return {
+          isPotential: true,
+          reason: `Similar to row ${rowNumber}: "${existingHeadline.substring(0, 50)}..." (${(similarity * 100).toFixed(0)}% similar)`,
+          matchRow: rowNumber
+        };
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // POTENTIAL 2: Same area + same crime type + dates within 1 day
+    // (Could be reporting delay between sources)
+    // ═══════════════════════════════════════════════════════════
+    if (existingArea && crime.area && existingArea.toLowerCase() === crime.area.toLowerCase()) {
+      if (existingCrimeType === crime.crime_type) {
+        const existingDateObj = new Date(existingDate);
+        const crimeDateObj = new Date(crime.crime_date);
+        const daysDiff = Math.abs(Math.round((existingDateObj - crimeDateObj) / (1000 * 60 * 60 * 24)));
+
+        if (daysDiff === 1) {
+          const similarity = calculateSimilarity(existingHeadline, crime.headline);
+          if (similarity > 0.40) {
+            return {
+              isPotential: true,
+              reason: `Same area "${crime.area}" + crime type, 1 day apart from row ${rowNumber}`,
+              matchRow: rowNumber
+            };
+          }
+        }
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // POTENTIAL 3: Semantic near-miss (matched keywords but similarity too low)
+    // ═══════════════════════════════════════════════════════════
+    if (existingDateStr === crime.crime_date && existingCrimeType === crime.crime_type) {
+      const semanticResult = checkSemanticDuplicate(existingHeadline, crime.headline, existingArea, crime.area);
+
+      // If we found matching keywords but not enough for a hard match
+      if (!semanticResult.isMatch && semanticResult.matchedKeywords.length >= 1 && semanticResult.similarity > 0.30) {
+        return {
+          isPotential: true,
+          reason: `Shared keywords [${semanticResult.matchedKeywords.join(', ')}] with row ${rowNumber}, ${(semanticResult.similarity * 100).toFixed(0)}% similar`,
+          matchRow: rowNumber
+        };
+      }
+    }
+  }
+
+  return { isPotential: false, reason: '', matchRow: -1 };
+}
 
 /**
  * Simple string similarity (Levenshtein-based)

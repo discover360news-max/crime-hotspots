@@ -227,6 +227,25 @@ Examples:
 ❌ WRONG: "Man shot dead" → all_crime_types: ["Murder"] (missing Shooting)
 
 ═══════════════════════════════════════════════════════════════════════════════
+CRIME TYPE SEVERITY HIERARCHY (For Determining Primary Crime)
+═══════════════════════════════════════════════════════════════════════════════
+
+When listing all_crime_types, order by severity (highest first):
+Murder > Kidnapping > Sexual Assault > Shooting > Assault > Home Invasion > Robbery > Burglary > Theft > Seizures
+
+The FIRST crime type in the array is considered the PRIMARY crime.
+
+EXCEPTION - Multiple Victims Override:
+If a LOWER-severity crime affects MORE victims than a higher one, it becomes PRIMARY.
+
+Example: "3 people shot, 1 dies"
+→ all_crime_types: ["Shooting", "Murder"] (Shooting is primary - 3 victims vs 1)
+→ victimCount: 3 (count for primary crime)
+
+Example: "Man murdered, woman robbed at same scene"
+→ This is TWO separate crime objects (different victims)
+
+═══════════════════════════════════════════════════════════════════════════════
 VICTIM COUNT RULES (CRITICAL - Read Carefully)
 ═══════════════════════════════════════════════════════════════════════════════
 Count EVERY person affected by the crime:
@@ -285,22 +304,50 @@ Crime Type Schema (USE ONLY THESE):
 Murder, Shooting, Kidnapping, Robbery, Assault, Sexual Assault, Home Invasion, Burglary, Theft, Seizures
 
 ═══════════════════════════════════════════════════════════════════════════════
-DATE CALCULATION RULES (CRITICAL - Relative Dates)
+DATE CALCULATION RULES (CRITICAL - YOU MUST CALCULATE)
 ═══════════════════════════════════════════════════════════════════════════════
 
-You will receive the PUBLISHED date with each article. Calculate crime_date as follows:
+STEP 1: Identify the PUBLISHED date (provided with each article)
+STEP 2: Find relative date phrases in the article
+STEP 3: Calculate the ACTUAL crime date using these rules:
 
-- "yesterday" → subtract 1 day from published date
-- "on [day]" (e.g., "on Thursday") → find the MOST RECENT [day] before or on published date
-- "last [day]" (e.g., "last Thursday") → find [day] in the PREVIOUS week
-- "this [day]" → find [day] in the SAME week as published date
-- No date mentioned → use published date
+| Phrase         | Meaning                      | Calculation                           |
+|----------------|------------------------------|---------------------------------------|
+| "yesterday"    | Day before publication       | Published minus 1 day                 |
+| "on [day]"     | Most recent occurrence       | Find [day] on or before published     |
+| "last [day]"   | PREVIOUS WEEK's [day]        | Go back to week BEFORE, find that day |
+| "this [day]"   | Same week as published       | Find [day] in current week            |
+| No date        | Use published date           | Default fallback                      |
 
-Example: Published = Saturday January 18, 2026
-- "yesterday" → 2026-01-17 (Friday)
-- "on Thursday" → 2026-01-16 (most recent Thursday)
-- "last Thursday" → 2026-01-09 (Thursday of previous week)
-- "on Monday" → 2026-01-13 (most recent Monday)
+═══════════════════════════════════════════════════════════════════════════════
+WORKED EXAMPLES (MEMORIZE THESE PATTERNS)
+═══════════════════════════════════════════════════════════════════════════════
+
+EXAMPLE 1: Published = Thursday, January 22, 2026
+- "yesterday" → 2026-01-21 (Wednesday) ✓
+- "on Saturday" → 2026-01-18 (most recent Saturday) ✓
+- "last Saturday" → 2026-01-11 (PREVIOUS week's Saturday) ✓
+- "on Monday" → 2026-01-20 (most recent Monday) ✓
+- "last Monday" → 2026-01-13 (PREVIOUS week's Monday) ✓
+
+EXAMPLE 2: Published = Wednesday, January 15, 2026
+- "on Sunday" → 2026-01-12 ✓
+- "last Sunday" → 2026-01-05 ✓
+- "last Friday" → 2026-01-03 ✓
+
+EXAMPLE 3: Published = Saturday, January 18, 2026
+- "yesterday" → 2026-01-17 (Friday) ✓
+- "on Thursday" → 2026-01-16 (most recent Thursday) ✓
+- "last Thursday" → 2026-01-09 (Thursday of PREVIOUS week) ✓
+- "on Monday" → 2026-01-13 (most recent Monday) ✓
+
+⚠️ CRITICAL DISTINCTION:
+- "on Saturday" = the Saturday that just passed (same week or most recent)
+- "last Saturday" = Saturday of the PREVIOUS week (go back further!)
+
+Example: If today is Thursday Jan 22:
+- "on Saturday" → Jan 18 (4 days ago)
+- "last Saturday" → Jan 11 (11 days ago)
 
 ═══════════════════════════════════════════════════════════════════════════════
 OUTPUT EXAMPLES

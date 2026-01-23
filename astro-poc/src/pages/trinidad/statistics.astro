@@ -1,0 +1,496 @@
+---
+/**
+ * Trinidad & Tobago Crime Statistics Hub
+ * Authority page for Trinidad crime statistics
+ * Target keyword: "trinidad crime statistics"
+ *
+ * Features:
+ * - Auto-updates daily via Astro SSG + GitHub Actions rebuild
+ * - Indexable text content for SEO
+ * - Year-over-year comparisons (2025 vs 2026)
+ * - Latest weekly blog post integration
+ * - Public CSV download links
+ */
+
+// Keep statistics page static (pre-rendered at build time)
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getTrinidadCrimes } from '../../lib/crimeData';
+import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
+import { getCollection } from 'astro:content';
+import { TRINIDAD_CSV_URLS } from '../../config/csvUrls';
+import {
+  compareYearToDate,
+  getTopRegions,
+  getTotalCrimeCount,
+  formatPercentChange,
+  getCurrentPeriodDescription,
+  TRACKED_CRIME_TYPES
+} from '../../lib/statisticsHelpers';
+
+// Fetch all crimes at build time
+const allCrimes = await getTrinidadCrimes();
+
+// Filter by year
+const crimes2026 = allCrimes.filter(c => c.year === 2026);
+const crimes2025 = allCrimes.filter(c => c.year === 2025);
+
+// Calculate statistics
+const yoyComparisons = compareYearToDate(crimes2026, crimes2025);
+const topRegions = getTopRegions(crimes2026);
+const insights2026 = calculateInsights(crimes2026);
+const totalCrimes2026 = getTotalCrimeCount(crimes2026);
+
+// Key crime counts for summary cards
+const murderCount = countCrimeType(crimes2026, 'Murder');
+const robberyCount = countCrimeType(crimes2026, 'Robbery');
+const shootingCount = countCrimeType(crimes2026, 'Shooting');
+
+// Get total YoY change
+const total2025SamePeriod = yoyComparisons.reduce((sum, c) => sum + c.count2025, 0);
+const total2026YTD = yoyComparisons.reduce((sum, c) => sum + c.count2026, 0);
+const totalYoYChange = total2025SamePeriod > 0
+  ? ((total2026YTD - total2025SamePeriod) / total2025SamePeriod) * 100
+  : 0;
+
+// Get latest Trinidad blog post
+const blogPosts = await getCollection('blog', ({ data }) => data.country === 'tt');
+const latestPost = blogPosts.sort((a, b) =>
+  new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+)[0];
+
+// Current period description
+const periodDescription = getCurrentPeriodDescription();
+
+// Last updated = build time
+const lastUpdated = new Date().toLocaleDateString('en-US', {
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric'
+});
+
+// SEO
+const title = "Trinidad & Tobago Crime Statistics 2026 - Live Data & Analysis | Crime Hotspots";
+const description = `Comprehensive crime statistics for Trinidad & Tobago. ${murderCount} murders, ${robberyCount} robberies, ${shootingCount} shootings in 2026. Updated daily with year-over-year analysis.`;
+const canonicalUrl = "https://crimehotspots.com/trinidad/statistics/";
+
+// Structured Data - Dataset
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": "Trinidad & Tobago Crime Statistics 2026",
+  "description": "Comprehensive crime statistics for Trinidad & Tobago including murders, robberies, shootings, and other offenses. Data collected from verified news sources and updated daily.",
+  "url": canonicalUrl,
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "creator": {
+    "@type": "Organization",
+    "name": "Crime Hotspots",
+    "url": "https://crimehotspots.com"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "encodingFormat": "text/csv",
+      "contentUrl": TRINIDAD_CSV_URLS[2026]
+    },
+    {
+      "@type": "DataDownload",
+      "encodingFormat": "text/csv",
+      "contentUrl": TRINIDAD_CSV_URLS[2025]
+    }
+  ],
+  "temporalCoverage": "2025/2026",
+  "spatialCoverage": {
+    "@type": "Place",
+    "name": "Trinidad and Tobago",
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 10.6918,
+      "longitude": -61.2225
+    }
+  },
+  "dateModified": new Date().toISOString()
+};
+
+// Breadcrumb structured data
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://crimehotspots.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Trinidad", "item": "https://crimehotspots.com/trinidad/dashboard/" },
+    { "@type": "ListItem", "position": 3, "name": "Statistics" }
+  ]
+};
+---
+
+<Layout title={title} description={description}>
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Breadcrumbs -->
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: 'Trinidad', href: '/trinidad/dashboard' },
+      { label: 'Statistics' }
+    ]} />
+
+    <!-- Header -->
+    <header class="mt-6 mb-8">
+      <h1 class="text-3xl sm:text-4xl font-bold text-slate-800">
+        Trinidad & Tobago Crime Statistics
+      </h1>
+      <p class="mt-2 text-slate-500">
+        Updated daily &bull; Last updated: {lastUpdated}
+      </p>
+    </header>
+
+    <!-- 2026 Year-to-Date Summary -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-slate-700 mb-4">
+        2026 Year-to-Date Summary
+      </h2>
+      <p class="text-sm text-slate-500 mb-4">
+        {periodDescription}
+      </p>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <!-- Murder Card -->
+        <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+          <div class="text-sm text-slate-500 font-medium">Murders</div>
+          <div class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{murderCount}</div>
+          {yoyComparisons.find(c => c.type === 'Murder') && (
+            <div class={`text-sm mt-1 ${yoyComparisons.find(c => c.type === 'Murder')!.direction === 'down' ? 'text-emerald-600' : yoyComparisons.find(c => c.type === 'Murder')!.direction === 'up' ? 'text-rose-600' : 'text-slate-400'}`}>
+              {yoyComparisons.find(c => c.type === 'Murder')!.direction === 'down' ? '↓' : yoyComparisons.find(c => c.type === 'Murder')!.direction === 'up' ? '↑' : '→'}
+              {formatPercentChange(yoyComparisons.find(c => c.type === 'Murder')!.percentChange)} vs 2025
+            </div>
+          )}
+        </div>
+
+        <!-- Robbery Card -->
+        <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+          <div class="text-sm text-slate-500 font-medium">Robberies</div>
+          <div class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{robberyCount}</div>
+          {yoyComparisons.find(c => c.type === 'Robbery') && (
+            <div class={`text-sm mt-1 ${yoyComparisons.find(c => c.type === 'Robbery')!.direction === 'down' ? 'text-emerald-600' : yoyComparisons.find(c => c.type === 'Robbery')!.direction === 'up' ? 'text-rose-600' : 'text-slate-400'}`}>
+              {yoyComparisons.find(c => c.type === 'Robbery')!.direction === 'down' ? '↓' : yoyComparisons.find(c => c.type === 'Robbery')!.direction === 'up' ? '↑' : '→'}
+              {formatPercentChange(yoyComparisons.find(c => c.type === 'Robbery')!.percentChange)} vs 2025
+            </div>
+          )}
+        </div>
+
+        <!-- Shooting Card -->
+        <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+          <div class="text-sm text-slate-500 font-medium">Shootings</div>
+          <div class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{shootingCount}</div>
+          {yoyComparisons.find(c => c.type === 'Shooting') && (
+            <div class={`text-sm mt-1 ${yoyComparisons.find(c => c.type === 'Shooting')!.direction === 'down' ? 'text-emerald-600' : yoyComparisons.find(c => c.type === 'Shooting')!.direction === 'up' ? 'text-rose-600' : 'text-slate-400'}`}>
+              {yoyComparisons.find(c => c.type === 'Shooting')!.direction === 'down' ? '↓' : yoyComparisons.find(c => c.type === 'Shooting')!.direction === 'up' ? '↑' : '→'}
+              {formatPercentChange(yoyComparisons.find(c => c.type === 'Shooting')!.percentChange)} vs 2025
+            </div>
+          )}
+        </div>
+
+        <!-- Total Card -->
+        <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+          <div class="text-sm text-slate-500 font-medium">Total Incidents</div>
+          <div class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{total2026YTD}</div>
+          <div class={`text-sm mt-1 ${totalYoYChange < -0.5 ? 'text-emerald-600' : totalYoYChange > 0.5 ? 'text-rose-600' : 'text-slate-400'}`}>
+            {totalYoYChange < -0.5 ? '↓' : totalYoYChange > 0.5 ? '↑' : '→'}
+            {formatPercentChange(totalYoYChange)} vs 2025
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Crime by Type (2026) -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-slate-700 mb-4">
+        Crime by Type (2026)
+      </h2>
+      <div class="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="text-left px-4 py-3 font-semibold text-slate-700">Crime Type</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700">2026 Count</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700">2025 (Same Period)</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700">Change</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              {yoyComparisons.filter(c => c.count2026 > 0 || c.count2025 > 0).map(comparison => (
+                <tr class="hover:bg-slate-50">
+                  <td class="px-4 py-3 text-slate-700 font-medium">{comparison.type}</td>
+                  <td class="px-4 py-3 text-right text-slate-700">{comparison.count2026}</td>
+                  <td class="px-4 py-3 text-right text-slate-500">{comparison.count2025}</td>
+                  <td class={`px-4 py-3 text-right font-medium ${comparison.direction === 'down' ? 'text-emerald-600' : comparison.direction === 'up' ? 'text-rose-600' : 'text-slate-400'}`}>
+                    {comparison.direction === 'down' ? '↓' : comparison.direction === 'up' ? '↑' : '→'}
+                    {formatPercentChange(comparison.percentChange)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Regional Breakdown -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-slate-700 mb-4">
+        Regional Breakdown (2026)
+      </h2>
+      <p class="text-sm text-slate-500 mb-4">
+        Top 5 divisions by crime count
+      </p>
+      <div class="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="text-left px-4 py-3 font-semibold text-slate-700">Division</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700">Incidents</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700">% of Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              {topRegions.map((region, index) => (
+                <tr class="hover:bg-slate-50">
+                  <td class="px-4 py-3 text-slate-700">
+                    <span class="inline-flex items-center">
+                      <span class="w-5 h-5 flex items-center justify-center bg-slate-100 rounded text-xs font-medium text-slate-500 mr-2">
+                        {index + 1}
+                      </span>
+                      {region.region}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 text-right text-slate-700 font-medium">{region.count}</td>
+                  <td class="px-4 py-3 text-right text-slate-500">{region.percentage.toFixed(1)}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest Analysis -->
+    {latestPost && (
+      <section class="mb-10">
+        <h2 class="text-xl font-semibold text-slate-700 mb-4">
+          Latest Analysis
+        </h2>
+        <div class="bg-white rounded-lg border border-slate-200 p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-slate-800 mb-3">
+            <a href={`/blog/${latestPost.slug}/`} class="hover:text-rose-600 transition-colors">
+              {latestPost.data.title}
+            </a>
+          </h3>
+          <p class="text-slate-600 text-sm leading-relaxed mb-4">
+            {latestPost.data.excerpt}
+          </p>
+          <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-4 text-xs text-slate-500">
+              <span>{latestPost.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+              <span>{latestPost.data.readTime}</span>
+            </div>
+            <a
+              href={`/blog/${latestPost.slug}/`}
+              class="inline-flex items-center text-sm font-medium text-rose-600 hover:text-rose-700"
+            >
+              Read full report
+              <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- Download Data -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-slate-700 mb-4">
+        Download Data
+      </h2>
+      <p class="text-sm text-slate-500 mb-4">
+        Raw crime data in CSV format. Free to use with attribution.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a
+          href={TRINIDAD_CSV_URLS[2026]}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center px-5 py-3 min-h-[44px] bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:bg-rose-800 transition font-medium text-sm shadow-sm"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download 2026 Data (CSV)
+        </a>
+        <a
+          href={TRINIDAD_CSV_URLS[2025]}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center px-5 py-3 min-h-[44px] border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition font-medium text-sm"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download 2025 Data (CSV)
+        </a>
+      </div>
+    </section>
+
+    <!-- Methodology -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-slate-700 mb-4">
+        Methodology
+      </h2>
+      <div class="bg-slate-50 rounded-lg border border-slate-200 p-5">
+        <p class="text-slate-600 text-sm">
+          Learn how we collect, verify, and categorize crime data from verified news sources across Trinidad & Tobago.
+        </p>
+        <a
+          href="/methodology"
+          class="inline-flex items-center mt-3 text-sm font-medium text-rose-600 hover:text-rose-700"
+        >
+          View full methodology
+          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- Share & Cite -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-slate-700 mb-4">
+        Share & Cite
+      </h2>
+      <div class="space-y-4">
+        <!-- Share buttons -->
+        <div class="flex gap-3">
+          <a
+            id="share-whatsapp"
+            href="#"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-[#25D366] text-white hover:opacity-90 active:opacity-80 transition shadow-sm"
+            aria-label="Share on WhatsApp"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+          </a>
+          <a
+            id="share-facebook"
+            href="#"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-[#1877F2] text-white hover:opacity-90 active:opacity-80 transition shadow-sm"
+            aria-label="Share on Facebook"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </a>
+          <a
+            id="share-twitter"
+            href="#"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:opacity-90 active:opacity-80 transition shadow-sm"
+            aria-label="Share on X"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          <button
+            id="share-copy"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 active:bg-slate-400 transition shadow-sm"
+            aria-label="Copy link"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
+        <p id="copy-feedback" class="text-xs text-emerald-600 opacity-0 transition-opacity">Link copied!</p>
+
+        <!-- Citation -->
+        <div class="bg-slate-50 rounded-lg border border-slate-200 p-4">
+          <p class="text-xs text-slate-500 mb-2">Cite this page:</p>
+          <p class="text-sm text-slate-700 font-mono">
+            Crime Hotspots. ({new Date().getFullYear()}). Trinidad & Tobago Crime Statistics 2026.
+            Retrieved {lastUpdated}, from {canonicalUrl}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Links -->
+    <section class="mb-10">
+      <h2 class="text-xl font-semibold text-slate-700 mb-4">
+        Related Resources
+      </h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <a href="/trinidad/dashboard" class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800">Interactive Dashboard</h3>
+          <p class="text-sm text-slate-500 mt-1">Map visualization, filters, and detailed crime listings</p>
+        </a>
+        <a href="/trinidad/murder-count" class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800">Murder Count 2026</h3>
+          <p class="text-sm text-slate-500 mt-1">Live murder toll counter for Trinidad & Tobago</p>
+        </a>
+        <a href="/blog" class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800">Weekly Reports</h3>
+          <p class="text-sm text-slate-500 mt-1">In-depth analysis and trend reports</p>
+        </a>
+        <a href="/report" class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800">Report a Crime</h3>
+          <p class="text-sm text-slate-500 mt-1">Anonymous crime reporting form</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  </main>
+</Layout>
+
+<script define:vars={{ canonicalUrl, murderCount }}>
+  // Share functionality
+  const pageUrl = canonicalUrl;
+  const shareText = `Trinidad & Tobago Crime Statistics 2026: ${murderCount} murders YTD. View live data and analysis.`;
+
+  // WhatsApp
+  document.getElementById('share-whatsapp').href =
+    `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`;
+
+  // Facebook
+  document.getElementById('share-facebook').href =
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
+
+  // X/Twitter
+  document.getElementById('share-twitter').href =
+    `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`;
+
+  // Copy link
+  document.getElementById('share-copy').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(pageUrl);
+      const feedback = document.getElementById('copy-feedback');
+      feedback.style.opacity = '1';
+      setTimeout(() => { feedback.style.opacity = '0'; }, 2000);
+    } catch (err) {
+      const input = document.createElement('input');
+      input.value = pageUrl;
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand('copy');
+      document.body.removeChild(input);
+      const feedback = document.getElementById('copy-feedback');
+      feedback.style.opacity = '1';
+      setTimeout(() => { feedback.style.opacity = '0'; }, 2000);
+    }
+  });
+</script>

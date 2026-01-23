@@ -26,6 +26,22 @@ Write a comprehensive, data-driven blog post analyzing the week's crime statisti
 - Focus on trends, patterns, and safety recommendations
 - Use clear, accessible language (avoid jargon)
 
+**CRITICAL: GENERATE SEO-OPTIMIZED TITLE FIRST**
+Before writing the blog content, generate an SEO-friendly title in this exact format:
+
+**TITLE:** Trinidad Crime Report: Week of [Month Day, Year] - [X] Incidents, [Y] Murders, [Z] [Next Highest Crime Type]
+
+Examples:
+- Trinidad Crime Report: Week of January 2, 2026 - 7 Incidents, 2 Murders, 3 Shootings
+- Trinidad Crime Report: Week of December 16, 2025 - 32 Incidents, 5 Murders, 8 Robberies
+
+Rules for title:
+- Include total incidents
+- Include murder count (always)
+- Include the next highest crime type (Shooting, Robbery, etc.)
+- Keep to 2-3 key statistics maximum
+- Use full date format (Month Day, Year)
+
 **REQUIRED STRUCTURE:**
 Use this exact markdown structure (DO NOT include frontmatter - that will be added separately):
 
@@ -86,15 +102,16 @@ Use this exact text:
 ---
 
 **IMPORTANT RULES:**
-1. Use ONLY the data provided below - do not invent statistics
-2. If a data category is missing, skip that section
-3. Keep percentages to whole numbers (e.g., "12%" not "12.5%")
-4. Use up/down arrows (↑/↓) for changes
-5. Write in present/past tense (not future predictions)
-6. Keep each section concise (3-5 sentences max)
-7. Total length: 600-800 words
-8. Use markdown formatting (##, ###, **, -, etc.)
-9. DO NOT include YAML frontmatter (---) - that will be added separately
+1. **ALWAYS START WITH:** "**TITLE:** [your generated title]" on the first line
+2. Use ONLY the data provided below - do not invent statistics
+3. If a data category is missing, skip that section
+4. Keep percentages to whole numbers (e.g., "12%" not "12.5%")
+5. Use up/down arrows (↑/↓) for changes
+6. Write in present/past tense (not future predictions)
+7. Keep each section concise (3-5 sentences max)
+8. Total length: 600-800 words
+9. Use markdown formatting (##, ###, **, -, etc.)
+10. DO NOT include YAML frontmatter (---) - that will be added separately
 
 **DATA TO ANALYZE:**
 [PASTE THE OUTPUT FROM generateBlogData() HERE]
@@ -123,15 +140,50 @@ BLOG POST DATA
 [rest of the data from Apps Script]
 ```
 
+## Example of Gemini's Output
+
+Gemini will now generate output like this:
+
+```
+**TITLE:** Trinidad Crime Report: Week of December 23, 2025 - 47 Incidents, 8 Murders, 12 Robberies
+
+## Executive Summary
+
+Trinidad and Tobago recorded a total of 47 criminal incidents during the week of December 17-23, 2025, representing a 11% decrease from the previous week's 53 incidents. The most significant trend observed was a concerning spike in armed robberies...
+
+[rest of content]
+```
+
+**What you do:**
+1. Copy the title: `Trinidad Crime Report: Week of December 23, 2025 - 47 Incidents, 8 Murders, 12 Robberies`
+2. Paste it into the frontmatter `title:` field
+3. Copy the content starting from `## Executive Summary`
+4. Paste below the frontmatter
+
 ---
 
 ## After Gemini Generates the Post
 
-1. **Copy the markdown output** from Gemini
-2. **Add frontmatter** (see BLOG-TEMPLATE.md)
-3. **Save file** as `trinidad-weekly-YYYY-MM-DD.md` in `astro-poc/src/content/blog/`
-4. **Commit and push** to GitHub
-5. **Automatic build** will deploy to production
+1. **Copy the TITLE** from the first line of Gemini's output (e.g., "**TITLE:** Trinidad Crime Report: Week of...")
+2. **Copy the markdown content** (everything AFTER the title line)
+3. **Add frontmatter** at the top of your .md file:
+   ```yaml
+   ---
+   title: '[PASTE THE TITLE HERE - without the TITLE: prefix]'
+   country: 'tt'
+   countryName: 'Trinidad & Tobago'
+   date: YYYY-MM-DD
+   excerpt: '[First 1-2 sentences from Executive Summary]'
+   author: 'Crime Hotspots Analytics'
+   readTime: '4 min read'
+   image: '/assets/images/report-hero.svg'
+   tags: ['Trinidad', 'Weekly Report', 'Statistics']
+   ---
+   ```
+4. **Paste the content** below the frontmatter
+5. **Save file** as `trinidad-weekly-YYYY-MM-DD.md` in `astro-poc/src/content/blog/`
+6. **Commit and push** to GitHub
+7. **Automatic build** will deploy to production
 
 ---
 

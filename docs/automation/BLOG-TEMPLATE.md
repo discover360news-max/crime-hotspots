@@ -12,7 +12,7 @@ Copy this template when creating a new blog post:
 
 ```markdown
 ---
-title: 'Trinidad & Tobago Weekly Crime Report - [Month Day, Year]'
+title: 'Trinidad Crime Report: Week of [Month Day, Year] - [X] Incidents, [Y] Murders, [Z] [Crime Type]'
 country: 'tt'
 countryName: 'Trinidad & Tobago'
 date: YYYY-MM-DD
@@ -20,11 +20,13 @@ excerpt: 'Analysis of [X] crime incidents reported this week. [Brief 1-sentence 
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'
 image: '/assets/images/report-hero.svg'
-tags: ['Trinidad', 'Tobago', 'Trinidad & Tobago' 'Weekly Report', 'Statistics']
+tags: ['Trinidad', 'Tobago', 'Trinidad & Tobago', 'Weekly Report', 'Statistics']
 ---
 
-[PASTE GEMINI-GENERATED CONTENT HERE]
+[PASTE GEMINI-GENERATED CONTENT HERE - WITHOUT THE TITLE LINE]
 ```
+
+**NEW:** Gemini now generates the title for you! Copy it from the first line of Gemini's output.
 
 ---
 
@@ -32,7 +34,7 @@ tags: ['Trinidad', 'Tobago', 'Trinidad & Tobago' 'Weekly Report', 'Statistics']
 
 | Field | Description | Example |
 |-------|-------------|---------|
-| `title` | Blog post title | `'Trinidad & Tobago Weekly Crime Report - December 17, 2025'` |
+| `title` | SEO-optimized title with stats | `'Trinidad Crime Report: Week of December 17, 2025 - 47 Incidents, 8 Murders, 12 Robberies'` |
 | `country` | Country code | `'tt'` (Trinidad) or `'gy'` (Guyana) |
 | `countryName` | Full country name | `'Trinidad & Tobago'` or `'Guyana'` |
 | `date` | Report end date (ISO format) | `2025-12-17` |
@@ -59,7 +61,8 @@ tags: ['Trinidad', 'Tobago', 'Trinidad & Tobago' 'Weekly Report', 'Statistics']
 1. Open Google AI Studio or Gemini Pro
 2. Paste the full prompt from `BLOG-GENERATION-PROMPT.md`
 3. Append the data from step 1
-4. Copy Gemini's markdown output
+4. **NEW:** Gemini will output a **TITLE:** line first, then the content
+5. Copy BOTH the title and content
 
 ### 3. Create Blog File
 
@@ -67,10 +70,10 @@ tags: ['Trinidad', 'Tobago', 'Trinidad & Tobago' 'Weekly Report', 'Statistics']
 2. Create new file: `astro-poc/src/content/blog/trinidad-weekly-2025-12-23.md`
 3. Copy the template above
 4. Fill in frontmatter fields:
-   - **title:** `Trinidad & Tobago Weekly Crime Report - December 23, 2025`
+   - **title:** Copy from Gemini's **TITLE:** line (e.g., `Trinidad Crime Report: Week of December 23, 2025 - 47 Incidents, 8 Murders, 12 Robberies`)
    - **date:** `2025-12-23` (end of week, YYYY-MM-DD)
    - **excerpt:** Write 1-2 sentence summary based on Gemini output
-5. Paste Gemini content below frontmatter
+5. Paste Gemini content below frontmatter (SKIP the TITLE: line)
 
 ### 4. Example Excerpt Generation
 
