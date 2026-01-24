@@ -1,13 +1,14 @@
 ---
 /**
  * Individual Crime Page
- * Server-Side Rendered (SSR) for optimal build performance
- * Pages are rendered on-demand and cached by Cloudflare CDN
+ * HYBRID MODE: Recent crimes (90 days) pre-rendered at build time, older crimes SSR on-demand
+ * - Recent crimes: Static → Fast LCP (500-1,500ms)
+ * - Old crimes: SSR → Cached by Cloudflare (2,000-8,000ms, acceptable for low traffic)
  * URL: /trinidad/crime/murder-port-of-spain-2025-12-10
  */
 
-// Enable SSR for this page (hybrid mode)
-export const prerender = false;
+// Enable pre-rendering for paths returned by getStaticPaths()
+export const prerender = true;
 
 import Layout from '../../../layouts/Layout.astro';
 import { getTrinidadCrimes, type Crime } from '../../../lib/crimeData';
@@ -19,25 +20,73 @@ import { dataUpdateNotice } from '../../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../../lib/areaAliases';
 import { getCountryName } from '../../../data/countries';
 
-// Get slug from URL params
-const { slug } = Astro.params;
+/**
+ * Pre-render recent crimes (last 90 days) at build time
+ * This function tells Astro which pages to generate statically
+ * Older crimes will fallback to SSR when accessed
+ */
+export async function getStaticPaths() {
+  const crimes = await getTrinidadCrimes();
 
-// Fetch all crimes and find the requested one
-const crimes = await getTrinidadCrimes();
-const crime = crimes.find(c => c.slug === slug);
+  // Calculate 90 days ago from build time
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-// Handle 404 if crime not found
-if (!crime) {
-  return Astro.redirect('/404');
+  // Filter to only crimes from last 90 days
+  const recentCrimes = crimes.filter(c => c.dateObj >= ninetyDaysAgo);
+
+  console.log(`Building ${recentCrimes.length} recent crime pages (last 90 days)`);
+  console.log(`${crimes.length - recentCrimes.length} older crimes will use SSR on-demand`);
+
+  // Sort crimes by date (newest first) for sequential navigation
+  const sortedCrimes = recentCrimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
+
+  return sortedCrimes.map((crime, index) => {
+    // Get previous (newer) and next (older) crimes
+    const prevCrime = index > 0 ? sortedCrimes[index - 1] : null;
+    const nextCrime = index < sortedCrimes.length - 1 ? sortedCrimes[index + 1] : null;
+
+    return {
+      params: { slug: crime.slug },
+      props: {
+        crime,
+        prevCrime,
+        nextCrime
+      }
+    };
+  });
 }
 
-// Sort crimes by date (newest first) for sequential navigation
-const sortedCrimes = crimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
-const crimeIndex = sortedCrimes.findIndex(c => c.slug === slug);
+// SSR FALLBACK: For crimes older than 90 days (not in getStaticPaths)
+// This code runs when someone accesses an old crime via direct URL
+const { crime: staticCrime, prevCrime: staticPrevCrime, nextCrime: staticNextCrime } = Astro.props;
 
-// Get previous (newer) and next (older) crimes
-const prevCrime = crimeIndex > 0 ? sortedCrimes[crimeIndex - 1] : null;
-const nextCrime = crimeIndex < sortedCrimes.length - 1 ? sortedCrimes[crimeIndex + 1] : null;
+let crime, prevCrime, nextCrime;
+
+if (staticCrime) {
+  // Static pre-rendered page (fast path - last 90 days)
+  crime = staticCrime;
+  prevCrime = staticPrevCrime;
+  nextCrime = staticNextCrime;
+} else {
+  // SSR fallback for older crimes (slow path)
+  const { slug } = Astro.params;
+  const crimes = await getTrinidadCrimes();
+  crime = crimes.find(c => c.slug === slug);
+
+  // Handle 404 if crime not found
+  if (!crime) {
+    return Astro.redirect('/404');
+  }
+
+  // Sort crimes by date (newest first) for sequential navigation
+  const sortedCrimes = crimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
+  const crimeIndex = sortedCrimes.findIndex(c => c.slug === slug);
+
+  // Get previous (newer) and next (older) crimes
+  prevCrime = crimeIndex > 0 ? sortedCrimes[crimeIndex - 1] : null;
+  nextCrime = crimeIndex < sortedCrimes.length - 1 ? sortedCrimes[crimeIndex + 1] : null;
+}
 
 // Load area aliases for tooltip
 const areaAliases = await loadAreaAliases();

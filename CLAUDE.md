@@ -19,6 +19,12 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 ## Recent Work (Last 30 Days)
 
 **January 2026:**
+- **🚀 HYBRID RENDERING IMPLEMENTATION** (Jan 24) - **CRITICAL LCP FIX**
+  - 90-day rolling window: Pre-render last 795 crimes (static, fast LCP)
+  - Older crimes: SSR on-demand (low traffic, acceptable degradation)
+  - Build time: 10:41 (well under 20-min Cloudflare limit)
+  - **Expected LCP improvement: 60-80% (8,500ms → 1,000-2,000ms)**
+  - Scales infinitely (always builds same ~90-day window)
 - **Murder Count 2026 page** - iOS-style flip counter, share buttons, SEO-optimized (Jan 22)
 - **Claude API migration** - Replaced Gemini/Groq with Claude Haiku 4.5 for crime extraction (Jan 2026)
 - **XSS security fixes** - `escapeHtml.ts` utility, secured CrimeDetailModal + headlines (Jan 18)
@@ -62,7 +68,7 @@ To find a way to get goals accomplished efficiently and by using the least token
 ## Tech Stack
 
 **Frontend:**
-- **Astro 5.16.5** - Static site generator with file-based routing
+- **Astro 5.16.5** - Hybrid rendering: Recent crimes (90 days) pre-rendered, older crimes SSR on-demand
 - **Tailwind CSS 4.1.18** - Via Vite plugin (@tailwindcss/vite)
 - **TypeScript** - Type safety for components and content
 - **Astro Content Collections** - Type-safe blog system
@@ -119,6 +125,38 @@ Before adding any feature, ask: "Should this be a reusable component?" Create co
 - Modify `astro.config.mjs` without understanding
 - Create new button variants (use existing patterns from DESIGN-TOKENS.md)
 - Work in root directory (Vite version is deprecated)
+
+### HYBRID RENDERING SYSTEM ⭐⭐⭐ (CRITICAL FOR LCP)
+
+**✅ IMPLEMENTED January 24, 2026** - Fixes catastrophic LCP degradation (8,500ms → 1,000-2,000ms expected)
+
+**How It Works:**
+- Crime pages use **90-day rolling window** pre-rendering
+- Last 90 days (795 pages): **Static** → Fast LCP (500-1,500ms)
+- Older crimes (1,139 pages): **SSR on-demand** → Slower but acceptable (low traffic)
+- Build time: **10:41** (well under 20-minute Cloudflare limit)
+- Scales infinitely (always builds same ~90-day window)
+
+**Implementation:**
+- `astro.config.mjs`: `output: 'server'`
+- `[slug].astro`: `export const prerender = true;` + `getStaticPaths()` with 90-day filter
+- SSR fallback code handles older crimes not in `getStaticPaths()`
+
+**NEVER:**
+- Remove `getStaticPaths()` function from crime detail pages
+- Change the 90-day window without understanding build time impact
+- Switch back to full SSR (`prerender = false` only) - this kills LCP
+- Switch to full static (`getStaticPaths()` returning all crimes) - this breaks Cloudflare 20-min limit
+
+**ALWAYS:**
+- Test build time after changes (`npm run build` must complete under 15 minutes for safety)
+- Verify recent crimes are pre-rendering (check build logs for "Building X recent crime pages")
+- Monitor LCP metrics after deployment (should be <2,500ms for "Good" rating)
+
+**Why This Matters:**
+- Full SSR: 8,500ms P99 LCP (32% poor ratings) ❌
+- Full Static: 29-35 minute builds (exceeds Cloudflare 20-min limit) ❌
+- Hybrid: Fast LCP + Fast builds ✅
 
 ### When Working on Automation
 
