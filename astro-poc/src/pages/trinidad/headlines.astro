@@ -281,6 +281,9 @@ const breadcrumbs = [
 
   <!-- Client-side filtering script -->
   <script define:vars={{ allCrimes, areaAliases: Object.fromEntries(areaAliases) }}>
+    // Expose crimes data globally for modal safety context
+    window.__crimesData = allCrimes;
+
     // XSS Prevention: Escape HTML special characters
     function escapeHtml(str) {
       if (str == null) return '';

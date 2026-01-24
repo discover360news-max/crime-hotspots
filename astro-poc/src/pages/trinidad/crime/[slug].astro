@@ -16,9 +16,11 @@ import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import ReportIssueModal from '../../../components/ReportIssueModal.astro';
 import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
 import AreaNameTooltip from '../../../components/AreaNameTooltip.astro';
+import SafetyContext from '../../../components/SafetyContext.astro';
 import { dataUpdateNotice } from '../../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../../lib/areaAliases';
 import { getCountryName } from '../../../data/countries';
+import { getSafetyContext } from '../../../lib/safetyHelpers';
 
 /**
  * Pre-render recent crimes (last 90 days) at build time
@@ -91,6 +93,10 @@ if (staticCrime) {
 // Load area aliases for tooltip
 const areaAliases = await loadAreaAliases();
 const localName = getLocalName(areaAliases, crime.area);
+
+// Calculate safety context for this area
+const allCrimes = await getTrinidadCrimes();
+const safetyContext = getSafetyContext(crime.area, allCrimes);
 
 // Truncate headline for breadcrumbs (first 3-5 words)
 const truncatedHeadline = crime.headline.split(' ').slice(0, 5).join(' ') + (crime.headline.split(' ').length > 5 ? '...' : '');
@@ -346,6 +352,16 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
         </aside>
       </div>
     </article>
+
+    <!-- Safety Context for Area -->
+    <SafetyContext
+      areaName={crime.area}
+      score={safetyContext.score}
+      level={safetyContext.level}
+      tip={safetyContext.tip}
+      positiveNote={safetyContext.positiveNote}
+      primaryCrimeType={safetyContext.primaryCrimeType}
+    />
 
     <!-- Previous/Next Crime Navigation -->
     {(prevCrime || nextCrime) && (

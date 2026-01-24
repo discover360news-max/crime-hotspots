@@ -1,0 +1,48 @@
+---
+/**
+ * StatCards Component
+ * Grid of statistics cards with year-over-year comparison
+ *
+ * Usage:
+ * <StatCards stats={[
+ *   { label: "Murders", current: 50, previous: 45, yoyChange: 11.1, direction: "up" },
+ *   ...
+ * ]} />
+ */
+
+interface StatCard {
+  label: string;
+  current: number;
+  previous: number;
+  yoyChange: number;
+  direction: 'up' | 'down' | 'flat';
+}
+
+interface Props {
+  stats: StatCard[];
+}
+
+const { stats } = Astro.props;
+
+function formatPercentChange(change: number): string {
+  const formatted = Math.abs(change).toFixed(1);
+  return change >= 0 ? `+${formatted}%` : `-${formatted}%`;
+}
+---
+
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+  {stats.map((stat) => (
+    <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
+      <div class="text-sm text-slate-500 font-medium">{stat.label}</div>
+      <div class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{stat.current}</div>
+      <div class={`text-sm mt-1 ${
+        stat.direction === 'down' ? 'text-emerald-600' :
+        stat.direction === 'up' ? 'text-rose-600' :
+        'text-slate-400'
+      }`}>
+        {stat.direction === 'down' ? '↓' : stat.direction === 'up' ? '↑' : '→'}
+        {formatPercentChange(stat.yoyChange)} vs 2025
+      </div>
+    </div>
+  ))}
+</div>

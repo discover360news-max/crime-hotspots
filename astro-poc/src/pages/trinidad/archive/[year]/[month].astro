@@ -340,6 +340,9 @@ const breadcrumbs = [
 </Layout>
 
 <script define:vars={{ crimes }}>
+  // Expose crimes data globally for modal safety context
+  window.__crimesData = crimes;
+
   // Event delegation for crime card clicks
   document.addEventListener('DOMContentLoaded', () => {
     const container = document.querySelector('section');

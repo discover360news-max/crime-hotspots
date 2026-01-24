@@ -37,6 +37,9 @@ import ReportIssueModal from './ReportIssueModal.astro';
       <!-- Details Grid -->
       <div id="modalDetails" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 rounded-lg"></div>
 
+      <!-- Safety Context -->
+      <div id="modalSafetyContext" class="mt-6 mb-6"></div>
+
       <!-- Action Buttons -->
       <div class="flex flex-col gap-3 pt-4 border-t border-slate-200">
         <div class="flex items-center gap-3">
@@ -134,6 +137,166 @@ import ReportIssueModal from './ReportIssueModal.astro';
     return ''; // Block javascript:, data:, etc.
   }
 
+  // Safety Context Calculator (client-side version of safetyHelpers.ts)
+  function calculateAreaSafetyContext(areaName, allCrimes) {
+    // Filter to recent crimes (last 90 days)
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 90);
+
+    const recentCrimesInArea = allCrimes.filter(c => {
+      // Use dateObj if available, otherwise parse date string
+      const crimeDate = c.dateObj ? new Date(c.dateObj) : new Date(c.date);
+      return c.area === areaName && crimeDate >= cutoffDate;
+    });
+
+    const totalRecentCrimes = allCrimes.filter(c => {
+      // Use dateObj if available, otherwise parse date string
+      const crimeDate = c.dateObj ? new Date(c.dateObj) : new Date(c.date);
+      return crimeDate >= cutoffDate;
+    });
+
+    // Calculate score
+    const areaCrimeCount = recentCrimesInArea.length;
+    const totalCrimeCount = totalRecentCrimes.length;
+
+    if (totalCrimeCount === 0) {
+      return { score: 1, level: 'low', tip: 'No recent data available for this area.', primaryCrimeType: 'None' };
+    }
+
+    const density = (areaCrimeCount / totalCrimeCount) * 100;
+
+    // Score calculation (same as backend)
+    let score;
+    if (density <= 0.5) score = 1 + density;
+    else if (density <= 1) score = 2 + (density - 0.5) * 2;
+    else if (density <= 2) score = 3 + (density - 1);
+    else if (density <= 3) score = 4 + (density - 2);
+    else if (density <= 4) score = 5 + (density - 3);
+    else if (density <= 5) score = 6 + (density - 4);
+    else if (density <= 7) score = 7 + (density - 5) / 2;
+    else if (density <= 10) score = 8 + (density - 7) / 3;
+    else score = 9 + Math.min((density - 10) / 10, 1);
+
+    score = Math.max(1, Math.min(10, Math.round(score * 10) / 10));
+
+    // Get primary crime type
+    const crimeTypeCounts = {};
+    recentCrimesInArea.forEach(crime => {
+      const type = crime.primaryCrimeType || crime.crimeType || 'Unknown';
+      crimeTypeCounts[type] = (crimeTypeCounts[type] || 0) + 1;
+    });
+
+    const primaryCrimeType = Object.entries(crimeTypeCounts)
+      .sort((a, b) => b[1] - a[1])[0]?.[0] || 'General Crime';
+
+    // Determine level
+    let level;
+    if (score > 7) level = 'high';
+    else if (score >= 4) level = 'neutral';
+    else level = 'low';
+
+    // Get tip (simplified - using primary tips only)
+    const tips = {
+      high: {
+        'Vehicle Theft': "The 'Empty Seat' Protocol: Vehicle break-ins are a primary driver of the score in this zone. Never leave bags, charging cables, or even loose change visible; an empty car is rarely a target.",
+        'Robbery': "Active Awareness Zone: This area has high reports of 'distraction' incidents. We recommend keeping mobile devices tucked away and avoiding the use of headphones while walking to remain fully alert.",
+        default: "Lighting & Line-of-Sight: Incident data here correlates with low-visibility hours. If possible, park only under active streetlights and avoid 'shortcuts' through alleys or unlit residential passages."
+      },
+      neutral: [
+        "Baseline Awareness: This area currently maintains a stable safety standing. To help keep it that way, remain aware of your surroundings during 'transition times' like sunrise and sunset when visibility changes.",
+        "The 9 PM Routine: Maintaining a '9 PM Routine'—checking that all car doors, house doors, and windows are locked every night—is often the difference between a neutral score and a high-crime score."
+      ],
+      low: [
+        "Maintain the Standard: Keep up the great neighborhood lighting and locked-door habits that have made this area one of the safest in the region.",
+        "Neighborhood Watch Excellence: Continue participating in community watch programs to maintain this area's superior safety standing."
+      ]
+    };
+
+    let tip;
+    if (level === 'high') {
+      tip = tips.high[primaryCrimeType] || tips.high.default;
+    } else {
+      const levelTips = tips[level];
+      tip = levelTips[Math.floor(Math.random() * levelTips.length)];
+    }
+
+    // Get positive note
+    let positiveNote;
+    if (level === 'high') {
+      positiveNote = "High Community Guardianship: Residents in this area are historically proactive about reporting suspicious activity early.";
+    } else if (level === 'low') {
+      positiveNote = `Safety Top Percentile: ${areaName} ranks in the top 10% for safety within the city, maintaining a consistently lower-than-average incident rate over the last 12 months.`;
+    }
+
+    return { score, level, tip, positiveNote, primaryCrimeType };
+  }
+
+  // Generate Safety Context HTML
+  function generateSafetyContextHTML(areaName, context) {
+    const styles = {
+      high: {
+        bg: 'bg-amber-50',
+        border: 'border-amber-200',
+        icon: 'text-amber-600',
+        title: 'text-amber-800',
+        text: 'text-slate-700',
+        label: 'Active Safety Alert',
+        iconPath: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+      },
+      neutral: {
+        bg: 'bg-slate-50',
+        border: 'border-slate-200',
+        icon: 'text-slate-500',
+        title: 'text-slate-700',
+        text: 'text-slate-600',
+        label: 'Community Standing: Stable',
+        iconPath: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z'
+      },
+      low: {
+        bg: 'bg-emerald-50',
+        border: 'border-emerald-200',
+        icon: 'text-emerald-600',
+        title: 'text-emerald-800',
+        text: 'text-slate-700',
+        label: 'Safe Haven Status',
+        iconPath: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
+      }
+    };
+
+    const style = styles[context.level];
+
+    return `
+      <div class="${style.bg} ${style.border} border rounded-lg p-5">
+        <div class="flex items-start gap-3">
+          <div class="${style.icon} flex-shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${style.iconPath}" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-sm font-semibold ${style.title} mb-1">
+              ${style.label} - ${escapeHtml(areaName)}
+            </h3>
+            <div class="text-xs text-slate-500 mb-3">
+              Risk Level: ${context.score.toFixed(1)}/10
+              ${context.primaryCrimeType ? ` • Primary Concern: ${escapeHtml(context.primaryCrimeType)}` : ''}
+            </div>
+            <p class="text-sm ${style.text} leading-relaxed mb-3">
+              ${escapeHtml(context.tip)}
+            </p>
+            ${context.positiveNote ? `
+              <div class="mt-3 pt-3 border-t border-slate-200">
+                <p class="text-sm text-slate-600 leading-relaxed italic">
+                  ${escapeHtml(context.positiveNote)}
+                </p>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   // Function to open modal with crime data
   function openCrimeModal(crime) {
     if (!backdrop || !modal || !content) return;
@@ -185,6 +348,16 @@ import ReportIssueModal from './ReportIssueModal.astro';
         <dd class="text-xs text-slate-700">${escapeHtml(crime.source)}</dd>
       ` : ''}
     `;
+
+    // Calculate and populate safety context
+    const allCrimes = window.__crimesData || [];
+    const safetyContext = calculateAreaSafetyContext(crime.area, allCrimes);
+
+    // Populate safety context
+    const safetyContextEl = document.getElementById('modalSafetyContext');
+    if (safetyContextEl) {
+      safetyContextEl.innerHTML = generateSafetyContextHTML(crime.area, safetyContext);
+    }
 
     // Update button links (with URL sanitization)
     document.getElementById('modalViewFullBtn').href = `/trinidad/crime/${encodeURIComponent(crime.slug)}`;

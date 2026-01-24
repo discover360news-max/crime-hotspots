@@ -1,0 +1,102 @@
+---
+/**
+ * Hero Component
+ * Full-width gradient hero section for landing pages and authority pages
+ * Pattern: DESIGN-TOKENS.md v1.1 - Hero Sections
+ *
+ * Usage:
+ * <Hero
+ *   title="Page Title"
+ *   subtitle="Supporting description"
+ *   badge="Optional badge text"
+ *   primaryCTA={{ text: "Primary Action", href: "/path", icon: "dashboard" }}
+ *   secondaryCTA={{ text: "Secondary Action", href: "/path", icon: "download" }}
+ * />
+ */
+
+interface CTA {
+  text: string;
+  href: string;
+  icon?: 'dashboard' | 'download' | 'arrow' | 'external';
+  target?: '_blank' | '_self';
+  rel?: string;
+}
+
+interface Props {
+  title: string;
+  subtitle: string;
+  badge?: string;
+  primaryCTA?: CTA;
+  secondaryCTA?: CTA;
+}
+
+const { title, subtitle, badge, primaryCTA, secondaryCTA } = Astro.props;
+
+// Icon SVG paths
+const icons = {
+  dashboard: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+  download: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4',
+  arrow: 'M19 9l-7 7-7-7',
+  external: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14'
+};
+---
+
+<section class="w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 py-12 sm:py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+    <!-- Main Headline -->
+    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800 mb-4 sm:mb-6 leading-tight">
+      {title}
+    </h1>
+
+    <!-- Subheadline -->
+    <p class="text-base sm:text-lg text-slate-600 mb-6 max-w-3xl mx-auto leading-relaxed">
+      {subtitle}
+    </p>
+
+    <!-- Optional Badge (e.g., "Updated daily • Last updated: Jan 24") -->
+    {badge && (
+      <p class="text-sm text-slate-500 mb-8">
+        {badge}
+      </p>
+    )}
+
+    <!-- CTAs -->
+    {(primaryCTA || secondaryCTA) && (
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <!-- Primary CTA -->
+        {primaryCTA && (
+          <a
+            href={primaryCTA.href}
+            target={primaryCTA.target}
+            rel={primaryCTA.rel}
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 transition text-sm font-medium shadow-lg hover:shadow-xl min-h-[44px]"
+          >
+            {primaryCTA.text}
+            {primaryCTA.icon && (
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons[primaryCTA.icon]} />
+              </svg>
+            )}
+          </a>
+        )}
+
+        <!-- Secondary CTA -->
+        {secondaryCTA && (
+          <a
+            href={secondaryCTA.href}
+            target={secondaryCTA.target}
+            rel={secondaryCTA.rel}
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 active:bg-rose-50 transition text-sm font-medium min-h-[44px]"
+          >
+            {secondaryCTA.text}
+            {secondaryCTA.icon && (
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons[secondaryCTA.icon]} />
+              </svg>
+            )}
+          </a>
+        )}
+      </div>
+    )}
+  </div>
+</section>

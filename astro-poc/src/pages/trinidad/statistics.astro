@@ -17,6 +17,9 @@ export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Hero from '../../components/Hero.astro';
+import StatCards from '../../components/StatCards.astro';
+import DataTable from '../../components/DataTable.astro';
 import { getTrinidadCrimes } from '../../lib/crimeData';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
 import { getCollection } from 'astro:content';
@@ -63,6 +66,38 @@ const total2026YTD = yoyComparisons.reduce((sum, c) => sum + c.count2026, 0);
 const totalYoYChange = total2025SamePeriod > 0
   ? ((total2026YTD - total2025SamePeriod) / total2025SamePeriod) * 100
   : 0;
+
+// Prepare stat cards data
+const statCardsData = [
+  {
+    label: 'Murders',
+    current: murderCount,
+    previous: yoyComparisons.find(c => c.type === 'Murder')?.count2025 || 0,
+    yoyChange: yoyComparisons.find(c => c.type === 'Murder')?.percentChange || 0,
+    direction: yoyComparisons.find(c => c.type === 'Murder')?.direction || 'flat'
+  },
+  {
+    label: 'Robberies',
+    current: robberyCount,
+    previous: yoyComparisons.find(c => c.type === 'Robbery')?.count2025 || 0,
+    yoyChange: yoyComparisons.find(c => c.type === 'Robbery')?.percentChange || 0,
+    direction: yoyComparisons.find(c => c.type === 'Robbery')?.direction || 'flat'
+  },
+  {
+    label: 'Shootings',
+    current: shootingCount,
+    previous: yoyComparisons.find(c => c.type === 'Shooting')?.count2025 || 0,
+    yoyChange: yoyComparisons.find(c => c.type === 'Shooting')?.percentChange || 0,
+    direction: yoyComparisons.find(c => c.type === 'Shooting')?.direction || 'flat'
+  },
+  {
+    label: 'Total Incidents',
+    current: total2026YTD,
+    previous: total2025SamePeriod,
+    yoyChange: totalYoYChange,
+    direction: totalYoYChange < -0.5 ? 'down' : totalYoYChange > 0.5 ? 'up' : 'flat'
+  }
+];
 
 // Get latest Trinidad blog post
 const blogPosts = await getCollection('blog', ({ data }) => data.country === 'tt');
@@ -166,26 +201,36 @@ const breadcrumbData = {
 ---
 
 <Layout title={title} description={description}>
-  <main class="max-w-4xl mx-auto px-4 py-8">
-    <!-- Breadcrumbs -->
+  <!-- Breadcrumbs (Above Hero) -->
+  <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-4">
     <Breadcrumbs items={[
       { label: 'Home', href: '/' },
       { label: 'Trinidad', href: '/trinidad/dashboard' },
       { label: 'Statistics' }
     ]} />
+  </div>
 
-    <!-- Header -->
-    <header class="mt-6 mb-8">
-      <h1 class="text-3xl sm:text-4xl font-bold text-slate-800">
-        Trinidad & Tobago Crime Statistics
-      </h1>
-      <p class="mt-3 text-slate-600 text-base leading-relaxed">
-        Comprehensive crime statistics in Trinidad and Tobago for 2026. Track the Trinidad crime rate, murder statistics, robbery trends, and regional crime data. All statistics updated daily from verified sources.
-      </p>
-      <p class="mt-2 text-sm text-slate-500">
-        Updated daily &bull; Last updated: {lastUpdated}
-      </p>
-    </header>
+  <!-- Hero Section -->
+  <Hero
+    title="Trinidad & Tobago Crime Statistics"
+    subtitle="Real-time crime statistics and data analysis for Trinidad & Tobago. Track the crime rate, murder statistics, robbery trends, and regional crime data. Updated daily from verified sources."
+    badge={`Updated daily • Last updated: ${lastUpdated}`}
+    primaryCTA={{
+      text: "View Interactive Dashboard",
+      href: "/trinidad/dashboard",
+      icon: "dashboard"
+    }}
+    secondaryCTA={{
+      text: `Download ${currentYear} Data`,
+      href: TRINIDAD_CSV_URLS[currentYear],
+      icon: "download",
+      target: "_blank",
+      rel: "noopener noreferrer"
+    }}
+  />
+
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-4 py-8">
 
     <!-- Current Year Summary -->
     <section class="mb-10">
@@ -196,53 +241,7 @@ const breadcrumbData = {
         {periodDescription}
       </p>
 
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <!-- Murder Card -->
-        <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-          <div class="text-sm text-slate-500 font-medium">Murders</div>
-          <div class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{murderCount}</div>
-          {yoyComparisons.find(c => c.type === 'Murder') && (
-            <div class={`text-sm mt-1 ${yoyComparisons.find(c => c.type === 'Murder')!.direction === 'down' ? 'text-emerald-600' : yoyComparisons.find(c => c.type === 'Murder')!.direction === 'up' ? 'text-rose-600' : 'text-slate-400'}`}>
-              {yoyComparisons.find(c => c.type === 'Murder')!.direction === 'down' ? '↓' : yoyComparisons.find(c => c.type === 'Murder')!.direction === 'up' ? '↑' : '→'}
-              {formatPercentChange(yoyComparisons.find(c => c.type === 'Murder')!.percentChange)} vs 2025
-            </div>
-          )}
-        </div>
-
-        <!-- Robbery Card -->
-        <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-          <div class="text-sm text-slate-500 font-medium">Robberies</div>
-          <div class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{robberyCount}</div>
-          {yoyComparisons.find(c => c.type === 'Robbery') && (
-            <div class={`text-sm mt-1 ${yoyComparisons.find(c => c.type === 'Robbery')!.direction === 'down' ? 'text-emerald-600' : yoyComparisons.find(c => c.type === 'Robbery')!.direction === 'up' ? 'text-rose-600' : 'text-slate-400'}`}>
-              {yoyComparisons.find(c => c.type === 'Robbery')!.direction === 'down' ? '↓' : yoyComparisons.find(c => c.type === 'Robbery')!.direction === 'up' ? '↑' : '→'}
-              {formatPercentChange(yoyComparisons.find(c => c.type === 'Robbery')!.percentChange)} vs 2025
-            </div>
-          )}
-        </div>
-
-        <!-- Shooting Card -->
-        <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-          <div class="text-sm text-slate-500 font-medium">Shootings</div>
-          <div class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{shootingCount}</div>
-          {yoyComparisons.find(c => c.type === 'Shooting') && (
-            <div class={`text-sm mt-1 ${yoyComparisons.find(c => c.type === 'Shooting')!.direction === 'down' ? 'text-emerald-600' : yoyComparisons.find(c => c.type === 'Shooting')!.direction === 'up' ? 'text-rose-600' : 'text-slate-400'}`}>
-              {yoyComparisons.find(c => c.type === 'Shooting')!.direction === 'down' ? '↓' : yoyComparisons.find(c => c.type === 'Shooting')!.direction === 'up' ? '↑' : '→'}
-              {formatPercentChange(yoyComparisons.find(c => c.type === 'Shooting')!.percentChange)} vs 2025
-            </div>
-          )}
-        </div>
-
-        <!-- Total Card -->
-        <div class="bg-white rounded-lg border border-slate-200 p-4 shadow-sm">
-          <div class="text-sm text-slate-500 font-medium">Total Incidents</div>
-          <div class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{total2026YTD}</div>
-          <div class={`text-sm mt-1 ${totalYoYChange < -0.5 ? 'text-emerald-600' : totalYoYChange > 0.5 ? 'text-rose-600' : 'text-slate-400'}`}>
-            {totalYoYChange < -0.5 ? '↓' : totalYoYChange > 0.5 ? '↑' : '→'}
-            {formatPercentChange(totalYoYChange)} vs 2025
-          </div>
-        </div>
-      </div>
+      <StatCards stats={statCardsData} />
     </section>
 
     <!-- Trinidad Crime Rate -->
