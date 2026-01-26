@@ -3,7 +3,7 @@ title: 'Trinidad Crime Report: Week of January 23, 2026 - 45 Incidents, 8 Murder
 country: 'tt'
 countryName: 'Trinidad & Tobago'
 date: 2026-01-23
-excerpt: 'Following a sharp 30% increase in total incidents, Trinidad and Tobago recorded a significant surge in violent property crime between January 10–16, 2026. The data reveals 70 total incidents, highlighted by a 250% spike in home invasions and major police seizures in Beetham Gardens and Diego Martin.'
+excerpt: 'With a 33% decline in total incidents, Trinidad and Tobago saw a shift toward violence between January 17–23, 2026. While reports fell to 45, murders surged by 60% and shootings rose 29%, with Port of Spain remaining the primary crime hotspot.'
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'
 image: '/assets/images/trinidad-january-23.webp'
