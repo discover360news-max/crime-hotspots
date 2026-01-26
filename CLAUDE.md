@@ -114,7 +114,28 @@ To find a way to get goals accomplished efficiently and by using the least token
 
 ### COMPONENT-FIRST PRINCIPLE ⭐⭐⭐
 
-Before adding any feature, ask: "Should this be a reusable component?" Create components for reusable UI patterns (filters, cards, modals, forms) before writing inline code. Store in `src/components/` or `src/scripts/` for TypeScript utilities.
+**CRITICAL TWO-STEP PROCESS** - Follow this order EVERY TIME:
+
+**STEP 1: Check Existing Components First**
+- Before writing ANY UI code, search `src/components/` for existing components
+- Use `Glob` tool: `pattern: "*.astro", path: "src/components/"`
+- Check if Hero.astro, StatCards.astro, DataTable.astro, SafetyContext.astro, or any other component can be used
+- Even if component needs slight modification, prefer editing the component over writing inline code
+
+**STEP 2: Should This Be a New Component?**
+- If no existing component fits, ask: "Is this a reusable UI pattern?"
+- Cards, modals, forms, buttons, grids, tooltips → Component
+- One-off content, page-specific text → Inline is OK
+- When in doubt: Create a component (future pages will thank you)
+
+**Store In:**
+- UI components → `src/components/`
+- TypeScript utilities → `src/scripts/` or `src/lib/`
+
+**Why This Matters:**
+- As the site grows (1,889+ pages), duplicated inline code becomes unmaintainable
+- Changing a button style should update everywhere, not require 50 file edits
+- Consistency across the site improves UX and SEO
 
 ### DESIGN SYSTEM ⭐
 
