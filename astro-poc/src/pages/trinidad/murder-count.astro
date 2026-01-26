@@ -1,8 +1,8 @@
 ---
 /**
- * Trinidad Murder Count 2026
- * Mobile-first page displaying murder count with animated flip counter
- * Target keyword: "how many murders in trinidad 2026"
+ * Trinidad Murder Rate & Count 2026
+ * Mobile-first page displaying murder count with animated flip counter + murder rate per 100k
+ * Target keywords: "trinidad murder rate", "trinidad murder toll", "how many murders in trinidad 2026"
  */
 
 // Keep murder count page static (pre-rendered at build time)
@@ -38,6 +38,24 @@ const yoyChange = murderCount2025SamePeriod > 0
   : 0;
 const yoyDirection = yoyChange > 0.5 ? 'up' : yoyChange < -0.5 ? 'down' : 'same';
 
+// Population for murder rate calculation (Trinidad & Tobago estimate)
+const POPULATION = 1500000;
+
+// Calculate murder rate per 100,000 population
+const currentMurderRate = ((murderCount / POPULATION) * 100000).toFixed(1);
+
+// Calculate 2025 full year murder rate for comparison
+const murderCount2025Full = countCrimeType(crimes2025, 'Murder');
+const murderRate2025 = ((murderCount2025Full / POPULATION) * 100000).toFixed(1);
+
+// Project annual murder count and rate (based on current pace)
+const now = new Date();
+const startOf2026 = new Date('2026-01-01');
+const daysPassed = Math.floor((now - startOf2026) / (1000 * 60 * 60 * 24));
+const daysInYear = 365;
+const projectedAnnualMurders = daysPassed > 0 ? Math.round((murderCount / daysPassed) * daysInYear) : 0;
+const projectedMurderRate = ((projectedAnnualMurders / POPULATION) * 100000).toFixed(1);
+
 // Get latest Trinidad blog post
 const blogPosts = await getCollection('blog', ({ data }) => data.country === 'tt');
 const latestPost = blogPosts.sort((a, b) =>
@@ -51,8 +69,8 @@ const lastUpdated = new Date().toLocaleDateString('en-US', {
   day: 'numeric'
 });
 
-const title = "How Many Murders in Trinidad 2026? Live Murder Count & Statistics";
-const description = `How many murders in Trinidad for 2026? ${murderCount} murders so far. Track the Trinidad & Tobago murder toll with live statistics updated daily. Compare to 2025 trends and view detailed crime data.`;
+const title = "Trinidad Murder Rate & Count 2026 - Live Statistics | Crime Hotspots";
+const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k (${murderCount} murders so far). Track the Trinidad & Tobago murder toll and murder rate with live statistics. Projected annual rate: ${projectedMurderRate} per 100k. Updated daily.`;
 ---
 
 <Layout title={title} description={description}>
@@ -62,7 +80,7 @@ const description = `How many murders in Trinidad for 2026? ${murderCount} murde
       <Breadcrumbs items={[
         { label: 'Home', href: '/' },
         { label: 'Trinidad', href: '/trinidad/dashboard' },
-        { label: 'Murder Count' }
+        { label: 'Murder Rate & Count' }
       ]} />
     </div>
 
@@ -102,6 +120,40 @@ const description = `How many murders in Trinidad for 2026? ${murderCount} murde
             {yoyDirection === 'down' ? '↓' : '↑'} {Math.abs(yoyChange).toFixed(0)}% vs 2025
           </p>
         )}
+      </div>
+
+      <!-- Murder Rate Section (SEO: "trinidad murder rate") -->
+      <div class="mt-8 w-full max-w-md mx-auto">
+        <h2 class="text-xl font-bold text-slate-700 mb-4 text-center">
+          Trinidad & Tobago Murder Rate 2026
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <!-- Current Year-to-Date Rate -->
+          <div class="bg-rose-50 rounded-lg border border-rose-200 p-4 text-center">
+            <div class="text-xs text-slate-500 font-medium mb-1">Current Rate (YTD)</div>
+            <div class="text-2xl font-bold text-rose-600">{currentMurderRate}</div>
+            <div class="text-xs text-slate-400 mt-1">per 100k</div>
+          </div>
+
+          <!-- Projected Annual Rate -->
+          <div class="bg-amber-50 rounded-lg border border-amber-200 p-4 text-center">
+            <div class="text-xs text-slate-500 font-medium mb-1">Projected Rate</div>
+            <div class="text-2xl font-bold text-amber-700">{projectedMurderRate}</div>
+            <div class="text-xs text-slate-400 mt-1">per 100k (2026)</div>
+          </div>
+
+          <!-- 2025 Final Rate -->
+          <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 text-center">
+            <div class="text-xs text-slate-500 font-medium mb-1">2025 Final Rate</div>
+            <div class="text-2xl font-bold text-slate-700">{murderRate2025}</div>
+            <div class="text-xs text-slate-400 mt-1">per 100k</div>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-500 text-center mt-3">
+          Based on population estimate of {(POPULATION / 1000000).toFixed(1)}M
+        </p>
       </div>
 
       <!-- Action Buttons -->
@@ -188,7 +240,7 @@ const description = `How many murders in Trinidad for 2026? ${murderCount} murde
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "Trinidad Murder Count 2026",
+      "name": "Trinidad & Tobago Murder Rate & Count 2026",
       "description": description,
       "url": "https://crimehotspots.com/trinidad/murder-count/",
       "breadcrumb": {
@@ -209,14 +261,39 @@ const description = `How many murders in Trinidad for 2026? ${murderCount} murde
           {
             "@type": "ListItem",
             "position": 3,
-            "name": "Murder Count"
+            "name": "Murder Rate & Count"
           }
         ]
       },
       "mainEntity": {
-        "@type": "StatisticalPopulation",
-        "name": "Trinidad & Tobago Murder Count 2026",
-        "numConstraints": murderCount
+        "@type": "Dataset",
+        "name": "Trinidad & Tobago Murder Statistics 2026",
+        "description": "Live murder count and murder rate per 100,000 population for Trinidad & Tobago",
+        "variableMeasured": [
+          {
+            "@type": "PropertyValue",
+            "name": "Murder Count",
+            "value": murderCount,
+            "unitText": "murders"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Murder Rate",
+            "value": currentMurderRate,
+            "unitText": "per 100,000 population"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Projected Annual Murder Rate",
+            "value": projectedMurderRate,
+            "unitText": "per 100,000 population"
+          }
+        ],
+        "temporalCoverage": currentYear.toString(),
+        "spatialCoverage": {
+          "@type": "Place",
+          "name": "Trinidad and Tobago"
+        }
       }
     })} />
   </main>
