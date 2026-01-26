@@ -12,19 +12,35 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Traffic:** ~4 real visitors/day, Google Search Console active (1,728 pages indexed)
-**Last Updated:** January 22, 2026
+**Last Updated:** January 26, 2026
 
 ---
 
 ## Recent Work (Last 30 Days)
 
 **January 2026:**
-- **🚀 HYBRID RENDERING IMPLEMENTATION** (Jan 24) - **CRITICAL LCP FIX**
+- **🛡️ SAFETY CONTEXT SYSTEM** (Jan 26) - **"The Safety Strength Engine"**
+  - Created `safetyHelpers.ts` - Calculate area-based crime scores (1-10 scale)
+  - Created `SafetyContext.astro` - Color-coded contextual safety tips component
+  - Integrated into crime detail pages AND CrimeDetailModal
+  - High-risk areas (>7): Actionable prevention tips (amber background)
+  - Neutral areas (4-6): Maintenance tips (slate background)
+  - Low-risk areas (<4): Positive reinforcement (emerald background)
+  - SEO benefits: Balanced messaging, positive keywords ("safest neighborhoods", "low crime areas")
+  - Fixed modal data availability across all pages (headlines, archive, dashboard)
+- **🎨 COMPONENT REFACTORING** (Jan 26) - **COMPONENT-FIRST PRINCIPLE**
+  - Created `Hero.astro` (102 lines) - Reusable gradient hero for landing pages
+  - Created `StatCards.astro` (48 lines) - Statistics grid with YoY comparisons
+  - Created `DataTable.astro` (32 lines) - Responsive table wrapper
+  - Refactored `/trinidad/statistics` page using new components
+  - Improved code maintainability and reusability
+- **🚀 HYBRID RENDERING IMPLEMENTATION** (Jan 26) - **CRITICAL LCP FIX**
   - 90-day rolling window: Pre-render last 795 crimes (static, fast LCP)
   - Older crimes: SSR on-demand (low traffic, acceptable degradation)
-  - Build time: 10:41 (well under 20-min Cloudflare limit)
+  - Build time: 10:58 (well under 20-min Cloudflare limit)
   - **Expected LCP improvement: 60-80% (8,500ms → 1,000-2,000ms)**
   - Scales infinitely (always builds same ~90-day window)
+  - Protects Google SEO rankings from Core Web Vitals penalties
 - **Murder Count 2026 page** - iOS-style flip counter, share buttons, SEO-optimized (Jan 22)
 - **Claude API migration** - Replaced Gemini/Groq with Claude Haiku 4.5 for crime extraction (Jan 2026)
 - **XSS security fixes** - `escapeHtml.ts` utility, secured CrimeDetailModal + headlines (Jan 18)
@@ -128,13 +144,13 @@ Before adding any feature, ask: "Should this be a reusable component?" Create co
 
 ### HYBRID RENDERING SYSTEM ⭐⭐⭐ (CRITICAL FOR LCP)
 
-**✅ IMPLEMENTED January 24, 2026** - Fixes catastrophic LCP degradation (8,500ms → 1,000-2,000ms expected)
+**✅ IMPLEMENTED January 26, 2026** - Fixes catastrophic LCP degradation (8,500ms → 1,000-2,000ms expected)
 
 **How It Works:**
 - Crime pages use **90-day rolling window** pre-rendering
 - Last 90 days (795 pages): **Static** → Fast LCP (500-1,500ms)
 - Older crimes (1,139 pages): **SSR on-demand** → Slower but acceptable (low traffic)
-- Build time: **10:41** (well under 20-minute Cloudflare limit)
+- Build time: **10:58** (well under 20-minute Cloudflare limit)
 - Scales infinitely (always builds same ~90-day window)
 
 **Implementation:**
@@ -199,6 +215,42 @@ See `docs/claude-context/development-workflow.md` for details.
 
 **Configuration:** `astro-poc/src/config/crimeTypeConfig.ts`
 
+### Safety Context System (2026+)
+
+**✅ IMPLEMENTED January 26, 2026** - "The Safety Strength Engine"
+
+**What It Does:**
+- Calculates area-based crime scores (1-10 scale) using 90-day crime density
+- Provides contextual safety tips based on risk level
+- Displays in crime detail pages AND CrimeDetailModal
+- Balanced messaging for SEO and user experience (avoid "doom scrolling")
+
+**Implementation:**
+- `src/lib/safetyHelpers.ts` - Server-side & client-side scoring algorithms
+- `src/components/SafetyContext.astro` - Display component with color coding
+- `src/pages/trinidad/crime/[slug].astro` - Integrated on crime pages
+- `src/components/CrimeDetailModal.astro` - Client-side calculation for modal
+
+**Risk Levels:**
+- **High (>7)**: Amber background, actionable prevention tips (e.g., "Empty Seat Protocol")
+- **Neutral (4-6)**: Slate background, maintenance tips (e.g., "9 PM Routine")
+- **Low (<4)**: Emerald background, positive reinforcement (e.g., "Safe Haven Status")
+
+**CRITICAL:**
+- Modal requires `window.__crimesData` to be populated (headlines, archive, dashboard pages)
+- Scoring algorithm uses 90-day rolling window (matches hybrid rendering)
+- Client-side calculation must use `dateObj` field (not just `date` string)
+
+**DO:**
+- Add more safety tips to `getSafetyTip()` in `safetyHelpers.ts` as needed
+- Keep tips actionable, specific, and non-alarmist
+- Use positive notes for low-crime areas to improve SEO
+
+**DON'T:**
+- Remove safety context from modal (improves UX by keeping users on site)
+- Change scoring algorithm without understanding SEO impact
+- Use alarmist language that causes users to leave immediately
+
 ---
 
 ## Git/GitHub
@@ -248,6 +300,17 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 **🧩 UI Patterns**
 - `docs/guides/ACCORDION-PATTERN.md` - Date accordion component pattern
 - `docs/guides/INFO-ICON-PATTERN.md` - Info icon hover pattern
+- `docs/guides/The-Safety-Strength-Engine.md` - **Safety Context System** ⭐
+  - Area-based crime scoring algorithm (1-10 scale)
+  - Contextual safety tips (high/neutral/low risk levels)
+  - Balanced messaging for SEO and user experience
+
+**🧱 Reusable Components** (COMPONENT-FIRST Architecture)
+- `src/components/Hero.astro` - Full-width gradient hero with CTAs (landing pages)
+- `src/components/StatCards.astro` - Statistics grid with YoY comparisons
+- `src/components/DataTable.astro` - Responsive table wrapper with consistent styling
+- `src/components/SafetyContext.astro` - Color-coded area safety tips (high/neutral/low)
+- `src/lib/safetyHelpers.ts` - Crime scoring & safety context calculation
 
 **🤖 Automation**
 - `google-apps-script/trinidad/README.md` - Trinidad automation
