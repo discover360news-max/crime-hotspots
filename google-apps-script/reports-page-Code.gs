@@ -3,9 +3,24 @@
 
 // === CONFIGURATION ===
 const RECIPIENT_EMAIL = "discover360news@gmail.com";
-const TURNSTILE_SECRET = "0x4AAAAAAB_ThJuP2rMpgWbkkvhEbLPN8Ms";
-const SHEET_ID = "1MLWKHu5TJoWp2_IzdHdH6eZxROglEQ8t0G9qo-kQei4"; // Replace with your Google Sheet ID
-const SHEET_NAME = "Reports"; // Name of the sheet tab
+const SHEET_ID = "1MLWKHu5TJoWp2_IzdHdH6eZxROglEQ8t0G9qo-kQei4";
+const SHEET_NAME = "Reports";
+
+// === HTML ESCAPING (prevents HTML injection in emails) ===
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Turnstile secret stored securely in Script Properties (not hardcoded)
+function getTurnstileSecret() {
+  return PropertiesService.getScriptProperties().getProperty('TURNSTILE_SECRET');
+}
 
 // === HANDLE ALL REQUESTS ===
 function doPost(e) {
@@ -81,7 +96,7 @@ function handleRequest(e) {
 function sendCrimeReportEmail(data) {
   const subject = 'Crime Report: ' + data.crimeType + ' in ' + (data.area || data.countryName);
 
-  const htmlBody = '<html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #e11d48;">New Crime Report Submitted</h2><table style="width: 100%; border-collapse: collapse;"><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Report ID</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + data.id + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Date of Incident</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + data.date + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Type</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + data.crimeType + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Country</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + data.countryName + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Area</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.area || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Street/Location</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.street || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Headline</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + data.headline + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold; vertical-align: top;">Details</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + data.details + '</td></tr></table><p style="margin-top: 20px; font-size: 12px; color: #6c757d;"><strong>Submitted:</strong> ' + new Date().toLocaleString() + '<br><strong>User Agent:</strong> ' + (data.ua || 'Unknown') + '</p></body></html>';
+  const htmlBody = '<html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #e11d48;">New Crime Report Submitted</h2><table style="width: 100%; border-collapse: collapse;"><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Report ID</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.id) + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Date of Incident</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.date) + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Type</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.crimeType) + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Country</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.countryName) + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Area</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.area || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Street/Location</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.street || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Headline</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.headline) + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold; vertical-align: top;">Details</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.details) + '</td></tr></table><p style="margin-top: 20px; font-size: 12px; color: #6c757d;"><strong>Submitted:</strong> ' + new Date().toLocaleString() + '<br><strong>User Agent:</strong> ' + escapeHtml(data.ua || 'Unknown') + '</p></body></html>';
 
   const textBody = 'NEW CRIME REPORT SUBMITTED\n\nReport ID: ' + data.id + '\nDate of Incident: ' + data.date + '\nCrime Type: ' + data.crimeType + '\nCountry: ' + data.countryName + '\nArea: ' + (data.area || 'Not specified') + '\nStreet/Location: ' + (data.street || 'Not specified') + '\n\nHeadline: ' + data.headline + '\n\nDetails:\n' + data.details + '\n\n---\nSubmitted: ' + new Date().toLocaleString() + '\nUser Agent: ' + (data.ua || 'Unknown');
 
@@ -138,7 +153,7 @@ function sendIssueReportEmail(data) {
 
   const issueTypes = Array.isArray(data.issueTypes) ? data.issueTypes.join(', ') : 'Not specified';
 
-  const htmlBody = '<html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #e11d48;">Crime Report Issue Submitted</h2><table style="width: 100%; border-collapse: collapse;"><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Slug</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeSlug || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Headline</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeHeadline || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Date of Incident</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeDate || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Type</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeType || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Region</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeRegion || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Area</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeArea || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Street</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeStreet || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Source URL</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + (data.crimeUrl || 'Not specified') + '</td></tr><tr style="background-color: #fffbeb;"><td colspan="2" style="padding: 15px; border: 1px solid #f59e0b;"><h3 style="margin: 0 0 10px 0; color: #92400e;">Issue Details</h3><p style="margin: 5px 0;"><strong>Issue Types:</strong> ' + issueTypes + '</p><p style="margin: 5px 0;"><strong>Information Source:</strong> ' + (data.informationSource || 'Not specified') + '</p><p style="margin: 5px 0;"><strong>Description:</strong></p><p style="margin: 5px 0; white-space: pre-wrap;">' + (data.description || 'No description provided') + '</p><p style="margin: 5px 0;"><strong>Contact Email:</strong> ' + (data.contactEmail || 'Not provided') + '</p></td></tr></table><p style="margin-top: 20px; font-size: 12px; color: #6c757d;"><strong>Submitted:</strong> ' + (data.timestamp || new Date().toLocaleString()) + '<br><strong>User Agent:</strong> ' + (data.userAgent || 'Unknown') + '</p></body></html>';
+  const htmlBody = '<html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #e11d48;">Crime Report Issue Submitted</h2><table style="width: 100%; border-collapse: collapse;"><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Slug</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.crimeSlug || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Headline</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.crimeHeadline || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Date of Incident</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.crimeDate || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Crime Type</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.crimeType || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Region</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.crimeRegion || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Area</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.crimeArea || 'Not specified') + '</td></tr><tr style="background-color: #f8f9fa;"><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Street</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.crimeStreet || 'Not specified') + '</td></tr><tr><td style="padding: 10px; border: 1px solid #dee2e6; font-weight: bold;">Source URL</td><td style="padding: 10px; border: 1px solid #dee2e6;">' + escapeHtml(data.crimeUrl || 'Not specified') + '</td></tr><tr style="background-color: #fffbeb;"><td colspan="2" style="padding: 15px; border: 1px solid #f59e0b;"><h3 style="margin: 0 0 10px 0; color: #92400e;">Issue Details</h3><p style="margin: 5px 0;"><strong>Issue Types:</strong> ' + escapeHtml(issueTypes) + '</p><p style="margin: 5px 0;"><strong>Information Source:</strong> ' + escapeHtml(data.informationSource || 'Not specified') + '</p><p style="margin: 5px 0;"><strong>Description:</strong></p><p style="margin: 5px 0; white-space: pre-wrap;">' + escapeHtml(data.description || 'No description provided') + '</p><p style="margin: 5px 0;"><strong>Contact Email:</strong> ' + escapeHtml(data.contactEmail || 'Not provided') + '</p></td></tr></table><p style="margin-top: 20px; font-size: 12px; color: #6c757d;"><strong>Submitted:</strong> ' + escapeHtml(data.timestamp || new Date().toLocaleString()) + '<br><strong>User Agent:</strong> ' + escapeHtml(data.userAgent || 'Unknown') + '</p></body></html>';
 
   const textBody = 'CRIME REPORT ISSUE SUBMITTED\n\nCrime Slug: ' + (data.crimeSlug || 'Not specified') + '\nHeadline: ' + (data.crimeHeadline || 'Not specified') + '\nDate: ' + (data.crimeDate || 'Not specified') + '\nType: ' + (data.crimeType || 'Not specified') + '\nRegion: ' + (data.crimeRegion || 'Not specified') + '\nArea: ' + (data.crimeArea || 'Not specified') + '\nStreet: ' + (data.crimeStreet || 'Not specified') + '\nSource: ' + (data.crimeUrl || 'Not specified') + '\n\n--- ISSUE DETAILS ---\nIssue Types: ' + issueTypes + '\nInformation Source: ' + (data.informationSource || 'Not specified') + '\n\nDescription:\n' + (data.description || 'No description provided') + '\n\nContact Email: ' + (data.contactEmail || 'Not provided') + '\n\n---\nSubmitted: ' + (data.timestamp || new Date().toLocaleString()) + '\nUser Agent: ' + (data.userAgent || 'Unknown');
 
@@ -211,7 +226,7 @@ function saveIssueToSheet(data) {
 function validateTurnstile(token) {
   const url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
   const payload = {
-    secret: TURNSTILE_SECRET,
+    secret: getTurnstileSecret(),
     response: token
   };
 
@@ -235,6 +250,19 @@ function validateTurnstile(token) {
 // === CREATE RESPONSE ===
 function createResponse(data, statusCode) {
   return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// === SETUP (Run once in Apps Script editor) ===
+/**
+ * Store Turnstile secret in Script Properties.
+ * Steps:
+ * 1. Replace 'YOUR_TURNSTILE_SECRET' with the actual secret from Cloudflare dashboard
+ * 2. Run this function ONCE in the Apps Script editor
+ * 3. Delete the secret from this code immediately after running
+ */
+function setTurnstileSecret() {
+  PropertiesService.getScriptProperties().setProperty('TURNSTILE_SECRET', 'YOUR_TURNSTILE_SECRET');
+  Logger.log('Turnstile secret stored in Script Properties');
 }
 
 // === TEST FUNCTIONS ===

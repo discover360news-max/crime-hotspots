@@ -19,6 +19,19 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 ## Recent Work (Last 30 Days)
 
 **January 2026:**
+- **🔒 SECURITY HARDENING AUDIT** (Jan 27)
+  - Removed stale Google Fonts domains from CSP (`fonts.googleapis.com`, `fonts.gstatic.com`) — fonts now self-hosted
+  - Added `Secure` flag to consent cookie (`cookieConsent.ts`)
+  - Added `escapeHtml()` to Google Apps Script email templates (`reports-page-Code.gs`) — prevents HTML injection in admin emails
+  - Updated `@astrojs/cloudflare` to 12.6.12 (SSRF fix). Remaining moderate `undici` CVE is upstream/unpatched.
+  - **Audit grade: A-** — No critical vulnerabilities. See `docs/claude-context/recent-features.md` for full findings.
+- **⚡ LCP FONT OPTIMIZATION + HERO COMPACT** (Jan 27)
+  - Self-hosted Inter font (woff2) — eliminated Google Fonts external request chain (~200-500ms LCP saving)
+  - Removed `dns-prefetch`/`preconnect` for `fonts.googleapis.com`/`fonts.gstatic.com`
+  - Updated CSP to remove external font domains
+  - Added `compact` variant to `Hero.astro` — smaller padding, left-aligned, compact CTA sizing
+  - Added `<slot>` support to `Hero.astro` for custom actions (e.g., JS buttons)
+  - Refactored Headlines page to use compact Hero with Dashboard CTA + Filters button
 - **🛡️ SAFETY CONTEXT SYSTEM** (Jan 26) - **"The Safety Strength Engine"**
   - Created `safetyHelpers.ts` - Calculate area-based crime scores (1-10 scale)
   - Created `SafetyContext.astro` - Color-coded contextual safety tips component
@@ -146,6 +159,28 @@ To find a way to get goals accomplished efficiently and by using the least token
 - Always add explicit text colors (`text-slate-700`, `text-slate-400`)
 - Use colors only from Rose + Slate palette
 - No emojis unless requested
+
+### SECURITY RULES ⭐⭐
+
+**Audit Grade: A-** (January 27, 2026)
+
+**ALWAYS:**
+- Use `escapeHtml()` from `src/lib/escapeHtml.ts` when rendering user/crime data via `innerHTML` or `set:html`
+- Use `sanitizeUrl()` for any external URLs rendered in HTML
+- Keep CSP in `public/_headers` tight — only add domains actually needed
+- Set `Secure;SameSite=Lax` on all cookies
+- Run `npm audit` periodically and update dependencies
+- Escape user input in Google Apps Script email templates (`escapeHtml()` in `reports-page-Code.gs`)
+
+**NEVER:**
+- Render user-submitted data without escaping (XSS risk)
+- Add new external domains to CSP without justification
+- Hardcode API keys or secrets in source files
+- Remove Turnstile CAPTCHA, honeypot, or rate limiting from report forms
+
+**Known Accepted Risk:**
+- `'unsafe-inline'` and `'unsafe-eval'` in CSP `script-src` — required by Leaflet.js and Astro inline scripts. Mitigated by `escapeHtml()`.
+- Moderate `undici` CVE in transitive dependency (wrangler) — upstream unpatched, server-side only.
 
 ### When Working on Astro Frontend
 
@@ -327,7 +362,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   - Balanced messaging for SEO and user experience
 
 **🧱 Reusable Components** (COMPONENT-FIRST Architecture)
-- `src/components/Hero.astro` - Full-width gradient hero with CTAs (landing pages)
+- `src/components/Hero.astro` - Full-width gradient hero with CTAs (landing pages) + compact variant + slot for custom actions
 - `src/components/StatCards.astro` - Statistics grid with YoY comparisons
 - `src/components/DataTable.astro` - Responsive table wrapper with consistent styling
 - `src/components/SafetyContext.astro` - Color-coded area safety tips (high/neutral/low)
