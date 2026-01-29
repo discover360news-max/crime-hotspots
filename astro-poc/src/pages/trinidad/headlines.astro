@@ -9,6 +9,7 @@ export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Hero from '../../components/Hero.astro';
 import CrimeCard from '../../components/CrimeCard.astro';
 import DateAccordion from '../../components/DateAccordion.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
@@ -71,35 +72,32 @@ const breadcrumbs = [
 ];
 ---
 
-<Layout title={title} description={description}>
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5" data-pagefind-ignore>
-    <!-- Breadcrumbs -->
+<Layout title={title} description={description} includeTurnstile={true}>
+  <!-- Breadcrumbs (Above Hero) -->
+  <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-4">
     <Breadcrumbs items={breadcrumbs} />
+  </div>
 
-    <!-- Page Header -->
-    <div class="mb-4 flex items-start justify-between gap-4">
-      <div>
-        <h1 class="text-h1 font-bold text-slate-700 mb-2">
-          Trinidad Crime Headlines
-        </h1>
-        <p class="text-xs text-slate-500">Latest crime reports from all years</p>
-      </div>
-      <div class="flex flex-col gap-2">
+  <!-- Hero Section -->
+  <Hero
+    title="Trinidad & Tobago Crime Headlines"
+    subtitle="Latest crime reports from all years. Filter incidents by area, crime type, and date."
+    compact={true}
+    primaryCTA={{
+      text: "Dashboard",
+      href: "/trinidad/dashboard",
+      icon: "dashboard"
+    }}
+  >
+    <button
+      id="filtersBtn"
+      class="px-4 py-1.5 min-h-[22px] inline-flex items-center justify-center border-2 border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 active:bg-rose-50 rounded-lg transition font-medium text-xs whitespace-nowrap"
+    >
+      Filters ›
+    </button>
+  </Hero>
 
-        <a
-          href="/trinidad/dashboard"
-          class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap"
-        >
-          Dashboard
-        </a>
-        <button
-          id="filtersBtn"
-          class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap"
-        >
-          Filters ›
-        </button>
-      </div>
-    </div>
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5" data-pagefind-ignore>
 
     <!-- Site Notification Banner -->
     <SiteNotificationBanner notification={dataUpdateNotice} />
@@ -119,6 +117,7 @@ const breadcrumbs = [
     <div id="crimeAccordions">
       {sortedDates.map((date, index) => {
         const crimes = crimesByDate.get(date)!;
+        const incidentCount = crimes.length;
         const victimCount = calculateVictimCount(crimes);
         const isExpanded = index === 0;
         const formattedDate = new Date(date).toLocaleDateString('en-US', {
@@ -146,12 +145,12 @@ const breadcrumbs = [
 
                 <div class="text-left">
                   <h3 class={`accordion-title text-small font-semibold ${isExpanded ? 'text-rose-600' : 'text-slate-700'}`}>{formattedDate}</h3>
-                  <p class="text-xs text-slate-500">{victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+                  <p class="text-xs text-slate-500">{incidentCount} {incidentCount === 1 ? 'incident' : 'incidents'} affecting {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
                 </div>
               </div>
 
               <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-medium">
-                {victimCount}
+                {incidentCount}
               </span>
             </button>
 
@@ -470,6 +469,7 @@ const breadcrumbs = [
         year: 'numeric'
       });
 
+      const incidentCount = crimes.length;
       const victimCount = calculateVictimCount(crimes);
       const expandedClass = isExpanded ? 'max-h-[10000px] mt-3' : 'max-h-0';
       const chevronClass = isExpanded ? 'rotate-90' : '';
@@ -494,12 +494,12 @@ const breadcrumbs = [
 
               <div class="text-left">
                 <h3 class="accordion-title text-small font-semibold ${textClass}">${escapeHtml(formattedDate)}</h3>
-                <p class="text-xs text-slate-500">${victimCount} ${victimCount === 1 ? 'victim' : 'victims'}</p>
+                <p class="text-xs text-slate-500">${incidentCount} ${incidentCount === 1 ? 'incident' : 'incidents'} affecting ${victimCount} ${victimCount === 1 ? 'victim' : 'victims'}</p>
               </div>
             </div>
 
             <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-medium">
-              ${victimCount}
+              ${incidentCount}
             </span>
           </button>
 

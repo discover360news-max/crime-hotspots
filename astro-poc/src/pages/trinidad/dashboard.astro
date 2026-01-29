@@ -44,7 +44,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 ---
 
 
-<Layout title={title} description={description} includeLeaflet={true}>
+<Layout title={title} description={description} includeLeaflet={true} includeTurnstile={true}>
 
   <div class="container mx-auto px-4 py-2 max-w-7xl" data-pagefind-ignore>
     <!-- Page Header -->
@@ -134,20 +134,70 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
           </ul>
         </InfoPopup>
       </div>
-      <div class="relative min-h-[450px]">
-        <!-- Map Shimmer (shown during loading) -->
-        <div id="mapShimmer" class="absolute inset-0 w-full transition-opacity duration-300">
-          <LoadingShimmer height="450px" />
+      <div class="lg:grid lg:grid-cols-3 lg:gap-4">
+        <!-- Map (2/3 on desktop, full width on mobile) -->
+        <div class="lg:col-span-2 relative min-h-[450px]">
+          <!-- Map Shimmer (shown during loading) -->
+          <div id="mapShimmer" class="absolute inset-0 w-full transition-opacity duration-300">
+            <LoadingShimmer height="450px" />
+          </div>
+
+          <!-- Actual Map (hidden initially) -->
+          <div id="leafletMap" class="absolute inset-0 w-full h-[450px] rounded-lg opacity-0 transition-opacity duration-300"></div>
+
+          <!-- Pan instruction overlay (shown on single finger touch) -->
+          <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-10">
+            <div class="bg-white/70 backdrop-blur-md rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
+              <p class="text-small font-semibold text-slate-600">Use two fingers to move map</p>
+              <p class="text-tiny text-slate-600 mt-1">One finger scrolls the page</p>
+            </div>
+          </div>
         </div>
 
-        <!-- Actual Map (hidden initially) -->
-        <div id="leafletMap" class="absolute inset-0 w-full h-[450px] rounded-lg opacity-0 transition-opacity duration-300"></div>
-
-        <!-- Pan instruction overlay (shown on single finger touch) -->
-        <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-10">
-          <div class="bg-white/70 backdrop-blur-md rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
-            <p class="text-small font-semibold text-slate-600">Use two fingers to move map</p>
-            <p class="text-tiny text-slate-600 mt-1">One finger scrolls the page</p>
+        <!-- Map Legend (1/3 sidebar on desktop, full width below on mobile) -->
+        <div class="mt-4 lg:mt-0 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-lg p-4 self-start">
+          <h3 class="text-xs font-semibold text-slate-700 mb-3">Legend</h3>
+          <div class="grid grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full border border-white shadow-sm shrink-0" style="background:#e11d48"></span>
+              <span class="text-xs text-slate-600">Murder</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full border border-white shadow-sm shrink-0" style="background:#dc2626"></span>
+              <span class="text-xs text-slate-600">Shooting</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full border border-white shadow-sm shrink-0" style="background:#f97316"></span>
+              <span class="text-xs text-slate-600">Robbery</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full border border-white shadow-sm shrink-0" style="background:#9333ea"></span>
+              <span class="text-xs text-slate-600">Home Invasion</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full border border-white shadow-sm shrink-0" style="background:#06b6d4"></span>
+              <span class="text-xs text-slate-600">Theft</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full border border-white shadow-sm shrink-0" style="background:#ec4899"></span>
+              <span class="text-xs text-slate-600">Kidnapping</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full border border-white shadow-sm shrink-0" style="background:#c026d3"></span>
+              <span class="text-xs text-slate-600">Sexual Assault</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full border border-white shadow-sm shrink-0" style="background:#8b5cf6"></span>
+              <span class="text-xs text-slate-600">Assault</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full border border-white shadow-sm shrink-0" style="background:#3b82f6"></span>
+              <span class="text-xs text-slate-600">Seizures</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full border border-white shadow-sm shrink-0" style="background:#eab308"></span>
+              <span class="text-xs text-slate-600">Burglary</span>
+            </div>
           </div>
         </div>
       </div>
