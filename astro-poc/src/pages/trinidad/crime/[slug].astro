@@ -17,6 +17,7 @@ import ReportIssueModal from '../../../components/ReportIssueModal.astro';
 import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
 import AreaNameTooltip from '../../../components/AreaNameTooltip.astro';
 import SafetyContext from '../../../components/SafetyContext.astro';
+import FeedbackToggle from '../../../components/FeedbackToggle.astro';
 import { dataUpdateNotice } from '../../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../../lib/areaAliases';
 import { getCountryName } from '../../../data/countries';
@@ -361,6 +362,12 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
       tip={safetyContext.tip}
       positiveNote={safetyContext.positiveNote}
       primaryCrimeType={safetyContext.primaryCrimeType}
+    />
+
+    <FeedbackToggle
+      areaName={crime.area}
+      pageUrl={`https://crimehotspots.com/trinidad/crime/${crime.slug}`}
+      pageTitle={crime.headline}
     />
 
     <!-- Previous/Next Crime Navigation -->

@@ -15,6 +15,7 @@ import Hero from '../../../components/Hero.astro';
 import StatCards from '../../../components/StatCards.astro';
 import DataTable from '../../../components/DataTable.astro';
 import SafetyContext from '../../../components/SafetyContext.astro';
+import FeedbackToggle from '../../../components/FeedbackToggle.astro';
 import MailchimpSignup from '../../../components/MailchimpSignup.astro';
 import { getTrinidadCrimes, generateNameSlug } from '../../../lib/crimeData';
 import { loadFullAreaData } from '../../../lib/areaAliases';
@@ -218,6 +219,12 @@ const breadcrumbs = [
       tip={safety.tip}
       positiveNote={safety.positiveNote}
       primaryCrimeType={safety.primaryCrimeType}
+    />
+
+    <FeedbackToggle
+      areaName={areaName}
+      pageUrl={`https://crimehotspots.com/trinidad/area/${slug}`}
+      pageTitle={`Crime Statistics for ${areaName}, Trinidad`}
     />
 
     <!-- Email Subscription -->
