@@ -3,6 +3,7 @@ import Header from '../components/Header.astro';
 import DashboardModal from '../components/DashboardModal.astro';
 import HeadlinesModal from '../components/HeadlinesModal.astro';
 import ArchivesModal from '../components/ArchivesModal.astro';
+import AreasModal from '../components/AreasModal.astro';
 import SearchModal from '../components/SearchModal.astro';
 import CrimeDetailModal from '../components/CrimeDetailModal.astro';
 
@@ -12,6 +13,7 @@ interface Props {
   ogImage?: string;
   includeLeaflet?: boolean;
   includePagefind?: boolean;
+  includeTurnstile?: boolean;
 }
 
 const {
@@ -19,7 +21,8 @@ const {
   description = "Real-time crime statistics and interactive dashboards for the Caribbean",
   ogImage = "https://crimehotspots.com/og-image.jpg",
   includeLeaflet = false,
-  includePagefind = true
+  includePagefind = true,
+  includeTurnstile = false
 } = Astro.props;
 
 const canonicalURL = Astro.site
@@ -47,6 +50,8 @@ const isHomepage = Astro.url.pathname === '/';
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
   <meta property="og:image" content={ogImage}>
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="Crime Hotspots">
 
   <!-- Twitter Card -->
@@ -62,14 +67,10 @@ const isHomepage = Astro.url.pathname === '/';
   <meta name="theme-color" content="#e11d48">
 
   <!-- Security: Content Security Policy (meta tag - proven to work with Turnstile) -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com https://www.googletagmanager.com https://*.google-analytics.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://unpkg.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; frame-src 'self' https://*.google.com https://*.googleusercontent.com https://challenges.cloudflare.com https://lookerstudio.google.com https://docs.google.com; connect-src 'self' https://cdn.jsdelivr.net https://docs.google.com https://*.google.com https://*.googleusercontent.com https://*.googleapis.com https://script.google.com https://challenges.cloudflare.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://unpkg.com; form-action 'self' https://script.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com https://www.googletagmanager.com https://*.google-analytics.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net; font-src 'self'; img-src 'self' data: https:; frame-src 'self' https://*.google.com https://*.googleusercontent.com https://challenges.cloudflare.com https://lookerstudio.google.com https://docs.google.com; connect-src 'self' https://cdn.jsdelivr.net https://docs.google.com https://*.google.com https://*.googleusercontent.com https://*.googleapis.com https://script.google.com https://challenges.cloudflare.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://unpkg.com; form-action 'self' https://script.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'">
 
   <!-- Resource Hints for Critical Domains -->
-  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
   <link rel="dns-prefetch" href="https://static.cloudflareinsights.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Conditional Leaflet CSS (only load on pages with maps) -->
   {includeLeaflet && (
@@ -88,13 +89,14 @@ const isHomepage = Astro.url.pathname === '/';
     </>
   )}
 
-  <!-- Fonts with optimized loading -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet"></noscript>
+  <!-- Self-hosted Inter font (eliminates external request chain for faster LCP) -->
+  <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 
-  <!-- Cloudflare Turnstile (loaded globally with explicit rendering) -->
-  <!-- CRITICAL: render=explicit prevents auto-rendering, giving us control over when widgets initialize -->
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
+
+  {includeTurnstile && (
+    <!-- Cloudflare Turnstile (loaded only on pages with forms) -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
+  )}
 
   <!-- Cloudflare Web Analytics (cookieless, no consent needed, tracks all real visitors) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "9edc1888af84466fa5b067943e7c6f99"}'></script>
@@ -120,6 +122,25 @@ const isHomepage = Astro.url.pathname === '/';
 
 <style is:global>
   @import "tailwindcss";
+
+  /* Self-hosted Inter font */
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url('/fonts/inter-latin.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url('/fonts/inter-latin-ext.woff2') format('woff2');
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
 
   /* Global Leaflet Cluster Overrides - Must come after Leaflet CSS loads */
   .marker-cluster-small,
@@ -191,6 +212,9 @@ const isHomepage = Astro.url.pathname === '/';
 
   <!-- Archives Selection Modal -->
   <ArchivesModal />
+
+  <!-- Areas Selection Modal (fallback for non-country pages) -->
+  <AreasModal />
 
   <!-- Crime Detail Modal -->
   <CrimeDetailModal />

@@ -7,6 +7,15 @@
 import { usesVictimCount } from '../config/crimeTypeConfig';
 import { getRiskWeight } from '../config/riskWeights';
 
+/** Client-side slug generator (mirrors generateNameSlug from crimeData.ts) */
+function toAreaSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 80);
+}
+
 interface Crime {
   date: string;
   headline: string;
@@ -398,9 +407,18 @@ export function updateQuickInsights(crimes: Crime[]) {
   if (mostDangerousDayEl) mostDangerousDayEl.textContent = mostDangerousDay;
   if (busiestMonthEl) busiestMonthEl.textContent = busiestMonth;
   if (top3PercentageEl) top3PercentageEl.textContent = `Top 3 areas: ${top3Percentage}%`;
-  if (mostDangerousRegionEl) mostDangerousRegionEl.textContent = mostDangerousRegion;
+  // Update area names and wrap parent <a> with correct href
+  if (mostDangerousRegionEl) {
+    mostDangerousRegionEl.textContent = mostDangerousRegion;
+    const dangerousLink = mostDangerousRegionEl.closest('a');
+    if (dangerousLink) dangerousLink.href = `/trinidad/area/${toAreaSlug(mostDangerousRegion)}`;
+  }
   if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = `${mostDangerousRegionCount} incidents`;
-  if (safestRegionEl) safestRegionEl.textContent = safestRegion;
+  if (safestRegionEl) {
+    safestRegionEl.textContent = safestRegion;
+    const safestLink = safestRegionEl.closest('a');
+    if (safestLink) safestLink.href = `/trinidad/area/${toAreaSlug(safestRegion)}`;
+  }
   if (safestRegionCountEl) safestRegionCountEl.textContent = `${safestRegionCount} incidents`;
 
   console.log('✅ Quick Insights updated');
@@ -455,13 +473,19 @@ export function updateTopRegions(crimes: Crime[]) {
     const riskPercentage = riskLevels.get(area) || 0;
     const riskLevelText = getRiskLevelText(riskPercentage);
     const riskTextColor = getRiskTextColor(riskPercentage);
+    const areaSlug = toAreaSlug(area);
     return `
-    <div class="flex flex-col gap-1 pb-3 border-b border-slate-200">
+    <a href="/trinidad/area/${areaSlug}" class="flex flex-col gap-1 pb-3 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-50 rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
-        <span class="text-xs text-slate-500 truncate flex-1">${renderAreaName(area)}</span>
-        <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium flex-shrink-0">
-          ${count}
-        </span>
+        <span class="text-xs text-slate-500 truncate flex-1 underline decoration-slate-300 underline-offset-2">${renderAreaName(area)}</span>
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+          <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
+            ${count}
+          </span>
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
       </div>
       <!-- Gradient reveal bar -->
       <div class="relative w-full h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -473,7 +497,7 @@ export function updateTopRegions(crimes: Crime[]) {
       </div>
       <!-- Risk level text -->
       <span class="text-xs font-medium ${riskTextColor}">Risk: ${riskLevelText}</span>
-    </div>
+    </a>
   `;
   }).join('');
 

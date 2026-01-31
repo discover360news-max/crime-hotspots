@@ -14,6 +14,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getTrinidadCrimes } from '../../lib/crimeData';
 import { countCrimeType } from '../../lib/dashboardHelpers';
 import { getCollection } from 'astro:content';
+import { generateMurderCountOgImage } from '../../lib/generateOgImage';
 
 // Fetch current year's crime data
 const allCrimes = await getTrinidadCrimes();
@@ -69,11 +70,21 @@ const lastUpdated = new Date().toLocaleDateString('en-US', {
   day: 'numeric'
 });
 
+// Generate dynamic OG image with live murder count
+const ogImagePath = await generateMurderCountOgImage({
+  murderCount,
+  currentYear,
+  projectedRate: projectedMurderRate,
+  yoyChange,
+  yoyDirection: yoyDirection as 'up' | 'down' | 'same',
+  currentRate: currentMurderRate,
+});
+
 const title = "Trinidad Murder Rate & Count 2026 - Live Statistics | Crime Hotspots";
 const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k (${murderCount} murders so far). Track the Trinidad & Tobago murder toll and murder rate with live statistics. Projected annual rate: ${projectedMurderRate} per 100k. Updated daily.`;
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} includePagefind={false} ogImage={`https://crimehotspots.com${ogImagePath}`}>
   <main class="px-4 py-8" data-pagefind-ignore>
     <!-- Breadcrumbs -->
     <div class="mb-6">

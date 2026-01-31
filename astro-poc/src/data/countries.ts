@@ -11,6 +11,7 @@ export interface Country {
   available: boolean;
   headlinesUrl?: string;
   dashboardUrl?: string;
+  areasUrl?: string;
 }
 
 export const COUNTRIES: Country[] = [
@@ -22,6 +23,7 @@ export const COUNTRIES: Country[] = [
     available: true,
     headlinesUrl: '/trinidad/headlines',
     dashboardUrl: '/trinidad/dashboard',
+    areasUrl: '/trinidad/areas',
   },
   {
     id: 'gy',
@@ -31,6 +33,7 @@ export const COUNTRIES: Country[] = [
     available: false,
     headlinesUrl: '/guyana/headlines',
     dashboardUrl: '/guyana/dashboard',
+    areasUrl: '/guyana/areas',
   },
   {
     id: 'bb',
@@ -40,6 +43,7 @@ export const COUNTRIES: Country[] = [
     available: false,
     headlinesUrl: '/barbados/headlines',
     dashboardUrl: '/barbados/dashboard',
+    areasUrl: '/barbados/areas',
   },
   {
     id: 'jm',
@@ -49,6 +53,7 @@ export const COUNTRIES: Country[] = [
     available: false,
     headlinesUrl: '/jamaica/headlines',
     dashboardUrl: '/jamaica/dashboard',
+    areasUrl: '/jamaica/areas',
   },
 ];
 

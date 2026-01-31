@@ -93,3 +93,79 @@ export function getLocalName(
 ): string | undefined {
   return aliasMap.get(area);
 }
+
+// ============================================================================
+// FULL AREA DATA (for area/region pages)
+// ============================================================================
+
+let cachedAreaData: AreaInfo[] | null = null;
+
+/**
+ * Fetches and parses the RegionData CSV
+ * Returns full AreaInfo[] with area, region, division, knownAs
+ */
+export async function loadFullAreaData(): Promise<AreaInfo[]> {
+  if (cachedAreaData !== null) return cachedAreaData;
+
+  try {
+    const response = await fetch(REGION_DATA_CSV_URL);
+    if (!response.ok) {
+      console.error('Failed to fetch RegionData CSV:', response.statusText);
+      return [];
+    }
+
+    const csvText = await response.text();
+    cachedAreaData = parseFullAreaData(csvText);
+    return cachedAreaData;
+  } catch (error) {
+    console.error('Error loading full area data:', error);
+    return [];
+  }
+}
+
+/**
+ * Parses CSV text and returns full AreaInfo array
+ */
+export function parseFullAreaData(csvText: string): AreaInfo[] {
+  const lines = csvText.trim().split('\n');
+  if (lines.length < 2) return [];
+
+  const headerLine = lines[0];
+  const headers = parseCSVLine(headerLine).map((h) => stripQuotes(h));
+
+  const areaIndex = headers.indexOf('Area');
+  const regionIndex = headers.indexOf('Region');
+  const divisionIndex = headers.indexOf('Division');
+  const knownAsIndex = headers.indexOf('known_as');
+
+  if (areaIndex === -1) {
+    console.error('Missing Area column in RegionData CSV');
+    return [];
+  }
+
+  const areas: AreaInfo[] = [];
+  const seenAreas = new Set<string>();
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    const columns = parseCSVLine(line).map((col) => stripQuotes(col));
+
+    const area = columns[areaIndex];
+    if (!area) continue;
+
+    // Deduplicate: keep only the first occurrence (has complete data)
+    if (seenAreas.has(area)) continue;
+    seenAreas.add(area);
+
+    areas.push({
+      area,
+      region: regionIndex !== -1 ? columns[regionIndex] || '' : '',
+      division: divisionIndex !== -1 ? columns[divisionIndex] || '' : '',
+      knownAs: knownAsIndex !== -1 ? columns[knownAsIndex] || '' : '',
+    });
+  }
+
+  return areas;
+}

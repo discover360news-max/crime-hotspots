@@ -109,7 +109,7 @@ const title = `${crime.headline} | Crime Hotspots Trinidad`;
 const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${crime.date}. View details, location, and related crimes.`;
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} includeTurnstile={true}>
   <!-- Schema.org NewsArticle Markup -->
   <script type="application/ld+json" slot="head">
     {

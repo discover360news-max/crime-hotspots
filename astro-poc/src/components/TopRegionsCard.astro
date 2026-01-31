@@ -7,6 +7,7 @@
 
 import AreaNameTooltip from './AreaNameTooltip.astro';
 import { loadAreaAliases, getLocalName } from '../lib/areaAliases';
+import { generateNameSlug } from '../lib/crimeData';
 import { getRiskWeight } from '../config/riskWeights';
 import { usesVictimCount } from '../config/crimeTypeConfig';
 
@@ -114,15 +115,21 @@ function getRiskTextColor(percentage: number): string {
       const localName = getLocalName(areaAliases, area);
       const riskLevelText = getRiskLevelText(riskPercentage);
       const riskTextColor = getRiskTextColor(riskPercentage);
+      const areaSlug = generateNameSlug(area);
       return (
-        <div class="flex flex-col gap-1 pb-3 border-b border-slate-200">
+        <a href={`/trinidad/area/${areaSlug}`} class="flex flex-col gap-1 pb-3 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-50 rounded-lg px-2 -mx-2 py-2 transition">
           <div class="flex justify-between items-center gap-2">
-            <span class="text-xs text-slate-500 truncate flex-1">
+            <span class="text-xs text-slate-500 truncate flex-1 underline decoration-slate-300 underline-offset-2">
               <AreaNameTooltip area={area} localName={localName} />
             </span>
-            <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium flex-shrink-0">
-              {count}
-            </span>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
+                {count}
+              </span>
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
           </div>
           <!-- Gradient reveal bar -->
           <div class="relative w-full h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -134,7 +141,7 @@ function getRiskTextColor(percentage: number): string {
           </div>
           <!-- Risk level text -->
           <span class={`text-xs font-medium ${riskTextColor}`}>Risk: {riskLevelText}</span>
-        </div>
+        </a>
       );
     })}
   </div>

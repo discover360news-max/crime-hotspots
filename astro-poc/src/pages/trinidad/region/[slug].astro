@@ -1,0 +1,299 @@
+---
+/**
+ * Region Detail Page
+ * Aggregate crime statistics for a region with child area ranking
+ * Target keywords: "crime in {region} trinidad", "{region} crime statistics"
+ */
+
+export const prerender = true;
+
+import Layout from '../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import Hero from '../../../components/Hero.astro';
+import StatCards from '../../../components/StatCards.astro';
+import DataTable from '../../../components/DataTable.astro';
+import { getTrinidadCrimes, generateNameSlug } from '../../../lib/crimeData';
+import { loadFullAreaData } from '../../../lib/areaAliases';
+import { calculateAreaCrimeScore } from '../../../lib/safetyHelpers';
+import { countCrimeType } from '../../../lib/dashboardHelpers';
+import {
+  TRACKED_CRIME_TYPES,
+  calculatePercentChange,
+  filterToSamePeriod,
+} from '../../../lib/statisticsHelpers';
+import { escapeHtml } from '../../../lib/escapeHtml';
+
+export async function getStaticPaths() {
+  const areaData = await loadFullAreaData();
+
+  // Get unique regions
+  const regions = new Set(areaData.map(a => a.region).filter(r => r));
+
+  return Array.from(regions).map(region => ({
+    params: { slug: generateNameSlug(region) },
+    props: { regionName: region },
+  }));
+}
+
+const { slug } = Astro.params;
+const { regionName } = Astro.props;
+
+const allCrimes = await getTrinidadCrimes();
+const areaData = await loadFullAreaData();
+
+// Region crimes
+const regionCrimes = allCrimes.filter(c => c.region === regionName);
+
+// Date ranges
+const currentYear = new Date().getFullYear();
+const previousYear = currentYear - 1;
+const cutoff90d = new Date();
+cutoff90d.setDate(cutoff90d.getDate() - 90);
+const cutoff30d = new Date();
+cutoff30d.setDate(cutoff30d.getDate() - 30);
+
+const recentCrimes90d = regionCrimes.filter(c => c.dateObj >= cutoff90d);
+const recentCrimes30d = regionCrimes.filter(c => c.dateObj >= cutoff30d);
+const crimesCurrent = regionCrimes.filter(c => c.year === currentYear);
+const crimesPrevious = regionCrimes.filter(c => c.year === previousYear);
+
+const crimesCurrentYTD = filterToSamePeriod(crimesCurrent, currentYear);
+const crimesPreviousYTD = filterToSamePeriod(crimesPrevious, previousYear);
+
+// Stat cards
+const murdersCurrent = countCrimeType(crimesCurrentYTD, 'Murder');
+const murdersPrevious = countCrimeType(crimesPreviousYTD, 'Murder');
+const robberiesCurrent = countCrimeType(crimesCurrentYTD, 'Robbery');
+const robberiesPrevious = countCrimeType(crimesPreviousYTD, 'Robbery');
+
+const statCards = [
+  {
+    label: 'Incidents (90d)',
+    current: recentCrimes90d.length,
+    previous: 0,
+    yoyChange: 0,
+    direction: 'flat' as const,
+  },
+  {
+    label: 'Murders (YTD)',
+    current: murdersCurrent,
+    previous: murdersPrevious,
+    yoyChange: calculatePercentChange(murdersPrevious, murdersCurrent),
+    direction: (murdersCurrent > murdersPrevious ? 'up' : murdersCurrent < murdersPrevious ? 'down' : 'flat') as 'up' | 'down' | 'flat',
+  },
+  {
+    label: 'Robberies (YTD)',
+    current: robberiesCurrent,
+    previous: robberiesPrevious,
+    yoyChange: calculatePercentChange(robberiesPrevious, robberiesCurrent),
+    direction: (robberiesCurrent > robberiesPrevious ? 'up' : robberiesCurrent < robberiesPrevious ? 'down' : 'flat') as 'up' | 'down' | 'flat',
+  },
+  {
+    label: 'Areas',
+    current: areaData.filter(a => a.region === regionName).length,
+    previous: 0,
+    yoyChange: 0,
+    direction: 'flat' as const,
+  },
+];
+
+// Crime type breakdown
+const crimeTypeBreakdown = TRACKED_CRIME_TYPES.map(type => {
+  const currentCount = countCrimeType(crimesCurrentYTD, type);
+  const previousCount = countCrimeType(crimesPreviousYTD, type);
+  const change = calculatePercentChange(previousCount, currentCount);
+  return {
+    type,
+    currentCount,
+    previousCount,
+    change,
+    direction: change > 0.5 ? 'up' : change < -0.5 ? 'down' : 'same',
+  };
+}).filter(c => c.currentCount > 0 || c.previousCount > 0);
+
+// Area ranking within region (by 90-day crime count)
+const regionAreas = areaData
+  .filter(a => a.region === regionName)
+  .map(a => {
+    const crimeCount = recentCrimes90d.filter(c => c.area === a.area).length;
+    const score = calculateAreaCrimeScore(a.area, allCrimes);
+    const level = score > 7 ? 'high' : score >= 4 ? 'neutral' : 'low';
+    return {
+      name: a.area,
+      slug: generateNameSlug(a.area),
+      knownAs: a.knownAs,
+      crimeCount,
+      score,
+      level,
+      hasCrimes: allCrimes.some(c => c.area === a.area),
+    };
+  })
+  .sort((a, b) => b.crimeCount - a.crimeCount);
+
+// Recent headlines
+const headlinesByDate = new Map<string, typeof regionCrimes>();
+recentCrimes30d.slice(0, 20).forEach(crime => {
+  const dateKey = crime.dateObj.toLocaleDateString('en-TT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  if (!headlinesByDate.has(dateKey)) headlinesByDate.set(dateKey, []);
+  headlinesByDate.get(dateKey)!.push(crime);
+});
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Trinidad', href: '/trinidad/dashboard' },
+  { label: 'Regions', href: '/trinidad/regions' },
+  { label: regionName },
+];
+
+const pageTitle = `${regionName} Crime Statistics ${currentYear} | Crime Hotspots`;
+const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentCrimes90d.length} incidents in the last 90 days across ${regionAreas.length} areas. Updated daily.`;
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <div class="max-w-6xl mx-auto px-4 py-6" data-pagefind-body>
+    <Breadcrumbs items={breadcrumbs} />
+
+    <Hero
+      compact
+      title={`${regionName} Region`}
+      subtitle={`${regionAreas.length} areas • ${regionCrimes.length} total recorded incidents`}
+      badge={`${recentCrimes90d.length} incidents in the last 90 days • Updated daily`}
+      primaryCTA={{ text: 'All Regions', href: '/trinidad/regions', icon: 'arrow' }}
+      secondaryCTA={{ text: 'View All Areas', href: '/trinidad/areas', icon: 'arrow' }}
+    />
+
+    <!-- Stat Cards -->
+    <div class="mt-6">
+      <StatCards stats={statCards} />
+    </div>
+
+    <!-- Area Ranking -->
+    <section class="mt-8">
+      <h2 class="text-lg font-bold text-slate-800 mb-4">Areas in {regionName}</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {regionAreas.map((area, index) => (
+          <a
+            href={area.hasCrimes ? `/trinidad/area/${area.slug}` : '#'}
+            class={`block rounded-lg border p-4 transition ${
+              area.hasCrimes
+                ? 'bg-white border-slate-200 hover:border-rose-300 hover:shadow-md group'
+                : 'bg-slate-50 border-slate-100 cursor-default'
+            }`}
+          >
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-400 font-medium">#{index + 1}</span>
+                  <h3 class={`text-sm font-semibold truncate ${
+                    area.hasCrimes ? 'text-slate-800 group-hover:text-rose-600 transition' : 'text-slate-400'
+                  }`}>
+                    {area.name}
+                  </h3>
+                </div>
+                {area.knownAs && area.knownAs !== area.name && (
+                  <p class="text-xs text-slate-400 truncate ml-6">Also known as: {area.knownAs}</p>
+                )}
+              </div>
+              <span class={`flex-shrink-0 ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${
+                area.level === 'low' ? 'bg-emerald-100 text-emerald-700' :
+                area.level === 'neutral' ? 'bg-slate-100 text-slate-600' :
+                'bg-amber-100 text-amber-700'
+              }`}>
+                Risk Level: {area.score.toFixed(1)}
+              </span>
+            </div>
+            <div class="text-xs text-slate-500">
+              {area.crimeCount} incident{area.crimeCount !== 1 ? 's' : ''} (90d)
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- Crime Type Breakdown -->
+    {crimeTypeBreakdown.length > 0 && (
+      <section class="mt-8">
+        <h2 class="text-lg font-bold text-slate-800 mb-4">Crime Breakdown (Year-to-Date)</h2>
+        <DataTable headers={['Crime Type', String(currentYear), String(previousYear), 'Change']}>
+          {crimeTypeBreakdown.map(row => (
+            <tr class="hover:bg-slate-50">
+              <td class="px-4 py-3 text-sm font-medium text-slate-700">{row.type}</td>
+              <td class="px-4 py-3 text-sm text-right text-slate-700">{row.currentCount}</td>
+              <td class="px-4 py-3 text-sm text-right text-slate-500">{row.previousCount}</td>
+              <td class={`px-4 py-3 text-sm text-right font-medium ${
+                row.direction === 'up' ? 'text-rose-600' :
+                row.direction === 'down' ? 'text-emerald-600' :
+                'text-slate-400'
+              }`}>
+                {row.direction === 'up' ? '↑' : row.direction === 'down' ? '↓' : '→'}
+                {Math.abs(row.change).toFixed(1)}%
+              </td>
+            </tr>
+          ))}
+        </DataTable>
+      </section>
+    )}
+
+    <!-- Recent Headlines -->
+    {recentCrimes30d.length > 0 && (
+      <section class="mt-8">
+        <h2 class="text-lg font-bold text-slate-800 mb-4">
+          Recent Headlines
+          <span class="text-sm font-normal text-slate-500 ml-2">Last 30 days</span>
+        </h2>
+
+        <div class="space-y-2">
+          {Array.from(headlinesByDate.entries()).map(([dateStr, crimes]) => (
+            <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+              <button
+                class="accordion-toggle w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition cursor-pointer"
+                aria-expanded="false"
+              >
+                <div class="flex items-center gap-2">
+                  <svg class="accordion-chevron w-4 h-4 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span class="text-sm font-medium text-slate-700">{dateStr}</span>
+                </div>
+                <span class="text-xs text-slate-400">{crimes.length} incident{crimes.length !== 1 ? 's' : ''}</span>
+              </button>
+
+              <div class="accordion-content hidden">
+                <div class="border-t border-slate-100 px-4 py-3 space-y-3">
+                  {crimes.map(crime => (
+                    <a
+                      href={`/trinidad/crime/${crime.slug}`}
+                      class="block p-3 rounded-lg hover:bg-slate-50 transition group"
+                    >
+                      <div class="text-sm font-medium text-slate-700 group-hover:text-rose-600 transition">
+                        {escapeHtml(crime.headline)}
+                      </div>
+                      <div class="flex items-center gap-2 mt-1 text-xs text-slate-400">
+                        <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">{crime.primaryCrimeType || crime.crimeType}</span>
+                        <span>{escapeHtml(crime.area)}</span>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</Layout>
+
+<script is:inline>
+  document.querySelectorAll('.accordion-toggle').forEach(button => {
+    button.addEventListener('click', function() {
+      const content = this.nextElementSibling;
+      const chevron = this.querySelector('.accordion-chevron');
+      const isOpen = this.getAttribute('aria-expanded') === 'true';
+
+      this.setAttribute('aria-expanded', String(!isOpen));
+      content.classList.toggle('hidden');
+      chevron.style.transform = isOpen ? '' : 'rotate(90deg)';
+    });
+  });
+</script>

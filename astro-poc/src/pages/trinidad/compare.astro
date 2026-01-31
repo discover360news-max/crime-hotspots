@@ -1,0 +1,313 @@
+---
+/**
+ * Area Comparison Tool
+ * Side-by-side comparison of two areas
+ * SSR page — reads query params ?a=slug&b=slug
+ *
+ * Target keywords: "{area A} vs {area B} crime", "compare trinidad areas"
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SafetyContext from '../../components/SafetyContext.astro';
+import { getTrinidadCrimes, generateNameSlug } from '../../lib/crimeData';
+import { loadFullAreaData, type AreaInfo } from '../../lib/areaAliases';
+import { getSafetyContext } from '../../lib/safetyHelpers';
+import { countCrimeType } from '../../lib/dashboardHelpers';
+import { TRACKED_CRIME_TYPES, calculatePercentChange, filterToSamePeriod } from '../../lib/statisticsHelpers';
+
+const allCrimes = await getTrinidadCrimes();
+const areaData = await loadFullAreaData();
+
+// Build slug → area mapping
+const slugToArea = new Map<string, AreaInfo>();
+areaData.forEach(a => slugToArea.set(generateNameSlug(a.area), a));
+
+// Available areas for dropdowns (only areas with crimes)
+const areasWithCrimes = new Set(allCrimes.map(c => c.area).filter(a => a));
+const availableAreas = areaData
+  .filter(a => areasWithCrimes.has(a.area))
+  .map(a => ({ name: a.area, slug: generateNameSlug(a.area) }))
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+// Read query params
+const slugA = Astro.url.searchParams.get('a') || '';
+const slugB = Astro.url.searchParams.get('b') || '';
+
+const areaA = slugToArea.get(slugA);
+const areaB = slugToArea.get(slugB);
+
+// Calculate stats for an area
+function getAreaStats(areaName: string) {
+  const crimes = allCrimes.filter(c => c.area === areaName);
+  const currentYear = new Date().getFullYear();
+  const previousYear = currentYear - 1;
+  const cutoff90d = new Date();
+  cutoff90d.setDate(cutoff90d.getDate() - 90);
+
+  const recent90d = crimes.filter(c => c.dateObj >= cutoff90d);
+  const crimesCurrent = filterToSamePeriod(crimes.filter(c => c.year === currentYear), currentYear);
+  const crimesPrevious = filterToSamePeriod(crimes.filter(c => c.year === previousYear), previousYear);
+
+  const safety = getSafetyContext(areaName, allCrimes);
+
+  const breakdown = TRACKED_CRIME_TYPES.map(type => ({
+    type,
+    count: countCrimeType(recent90d, type),
+  })).filter(c => c.count > 0);
+
+  const murdersCurrent = countCrimeType(crimesCurrent, 'Murder');
+  const murdersPrevious = countCrimeType(crimesPrevious, 'Murder');
+
+  return {
+    total90d: recent90d.length,
+    totalAll: crimes.length,
+    murders: murdersCurrent,
+    murderChange: calculatePercentChange(murdersPrevious, murdersCurrent),
+    safety,
+    breakdown,
+  };
+}
+
+const statsA = areaA ? getAreaStats(areaA.area) : null;
+const statsB = areaB ? getAreaStats(areaB.area) : null;
+
+const hasComparison = areaA && areaB && statsA && statsB;
+
+const pageTitle = hasComparison
+  ? `${areaA.area} vs ${areaB.area} Crime Comparison | Crime Hotspots`
+  : 'Compare Areas - Trinidad Crime Statistics | Crime Hotspots';
+const pageDescription = hasComparison
+  ? `Compare crime statistics between ${areaA.area} and ${areaB.area}. Safety scores, crime breakdown, and trends side-by-side.`
+  : 'Compare crime statistics between any two areas in Trinidad & Tobago. Side-by-side safety scores and crime breakdowns.';
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Trinidad', href: '/trinidad/dashboard' },
+  { label: 'Compare Areas' },
+];
+
+// Helper for "winner" indicator
+function getWinner(valA: number, valB: number, lowerIsBetter: boolean = true) {
+  if (valA === valB) return 'tie';
+  if (lowerIsBetter) return valA < valB ? 'a' : 'b';
+  return valA > valB ? 'a' : 'b';
+}
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <div class="max-w-6xl mx-auto px-4 py-6" data-pagefind-body>
+    <Breadcrumbs items={breadcrumbs} />
+
+    <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">Compare Areas</h1>
+    <p class="text-sm text-slate-500 mb-6">Select two areas to compare their crime statistics side-by-side.</p>
+
+    <!-- Area Selectors -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+      <div>
+        <label for="selectA" class="block text-xs font-medium text-slate-500 mb-1">Area A</label>
+        <select
+          id="selectA"
+          class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300"
+        >
+          <option value="">Select an area...</option>
+          {availableAreas.map(a => (
+            <option value={a.slug} selected={a.slug === slugA}>{a.name}</option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label for="selectB" class="block text-xs font-medium text-slate-500 mb-1">Area B</label>
+        <select
+          id="selectB"
+          class="w-full px-4 py-3 rounded-lg border border-slate-300 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300"
+        >
+          <option value="">Select an area...</option>
+          {availableAreas.map(a => (
+            <option value={a.slug} selected={a.slug === slugB}>{a.name}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+
+    {/* Comparison Results */}
+    {hasComparison && (
+      <div class="space-y-6">
+        <!-- Header -->
+        <div class="grid grid-cols-2 gap-4 text-center">
+          <div class="bg-white rounded-lg border border-slate-200 p-4">
+            <a href={`/trinidad/area/${slugA}`} class="text-base font-bold text-slate-800 hover:text-rose-600 transition">
+              {areaA.area}
+            </a>
+            <p class="text-xs text-slate-400 mt-1">{areaA.region} Region</p>
+            {areaA.knownAs && areaA.knownAs !== areaA.area && (
+              <p class="text-xs text-slate-400">Also known as: {areaA.knownAs}</p>
+            )}
+          </div>
+          <div class="bg-white rounded-lg border border-slate-200 p-4">
+            <a href={`/trinidad/area/${slugB}`} class="text-base font-bold text-slate-800 hover:text-rose-600 transition">
+              {areaB.area}
+            </a>
+            <p class="text-xs text-slate-400 mt-1">{areaB.region} Region</p>
+            {areaB.knownAs && areaB.knownAs !== areaB.area && (
+              <p class="text-xs text-slate-400">Also known as: {areaB.knownAs}</p>
+            )}
+          </div>
+        </div>
+
+        <!-- Safety Scores -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class={`rounded-lg border p-4 text-center ${
+            getWinner(statsA.safety.score, statsB.safety.score) === 'a'
+              ? 'border-emerald-300 bg-emerald-50'
+              : getWinner(statsA.safety.score, statsB.safety.score) === 'b'
+              ? 'border-rose-200 bg-rose-50'
+              : 'border-slate-200 bg-white'
+          }`}>
+            <div class="text-3xl font-bold text-slate-800">{statsA.safety.score.toFixed(1)}</div>
+            <div class="text-xs text-slate-500 mt-1">Risk Level /10</div>
+            <div class={`text-xs font-medium mt-1 ${
+              statsA.safety.level === 'low' ? 'text-emerald-600' :
+              statsA.safety.level === 'neutral' ? 'text-slate-500' :
+              'text-amber-600'
+            }`}>
+              {statsA.safety.level === 'low' ? 'Low Risk' : statsA.safety.level === 'neutral' ? 'Moderate' : 'High Risk'}
+            </div>
+          </div>
+          <div class={`rounded-lg border p-4 text-center ${
+            getWinner(statsA.safety.score, statsB.safety.score) === 'b'
+              ? 'border-emerald-300 bg-emerald-50'
+              : getWinner(statsA.safety.score, statsB.safety.score) === 'a'
+              ? 'border-rose-200 bg-rose-50'
+              : 'border-slate-200 bg-white'
+          }`}>
+            <div class="text-3xl font-bold text-slate-800">{statsB.safety.score.toFixed(1)}</div>
+            <div class="text-xs text-slate-500 mt-1">Risk Level /10</div>
+            <div class={`text-xs font-medium mt-1 ${
+              statsB.safety.level === 'low' ? 'text-emerald-600' :
+              statsB.safety.level === 'neutral' ? 'text-slate-500' :
+              'text-amber-600'
+            }`}>
+              {statsB.safety.level === 'low' ? 'Low Risk' : statsB.safety.level === 'neutral' ? 'Moderate' : 'High Risk'}
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Stats Comparison -->
+        <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="px-4 py-3 text-left font-semibold text-slate-700">Metric</th>
+                <th class="px-4 py-3 text-right font-semibold text-slate-700">{areaA.area}</th>
+                <th class="px-4 py-3 text-right font-semibold text-slate-700">{areaB.area}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 font-medium text-slate-700">Total Incidents (90d)</td>
+                <td class={`px-4 py-3 text-right font-medium ${getWinner(statsA.total90d, statsB.total90d) === 'a' ? 'text-emerald-600' : getWinner(statsA.total90d, statsB.total90d) === 'b' ? 'text-rose-600' : 'text-slate-700'}`}>
+                  {statsA.total90d}
+                </td>
+                <td class={`px-4 py-3 text-right font-medium ${getWinner(statsA.total90d, statsB.total90d) === 'b' ? 'text-emerald-600' : getWinner(statsA.total90d, statsB.total90d) === 'a' ? 'text-rose-600' : 'text-slate-700'}`}>
+                  {statsB.total90d}
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 font-medium text-slate-700">Murders (YTD)</td>
+                <td class={`px-4 py-3 text-right font-medium ${getWinner(statsA.murders, statsB.murders) === 'a' ? 'text-emerald-600' : getWinner(statsA.murders, statsB.murders) === 'b' ? 'text-rose-600' : 'text-slate-700'}`}>
+                  {statsA.murders}
+                </td>
+                <td class={`px-4 py-3 text-right font-medium ${getWinner(statsA.murders, statsB.murders) === 'b' ? 'text-emerald-600' : getWinner(statsA.murders, statsB.murders) === 'a' ? 'text-rose-600' : 'text-slate-700'}`}>
+                  {statsB.murders}
+                </td>
+              </tr>
+              <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 font-medium text-slate-700">All-Time Incidents</td>
+                <td class="px-4 py-3 text-right text-slate-600">{statsA.totalAll}</td>
+                <td class="px-4 py-3 text-right text-slate-600">{statsB.totalAll}</td>
+              </tr>
+              <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 font-medium text-slate-700">Primary Concern</td>
+                <td class="px-4 py-3 text-right text-slate-600">{statsA.safety.primaryCrimeType}</td>
+                <td class="px-4 py-3 text-right text-slate-600">{statsB.safety.primaryCrimeType}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Crime Type Breakdown -->
+        {(statsA.breakdown.length > 0 || statsB.breakdown.length > 0) && (
+          <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+            <div class="px-4 py-3 bg-slate-50 border-b border-slate-200">
+              <h3 class="text-sm font-semibold text-slate-700">Crime Breakdown (90 Days)</h3>
+            </div>
+            <table class="w-full text-sm">
+              <thead class="bg-slate-50/50 border-b border-slate-100">
+                <tr>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-slate-500">Type</th>
+                  <th class="px-4 py-2 text-right text-xs font-medium text-slate-500">{areaA.area}</th>
+                  <th class="px-4 py-2 text-right text-xs font-medium text-slate-500">{areaB.area}</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                {(() => {
+                  const allTypes = new Set([
+                    ...statsA.breakdown.map(b => b.type),
+                    ...statsB.breakdown.map(b => b.type),
+                  ]);
+                  return Array.from(allTypes).map(type => {
+                    const countA = statsA.breakdown.find(b => b.type === type)?.count || 0;
+                    const countB = statsB.breakdown.find(b => b.type === type)?.count || 0;
+                    return (
+                      <tr class="hover:bg-slate-50">
+                        <td class="px-4 py-2 text-slate-700">{type}</td>
+                        <td class={`px-4 py-2 text-right font-medium ${
+                          countA < countB ? 'text-emerald-600' : countA > countB ? 'text-rose-600' : 'text-slate-600'
+                        }`}>{countA}</td>
+                        <td class={`px-4 py-2 text-right font-medium ${
+                          countB < countA ? 'text-emerald-600' : countB > countA ? 'text-rose-600' : 'text-slate-600'
+                        }`}>{countB}</td>
+                      </tr>
+                    );
+                  });
+                })()}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    )}
+
+    {/* No comparison yet */}
+    {!hasComparison && (
+      <div class="bg-slate-50 rounded-lg border border-slate-200 p-8 text-center">
+        <svg class="w-12 h-12 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        <p class="text-sm text-slate-500 mb-2">Select two areas above to compare them.</p>
+        <p class="text-xs text-slate-400">You'll see safety scores, crime counts, and breakdowns side by side.</p>
+      </div>
+    )}
+  </div>
+</Layout>
+
+<script is:inline>
+  const selectA = document.getElementById('selectA');
+  const selectB = document.getElementById('selectB');
+
+  function updateComparison() {
+    const a = selectA.value;
+    const b = selectB.value;
+    if (a && b) {
+      window.location.href = `/trinidad/compare?a=${a}&b=${b}`;
+    } else if (a) {
+      window.location.href = `/trinidad/compare?a=${a}`;
+    } else if (b) {
+      window.location.href = `/trinidad/compare?b=${b}`;
+    }
+  }
+
+  if (selectA) selectA.addEventListener('change', updateComparison);
+  if (selectB) selectB.addEventListener('change', updateComparison);
+</script>

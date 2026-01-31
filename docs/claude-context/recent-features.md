@@ -2,13 +2,89 @@
 
 **For:** Complete details of recently implemented features
 
-**Last Updated:** January 23, 2026
+**Last Updated:** January 28, 2026
 
 **Note:** Features older than 90 days are archived to `docs/archive/accomplishments/`
 
 ---
 
 ## January 2026 Features
+
+### Dynamic OG Image for Murder Count (Jan 28, 2026)
+
+**Context:** When users share `/trinidad/murder-count/` on WhatsApp, Facebook, or X, no preview image was shown. The `og-image.jpg` meta tag pointed to a non-existent file. Goal: Generate a branded OG image at build time showing the live murder count.
+
+**Implementation:**
+- **Satori + Sharp** — Build-time image generation
+  - Satori renders JSX-like objects to SVG
+  - Sharp converts SVG to PNG
+  - Runs once during `npm run build`
+- **OG Image Design (1200x630):**
+  - Dark slate gradient background
+  - "TRINIDAD & TOBAGO" header
+  - Large murder count number (rose color)
+  - "murders so far" subtitle
+  - YoY change indicator (green ↓ or red ↑)
+  - Murder rate per 100k
+  - "crimehotspots.com" branding
+- **Daily Updates** — Image regenerates with each GitHub Actions rebuild at 6 AM UTC
+
+**Files Created/Modified:**
+- `src/lib/generateOgImage.ts` — Reusable OG image generator
+- `public/fonts/Inter-Regular.otf`, `Inter-Bold.otf` — Fonts for satori (OTF required, woff2 not supported)
+- `public/og-images/murder-count.png` — Generated image (57KB)
+- `src/pages/trinidad/murder-count.astro` — Calls generator, passes ogImage to Layout
+- `src/layouts/Layout.astro` — Added `og:image:width` (1200) and `og:image:height` (630) meta tags
+
+**Dependencies Added:**
+- `satori` — JSX to SVG renderer
+- `sharp` — Image processing (SVG to PNG)
+
+**Verification:**
+- Test with [opengraph.dev](https://opengraph.dev) or Facebook Sharing Debugger
+- Check that og:image meta tag points to `https://crimehotspots.com/og-images/murder-count.png`
+
+**Status:** ✅ Complete - Ready for production
+
+---
+
+### Murder Count Page Performance Optimization (Jan 28, 2026)
+
+**Context:** Cloudflare Speed reported 16 requests with 2 poor + 1 needs-improvement scores on `/trinidad/murder-count/` (Chrome mobile). Root cause: Page loaded resources it doesn't use.
+
+**Problem Resources:**
+1. **Turnstile CAPTCHA script** — Hardcoded in Layout.astro, only needed on report forms
+2. **Pagefind search JS + CSS** — Loaded by default, not needed on this page
+
+**Implementation:**
+
+**1. Turnstile Made Opt-In:**
+- Added `includeTurnstile?: boolean` prop to Layout.astro (defaults to `false`)
+- Wrapped Turnstile `<script>` in conditional: `{includeTurnstile && (...)}`
+- Added `includeTurnstile={true}` to 5 pages that need it:
+  - `src/pages/report.astro`
+  - `src/pages/trinidad/headlines.astro`
+  - `src/pages/trinidad/dashboard.astro`
+  - `src/pages/trinidad/archive/[year]/[month].astro`
+  - `src/pages/trinidad/crime/[slug].astro`
+
+**2. Pagefind Disabled on Murder Count:**
+- Added `includePagefind={false}` to murder-count.astro Layout call
+
+**Impact:**
+- Eliminates 3 unnecessary HTTP requests
+- Removes ~60-80KB of unused JS (Turnstile + Pagefind)
+- Should fix the 2 poor Cloudflare Speed scores
+- Bonus: All other pages without crime modals (about, privacy, faq, etc.) no longer load Turnstile
+
+**Files Modified:**
+- `src/layouts/Layout.astro` — Added `includeTurnstile` prop
+- `src/pages/trinidad/murder-count.astro` — Added `includePagefind={false}`
+- 5 pages above — Added `includeTurnstile={true}`
+
+**Status:** ✅ Complete - Ready for production
+
+---
 
 ### Murder Count 2026 Page (Jan 22, 2026)
 

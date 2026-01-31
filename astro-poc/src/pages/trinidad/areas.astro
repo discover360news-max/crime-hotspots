@@ -1,0 +1,213 @@
+---
+/**
+ * Trinidad Areas Index Page
+ * Lists all 179 areas grouped by region with crime counts and risk levels
+ * Target keywords: "trinidad crime by area", "safest areas in trinidad"
+ */
+
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Hero from '../../components/Hero.astro';
+import { getTrinidadCrimes, generateNameSlug } from '../../lib/crimeData';
+import { loadFullAreaData } from '../../lib/areaAliases';
+import { calculateAreaCrimeScore } from '../../lib/safetyHelpers';
+
+const allCrimes = await getTrinidadCrimes();
+const areaData = await loadFullAreaData();
+
+// Calculate 90-day cutoff for recent crime counts
+const cutoffDate = new Date();
+cutoffDate.setDate(cutoffDate.getDate() - 90);
+const recentCrimes = allCrimes.filter(c => c.dateObj >= cutoffDate);
+
+// Build area stats
+interface AreaStat {
+  name: string;
+  slug: string;
+  region: string;
+  division: string;
+  knownAs: string;
+  crimeCount90d: number;
+  totalCrimes: number;
+  safetyScore: number;
+  level: 'high' | 'neutral' | 'low';
+}
+
+const areaStats: AreaStat[] = areaData.map(a => {
+  const crimeCount90d = recentCrimes.filter(c => c.area === a.area).length;
+  const totalCrimes = allCrimes.filter(c => c.area === a.area).length;
+  const safetyScore = calculateAreaCrimeScore(a.area, allCrimes);
+  const level = safetyScore > 7 ? 'high' : safetyScore >= 4 ? 'neutral' : 'low';
+
+  return {
+    name: a.area,
+    slug: generateNameSlug(a.area),
+    region: a.region,
+    division: a.division,
+    knownAs: a.knownAs,
+    crimeCount90d,
+    totalCrimes,
+    safetyScore,
+    level,
+  };
+});
+
+// Group by region
+const regionGroups = new Map<string, AreaStat[]>();
+areaStats.forEach(a => {
+  const region = a.region || 'Other';
+  if (!regionGroups.has(region)) regionGroups.set(region, []);
+  regionGroups.get(region)!.push(a);
+});
+
+// Sort regions alphabetically, sort areas within each region by crime count (highest first)
+const sortedRegions = Array.from(regionGroups.entries())
+  .sort((a, b) => a[0].localeCompare(b[0]))
+  .map(([region, areas]) => ({
+    region,
+    areas: areas.sort((a, b) => b.crimeCount90d - a.crimeCount90d),
+    totalCrimes: areas.reduce((sum, a) => sum + a.crimeCount90d, 0),
+  }));
+
+const totalAreas = areaStats.length;
+const areasWithCrime = areaStats.filter(a => a.totalCrimes > 0).length;
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Trinidad', href: '/trinidad/dashboard' },
+  { label: 'Areas' },
+];
+
+const pageTitle = `Trinidad Crime Statistics by Area - ${totalAreas} Areas | Crime Hotspots`;
+const pageDescription = `Crime statistics for ${totalAreas} areas across Trinidad & Tobago. Risk levels, crime counts, and detailed breakdowns for every area. Updated daily.`;
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <div class="max-w-6xl mx-auto px-4 py-6" data-pagefind-body>
+    <Breadcrumbs items={breadcrumbs} />
+
+    <Hero
+      compact
+      title="Crime Statistics by Area"
+      subtitle={`Explore crime data for ${totalAreas} areas across Trinidad & Tobago. ${areasWithCrime} areas with recorded incidents.`}
+      badge="Updated daily • Risk levels based on 90-day rolling window"
+      primaryCTA={{ text: 'Compare Areas', href: '/trinidad/compare', icon: 'arrow' }}
+      secondaryCTA={{ text: 'View Regions', href: '/trinidad/regions', icon: 'arrow' }}
+    />
+
+    <!-- Search/Filter -->
+    <div class="mt-6 mb-6">
+      <div class="relative">
+        <input
+          type="text"
+          id="areaSearch"
+          placeholder="Search areas..."
+          class="w-full px-4 py-3 pl-10 rounded-lg border border-slate-300 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300"
+        />
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Region Groups -->
+    <div id="regionContainer" class="space-y-8">
+      {sortedRegions.map(({ region, areas, totalCrimes }) => (
+        <section class="region-group" data-region={region.toLowerCase()}>
+          <!-- Region Header -->
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-800">{region}</h2>
+              <p class="text-xs text-slate-500">{areas.length} areas • {totalCrimes} incidents (90 days)</p>
+            </div>
+            <a
+              href={`/trinidad/region/${generateNameSlug(region)}`}
+              class="text-xs text-rose-600 hover:text-rose-700 font-medium"
+            >
+              View Region
+            </a>
+          </div>
+
+          <!-- Area Cards Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {areas.map(area => (
+              <a
+                href={`/trinidad/area/${area.slug}`}
+                class="area-card block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-md transition group"
+                data-area={area.name.toLowerCase()}
+                data-known-as={area.knownAs?.toLowerCase() || ''}
+              >
+                <div class="flex items-start justify-between mb-2">
+                  <div class="flex-1 min-w-0">
+                    <h3 class="text-sm font-semibold text-slate-800 group-hover:text-rose-600 transition truncate">
+                      {area.name}
+                    </h3>
+                    {area.knownAs && area.knownAs !== area.name && (
+                      <p class="text-xs text-slate-400 truncate">
+                        Also known as: {area.knownAs}
+                      </p>
+                    )}
+                  </div>
+                  <!-- Safety Score Badge -->
+                  <span class={`flex-shrink-0 ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${
+                    area.level === 'low' ? 'bg-emerald-100 text-emerald-700' :
+                    area.level === 'neutral' ? 'bg-slate-100 text-slate-600' :
+                    'bg-amber-100 text-amber-700'
+                  }`}>
+                    Risk Level: {area.safetyScore.toFixed(1)}
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-between text-xs text-slate-500">
+                  <span>{area.crimeCount90d} incident{area.crimeCount90d !== 1 ? 's' : ''} (90d)</span>
+                  <span class="text-slate-400">{area.division}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+
+    <!-- No results message -->
+    <div id="noResults" class="hidden text-center py-12">
+      <p class="text-slate-500 text-sm">No areas found matching your search.</p>
+    </div>
+  </div>
+</Layout>
+
+<script is:inline>
+  const searchInput = document.getElementById('areaSearch');
+  const regionContainer = document.getElementById('regionContainer');
+  const noResults = document.getElementById('noResults');
+
+  if (searchInput && regionContainer && noResults) {
+    searchInput.addEventListener('input', function() {
+      const query = this.value.toLowerCase().trim();
+      const regionGroups = regionContainer.querySelectorAll('.region-group');
+      let anyVisible = false;
+
+      regionGroups.forEach(group => {
+        const cards = group.querySelectorAll('.area-card');
+        let groupHasVisible = false;
+
+        cards.forEach(card => {
+          const areaName = card.getAttribute('data-area') || '';
+          const knownAs = card.getAttribute('data-known-as') || '';
+          const regionName = group.getAttribute('data-region') || '';
+          const matches = !query || areaName.includes(query) || knownAs.includes(query) || regionName.includes(query);
+
+          card.style.display = matches ? '' : 'none';
+          if (matches) groupHasVisible = true;
+        });
+
+        group.style.display = groupHasVisible ? '' : 'none';
+        if (groupHasVisible) anyVisible = true;
+      });
+
+      noResults.classList.toggle('hidden', anyVisible);
+    });
+  }
+</script>

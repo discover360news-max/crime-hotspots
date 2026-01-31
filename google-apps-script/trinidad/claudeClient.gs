@@ -218,13 +218,21 @@ MULTI-CRIME LOGIC (CRITICAL)
 IMPORTANT - Shooting as Method:
 - "Shot dead" / "shot and killed" / "gunned down" = ["Murder", "Shooting"]
 - "Stabbed to death" = ["Murder"] (no separate stabbing type)
-- Shooting is ALWAYS a related crime when someone is shot, even if they die
+- Shooting is ALWAYS a related crime when someone is ACTUALLY SHOT (bullet fired), even if they die
+
+⚠️ CRITICAL: Gun Present ≠ Shooting
+- "Shooting" means a firearm was DISCHARGED (bullet fired at someone)
+- "at gunpoint" / "armed with a gun" / "brandished firearm" = GUN USED AS THREAT, NOT a Shooting
+- Only add "Shooting" when someone was ACTUALLY SHOT or shots were FIRED
 
 Examples:
 ✅ CORRECT: "Man shot dead in vehicle" → all_crime_types: ["Murder", "Shooting"]
 ✅ CORRECT: "Woman gunned down outside home" → all_crime_types: ["Murder", "Shooting"]
 ✅ CORRECT: "Man kidnapped, then murdered" → all_crime_types: ["Murder", "Kidnapping"]
+✅ CORRECT: "Courier robbed at gunpoint" → all_crime_types: ["Robbery"] (NO Shooting — gun was threat only)
+✅ CORRECT: "Armed men held family at gunpoint" → all_crime_types: ["Home Invasion", "Robbery"] (NO Shooting)
 ❌ WRONG: "Man shot dead" → all_crime_types: ["Murder"] (missing Shooting)
+❌ WRONG: "Robbed at gunpoint" → all_crime_types: ["Robbery", "Shooting"] (gun not fired)
 
 ═══════════════════════════════════════════════════════════════════════════════
 CRIME TYPE SEVERITY HIERARCHY (For Determining Primary Crime)
@@ -286,7 +294,19 @@ CRITICAL EXCLUSIONS - Return {"crimes": [], "confidence": 0}
 
 ❌ FOLLOW-UP ARTICLES: "Family calls for", "relatives demand", funerals, memorials, reactions to previous crimes
 
-❌ OTHER: Court/sentencing, opinion pieces, historical (>1 month), brief mentions (<2 sentences)
+❌ PHOTO CAPTIONS: Short text with "—Photo:", "Photo:", or image credit lines (e.g., "Confiscated: Vehicles seized —Photo: Richard Charan")
+
+❌ BRIEF MENTIONS: "In a separate incident..." or recap paragraphs with < 2 sentences and missing key details (date, location, or victim)
+   → Only extract crimes that are the MAIN SUBJECT of the article with full details
+   → If a previous crime is mentioned for CONTEXT (e.g., "This follows last week's murder of..."), do NOT extract the old crime
+
+❌ UNCERTAIN DEATHS: Do NOT classify as Murder if:
+   - "No visible signs of violence", "cause of death unknown"
+   - "Decomposed body" without confirmed foul play
+   - "Autopsy pending", "police investigating cause of death"
+   → Return {"crimes": [], "confidence": 0} for unconfirmed deaths
+
+❌ OTHER: Court/sentencing, opinion pieces, historical (>1 month)
 
 ═══════════════════════════════════════════════════════════════════════════════
 CLASSIFICATION RULES

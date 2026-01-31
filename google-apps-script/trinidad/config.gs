@@ -262,8 +262,8 @@ const NEWS_SOURCES = [
     name: "Trinidad Newsday",
     country: "TT",
     rssUrl: "https://newsday.co.tt/feed",
-    enabled: true,
-    priority: 1, // Highest priority
+    enabled: false, // DISABLED: Newsday closed down (January 2026)
+    priority: 1,
     crimeKeywords: ["murder", "shoot", "rob", "assault", "kill", "crime", "police", "victim", "attack", "gang", "arrest", "home invasion"]
   },
   {

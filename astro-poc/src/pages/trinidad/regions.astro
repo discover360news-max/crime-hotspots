@@ -1,0 +1,117 @@
+---
+/**
+ * Trinidad Regions Index Page
+ * Lists all regions with aggregate crime stats
+ * Target keywords: "trinidad crime by region", "safest region in trinidad"
+ */
+
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Hero from '../../components/Hero.astro';
+import { getTrinidadCrimes, generateNameSlug } from '../../lib/crimeData';
+import { loadFullAreaData } from '../../lib/areaAliases';
+import { calculateAreaCrimeScore } from '../../lib/safetyHelpers';
+import { countCrimeType } from '../../lib/dashboardHelpers';
+
+const allCrimes = await getTrinidadCrimes();
+const areaData = await loadFullAreaData();
+
+const cutoff90d = new Date();
+cutoff90d.setDate(cutoff90d.getDate() - 90);
+const recentCrimes = allCrimes.filter(c => c.dateObj >= cutoff90d);
+
+// Build region stats
+const regionMap = new Map<string, { areas: string[]; crimeCount: number; murders: number; }>();
+
+areaData.forEach(a => {
+  const region = a.region || 'Other';
+  if (!regionMap.has(region)) regionMap.set(region, { areas: [], crimeCount: 0, murders: 0 });
+  const r = regionMap.get(region)!;
+  if (!r.areas.includes(a.area)) r.areas.push(a.area);
+});
+
+// Count crimes per region
+recentCrimes.forEach(c => {
+  const region = c.region || 'Other';
+  if (regionMap.has(region)) {
+    regionMap.get(region)!.crimeCount++;
+  }
+});
+
+// Count murders per region
+const currentYear = new Date().getFullYear();
+const crimesCurrent = allCrimes.filter(c => c.year === currentYear);
+regionMap.forEach((data, region) => {
+  const regionCrimes = crimesCurrent.filter(c => c.region === region);
+  data.murders = countCrimeType(regionCrimes, 'Murder');
+});
+
+// Sort by crime count (highest first)
+const regions = Array.from(regionMap.entries())
+  .map(([name, data]) => ({
+    name,
+    slug: generateNameSlug(name),
+    areaCount: data.areas.length,
+    crimeCount90d: data.crimeCount,
+    murders: data.murders,
+  }))
+  .sort((a, b) => b.crimeCount90d - a.crimeCount90d);
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Trinidad', href: '/trinidad/dashboard' },
+  { label: 'Regions' },
+];
+
+const pageTitle = `Trinidad Crime Statistics by Region - ${regions.length} Regions | Crime Hotspots`;
+const pageDescription = `Crime statistics for all ${regions.length} regions in Trinidad & Tobago. Compare crime rates, safety scores, and area breakdowns across regions. Updated daily.`;
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <div class="max-w-6xl mx-auto px-4 py-6" data-pagefind-body>
+    <Breadcrumbs items={breadcrumbs} />
+
+    <Hero
+      compact
+      title="Crime Statistics by Region"
+      subtitle={`Compare crime data across ${regions.length} regions in Trinidad & Tobago.`}
+      badge="Updated daily • Based on 90-day rolling window"
+      primaryCTA={{ text: 'View by Area', href: '/trinidad/areas', icon: 'arrow' }}
+      secondaryCTA={{ text: 'Compare Areas', href: '/trinidad/compare', icon: 'arrow' }}
+    />
+
+    <!-- Region Cards -->
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {regions.map((region, index) => (
+        <a
+          href={`/trinidad/region/${region.slug}`}
+          class="block bg-white rounded-lg border border-slate-200 p-5 hover:border-rose-300 hover:shadow-md transition group"
+        >
+          <div class="flex items-start justify-between mb-3">
+            <h2 class="text-base font-bold text-slate-800 group-hover:text-rose-600 transition">
+              {region.name}
+            </h2>
+            <span class="text-xs text-slate-400 font-medium">#{index + 1}</span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 text-center">
+            <div>
+              <div class="text-lg font-bold text-slate-800">{region.crimeCount90d}</div>
+              <div class="text-xs text-slate-400">Incidents (90d)</div>
+            </div>
+            <div>
+              <div class="text-lg font-bold text-rose-600">{region.murders}</div>
+              <div class="text-xs text-slate-400">Murders (YTD)</div>
+            </div>
+            <div>
+              <div class="text-lg font-bold text-slate-600">{region.areaCount}</div>
+              <div class="text-xs text-slate-400">Areas</div>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>

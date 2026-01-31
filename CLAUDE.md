@@ -12,13 +12,25 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Traffic:** ~4 real visitors/day, Google Search Console active (1,728 pages indexed)
-**Last Updated:** January 26, 2026
+**Last Updated:** January 28, 2026
 
 ---
 
 ## Recent Work (Last 30 Days)
 
 **January 2026:**
+- **🖼️ DYNAMIC OG IMAGE FOR MURDER COUNT** (Jan 28)
+  - Build-time OG image generation using satori + sharp
+  - Shows live murder count, YoY change, murder rate, branding
+  - 1200x630 PNG regenerates daily with GitHub Actions rebuild
+  - Created `src/lib/generateOgImage.ts` — reusable OG generator
+  - Added Inter OTF fonts for satori (`public/fonts/Inter-Regular.otf`, `Inter-Bold.otf`)
+  - Added `og:image:width`/`og:image:height` meta tags to Layout.astro
+- **⚡ MURDER COUNT PAGE PERFORMANCE FIX** (Jan 28)
+  - Made Turnstile CAPTCHA script opt-in via `includeTurnstile` prop (defaults to `false`)
+  - Added `includePagefind={false}` to murder-count page
+  - Eliminates 3 unnecessary requests (~60-80KB unused JS)
+  - Addresses Cloudflare Speed "poor" scores
 - **🔒 SECURITY HARDENING AUDIT** (Jan 27)
   - Removed stale Google Fonts domains from CSP (`fonts.googleapis.com`, `fonts.gstatic.com`) — fonts now self-hosted
   - Added `Secure` flag to consent cookie (`cookieConsent.ts`)
@@ -367,6 +379,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - `src/components/DataTable.astro` - Responsive table wrapper with consistent styling
 - `src/components/SafetyContext.astro` - Color-coded area safety tips (high/neutral/low)
 - `src/lib/safetyHelpers.ts` - Crime scoring & safety context calculation
+- `src/lib/generateOgImage.ts` - Dynamic OG image generator (satori + sharp)
 
 **🤖 Automation**
 - `google-apps-script/trinidad/README.md` - Trinidad automation
