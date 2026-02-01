@@ -26,6 +26,13 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
   - Created `src/lib/generateOgImage.ts` — reusable OG generator
   - Added Inter OTF fonts for satori (`public/fonts/Inter-Regular.otf`, `Inter-Bold.otf`)
   - Added `og:image:width`/`og:image:height` meta tags to Layout.astro
+- **⚡ DASHBOARD CLS FIX** (Feb 1)
+  - Fixed Cumulative Layout Shift (CLS) on dashboard — was scoring "Poor" in Cloudflare Speed
+  - Converted Top Regions shimmer from sequential `display:none` toggle to absolute overlay with opacity transitions
+  - Added `pointer-events: none` to hidden shimmers so clicks pass through to content
+  - Removed blanket `underline` from all Top Areas names; only known_as areas show dotted underline via AreaNameTooltip
+  - Unified dotted underline convention on Quick Insights (Highest/Lowest Crimes) for consistency
+  - Re-enabled pointer events on shimmer show during year filter changes
 - **⚡ MURDER COUNT PAGE PERFORMANCE FIX** (Jan 28)
   - Made Turnstile CAPTCHA script opt-in via `includeTurnstile` prop (defaults to `false`)
   - Added `includePagefind={false}` to murder-count page

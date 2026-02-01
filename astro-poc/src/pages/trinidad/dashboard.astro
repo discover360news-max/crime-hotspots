@@ -233,11 +233,13 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
         </InfoPopup>
       </div>
 
-      <div id="topRegionsShimmer" class="transition-opacity duration-300">
-        <LoadingShimmer height="260px" />
-      </div>
-      <div id="topRegionsCard" class="opacity-0 transition-opacity duration-300">
-        <TopRegionsCard crimes={crimes} />
+      <div class="relative">
+        <div id="topRegionsShimmer" class="absolute inset-0 z-10 transition-opacity duration-300">
+          <LoadingShimmer height="100%" />
+        </div>
+        <div id="topRegionsCard" class="opacity-0 transition-opacity duration-300">
+          <TopRegionsCard crimes={crimes} />
+        </div>
       </div>
     </div>
 
@@ -338,7 +340,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
           const statsShimmer = document.getElementById('statsShimmer');
           const statsContainer = document.querySelector('.stats-scroll-container');
 
-          if (statsShimmer) statsShimmer.style.opacity = '1';
+          if (statsShimmer) { statsShimmer.style.opacity = '1'; statsShimmer.style.pointerEvents = ''; }
           if (statsContainer) statsContainer.style.opacity = '0';
 
           // Update after short delay
@@ -355,7 +357,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
           const insightsShimmer = document.getElementById('insightsShimmer');
           const insightsCards = document.getElementById('insightsCards');
 
-          if (insightsShimmer) insightsShimmer.style.opacity = '1';
+          if (insightsShimmer) { insightsShimmer.style.opacity = '1'; insightsShimmer.style.pointerEvents = ''; }
           if (insightsCards) insightsCards.style.opacity = '0';
 
           // Update after short delay
@@ -368,11 +370,11 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
           }, 100);
         },
         updateTopRegions: (crimes) => {
-          // Show shimmer before update (sequential display - no overlay)
+          // Show shimmer before update (absolute overlay - opacity transition)
           const topRegionsShimmer = document.getElementById('topRegionsShimmer');
           const topRegionsCard = document.getElementById('topRegionsCard');
 
-          if (topRegionsShimmer) topRegionsShimmer.style.display = 'block';
+          if (topRegionsShimmer) { topRegionsShimmer.style.opacity = '1'; topRegionsShimmer.style.pointerEvents = ''; }
           if (topRegionsCard) topRegionsCard.style.opacity = '0';
 
           // Update after short delay
@@ -381,15 +383,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
             updateTopRegions(crimes);
 
             // Hide shimmer with minimum time
-            const elapsed = Date.now() - updateStart;
-            const remaining = Math.max(0, 500 - elapsed);
-
-            if (remaining > 0) {
-              await new Promise(resolve => setTimeout(resolve, remaining));
-            }
-
-            if (topRegionsShimmer) topRegionsShimmer.style.display = 'none';
-            if (topRegionsCard) topRegionsCard.style.opacity = '1';
+            await window.hideShimmerWithMinTime(topRegionsShimmer, topRegionsCard, updateStart);
           }, 100);
         },
         updateLeafletMap: (crimes) => {
@@ -397,7 +391,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
           const mapShimmer = document.getElementById('mapShimmer');
           const leafletMap = document.getElementById('leafletMap');
 
-          if (mapShimmer) mapShimmer.style.opacity = '1';
+          if (mapShimmer) { mapShimmer.style.opacity = '1'; mapShimmer.style.pointerEvents = ''; }
           if (leafletMap) leafletMap.style.opacity = '0';
 
           // Update after short delay

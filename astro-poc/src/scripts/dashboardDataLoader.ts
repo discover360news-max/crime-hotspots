@@ -159,7 +159,10 @@ export async function hideShimmerWithMinTime(
   }
 
   // Hide shimmer, show content (opacity only - no layout shift)
-  if (shimmerEl) shimmerEl.style.opacity = '0';
+  if (shimmerEl) {
+    shimmerEl.style.opacity = '0';
+    shimmerEl.style.pointerEvents = 'none';
+  }
   if (contentEl) {
     contentEl.style.opacity = '1';
   }
@@ -236,19 +239,12 @@ export async function initializeDashboardData(): Promise<void> {
     shimmerStartTime
   );
 
-  // Hide Top Regions shimmer (no overlay pattern - sequential display)
-  const topRegionsShimmer = document.getElementById('topRegionsShimmer');
-  const topRegionsCard = document.getElementById('topRegionsCard');
-
-  const elapsed = Date.now() - shimmerStartTime;
-  const remaining = Math.max(0, MINIMUM_SHIMMER_TIME - elapsed);
-
-  if (remaining > 0) {
-    await new Promise(resolve => setTimeout(resolve, remaining));
-  }
-
-  if (topRegionsShimmer) topRegionsShimmer.style.display = 'none';
-  if (topRegionsCard) topRegionsCard.style.opacity = '1';
+  // Hide Top Regions shimmer (absolute overlay pattern - opacity transition)
+  await hideShimmerWithMinTime(
+    document.getElementById('topRegionsShimmer'),
+    document.getElementById('topRegionsCard'),
+    shimmerStartTime
+  );
 }
 
 // Make hideShimmerWithMinTime available globally for use by other scripts
