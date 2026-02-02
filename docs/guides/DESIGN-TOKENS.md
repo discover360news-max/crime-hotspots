@@ -236,6 +236,23 @@ body {
 
 ---
 
+## 🧭 Breadcrumb Rules
+
+**Country label must always be the full name:**
+- Trinidad pages: `{ label: 'Trinidad & Tobago', href: '/trinidad/dashboard' }` — NEVER just "Trinidad"
+- The folder path is `/trinidad/` but the display label is always "Trinidad & Tobago" (the two islands together)
+
+**Standard pattern for Trinidad pages:**
+```astro
+<Breadcrumbs items={[
+  { label: 'Home', href: '/' },
+  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard' },
+  { label: 'Page Name' }
+]} />
+```
+
+---
+
 ## 🎭 Hero Sections
 
 ### Full-Width Gradient Hero (Enterprise/Landing Pages)
@@ -244,6 +261,7 @@ body {
 <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-4">
   <Breadcrumbs items={[
     { label: 'Home', href: '/' },
+    { label: 'Trinidad & Tobago', href: '/trinidad/dashboard' },
     { label: 'Page Title' }
   ]} />
 </div>
