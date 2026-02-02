@@ -12,11 +12,27 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Traffic:** ~4 real visitors/day, Google Search Console active (1,728 pages indexed)
-**Last Updated:** January 28, 2026
+**Last Updated:** February 2, 2026
 
 ---
 
 ## Recent Work (Last 30 Days)
+
+**February 2026:**
+- **SECTION PICKER MODAL** (Feb 2)
+  - Homepage island click now opens a section picker modal instead of navigating directly to dashboard
+  - Shows all available sections: Dashboard, Headlines, Archive, Areas, Compare, Statistics, Regions, Murder Count
+  - Sections driven dynamically from `countries.ts` config — adding a new section is just adding an entry
+  - Follows existing HeadlinesModal pattern (frosted glass, backdrop blur, escape/overlay close)
+  - Coming-soon islands unchanged (no modal)
+  - Created `src/components/SectionPickerModal.astro`, updated `src/data/countries.ts` with `sections` array
+- **FACEBOOK POST SUBMITTER WEB APP** (Feb 2)
+  - Google Apps Script web app for quick Facebook crime post entry
+  - Paste text + URL → Claude Haiku extracts → Production sheet (bypasses confidence check)
+  - Year toggle: 2026 → pipeline Production, 2025 → FR1 sheet (different spreadsheet/column format)
+  - Replaces manual Gemini + Google Forms workflow; used daily
+  - Also serves as primary Guardian source (Guardian has no RSS feed, site is fully JS-rendered)
+  - Created `google-apps-script/trinidad/facebookSubmitter.gs`
 
 **January 2026:**
 - **🖼️ DYNAMIC OG IMAGE FOR MURDER COUNT** (Jan 28)
@@ -385,11 +401,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - `src/components/StatCards.astro` - Statistics grid with YoY comparisons
 - `src/components/DataTable.astro` - Responsive table wrapper with consistent styling
 - `src/components/SafetyContext.astro` - Color-coded area safety tips (high/neutral/low)
+- `src/components/SectionPickerModal.astro` - Homepage section picker (dynamic from countries.ts)
 - `src/lib/safetyHelpers.ts` - Crime scoring & safety context calculation
 - `src/lib/generateOgImage.ts` - Dynamic OG image generator (satori + sharp)
 
 **🤖 Automation**
 - `google-apps-script/trinidad/README.md` - Trinidad automation
+- `google-apps-script/trinidad/facebookSubmitter.gs` - Facebook Post Submitter web app (daily use)
 - `docs/FACEBOOK-DATA-COLLECTION.md` - Facebook sources
 - `docs/automation/WEEKLY-REPORT-SAFEGUARDS.md` - Blog automation
 - `docs/automation/DUPLICATE-DETECTION-ARCHIVE.md` - Enhanced duplicate detection

@@ -10,6 +10,51 @@
 
 ## February 2026 Features
 
+### Section Picker Modal (Feb 2, 2026)
+
+**Problem:** Clicking an island on the homepage navigated directly to the dashboard. Users had no visibility into other available sections (Headlines, Statistics, Compare, etc.) without first landing on the dashboard and discovering them through the header navigation.
+
+**Solution:**
+- New `SectionPickerModal` component opens when clicking an available island on the homepage
+- Shows all available sections for that island as a list of clickable buttons (same style as HeadlinesModal)
+- Sections are driven dynamically from `countries.ts` config via a `sections` array on each country
+- Adding a new page/section only requires adding an entry to the config — no component changes needed
+- Coming-soon islands remain unchanged (disabled, no modal)
+
+**Sections (Trinidad):** Dashboard, Headlines, Archive, Areas, Compare, Statistics, Regions, Murder Count
+
+**Files:**
+- `src/components/SectionPickerModal.astro` — New component
+- `src/data/countries.ts` — Added `CountrySection` interface and `sections` array to Trinidad
+- `src/pages/index.astro` — Changed island `<a>` to `<button>` triggering modal, added "Explore" CTA text
+
+**Status:** Complete
+
+---
+
+### Facebook Post Submitter Web App (Feb 2, 2026)
+
+**Problem:** Manual workflow for Facebook crime stories was slow: copy post → paste into Gemini → copy fields line-by-line into Google Forms. Done daily.
+
+**Solution:**
+- Google Apps Script web app (`facebookSubmitter.gs`) with text box + URL field + year toggle
+- Reuses existing Claude Haiku extraction (`claudeClient.gs`) and production routing (`processor.gs`)
+- Year toggle: **2026** writes to pipeline Production sheet, **2025** writes to FR1 sheet (different spreadsheet)
+- Confidence bypass: manual submissions skip confidence check, always route to Production
+- Includes geocoding and duplicate detection (2026 path) via existing `appendToProduction()`
+
+**Key Details:**
+- 2025 FR1 sheet has different 14-column format (Date, Headline, Crime Type, Street Address, Location, Area, Region, Island, URL, Source, Latitude, Longitude, Summary, Secondary Crime Types)
+- 2026 Production sheet uses 16-column format with victimCount and dual crime type fields
+- Facebook URL field optional (defaults to `facebook.com/manual-entry`)
+- Trinidad Guardian has no RSS feed (site is fully JS-rendered) — Facebook submitter is the primary way to capture Guardian stories
+
+**Files:** `google-apps-script/trinidad/facebookSubmitter.gs`
+
+**Status:** Complete
+
+---
+
 ### Modal Pageview Tracking via pushState (Feb 2, 2026)
 
 **Context:** CrimeDetailModal shows full crime page content (headline, metadata, safety context, share buttons) but neither GA4 nor Cloudflare Web Analytics tracked these views. This underreported total audience reach — critical for attracting sponsors.
