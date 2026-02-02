@@ -1,10 +1,41 @@
-# Recent Features (December 2025 - January 2026)
+# Recent Features (December 2025 - February 2026)
 
 **For:** Complete details of recently implemented features
 
-**Last Updated:** January 28, 2026
+**Last Updated:** February 2, 2026
 
 **Note:** Features older than 90 days are archived to `docs/archive/accomplishments/`
+
+---
+
+## February 2026 Features
+
+### Modal Pageview Tracking via pushState (Feb 2, 2026)
+
+**Context:** CrimeDetailModal shows full crime page content (headline, metadata, safety context, share buttons) but neither GA4 nor Cloudflare Web Analytics tracked these views. This underreported total audience reach — critical for attracting sponsors.
+
+**Problem:** Modals don't trigger real page navigations, so analytics platforms ignore them. GA4 custom events alone wouldn't fix Cloudflare (which has no event API). Needed a solution that works for both.
+
+**Implementation:**
+- **`history.pushState()`** on modal open — pushes `/trinidad/crime/{slug}` to browser URL
+  - Cloudflare beacon detects pushState and records a pageview automatically
+  - GA4 enhanced measurement also detects history changes
+  - URL becomes shareable (copied URL points to actual crime page)
+- **`history.back()`** on modal close (X button, backdrop click, Escape key)
+  - Restores the original page URL
+- **`popstate` listener** for browser back button
+  - Closes modal visually without double-calling `history.back()`
+  - `skipHistory` flag prevents race condition
+
+**UX Improvements:**
+- Back button now closes modal (expected mobile behavior, previously navigated away)
+- URL updates to crime page path while modal is open (shareable)
+- Zero impact if cookie consent not given (Cloudflare is cookieless, GA4 silently skips)
+
+**Files Modified:**
+- `src/components/CrimeDetailModal.astro` — Added `originalUrl` variable, `pushState` on open, `history.back()` on close, `popstate` event listener
+
+**Status:** ✅ Complete
 
 ---
 

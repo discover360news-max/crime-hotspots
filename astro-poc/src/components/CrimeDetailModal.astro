@@ -116,6 +116,7 @@ import ReportIssueModal from './ReportIssueModal.astro';
   let currentCrimeUrl = '';
   let currentCrimeHeadline = '';
   let currentCrimeData = null; // Store full crime object
+  let originalUrl = ''; // URL before modal opened (for restoring on close)
 
   // XSS Prevention: Escape HTML special characters
   function escapeHtml(str) {
@@ -549,6 +550,10 @@ import ReportIssueModal from './ReportIssueModal.astro';
     modal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 
+    // Push crime URL so back button closes modal + both Cloudflare & GA4 track the view
+    originalUrl = window.location.pathname + window.location.search;
+    history.pushState({ crimeModal: true }, '', `/trinidad/crime/${crime.slug}`);
+
     requestAnimationFrame(() => {
       backdrop.classList.remove('opacity-0');
       backdrop.classList.add('opacity-100');
@@ -557,8 +562,14 @@ import ReportIssueModal from './ReportIssueModal.astro';
     });
   }
 
-  function closeCrimeModal() {
+  function closeCrimeModal(skipHistory = false) {
     if (!backdrop || !modal || !content) return;
+
+    // Restore original URL (skip if triggered by back button — browser already handled it)
+    if (!skipHistory && originalUrl) {
+      history.back();
+    }
+    originalUrl = '';
 
     backdrop.classList.remove('opacity-100');
     backdrop.classList.add('opacity-0');
@@ -571,6 +582,13 @@ import ReportIssueModal from './ReportIssueModal.astro';
       document.body.style.overflow = '';
     }, 300);
   }
+
+  // Back button closes modal instead of navigating away
+  window.addEventListener('popstate', (e) => {
+    if (!backdrop?.classList.contains('hidden')) {
+      closeCrimeModal(true); // skipHistory — browser already went back
+    }
+  });
 
   // Event listeners
   if (closeBtn) {
