@@ -66,8 +66,8 @@ const isHomepage = Astro.url.pathname === '/';
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta name="theme-color" content="#e11d48">
 
-  <!-- Security: Content Security Policy (meta tag - proven to work with Turnstile) -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://challenges.cloudflare.com https://static.cloudflareinsights.com https://www.googletagmanager.com https://*.google-analytics.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net; font-src 'self'; img-src 'self' data: https:; frame-src 'self' https://*.google.com https://*.googleusercontent.com https://challenges.cloudflare.com https://lookerstudio.google.com https://docs.google.com; connect-src 'self' https://cdn.jsdelivr.net https://docs.google.com https://*.google.com https://*.googleusercontent.com https://*.googleapis.com https://script.google.com https://challenges.cloudflare.com https://cloudflareinsights.com https://static.cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://unpkg.com; form-action 'self' https://script.google.com; frame-ancestors 'none'; base-uri 'self'; object-src 'none'">
+  <!-- CSP is enforced via Cloudflare _headers file (single source of truth) -->
+  <!-- Do NOT add a <meta> CSP here — dual CSPs conflict and break Turnstile -->
 
   <!-- Resource Hints for Critical Domains -->
   <link rel="dns-prefetch" href="https://static.cloudflareinsights.com">
