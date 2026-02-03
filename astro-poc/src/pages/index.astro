@@ -10,8 +10,6 @@ export const prerender = true;
 import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import InfoPopup from '../components/InfoPopup.astro';
-import SectionPickerModal from '../components/SectionPickerModal.astro';
-
 // Import optimized images (Astro converts to WebP automatically)
 import trinidadImg from '../assets/images/trinidad.jpg';
 import guyanaImg from '../assets/images/guyana.jpg';
@@ -225,7 +223,6 @@ const countries = [
       </div>
     </section>
   </main>
-  <SectionPickerModal />
 </Layout>
 
 <script

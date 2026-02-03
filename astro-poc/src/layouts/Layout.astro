@@ -6,6 +6,7 @@ import ArchivesModal from '../components/ArchivesModal.astro';
 import AreasModal from '../components/AreasModal.astro';
 import SearchModal from '../components/SearchModal.astro';
 import CrimeDetailModal from '../components/CrimeDetailModal.astro';
+import SectionPickerModal from '../components/SectionPickerModal.astro';
 
 interface Props {
   title: string;
@@ -246,6 +247,9 @@ const isHomepage = Astro.url.pathname === '/';
 
   <!-- Crime Detail Modal -->
   <CrimeDetailModal />
+
+  <!-- Section Picker Modal (island sections) -->
+  <SectionPickerModal />
 
   <!-- Main Content -->
   <main data-pagefind-body>
