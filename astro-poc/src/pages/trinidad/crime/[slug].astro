@@ -295,7 +295,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
         <div class="space-y-6">
           {crime.summary && (
             <div>
-              <p class="text-body text-slate-700 leading-relaxed">{crime.summary}</p>
+              <p class="text-body text-slate-700 leading-relaxed whitespace-pre-line">{crime.summary.replace(/\|\|/g, '\n\n')}</p>
             </div>
           )}
 

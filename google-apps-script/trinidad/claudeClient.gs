@@ -199,7 +199,7 @@ JSON SCHEMA:
       "area": "Neighborhood (e.g., Maraval, Port of Spain)",
       "street": "Street address INCLUDING business names/landmarks",
       "headline": "Brief headline with victim name/age in parentheses if known",
-      "details": "4-5 complete sentences (minimum 60 words). Include: (1) what happened, (2) when/where, (3) victim details, (4) circumstances/motive, (5) police response.",
+      "details": "4-5 complete sentences (minimum 60 words). Separate logical paragraphs with || delimiter. Group: (1) what happened + when/where, (2) victim details + circumstances/motive, (3) police response/investigation. Example: 'First paragraph about the incident.||Second paragraph about the victim.||Third paragraph about police response.'",
       "victims": [{"name": "Name or null", "age": number, "aliases": []}],
       "victimCount": number,
       "location_country": "Trinidad and Tobago|Venezuela|Guyana|Other"
@@ -373,11 +373,14 @@ Example: If today is Thursday Jan 22:
 OUTPUT EXAMPLES
 ═══════════════════════════════════════════════════════════════════════════════
 
-Good details (4-5 sentences):
-"Labourer Gary Griffith, 45, was shot and killed in a drive-by shooting on Nelson Street, Port of Spain on Monday evening. Witnesses reported hearing multiple gunshots around 7:30 PM as a dark-colored vehicle sped past. Griffith was pronounced dead at the scene by emergency responders. Police are investigating the motive and searching for suspects. No arrests have been made."
+Good details (4-5 sentences with || paragraph breaks):
+"Labourer Gary Griffith, 45, was shot and killed in a drive-by shooting on Nelson Street, Port of Spain on Monday evening. Witnesses reported hearing multiple gunshots around 7:30 PM as a dark-colored vehicle sped past.||Griffith was pronounced dead at the scene by emergency responders.||Police are investigating the motive and searching for suspects. No arrests have been made."
 
 Bad details (too short):
-"Labourer Gary Griffith was shot dead in Port of Spain."`;
+"Labourer Gary Griffith was shot dead in Port of Spain."
+
+Bad details (no || separators):
+"Labourer Gary Griffith, 45, was shot and killed in a drive-by shooting on Nelson Street, Port of Spain on Monday evening. Witnesses reported hearing multiple gunshots around 7:30 PM as a dark-colored vehicle sped past. Griffith was pronounced dead at the scene by emergency responders. Police are investigating the motive and searching for suspects. No arrests have been made."`;
 }
 
 /**

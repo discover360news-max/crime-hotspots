@@ -2,7 +2,7 @@
 
 **For:** Google Apps Script automation details
 
-**Last Updated:** January 22, 2026
+**Last Updated:** February 2, 2026
 
 ---
 
@@ -19,10 +19,15 @@
 - **File:** `google-apps-script/trinidad/claudeClient.gs`
 
 **Data Sources:**
-1. **RSS feeds** collected every 2 hours (Trinidad Express, Guardian, Newsday)
-2. **Facebook sources** (manual collection): Ian Alleyne Network, DJ Sherrif
-   - These Facebook pages post verified info that doesn't make mainstream media
-   - Currently collected manually (automation pending)
+1. **RSS feeds** collected 3x daily (CNC3, Trinidad Express)
+   - Newsday disabled (closed January 2026)
+   - Trinidad Guardian has NO RSS feed (site is fully JS-rendered, archive pages return 404)
+2. **Facebook sources** via Facebook Post Submitter web app: Ian Alleyne Network, DJ Sherrif, Trinidad Guardian
+   - **File:** `google-apps-script/trinidad/facebookSubmitter.gs`
+   - Web app: paste text + URL → Claude Haiku extracts → Production sheet
+   - Year toggle: 2026 → pipeline Production sheet, 2025 → FR1 sheet (spreadsheet `1ornc_adllfJeA9V984qFCDdwfrEEX2H6rNH6nNQUHCQ`)
+   - Confidence bypass: manual submissions always go to Production (user-vetted)
+   - Deploy: Apps Script → Web app (Execute as: Me, Access: Only myself)
 
 **Processing Pipeline:**
 1. RSS feeds collected every 2 hours
