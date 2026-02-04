@@ -54,48 +54,61 @@ cutoff30d.setDate(cutoff30d.getDate() - 30);
 
 const recentCrimes90d = regionCrimes.filter(c => c.dateObj >= cutoff90d);
 const recentCrimes30d = regionCrimes.filter(c => c.dateObj >= cutoff30d);
+
+// Same 90-day window last year (for YoY comparison of the incidents card)
+const cutoff90dPrevStart = new Date(cutoff90d);
+cutoff90dPrevStart.setFullYear(cutoff90dPrevStart.getFullYear() - 1);
+const cutoff90dPrevEnd = new Date();
+cutoff90dPrevEnd.setFullYear(cutoff90dPrevEnd.getFullYear() - 1);
+const recentCrimes90dPrev = regionCrimes.filter(c => c.dateObj >= cutoff90dPrevStart && c.dateObj <= cutoff90dPrevEnd);
 const crimesCurrent = regionCrimes.filter(c => c.year === currentYear);
 const crimesPrevious = regionCrimes.filter(c => c.year === previousYear);
 
 const crimesCurrentYTD = filterToSamePeriod(crimesCurrent, currentYear);
 const crimesPreviousYTD = filterToSamePeriod(crimesPrevious, previousYear);
 
-// Stat cards
-const murdersCurrent = countCrimeType(crimesCurrentYTD, 'Murder');
-const murdersPrevious = countCrimeType(crimesPreviousYTD, 'Murder');
-const robberiesCurrent = countCrimeType(crimesCurrentYTD, 'Robbery');
-const robberiesPrevious = countCrimeType(crimesPreviousYTD, 'Robbery');
+// Helper to build a YoY stat card
+function makeYoYCard(label: string, currentCount: number, previousCount: number) {
+  const yoyChange = calculatePercentChange(previousCount, currentCount);
+  return {
+    label,
+    current: currentCount,
+    previous: previousCount,
+    yoyChange,
+    direction: (currentCount > previousCount ? 'up' : currentCount < previousCount ? 'down' : 'flat') as 'up' | 'down' | 'flat',
+  };
+}
 
+// Calculate average risk score for the region
+const regionAreaScores = areaData
+  .filter(a => a.region === regionName)
+  .map(a => calculateAreaCrimeScore(a.area, allCrimes));
+const avgRiskScore = regionAreaScores.length > 0
+  ? regionAreaScores.reduce((sum, s) => sum + s, 0) / regionAreaScores.length
+  : 1;
+
+// Primary stat cards (visible)
 const statCards = [
+  makeYoYCard('Incidents (90d)', recentCrimes90d.length, recentCrimes90dPrev.length),
+  makeYoYCard('Murders (YTD)', countCrimeType(crimesCurrentYTD, 'Murder'), countCrimeType(crimesPreviousYTD, 'Murder')),
+  makeYoYCard('Robberies (YTD)', countCrimeType(crimesCurrentYTD, 'Robbery'), countCrimeType(crimesPreviousYTD, 'Robbery')),
   {
-    label: 'Incidents (90d)',
-    current: recentCrimes90d.length,
-    previous: 0,
-    yoyChange: 0,
-    direction: 'flat' as const,
-  },
-  {
-    label: 'Murders (YTD)',
-    current: murdersCurrent,
-    previous: murdersPrevious,
-    yoyChange: calculatePercentChange(murdersPrevious, murdersCurrent),
-    direction: (murdersCurrent > murdersPrevious ? 'up' : murdersCurrent < murdersPrevious ? 'down' : 'flat') as 'up' | 'down' | 'flat',
-  },
-  {
-    label: 'Robberies (YTD)',
-    current: robberiesCurrent,
-    previous: robberiesPrevious,
-    yoyChange: calculatePercentChange(robberiesPrevious, robberiesCurrent),
-    direction: (robberiesCurrent > robberiesPrevious ? 'up' : robberiesCurrent < robberiesPrevious ? 'down' : 'flat') as 'up' | 'down' | 'flat',
-  },
-  {
-    label: 'Areas',
-    current: areaData.filter(a => a.region === regionName).length,
-    previous: 0,
-    yoyChange: 0,
-    direction: 'flat' as const,
+    label: 'Risk Level',
+    current: parseFloat(avgRiskScore.toFixed(1)),
+    subtitle: 'out of 10',
   },
 ];
+
+// Extra stat cards for expandable tray (only show types with data)
+const extraStatCards = [
+  makeYoYCard('Shootings (YTD)', countCrimeType(crimesCurrentYTD, 'Shooting'), countCrimeType(crimesPreviousYTD, 'Shooting')),
+  makeYoYCard('Home Invasions (YTD)', countCrimeType(crimesCurrentYTD, 'Home Invasion'), countCrimeType(crimesPreviousYTD, 'Home Invasion')),
+  makeYoYCard('Assaults (YTD)', countCrimeType(crimesCurrentYTD, 'Assault'), countCrimeType(crimesPreviousYTD, 'Assault')),
+  makeYoYCard('Burglaries (YTD)', countCrimeType(crimesCurrentYTD, 'Burglary'), countCrimeType(crimesPreviousYTD, 'Burglary')),
+  makeYoYCard('Thefts (YTD)', countCrimeType(crimesCurrentYTD, 'Theft'), countCrimeType(crimesPreviousYTD, 'Theft')),
+  makeYoYCard('Kidnappings (YTD)', countCrimeType(crimesCurrentYTD, 'Kidnapping'), countCrimeType(crimesPreviousYTD, 'Kidnapping')),
+  makeYoYCard('Seizures (YTD)', countCrimeType(crimesCurrentYTD, 'Seizures'), countCrimeType(crimesPreviousYTD, 'Seizures')),
+].filter(c => c.current > 0 || c.previous > 0);
 
 // Crime type breakdown
 const crimeTypeBreakdown = TRACKED_CRIME_TYPES.map(type => {
@@ -165,6 +178,23 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
     <!-- Stat Cards -->
     <div class="mt-6">
       <StatCards stats={statCards} />
+
+      {extraStatCards.length > 0 && (
+        <div class="mt-2">
+          <button
+            id="moreStatsToggle"
+            class="w-full flex items-center justify-center gap-1 py-2 text-xs font-medium text-slate-400 hover:text-rose-600 transition cursor-pointer"
+          >
+            <span id="moreStatsLabel">More stats</span>
+            <svg id="moreStatsChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <div id="moreStatsContent" class="hidden mt-2">
+            <StatCards stats={extraStatCards} />
+          </div>
+        </div>
+      )}
     </div>
 
     <!-- Area Ranking -->
@@ -285,6 +315,7 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
 </Layout>
 
 <script is:inline>
+  // Accordion toggles
   document.querySelectorAll('.accordion-toggle').forEach(button => {
     button.addEventListener('click', function() {
       const content = this.nextElementSibling;
@@ -296,4 +327,19 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
       chevron.style.transform = isOpen ? '' : 'rotate(90deg)';
     });
   });
+
+  // More stats toggle
+  const moreStatsToggle = document.getElementById('moreStatsToggle');
+  const moreStatsContent = document.getElementById('moreStatsContent');
+  const moreStatsLabel = document.getElementById('moreStatsLabel');
+  const moreStatsChevron = document.getElementById('moreStatsChevron');
+
+  if (moreStatsToggle && moreStatsContent) {
+    moreStatsToggle.addEventListener('click', function() {
+      const isOpen = !moreStatsContent.classList.contains('hidden');
+      moreStatsContent.classList.toggle('hidden');
+      moreStatsChevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+      moreStatsLabel.textContent = isOpen ? 'More stats' : 'Less stats';
+    });
+  }
 </script>

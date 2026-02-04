@@ -99,6 +99,12 @@ const isHomepage = Astro.url.pathname === '/';
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
   )}
 
+  <!-- Critical inline styles to prevent CLS before main CSS bundle loads -->
+  <style>
+    #mainNav { display: none }
+    @media (min-width: 768px) { #mainNav { display: flex } }
+  </style>
+
   <!-- Cloudflare Web Analytics (cookieless, no consent needed, tracks all real visitors) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "9edc1888af84466fa5b067943e7c6f99"}'></script>
 

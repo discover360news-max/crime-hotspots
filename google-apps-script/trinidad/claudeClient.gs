@@ -21,7 +21,8 @@
  * @param {Date} publishedDate - Article publication date
  * @returns {Object} Extracted crime data as JSON
  */
-function extractCrimeData(articleText, articleTitle, articleUrl, publishedDate) {
+function extractCrimeData(articleText, articleTitle, articleUrl, publishedDate, options) {
+  options = options || {};
   const apiKey = getClaudeApiKey();
 
   if (!apiKey) {
@@ -42,7 +43,7 @@ function extractCrimeData(articleText, articleTitle, articleUrl, publishedDate) 
 
   // Build system prompt (static - cached) and user prompt (dynamic - per article)
   const systemPrompt = buildSystemPrompt();
-  const userPrompt = buildUserPrompt(articleText, articleTitle, publishedDate);
+  const userPrompt = buildUserPrompt(articleText, articleTitle, publishedDate, options.skipExclusions);
 
   // Claude API with system parameter for prompt caching
   const payload = {
@@ -64,7 +65,7 @@ function extractCrimeData(articleText, articleTitle, articleUrl, publishedDate) 
     ]
   };
 
-  const options = {
+  const fetchOptions = {
     method: 'post',
     contentType: 'application/json',
     headers: {
@@ -83,7 +84,7 @@ function extractCrimeData(articleText, articleTitle, articleUrl, publishedDate) 
     let responseData;
 
     for (let attempt = 1; attempt <= retries; attempt++) {
-      response = UrlFetchApp.fetch(CLAUDE_API_ENDPOINT, options);
+      response = UrlFetchApp.fetch(CLAUDE_API_ENDPOINT, fetchOptions);
       const statusCode = response.getResponseCode();
       responseData = JSON.parse(response.getContentText());
 
@@ -391,7 +392,7 @@ Bad details (no || separators):
  * @param {Date} publishedDate - Article publication date
  * @returns {string} User prompt for Claude
  */
-function buildUserPrompt(articleText, articleTitle, publishedDate) {
+function buildUserPrompt(articleText, articleTitle, publishedDate, skipExclusions) {
   const pubDateStr = publishedDate
     ? Utilities.formatDate(new Date(publishedDate), Session.getScriptTimeZone(), 'yyyy-MM-dd')
     : Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
@@ -400,13 +401,17 @@ function buildUserPrompt(articleText, articleTitle, publishedDate) {
   const pubDate = publishedDate ? new Date(publishedDate) : new Date();
   const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][pubDate.getDay()];
 
+  const manualOverride = skipExclusions
+    ? '\n\nIMPORTANT: This is a CONFIRMED manual crime submission. SKIP all exclusion rules (traffic accidents, police shootings, etc). Extract the crime data regardless. Always return at least one crime object with confidence 7+.'
+    : '';
+
   return `PUBLISHED: ${pubDateStr} (${dayOfWeek})
 HEADLINE: ${articleTitle}
 
 ARTICLE:
 ${articleText}
 
-Extract all crime incidents as JSON. Return {"crimes": [], "confidence": 0} if not a crime article.`;
+Extract all crime incidents as JSON. Return {"crimes": [], "confidence": 0} if not a crime article.${manualOverride}`;
 }
 
 // ============================================================================
@@ -429,6 +434,12 @@ function parseClaudeResponse(responseText, articleUrl) {
     }
     if (cleanJson.startsWith('```')) {
       cleanJson = cleanJson.replace(/```\n?/g, '');
+    }
+
+    // Strip trailing text after JSON (Claude sometimes adds notes after the closing brace)
+    var lastBrace = cleanJson.lastIndexOf('}');
+    if (lastBrace !== -1 && lastBrace < cleanJson.length - 1) {
+      cleanJson = cleanJson.substring(0, lastBrace + 1);
     }
 
     const extracted = JSON.parse(cleanJson);
@@ -456,9 +467,30 @@ function parseClaudeResponse(responseText, articleUrl) {
       extracted.ambiguities.push('Invalid response format - crimes is not an array');
     }
 
-    // CRITICAL: Add source URL to EACH crime
+    // CRITICAL: Add source URL to EACH crime + ensure || paragraph breaks in details
     extracted.crimes.forEach(crime => {
       crime.source_url = articleUrl;
+
+      // Post-process: auto-insert || paragraph breaks if Claude omitted them
+      if (crime.details && !crime.details.includes('||')) {
+        // Find sentence boundary positions: ". A", "! T", "? W" etc.
+        var boundaries = [];
+        var re = /[.!?]\s+[A-Z]/g;
+        var m;
+        while ((m = re.exec(crime.details)) !== null) {
+          // Position right after the punctuation + space (before the uppercase letter)
+          boundaries.push(m.index + m[0].length - 1);
+        }
+        if (boundaries.length >= 3) {
+          // Insert || after sentence 2 and after ~middle sentence
+          var cut1 = boundaries[1];  // after 2nd sentence
+          var midIdx = Math.ceil(boundaries.length / 2);
+          var cut2 = boundaries[midIdx];
+          crime.details = crime.details.substring(0, cut1) + '||' +
+                          crime.details.substring(cut1, cut2) + '||' +
+                          crime.details.substring(cut2);
+        }
+      }
     });
 
     extracted.source_url = articleUrl;

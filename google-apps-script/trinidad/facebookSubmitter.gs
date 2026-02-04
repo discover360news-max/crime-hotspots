@@ -63,7 +63,7 @@ function submitFacebookPost(postText, sourceUrl, targetYear) {
     // (Reuses existing extractCrimeData from claudeClient.gs)
     // ═══════════════════════════════════════════════════════════
     Logger.log('Calling Claude Haiku for extraction...');
-    const extracted = extractCrimeData(cleanText, firstLine, cleanUrl, publishedDate);
+    const extracted = extractCrimeData(cleanText, firstLine, cleanUrl, publishedDate, { skipExclusions: true });
 
     if (!extracted.crimes || extracted.crimes.length === 0) {
       Logger.log('No crimes extracted from post');

@@ -111,9 +111,9 @@ const description = "Help build safer communities: report crime anonymously via 
         </div>
       </div>
 
-      <!-- Cloudflare Turnstile Widget -->
+      <!-- Cloudflare Turnstile Widget (invisible mode — zero height to prevent CLS) -->
       <!-- With ?render=explicit mode, config is passed to render() function, NOT via data attributes -->
-      <div id="reportTurnstile" class="cf-turnstile"></div>
+      <div id="reportTurnstile" class="cf-turnstile" style="height: 0; overflow: hidden;"></div>
       <div class="flex items-center justify-between mt-4">
         <div class="text-xs text-slate-500">
           You'll receive a unique anonymous report ID.
