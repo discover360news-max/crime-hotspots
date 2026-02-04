@@ -132,7 +132,7 @@ To find a way to get goals accomplished efficiently and by using the least token
 ## Tech Stack
 
 **Frontend:**
-- **Astro 5.16.5** - Hybrid rendering: Recent crimes (90 days) pre-rendered, older crimes SSR on-demand
+- **Astro 5.16.5** - Server mode: Crime pages are SSR with Cloudflare CDN caching (24h), other pages pre-rendered
 - **Tailwind CSS 4.1.18** - Via Vite plugin (@tailwindcss/vite)
 - **TypeScript** - Type safety for components and content
 - **Astro Content Collections** - Type-safe blog system
@@ -233,37 +233,33 @@ To find a way to get goals accomplished efficiently and by using the least token
 - Create new button variants (use existing patterns from DESIGN-TOKENS.md)
 - Work in root directory (Vite version is deprecated)
 
-### HYBRID RENDERING SYSTEM ⭐⭐⭐ (CRITICAL FOR LCP)
+### CRIME PAGE RENDERING ⭐⭐⭐ (Full SSR + CDN Cache)
 
-**✅ IMPLEMENTED January 26, 2026** - Fixes catastrophic LCP degradation (8,500ms → 1,000-2,000ms expected)
+**✅ UPDATED February 4, 2026** — Switched from hybrid (90-day prerender) to full SSR
 
-**How It Works:**
-- Crime pages use **90-day rolling window** pre-rendering
-- Last 90 days (795 pages): **Static** → Fast LCP (500-1,500ms)
-- Older crimes (1,139 pages): **SSR on-demand** → Slower but acceptable (low traffic)
-- Build time: **10:58** (well under 20-minute Cloudflare limit)
-- Scales infinitely (always builds same ~90-day window)
+**Why the change:** The previous hybrid approach with `prerender = true` caused old crime pages (>90 days) to 404 silently. Cloudflare served the homepage as SPA fallback, causing Google Search Console to report 446+ pages as "Alternate page with proper canonical tag" — effectively de-indexing old crime pages.
+
+**How It Works Now:**
+- ALL crime pages are server-rendered (SSR) on request
+- `CDN-Cache-Control: max-age=86400` — Cloudflare edge caches for 24h after first visit
+- `Cache-Control: public, max-age=3600` — Browser caches for 1h
+- Unknown slugs return proper HTTP 404 (not homepage redirect)
+- Build time: ~4.5 min (no crime pages pre-rendered, faster than before)
 
 **Implementation:**
 - `astro.config.mjs`: `output: 'server'`
-- `[slug].astro`: `export const prerender = true;` + `getStaticPaths()` with 90-day filter
-- SSR fallback code handles older crimes not in `getStaticPaths()`
+- `[slug].astro`: No `prerender`, no `getStaticPaths()` — pure SSR
+- `Astro.response.headers` sets CDN + browser cache headers
 
 **NEVER:**
-- Remove `getStaticPaths()` function from crime detail pages
-- Change the 90-day window without understanding build time impact
-- Switch back to full SSR (`prerender = false` only) - this kills LCP
-- Switch to full static (`getStaticPaths()` returning all crimes) - this breaks Cloudflare 20-min limit
+- Add `prerender = true` back to `[slug].astro` — this breaks old crime pages (GSC canonical issue)
+- Use `Astro.redirect('/404')` for missing crimes — return `new Response(null, { status: 404 })` instead
+- Remove CDN cache headers — SSR without caching degrades LCP
 
 **ALWAYS:**
-- Test build time after changes (`npm run build` must complete under 15 minutes for safety)
-- Verify recent crimes are pre-rendering (check build logs for "Building X recent crime pages")
-- Monitor LCP metrics after deployment (should be <2,500ms for "Good" rating)
-
-**Why This Matters:**
-- Full SSR: 8,500ms P99 LCP (32% poor ratings) ❌
-- Full Static: 29-35 minute builds (exceeds Cloudflare 20-min limit) ❌
-- Hybrid: Fast LCP + Fast builds ✅
+- Test build time after changes (`npm run build` must complete under 15 minutes)
+- Monitor LCP metrics after deployment (SSR pages should be <5,000ms first load, <2,500ms cached)
+- Verify old crime URLs return real content (not homepage)
 
 ### When Working on Automation
 

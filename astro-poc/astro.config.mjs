@@ -7,7 +7,8 @@ import cloudflare from '@astrojs/cloudflare';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://crimehotspots.com',
-  output: 'server', // SSR mode with selective pre-rendering via getStaticPaths()
+  trailingSlash: 'always',
+  output: 'server',
   adapter: cloudflare({
     imageService: 'passthrough', // Use Astro's default image service
   }),

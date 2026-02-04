@@ -146,11 +146,20 @@ function submitFacebookPost(postText, sourceUrl, targetYear) {
     Logger.log(`✅ Submission complete: ${results.length} crime(s) processed`);
     Logger.log('═══════════════════════════════════════════════');
 
+    // Build sheet URL for quick verification
+    var sheetUrl = '';
+    if (targetYear === '2025') {
+      sheetUrl = 'https://docs.google.com/spreadsheets/d/' + FR1_SPREADSHEET_ID + '/edit';
+    } else {
+      sheetUrl = 'https://docs.google.com/spreadsheets/d/' + SpreadsheetApp.getActiveSpreadsheet().getId() + '/edit';
+    }
+
     return {
       success: true,
       crimesProcessed: results.length,
       confidence: extracted.confidence,
-      results: results
+      results: results,
+      sheetUrl: sheetUrl
     };
 
   } catch (error) {
@@ -236,16 +245,33 @@ function getFacebookSubmitterHtml() {
       max-width: 640px;
       margin: 0 auto;
     }
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.25rem;
+    }
     h1 {
       font-size: 1.5rem;
       font-weight: 700;
-      margin-bottom: 0.25rem;
       color: #f1f5f9;
+    }
+    .session-counter {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #0f172a;
+      background: #86efac;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
     }
     .subtitle {
       color: #94a3b8;
       font-size: 0.875rem;
       margin-bottom: 1.5rem;
+    }
+    .shortcut-hint {
+      color: #64748b;
+      font-size: 0.75rem;
     }
     label {
       display: block;
@@ -332,6 +358,18 @@ function getFacebookSubmitterHtml() {
     }
     .year-btn:not(.active):hover { border-color: #64748b; color: #cbd5e1; }
 
+    /* Duplicate warning */
+    .duplicate-warning {
+      display: none;
+      background: #78350f;
+      border: 1px solid #b45309;
+      color: #fcd34d;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
     /* Status area */
     .status {
       margin-top: 1.5rem;
@@ -376,11 +414,69 @@ function getFacebookSubmitterHtml() {
     .badge-review { background: #78350f; color: #fcd34d; }
     .badge-skipped { background: #475569; color: #94a3b8; }
 
+    /* Session history */
+    .history-section {
+      margin-top: 1.5rem;
+      border-top: 1px solid #1e293b;
+      padding-top: 1rem;
+    }
+    .history-toggle {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.375rem 0;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+    }
+    .history-toggle:hover { color: #cbd5e1; }
+    .history-toggle .arrow { transition: transform 0.15s; display: inline-block; }
+    .history-toggle .arrow.open { transform: rotate(90deg); }
+    .history-list {
+      display: none;
+      margin-top: 0.5rem;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+    .history-list.open { display: block; }
+    .history-item {
+      padding: 0.375rem 0.5rem;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      border-bottom: 1px solid #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-item .h-headline { color: #cbd5e1; flex: 1; }
+    .history-item .h-meta { color: #64748b; white-space: nowrap; font-size: 0.7rem; }
+    .history-item .h-badge {
+      font-size: 0.65rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+    .h-badge-ok { background: #166534; color: #86efac; }
+    .h-badge-skip { background: #475569; color: #94a3b8; }
+
     /* Calendar */
     .calendar-section {
-      margin-top: 2.5rem;
-      padding-top: 1.5rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
       border-top: 1px solid #1e293b;
+    }
+    .calendar-label {
+      font-size: 0.75rem;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+      text-align: center;
     }
     .calendar-header {
       display: flex;
@@ -425,13 +521,39 @@ function getFacebookSubmitterHtml() {
       padding: 0.35rem 0;
       border-radius: 4px;
       color: #94a3b8;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .calendar-grid .day:hover:not(.empty) {
+      background: #334155;
+      color: #e2e8f0;
     }
     .calendar-grid .day.today {
       background: #f43f5e;
       color: white;
       font-weight: 700;
     }
-    .calendar-grid .day.empty { visibility: hidden; }
+    .calendar-grid .day.today:hover {
+      background: #e11d48;
+    }
+    .calendar-grid .day.selected {
+      background: #7c3aed;
+      color: white;
+      font-weight: 700;
+    }
+    .calendar-grid .day.empty { visibility: hidden; cursor: default; }
+    .date-inserted-toast {
+      display: none;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #86efac;
+      margin-top: 0.5rem;
+      animation: fadeOut 2s forwards;
+    }
+    @keyframes fadeOut {
+      0%, 60% { opacity: 1; }
+      100% { opacity: 0; }
+    }
 
     .spinner {
       display: inline-block;
@@ -449,18 +571,23 @@ function getFacebookSubmitterHtml() {
 </head>
 <body>
   <div class="container">
-    <h1>Facebook Post Submitter</h1>
+    <div class="header-row">
+      <h1>Facebook Post Submitter</h1>
+      <span class="session-counter" id="sessionCounter" style="display:none;">0 submitted</span>
+    </div>
     <p class="subtitle">Paste a Facebook crime post to extract and add to the Production sheet</p>
 
     <label>Target Year</label>
     <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
-      <button type="button" class="year-btn active" id="btn2026" onclick="setYear('2026')">2026</button>
+      <button type="button" class="year-btn" id="btn2026" onclick="setYear('2026')">2026</button>
       <button type="button" class="year-btn" id="btn2025" onclick="setYear('2025')">2025</button>
     </div>
     <input type="hidden" id="targetYear" value="2026">
 
-    <label for="postText">Facebook Post Text</label>
+    <label for="postText">Facebook Post Text <span class="shortcut-hint">(Ctrl+Enter to submit)</span></label>
     <textarea id="postText" placeholder="Paste the Facebook post here..."></textarea>
+
+    <div class="duplicate-warning" id="dupWarning">This post looks like one you already submitted this session.</div>
 
     <label for="sourceUrl">Facebook Post URL</label>
     <input type="url" id="sourceUrl" placeholder="https://www.facebook.com/...">
@@ -470,23 +597,160 @@ function getFacebookSubmitterHtml() {
 
     <div class="status" id="status"></div>
 
+    <div class="history-section" id="historySection" style="display:none;">
+      <button type="button" class="history-toggle" onclick="toggleHistory()">
+        <span class="arrow" id="historyArrow">&#9656;</span> Session History (<span id="historyCount">0</span>)
+      </button>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
     <div class="calendar-section">
+      <div class="calendar-label" id="calLabel">Click a date to insert it into the post</div>
       <div class="calendar-header">
         <button type="button" class="cal-nav" onclick="changeMonth(-1)">&lsaquo;</button>
         <span id="calTitle"></span>
         <button type="button" class="cal-nav" onclick="changeMonth(1)">&rsaquo;</button>
       </div>
       <div class="calendar-grid" id="calGrid"></div>
+      <div class="date-inserted-toast" id="dateToast"></div>
     </div>
   </div>
 
   <script>
+    // ═══════════════════════════════════════════════════════
+    // SESSION STATE
+    // ═══════════════════════════════════════════════════════
+    var sessionCount = 0;
+    var sessionHashes = [];   // duplicate detection
+    var sessionHistory = [];  // submission log
+
+    // ═══════════════════════════════════════════════════════
+    // YEAR TOGGLE (with localStorage persistence + calendar sync)
+    // ═══════════════════════════════════════════════════════
     function setYear(year) {
       document.getElementById('targetYear').value = year;
       document.getElementById('btn2025').className = year === '2025' ? 'year-btn active' : 'year-btn';
       document.getElementById('btn2026').className = year === '2026' ? 'year-btn active' : 'year-btn';
+      try { localStorage.setItem('fb_submitter_year', year); } catch(e) {}
+
+      // Sync calendar to January of target year if switching years
+      var currentCalYear = calDate.getFullYear();
+      if (String(currentCalYear) !== year) {
+        calDate = new Date(parseInt(year), calDate.getMonth(), 1);
+        renderCalendar();
+      }
     }
 
+    function loadStickyYear() {
+      try {
+        var saved = localStorage.getItem('fb_submitter_year');
+        if (saved === '2025' || saved === '2026') {
+          setYear(saved);
+          return;
+        }
+      } catch(e) {}
+      setYear('2026');
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // DUPLICATE DETECTION
+    // ═══════════════════════════════════════════════════════
+    function hashText(text) {
+      // Simple hash of first 120 chars (enough to fingerprint a post)
+      var s = text.trim().substring(0, 120).toLowerCase();
+      var h = 0;
+      for (var i = 0; i < s.length; i++) {
+        h = ((h << 5) - h) + s.charCodeAt(i);
+        h |= 0;
+      }
+      return h;
+    }
+
+    function checkDuplicate() {
+      var text = document.getElementById('postText').value;
+      var warn = document.getElementById('dupWarning');
+      if (text.trim().length < 20) { warn.style.display = 'none'; return false; }
+      var h = hashText(text);
+      var isDup = sessionHashes.indexOf(h) !== -1;
+      warn.style.display = isDup ? 'block' : 'none';
+      return isDup;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // AUDIO PING
+    // ═══════════════════════════════════════════════════════
+    function playPing(success) {
+      try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = success ? 880 : 330;
+        osc.type = 'sine';
+        gain.gain.value = 0.15;
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        osc.stop(ctx.currentTime + 0.3);
+      } catch(e) {}
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // SESSION COUNTER + HISTORY
+    // ═══════════════════════════════════════════════════════
+    function updateCounter() {
+      var el = document.getElementById('sessionCounter');
+      el.textContent = sessionCount + ' submitted';
+      el.style.display = sessionCount > 0 ? 'inline-block' : 'none';
+    }
+
+    function addToHistory(results, year) {
+      var time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      results.forEach(function(r) {
+        sessionHistory.unshift({
+          headline: r.headline || 'Unknown',
+          status: r.status,
+          destination: r.destination || '',
+          crimeType: r.crimeType || '',
+          time: time
+        });
+      });
+      renderHistory();
+    }
+
+    function renderHistory() {
+      var section = document.getElementById('historySection');
+      var list = document.getElementById('historyList');
+      var countEl = document.getElementById('historyCount');
+
+      if (sessionHistory.length === 0) { section.style.display = 'none'; return; }
+      section.style.display = 'block';
+      countEl.textContent = sessionHistory.length;
+
+      var html = '';
+      sessionHistory.forEach(function(h) {
+        var badgeClass = h.status === 'skipped' ? 'h-badge-skip' : 'h-badge-ok';
+        var badgeLabel = h.status === 'skipped' ? 'SKIP' : 'OK';
+        html += '<div class="history-item">';
+        html += '<span class="h-badge ' + badgeClass + '">' + badgeLabel + '</span> ';
+        html += '<span class="h-headline">' + escapeHtml(h.headline) + '</span>';
+        html += '<span class="h-meta">' + escapeHtml(h.crimeType) + ' ' + h.time + '</span>';
+        html += '</div>';
+      });
+      list.innerHTML = html;
+    }
+
+    function toggleHistory() {
+      var list = document.getElementById('historyList');
+      var arrow = document.getElementById('historyArrow');
+      var isOpen = list.classList.contains('open');
+      list.classList.toggle('open');
+      arrow.classList.toggle('open');
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // SUBMIT
+    // ═══════════════════════════════════════════════════════
     function handleSubmit() {
       var postText = document.getElementById('postText').value.trim();
       var sourceUrl = document.getElementById('sourceUrl').value.trim();
@@ -512,8 +776,25 @@ function getFacebookSubmitterHtml() {
           submitBtn.textContent = 'Submit to Pipeline';
 
           if (response.success) {
+            playPing(true);
+
+            // Track duplicate hash
+            sessionHashes.push(hashText(postText));
+
+            // Update session counter
+            var added = response.results.filter(function(r) { return r.status !== 'skipped'; }).length;
+            sessionCount += added;
+            updateCounter();
+
+            // Add to history
+            addToHistory(response.results, targetYear);
+
             var html = '<strong>Extracted ' + response.crimesProcessed + ' crime(s)</strong>';
-            html += ' (Confidence: ' + response.confidence + '/10)<br><br>';
+            html += ' (Confidence: ' + response.confidence + '/10)';
+            if (response.sheetUrl) {
+              html += ' &mdash; <a href="' + response.sheetUrl + '" target="_blank" style="color:#86efac;">View in Sheet</a>';
+            }
+            html += '<br><br>';
 
             response.results.forEach(function(r) {
               html += '<div class="crime-result">';
@@ -537,19 +818,25 @@ function getFacebookSubmitterHtml() {
             statusEl.className = 'status success';
             statusEl.innerHTML = html;
 
-            // Clear form for next entry
+            // Clear form and refocus for next entry
             document.getElementById('postText').value = '';
             document.getElementById('sourceUrl').value = '';
+            document.getElementById('dupWarning').style.display = 'none';
+            document.getElementById('postText').focus();
           } else {
+            playPing(false);
             statusEl.className = 'status error';
             statusEl.innerHTML = '<strong>Not processed:</strong><br>' + escapeHtml(response.error || 'Unknown error');
+            document.getElementById('postText').focus();
           }
         })
         .withFailureHandler(function(error) {
+          playPing(false);
           submitBtn.disabled = false;
           submitBtn.textContent = 'Submit to Pipeline';
           statusEl.className = 'status error';
           statusEl.innerHTML = '<strong>Error:</strong> ' + escapeHtml(error.message || 'Unknown error');
+          document.getElementById('postText').focus();
         })
         .submitFacebookPost(postText, sourceUrl, targetYear);
     }
@@ -559,6 +846,8 @@ function getFacebookSubmitterHtml() {
       document.getElementById('sourceUrl').value = '';
       document.getElementById('status').className = 'status';
       document.getElementById('status').innerHTML = '';
+      document.getElementById('dupWarning').style.display = 'none';
+      document.getElementById('postText').focus();
     }
 
     function escapeHtml(text) {
@@ -567,14 +856,62 @@ function getFacebookSubmitterHtml() {
       return div.innerHTML;
     }
 
-    // Calendar
+    // ═══════════════════════════════════════════════════════
+    // KEYBOARD SHORTCUT: Ctrl+Enter to submit
+    // ═══════════════════════════════════════════════════════
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        var btn = document.getElementById('submitBtn');
+        if (!btn.disabled) handleSubmit();
+      }
+    });
+
+    // Check for duplicates on paste
+    document.getElementById('postText').addEventListener('input', function() {
+      checkDuplicate();
+    });
+
+    // ═══════════════════════════════════════════════════════
+    // CALENDAR (synced to year toggle, clickable dates)
+    // ═══════════════════════════════════════════════════════
     var calDate = new Date();
+    var selectedCalDate = null;
     var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     var DAYS = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
     function changeMonth(delta) {
       calDate.setMonth(calDate.getMonth() + delta);
       renderCalendar();
+    }
+
+    function selectDate(day) {
+      var year = calDate.getFullYear();
+      var month = calDate.getMonth();
+      selectedCalDate = new Date(year, month, day);
+
+      // Format: "January 15, 2025"
+      var dateStr = MONTHS[month] + ' ' + day + ', ' + year;
+
+      // Prepend to textarea so Claude picks it up
+      var ta = document.getElementById('postText');
+      var existing = ta.value;
+      if (existing.trim()) {
+        ta.value = '[Date: ' + dateStr + ']\\n\\n' + existing;
+      } else {
+        ta.value = '[Date: ' + dateStr + ']\\n\\n';
+      }
+
+      // Show toast
+      var toast = document.getElementById('dateToast');
+      toast.textContent = dateStr + ' inserted into post';
+      toast.style.display = 'block';
+      toast.style.animation = 'none';
+      toast.offsetHeight; // trigger reflow
+      toast.style.animation = 'fadeOut 2s forwards';
+
+      renderCalendar();
+      ta.focus();
     }
 
     function renderCalendar() {
@@ -595,13 +932,22 @@ function getFacebookSubmitterHtml() {
       }
       for (var d = 1; d <= daysInMonth; d++) {
         var isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
-        html += '<div class="day' + (isToday ? ' today' : '') + '">' + d + '</div>';
+        var isSelected = selectedCalDate && d === selectedCalDate.getDate() && month === selectedCalDate.getMonth() && year === selectedCalDate.getFullYear();
+        var cls = 'day';
+        if (isSelected) cls += ' selected';
+        else if (isToday) cls += ' today';
+        html += '<div class="' + cls + '" onclick="selectDate(' + d + ')">' + d + '</div>';
       }
 
       document.getElementById('calGrid').innerHTML = html;
     }
 
+    // ═══════════════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════════════
+    loadStickyYear();
     renderCalendar();
+    document.getElementById('postText').focus();
   </script>
 </body>
 </html>`;

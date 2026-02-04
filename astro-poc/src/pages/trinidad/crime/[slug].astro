@@ -1,14 +1,10 @@
 ---
 /**
- * Individual Crime Page
- * HYBRID MODE: Recent crimes (90 days) pre-rendered at build time, older crimes SSR on-demand
- * - Recent crimes: Static → Fast LCP (500-1,500ms)
- * - Old crimes: SSR → Cached by Cloudflare (2,000-8,000ms, acceptable for low traffic)
+ * Individual Crime Page — Full SSR with Cloudflare CDN caching
+ * All crime pages are server-rendered on request, then cached at Cloudflare's edge for 24h.
+ * This ensures ALL crime pages (new and old) are accessible and indexed by Google.
  * URL: /trinidad/crime/murder-port-of-spain-2025-12-10
  */
-
-// Enable pre-rendering for paths returned by getStaticPaths()
-export const prerender = true;
 
 import Layout from '../../../layouts/Layout.astro';
 import { getTrinidadCrimes, type Crime } from '../../../lib/crimeData';
@@ -23,81 +19,32 @@ import { loadAreaAliases, getLocalName } from '../../../lib/areaAliases';
 import { getCountryName } from '../../../data/countries';
 import { getSafetyContext } from '../../../lib/safetyHelpers';
 
-/**
- * Pre-render recent crimes (last 90 days) at build time
- * This function tells Astro which pages to generate statically
- * Older crimes will fallback to SSR when accessed
- */
-export async function getStaticPaths() {
-  const crimes = await getTrinidadCrimes();
+// Fetch all crimes once per request (used for slug lookup, navigation, and safety context)
+const { slug } = Astro.params;
+const allCrimes = await getTrinidadCrimes();
+const crime = allCrimes.find(c => c.slug === slug);
 
-  // Calculate 90 days ago from build time
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-
-  // Filter to only crimes from last 90 days
-  const recentCrimes = crimes.filter(c => c.dateObj >= ninetyDaysAgo);
-
-  console.log(`Building ${recentCrimes.length} recent crime pages (last 90 days)`);
-  console.log(`${crimes.length - recentCrimes.length} older crimes will use SSR on-demand`);
-
-  // Sort crimes by date (newest first) for sequential navigation
-  const sortedCrimes = recentCrimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
-
-  return sortedCrimes.map((crime, index) => {
-    // Get previous (newer) and next (older) crimes
-    const prevCrime = index > 0 ? sortedCrimes[index - 1] : null;
-    const nextCrime = index < sortedCrimes.length - 1 ? sortedCrimes[index + 1] : null;
-
-    return {
-      params: { slug: crime.slug },
-      props: {
-        crime,
-        prevCrime,
-        nextCrime
-      }
-    };
-  });
+// Return proper 404 for unknown slugs
+if (!crime) {
+  return new Response(null, { status: 404, statusText: 'Not Found' });
 }
 
-// SSR FALLBACK: For crimes older than 90 days (not in getStaticPaths)
-// This code runs when someone accesses an old crime via direct URL
-const { crime: staticCrime, prevCrime: staticPrevCrime, nextCrime: staticNextCrime } = Astro.props;
-
-let crime, prevCrime, nextCrime;
-
-if (staticCrime) {
-  // Static pre-rendered page (fast path - last 90 days)
-  crime = staticCrime;
-  prevCrime = staticPrevCrime;
-  nextCrime = staticNextCrime;
-} else {
-  // SSR fallback for older crimes (slow path)
-  const { slug } = Astro.params;
-  const crimes = await getTrinidadCrimes();
-  crime = crimes.find(c => c.slug === slug);
-
-  // Handle 404 if crime not found
-  if (!crime) {
-    return Astro.redirect('/404');
-  }
-
-  // Sort crimes by date (newest first) for sequential navigation
-  const sortedCrimes = crimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
-  const crimeIndex = sortedCrimes.findIndex(c => c.slug === slug);
-
-  // Get previous (newer) and next (older) crimes
-  prevCrime = crimeIndex > 0 ? sortedCrimes[crimeIndex - 1] : null;
-  nextCrime = crimeIndex < sortedCrimes.length - 1 ? sortedCrimes[crimeIndex + 1] : null;
-}
+// Sort for prev/next navigation
+const sortedCrimes = [...allCrimes].sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
+const crimeIndex = sortedCrimes.findIndex(c => c.slug === slug);
+const prevCrime = crimeIndex > 0 ? sortedCrimes[crimeIndex - 1] : null;
+const nextCrime = crimeIndex < sortedCrimes.length - 1 ? sortedCrimes[crimeIndex + 1] : null;
 
 // Load area aliases for tooltip
 const areaAliases = await loadAreaAliases();
 const localName = getLocalName(areaAliases, crime.area);
 
-// Calculate safety context for this area
-const allCrimes = await getTrinidadCrimes();
+// Calculate safety context for this area (reuses allCrimes — no duplicate fetch)
 const safetyContext = getSafetyContext(crime.area, allCrimes);
+
+// CDN cache: Cloudflare caches SSR response for 24h, browser caches for 1h
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=86400');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
 // Truncate headline for breadcrumbs (first 3-5 words)
 const truncatedHeadline = crime.headline.split(' ').slice(0, 5).join(' ') + (crime.headline.split(' ').length > 5 ? '...' : '');

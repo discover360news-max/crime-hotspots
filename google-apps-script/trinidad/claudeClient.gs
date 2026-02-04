@@ -402,7 +402,7 @@ function buildUserPrompt(articleText, articleTitle, publishedDate, skipExclusion
   const dayOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][pubDate.getDay()];
 
   const manualOverride = skipExclusions
-    ? '\n\nIMPORTANT: This is a CONFIRMED manual crime submission. SKIP all exclusion rules (traffic accidents, police shootings, etc). Extract the crime data regardless. Always return at least one crime object with confidence 7+.'
+    ? '\n\nCRITICAL OVERRIDE — MANUAL SUBMISSION: This post was manually submitted by the operator. You MUST extract at least one crime object. ALL exclusion rules are SUSPENDED — this includes police operations, seizures, police shootings, traffic accidents, follow-ups, and any other exclusion. Seizures of guns/drugs/ammunition/marijuana ARE crimes to extract (use crime type "Seizures"). Police operations ARE crimes to extract. Do NOT return an empty crimes array. Always return confidence 7+.'
     : '';
 
   return `PUBLISHED: ${pubDateStr} (${dayOfWeek})
