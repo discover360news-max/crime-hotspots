@@ -109,7 +109,7 @@ const { isHomepage = false } = Astro.props;
 
     <!-- Quick Access Pills (horizontal scroll) - MOBILE ONLY -->
     <div class="bg-white md:hidden">
-      <div class="relative">
+      <div class="relative overflow-hidden">
         <div id="pillsContainer" class="flex items-center gap-2 py-2.5 overflow-x-auto snap-x snap-mandatory hide-scrollbar px-4">
           <a href="/report"
              class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-rose-600 text-rose-600 hover:bg-rose-700 active:bg-rose-800 transition text-xs font-medium whitespace-nowrap">
@@ -167,7 +167,7 @@ const { isHomepage = false } = Astro.props;
 <div id="subscribeBackdrop" class="fixed inset-0 bg-white/25 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" data-pagefind-ignore></div>
 
 <!-- Subscribe tray -->
-<div id="subscribeTray" class="fixed top-0 right-0 bottom-0 w-80 bg-white/25 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto" data-pagefind-ignore>
+<div id="subscribeTray" class="fixed top-0 right-0 bottom-0 w-80 bg-white/25 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full invisible transition-transform duration-300 ease-out overflow-y-auto" data-pagefind-ignore>
   <div class="p-6">
     <div class="flex items-center justify-between mb-8">
       <h2 class="text-h3 font-bold text-slate-800">Follow Us</h2>
@@ -234,7 +234,7 @@ const { isHomepage = false } = Astro.props;
 <div id="mobileMenuBackdrop" class="fixed inset-0 bg-white/25 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 md:hidden" data-pagefind-ignore></div>
 
 <!-- Mobile menu overlay -->
-<nav id="mobileNav" class="fixed top-0 right-0 bottom-0 w-72 bg-white/25 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full transition-transform duration-300 ease-out md:hidden overflow-y-auto" role="navigation" aria-label="Mobile menu" data-pagefind-ignore>
+<nav id="mobileNav" class="fixed top-0 right-0 bottom-0 w-72 bg-white/25 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full invisible transition-transform duration-300 ease-out md:hidden overflow-y-auto" role="navigation" aria-label="Mobile menu" data-pagefind-ignore>
   <div class="p-6">
     <div class="flex items-center justify-end mb-8">
       <button id="mobileMenuClose" class="p-2 rounded-full text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-all" aria-label="Close menu">
@@ -322,7 +322,7 @@ const { isHomepage = false } = Astro.props;
   function openMobileMenu() {
     if (!mobileBackdrop || !mobileNav || !menuToggle) return;
     mobileBackdrop.classList.remove('hidden');
-    mobileNav.classList.remove('translate-x-full');
+    mobileNav.classList.remove('translate-x-full', 'invisible');
     mobileNav.classList.add('translate-x-0');
     document.body.style.overflow = 'hidden';
 
@@ -344,6 +344,7 @@ const { isHomepage = false } = Astro.props;
 
     setTimeout(() => {
       mobileBackdrop.classList.add('hidden');
+      mobileNav.classList.add('invisible');
     }, 300);
 
     menuToggle.setAttribute('aria-expanded', 'false');
@@ -388,7 +389,7 @@ const { isHomepage = false } = Astro.props;
   function openSubscribeTray() {
     if (!subscribeBackdrop || !subscribeTray) return;
     subscribeBackdrop.classList.remove('hidden');
-    subscribeTray.classList.remove('translate-x-full');
+    subscribeTray.classList.remove('translate-x-full', 'invisible');
     subscribeTray.classList.add('translate-x-0');
     document.body.style.overflow = 'hidden';
 
@@ -408,6 +409,7 @@ const { isHomepage = false } = Astro.props;
 
     setTimeout(() => {
       subscribeBackdrop.classList.add('hidden');
+      subscribeTray.classList.add('invisible');
     }, 300);
   }
 

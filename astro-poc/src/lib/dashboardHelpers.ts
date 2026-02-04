@@ -97,6 +97,7 @@ export const calculateInsights = (crimeData: Crime[]) => {
 
   // Average crimes per day
   const avgPerDay = (totalCrimes / daysDiff).toFixed(1);
+  const victimsPerDay = Math.round(totalVictims / daysDiff);
 
   // Most dangerous day of week
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -139,7 +140,7 @@ export const calculateInsights = (crimeData: Crime[]) => {
 
   return {
     avgPerDay,
-    totalVictims,
+    victimsPerDay,
     mostDangerousDay,
     busiestMonth,
     safestRegion,

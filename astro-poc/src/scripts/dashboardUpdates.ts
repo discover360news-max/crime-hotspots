@@ -296,7 +296,7 @@ export function updateQuickInsights(crimes: Crime[]) {
   // If no crimes, show "No data" message
   if (crimes.length === 0) {
     const avgPerDayEl = document.getElementById('avgPerDay');
-    const totalVictimsEl = document.getElementById('totalVictims');
+    const victimsPerDayEl = document.getElementById('victimsPerDay');
     const mostDangerousDayEl = document.getElementById('mostDangerousDay');
     const busiestMonthEl = document.getElementById('busiestMonth');
     const top3PercentageEl = document.getElementById('top3Percentage');
@@ -306,7 +306,7 @@ export function updateQuickInsights(crimes: Crime[]) {
     const safestRegionCountEl = document.getElementById('safestRegionCount');
 
     if (avgPerDayEl) avgPerDayEl.textContent = 'No data';
-    if (totalVictimsEl) totalVictimsEl.textContent = '0 total victims';
+    if (victimsPerDayEl) victimsPerDayEl.textContent = '0 victims/day';
     if (mostDangerousDayEl) mostDangerousDayEl.textContent = 'N/A';
     if (busiestMonthEl) busiestMonthEl.textContent = 'N/A';
     if (top3PercentageEl) top3PercentageEl.textContent = 'N/A';
@@ -355,6 +355,7 @@ export function updateQuickInsights(crimes: Crime[]) {
   }, 0);
 
   const avgPerDay = (totalCrimes / daysDiff).toFixed(1);
+  const victimsPerDay = Math.round(totalVictims / daysDiff);
 
   // Most dangerous day
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -393,7 +394,7 @@ export function updateQuickInsights(crimes: Crime[]) {
 
   // Update DOM using IDs
   const avgPerDayEl = document.getElementById('avgPerDay');
-  const totalVictimsEl = document.getElementById('totalVictims');
+  const victimsPerDayEl = document.getElementById('victimsPerDay');
   const mostDangerousDayEl = document.getElementById('mostDangerousDay');
   const busiestMonthEl = document.getElementById('busiestMonth');
   const top3PercentageEl = document.getElementById('top3Percentage');
@@ -403,7 +404,7 @@ export function updateQuickInsights(crimes: Crime[]) {
   const safestRegionCountEl = document.getElementById('safestRegionCount');
 
   if (avgPerDayEl) avgPerDayEl.textContent = `${avgPerDay} crimes/day`;
-  if (totalVictimsEl) totalVictimsEl.textContent = `${totalVictims} total victims`;
+  if (victimsPerDayEl) victimsPerDayEl.textContent = `${victimsPerDay} victims/day`;
   if (mostDangerousDayEl) mostDangerousDayEl.textContent = mostDangerousDay;
   if (busiestMonthEl) busiestMonthEl.textContent = busiestMonth;
   if (top3PercentageEl) top3PercentageEl.textContent = `Top 3 areas: ${top3Percentage}%`;

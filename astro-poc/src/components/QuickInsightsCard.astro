@@ -8,7 +8,7 @@
 interface Props {
   insights: {
     avgPerDay: string;
-    totalVictims: number;
+    victimsPerDay: number;
     mostDangerousDay: string;
     busiestMonth: string;
     top3Percentage: string;
@@ -28,7 +28,7 @@ const dangerousSlug = generateNameSlug(insights.mostDangerousRegion);
 const safestSlug = generateNameSlug(insights.safestRegion);
 ---
 
-<div id="quickInsightsCard" class="bg-white/70 backdrop-blur-md rounded-lg p-4 shadow-md">
+<div id="quickInsightsCard" class="bg-white/85 backdrop-blur-md rounded-lg p-4 shadow-md">
   <h3 id="quickInsightsTitle" class="text-h3 font-bold text-slate-600 mb-4">Quick Insights</h3>
 
   <!-- 2x2 Grid Layout (Always 2 columns, even on mobile) -->
@@ -41,7 +41,7 @@ const safestSlug = generateNameSlug(insights.safestRegion);
       <div class="flex-1 min-w-0">
         <div class="text-xs text-slate-500 mb-1">Daily Avg</div>
         <div id="avgPerDay" class="text-sm md:text-lg font-bold text-slate-600 break-words">{insights.avgPerDay} crimes/day</div>
-        <div id="totalVictims" class="text-xs text-slate-500 mt-0.5">{insights.totalVictims} total victims</div>
+        <div id="victimsPerDay" class="text-xs text-slate-500 mt-0.5">{insights.victimsPerDay} victims/day</div>
       </div>
     </div>
 

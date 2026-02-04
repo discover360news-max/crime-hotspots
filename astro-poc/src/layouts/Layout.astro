@@ -34,7 +34,7 @@ const isHomepage = Astro.url.pathname === '/';
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="overflow-x-clip">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -232,7 +232,7 @@ const isHomepage = Astro.url.pathname === '/';
   }
 </style>
 
-<body class="bg-slate-100 text-slate-700 min-h-screen font-sans">
+<body class="bg-slate-100 text-slate-700 min-h-screen font-sans overflow-x-hidden">
   <!-- Header Component -->
   <Header isHomepage={isHomepage} />
 
@@ -263,7 +263,7 @@ const isHomepage = Astro.url.pathname === '/';
   </main>
 
   <!-- Footer -->
-  <footer class="bg-white/50 border-t border-slate-200 mt-30" data-pagefind-ignore>
+  <footer class="bg-white/85 border-t border-slate-200 mt-30" data-pagefind-ignore>
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
         <!-- About -->

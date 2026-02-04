@@ -26,6 +26,29 @@ export function initializeStatsScroll(
         }
       }, { passive: false }); // passive: false allows preventDefault()
 
+      // Hide scroll hint when scrolled to end
+      const scrollHint = document.getElementById('statsScrollHint');
+      if (scrollHint) {
+        function checkStatsScroll() {
+          const el = statsContainer as HTMLElement;
+          // Don't show hint while shimmer is still visible (content opacity is 0)
+          if (el.style.opacity === '0' || el.style.opacity === '') return;
+
+          const isScrollable = el.scrollWidth > el.clientWidth;
+          const isAtEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
+
+          if (!isScrollable || isAtEnd) {
+            scrollHint!.style.opacity = '0';
+          } else {
+            scrollHint!.style.opacity = '1';
+          }
+        }
+
+        (statsContainer as HTMLElement).addEventListener('scroll', checkStatsScroll);
+        window.addEventListener('resize', checkStatsScroll);
+        setTimeout(checkStatsScroll, 100);
+      }
+
       console.log('✅ Stats horizontal scroll initialized');
     } else {
       console.warn('⚠️ Stats scroll elements not found');

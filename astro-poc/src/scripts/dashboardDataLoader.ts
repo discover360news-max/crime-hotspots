@@ -233,6 +233,10 @@ export async function initializeDashboardData(): Promise<void> {
     shimmerStartTime
   );
 
+  // Show stats scroll hint after shimmer is hidden
+  const statsScrollHint = document.getElementById('statsScrollHint');
+  if (statsScrollHint) statsScrollHint.style.opacity = '1';
+
   await hideShimmerWithMinTime(
     document.getElementById('insightsShimmer'),
     document.getElementById('insightsCards'),
