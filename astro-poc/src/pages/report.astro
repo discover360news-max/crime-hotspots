@@ -407,6 +407,8 @@ const description = "Help build safer communities: report crime anonymously via 
           if (exploreBtn && country) {
             exploreBtn.textContent = `Explore ${country.name}`;
             exploreBtn.addEventListener("click", () => {
+              // Hide success screen so modal is visible above it
+              successScreen.classList.add("hidden");
               (window as any).openSectionPickerModal(countryId, country.name);
             });
           }
