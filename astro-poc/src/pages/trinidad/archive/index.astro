@@ -48,8 +48,17 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
       { label: 'Archive' }
     ]} />
 
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+      <h1 class="text-display text-slate-700 mb-2">Crime Archives</h1>
+      <p class="text-display font-bold text-rose-600">Trinidad & Tobago</p>
+      <p class="text-xs text-slate-500 mt-2">
+        Browse {crimes.length} crime incidents organized by month
+      </p>
+    </div>
+
     <!-- Navigation Buttons -->
-    <div class="flex gap-2 mb-6">
+    <div class="flex justify-center gap-2 mb-8">
       <a
         href={routes.trinidad.dashboard}
         class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap"
@@ -62,15 +71,6 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
       >
         Headlines
       </a>
-    </div>
-
-    <!-- Page Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-display text-slate-700 mb-2">Crime Archives</h1>
-      <p class="text-display font-bold text-rose-600">Trinidad & Tobago</p>
-      <p class="text-xs text-slate-500 mt-2">
-        Browse {crimes.length} crime incidents organized by month
-      </p>
     </div>
 
     <!-- Site Notification Banner -->

@@ -67,7 +67,7 @@ const sortedRegions = Array.from(regionGroups.entries())
   .sort((a, b) => a[0].localeCompare(b[0]))
   .map(([region, areas]) => ({
     region,
-    areas: areas.sort((a, b) => b.crimeCount90d - a.crimeCount90d),
+    areas: areas.sort((a, b) => a.name.localeCompare(b.name)),
     totalCrimes: areas.reduce((sum, a) => sum + a.crimeCount90d, 0),
   }));
 
@@ -97,9 +97,9 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
       secondaryCTA={{ text: 'View Regions', href: '/trinidad/regions/', icon: 'arrow' }}
     />
 
-    <!-- Search/Filter -->
-    <div class="mt-6 mb-6">
-      <div class="relative">
+    <!-- Search/Filter + Sort -->
+    <div class="mt-6 mb-6 flex flex-col sm:flex-row gap-3">
+      <div class="relative flex-1">
         <input
           type="text"
           id="areaSearch"
@@ -109,6 +109,19 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
+      </div>
+      <div class="flex items-center gap-1 self-end sm:self-center">
+        <span class="text-xs text-slate-500 mr-1">Sort:</span>
+        <button
+          id="sortAZ"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-rose-600 text-white"
+          title="Sort alphabetically"
+        >A–Z</button>
+        <button
+          id="sortCrime"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition border border-slate-300 text-slate-600 hover:bg-slate-50"
+          title="Sort by crime count"
+        >Most incidents</button>
       </div>
     </div>
 
@@ -138,6 +151,7 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
                 class="area-card block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-md transition group"
                 data-area={area.name.toLowerCase()}
                 data-known-as={area.knownAs?.toLowerCase() || ''}
+                data-crime-count={area.crimeCount90d}
               >
                 <div class="flex items-start justify-between mb-2">
                   <div class="flex-1 min-w-0">
@@ -182,6 +196,44 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
   const searchInput = document.getElementById('areaSearch');
   const regionContainer = document.getElementById('regionContainer');
   const noResults = document.getElementById('noResults');
+  const sortAZ = document.getElementById('sortAZ');
+  const sortCrime = document.getElementById('sortCrime');
+
+  const activeClass = 'bg-rose-600 text-white';
+  const inactiveClass = 'border border-slate-300 text-slate-600 hover:bg-slate-50';
+
+  function setActiveSort(activeBtn, inactiveBtn) {
+    activeBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' + activeClass;
+    inactiveBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' + inactiveClass;
+  }
+
+  function sortCards(mode) {
+    if (!regionContainer) return;
+    const groups = regionContainer.querySelectorAll('.region-group');
+    groups.forEach(function(group) {
+      var grid = group.querySelector('.grid');
+      if (!grid) return;
+      var cards = Array.from(grid.querySelectorAll('.area-card'));
+      cards.sort(function(a, b) {
+        if (mode === 'az') {
+          return (a.getAttribute('data-area') || '').localeCompare(b.getAttribute('data-area') || '');
+        }
+        return (parseInt(b.getAttribute('data-crime-count')) || 0) - (parseInt(a.getAttribute('data-crime-count')) || 0);
+      });
+      cards.forEach(function(card) { grid.appendChild(card); });
+    });
+  }
+
+  if (sortAZ && sortCrime) {
+    sortAZ.addEventListener('click', function() {
+      setActiveSort(sortAZ, sortCrime);
+      sortCards('az');
+    });
+    sortCrime.addEventListener('click', function() {
+      setActiveSort(sortCrime, sortAZ);
+      sortCards('crime');
+    });
+  }
 
   if (searchInput && regionContainer && noResults) {
     searchInput.addEventListener('input', function() {
