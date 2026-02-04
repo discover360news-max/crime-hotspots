@@ -18,6 +18,7 @@ import { getTrinidadCrimes, type Crime } from '../../../../lib/crimeData';
 import { dataUpdateNotice } from '../../../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../../../lib/areaAliases';
 import { getCountryName } from '../../../../data/countries';
+import { routes, buildRoute } from '../../../../config/routes';
 
 export async function getStaticPaths() {
   const crimes = await getTrinidadCrimes();
@@ -171,9 +172,9 @@ const insights = {
 
 // Breadcrumbs
 const breadcrumbs = [
-  { label: 'Home', href: '/' },
-  { label: getCountryName('tt'), href: '/trinidad/dashboard/' },
-  { label: 'Archive', href: '/trinidad/archive/' },
+  { label: 'Home', href: routes.home },
+  { label: getCountryName('tt'), href: routes.trinidad.dashboard },
+  { label: 'Archive', href: routes.trinidad.archive },
   { label: String(year), href: `/trinidad/archive/${year}/` },
   { label: monthName }
 ];
@@ -187,13 +188,13 @@ const breadcrumbs = [
     <!-- Navigation Buttons -->
     <div class="flex gap-2 mb-6">
       <a
-        href="/trinidad/dashboard/"
+        href={routes.trinidad.dashboard}
         class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap"
       >
         Dashboard
       </a>
       <a
-        href="/trinidad/headlines/"
+        href={routes.trinidad.headlines}
         class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap"
       >
         Headlines
@@ -315,7 +316,7 @@ const breadcrumbs = [
               )}
 
               <div class="flex items-center justify-between pt-3 border-t border-slate-200">
-                <a href={`/trinidad/crime/${crime.slug}`} class="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1">
+                <a href={buildRoute.crime(crime.slug)} class="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1">
                   View Details
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

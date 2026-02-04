@@ -18,6 +18,7 @@ import { getTrinidadCrimes, type Crime } from '../../lib/crimeData';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../lib/areaAliases';
 import { getCountryName } from '../../data/countries';
+import { routes, buildRoute } from '../../config/routes';
 
 // Fetch all crimes (server-side) - include all years for filtering
 const allCrimes = await getTrinidadCrimes();
@@ -66,8 +67,8 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
 
 // Breadcrumbs
 const breadcrumbs = [
-  { label: 'Home', href: '/' },
-  { label: getCountryName('tt'), href: '/trinidad/dashboard/' },
+  { label: 'Home', href: routes.home },
+  { label: getCountryName('tt'), href: routes.trinidad.dashboard },
   { label: 'Headlines' }
 ];
 ---
@@ -85,7 +86,7 @@ const breadcrumbs = [
     compact={true}
     primaryCTA={{
       text: "Dashboard",
-      href: "/trinidad/dashboard/",
+      href: routes.trinidad.dashboard,
       icon: "dashboard"
     }}
   >
@@ -105,9 +106,9 @@ const breadcrumbs = [
     <!-- Results Count -->
     <div class="mb-6 text-xs text-rose-600 flex items-center justify-between">
       <div>
-        Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of all <a href="/trinidad/archive/" class="border-b border-dotted border-rose-600 hover:border-rose-700 hover:text-rose-700 transition"><span id="resultsTotal">{allCrimes.length}</span></a> listed crimes
+        Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of all <a href={routes.trinidad.archive} class="border-b border-dotted border-rose-600 hover:border-rose-700 hover:text-rose-700 transition"><span id="resultsTotal">{allCrimes.length}</span></a> listed crimes
       </div>
-      <a href="/trinidad/archive/" class="text-rose-600 hover:text-rose-700 transition">View Archive</a>
+      <a href={routes.trinidad.archive} class="text-rose-600 hover:text-rose-700 transition">View Archive</a>
     </div>
 
     <!-- Blog Rotating Banner -->
@@ -434,6 +435,7 @@ const breadcrumbs = [
           </p>
 
           <div class="flex items-center justify-between pt-3 border-t border-slate-200">
+            <!-- Keep crime route in sync with src/config/routes.ts -->
             <a href="/trinidad/crime/${safeSlug}/" class="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1">
               View Details
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

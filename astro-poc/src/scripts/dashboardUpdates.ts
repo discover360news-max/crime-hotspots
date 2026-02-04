@@ -6,6 +6,7 @@
 
 import { usesVictimCount } from '../config/crimeTypeConfig';
 import { getRiskWeight } from '../config/riskWeights';
+import { buildRoute } from '../config/routes';
 
 /** Client-side slug generator (mirrors generateNameSlug from crimeData.ts) */
 function toAreaSlug(name: string): string {
@@ -412,13 +413,13 @@ export function updateQuickInsights(crimes: Crime[]) {
   if (mostDangerousRegionEl) {
     mostDangerousRegionEl.textContent = mostDangerousRegion;
     const dangerousLink = mostDangerousRegionEl.closest('a');
-    if (dangerousLink) dangerousLink.href = `/trinidad/area/${toAreaSlug(mostDangerousRegion)}`;
+    if (dangerousLink) dangerousLink.href = buildRoute.area(toAreaSlug(mostDangerousRegion));
   }
   if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = `${mostDangerousRegionCount} incidents`;
   if (safestRegionEl) {
     safestRegionEl.textContent = safestRegion;
     const safestLink = safestRegionEl.closest('a');
-    if (safestLink) safestLink.href = `/trinidad/area/${toAreaSlug(safestRegion)}`;
+    if (safestLink) safestLink.href = buildRoute.area(toAreaSlug(safestRegion));
   }
   if (safestRegionCountEl) safestRegionCountEl.textContent = `${safestRegionCount} incidents`;
 
@@ -476,7 +477,7 @@ export function updateTopRegions(crimes: Crime[]) {
     const riskTextColor = getRiskTextColor(riskPercentage);
     const areaSlug = toAreaSlug(area);
     return `
-    <a href="/trinidad/area/${areaSlug}/" class="flex flex-col gap-1 pb-3 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-50 rounded-lg px-2 -mx-2 py-2 transition">
+    <a href="${buildRoute.area(areaSlug)}" class="flex flex-col gap-1 pb-3 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-50 rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
         <span class="text-xs text-slate-500 truncate flex-1 underline decoration-slate-300 underline-offset-2">${renderAreaName(area)}</span>
         <div class="flex items-center gap-1.5 flex-shrink-0">

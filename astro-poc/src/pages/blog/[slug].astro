@@ -10,6 +10,7 @@ export const prerender = true;
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { routes } from '../../config/routes';
 
 export async function getStaticPaths() {
   const blogPosts = await getCollection('blog');
@@ -36,13 +37,13 @@ function formatDate(date: Date) {
 
 // Determine dashboard link based on country
 const dashboardLink = post.data.country === 'tt'
-  ? '/trinidad/dashboard/'
+  ? routes.trinidad.dashboard
   : '/guyana/dashboard/';
 
 // Breadcrumb items
 const breadcrumbItems = [
-  { label: 'Home', href: '/' },
-  { label: 'Blog', href: '/blog/' },
+  { label: 'Home', href: routes.home },
+  { label: 'Blog', href: routes.blog },
   { label: post.data.title }
 ];
 
@@ -320,7 +321,7 @@ const blogPostingSchema = {
 
       <!-- Back to Blog -->
       <div class="mt-6 sm:mt-8">
-        <a href="/blog/" class="text-rose-600 hover:text-rose-700 font-medium text-small">
+        <a href={routes.blog} class="text-rose-600 hover:text-rose-700 font-medium text-small">
           ← Back to Blog
         </a>
       </div>

@@ -6,6 +6,7 @@
 
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { routes } from '../config/routes';
 
 const title = "FAQ — Crime Hotspots Caribbean | Frequently Asked Questions";
 const description = "Answers to frequently asked questions about Crime Hotspots Caribbean. Learn about our data sources, update frequency, platform usage, and privacy policies.";
@@ -119,7 +120,7 @@ const allQuestions = faqData.flatMap(category => category.questions);
 
   <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-12">
     <Breadcrumbs items={[
-      { label: 'Home', href: '/' },
+      { label: 'Home', href: routes.home },
       { label: 'FAQ' }
     ]} />
     <h1 class="text-h1 text-slate-700 font-semibold mb-3 text-center pt-4">Frequently Asked Questions</h1>
@@ -152,12 +153,12 @@ const allQuestions = faqData.flatMap(category => category.questions);
                   {item.answer}
                   {item.question.includes("report crime") && (
                     <span>
-                      {' '}<a href="/report/" class="text-rose-600 hover:text-rose-700 font-medium underline">Submit a report here</a>.
+                      {' '}<a href={routes.report} class="text-rose-600 hover:text-rose-700 font-medium underline">Submit a report here</a>.
                     </span>
                   )}
                   {item.question.includes("protect privacy") && (
                     <span>
-                      {' '}<a href="/privacy/" class="text-rose-600 hover:text-rose-700 font-medium underline">Read our Privacy Policy</a>.
+                      {' '}<a href={routes.privacy} class="text-rose-600 hover:text-rose-700 font-medium underline">Read our Privacy Policy</a>.
                     </span>
                   )}
                 </div>

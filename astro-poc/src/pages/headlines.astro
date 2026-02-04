@@ -7,6 +7,7 @@
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { COUNTRIES } from '../data/countries';
+import { routes } from '../config/routes';
 
 // Breadcrumbs
 const breadcrumbs = [
@@ -73,7 +74,7 @@ const breadcrumbs = [
       <div class="mt-12 text-center">
         <p class="text-small text-slate-500">
           Don't see your island? We're expanding coverage.
-          <a href="/report/" class="text-rose-600 hover:text-rose-700 underline">Submit a crime report</a> to help us grow.
+          <a href={routes.report} class="text-rose-600 hover:text-rose-700 underline">Submit a crime report</a> to help us grow.
         </p>
       </div>
     </div>

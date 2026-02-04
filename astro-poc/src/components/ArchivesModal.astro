@@ -5,6 +5,7 @@
  * Opens from header pills/nav instead of navigating to separate page
  */
 import { COUNTRIES } from '../data/countries';
+import { routes } from '../config/routes';
 ---
 
 <!-- Modal Overlay -->
@@ -33,7 +34,7 @@ import { COUNTRIES } from '../data/countries';
     <!-- Island Buttons -->
     <div class="p-6 space-y-3 max-h-[60vh] overflow-y-auto">
       {COUNTRIES.map((country) => {
-        const archiveUrl = country.available ? `/trinidad/archive` : null;
+        const archiveUrl = country.available ? routes.trinidad.archive : null;
         return country.available ? (
           <!-- Active Island Button -->
           <a

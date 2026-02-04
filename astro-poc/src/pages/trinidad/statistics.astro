@@ -24,6 +24,7 @@ import { getTrinidadCrimes } from '../../lib/crimeData';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
 import { getCollection } from 'astro:content';
 import { TRINIDAD_CSV_URLS } from '../../config/csvUrls';
+import { routes } from '../../config/routes';
 import {
   compareYearToDate,
   getTopRegions,
@@ -490,7 +491,7 @@ const breadcrumbData = {
           Learn how we collect, verify, and categorize crime data from verified news sources across Trinidad & Tobago.
         </p>
         <a
-          href="/methodology/"
+          href={routes.methodology}
           class="inline-flex items-center mt-3 text-sm font-medium text-rose-600 hover:text-rose-700"
         >
           View full methodology
@@ -568,19 +569,19 @@ const breadcrumbData = {
         Related Resources
       </h2>
       <div class="grid sm:grid-cols-2 gap-4">
-        <a href="/trinidad/dashboard/" class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
+        <a href={routes.trinidad.dashboard} class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
           <h3 class="font-semibold text-slate-800">Interactive Dashboard</h3>
           <p class="text-sm text-slate-500 mt-1">Map visualization, filters, and detailed crime listings</p>
         </a>
-        <a href="/trinidad/murder-count/" class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
+        <a href={routes.trinidad.murderCount} class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
           <h3 class="font-semibold text-slate-800">Murder Count 2026</h3>
           <p class="text-sm text-slate-500 mt-1">Live murder toll counter for Trinidad & Tobago</p>
         </a>
-        <a href="/blog/" class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
+        <a href={routes.blog} class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
           <h3 class="font-semibold text-slate-800">Weekly Reports</h3>
           <p class="text-sm text-slate-500 mt-1">In-depth analysis and trend reports</p>
         </a>
-        <a href="/report/" class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
+        <a href={routes.report} class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
           <h3 class="font-semibold text-slate-800">Report a Crime</h3>
           <p class="text-sm text-slate-500 mt-1">Anonymous crime reporting form</p>
         </a>

@@ -108,6 +108,7 @@ import ReportIssueModal from './ReportIssueModal.astro';
 />
 
 <script>
+  import { buildRoute } from '../config/routes';
   const backdrop = document.getElementById('crimeDetailBackdrop');
   const modal = document.getElementById('crimeDetailModal');
   const content = document.getElementById('crimeDetailContent');
@@ -523,14 +524,14 @@ import ReportIssueModal from './ReportIssueModal.astro';
     // Populate safety context + feedback toggle
     const safetyContextEl = document.getElementById('modalSafetyContext');
     if (safetyContextEl) {
-      const feedbackUrl = `https://crimehotspots.com/trinidad/crime/${crime.slug}`;
+      const feedbackUrl = buildRoute.crimeAbsolute(crime.slug);
       safetyContextEl.innerHTML = generateSafetyContextHTML(crime.area, safetyContext)
         + generateFeedbackToggleHTML(crime.area, feedbackUrl, crime.headline);
       initModalFeedbackToggle(safetyContextEl.querySelector('.feedback-toggle'));
     }
 
     // Update button links (with URL sanitization)
-    document.getElementById('modalViewFullBtn').href = `/trinidad/crime/${encodeURIComponent(crime.slug)}`;
+    document.getElementById('modalViewFullBtn').href = buildRoute.crime(encodeURIComponent(crime.slug));
     const sourceBtn = document.getElementById('modalSourceBtn');
     const safeUrl = sanitizeUrl(crime.url);
     if (safeUrl) {
@@ -541,7 +542,7 @@ import ReportIssueModal from './ReportIssueModal.astro';
     }
 
     // Store for sharing and reporting
-    currentCrimeUrl = `https://crimehotspots.com/trinidad/crime/${crime.slug}`;
+    currentCrimeUrl = buildRoute.crimeAbsolute(crime.slug);
     currentCrimeHeadline = crime.headline;
     currentCrimeData = crime; // Store full crime object for Report Issue
 
@@ -552,7 +553,7 @@ import ReportIssueModal from './ReportIssueModal.astro';
 
     // Push crime URL so back button closes modal + both Cloudflare & GA4 track the view
     originalUrl = window.location.pathname + window.location.search;
-    history.pushState({ crimeModal: true }, '', `/trinidad/crime/${crime.slug}`);
+    history.pushState({ crimeModal: true }, '', buildRoute.crime(crime.slug));
 
     requestAnimationFrame(() => {
       backdrop.classList.remove('opacity-0');

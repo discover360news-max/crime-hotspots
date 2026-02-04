@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getTrinidadCrimes } from '../lib/crimeData';
 import { getCollection } from 'astro:content';
+import { buildRoute } from '../config/routes';
 
 /**
  * Main Sitemap
@@ -44,7 +45,7 @@ export const GET: APIRoute = async () => {
     const priority = ageInDays < 30 ? 0.8 : ageInDays < 90 ? 0.6 : 0.4;
 
     return {
-      url: `trinidad/crime/${crime.slug}`,
+      url: buildRoute.crime(crime.slug).slice(1),
       lastmod: crime.dateObj.toISOString(),
       priority,
       changefreq: 'monthly' as const
@@ -59,7 +60,7 @@ export const GET: APIRoute = async () => {
     const months = [...new Set(yearCrimes.map(c => c.month))].sort((a, b) => a - b);
     for (const month of months) {
       archivePages.push({
-        url: `trinidad/archive/${year}/${String(month).padStart(2, '0')}`,
+        url: buildRoute.archive(Number(year), String(month).padStart(2, '0')).slice(1),
         lastmod: new Date().toISOString(),
         priority: year === years[0] ? 0.7 : 0.5,
         changefreq: 'weekly' as const
@@ -69,7 +70,7 @@ export const GET: APIRoute = async () => {
 
   // Blog posts
   const blogPages = blogPosts.map(post => ({
-    url: `blog/${post.slug}`,
+    url: buildRoute.blogPost(post.slug).slice(1),
     lastmod: post.data.pubDate?.toISOString() || new Date().toISOString(),
     priority: 0.7,
     changefreq: 'monthly' as const

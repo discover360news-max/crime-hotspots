@@ -12,6 +12,7 @@ export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { routes } from '../../config/routes';
 import { getTrinidadCrimes, generateNameSlug } from '../../lib/crimeData';
 import { loadFullAreaData } from '../../lib/areaAliases';
 import { getSafetyContext } from '../../lib/safetyHelpers';
@@ -73,8 +74,8 @@ const pageTitle = 'Compare Areas - Trinidad Crime Statistics | Crime Hotspots';
 const pageDescription = 'Compare crime statistics between any two areas in Trinidad & Tobago. Side-by-side safety scores and crime breakdowns.';
 
 const breadcrumbs = [
-  { label: 'Home', href: '/' },
-  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
+  { label: 'Home', href: routes.home },
+  { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
   { label: 'Compare Areas' },
 ];
 ---
@@ -129,6 +130,7 @@ const breadcrumbs = [
 </Layout>
 
 <script is:inline define:vars={{ availableAreas, areaStatsMap }}>
+  // Area links: keep in sync with src/config/routes.ts
   const selectA = document.getElementById('selectA');
   const selectB = document.getElementById('selectB');
   const resultsEl = document.getElementById('comparisonResults');

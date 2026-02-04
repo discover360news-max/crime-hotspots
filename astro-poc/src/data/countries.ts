@@ -2,6 +2,7 @@
  * Countries configuration for Crime Hotspots
  * Currently focusing on Trinidad & Tobago only
  */
+import { routes } from '../config/routes';
 
 export interface CountrySection {
   id: string;
@@ -29,18 +30,18 @@ export const COUNTRIES: Country[] = [
     short: 'Nationwide coverage',
     csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv",
     available: true,
-    headlinesUrl: '/trinidad/headlines',
-    dashboardUrl: '/trinidad/dashboard',
-    areasUrl: '/trinidad/areas',
+    headlinesUrl: routes.trinidad.headlines,
+    dashboardUrl: routes.trinidad.dashboard,
+    areasUrl: routes.trinidad.areas,
     sections: [
-      { id: 'dashboard', label: 'Dashboard', description: 'Interactive map and crime statistics overview', url: '/trinidad/dashboard' },
-      { id: 'headlines', label: 'Headlines', description: 'Latest crime news and reports', url: '/trinidad/headlines' },
-      { id: 'archive', label: 'Archive', description: 'Historical crime data records', url: '/trinidad/archive' },
-      { id: 'areas', label: 'Areas', description: 'Crime data by area and neighbourhood', url: '/trinidad/areas' },
-      { id: 'compare', label: 'Compare', description: 'Year-over-year crime comparisons', url: '/trinidad/compare' },
-      { id: 'statistics', label: 'Statistics', description: 'Detailed crime breakdowns and trends', url: '/trinidad/statistics' },
-      { id: 'regions', label: 'Regions', description: 'Regional crime analysis', url: '/trinidad/regions' },
-      { id: 'murder-count', label: 'Murder Count', description: 'Live murder count tracker', url: '/trinidad/murder-count' },
+      { id: 'dashboard', label: 'Dashboard', description: 'Interactive map and crime statistics overview', url: routes.trinidad.dashboard },
+      { id: 'headlines', label: 'Headlines', description: 'Latest crime news and reports', url: routes.trinidad.headlines },
+      { id: 'archive', label: 'Archive', description: 'Historical crime data records', url: routes.trinidad.archive },
+      { id: 'areas', label: 'Areas', description: 'Crime data by area and neighbourhood', url: routes.trinidad.areas },
+      { id: 'compare', label: 'Compare', description: 'Year-over-year crime comparisons', url: routes.trinidad.compare },
+      { id: 'statistics', label: 'Statistics', description: 'Detailed crime breakdowns and trends', url: routes.trinidad.statistics },
+      { id: 'regions', label: 'Regions', description: 'Regional crime analysis', url: routes.trinidad.regions },
+      { id: 'murder-count', label: 'Murder Count', description: 'Live murder count tracker', url: routes.trinidad.murderCount },
     ],
   },
   {

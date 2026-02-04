@@ -6,6 +6,7 @@
  */
 
 import { getCollection } from 'astro:content';
+import { routes } from '../config/routes';
 
 interface Props {
   country: 'tt' | 'gy'; // Country code to filter blog posts
@@ -28,7 +29,7 @@ if (latestPosts.length === 0) return null;
   class="blog-rotating-banner border border-slate-600 rounded-lg px-3 py-1 md:px-4 md:py-2 mb-4 overflow-hidden"
   data-post-count={latestPosts.length}
 >
-  <a href="/blog/" class="flex items-center gap-2 md:gap-3 group">
+  <a href={routes.blog} class="flex items-center gap-2 md:gap-3 group">
     <!-- Horn Icon -->
     <div class="flex-shrink-0">
       <svg
