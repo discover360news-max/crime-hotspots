@@ -32,11 +32,47 @@
   text-anchor: middle;
 }
 
+/* Map container expand/collapse transition */
+#mapContainer {
+  transition: height 400ms ease-in-out;
+  overflow: hidden;
+}
+
+#mapContainer.map-expanded {
+  height: 80vh;
+}
+
 /* Fix map z-index to stay below header and allow vertical scroll */
 #leafletMap {
   z-index: 1 !important;
   position: relative;
+  height: 100% !important; /* Fill parent container (expand/collapse controlled by #mapContainer) */
   touch-action: pan-y pinch-zoom; /* Allow vertical scroll and two-finger zoom */
+}
+
+/* Expand/collapse button styling */
+.leaflet-control-expand {
+  background: white;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px !important;
+  cursor: pointer;
+}
+
+.leaflet-control-expand a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: #334155;
+  text-decoration: none;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.leaflet-control-expand a:hover {
+  background: #f1f5f9;
+  border-radius: 6px;
 }
 
 .leaflet-pane,

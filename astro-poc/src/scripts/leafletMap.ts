@@ -66,6 +66,81 @@ function getCrimeIcon(crimeType: string) {
 }
 
 /**
+ * SVG icons for expand/collapse button
+ */
+const EXPAND_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`;
+
+const COLLAPSE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`;
+
+/**
+ * Add expand/collapse control to the map
+ */
+function addExpandControl(map: any, containerId: string) {
+  const L = (window as any).L;
+  const container = document.getElementById(containerId)?.parentElement;
+  if (!container || container.id !== 'mapContainer') return;
+
+  let isExpanded = false;
+  let resizeInterval: ReturnType<typeof setInterval> | null = null;
+
+  const ExpandControl = L.Control.extend({
+    options: { position: 'topright' },
+    onAdd: function () {
+      const div = L.DomUtil.create('div', 'leaflet-control-expand leaflet-bar');
+      const link = L.DomUtil.create('a', '', div);
+      link.href = '#';
+      link.title = 'Expand map';
+      link.innerHTML = EXPAND_ICON;
+      link.setAttribute('role', 'button');
+      link.setAttribute('aria-label', 'Expand map');
+
+      L.DomEvent.disableClickPropagation(div);
+
+      L.DomEvent.on(link, 'click', function (e: Event) {
+        e.preventDefault();
+        isExpanded = !isExpanded;
+
+        if (isExpanded) {
+          container.classList.add('map-expanded');
+          link.innerHTML = COLLAPSE_ICON;
+          link.title = 'Collapse map';
+          link.setAttribute('aria-label', 'Collapse map');
+
+          // Scroll map into view
+          container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          container.classList.remove('map-expanded');
+          link.innerHTML = EXPAND_ICON;
+          link.title = 'Expand map';
+          link.setAttribute('aria-label', 'Expand map');
+        }
+
+        // Progressive invalidateSize during transition to avoid grey tiles
+        if (resizeInterval) clearInterval(resizeInterval);
+        resizeInterval = setInterval(() => {
+          map.invalidateSize({ animate: false });
+        }, 50);
+
+        // Clean up interval after transition ends
+        const onTransitionEnd = () => {
+          if (resizeInterval) {
+            clearInterval(resizeInterval);
+            resizeInterval = null;
+          }
+          map.invalidateSize({ animate: true });
+          container.removeEventListener('transitionend', onTransitionEnd);
+        };
+        container.addEventListener('transitionend', onTransitionEnd);
+      });
+
+      return div;
+    }
+  });
+
+  map.addControl(new ExpandControl());
+}
+
+/**
  * Initialize Leaflet map with crime markers
  * @param containerId - ID of the map container element
  * @param crimes - Array of crime data to display
@@ -168,6 +243,9 @@ export function initializeLeafletMap(
       map.dragging.enable();
     }, { passive: true });
 
+    // Add expand/collapse control
+    addExpandControl(map, containerId);
+
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -220,7 +298,7 @@ export function initializeLeafletMap(
         <div class="p-2">
           <div class="text-xs text-slate-500 mb-2">${formatPopupDate(crime.dateObj)}</div>
           <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
-          <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
+          <div class="text-small font-bold text-slate-600 mb-4">${crime.headline}</div>
           <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
           <div class="text-xs text-rose-600">${areaDisplay}</div>
           <button
@@ -230,7 +308,7 @@ export function initializeLeafletMap(
             View Details
           </button>
         </div>
-      `);
+      `, { autoPanPaddingTopLeft: L.point(10, 50), autoPanPaddingBottomRight: L.point(10, 10) });
       markers.addLayer(marker);
     });
 
@@ -323,7 +401,7 @@ export function updateLeafletMap(crimes: Crime[], crimeDetailPath: string) {
           View Details
         </button>
       </div>
-    `);
+    `, { autoPanPaddingTopLeft: L.point(10, 50), autoPanPaddingBottomRight: L.point(10, 10) });
 
     leafletMarkersGroup.addLayer(marker);
   });
