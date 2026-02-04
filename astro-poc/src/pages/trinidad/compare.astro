@@ -74,7 +74,7 @@ const pageDescription = 'Compare crime statistics between any two areas in Trini
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
-  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard' },
+  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
   { label: 'Compare Areas' },
 ];
 ---
@@ -235,12 +235,12 @@ const breadcrumbs = [
       <div class="space-y-6">
         <div class="grid grid-cols-2 gap-4 text-center">
           <div class="bg-white rounded-lg border border-slate-200 p-4">
-            <a href="/trinidad/area/${slugA}" class="text-base font-bold text-slate-800 hover:text-rose-600 transition">${areaA.name}</a>
+            <a href="/trinidad/area/${slugA}/" class="text-base font-bold text-slate-800 hover:text-rose-600 transition">${areaA.name}</a>
             <p class="text-xs text-slate-400 mt-1">${areaA.region} Region</p>
             ${knownAsA}
           </div>
           <div class="bg-white rounded-lg border border-slate-200 p-4">
-            <a href="/trinidad/area/${slugB}" class="text-base font-bold text-slate-800 hover:text-rose-600 transition">${areaB.name}</a>
+            <a href="/trinidad/area/${slugB}/" class="text-base font-bold text-slate-800 hover:text-rose-600 transition">${areaB.name}</a>
             <p class="text-xs text-slate-400 mt-1">${areaB.region} Region</p>
             ${knownAsB}
           </div>

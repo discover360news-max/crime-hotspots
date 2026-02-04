@@ -36,13 +36,13 @@ function formatDate(date: Date) {
 
 // Determine dashboard link based on country
 const dashboardLink = post.data.country === 'tt'
-  ? '/trinidad/dashboard'
-  : '/guyana/dashboard';
+  ? '/trinidad/dashboard/'
+  : '/guyana/dashboard/';
 
 // Breadcrumb items
 const breadcrumbItems = [
   { label: 'Home', href: '/' },
-  { label: 'Blog', href: '/blog' },
+  { label: 'Blog', href: '/blog/' },
   { label: post.data.title }
 ];
 
@@ -320,7 +320,7 @@ const blogPostingSchema = {
 
       <!-- Back to Blog -->
       <div class="mt-6 sm:mt-8">
-        <a href="/blog" class="text-rose-600 hover:text-rose-700 font-medium text-small">
+        <a href="/blog/" class="text-rose-600 hover:text-rose-700 font-medium text-small">
           ← Back to Blog
         </a>
       </div>

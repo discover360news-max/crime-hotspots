@@ -87,7 +87,7 @@ export class CookieConsent {
           <p style="margin: 0; font-size: 0.875rem; line-height: 1.5; color: #334155;">
             <strong style="font-weight: 600; color: #334155;">We value your privacy</strong><br>
             <span style="color: #64748b;">We use cookies to analyze site traffic and improve your experience. By clicking "Accept", you consent to our use of analytics cookies.</span>
-            <a href="/privacy" style="color: ${this.config.primaryColor}; text-decoration: underline; font-weight: 500;">Learn more</a>
+            <a href="/privacy/" style="color: ${this.config.primaryColor}; text-decoration: underline; font-weight: 500;">Learn more</a>
           </p>
         </div>
         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">

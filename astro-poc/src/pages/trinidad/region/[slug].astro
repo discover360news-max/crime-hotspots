@@ -153,8 +153,8 @@ recentCrimes30d.slice(0, 20).forEach(crime => {
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
-  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard' },
-  { label: 'Regions', href: '/trinidad/regions' },
+  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
+  { label: 'Regions', href: '/trinidad/regions/' },
   { label: regionName },
 ];
 
@@ -171,8 +171,8 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
       title={`${regionName} Region`}
       subtitle={`${regionAreas.length} areas • ${regionCrimes.length} total recorded incidents`}
       badge={`${recentCrimes90d.length} incidents in the last 90 days • Updated daily`}
-      primaryCTA={{ text: 'All Regions', href: '/trinidad/regions', icon: 'arrow' }}
-      secondaryCTA={{ text: 'View All Areas', href: '/trinidad/areas', icon: 'arrow' }}
+      primaryCTA={{ text: 'All Regions', href: '/trinidad/regions/', icon: 'arrow' }}
+      secondaryCTA={{ text: 'View All Areas', href: '/trinidad/areas/', icon: 'arrow' }}
     />
 
     <!-- Stat Cards -->

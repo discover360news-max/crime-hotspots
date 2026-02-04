@@ -71,15 +71,15 @@ const { isHomepage = false } = Astro.props;
           Areas
         </button>
 
-        <a href="/blog" class="text-xs text-slate-700 hover:text-rose-600 font-medium">
+        <a href="/blog/" class="text-xs text-slate-700 hover:text-rose-600 font-medium">
           Blog
         </a>
 
-        <a href="/report" class="px-4 py-1.5 min-h-[22px] rounded-lg bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 transition text-xs font-medium">
+        <a href="/report/" class="px-4 py-1.5 min-h-[22px] rounded-lg bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 transition text-xs font-medium">
           Report a Crime
         </a>
 
-        <a href="/about" class="text-xs text-slate-700 hover:text-rose-600 font-medium">
+        <a href="/about/" class="text-xs text-slate-700 hover:text-rose-600 font-medium">
           About
         </a>
 
@@ -111,7 +111,7 @@ const { isHomepage = false } = Astro.props;
     <div class="bg-white md:hidden">
       <div class="relative overflow-hidden">
         <div id="pillsContainer" class="flex items-center gap-2 py-2.5 overflow-x-auto snap-x snap-mandatory hide-scrollbar px-4">
-          <a href="/report"
+          <a href="/report/"
              class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-rose-600 text-rose-600 hover:bg-rose-700 active:bg-rose-800 transition text-xs font-medium whitespace-nowrap">
             Report Crime
           </a>
@@ -131,19 +131,19 @@ const { isHomepage = false } = Astro.props;
              class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap cursor-pointer">
             Areas
           </button>
-          <a href="/blog"
+          <a href="/blog/"
              class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
             Blog
           </a>
-          <a href="/about"
+          <a href="/about/"
              class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
             About
           </a>
-          <a href="/faq"
+          <a href="/faq/"
              class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
             FAQ
           </a>
-          <a href="/methodology"
+          <a href="/methodology/"
              class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
             Methodology
           </a>
@@ -278,21 +278,21 @@ const { isHomepage = false } = Astro.props;
         Areas
       </button>
 
-      <a href="/blog" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+      <a href="/blog/" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
         Blog
       </a>
 
-      <a href="/report" class="flex items-center gap-2 text-nav text-rose-400 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+      <a href="/report/" class="flex items-center gap-2 text-nav text-rose-400 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         Report a Crime
       </a>
 
-      <a href="/about" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+      <a href="/about/" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -444,10 +444,10 @@ const { isHomepage = false } = Astro.props;
   // Context-aware Areas navigation
   // Known country path prefixes mapped to their areas URLs
   const countryPaths = [
-    { prefix: '/trinidad', areasUrl: '/trinidad/areas' },
-    { prefix: '/guyana', areasUrl: '/guyana/areas' },
-    { prefix: '/barbados', areasUrl: '/barbados/areas' },
-    { prefix: '/jamaica', areasUrl: '/jamaica/areas' },
+    { prefix: '/trinidad', areasUrl: '/trinidad/areas/' },
+    { prefix: '/guyana', areasUrl: '/guyana/areas/' },
+    { prefix: '/barbados', areasUrl: '/barbados/areas/' },
+    { prefix: '/jamaica', areasUrl: '/jamaica/areas/' },
   ];
 
   window.navigateAreas = function() {

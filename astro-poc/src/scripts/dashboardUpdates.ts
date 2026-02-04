@@ -476,7 +476,7 @@ export function updateTopRegions(crimes: Crime[]) {
     const riskTextColor = getRiskTextColor(riskPercentage);
     const areaSlug = toAreaSlug(area);
     return `
-    <a href="/trinidad/area/${areaSlug}" class="flex flex-col gap-1 pb-3 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-50 rounded-lg px-2 -mx-2 py-2 transition">
+    <a href="/trinidad/area/${areaSlug}/" class="flex flex-col gap-1 pb-3 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-50 rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
         <span class="text-xs text-slate-500 truncate flex-1 underline decoration-slate-300 underline-offset-2">${renderAreaName(area)}</span>
         <div class="flex items-center gap-1.5 flex-shrink-0">

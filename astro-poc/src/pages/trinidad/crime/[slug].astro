@@ -91,10 +91,10 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
     <!-- Breadcrumbs -->
     <Breadcrumbs items={[
       { label: 'Home', href: '/' },
-      { label: getCountryName('tt'), href: '/trinidad/dashboard' },
-      { label: 'Archive', href: '/trinidad/archive' },
-      { label: String(crime.year), href: `/trinidad/archive/${crime.year}` },
-      { label: monthName, href: `/trinidad/archive/${crime.year}/${String(crime.month).padStart(2, '0')}` },
+      { label: getCountryName('tt'), href: '/trinidad/dashboard/' },
+      { label: 'Archive', href: '/trinidad/archive/' },
+      { label: String(crime.year), href: `/trinidad/archive/${crime.year}/` },
+      { label: monthName, href: `/trinidad/archive/${crime.year}/${String(crime.month).padStart(2, '0')}/` },
       { label: truncatedHeadline }
     ]} />
 
@@ -103,13 +103,13 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
       <!-- Left: Navigation Buttons -->
       <div class="flex gap-2">
         <a
-          href="/trinidad/dashboard"
+          href="/trinidad/dashboard/"
           class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap"
         >
           Dashboard
         </a>
         <a
-          href="/trinidad/headlines"
+          href="/trinidad/headlines/"
           class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap"
         >
           Headlines
@@ -212,7 +212,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
             <ul class="space-y-2">
               <li>
                 <a
-                  href={`/trinidad/archive/${crime.year}/${String(crime.month).padStart(2, '0')}`}
+                  href={`/trinidad/archive/${crime.year}/${String(crime.month).padStart(2, '0')}/`}
                   class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
                 >
                   → All crimes in {crime.dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -220,7 +220,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
               </li>
               <li>
                 <a
-                  href="/trinidad/dashboard"
+                  href="/trinidad/dashboard/"
                   class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
                 >
                   → View {crime.region} on interactive map
@@ -228,7 +228,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
               </li>
               <li>
                 <a
-                  href="/trinidad/headlines"
+                  href="/trinidad/headlines/"
                   class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
                 >
                   → Browse recent {crime.crimeType} incidents
@@ -274,7 +274,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
           <ul class="space-y-2">
             <li>
               <a
-                href={`/trinidad/archive/${crime.year}/${String(crime.month).padStart(2, '0')}`}
+                href={`/trinidad/archive/${crime.year}/${String(crime.month).padStart(2, '0')}/`}
                 class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
               >
                 → All crimes in {crime.dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -282,7 +282,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
             </li>
             <li>
               <a
-                href="/trinidad/dashboard"
+                href="/trinidad/dashboard/"
                 class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
               >
                 → View {crime.region} on interactive map
@@ -290,7 +290,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
             </li>
             <li>
               <a
-                href="/trinidad/headlines"
+                href="/trinidad/headlines/"
                 class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
               >
                 → Browse recent {crime.crimeType} incidents
@@ -324,7 +324,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
         <div class="text-left">
           {prevCrime && (
             <a
-              href={`/trinidad/crime/${prevCrime.slug}`}
+              href={`/trinidad/crime/${prevCrime.slug}/`}
               class="block p-4 bg-white/70 rounded-lg shadow-sm border border-slate-200 hover:border-rose-600 active:bg-rose-50 transition group"
             >
               <div class="text-xs text-slate-500 mb-1">← Previous Crime</div>
@@ -342,7 +342,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
         <div class="text-right">
           {nextCrime && (
             <a
-              href={`/trinidad/crime/${nextCrime.slug}`}
+              href={`/trinidad/crime/${nextCrime.slug}/`}
               class="block p-4 bg-white/70 rounded-lg shadow-sm border border-slate-200 hover:border-rose-600 active:bg-rose-50 transition group"
             >
               <div class="text-xs text-slate-500 mb-1">Next Crime →</div>

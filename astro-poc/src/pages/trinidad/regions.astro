@@ -61,7 +61,7 @@ const regions = Array.from(regionMap.entries())
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
-  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard' },
+  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
   { label: 'Regions' },
 ];
 
@@ -78,8 +78,8 @@ const pageDescription = `Crime statistics for all ${regions.length} regions in T
       title="Crime Statistics by Region"
       subtitle={`Compare crime data across ${regions.length} regions in Trinidad & Tobago.`}
       badge="Updated daily • Based on 90-day rolling window"
-      primaryCTA={{ text: 'View by Area', href: '/trinidad/areas', icon: 'arrow' }}
-      secondaryCTA={{ text: 'Compare Areas', href: '/trinidad/compare', icon: 'arrow' }}
+      primaryCTA={{ text: 'View by Area', href: '/trinidad/areas/', icon: 'arrow' }}
+      secondaryCTA={{ text: 'Compare Areas', href: '/trinidad/compare/', icon: 'arrow' }}
     />
 
     <!-- Region Cards -->

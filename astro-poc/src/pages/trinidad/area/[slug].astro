@@ -190,8 +190,8 @@ const schemaData = {
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
-  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard' },
-  { label: 'Areas', href: '/trinidad/areas' },
+  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
+  { label: 'Areas', href: '/trinidad/areas/' },
   { label: areaName },
 ];
 ---
@@ -207,8 +207,8 @@ const breadcrumbs = [
       title={subtitle}
       subtitle={`${region} Region • ${division} Division • ${areaCrimes.length} total recorded incidents`}
       badge={`Risk Level: ${safety.score.toFixed(1)}/10 • Updated daily`}
-      primaryCTA={{ text: 'View Dashboard', href: '/trinidad/dashboard', icon: 'dashboard' }}
-      secondaryCTA={{ text: 'Compare Area', href: `/trinidad/compare?a=${slug}`, icon: 'arrow' }}
+      primaryCTA={{ text: 'View Dashboard', href: '/trinidad/dashboard/', icon: 'dashboard' }}
+      secondaryCTA={{ text: 'Compare Area', href: `/trinidad/compare/?a=${slug}`, icon: 'arrow' }}
     />
 
     <!-- Stat Cards -->

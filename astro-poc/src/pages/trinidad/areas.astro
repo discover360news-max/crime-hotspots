@@ -76,7 +76,7 @@ const areasWithCrime = areaStats.filter(a => a.totalCrimes > 0).length;
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
-  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard' },
+  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
   { label: 'Areas' },
 ];
 
@@ -93,8 +93,8 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
       title="Crime Statistics by Area"
       subtitle={`Explore crime data for ${totalAreas} areas across Trinidad & Tobago. ${areasWithCrime} areas with recorded incidents.`}
       badge="Updated daily • Risk levels based on 90-day rolling window"
-      primaryCTA={{ text: 'Compare Areas', href: '/trinidad/compare', icon: 'arrow' }}
-      secondaryCTA={{ text: 'View Regions', href: '/trinidad/regions', icon: 'arrow' }}
+      primaryCTA={{ text: 'Compare Areas', href: '/trinidad/compare/', icon: 'arrow' }}
+      secondaryCTA={{ text: 'View Regions', href: '/trinidad/regions/', icon: 'arrow' }}
     />
 
     <!-- Search/Filter -->
