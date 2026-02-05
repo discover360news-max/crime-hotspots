@@ -12,13 +12,22 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Traffic:** ~4 real visitors/day, Google Search Console active (1,728 pages indexed)
-**Last Updated:** February 2, 2026
+**Last Updated:** February 5, 2026
 
 ---
 
 ## Recent Work (Last 30 Days)
 
 **February 2026:**
+- **📱 UX NAVIGATION OVERHAUL** (Feb 5) - **50% Mobile Discoverability Fix**
+  - Created `BottomNav.astro` — persistent mobile tab bar (Dashboard, Headlines, Areas, Report, More)
+  - Created `RelatedCrimes.astro` — actual crime cards instead of generic text links
+  - Header.astro: Direct links on Trinidad pages (reduces modal friction from 2+ taps to 1)
+  - Header.astro: Active section indicator (underline on current section)
+  - Footer: Added "Browse" column with primary navigation (Dashboard, Headlines, Areas, Archive)
+  - Removed redundant horizontal pills (replaced by bottom nav)
+  - Countries.ts: Added `showInBottomNav`, `icon` fields for dynamic bottom nav config
+  - Full audit: `docs/guides/UX-NAVIGATION-AUDIT.md`
 - **SECTION PICKER MODAL** (Feb 2)
   - Homepage island click now opens a section picker modal instead of navigating directly to dashboard
   - Shows all available sections: Dashboard, Headlines, Archive, Areas, Compare, Statistics, Regions, Murder Count
@@ -391,6 +400,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
   - Area-based crime scoring algorithm (1-10 scale)
   - Contextual safety tips (high/neutral/low risk levels)
   - Balanced messaging for SEO and user experience
+- `docs/guides/UX-NAVIGATION-AUDIT.md` - **Mobile Navigation Best Practices** ⭐
+  - Nielsen Norman, Material Design, Apple HIG research
+  - Priority matrix for navigation improvements
+  - Bottom nav, direct links, active indicators, related content patterns
 
 **🧱 Reusable Components** (COMPONENT-FIRST Architecture)
 - `src/components/Hero.astro` - Full-width gradient hero with CTAs (landing pages) + compact variant + slot for custom actions
@@ -398,6 +411,8 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - `src/components/DataTable.astro` - Responsive table wrapper with consistent styling
 - `src/components/SafetyContext.astro` - Color-coded area safety tips (high/neutral/low)
 - `src/components/SectionPickerModal.astro` - Homepage section picker (dynamic from countries.ts)
+- `src/components/BottomNav.astro` - Mobile bottom tab bar (persistent, config-driven from countries.ts)
+- `src/components/RelatedCrimes.astro` - Actual crime cards for related content (same area/type priority)
 - `src/lib/safetyHelpers.ts` - Crime scoring & safety context calculation
 - `src/lib/generateOgImage.ts` - Dynamic OG image generator (satori + sharp)
 

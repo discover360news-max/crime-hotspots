@@ -40,6 +40,9 @@ import ReportIssueModal from './ReportIssueModal.astro';
       <!-- Safety Context -->
       <div id="modalSafetyContext" class="mt-6 mb-6"></div>
 
+      <!-- Related Crimes -->
+      <div id="modalRelatedCrimes" class="mb-6"></div>
+
       <!-- Action Buttons -->
       <div class="flex flex-col gap-3 pt-4 border-t border-slate-200">
         <div class="flex items-center gap-3">
@@ -417,6 +420,129 @@ import ReportIssueModal from './ReportIssueModal.astro';
     `;
   }
 
+  // Crime type color mapping (matches crimeColors.ts)
+  function getCrimeColorHex(crimeType) {
+    const colors = {
+      'Murder': '#e11d48',
+      'Shooting': '#dc2626',
+      'Robbery': '#f97316',
+      'Burglary': '#eab308',
+      'Theft': '#06b6d4',
+      'Home Invasion': '#9333ea',
+      'Kidnapping': '#ec4899',
+      'Sexual Assault': '#c026d3',
+      'Assault': '#8b5cf6',
+      'Seizures': '#3b82f6',
+      'Vehicle Theft': '#0ea5e9'
+    };
+    return colors[crimeType] || '#64748b';
+  }
+
+  // Generate Related Crimes HTML for modal
+  function generateRelatedCrimesHTML(currentCrime, allCrimes, maxCards = 4) {
+    // Filter out current crime
+    const otherCrimes = allCrimes.filter(c => c.slug !== currentCrime.slug);
+
+    // Find crimes in same area
+    const sameAreaCrimes = otherCrimes
+      .filter(c => c.area?.toLowerCase() === currentCrime.area?.toLowerCase())
+      .slice(0, maxCards);
+
+    // If we need more, add same crime type from other areas
+    let relatedCrimes = [...sameAreaCrimes];
+    if (relatedCrimes.length < 3) {
+      const sameCrimeTypeCrimes = otherCrimes
+        .filter(c =>
+          c.crimeType?.toLowerCase() === currentCrime.crimeType?.toLowerCase() &&
+          c.area?.toLowerCase() !== currentCrime.area?.toLowerCase()
+        )
+        .slice(0, maxCards - relatedCrimes.length);
+      relatedCrimes = [...relatedCrimes, ...sameCrimeTypeCrimes];
+    }
+
+    // Sort by date (most recent first)
+    relatedCrimes.sort((a, b) => {
+      const dateA = a.dateObj ? new Date(a.dateObj) : new Date(a.date);
+      const dateB = b.dateObj ? new Date(b.dateObj) : new Date(b.date);
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    // Limit to maxCards
+    relatedCrimes = relatedCrimes.slice(0, maxCards);
+
+    if (relatedCrimes.length === 0) {
+      return '';
+    }
+
+    // Format date for display
+    const formatDate = (dateStr) => {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+
+    // Truncate headline
+    const truncateHeadline = (headline, maxLength = 60) => {
+      if (!headline) return '';
+      if (headline.length <= maxLength) return headline;
+      return headline.substring(0, maxLength).trim() + '...';
+    };
+
+    // Create area slug for link
+    const areaSlug = (currentCrime.area || '')
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
+
+    const crimeCards = relatedCrimes.map(crime => {
+      const isSameArea = crime.area?.toLowerCase() === currentCrime.area?.toLowerCase();
+      const colorHex = getCrimeColorHex(crime.crimeType);
+      const crimeUrl = buildRoute.crime(crime.slug);
+
+      return `
+        <a href="${escapeHtml(crimeUrl)}" class="block p-3 bg-white rounded-lg border border-slate-100 hover:border-rose-200 hover:shadow-sm transition-all group">
+          <div class="flex items-start gap-2">
+            <span class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style="background-color: ${colorHex}"></span>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-medium text-slate-700 group-hover:text-rose-600 transition-colors line-clamp-2">
+                ${escapeHtml(truncateHeadline(crime.headline))}
+              </p>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-[10px] text-slate-400">${formatDate(crime.date)}</span>
+                ${isSameArea
+                  ? '<span class="text-[10px] px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded">Same area</span>'
+                  : `<span class="text-[10px] text-slate-400 truncate">${escapeHtml(crime.area || '')}</span>`
+                }
+              </div>
+            </div>
+            <svg class="w-3 h-3 text-slate-300 group-hover:text-rose-400 transition-colors flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </a>
+      `;
+    }).join('');
+
+    return `
+      <aside class="p-4 bg-slate-50/80 backdrop-blur-sm rounded-lg border border-slate-200">
+        <h2 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+          <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Related Crimes
+        </h2>
+        <div class="space-y-2">
+          ${crimeCards}
+        </div>
+        <a href="/trinidad/area/${escapeHtml(areaSlug)}/" class="mt-3 flex items-center justify-center gap-1 w-full py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors">
+          View all crimes in ${escapeHtml(currentCrime.area || '')}
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </a>
+      </aside>
+    `;
+  }
+
   // Initialize feedback toggle event listeners for modal
   function initModalFeedbackToggle(container) {
     if (!container) return;
@@ -528,6 +654,12 @@ import ReportIssueModal from './ReportIssueModal.astro';
       safetyContextEl.innerHTML = generateSafetyContextHTML(crime.area, safetyContext)
         + generateFeedbackToggleHTML(crime.area, feedbackUrl, crime.headline);
       initModalFeedbackToggle(safetyContextEl.querySelector('.feedback-toggle'));
+    }
+
+    // Populate related crimes
+    const relatedCrimesEl = document.getElementById('modalRelatedCrimes');
+    if (relatedCrimesEl) {
+      relatedCrimesEl.innerHTML = generateRelatedCrimesHTML(crime, allCrimes, 4);
     }
 
     // Update button links (with URL sanitization)

@@ -9,6 +9,10 @@ export interface CountrySection {
   label: string;
   description: string;
   url: string;
+  /** If true, shows in bottom tab bar. If false/undefined, shows in "More" menu */
+  showInBottomNav?: boolean;
+  /** Icon identifier for bottom nav (e.g., 'dashboard', 'headlines', 'areas') */
+  icon?: string;
 }
 
 export interface Country {
@@ -34,10 +38,10 @@ export const COUNTRIES: Country[] = [
     dashboardUrl: routes.trinidad.dashboard,
     areasUrl: routes.trinidad.areas,
     sections: [
-      { id: 'dashboard', label: 'Dashboard', description: 'Interactive map and crime statistics overview', url: routes.trinidad.dashboard },
-      { id: 'headlines', label: 'Headlines', description: 'Latest crime news and reports', url: routes.trinidad.headlines },
+      { id: 'dashboard', label: 'Dashboard', description: 'Interactive map and crime statistics overview', url: routes.trinidad.dashboard, showInBottomNav: true, icon: 'dashboard' },
+      { id: 'headlines', label: 'Headlines', description: 'Latest crime news and reports', url: routes.trinidad.headlines, showInBottomNav: true, icon: 'headlines' },
+      { id: 'areas', label: 'Areas', description: 'Crime data by area and neighbourhood', url: routes.trinidad.areas, showInBottomNav: true, icon: 'areas' },
       { id: 'archive', label: 'Archive', description: 'Historical crime data records', url: routes.trinidad.archive },
-      { id: 'areas', label: 'Areas', description: 'Crime data by area and neighbourhood', url: routes.trinidad.areas },
       { id: 'compare', label: 'Compare', description: 'Year-over-year crime comparisons', url: routes.trinidad.compare },
       { id: 'statistics', label: 'Statistics', description: 'Detailed crime breakdowns and trends', url: routes.trinidad.statistics },
       { id: 'regions', label: 'Regions', description: 'Regional crime analysis', url: routes.trinidad.regions },
@@ -93,4 +97,20 @@ export function getCountryById(id: string): Country | undefined {
 export function getCountryName(id: string): string {
   const country = getCountryById(id);
   return country?.name || id.toUpperCase();
+}
+
+/**
+ * Get sections for bottom nav (showInBottomNav: true)
+ */
+export function getBottomNavSections(countryId: string): CountrySection[] {
+  const country = getCountryById(countryId);
+  return country?.sections?.filter(s => s.showInBottomNav) || [];
+}
+
+/**
+ * Get sections for "More" menu (showInBottomNav: false/undefined)
+ */
+export function getMoreMenuSections(countryId: string): CountrySection[] {
+  const country = getCountryById(countryId);
+  return country?.sections?.filter(s => !s.showInBottomNav) || [];
 }

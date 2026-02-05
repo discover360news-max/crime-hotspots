@@ -1,0 +1,150 @@
+---
+/**
+ * Related Crimes Component
+ *
+ * Shows actual crime cards related to the current crime.
+ * Priority: Same area > Same crime type (fallback)
+ * Displays 3-5 compact crime cards with "View all" CTA.
+ *
+ * Props:
+ * - currentCrime: The crime being viewed (to exclude from results)
+ * - allCrimes: Array of all crimes to filter from
+ * - maxCards: Maximum cards to show (default 5)
+ *
+ * Created: Feb 5, 2026
+ */
+
+import { getCrimeTailwindColor } from '../lib/crimeColors';
+import { buildRoute } from '../config/routes';
+
+interface Crime {
+  slug: string;
+  date: string;
+  headline: string;
+  crimeType: string;
+  area: string;
+  region: string;
+  url: string;
+}
+
+interface Props {
+  currentCrime: Crime;
+  allCrimes: Crime[];
+  maxCards?: number;
+}
+
+const { currentCrime, allCrimes, maxCards = 5 } = Astro.props;
+
+// Filter out current crime
+const otherCrimes = allCrimes.filter(c => c.slug !== currentCrime.slug);
+
+// Find crimes in same area
+const sameAreaCrimes = otherCrimes
+  .filter(c => c.area.toLowerCase() === currentCrime.area.toLowerCase())
+  .slice(0, maxCards);
+
+// If we need more, add same crime type from other areas
+let relatedCrimes = [...sameAreaCrimes];
+if (relatedCrimes.length < 3) {
+  const sameCrimeTypeCrimes = otherCrimes
+    .filter(c =>
+      c.crimeType.toLowerCase() === currentCrime.crimeType.toLowerCase() &&
+      c.area.toLowerCase() !== currentCrime.area.toLowerCase()
+    )
+    .slice(0, maxCards - relatedCrimes.length);
+  relatedCrimes = [...relatedCrimes, ...sameCrimeTypeCrimes];
+}
+
+// Sort by date (most recent first)
+relatedCrimes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+// Limit to maxCards
+relatedCrimes = relatedCrimes.slice(0, maxCards);
+
+// Format date for display
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+// Truncate headline for compact display
+const truncateHeadline = (headline: string, maxLength = 60) => {
+  if (headline.length <= maxLength) return headline;
+  return headline.substring(0, maxLength).trim() + '...';
+};
+
+// Create area slug for link
+const areaSlug = currentCrime.area.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+---
+
+{relatedCrimes.length > 0 && (
+  <aside class="p-4 bg-slate-50/80 backdrop-blur-sm rounded-lg border border-slate-200" data-pagefind-ignore>
+    <h2 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+      <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+      Related Crimes
+    </h2>
+
+    <div class="space-y-2">
+      {relatedCrimes.map((crime) => {
+        const colorClass = getCrimeTailwindColor(crime.crimeType);
+        const isSameArea = crime.area.toLowerCase() === currentCrime.area.toLowerCase();
+
+        return (
+          <a
+            href={buildRoute.crime(crime.slug)}
+            class="block p-3 bg-white rounded-lg border border-slate-100 hover:border-rose-200 hover:shadow-sm transition-all group"
+          >
+            <div class="flex items-start gap-2">
+              {/* Crime type indicator dot */}
+              <span class={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${colorClass}`}></span>
+
+              <div class="flex-1 min-w-0">
+                {/* Headline */}
+                <p class="text-xs font-medium text-slate-700 group-hover:text-rose-600 transition-colors line-clamp-2">
+                  {truncateHeadline(crime.headline)}
+                </p>
+
+                {/* Meta row */}
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-[10px] text-slate-400">
+                    {formatDate(crime.date)}
+                  </span>
+                  {isSameArea ? (
+                    <span class="text-[10px] px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded">
+                      Same area
+                    </span>
+                  ) : (
+                    <span class="text-[10px] text-slate-400 truncate">
+                      {crime.area}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Arrow */}
+              <svg class="w-3 h-3 text-slate-300 group-hover:text-rose-400 transition-colors flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+
+    {/* View all CTA */}
+    <a
+      href={buildRoute.area(areaSlug)}
+      class="mt-3 flex items-center justify-center gap-1 w-full py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+    >
+      View all crimes in {currentCrime.area}
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+      </svg>
+    </a>
+  </aside>
+)}

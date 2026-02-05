@@ -1,5 +1,6 @@
 ---
 import Header from '../components/Header.astro';
+import BottomNav from '../components/BottomNav.astro';
 import { routes } from '../config/routes';
 import DashboardModal from '../components/DashboardModal.astro';
 import HeadlinesModal from '../components/HeadlinesModal.astro';
@@ -266,20 +267,31 @@ const isHomepage = Astro.url.pathname === '/';
   <!-- Footer -->
   <footer class="bg-white/85 border-t border-slate-200 mt-30" data-pagefind-ignore>
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
         <!-- About -->
-        <div>
+        <div class="col-span-2 md:col-span-1">
           <h3 class="text-h3 font-bold text-slate-700 mb-4">Crime Hotspots</h3>
           <p class="text-xs text-slate-400">
             Real-time crime statistics and interactive dashboards for the Caribbean.
           </p>
         </div>
 
-        <!-- Quick Links -->
+        <!-- Browse (Primary Navigation) -->
+        <div>
+          <h4 class="text-nav font-semibold text-slate-700 mb-4">Browse</h4>
+          <ul class="space-y-1">
+            <li><a href={routes.trinidad.dashboard} class="text-small text-slate-400 hover:text-rose-600">Dashboard</a></li>
+            <li><a href={routes.trinidad.headlines} class="text-small text-slate-400 hover:text-rose-600">Headlines</a></li>
+            <li><a href={routes.trinidad.areas} class="text-small text-slate-400 hover:text-rose-600">Areas</a></li>
+            <li><a href={routes.trinidad.archive} class="text-small text-slate-400 hover:text-rose-600">Archive</a></li>
+            <li><a href={routes.report} class="text-small text-slate-400 hover:text-rose-600">Report a Crime</a></li>
+          </ul>
+        </div>
+
+        <!-- Quick Links (Utility) -->
         <div>
           <h4 class="text-nav font-semibold text-slate-700 mb-4">Quick Links</h4>
           <ul class="space-y-1">
-            <li><a href={routes.trinidad.archive} class="text-small text-slate-400 hover:text-rose-600">Archives</a></li>
             <li><a href={routes.about} class="text-small text-slate-400 hover:text-rose-600">About</a></li>
             <li><a href={routes.methodology} class="text-small text-slate-400 hover:text-rose-600">Methodology</a></li>
             <li><a href={routes.faq} class="text-small text-slate-400 hover:text-rose-600">FAQ</a></li>
@@ -289,7 +301,7 @@ const isHomepage = Astro.url.pathname === '/';
         </div>
 
         <!-- Social -->
-        <div class="col-span-2 md:col-span-1">
+        <div>
           <h4 class="text-nav font-semibold text-slate-700 mb-4">Follow Us</h4>
           <div class="flex gap-4 items-center justify-between">
             <div class="flex gap-4 items-center">
@@ -332,5 +344,8 @@ const isHomepage = Astro.url.pathname === '/';
       </div>
     </div>
   </footer>
+
+  <!-- Bottom Navigation (Mobile Only) -->
+  {!isHomepage && <BottomNav />}
 </body>
 </html>

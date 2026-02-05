@@ -14,6 +14,7 @@ import SiteNotificationBanner from '../../../components/SiteNotificationBanner.a
 import AreaNameTooltip from '../../../components/AreaNameTooltip.astro';
 import SafetyContext from '../../../components/SafetyContext.astro';
 import FeedbackToggle from '../../../components/FeedbackToggle.astro';
+import RelatedCrimes from '../../../components/RelatedCrimes.astro';
 import { dataUpdateNotice } from '../../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../../lib/areaAliases';
 import { getCountryName } from '../../../data/countries';
@@ -207,36 +208,10 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
             </dl>
           </header>
 
-          <!-- Related Crimes (desktop: in left column, mobile: after summary) -->
-          <aside class="p-4 bg-slate-100 rounded-lg border border-slate-200 hidden lg:block mt-6" data-pagefind-ignore>
-            <h2 class="text-h3 font-bold text-slate-700 mb-4">Related Crimes</h2>
-            <ul class="space-y-2">
-              <li>
-                <a
-                  href={buildRoute.archive(crime.year, String(crime.month).padStart(2, '0'))}
-                  class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
-                >
-                  → All crimes in {crime.dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                </a>
-              </li>
-              <li>
-                <a
-                  href={routes.trinidad.dashboard}
-                  class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
-                >
-                  → View {crime.region} on interactive map
-                </a>
-              </li>
-              <li>
-                <a
-                  href={routes.trinidad.headlines}
-                  class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
-                >
-                  → Browse recent {crime.crimeType} incidents
-                </a>
-              </li>
-            </ul>
-          </aside>
+          <!-- Related Crimes (desktop: in left column) -->
+          <div class="hidden lg:block mt-6">
+            <RelatedCrimes currentCrime={crime} allCrimes={allCrimes} maxCards={5} />
+          </div>
         </div>
 
         <!-- RIGHT COLUMN: Summary & Report Issue (Row 1, Col 2) -->
@@ -270,35 +245,9 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
         </div>
 
         <!-- Related Crimes (mobile only - shown after summary) -->
-        <aside class="p-4 bg-slate-100 rounded-lg border border-slate-200 lg:hidden" data-pagefind-ignore>
-          <h2 class="text-h3 font-bold text-slate-700 mb-4">Related Crimes</h2>
-          <ul class="space-y-2">
-            <li>
-              <a
-                href={buildRoute.archive(crime.year, String(crime.month).padStart(2, '0'))}
-                class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
-              >
-                → All crimes in {crime.dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-              </a>
-            </li>
-            <li>
-              <a
-                href={routes.trinidad.dashboard}
-                class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
-              >
-                → View {crime.region} on interactive map
-              </a>
-            </li>
-            <li>
-              <a
-                href={routes.trinidad.headlines}
-                class="text-xs text-rose-600 hover:text-rose-700 hover:underline"
-              >
-                → Browse recent {crime.crimeType} incidents
-              </a>
-            </li>
-          </ul>
-        </aside>
+        <div class="lg:hidden">
+          <RelatedCrimes currentCrime={crime} allCrimes={allCrimes} maxCards={4} />
+        </div>
       </div>
     </article>
 

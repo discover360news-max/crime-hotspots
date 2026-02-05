@@ -2,13 +2,68 @@
 
 **For:** Complete details of recently implemented features
 
-**Last Updated:** February 2, 2026
+**Last Updated:** February 5, 2026
 
 **Note:** Features older than 90 days are archived to `docs/archive/accomplishments/`
 
 ---
 
 ## February 2026 Features
+
+### UX Navigation Overhaul (Feb 5, 2026)
+
+**Context:** UX audit revealed mobile navigation reduced discoverability by ~50% (Nielsen Norman research). Horizontal pills + hamburger menu created redundancy and confusion. Modals added friction for single-country (Trinidad) navigation.
+
+**What Was Implemented:**
+
+**Phase 1: Persistent Bottom Tab Bar (P1)**
+- New `BottomNav.astro` component — always-visible mobile navigation
+- Shows 4 primary sections: Dashboard, Headlines, Areas, Report
+- "More" button opens slide-up menu with remaining sections (Archive, Compare, Statistics, Regions, Murder Count)
+- Active section indicator (rose dot under active tab)
+- Safe area support for iPhone X+ (home indicator)
+- Sections pulled dynamically from `countries.ts` config (`showInBottomNav` flag)
+- Removed redundant horizontal pills from Header
+
+**Phase 2: Direct Links for Trinidad (P1)**
+- Header.astro modified to detect `/trinidad/*` pages
+- When on Trinidad pages: nav buttons become direct `<a>` links (1 tap)
+- When on homepage/other pages: keeps modal buttons (country picker)
+- Reduces tap count from 2-3 to 1 for section navigation
+
+**Phase 3: Active Section Indicator (P2)**
+- Desktop header shows underline on current section
+- Mobile bottom nav shows dot indicator on active tab
+- `getActiveSection()` helper detects current section from URL path
+
+**Phase 4: Enhanced Related Crimes (P2)**
+- New `RelatedCrimes.astro` component — shows actual crime cards
+- Priority: Same area (up to 5) → Same crime type from other areas (fallback)
+- Compact card design with crime type dot, truncated headline, date, area badge
+- "View all crimes in [Area]" CTA
+- Replaced generic text links (→ All crimes in Month, → View Region on map)
+
+**Phase 5: Footer Primary Navigation (P2)**
+- Added "Browse" column with Dashboard, Headlines, Areas, Archive, Report
+- Footer now has primary + utility links (was utility only)
+- 4-column grid on desktop, 2-column on mobile
+
+**Files Created:**
+- `src/components/BottomNav.astro` — Mobile bottom tab bar
+- `src/components/RelatedCrimes.astro` — Actual related crime cards
+
+**Files Modified:**
+- `src/layouts/Layout.astro` — Added BottomNav, enhanced footer
+- `src/components/Header.astro` — Direct links on Trinidad, active indicators, removed pills
+- `src/data/countries.ts` — Added `showInBottomNav`, `icon` fields, helper functions
+- `src/pages/trinidad/crime/[slug].astro` — Uses RelatedCrimes component
+
+**Documentation:**
+- `docs/guides/UX-NAVIGATION-AUDIT.md` — Full audit with best practices, priority matrix
+
+**Status:** ✅ Complete (Phases 1-5)
+
+---
 
 ### Section Picker Modal (Feb 2, 2026)
 

@@ -3,6 +3,8 @@
  * Header Component
  * Reusable header with navigation for all pages
  * Trinidad-focused (no dropdowns needed yet)
+ *
+ * Phase 2 UX: Direct links when on Trinidad pages (reduces modal friction)
  */
 import { routes } from '../config/routes';
 
@@ -11,6 +13,31 @@ interface Props {
 }
 
 const { isHomepage = false } = Astro.props;
+
+// Detect if we're on a Trinidad page for direct navigation (no modals needed)
+const currentPath = Astro.url.pathname;
+const isOnTrinidadPage = currentPath.startsWith('/trinidad');
+
+// Phase 3: Detect active section for visual indicator
+type Section = 'dashboard' | 'headlines' | 'archive' | 'areas' | 'blog' | 'about' | 'report' | null;
+
+function getActiveSection(path: string): Section {
+  if (path.startsWith('/trinidad/dashboard')) return 'dashboard';
+  if (path.startsWith('/trinidad/headlines')) return 'headlines';
+  if (path.startsWith('/trinidad/archive') || path.startsWith('/trinidad/crime/')) return 'archive';
+  if (path.startsWith('/trinidad/areas') || path.startsWith('/trinidad/area/')) return 'areas';
+  if (path.startsWith('/blog')) return 'blog';
+  if (path.startsWith('/about')) return 'about';
+  if (path.startsWith('/report')) return 'report';
+  return null;
+}
+
+const activeSection = getActiveSection(currentPath);
+
+// Active link styles
+const baseNavClass = "text-xs font-medium transition-colors";
+const activeNavClass = `${baseNavClass} text-rose-600 border-b-2 border-rose-600 pb-0.5`;
+const inactiveNavClass = `${baseNavClass} text-slate-700 hover:text-rose-600`;
 ---
 
 <header class="bg-white shadow-sm sticky top-0 z-40" data-pagefind-ignore>
@@ -56,23 +83,47 @@ const { isHomepage = false } = Astro.props;
       <nav id="mainNav" class="hidden md:flex items-center gap-4" role="navigation" aria-label="Primary">
         {!isHomepage && (
           <>
-            <button onclick="window.openDashboardModal()" class="text-xs text-slate-700 hover:text-rose-600 font-medium cursor-pointer">
-              Dashboard
-            </button>
-            <button onclick="window.openHeadlinesModal()" class="text-xs text-slate-700 hover:text-rose-600 font-medium cursor-pointer">
-              Headlines
-            </button>
-            <button onclick="window.openArchivesModal()" class="text-xs text-slate-700 hover:text-rose-600 font-medium cursor-pointer">
-              Archives
-            </button>
+            {isOnTrinidadPage ? (
+              /* Direct links when on Trinidad pages (Phase 2: reduce modal friction) */
+              <>
+                <a href={routes.trinidad.dashboard} class={activeSection === 'dashboard' ? activeNavClass : inactiveNavClass}>
+                  Dashboard
+                </a>
+                <a href={routes.trinidad.headlines} class={activeSection === 'headlines' ? activeNavClass : inactiveNavClass}>
+                  Headlines
+                </a>
+                <a href={routes.trinidad.archive} class={activeSection === 'archive' ? activeNavClass : inactiveNavClass}>
+                  Archives
+                </a>
+              </>
+            ) : (
+              /* Modal buttons for non-country pages */
+              <>
+                <button onclick="window.openDashboardModal()" class={`${inactiveNavClass} cursor-pointer`}>
+                  Dashboard
+                </button>
+                <button onclick="window.openHeadlinesModal()" class={`${inactiveNavClass} cursor-pointer`}>
+                  Headlines
+                </button>
+                <button onclick="window.openArchivesModal()" class={`${inactiveNavClass} cursor-pointer`}>
+                  Archives
+                </button>
+              </>
+            )}
           </>
         )}
 
-        <button onclick="window.navigateAreas()" class="text-xs text-slate-700 hover:text-rose-600 font-medium cursor-pointer">
-          Areas
-        </button>
+        {isOnTrinidadPage ? (
+          <a href={routes.trinidad.areas} class={activeSection === 'areas' ? activeNavClass : inactiveNavClass}>
+            Areas
+          </a>
+        ) : (
+          <button onclick="window.navigateAreas()" class={`${inactiveNavClass} cursor-pointer`}>
+            Areas
+          </button>
+        )}
 
-        <a href={routes.blog} class="text-xs text-slate-700 hover:text-rose-600 font-medium">
+        <a href={routes.blog} class={activeSection === 'blog' ? activeNavClass : inactiveNavClass}>
           Blog
         </a>
 
@@ -80,7 +131,7 @@ const { isHomepage = false } = Astro.props;
           Report a Crime
         </a>
 
-        <a href={routes.about} class="text-xs text-slate-700 hover:text-rose-600 font-medium">
+        <a href={routes.about} class={activeSection === 'about' ? activeNavClass : inactiveNavClass}>
           About
         </a>
 
@@ -105,62 +156,6 @@ const { isHomepage = false } = Astro.props;
       </nav>
     </div>
 
-    <!-- Separator (top of pills) - MOBILE ONLY -->
-    <div class="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent md:hidden"></div>
-
-    <!-- Quick Access Pills (horizontal scroll) - MOBILE ONLY -->
-    <div class="bg-white md:hidden">
-      <div class="relative overflow-hidden">
-        <div id="pillsContainer" class="flex items-center gap-2 py-2.5 overflow-x-auto snap-x snap-mandatory hide-scrollbar px-4">
-          <a href={routes.report}
-             class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-rose-600 text-rose-600 hover:bg-rose-700 active:bg-rose-800 transition text-xs font-medium whitespace-nowrap">
-            Report Crime
-          </a>
-          {!isHomepage && (
-            <>
-              <button onclick="window.openHeadlinesModal()"
-                 class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap cursor-pointer">
-                Headlines
-              </button>
-              <button onclick="window.openDashboardModal()"
-                 class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap cursor-pointer">
-                Dashboard
-              </button>
-            </>
-          )}
-          <button onclick="window.navigateAreas()"
-             class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap cursor-pointer">
-            Areas
-          </button>
-          <a href={routes.blog}
-             class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
-            Blog
-          </a>
-          <a href={routes.about}
-             class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
-            About
-          </a>
-          <a href={routes.faq}
-             class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
-            FAQ
-          </a>
-          <a href={routes.methodology}
-             class="flex-shrink-0 snap-start px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-rose-600 hover:text-rose-600 transition text-xs font-medium whitespace-nowrap">
-            Methodology
-          </a>
-        </div>
-
-        <!-- Fade gradient + pulsing arrow (right side) -->
-        <div id="pillsScrollHint" class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none flex items-center justify-end pr-2">
-          <svg class="w-4 h-4 text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <!-- Separator (bottom of pills) - MOBILE ONLY -->
-    <div class="h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent md:hidden"></div>
   </div>
 </header>
 
@@ -248,36 +243,75 @@ const { isHomepage = false } = Astro.props;
     <div class="space-y-1">
       {!isHomepage && (
         <>
-          <button onclick="window.openDashboardModal()" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200 w-full text-left cursor-pointer">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            Dashboard
-          </button>
+          {isOnTrinidadPage ? (
+            /* Direct links when on Trinidad pages (Phase 2: reduce modal friction) */
+            <>
+              <a href={routes.trinidad.dashboard} class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Dashboard
+              </a>
 
-          <button onclick="window.openHeadlinesModal()" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200 w-full text-left cursor-pointer">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-            </svg>
-            Headlines
-          </button>
+              <a href={routes.trinidad.headlines} class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+                Headlines
+              </a>
 
-          <button onclick="window.openArchivesModal()" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200 w-full text-left cursor-pointer">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-            </svg>
-            Archives
-          </button>
+              <a href={routes.trinidad.archive} class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+                Archives
+              </a>
+            </>
+          ) : (
+            /* Modal buttons for non-country pages */
+            <>
+              <button onclick="window.openDashboardModal()" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200 w-full text-left cursor-pointer">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                Dashboard
+              </button>
+
+              <button onclick="window.openHeadlinesModal()" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200 w-full text-left cursor-pointer">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                </svg>
+                Headlines
+              </button>
+
+              <button onclick="window.openArchivesModal()" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200 w-full text-left cursor-pointer">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                </svg>
+                Archives
+              </button>
+            </>
+          )}
         </>
       )}
 
-      <button onclick="window.navigateAreas()" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200 w-full text-left cursor-pointer">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        Areas
-      </button>
+      {isOnTrinidadPage ? (
+        <a href={routes.trinidad.areas} class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Areas
+        </a>
+      ) : (
+        <button onclick="window.navigateAreas()" class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200 w-full text-left cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Areas
+        </button>
+      )}
 
       <a href={routes.blog} class="flex items-center gap-2 text-nav text-slate-700 hover:text-rose-600 font-medium py-3 border-b border-slate-200">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -303,15 +337,6 @@ const { isHomepage = false } = Astro.props;
   </div>
 </nav>
 
-<style>
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-</style>
 
 <script is:inline>
   // Mobile menu
@@ -465,25 +490,4 @@ const { isHomepage = false } = Astro.props;
     }
   };
 
-  // Pills scroll hint
-  const pillsContainer = document.getElementById('pillsContainer');
-  const pillsScrollHint = document.getElementById('pillsScrollHint');
-
-  if (pillsContainer && pillsScrollHint) {
-    function checkPillsScroll() {
-      const isScrollable = pillsContainer.scrollWidth > pillsContainer.clientWidth;
-      const isAtEnd = pillsContainer.scrollLeft + pillsContainer.clientWidth >= pillsContainer.scrollWidth - 10;
-
-      if (!isScrollable || isAtEnd) {
-        pillsScrollHint.style.opacity = '0';
-      } else {
-        pillsScrollHint.style.opacity = '1';
-      }
-    }
-
-    pillsContainer.addEventListener('scroll', checkPillsScroll);
-    window.addEventListener('resize', checkPillsScroll);
-
-    setTimeout(checkPillsScroll, 100);
-  }
 </script>

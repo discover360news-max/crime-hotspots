@@ -1,0 +1,346 @@
+---
+/**
+ * Bottom Navigation Component (Mobile Only)
+ *
+ * Persistent tab bar for mobile navigation, following iOS/Android patterns.
+ * Shows 4 primary sections + "More" menu with remaining sections.
+ *
+ * Sections are pulled dynamically from countries.ts config.
+ * Adding a new section with showInBottomNav: false will auto-add it to More menu.
+ */
+import { routes } from '../config/routes';
+import { getBottomNavSections, getMoreMenuSections, type CountrySection } from '../data/countries';
+
+interface Props {
+  /** Current country ID (defaults to 'tt' for Trinidad) */
+  countryId?: string;
+}
+
+const { countryId = 'tt' } = Astro.props;
+
+// Get sections from config
+const primarySections = getBottomNavSections(countryId);
+const moreSections = getMoreMenuSections(countryId);
+
+// Utility links for More menu (not country-specific)
+const utilityLinks = [
+  { label: 'Blog', url: routes.blog, icon: 'blog' },
+  { label: 'About', url: routes.about, icon: 'about' },
+  { label: 'FAQ', url: routes.faq, icon: 'faq' },
+];
+
+// Get current path for active state
+const currentPath = Astro.url.pathname;
+
+// Helper to check if a section is active
+function isActive(url: string): boolean {
+  if (url === '/') return currentPath === '/';
+  return currentPath.startsWith(url.replace(/\/$/, ''));
+}
+
+// Check if Report is active
+const isReportActive = isActive(routes.report);
+
+// Check if any "More" section is active
+const isMoreActive = moreSections.some(s => isActive(s.url)) ||
+                     utilityLinks.some(l => isActive(l.url));
+---
+
+<!-- Bottom Navigation Bar -->
+<nav
+  id="bottomNav"
+  class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-slate-200 md:hidden safe-area-bottom"
+  aria-label="Primary mobile navigation"
+  data-pagefind-ignore
+>
+  <div class="flex items-center justify-around h-16 px-2">
+    <!-- Primary Sections from Config -->
+    {primarySections.map((section) => (
+      <a
+        href={section.url}
+        class={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+          isActive(section.url)
+            ? 'text-rose-600'
+            : 'text-slate-500 hover:text-slate-700 active:text-rose-600'
+        }`}
+        aria-current={isActive(section.url) ? 'page' : undefined}
+      >
+        <span class="relative">
+          {section.icon === 'dashboard' && (
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          )}
+          {section.icon === 'headlines' && (
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+            </svg>
+          )}
+          {section.icon === 'areas' && (
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          )}
+          {/* Active indicator dot */}
+          {isActive(section.url) && (
+            <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-rose-600"></span>
+          )}
+        </span>
+        <span class="text-[10px] mt-1 font-medium">{section.label}</span>
+      </a>
+    ))}
+
+    <!-- Report Button (always visible, special styling) -->
+    <a
+      href={routes.report}
+      class={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+        isReportActive
+          ? 'text-rose-600'
+          : 'text-slate-500 hover:text-slate-700 active:text-rose-600'
+      }`}
+      aria-current={isReportActive ? 'page' : undefined}
+    >
+      <span class="relative">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        {isReportActive && (
+          <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-rose-600"></span>
+        )}
+      </span>
+      <span class="text-[10px] mt-1 font-medium">Report</span>
+    </a>
+
+    <!-- More Button -->
+    <button
+      id="moreMenuBtn"
+      class={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+        isMoreActive
+          ? 'text-rose-600'
+          : 'text-slate-500 hover:text-slate-700 active:text-rose-600'
+      }`}
+      aria-expanded="false"
+      aria-controls="moreMenu"
+    >
+      <span class="relative">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        {isMoreActive && (
+          <span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-rose-600"></span>
+        )}
+      </span>
+      <span class="text-[10px] mt-1 font-medium">More</span>
+    </button>
+  </div>
+</nav>
+
+<!-- More Menu Backdrop -->
+<div
+  id="moreMenuBackdrop"
+  class="fixed inset-0 bg-black/25 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-200 md:hidden"
+  data-pagefind-ignore
+></div>
+
+<!-- More Menu (Slide-up) -->
+<div
+  id="moreMenu"
+  class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-2xl transform translate-y-full transition-transform duration-300 ease-out md:hidden"
+  role="dialog"
+  aria-modal="true"
+  aria-label="More navigation options"
+  data-pagefind-ignore
+>
+  <!-- Handle bar -->
+  <div class="flex justify-center pt-3 pb-2">
+    <div class="w-10 h-1 rounded-full bg-slate-300"></div>
+  </div>
+
+  <!-- Menu Header -->
+  <div class="flex items-center justify-between px-6 pb-3 border-b border-slate-200">
+    <h2 class="text-h3 font-bold text-slate-700">More</h2>
+    <button
+      id="moreMenuClose"
+      class="p-2 rounded-full text-slate-500 hover:bg-slate-100 active:bg-slate-200 transition"
+      aria-label="Close menu"
+    >
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Menu Content -->
+  <div class="px-4 py-4 max-h-[60vh] overflow-y-auto safe-area-bottom">
+    <!-- Dynamic Sections from Config -->
+    {moreSections.length > 0 && (
+      <div class="mb-4">
+        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-2">Sections</h3>
+        <div class="grid grid-cols-2 gap-2">
+          {moreSections.map((section) => (
+            <a
+              href={section.url}
+              class={`flex items-center gap-3 p-3 rounded-lg transition ${
+                isActive(section.url)
+                  ? 'bg-rose-50 text-rose-600'
+                  : 'hover:bg-slate-50 active:bg-slate-100 text-slate-700'
+              }`}
+            >
+              <span class="text-sm font-medium">{section.label}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Utility Links -->
+    <div>
+      <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 px-2">More</h3>
+      <div class="grid grid-cols-2 gap-2">
+        {utilityLinks.map((link) => (
+          <a
+            href={link.url}
+            class={`flex items-center gap-3 p-3 rounded-lg transition ${
+              isActive(link.url)
+                ? 'bg-rose-50 text-rose-600'
+                : 'hover:bg-slate-50 active:bg-slate-100 text-slate-700'
+            }`}
+          >
+            <span class="text-sm font-medium">{link.label}</span>
+          </a>
+        ))}
+        <!-- Subscribe -->
+        <button
+          id="moreMenuSubscribe"
+          class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 active:bg-slate-100 text-slate-700 transition text-left"
+        >
+          <span class="text-sm font-medium">Subscribe</span>
+        </button>
+        <!-- Search -->
+        <button
+          id="moreMenuSearch"
+          class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 active:bg-slate-100 text-slate-700 transition text-left"
+        >
+          <span class="text-sm font-medium">Search</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Spacer to prevent content from being hidden behind bottom nav -->
+<div class="h-16 md:hidden" data-pagefind-ignore></div>
+
+<style>
+  /* Safe area inset for devices with home indicator (iPhone X+) */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+</style>
+
+<script is:inline>
+  // More menu functionality
+  const moreMenuBtn = document.getElementById('moreMenuBtn');
+  const moreMenu = document.getElementById('moreMenu');
+  const moreMenuBackdrop = document.getElementById('moreMenuBackdrop');
+  const moreMenuClose = document.getElementById('moreMenuClose');
+  const moreMenuSubscribe = document.getElementById('moreMenuSubscribe');
+  const moreMenuSearch = document.getElementById('moreMenuSearch');
+
+  function openMoreMenu() {
+    if (!moreMenu || !moreMenuBackdrop || !moreMenuBtn) return;
+
+    moreMenuBackdrop.classList.remove('hidden');
+    moreMenu.classList.remove('translate-y-full');
+    moreMenu.classList.add('translate-y-0');
+    document.body.style.overflow = 'hidden';
+
+    requestAnimationFrame(() => {
+      moreMenuBackdrop.classList.remove('opacity-0');
+      moreMenuBackdrop.classList.add('opacity-100');
+    });
+
+    moreMenuBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeMoreMenu() {
+    if (!moreMenu || !moreMenuBackdrop || !moreMenuBtn) return;
+
+    moreMenu.classList.remove('translate-y-0');
+    moreMenu.classList.add('translate-y-full');
+    moreMenuBackdrop.classList.remove('opacity-100');
+    moreMenuBackdrop.classList.add('opacity-0');
+    document.body.style.overflow = '';
+
+    setTimeout(() => {
+      moreMenuBackdrop.classList.add('hidden');
+    }, 200);
+
+    moreMenuBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  if (moreMenuBtn) {
+    moreMenuBtn.addEventListener('click', () => {
+      const isOpen = moreMenuBtn.getAttribute('aria-expanded') === 'true';
+      if (isOpen) closeMoreMenu();
+      else openMoreMenu();
+    });
+  }
+
+  if (moreMenuClose) {
+    moreMenuClose.addEventListener('click', closeMoreMenu);
+  }
+
+  if (moreMenuBackdrop) {
+    moreMenuBackdrop.addEventListener('click', closeMoreMenu);
+  }
+
+  // Close on escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && moreMenuBtn?.getAttribute('aria-expanded') === 'true') {
+      closeMoreMenu();
+    }
+  });
+
+  // Close when clicking a link
+  if (moreMenu) {
+    moreMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', closeMoreMenu);
+    });
+  }
+
+  // Subscribe button in More menu
+  if (moreMenuSubscribe) {
+    moreMenuSubscribe.addEventListener('click', () => {
+      closeMoreMenu();
+      // Open the subscribe tray from Header
+      setTimeout(() => {
+        const subscribeBackdrop = document.getElementById('subscribeBackdrop');
+        const subscribeTray = document.getElementById('subscribeTray');
+        if (subscribeBackdrop && subscribeTray) {
+          subscribeBackdrop.classList.remove('hidden');
+          subscribeTray.classList.remove('translate-x-full', 'invisible');
+          subscribeTray.classList.add('translate-x-0');
+          document.body.style.overflow = 'hidden';
+          requestAnimationFrame(() => {
+            subscribeBackdrop.classList.remove('opacity-0');
+            subscribeBackdrop.classList.add('opacity-100');
+          });
+        }
+      }, 200);
+    });
+  }
+
+  // Search button in More menu
+  if (moreMenuSearch) {
+    moreMenuSearch.addEventListener('click', () => {
+      closeMoreMenu();
+      setTimeout(() => {
+        if (typeof window.openSearchModal === 'function') {
+          window.openSearchModal();
+        }
+      }, 200);
+    });
+  }
+</script>
