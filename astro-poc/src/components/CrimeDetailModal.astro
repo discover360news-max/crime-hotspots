@@ -111,493 +111,46 @@ import ReportIssueModal from './ReportIssueModal.astro';
 />
 
 <script>
+  // === Imports from existing shared modules ===
+  import { escapeHtml } from '../lib/escapeHtml';
+  import { validateUrl } from '../lib/escapeHtml';
+  import { getSafetyContext } from '../lib/safetyHelpers';
   import { buildRoute } from '../config/routes';
-  const backdrop = document.getElementById('crimeDetailBackdrop');
-  const modal = document.getElementById('crimeDetailModal');
-  const content = document.getElementById('crimeDetailContent');
+
+  // === Imports from extracted modules ===
+  import { generateSafetyContextHTML, generateRelatedCrimesHTML, generateFeedbackToggleHTML } from '../scripts/modalHtmlGenerators';
+  import { initModalFeedbackToggle } from '../scripts/modalFeedbackHandler';
+  import { initShareHandlers } from '../scripts/modalShareHandlers';
+  import { initReportIssueHandler } from '../scripts/modalReportHandler';
+  import { createModalLifecycle } from '../scripts/modalLifecycle';
+
+  // === DOM References ===
+  const backdrop = document.getElementById('crimeDetailBackdrop')!;
+  const modal = document.getElementById('crimeDetailModal')!;
+  const contentEl = document.getElementById('crimeDetailContent')!;
   const closeBtn = document.getElementById('closeCrimeDetailBtn');
 
+  // === State ===
   let currentCrimeUrl = '';
   let currentCrimeHeadline = '';
-  let currentCrimeData = null; // Store full crime object
-  let originalUrl = ''; // URL before modal opened (for restoring on close)
+  let currentCrimeData: any = null;
 
-  // XSS Prevention: Escape HTML special characters
-  function escapeHtml(str) {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
+  // === Initialize modules ===
+  const lifecycle = createModalLifecycle({ backdrop, modal, content: contentEl });
+  initShareHandlers(() => currentCrimeUrl, () => currentCrimeHeadline);
+  initReportIssueHandler(() => currentCrimeData);
 
-  // XSS Prevention: Sanitize URLs (only allow http/https/relative)
-  function sanitizeUrl(url) {
-    if (url == null) return '';
-    const trimmed = String(url).trim();
-    if (trimmed.startsWith('/')) return trimmed;
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
-    return ''; // Block javascript:, data:, etc.
-  }
+  // === Close handlers (backdrop + close button) ===
+  closeBtn?.addEventListener('click', () => lifecycle.close());
+  backdrop?.addEventListener('click', () => lifecycle.close());
 
-  // Safety Context Calculator (client-side version of safetyHelpers.ts)
-  function calculateAreaSafetyContext(areaName, allCrimes) {
-    // Filter to recent crimes (last 90 days)
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - 90);
-
-    const recentCrimesInArea = allCrimes.filter(c => {
-      // Use dateObj if available, otherwise parse date string
-      const crimeDate = c.dateObj ? new Date(c.dateObj) : new Date(c.date);
-      return c.area === areaName && crimeDate >= cutoffDate;
-    });
-
-    const totalRecentCrimes = allCrimes.filter(c => {
-      // Use dateObj if available, otherwise parse date string
-      const crimeDate = c.dateObj ? new Date(c.dateObj) : new Date(c.date);
-      return crimeDate >= cutoffDate;
-    });
-
-    // Calculate score
-    const areaCrimeCount = recentCrimesInArea.length;
-    const totalCrimeCount = totalRecentCrimes.length;
-
-    if (totalCrimeCount === 0) {
-      return { score: 1, level: 'low', tip: 'No recent data available for this area.', primaryCrimeType: 'None' };
-    }
-
-    const density = (areaCrimeCount / totalCrimeCount) * 100;
-
-    // Score calculation (same as backend)
-    let score;
-    if (density <= 0.5) score = 1 + density;
-    else if (density <= 1) score = 2 + (density - 0.5) * 2;
-    else if (density <= 2) score = 3 + (density - 1);
-    else if (density <= 3) score = 4 + (density - 2);
-    else if (density <= 4) score = 5 + (density - 3);
-    else if (density <= 5) score = 6 + (density - 4);
-    else if (density <= 7) score = 7 + (density - 5) / 2;
-    else if (density <= 10) score = 8 + (density - 7) / 3;
-    else score = 9 + Math.min((density - 10) / 10, 1);
-
-    score = Math.max(1, Math.min(10, Math.round(score * 10) / 10));
-
-    // Get primary crime type
-    const crimeTypeCounts = {};
-    recentCrimesInArea.forEach(crime => {
-      const type = crime.primaryCrimeType || crime.crimeType || 'Unknown';
-      crimeTypeCounts[type] = (crimeTypeCounts[type] || 0) + 1;
-    });
-
-    const primaryCrimeType = Object.entries(crimeTypeCounts)
-      .sort((a, b) => b[1] - a[1])[0]?.[0] || 'General Crime';
-
-    // Determine level
-    let level;
-    if (score > 7) level = 'high';
-    else if (score >= 4) level = 'neutral';
-    else level = 'low';
-
-    // Deterministic hash for area-seeded tip selection
-    function hashStr(str) {
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-        hash = ((hash << 5) - hash) + str.charCodeAt(i);
-        hash |= 0;
-      }
-      return Math.abs(hash);
-    }
-
-    const seed = hashStr(areaName.toLowerCase());
-
-    // Get tip — expanded tips mirroring safetyHelpers.ts
-    const highCrimeTips = {
-      'Vehicle Theft': [
-        "The 'Empty Seat' Protocol: Vehicle break-ins are a primary driver of the score in this zone. Never leave bags, charging cables, or even loose change visible; an empty car is rarely a target.",
-        "Steering Lock Deterrent: Visible anti-theft devices like steering wheel locks reduce vehicle theft attempts significantly. A visual deterrent is often more effective than a hidden alarm in high-risk zones.",
-        "Park Smart Strategy: In this area, vehicles parked in well-lit, high-traffic spots are targeted far less frequently. Avoid parking near blind corners, overgrown hedges, or unmonitored lots."
-      ],
-      'Robbery': [
-        "Active Awareness Zone: This area has high reports of 'distraction' incidents. We recommend keeping mobile devices tucked away and avoiding the use of headphones while walking to remain fully alert.",
-        "The Buddy System: Incident data shows that individuals walking alone after dark account for the majority of robbery reports here. Travel with a companion when possible during evening hours.",
-        "Cash Minimisation: Avoid carrying large amounts of cash in this area. Use contactless payment methods where possible, and keep valuables distributed across pockets rather than in a single bag."
-      ],
-      'Burglary': [
-        "Secondary Security Deterrence: Standard locks are often bypassed in this area's incident reports. Consider secondary deterrents like steering wheel locks or reinforced door strike plates for home security.",
-        "The 'Occupied Home' Signal: Burglaries in this zone spike when homes appear vacant. Use timer-controlled lights, keep a radio on low volume, and vary your daily routine to avoid predictable absence patterns.",
-        "Entry Point Audit: Most burglaries here target side windows and back doors. Ensure all secondary entry points have reinforced locks and consider window security film as a low-cost deterrent."
-      ],
-      'Murder': [
-        "Conflict Avoidance Priority: Homicide data in this zone shows a strong correlation with interpersonal disputes. Avoid confrontations, leave heated situations immediately, and contact authorities if you feel threatened.",
-        "Route Planning: Certain corridors in high-risk areas see disproportionate violent crime. Stick to main roads with active foot traffic, avoid shortcuts through isolated areas, and vary your travel routes regularly.",
-        "Emergency Preparedness: In areas with elevated violent crime, keep your phone charged and accessible. Know the nearest police station location and have emergency contacts on speed dial."
-      ],
-      'Shooting': [
-        "Sound Awareness Protocol: If you hear what sounds like gunfire, do not investigate. Move immediately to a solid interior wall or below window level, and call emergency services from a secure position.",
-        "Avoid Congregating in Hotspots: Shooting incidents in this area often occur at specific gathering points. Stay aware of your surroundings and avoid lingering in areas with a history of incidents, especially after dark."
-      ],
-      default: [
-        "Lighting & Line-of-Sight: Incident data here correlates with low-visibility hours. If possible, park only under active streetlights and avoid 'shortcuts' through alleys or unlit residential passages.",
-        "General Alertness Protocol: This area's elevated score warrants heightened awareness. Keep valuables concealed, stay on well-trafficked routes, and trust your instincts if a situation feels unsafe.",
-        "Report & Prevent: Active reporting helps law enforcement allocate resources effectively. If you witness suspicious activity in this zone, report it promptly — even anonymous tips help reduce repeat incidents."
-      ]
-    };
-
-    const neutralTips = [
-      "Baseline Awareness: This area currently maintains a stable safety standing. To help keep it that way, remain aware of your surroundings during 'transition times' like sunrise and sunset when visibility changes.",
-      "The 9 PM Routine: Maintaining a '9 PM Routine'—checking that all car doors, house doors, and windows are locked every night—is often the difference between a neutral score and a high-crime score.",
-      "Strategic Lighting Maintenance: Check that your porch and motion-sensor lights are in working order. Well-lit neighborhoods statistically discourage the types of property 'probing' common in mid-tier areas.",
-      "Community Connection: Introduce yourself to your immediate neighbors. In areas with average crime scores, a connected block where people look out for each other's homes is the strongest deterrent available.",
-      "Vehicle 'Clean-Floor' Policy: Even in stable areas, leaving an empty box or a gym bag in your car can invite a window smash. Keep your car interior completely clear to avoid 'curiosity' break-ins.",
-      "The 'Walk With Purpose' Principle: In areas with moderate activity, how you carry yourself matters. Walking confidently, making brief eye contact, and moving with direction signals awareness to potential opportunists.",
-      "Digital Footprint Caution: Avoid posting real-time location updates on social media when you're away from home. Burglars in moderate-risk areas increasingly use social media to identify empty properties.",
-      "Landscaping as Security: Overgrown hedges and tall fences near entry points create concealment opportunities. Keep shrubs trimmed below window height and ensure your front door is visible from the street.",
-      "Spare Key Discipline: Never hide a spare key under mats, flower pots, or fake rocks. In areas with this crime profile, these are the first places checked. Use a trusted neighbor or a combination lockbox instead.",
-      "After-Dark Parking Protocol: When returning home after dark, park as close to your entrance as possible. Have your keys ready before you exit the vehicle and move directly to your door without lingering.",
-      "Window Security Check: Ground-floor windows in mid-tier areas are common entry points for opportunistic crime. Ensure all accessible windows have functioning locks and consider adding window pins for extra security.",
-      "Noise as Deterrent: A barking dog, a radio left on, or a TV timer can all signal occupancy. In areas with this safety profile, the perception of someone being home is often enough to deter a break-in attempt.",
-      "Cash Point Awareness: ATM-related incidents are more common in moderate areas during off-peak hours. Use machines inside banks or well-lit commercial areas, and shield your PIN entry from view."
-    ];
-
-    const lowTips = [
-      "Maintain the Standard: Keep up the great neighborhood lighting and locked-door habits that have made this area one of the safest in the region.",
-      "Neighborhood Watch Excellence: Continue participating in community watch programs to maintain this area's superior safety standing.",
-      "Security Maintenance: Regular checks of home security systems and outdoor lighting help maintain your area's excellent safety record.",
-      "Community Vigilance: Your area's low crime rate is a testament to community cooperation. Continue reporting suspicious activity to maintain this achievement.",
-      "Proactive Awareness: While your area enjoys low crime rates, maintaining basic security practices ensures it stays that way for years to come.",
-      "Welcome New Residents: A strong community fabric is the foundation of low-crime neighborhoods. Welcoming new neighbors and sharing local safety norms helps preserve the culture that keeps crime rates low.",
-      "Celebrate the Achievement: Your area's safety record is maintained by the collective habits of residents. Recognize that every locked door and reported concern contributes to this outcome.",
-      "Youth Engagement: Low-crime areas that invest in youth activities and community programs tend to sustain their safety advantage long-term. Support or volunteer with local initiatives when possible.",
-      "Emergency Preparedness: Even in the safest areas, having an emergency plan for natural disasters or unexpected events keeps your household resilient. Review your plan annually with all household members.",
-      "Share What Works: Your neighborhood's safety practices can inspire other communities. Consider sharing your community watch strategies or security tips with adjacent areas to help raise the regional standard.",
-      "Seasonal Vigilance: Crime patterns can shift during holiday seasons even in safe areas. Maintain your security routines during festive periods when homes may be unoccupied for travel.",
-      "Digital Security Extension: Your physical safety record is strong — extend that discipline to your digital life. Use strong passwords, enable two-factor authentication, and be cautious with unsolicited messages."
-    ];
-
-    let tip;
-    if (level === 'high') {
-      const tips = highCrimeTips[primaryCrimeType] || highCrimeTips.default;
-      tip = tips[seed % tips.length];
-    } else if (level === 'neutral') {
-      tip = neutralTips[seed % neutralTips.length];
-    } else {
-      tip = lowTips[seed % lowTips.length];
-    }
-
-    // Get positive note (seeded, not random)
-    let positiveNote;
-    if (level === 'high') {
-      const highNotes = [
-        "High Community Guardianship: Residents in this area are historically proactive about reporting suspicious activity early.",
-        "Resilient Community Network: Despite the elevated score, this area shows strong community bonds with active neighbourhood watch participation and rapid incident reporting.",
-        "Improving Trajectory: Recent reporting patterns suggest growing community engagement in crime prevention, which historically precedes measurable improvements in area safety scores.",
-        "Active Law Enforcement Presence: This area benefits from increased police patrols and community policing initiatives, reflecting a collaborative effort between residents and authorities."
-      ];
-      positiveNote = highNotes[seed % highNotes.length];
-    } else if (level === 'low') {
-      const lowNotes = [
-        `Safety Top Percentile: ${areaName} ranks in the top 10% for safety within the city, maintaining a consistently lower-than-average incident rate over the last 12 months.`,
-        `The "Safe Haven" Status: With a safety score of ${score.toFixed(1)}, this area qualifies as a 'Safe Haven' zone, making it one of the most residentially stable pockets in the region.`,
-        `Pedestrian-Friendly Rating: Low reports of street-level incidents make this one of the most pedestrian-friendly hotspots in our database for evening commutes and outdoor activity.`,
-        `Property Stability Win: Residential property crimes remain significantly below the municipal average here, suggesting a high standard of home security and neighborly vigilance.`,
-        `Family-Friendly Designation: ${areaName}'s consistently low incident rate makes it one of the most recommended areas for families seeking a safe residential environment.`,
-        `Business Confidence Zone: Low crime areas like ${areaName} attract higher commercial investment, creating a positive cycle of foot traffic, lighting, and community presence that reinforces safety.`,
-        `Evening Activity Safe Zone: With minimal after-dark incidents, ${areaName} supports an active evening culture — residents report feeling comfortable walking, jogging, and socialising well into the night.`,
-        `Community Trust Index: Areas with scores this low typically show the highest levels of inter-neighbour trust, translating to faster incident response and stronger collective vigilance.`
-      ];
-      positiveNote = lowNotes[seed % lowNotes.length];
-    }
-
-    return { score, level, tip, positiveNote, primaryCrimeType };
-  }
-
-  // Generate Safety Context HTML
-  function generateSafetyContextHTML(areaName, context) {
-    const styles = {
-      high: {
-        bg: 'bg-amber-50',
-        border: 'border-amber-200',
-        icon: 'text-amber-600',
-        title: 'text-amber-800',
-        text: 'text-slate-700',
-        label: 'Active Safety Alert',
-        iconPath: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
-      },
-      neutral: {
-        bg: 'bg-slate-50',
-        border: 'border-slate-200',
-        icon: 'text-slate-500',
-        title: 'text-slate-700',
-        text: 'text-slate-600',
-        label: 'Community Standing: Stable',
-        iconPath: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z'
-      },
-      low: {
-        bg: 'bg-emerald-50',
-        border: 'border-emerald-200',
-        icon: 'text-emerald-600',
-        title: 'text-emerald-800',
-        text: 'text-slate-700',
-        label: 'Safe Haven Status',
-        iconPath: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'
-      }
-    };
-
-    const style = styles[context.level];
-
-    return `
-      <div class="${style.bg} ${style.border} border rounded-lg p-5">
-        <div class="flex items-start gap-3">
-          <div class="${style.icon} flex-shrink-0 mt-0.5">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${style.iconPath}" />
-            </svg>
-          </div>
-          <div class="flex-1">
-            <h3 class="text-sm font-semibold ${style.title} mb-1">
-              ${style.label} - ${escapeHtml(areaName)}
-            </h3>
-            <div class="text-xs text-slate-500 mb-3">
-              Risk Level: ${context.score.toFixed(1)}/10
-              ${context.primaryCrimeType ? ` • Primary Concern: ${escapeHtml(context.primaryCrimeType)}` : ''}
-            </div>
-            <p class="text-sm ${style.text} leading-relaxed mb-3">
-              ${escapeHtml(context.tip)}
-            </p>
-            ${context.positiveNote ? `
-              <div class="mt-3 pt-3 border-t border-slate-200">
-                <p class="text-sm text-slate-600 leading-relaxed italic">
-                  ${escapeHtml(context.positiveNote)}
-                </p>
-              </div>
-            ` : ''}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // Generate Feedback Toggle HTML for modal
-  function generateFeedbackToggleHTML(areaName, pageUrl, pageTitle) {
-    const key = `feedback_safety_${areaName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
-    const existingVote = localStorage.getItem(key);
-    const showVote = existingVote === null;
-
-    return `
-      <div class="feedback-toggle mt-4" data-area="${escapeHtml(areaName)}" data-url="${escapeHtml(pageUrl)}" data-title="${escapeHtml(pageTitle)}">
-        <div class="feedback-vote ${showVote ? '' : 'hidden'} flex items-center justify-between p-4 bg-white border border-slate-200 rounded-lg">
-          <span class="text-sm text-slate-600 font-medium">Was this safety insight helpful?</span>
-          <div class="flex items-center gap-2">
-            <button class="feedback-btn px-4 py-1.5 min-h-[22px] border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition font-medium text-xs" data-vote="yes" aria-label="Yes, this was helpful">Yes</button>
-            <button class="feedback-btn px-4 py-1.5 min-h-[22px] border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition font-medium text-xs" data-vote="no" aria-label="No, this was not helpful">No</button>
-          </div>
-        </div>
-        <div class="feedback-thanks ${showVote ? 'hidden' : ''} p-4 bg-white border border-slate-200 rounded-lg">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="feedback-spark relative inline-flex items-center justify-center w-5 h-5">
-              <svg class="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-              </svg>
-            </span>
-            <span class="text-sm text-slate-700 font-medium">Thanks for your feedback</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-slate-500">Share this page:</span>
-            <button class="feedback-share-twitter p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 transition" title="Share on X (Twitter)" aria-label="Share on X (Twitter)">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </button>
-            <button class="feedback-share-facebook p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 transition" title="Share on Facebook" aria-label="Share on Facebook">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-            </button>
-            <button class="feedback-share-whatsapp p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 transition" title="Share on WhatsApp" aria-label="Share on WhatsApp">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // Crime type color mapping (matches crimeColors.ts)
-  function getCrimeColorHex(crimeType) {
-    const colors = {
-      'Murder': '#e11d48',
-      'Shooting': '#dc2626',
-      'Robbery': '#f97316',
-      'Burglary': '#eab308',
-      'Theft': '#06b6d4',
-      'Home Invasion': '#9333ea',
-      'Kidnapping': '#ec4899',
-      'Sexual Assault': '#c026d3',
-      'Assault': '#8b5cf6',
-      'Seizures': '#3b82f6',
-      'Vehicle Theft': '#0ea5e9'
-    };
-    return colors[crimeType] || '#64748b';
-  }
-
-  // Generate Related Crimes HTML for modal
-  function generateRelatedCrimesHTML(currentCrime, allCrimes, maxCards = 4) {
-    // Filter out current crime
-    const otherCrimes = allCrimes.filter(c => c.slug !== currentCrime.slug);
-
-    // Find crimes in same area
-    const sameAreaCrimes = otherCrimes
-      .filter(c => c.area?.toLowerCase() === currentCrime.area?.toLowerCase())
-      .slice(0, maxCards);
-
-    // If we need more, add same crime type from other areas
-    let relatedCrimes = [...sameAreaCrimes];
-    if (relatedCrimes.length < 3) {
-      const sameCrimeTypeCrimes = otherCrimes
-        .filter(c =>
-          c.crimeType?.toLowerCase() === currentCrime.crimeType?.toLowerCase() &&
-          c.area?.toLowerCase() !== currentCrime.area?.toLowerCase()
-        )
-        .slice(0, maxCards - relatedCrimes.length);
-      relatedCrimes = [...relatedCrimes, ...sameCrimeTypeCrimes];
-    }
-
-    // Sort by date (most recent first)
-    relatedCrimes.sort((a, b) => {
-      const dateA = a.dateObj ? new Date(a.dateObj) : new Date(a.date);
-      const dateB = b.dateObj ? new Date(b.dateObj) : new Date(b.date);
-      return dateB.getTime() - dateA.getTime();
-    });
-
-    // Limit to maxCards
-    relatedCrimes = relatedCrimes.slice(0, maxCards);
-
-    if (relatedCrimes.length === 0) {
-      return '';
-    }
-
-    // Format date for display
-    const formatDate = (dateStr) => {
-      const date = new Date(dateStr);
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    };
-
-    // Truncate headline
-    const truncateHeadline = (headline, maxLength = 60) => {
-      if (!headline) return '';
-      if (headline.length <= maxLength) return headline;
-      return headline.substring(0, maxLength).trim() + '...';
-    };
-
-    // Create area slug for link
-    const areaSlug = (currentCrime.area || '')
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
-
-    const crimeCards = relatedCrimes.map(crime => {
-      const isSameArea = crime.area?.toLowerCase() === currentCrime.area?.toLowerCase();
-      const colorHex = getCrimeColorHex(crime.crimeType);
-      const crimeUrl = buildRoute.crime(crime.slug);
-
-      return `
-        <a href="${escapeHtml(crimeUrl)}" data-related-crime-slug="${escapeHtml(crime.slug)}" class="related-crime-link block p-3 bg-white rounded-lg border border-slate-100 hover:border-rose-200 hover:shadow-sm transition-all group">
-          <div class="flex items-start gap-2">
-            <span class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style="background-color: ${colorHex}"></span>
-            <div class="flex-1 min-w-0">
-              <p class="text-xs font-medium text-slate-700 group-hover:text-rose-600 transition-colors line-clamp-2">
-                ${escapeHtml(truncateHeadline(crime.headline))}
-              </p>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-[10px] text-slate-400">${formatDate(crime.date)}</span>
-                ${isSameArea
-                  ? '<span class="text-[10px] px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded">Same area</span>'
-                  : `<span class="text-[10px] text-slate-400 truncate">${escapeHtml(crime.area || '')}</span>`
-                }
-              </div>
-            </div>
-            <svg class="w-3 h-3 text-slate-300 group-hover:text-rose-400 transition-colors flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-        </a>
-      `;
-    }).join('');
-
-    return `
-      <aside class="p-4 bg-slate-50/80 backdrop-blur-sm rounded-lg border border-slate-200">
-        <h2 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-          <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          Related Crimes
-        </h2>
-        <div class="space-y-2">
-          ${crimeCards}
-        </div>
-        <a href="/trinidad/area/${escapeHtml(areaSlug)}/" class="mt-3 flex items-center justify-center gap-1 w-full py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors">
-          View all crimes in ${escapeHtml(currentCrime.area || '')}
-          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </a>
-      </aside>
-    `;
-  }
-
-  // Initialize feedback toggle event listeners for modal
-  function initModalFeedbackToggle(container) {
-    if (!container) return;
-    const areaName = container.dataset.area || '';
-    const pageUrl = container.dataset.url || window.location.href;
-    const pageTitle = container.dataset.title || document.title;
-    const key = `feedback_safety_${areaName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}`;
-
-    const voteEl = container.querySelector('.feedback-vote');
-    const thanksEl = container.querySelector('.feedback-thanks');
-    if (!voteEl || !thanksEl) return;
-
-    // Already voted - state is handled by generateFeedbackToggleHTML
-    if (localStorage.getItem(key) !== null) return;
-
-    container.querySelectorAll('.feedback-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const vote = btn.dataset.vote || 'yes';
-        localStorage.setItem(key, vote);
-
-        voteEl.classList.add('hidden');
-        thanksEl.classList.remove('hidden');
-
-        const spark = thanksEl.querySelector('.feedback-spark');
-        if (spark) {
-          spark.classList.add('animate');
-          setTimeout(() => spark.classList.remove('animate'), 700);
-        }
-      });
-    });
-
-    container.querySelector('.feedback-share-twitter')?.addEventListener('click', () => {
-      const text = encodeURIComponent(pageTitle);
-      const url = encodeURIComponent(pageUrl);
-      window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=550,height=420');
-    });
-
-    container.querySelector('.feedback-share-facebook')?.addEventListener('click', () => {
-      const url = encodeURIComponent(pageUrl);
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=550,height=420');
-    });
-
-    container.querySelector('.feedback-share-whatsapp')?.addEventListener('click', () => {
-      const text = encodeURIComponent(`${pageTitle} - ${pageUrl}`);
-      window.open(`https://wa.me/?text=${text}`, '_blank');
-    });
-  }
-
-  // Bind click handlers on related crime links inside the modal
+  // === Bind related crime links for in-place navigation ===
   function bindRelatedCrimeLinks() {
-    document.querySelectorAll('#modalRelatedCrimes .related-crime-link').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        var slug = link.getAttribute('data-related-crime-slug');
-        var crimes = window.__crimesData || [];
-        var crime = crimes.find(function(c) { return c.slug === slug; });
+    document.querySelectorAll('#modalRelatedCrimes .related-crime-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        const slug = (link as HTMLElement).getAttribute('data-related-crime-slug');
+        const crimes = (window as any).__crimesData || [];
+        const crime = crimes.find((c: any) => c.slug === slug);
         if (crime) {
           e.preventDefault();
           openCrimeModal(crime);
@@ -606,53 +159,41 @@ import ReportIssueModal from './ReportIssueModal.astro';
     });
   }
 
-  // Function to open modal with crime data
-  function openCrimeModal(crime) {
-    if (!backdrop || !modal || !content) return;
-
-    // Check if modal is already open (navigating between crimes)
-    const isAlreadyOpen = !backdrop.classList.contains('hidden');
+  // === Main open function ===
+  function openCrimeModal(crime: any) {
+    const isAlreadyOpen = lifecycle.isOpen();
 
     // Format date
     const formattedDate = new Date(crime.date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      year: 'numeric', month: 'long', day: 'numeric'
     });
 
-    // Populate modal content
-    document.getElementById('modalHeadline').textContent = crime.headline;
+    // Populate headline
+    document.getElementById('modalHeadline')!.textContent = crime.headline;
 
-    // Metadata (date, crime type, location)
-    const metadata = document.getElementById('modalMetadata');
-
-    // Build related crimes pills if they exist (with XSS escaping)
+    // Populate metadata
     let relatedCrimesPills = '';
-    if (crime.relatedCrimeTypes && crime.relatedCrimeTypes.trim()) {
-      const relatedCrimes = crime.relatedCrimeTypes.split(',').map(c => c.trim());
-      relatedCrimesPills = relatedCrimes.map(relatedCrime =>
-        `<span class="px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-medium">${escapeHtml(relatedCrime)}</span>`
-      ).join('');
+    if (crime.relatedCrimeTypes?.trim()) {
+      relatedCrimesPills = crime.relatedCrimeTypes.split(',')
+        .map((c: string) => c.trim())
+        .map((rc: string) => `<span class="px-3 py-1 rounded-full bg-slate-300 text-slate-700 font-medium">${escapeHtml(rc)}</span>`)
+        .join('');
     }
-
-    metadata.innerHTML = `
+    document.getElementById('modalMetadata')!.innerHTML = `
       <time class="text-slate-500">${escapeHtml(formattedDate)}</time>
       <span class="px-3 py-1 rounded-full bg-rose-600 text-white font-medium">${escapeHtml(crime.crimeType)}</span>
       ${relatedCrimesPills}
       <span class="text-slate-500">${crime.street ? `${escapeHtml(crime.street)}, ` : ''}${escapeHtml(crime.area)}</span>
     `;
 
-    // Summary (with XSS escaping)
-    const summaryEl = document.getElementById('modalSummary');
-    if (crime.summary) {
-      summaryEl.innerHTML = `<p class="text-base text-slate-700 leading-relaxed whitespace-pre-line">${escapeHtml(crime.summary).replace(/\|\|/g, '\n\n')}</p>`;
-    } else {
-      summaryEl.innerHTML = '';
-    }
+    // Populate summary
+    const summaryEl = document.getElementById('modalSummary')!;
+    summaryEl.innerHTML = crime.summary
+      ? `<p class="text-base text-slate-700 leading-relaxed whitespace-pre-line">${escapeHtml(crime.summary).replace(/\|\|/g, '\n\n')}</p>`
+      : '';
 
-    // Details grid (with XSS escaping)
-    const detailsEl = document.getElementById('modalDetails');
-    detailsEl.innerHTML = `
+    // Populate details grid
+    document.getElementById('modalDetails')!.innerHTML = `
       <dt class="text-xs font-semibold text-slate-500">Region:</dt>
       <dd class="text-xs text-slate-700">${escapeHtml(crime.region)}</dd>
       ${crime.source ? `
@@ -661,30 +202,28 @@ import ReportIssueModal from './ReportIssueModal.astro';
       ` : ''}
     `;
 
-    // Calculate and populate safety context
-    const allCrimes = window.__crimesData || [];
-    const safetyContext = calculateAreaSafetyContext(crime.area, allCrimes);
-
-    // Populate safety context + feedback toggle
+    // Safety context
+    const allCrimes = (window as any).__crimesData || [];
+    const safetyContext = getSafetyContext(crime.area, allCrimes);
     const safetyContextEl = document.getElementById('modalSafetyContext');
     if (safetyContextEl) {
       const feedbackUrl = buildRoute.crimeAbsolute(crime.slug);
       safetyContextEl.innerHTML = generateSafetyContextHTML(crime.area, safetyContext)
         + generateFeedbackToggleHTML(crime.area, feedbackUrl, crime.headline);
-      initModalFeedbackToggle(safetyContextEl.querySelector('.feedback-toggle'));
+      initModalFeedbackToggle(safetyContextEl.querySelector('.feedback-toggle') as HTMLElement);
     }
 
-    // Populate related crimes
+    // Related crimes
     const relatedCrimesEl = document.getElementById('modalRelatedCrimes');
     if (relatedCrimesEl) {
       relatedCrimesEl.innerHTML = generateRelatedCrimesHTML(crime, allCrimes, 4);
       bindRelatedCrimeLinks();
     }
 
-    // Update button links (with URL sanitization)
-    document.getElementById('modalViewFullBtn').href = buildRoute.crime(encodeURIComponent(crime.slug));
-    const sourceBtn = document.getElementById('modalSourceBtn');
-    const safeUrl = sanitizeUrl(crime.url);
+    // Action buttons
+    (document.getElementById('modalViewFullBtn') as HTMLAnchorElement).href = buildRoute.crime(encodeURIComponent(crime.slug));
+    const sourceBtn = document.getElementById('modalSourceBtn') as HTMLAnchorElement;
+    const safeUrl = validateUrl(crime.url);
     if (safeUrl) {
       sourceBtn.href = safeUrl;
       sourceBtn.style.display = 'flex';
@@ -692,227 +231,31 @@ import ReportIssueModal from './ReportIssueModal.astro';
       sourceBtn.style.display = 'none';
     }
 
-    // Store for sharing and reporting
+    // Update state
     currentCrimeUrl = buildRoute.crimeAbsolute(crime.slug);
     currentCrimeHeadline = crime.headline;
-    currentCrimeData = crime; // Store full crime object for Report Issue
+    currentCrimeData = crime;
 
+    // History + animation
     if (isAlreadyOpen) {
-      // Already viewing a crime — replace URL so back button returns to original page
-      history.replaceState({ crimeModal: true }, '', buildRoute.crime(crime.slug));
-      // Scroll modal content back to top
-      content.scrollTop = 0;
+      lifecycle.replaceUrl(crime.slug);
+      contentEl.scrollTop = 0;
     } else {
-      // First open — show modal with animation
-      backdrop.classList.remove('hidden', 'pointer-events-none');
-      modal.classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-
-      // Push crime URL so back button closes modal + both Cloudflare & GA4 track the view
-      originalUrl = window.location.pathname + window.location.search;
-      history.pushState({ crimeModal: true }, '', buildRoute.crime(crime.slug));
-
-      requestAnimationFrame(() => {
-        backdrop.classList.remove('opacity-0');
-        backdrop.classList.add('opacity-100');
-        content.classList.remove('scale-95', 'opacity-0');
-        content.classList.add('scale-100', 'opacity-100');
-      });
+      lifecycle.setOriginalUrl(window.location.pathname + window.location.search);
+      lifecycle.open();
+      lifecycle.pushUrl(crime.slug);
     }
   }
 
-  function closeCrimeModal(skipHistory = false) {
-    if (!backdrop || !modal || !content) return;
-
-    // Restore original URL (skip if triggered by back button — browser already handled it)
-    if (!skipHistory && originalUrl) {
-      history.back();
-    }
-    originalUrl = '';
-
-    backdrop.classList.remove('opacity-100');
-    backdrop.classList.add('opacity-0');
-    content.classList.remove('scale-100', 'opacity-100');
-    content.classList.add('scale-95', 'opacity-0');
-
-    setTimeout(() => {
-      backdrop.classList.add('hidden', 'pointer-events-none');
-      modal.classList.add('hidden');
-      document.body.style.overflow = '';
-    }, 300);
+  // === Open by slug (for map markers and external calls) ===
+  function openCrimeDetailModal(slug: string) {
+    const crimes = (window as any).__crimesData || [];
+    const crime = crimes.find((c: any) => c.slug === slug);
+    if (crime) openCrimeModal(crime);
+    else console.error('Crime not found:', slug);
   }
 
-  // Back button closes modal instead of navigating away
-  window.addEventListener('popstate', (e) => {
-    if (!backdrop?.classList.contains('hidden')) {
-      closeCrimeModal(true); // skipHistory — browser already went back
-    }
-  });
-
-  // Event listeners
-  if (closeBtn) {
-    closeBtn.addEventListener('click', closeCrimeModal);
-  }
-
-  if (backdrop) {
-    backdrop.addEventListener('click', closeCrimeModal);
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && backdrop && !backdrop.classList.contains('hidden')) {
-      closeCrimeModal();
-    }
-  });
-
-  // Share button handlers
-  const shareTwitterBtn = document.getElementById('shareTwitterBtn');
-  const shareFacebookBtn = document.getElementById('shareFacebookBtn');
-  const shareWhatsAppBtn = document.getElementById('shareWhatsAppBtn');
-  const copyLinkBtn = document.getElementById('copyLinkBtn');
-  const copyFeedback = document.getElementById('copyFeedback');
-
-  if (shareTwitterBtn) {
-    shareTwitterBtn.addEventListener('click', () => {
-      const text = encodeURIComponent(currentCrimeHeadline);
-      const url = encodeURIComponent(currentCrimeUrl);
-      window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=550,height=420');
-    });
-  }
-
-  if (shareFacebookBtn) {
-    shareFacebookBtn.addEventListener('click', () => {
-      const url = encodeURIComponent(currentCrimeUrl);
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=550,height=420');
-    });
-  }
-
-  if (shareWhatsAppBtn) {
-    shareWhatsAppBtn.addEventListener('click', () => {
-      const text = encodeURIComponent(`${currentCrimeHeadline} - ${currentCrimeUrl}`);
-      window.open(`https://wa.me/?text=${text}`, '_blank');
-    });
-  }
-
-  if (copyLinkBtn && copyFeedback) {
-    copyLinkBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(currentCrimeUrl);
-        copyFeedback.classList.remove('opacity-0');
-        copyFeedback.classList.add('opacity-100');
-        setTimeout(() => {
-          copyFeedback.classList.remove('opacity-100');
-          copyFeedback.classList.add('opacity-0');
-        }, 2000);
-      } catch (err) {
-        console.error('Failed to copy:', err);
-      }
-    });
-  }
-
-  // Function to open modal by slug (for map markers and other external calls)
-  function openCrimeDetailModal(slug) {
-    // Get crimes from global variable (set by dashboardDataLoader)
-    const crimes = window.__crimesData || [];
-    const crime = crimes.find(c => c.slug === slug);
-
-    if (crime) {
-      openCrimeModal(crime);
-    } else {
-      console.error('Crime not found:', slug);
-    }
-  }
-
-  // Handle Report Issue button click
-  const modalReportIssueBtn = document.getElementById('modalReportIssueBtn');
-  if (modalReportIssueBtn) {
-    modalReportIssueBtn.addEventListener('click', () => {
-      if (!currentCrimeData) {
-        console.error('No crime data available');
-        return;
-      }
-
-      console.log('Opening report issue modal with crime data:', currentCrimeData);
-
-      // Update hidden form fields with current crime data
-      const form = document.getElementById('modalreportIssueForm');
-      if (!form) {
-        console.error('Form not found: modalreportIssueForm');
-        return;
-      }
-
-      try {
-        // Update required hidden fields
-        const slugInput = form.querySelector('input[name="crimeSlug"]');
-        const headlineInput = form.querySelector('input[name="crimeHeadline"]');
-        const dateInput = form.querySelector('input[name="crimeDate"]');
-        const typeInput = form.querySelector('input[name="crimeType"]');
-        const areaInput = form.querySelector('input[name="crimeArea"]');
-        const regionInput = form.querySelector('input[name="crimeRegion"]');
-
-        if (!slugInput || !headlineInput || !dateInput || !typeInput || !areaInput || !regionInput) {
-          console.error('Required form fields not found', {
-            slug: !!slugInput,
-            headline: !!headlineInput,
-            date: !!dateInput,
-            type: !!typeInput,
-            area: !!areaInput,
-            region: !!regionInput
-          });
-          return;
-        }
-
-        slugInput.value = currentCrimeData.slug || '';
-        headlineInput.value = currentCrimeData.headline || '';
-        dateInput.value = currentCrimeData.date || '';
-        typeInput.value = currentCrimeData.crimeType || '';
-        areaInput.value = currentCrimeData.area || '';
-        regionInput.value = currentCrimeData.region || '';
-
-        // Update optional fields
-        const streetInput = form.querySelector('input[name="crimeStreet"]');
-        if (streetInput) streetInput.value = currentCrimeData.street || '';
-
-        const summaryInput = form.querySelector('input[name="crimeSummary"]');
-        if (summaryInput) summaryInput.value = currentCrimeData.summary || '';
-
-        const sourceInput = form.querySelector('input[name="crimeSource"]');
-        if (sourceInput) sourceInput.value = currentCrimeData.source || '';
-
-        const urlInput = form.querySelector('input[name="crimeUrl"]');
-        if (urlInput) urlInput.value = currentCrimeData.url || '';
-
-        // Update preview text in the modal
-        const previewHeadline = form.querySelector('.text-sm.font-semibold.text-slate-700');
-        if (previewHeadline) previewHeadline.textContent = currentCrimeData.headline || '';
-
-        const previewMeta = form.querySelector('.text-xs.text-slate-500.mt-1');
-        if (previewMeta) previewMeta.textContent = `${currentCrimeData.date || ''} • ${currentCrimeData.area || ''}`;
-
-        console.log('Form fields populated successfully');
-      } catch (error) {
-        console.error('Error populating form fields:', error);
-        return;
-      }
-
-      // Directly open the ReportIssueModal
-      const reportIssueModal = document.getElementById('modalreportIssueModal');
-      const reportIssueContent = document.getElementById('modalreportIssueContent');
-
-      if (reportIssueModal && reportIssueContent) {
-        reportIssueModal.classList.remove('invisible', 'opacity-0');
-        reportIssueModal.classList.add('visible', 'opacity-100');
-        setTimeout(() => {
-          reportIssueContent.classList.remove('opacity-0', 'scale-95');
-          reportIssueContent.classList.add('opacity-100', 'scale-100');
-        }, 50);
-
-        // Trigger Turnstile rendering by dispatching a custom event
-        window.dispatchEvent(new CustomEvent('openReportIssueModal', { detail: { idPrefix: 'modal' } }));
-      }
-    });
-  }
-
-  // Expose functions globally so cards/markers can call them
-  window.openCrimeModal = openCrimeModal;
-  window.openCrimeDetailModal = openCrimeDetailModal;
+  // === Global exports ===
+  (window as any).openCrimeModal = openCrimeModal;
+  (window as any).openCrimeDetailModal = openCrimeDetailModal;
 </script>

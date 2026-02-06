@@ -13,12 +13,14 @@ import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import SiteNotificationBanner from '../../../../components/SiteNotificationBanner.astro';
 import QuickInsightsCard from '../../../../components/QuickInsightsCard.astro';
 import CrimeDetailModal from '../../../../components/CrimeDetailModal.astro';
+import CrimeCard from '../../../../components/CrimeCard.astro';
 import AreaNameTooltip from '../../../../components/AreaNameTooltip.astro';
 import { getTrinidadCrimes, type Crime } from '../../../../lib/crimeData';
 import { dataUpdateNotice } from '../../../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../../../lib/areaAliases';
 import { getCountryName } from '../../../../data/countries';
 import { routes, buildRoute } from '../../../../config/routes';
+import { usesVictimCount } from '../../../../config/crimeTypeConfig';
 
 export async function getStaticPaths() {
   const crimes = await getTrinidadCrimes();
@@ -124,6 +126,16 @@ const trendingCrime = Object.entries(crimesByType)
 const daysInMonth = new Date(year, month, 0).getDate();
 const avgPerDay = (crimes.length / daysInMonth).toFixed(1);
 
+// Calculate total victims (respecting victimCount for configured crime types)
+const totalVictims = crimes.reduce((sum, crime) => {
+  const primaryType = crime.primaryCrimeType || crime.crimeType;
+  if (primaryType && usesVictimCount(primaryType)) {
+    return sum + (crime.victimCount || 1);
+  }
+  return sum + 1;
+}, 0);
+const victimsPerDay = Math.round(totalVictims / daysInMonth);
+
 // Most dangerous day of week
 const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const dayOfWeekCount = new Map<string, number>();
@@ -161,6 +173,7 @@ const safestRegionCount = validAreas[validAreas.length - 1]?.[1] || 0;
 
 const insights = {
   avgPerDay,
+  victimsPerDay,
   mostDangerousDay,
   busiestMonth,
   top3Percentage,
@@ -170,12 +183,35 @@ const insights = {
   safestRegionCount
 };
 
+// Group crimes by date for accordion display
+const crimesByDate = new Map<string, Crime[]>();
+crimes.forEach(crime => {
+  const dateKey = crime.date;
+  if (!crimesByDate.has(dateKey)) {
+    crimesByDate.set(dateKey, []);
+  }
+  crimesByDate.get(dateKey)!.push(crime);
+});
+
+// Sort dates descending (most recent first)
+const sortedDates = Array.from(crimesByDate.keys()).sort((a, b) =>
+  new Date(b).getTime() - new Date(a).getTime()
+);
+
+// Helper to calculate victim count for a group
+function calculateVictimCount(groupCrimes: Crime[]): number {
+  return groupCrimes.reduce((total, crime) => {
+    const vc = crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1;
+    return total + vc;
+  }, 0);
+}
+
 // Breadcrumbs
 const breadcrumbs = [
   { label: 'Home', href: routes.home },
   { label: getCountryName('tt'), href: routes.trinidad.dashboard },
   { label: 'Archive', href: routes.trinidad.archive },
-  { label: String(year), href: `/trinidad/archive/${year}/` },
+  { label: String(year), href: routes.trinidad.archive },
   { label: monthName }
 ];
 ---
@@ -278,58 +314,72 @@ const breadcrumbs = [
       <QuickInsightsCard insights={insights} busiestLabel="Deadliest Day" />
     </div>
 
-    <!-- Crime Headlines List -->
+    <!-- Crime Headlines by Date -->
     <section>
       <h2 class="text-h2 font-bold text-slate-700 mb-4">All Headlines ({crimes.length})</h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {crimes.map(crime => {
-          const formattedDate = new Date(crime.date).toLocaleDateString('en-US', {
-            month: 'short',
+      <div id="crimeAccordions">
+        {sortedDates.map((date, index) => {
+          const dateCrimes = crimesByDate.get(date)!;
+          const incidentCount = dateCrimes.length;
+          const victimCount = calculateVictimCount(dateCrimes);
+          const isExpanded = index === 0;
+          const formattedDate = new Date(date).toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
             day: 'numeric',
             year: 'numeric'
           });
 
           return (
-            <article class="crime-card bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 hover:shadow-lg transition cursor-pointer" data-crime-slug={crime.slug}>
-              <div class="flex items-start justify-between mb-3">
-                <span class="inline-block px-3 py-1 rounded-full bg-rose-600 text-white text-xs font-medium">
-                  {crime.crimeType}
-                </span>
-                <span class="text-xs text-slate-500">
-                  {formattedDate}
-                </span>
-              </div>
-
-              <h3 class="text-small font-semibold text-slate-700 mb-2">
-                {crime.headline}
-              </h3>
-
-              {crime.area && (
-                <p class="text-xs text-slate-500 mb-3 flex items-center gap-1">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <AreaNameTooltip area={crime.area} localName={getLocalName(areaAliases, crime.area)} />
-                </p>
-              )}
-
-              <div class="flex items-center justify-between pt-3 border-t border-slate-200">
-                <a href={buildRoute.crime(crime.slug)} class="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1">
-                  View Details
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="date-accordion mb-4" data-date={date}>
+              <button
+                class={`accordion-header w-full px-4 py-3 bg-white/70 backdrop-blur-md rounded-lg hover:bg-white/90 transition flex items-center justify-between group ${isExpanded ? 'border border-rose-600' : 'border border-slate-200'}`}
+                aria-expanded={isExpanded}
+              >
+                <div class="flex items-center gap-3">
+                  <svg
+                    class={`chevron w-5 h-5 text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
 
-                <a href={crime.url} target="_blank" rel="noopener noreferrer" class="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1" title="Read original article">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
+                  <div class="text-left">
+                    <h3 class={`accordion-title text-small font-semibold ${isExpanded ? 'text-rose-600' : 'text-slate-700'}`}>{formattedDate}</h3>
+                    <p class="text-xs text-slate-500">{incidentCount} {incidentCount === 1 ? 'incident' : 'incidents'} affecting {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+                  </div>
+                </div>
+
+                <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-medium">
+                  {incidentCount}
+                </span>
+              </button>
+
+              <div class={`accordion-content overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[10000px] mt-3' : 'max-h-0'}`}>
+                <!-- Mobile Timeline View -->
+                <div class="relative pl-8 pb-4 sm:hidden">
+                  <div class="absolute left-3 top-0 bottom-4 w-px border-l-2 border-dotted border-slate-300"></div>
+                  <div class="space-y-4">
+                    {dateCrimes.map(crime => (
+                      <div class="relative">
+                        <div class="absolute -left-[23px] top-4 w-1.5 h-1.5 rounded-full bg-rose-600"></div>
+                        <CrimeCard crime={crime} localName={getLocalName(areaAliases, crime.area)} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <!-- Desktop Grid View -->
+                <div class="hidden sm:grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
+                  {dateCrimes.map(crime => (
+                    <CrimeCard crime={crime} localName={getLocalName(areaAliases, crime.area)} />
+                  ))}
+                </div>
               </div>
-            </article>
+            </div>
           );
         })}
       </div>
@@ -344,15 +394,47 @@ const breadcrumbs = [
   // Expose crimes data globally for modal safety context
   window.__crimesData = crimes;
 
-  // Event delegation for crime card clicks
   document.addEventListener('DOMContentLoaded', () => {
-    const container = document.querySelector('section');
+    // Accordion toggle listeners
+    const headers = document.querySelectorAll('.accordion-header');
+    headers.forEach(header => {
+      header.addEventListener('click', () => {
+        const accordion = header.closest('.date-accordion');
+        const content = accordion?.querySelector('.accordion-content');
+        const chevron = header.querySelector('.chevron');
+        const title = header.querySelector('.accordion-title');
+        const isExpanded = header.getAttribute('aria-expanded') === 'true';
+
+        if (content && chevron && title) {
+          if (isExpanded) {
+            header.setAttribute('aria-expanded', 'false');
+            content.classList.remove('max-h-[10000px]', 'mt-3');
+            content.classList.add('max-h-0');
+            chevron.classList.remove('rotate-90');
+            header.classList.remove('border-rose-600');
+            header.classList.add('border-slate-200');
+            title.classList.remove('text-rose-600');
+            title.classList.add('text-slate-700');
+          } else {
+            header.setAttribute('aria-expanded', 'true');
+            content.classList.add('max-h-[10000px]', 'mt-3');
+            content.classList.remove('max-h-0');
+            chevron.classList.add('rotate-90');
+            header.classList.remove('border-slate-200');
+            header.classList.add('border-rose-600');
+            title.classList.remove('text-slate-700');
+            title.classList.add('text-rose-600');
+          }
+        }
+      });
+    });
+
+    // Event delegation for crime card clicks
+    const container = document.getElementById('crimeAccordions');
     if (container) {
       container.addEventListener('click', (e) => {
-        // Don't open modal if clicking on a link
-        if (e.target.closest('a')) {
-          return;
-        }
+        if (e.target.closest('a')) return;
+        if (e.target.closest('.accordion-header')) return;
 
         const card = e.target.closest('.crime-card');
         if (card) {
@@ -368,12 +450,35 @@ const breadcrumbs = [
 </script>
 
 <style>
-  /* Hide scrollbar but keep functionality */
+  /* Hide scrollbar on touch devices, show on desktop */
   .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
   .hide-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Show styled scrollbar on devices with hover (desktop) */
+  @media (hover: hover) {
+    .hide-scrollbar {
+      -ms-overflow-style: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #fda4af transparent;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: block;
+      height: 6px;
+    }
+    .hide-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .hide-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #fda4af;
+      border-radius: 3px;
+    }
+    .hide-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: #fb7185;
+    }
   }
 </style>

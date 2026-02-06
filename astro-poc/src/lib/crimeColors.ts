@@ -43,6 +43,10 @@ export const CRIME_COLORS = {
   'Seizures': {
     tailwind: 'bg-blue-500',
     hex: '#3b82f6'
+  },
+  'Vehicle Theft': {
+    tailwind: 'bg-sky-500',
+    hex: '#0ea5e9'
   }
 } as const;
 

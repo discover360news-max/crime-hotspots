@@ -50,3 +50,20 @@ export function sanitizeUrl(url: string | null | undefined): string {
   // Block everything else (javascript:, data:, vbscript:, etc.)
   return '';
 }
+
+/**
+ * Validate a URL scheme without HTML escaping.
+ * Use this when assigning to DOM properties (element.href = url)
+ * where HTML escaping would cause double-encoding.
+ * Use sanitizeUrl() instead when inserting URLs into innerHTML templates.
+ */
+export function validateUrl(url: string | null | undefined): string {
+  if (url == null) return '';
+
+  const trimmed = String(url).trim();
+
+  if (trimmed.startsWith('/')) return trimmed;
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+
+  return '';
+}

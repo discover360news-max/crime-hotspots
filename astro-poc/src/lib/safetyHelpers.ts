@@ -11,6 +11,12 @@
 
 import type { Crime } from './crimeData';
 
+/** Normalize a date value that may be a Date object or ISO string (client-side JSON serialization) */
+function toDate(d: Date | string | undefined, fallback?: string): Date {
+  if (d instanceof Date) return d;
+  return new Date(d || fallback || 0);
+}
+
 /**
  * Safety context result
  */
@@ -42,10 +48,10 @@ export function calculateAreaCrimeScore(
 
   const recentCrimesInArea = allCrimes.filter(c =>
     c.area === areaName &&
-    c.dateObj >= cutoffDate
+    toDate(c.dateObj, c.date) >= cutoffDate
   );
 
-  const totalRecentCrimes = allCrimes.filter(c => c.dateObj >= cutoffDate);
+  const totalRecentCrimes = allCrimes.filter(c => toDate(c.dateObj, c.date) >= cutoffDate);
 
   // Calculate crime density (crimes per 100 total crimes)
   const areaCrimeCount = recentCrimesInArea.length;
@@ -90,7 +96,7 @@ export function getPrimaryCrimeType(areaName: string, allCrimes: Crime[]): strin
 
   const recentCrimesInArea = allCrimes.filter(c =>
     c.area === areaName &&
-    c.dateObj >= cutoffDate
+    toDate(c.dateObj, c.date) >= cutoffDate
   );
 
   const crimeTypeCounts = new Map<string, number>();
