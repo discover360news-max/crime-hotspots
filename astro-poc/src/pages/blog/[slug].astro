@@ -10,7 +10,7 @@ export const prerender = true;
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { routes } from '../../config/routes';
+import { routes, buildRoute } from '../../config/routes';
 
 export async function getStaticPaths() {
   const blogPosts = await getCollection('blog');
@@ -46,6 +46,13 @@ const breadcrumbItems = [
   { label: 'Blog', href: routes.blog },
   { label: post.data.title }
 ];
+
+// Get related posts (same country, most recent, excluding current)
+const allPosts = await getCollection('blog');
+const relatedPosts = allPosts
+  .filter(p => p.slug !== post.slug && p.data.country === post.data.country)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
 
 // BlogPosting Schema for SEO
 const blogPostingSchema = {
@@ -318,6 +325,27 @@ const blogPostingSchema = {
           View {post.data.countryName} Dashboard
         </a>
       </div>
+
+      <!-- More Reports -->
+      {relatedPosts.length > 0 && (
+        <div class="mt-8 sm:mt-12">
+          <h3 class="text-h3 font-semibold mb-4 text-slate-900">More Weekly Reports</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {relatedPosts.map((related) => (
+              <a href={buildRoute.blogPost(related.slug)} class="block bg-white/70 backdrop-blur-md rounded-lg border border-slate-200 p-4 hover:shadow-md hover:border-rose-200 transition-all">
+                <span class="text-tiny text-slate-500">{formatDate(related.data.date)}</span>
+                <h4 class="text-small font-semibold text-slate-900 mt-1 line-clamp-2">{related.data.title}</h4>
+                <span class="text-tiny text-rose-600 mt-2 block">{related.data.readTime}</span>
+              </a>
+            ))}
+          </div>
+          <div class="mt-4 text-center">
+            <a href={routes.blog} class="text-small text-rose-600 hover:text-rose-700 font-medium">
+              View all reports →
+            </a>
+          </div>
+        </div>
+      )}
 
       <!-- Back to Blog -->
       <div class="mt-6 sm:mt-8">
