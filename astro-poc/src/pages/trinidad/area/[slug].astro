@@ -27,6 +27,7 @@ import {
   filterToSamePeriod,
 } from '../../../lib/statisticsHelpers';
 import { escapeHtml } from '../../../lib/escapeHtml';
+import { routes, buildRoute } from '../../../config/routes';
 
 // Pre-render only areas that have crime data
 export async function getStaticPaths() {
@@ -185,13 +186,13 @@ const schemaData = {
     "name": region,
   },
   "additionalType": "https://schema.org/Dataset",
-  "url": `https://crimehotspots.com/trinidad/area/${slug}`,
+  "url": `https://crimehotspots.com/trinidad/area/${slug}/`,
 };
 
 const breadcrumbs = [
-  { label: 'Home', href: '/' },
-  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
-  { label: 'Areas', href: '/trinidad/areas/' },
+  { label: 'Home', href: routes.home },
+  { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
+  { label: 'Areas', href: routes.trinidad.areas },
   { label: areaName },
 ];
 ---
@@ -207,8 +208,8 @@ const breadcrumbs = [
       title={subtitle}
       subtitle={`${region} Region • ${division} Division • ${areaCrimes.length} total recorded incidents`}
       badge={`Risk Level: ${safety.score.toFixed(1)}/10 • Updated daily`}
-      primaryCTA={{ text: 'View Dashboard', href: '/trinidad/dashboard/', icon: 'dashboard' }}
-      secondaryCTA={{ text: 'Compare Area', href: `/trinidad/compare/?a=${slug}`, icon: 'arrow' }}
+      primaryCTA={{ text: 'View Dashboard', href: routes.trinidad.dashboard, icon: 'dashboard' }}
+      secondaryCTA={{ text: 'Compare Area', href: `${routes.trinidad.compare}?a=${slug}`, icon: 'arrow' }}
     />
 
     <!-- Stat Cards -->
@@ -245,7 +246,7 @@ const breadcrumbs = [
 
     <FeedbackToggle
       areaName={areaName}
-      pageUrl={`https://crimehotspots.com/trinidad/area/${slug}`}
+      pageUrl={`https://crimehotspots.com/trinidad/area/${slug}/`}
       pageTitle={`Crime Statistics for ${areaName}, Trinidad`}
     />
 
@@ -306,8 +307,9 @@ const breadcrumbs = [
                 <div class="border-t border-slate-100 px-4 py-3 space-y-3">
                   {crimes.map(crime => (
                     <a
-                      href={`/trinidad/crime/${crime.slug}`}
-                      class="block p-3 rounded-lg hover:bg-slate-50 transition group"
+                      href={buildRoute.crime(crime.slug)}
+                      data-crime-slug={crime.slug}
+                      class="crime-card-link block p-3 rounded-lg hover:bg-slate-50 transition group"
                     >
                       <div class="text-sm font-medium text-slate-700 group-hover:text-rose-600 transition">
                         {escapeHtml(crime.headline)}
@@ -345,7 +347,7 @@ const breadcrumbs = [
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {relatedAreas.map(a => (
                 <a
-                  href={a.hasCrimes ? `/trinidad/area/${a.slug}` : '#'}
+                  href={a.hasCrimes ? buildRoute.area(a.slug) : '#'}
                   class={`block px-4 py-3 rounded-lg border text-sm font-medium transition ${
                     a.hasCrimes
                       ? 'bg-white border-slate-200 text-slate-700 hover:border-rose-300 hover:text-rose-600'
@@ -370,7 +372,7 @@ const breadcrumbs = [
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {otherRegionAreas.map(a => (
                 <a
-                  href={`/trinidad/area/${a.slug}`}
+                  href={buildRoute.area(a.slug)}
                   class="block px-4 py-3 rounded-lg border bg-white border-slate-200 text-sm font-medium text-slate-700 hover:border-rose-300 hover:text-rose-600 transition"
                 >
                   <span>{a.name}</span>
@@ -415,4 +417,21 @@ const breadcrumbs = [
       moreStatsLabel.textContent = isOpen ? 'More stats' : 'Less stats';
     });
   }
+</script>
+
+<script define:vars={{ areaCrimes }}>
+  // Expose area crimes for CrimeDetailModal
+  window.__crimesData = areaCrimes;
+
+  // Intercept crime card clicks to open modal instead of navigating
+  document.querySelectorAll('.crime-card-link').forEach(function(card) {
+    card.addEventListener('click', function(e) {
+      var slug = card.getAttribute('data-crime-slug');
+      var crime = areaCrimes.find(function(c) { return c.slug === slug; });
+      if (crime && window.openCrimeModal) {
+        e.preventDefault();
+        window.openCrimeModal(crime);
+      }
+    });
+  });
 </script>

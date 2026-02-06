@@ -8,8 +8,8 @@ import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { routes } from '../config/routes';
 
-const title = "FAQ — Crime Hotspots Caribbean | Frequently Asked Questions";
-const description = "Answers to frequently asked questions about Crime Hotspots Caribbean. Learn about our data sources, update frequency, platform usage, and privacy policies.";
+const title = "FAQ — Crime Hotspots | Frequently Asked Questions";
+const description = "Answers to frequently asked questions about Crime Hotspots. Learn about our data sources, update frequency, how to navigate the platform, and privacy policies.";
 
 // FAQ data for Schema.org and rendering
 const faqData = [
@@ -18,23 +18,23 @@ const faqData = [
     questions: [
       {
         question: "Where does Crime Hotspots get its crime data?",
-        answer: "Our crime data is sourced exclusively from public reports by established media outlets like the Trinidad Express, Guardian TT, Newsday, Stabroek News, and Kaieteur News. For Trinidad, we also monitor specific high-traffic community social media feeds. This ensures we provide real-time crime statistics reflecting the public record."
+        answer: "Our crime data is sourced from public reports by established Trinidad & Tobago media outlets including the Trinidad Express and CNC3. We also monitor high-traffic community sources on Facebook, such as Ian Alleyne and DJ Sheriff, to capture incidents that may not appear in traditional media. This combination ensures broad coverage of reported crime across the country."
       },
       {
-        question: "How often is the crime map updated?",
-        answer: "We are committed to providing the freshest data possible. Our automated systems check Guyana crime reports hourly and Trinidad crime data every two hours. However, we display data with a 3-day lag to ensure completeness and accuracy. This means when you visit the site on January 4th, you'll see complete data through January 1st. This lag accounts for delayed media reporting and allows our AI validation systems to process incidents thoroughly. High-severity incidents undergo immediate human validation."
+        question: "How often is the crime data updated?",
+        answer: "Our data is updated daily. New incidents are processed and published with a typical lag of 1-2 days to allow for media reporting cycles and AI validation. This means when you visit the site on January 4th, you will see complete data through at least January 2nd. High-severity incidents may be processed faster."
       },
       {
         question: "What year of data am I viewing when I first visit the site?",
-        answer: "By default, all dashboards and maps show data from the current year (e.g., 2026 data in 2026). This ensures you're seeing the most recent crime trends and statistics. You can easily switch to view previous years' data using the year filter available in the Filters menu on each dashboard."
+        answer: "By default, all dashboards and maps show data from the current year (e.g., 2026 data in 2026). This ensures you are seeing the most recent crime trends and statistics. You can switch to view previous years using the year filter available in the Filters menu on the Dashboard."
       },
       {
         question: "Is your data based on official police statistics?",
-        answer: "No. We aggregate incidents as they are reported by the media, not official police records. This means our figures reflect media coverage and public awareness, not necessarily the official, verified crime counts. We recommend cross-referencing our crime trends with government statistics for formal research."
+        answer: "No. We aggregate incidents as they are reported by the media, not official police records. This means our figures reflect media coverage and public awareness, not necessarily official verified crime counts. We recommend cross-referencing our data with government statistics for formal research."
       },
       {
         question: "Do you use AI to analyze the crime reports?",
-        answer: "Yes, we utilize Google Gemini AI to extract structured data (Crime Type, Date, Location) from unstructured news articles. This AI-driven extraction ensures consistency and speed across thousands of reports. All high-severity incidents are subject to mandatory human oversight before publication to ensure accuracy."
+        answer: "Yes, we use Claude AI to extract structured data (crime type, date, location, victim details) from unstructured news articles and social media posts. This AI-driven extraction ensures consistency and speed across hundreds of reports. All high-severity incidents are subject to human oversight before publication to ensure accuracy."
       }
     ]
   },
@@ -42,24 +42,32 @@ const faqData = [
     category: "How to Use the Platform",
     questions: [
       {
-        question: "How can I find the crime rate for my specific area or town?",
-        answer: "Use the interactive crime map on the Dashboard page. You can filter by Crime Type (e.g., Murder, Robbery) and select your specific town or area in the Caribbean from the drop-down menu. The map aggregates incidents, helping you visualize local crime hotspots."
+        question: "What sections are available on Crime Hotspots?",
+        answer: "The platform includes several sections: the Dashboard (interactive map and statistics), Headlines (latest crime reports with filtering), Areas (crime data for 180+ neighborhoods), Compare (side-by-side area comparison), Archive (historical data by year and month), Statistics (year-to-date breakdowns by crime type), Regions (crime grouped by region), and Murder Count (live running total for the year). On mobile, use the bottom navigation bar to switch between key sections."
+      },
+      {
+        question: "How can I find the crime rate for my specific area?",
+        answer: "Visit the Areas page to browse all 180+ areas across Trinidad & Tobago, grouped by region. Each area shows a risk level score (1-10), recent incident count, and a safety assessment. You can search for your area by name or browse by region. Tap any area card to see detailed statistics, crime breakdowns, and recent headlines for that neighborhood."
+      },
+      {
+        question: "How do I compare two areas?",
+        answer: "Use the Compare page to view side-by-side crime statistics for any two areas. Select your areas from the dropdown menus to see differences in crime counts, types, and trends. You can access Compare from the Areas page or from the navigation menu."
+      },
+      {
+        question: "What do the risk level scores mean?",
+        answer: "Each area is assigned a risk level score from 1 to 10, based on a 90-day rolling window of crime density relative to the rest of the country. A score below 4 is considered low risk, 4-7 is neutral, and above 7 is elevated. Each area page also includes a tailored safety insight with practical tips based on the most common crime type in that neighborhood."
+      },
+      {
+        question: "How do I view crime details without leaving the page?",
+        answer: "When browsing Headlines, Areas, or the Archive, tapping on a crime headline opens a detail modal showing the full summary, location, safety context, and related crimes. You can browse between related crimes within the modal. Use the back button or tap outside to close it and return to where you were."
       },
       {
         question: "How do I view data from previous years?",
-        answer: "Click the 'Filters' button on any dashboard or headlines page. In the filters menu, use the 'Select Year' dropdown to choose which year's data you want to view (e.g., 2025, 2024). You can also access our comprehensive archive by clicking 'View Archive' to browse crime data organized by year and month."
-      },
-      {
-        question: "Can I filter the data by specific dates or crime types?",
-        answer: "Yes. All dashboards offer advanced filtering tools. On the Dashboard, you can filter by year and crime type. On the Headlines page, you can filter by date range (from/to dates), crime type, and area. The filters update your view in real-time, showing you exactly the data you need."
+        answer: "Click the Filters button on the Dashboard or Headlines page and use the year selector to choose which year to view. You can also visit the Archive section to browse crime data organized by year and month. All historical data remains permanently accessible."
       },
       {
         question: "How do I read the crime map?",
-        answer: "The map uses incident markers placed at the generalized location of the reported crime. Clusters of markers indicate a crime hotspot. Tap on any marker to view the source article and all structured details, including the Crime Type and the date of the incident."
-      },
-      {
-        question: "Is historical crime data still available after a new year starts?",
-        answer: "Yes! All historical data remains permanently accessible. When a new year begins (e.g., 2027), the dashboard will automatically default to showing the current year's data, but you can access any previous year (2026, 2025, etc.) using the year filter or by visiting our archive section. We maintain complete records from when we started tracking each island."
+        answer: "The map on the Dashboard uses incident markers placed at the reported crime location. Clusters of markers indicate a crime hotspot. Tap any marker to view details including the crime type, date, and a link to the full report."
       }
     ]
   },
@@ -67,33 +75,37 @@ const faqData = [
     category: "Coverage and Limitations",
     questions: [
       {
-        question: "What regions in the Caribbean do you cover?",
-        answer: "We aim for comprehensive national coverage, tracking incidents reported by major media outlets across all islands. However, our data density naturally favors metropolitan areas due to higher media reporting in those zones."
+        question: "What countries do you currently cover?",
+        answer: "Crime Hotspots currently covers Trinidad & Tobago with comprehensive daily updates. Coverage for additional Caribbean islands is planned for the future. If you would like to request coverage for a specific island, please get in touch via our Contact page."
       },
       {
         question: "What are the main limitations of your crime data?",
-        answer: "Our key limitation is that we only reflect media-reported crimes. We do not account for unreported crimes or incidents that receive no press coverage, especially in remote rural areas. Our data represents media visibility, which may contain geographic biases."
+        answer: "Our key limitation is that we only reflect media-reported crimes. Unreported crimes or incidents that receive no press or social media coverage are not captured, particularly in remote rural areas. Our data represents media visibility, which may contain geographic biases toward metropolitan areas where reporting is more frequent."
       },
       {
         question: "Why are exact street addresses often not shown on the map?",
         answer: "While our source reports often contain exact addresses, we generalize the location to the nearest street junction or area name to maintain focus on community-wide trends rather than specific residences. This also helps balance data specificity with safety considerations."
       },
       {
-        question: "Why do some locations on your map have names different from the local name?",
-        answer: "We prioritize geographic accuracy for researchers and official bodies. Our location data is extracted and validated against government and official mapping standards, ensuring the names used correspond to recognized administrative or municipal boundaries. This means a locally known neighborhood name may be mapped under the broader, official name of the area that it geographically falls into. We use these precise definitions to provide accurate regional crime statistics to our policy users."
+        question: "Why do some locations have names different from the local name?",
+        answer: "Our location data is validated against government and official mapping standards, so the names used correspond to recognized administrative or municipal boundaries. A locally known neighborhood name may be mapped under the broader official name of the area it falls within. This ensures accurate regional statistics across the platform."
       }
     ]
   },
   {
-    category: "Privacy and Reporting",
+    category: "Privacy, Reporting, and Contact",
     questions: [
       {
         question: "Does Crime Hotspots protect privacy?",
-        answer: "Yes, we adhere to strict ethical standards. Our platform focuses on crime statistics and trends. We do not solicit or publish private, unverified information. We only reflect details that have already been made public by the originating news source, maintaining data fidelity to the public record. For complete details on how we collect and protect your data,"
+        answer: "Yes, we adhere to strict ethical standards. Our platform focuses on crime statistics and trends. We do not solicit or publish private, unverified information. We only reflect details that have already been made public by the originating news source, maintaining data fidelity to the public record. For complete details on how we collect and protect your data, please read our Privacy Policy."
       },
       {
         question: "Do you offer a way to report crime or submit a tip?",
-        answer: "Yes. We provide a secure crime tip line form on our platform where you can report crime anonymously. This information is used to support local community awareness and is managed with confidentiality."
+        answer: "Yes. We provide a secure report form on our platform where you can submit crime information anonymously. This information is used to support local community awareness and is managed with confidentiality."
+      },
+      {
+        question: "How can I get in touch with Crime Hotspots?",
+        answer: "Visit our Contact page to send us an email. Whether you have a question, a partnership idea, a data correction, or want to request coverage for your island, we would love to hear from you."
       }
     ]
   }
@@ -159,6 +171,16 @@ const allQuestions = faqData.flatMap(category => category.questions);
                   {item.question.includes("protect privacy") && (
                     <span>
                       {' '}<a href={routes.privacy} class="text-rose-600 hover:text-rose-700 font-medium underline">Read our Privacy Policy</a>.
+                    </span>
+                  )}
+                  {item.question.includes("get in touch") && (
+                    <span>
+                      {' '}<a href={routes.contact} class="text-rose-600 hover:text-rose-700 font-medium underline">Go to Contact page</a>.
+                    </span>
+                  )}
+                  {item.question.includes("countries do you currently") && (
+                    <span>
+                      {' '}<a href={routes.contact} class="text-rose-600 hover:text-rose-700 font-medium underline">Contact us</a>.
                     </span>
                   )}
                 </div>

@@ -499,7 +499,7 @@ import ReportIssueModal from './ReportIssueModal.astro';
       const crimeUrl = buildRoute.crime(crime.slug);
 
       return `
-        <a href="${escapeHtml(crimeUrl)}" class="block p-3 bg-white rounded-lg border border-slate-100 hover:border-rose-200 hover:shadow-sm transition-all group">
+        <a href="${escapeHtml(crimeUrl)}" data-related-crime-slug="${escapeHtml(crime.slug)}" class="related-crime-link block p-3 bg-white rounded-lg border border-slate-100 hover:border-rose-200 hover:shadow-sm transition-all group">
           <div class="flex items-start gap-2">
             <span class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0" style="background-color: ${colorHex}"></span>
             <div class="flex-1 min-w-0">
@@ -591,9 +591,27 @@ import ReportIssueModal from './ReportIssueModal.astro';
     });
   }
 
+  // Bind click handlers on related crime links inside the modal
+  function bindRelatedCrimeLinks() {
+    document.querySelectorAll('#modalRelatedCrimes .related-crime-link').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        var slug = link.getAttribute('data-related-crime-slug');
+        var crimes = window.__crimesData || [];
+        var crime = crimes.find(function(c) { return c.slug === slug; });
+        if (crime) {
+          e.preventDefault();
+          openCrimeModal(crime);
+        }
+      });
+    });
+  }
+
   // Function to open modal with crime data
   function openCrimeModal(crime) {
     if (!backdrop || !modal || !content) return;
+
+    // Check if modal is already open (navigating between crimes)
+    const isAlreadyOpen = !backdrop.classList.contains('hidden');
 
     // Format date
     const formattedDate = new Date(crime.date).toLocaleDateString('en-US', {
@@ -660,6 +678,7 @@ import ReportIssueModal from './ReportIssueModal.astro';
     const relatedCrimesEl = document.getElementById('modalRelatedCrimes');
     if (relatedCrimesEl) {
       relatedCrimesEl.innerHTML = generateRelatedCrimesHTML(crime, allCrimes, 4);
+      bindRelatedCrimeLinks();
     }
 
     // Update button links (with URL sanitization)
@@ -678,21 +697,28 @@ import ReportIssueModal from './ReportIssueModal.astro';
     currentCrimeHeadline = crime.headline;
     currentCrimeData = crime; // Store full crime object for Report Issue
 
-    // Show modal
-    backdrop.classList.remove('hidden', 'pointer-events-none');
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+    if (isAlreadyOpen) {
+      // Already viewing a crime — replace URL so back button returns to original page
+      history.replaceState({ crimeModal: true }, '', buildRoute.crime(crime.slug));
+      // Scroll modal content back to top
+      content.scrollTop = 0;
+    } else {
+      // First open — show modal with animation
+      backdrop.classList.remove('hidden', 'pointer-events-none');
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
 
-    // Push crime URL so back button closes modal + both Cloudflare & GA4 track the view
-    originalUrl = window.location.pathname + window.location.search;
-    history.pushState({ crimeModal: true }, '', buildRoute.crime(crime.slug));
+      // Push crime URL so back button closes modal + both Cloudflare & GA4 track the view
+      originalUrl = window.location.pathname + window.location.search;
+      history.pushState({ crimeModal: true }, '', buildRoute.crime(crime.slug));
 
-    requestAnimationFrame(() => {
-      backdrop.classList.remove('opacity-0');
-      backdrop.classList.add('opacity-100');
-      content.classList.remove('scale-95', 'opacity-0');
-      content.classList.add('scale-100', 'opacity-100');
-    });
+      requestAnimationFrame(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+      });
+    }
   }
 
   function closeCrimeModal(skipHistory = false) {

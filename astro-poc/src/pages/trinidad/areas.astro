@@ -13,6 +13,7 @@ import Hero from '../../components/Hero.astro';
 import { getTrinidadCrimes, generateNameSlug } from '../../lib/crimeData';
 import { loadFullAreaData } from '../../lib/areaAliases';
 import { calculateAreaCrimeScore } from '../../lib/safetyHelpers';
+import { routes, buildRoute } from '../../config/routes';
 
 const allCrimes = await getTrinidadCrimes();
 const areaData = await loadFullAreaData();
@@ -75,8 +76,8 @@ const totalAreas = areaStats.length;
 const areasWithCrime = areaStats.filter(a => a.totalCrimes > 0).length;
 
 const breadcrumbs = [
-  { label: 'Home', href: '/' },
-  { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
+  { label: 'Home', href: routes.home },
+  { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
   { label: 'Areas' },
 ];
 
@@ -91,10 +92,10 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
     <Hero
       compact
       title="Crime Statistics by Area"
-      subtitle={`Explore crime data for ${totalAreas} areas across Trinidad & Tobago. ${areasWithCrime} areas with recorded incidents.`}
+      subtitle={`Explore crime data across ${sortedRegions.length} regions and ${totalAreas} areas in Trinidad & Tobago.`}
       badge="Updated daily • Risk levels based on 90-day rolling window"
-      primaryCTA={{ text: 'Compare Areas', href: '/trinidad/compare/', icon: 'arrow' }}
-      secondaryCTA={{ text: 'View Regions', href: '/trinidad/regions/', icon: 'arrow' }}
+      primaryCTA={{ text: 'Compare Areas', href: routes.trinidad.compare, icon: 'arrow' }}
+      secondaryCTA={{ text: 'View Regions', href: routes.trinidad.regions, icon: 'arrow' }}
     />
 
     <!-- Search/Filter + Sort -->
@@ -136,7 +137,7 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
               <p class="text-xs text-slate-500">{areas.length} areas • {totalCrimes} incidents (90 days)</p>
             </div>
             <a
-              href={`/trinidad/region/${generateNameSlug(region)}`}
+              href={buildRoute.region(generateNameSlug(region))}
               class="text-xs text-rose-600 hover:text-rose-700 font-medium"
             >
               View Region
@@ -147,7 +148,7 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {areas.map(area => (
               <a
-                href={`/trinidad/area/${area.slug}`}
+                href={buildRoute.area(area.slug)}
                 class="area-card block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-md transition group"
                 data-area={area.name.toLowerCase()}
                 data-known-as={area.knownAs?.toLowerCase() || ''}
