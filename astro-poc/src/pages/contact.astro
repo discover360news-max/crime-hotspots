@@ -1,0 +1,96 @@
+---
+/**
+ * Contact Page
+ * Simple mailto-based contact with styled presentation
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { routes } from '../config/routes';
+
+const title = "Contact Us — Crime Hotspots Caribbean";
+const description = "Get in touch with Crime Hotspots for inquiries, partnerships, data requests, or to request coverage for your island.";
+
+const email = "discover360news@gmail.com";
+const subject = "Crime Hotspots Inquiry";
+const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
+---
+
+<Layout title={title} description={description}>
+  <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-12 text-slate-700">
+    <Breadcrumbs items={[
+      { label: 'Home', href: routes.home },
+      { label: 'Contact' }
+    ]} />
+
+    <h1 class="text-h1 font-semibold mb-3 text-center pt-4">Contact Us</h1>
+
+    <div class="bg-white/70 backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100">
+      <!-- Intro -->
+      <p class="text-xs text-slate-500 mb-8 text-center max-w-md mx-auto">
+        Have a question, partnership idea, or want to request coverage for your island? We'd love to hear from you.
+      </p>
+
+      <!-- Contact Options -->
+      <div class="space-y-4 max-w-sm mx-auto">
+        <!-- Primary: Email Button -->
+        <a
+          href={mailtoLink}
+          class="group flex items-center justify-center gap-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg px-6 py-4 transition-all duration-200 shadow-md hover:shadow-lg"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <span>Send us an Email</span>
+          <svg class="w-4 h-4 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+
+        <!-- Email address (for copy/paste) -->
+        <p class="text-xs text-slate-400 text-center">
+          or copy: <span class="font-mono text-slate-600 select-all">{email}</span>
+        </p>
+      </div>
+
+      <!-- Divider -->
+      <div class="flex items-center gap-3 my-8">
+        <div class="flex-1 h-px bg-slate-200"></div>
+        <span class="text-xs text-slate-400">What we can help with</span>
+        <div class="flex-1 h-px bg-slate-200"></div>
+      </div>
+
+      <!-- Topics Grid -->
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="bg-slate-50 rounded-lg p-4 border border-slate-100">
+          <h3 class="text-small font-semibold text-slate-700 mb-1">General Inquiries</h3>
+          <p class="text-xs text-slate-500">Questions about our data, methodology, or platform.</p>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-4 border border-slate-100">
+          <h3 class="text-small font-semibold text-slate-700 mb-1">Data Requests</h3>
+          <p class="text-xs text-slate-500">Access crime data for research or journalism.</p>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-4 border border-slate-100">
+          <h3 class="text-small font-semibold text-slate-700 mb-1">Partnerships</h3>
+          <p class="text-xs text-slate-500">Media collaborations and business opportunities.</p>
+        </div>
+        <div class="bg-slate-50 rounded-lg p-4 border border-slate-100">
+          <h3 class="text-small font-semibold text-slate-700 mb-1">Island Coverage</h3>
+          <p class="text-xs text-slate-500">Request Crime Hotspots for your Caribbean island.</p>
+        </div>
+      </div>
+
+      <!-- Response Time Note -->
+      <p class="text-xs text-slate-400 text-center mt-8">
+        We typically respond within 24-48 hours.
+      </p>
+    </div>
+
+    <!-- Report Crime CTA -->
+    <div class="mt-6 text-center">
+      <p class="text-xs text-slate-500">
+        Want to report a crime anonymously? <a href={routes.report} class="text-rose-600 hover:text-rose-700 underline">Submit a report</a>
+      </p>
+    </div>
+  </main>
+</Layout>

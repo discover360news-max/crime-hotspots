@@ -301,13 +301,33 @@ CRITICAL EXCLUSIONS - Return {"crimes": [], "confidence": 0}
    → Only extract crimes that are the MAIN SUBJECT of the article with full details
    → If a previous crime is mentioned for CONTEXT (e.g., "This follows last week's murder of..."), do NOT extract the old crime
 
-❌ UNCERTAIN DEATHS: Do NOT classify as Murder if:
-   - "No visible signs of violence", "cause of death unknown"
-   - "Decomposed body" without confirmed foul play
-   - "Autopsy pending", "police investigating cause of death"
-   → Return {"crimes": [], "confidence": 0} for unconfirmed deaths
+⚠️ UNCERTAIN DEATHS - NUANCED APPROACH (READ CAREFULLY):
 
-❌ OTHER: Court/sentencing, opinion pieces, historical (>1 month)
+CRITICAL: Take article statements at FACE VALUE. Do NOT rationalize away indicators.
+- If article says "marks on body" → treat as violence indicator (do NOT speculate "could be post-mortem")
+- If article says items are "missing" → treat as robbery indicator (do NOT require "confirmed theft")
+
+REJECT (confidence 0) ONLY if ALL of these are true:
+- Decomposed/unconfirmed death
+- NO signs of violence mentioned (no marks, wounds, injuries in article)
+- NO missing items mentioned
+- NO police suspicion mentioned
+
+EXTRACT as Murder if decomposed body has ANY of these indicators:
+- Signs of violence: "marks on body", "wounds", "injuries", "bruises", "trauma"
+- Missing items: valuables, electronics, keys (suggests robbery motive)
+- Signs of forced entry or struggle
+- Police treating as suspicious/homicide
+
+Confidence scoring for ambiguous deaths:
+- 3 indicators (violence + missing items + police suspicion) → confidence 8-9
+- 2 indicators (e.g., marks + missing items) → confidence 7
+- 1 indicator only → confidence 4-5 (review queue)
+
+Example: "Decomposed body found with marks, cellphone missing"
+→ Extract: all_crime_types: ["Murder", "Robbery"], confidence 7
+
+❌ OTHER: Court/sentencing, opinion pieces (NOT historical articles - those are valid for backfill)
 
 ═══════════════════════════════════════════════════════════════════════════════
 CLASSIFICATION RULES

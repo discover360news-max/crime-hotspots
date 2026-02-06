@@ -20,6 +20,7 @@ export const routes = {
   blog: '/blog/',
   report: '/report/',
   about: '/about/',
+  contact: '/contact/',
   faq: '/faq/',
   methodology: '/methodology/',
   privacy: '/privacy/',

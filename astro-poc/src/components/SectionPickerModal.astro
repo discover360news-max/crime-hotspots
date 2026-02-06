@@ -3,6 +3,11 @@
  * Section Picker Modal
  * Shows available sections for a selected island on the homepage
  * Sections are driven dynamically from countries.ts config
+ *
+ * UX: Visual hierarchy to reduce decision fatigue
+ * - Primary sections (showInBottomNav) displayed prominently
+ * - Dashboard highlighted as "Recommended" starting point
+ * - Secondary sections shown compact below a divider
  */
 import { COUNTRIES } from '../data/countries';
 import { routes } from '../config/routes';
@@ -34,34 +39,94 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
     </div>
 
     <!-- Section Buttons (one container per country, toggled by JS) -->
-    {availableCountries.map((country) => (
-      <div
-        class="section-picker-list hidden p-6 space-y-3 max-h-[60vh] overflow-y-auto"
-        data-country-id={country.id}
-      >
-        {country.sections!.map((section) => (
-          <a
-            href={section.url}
-            class="group relative bg-white/80 backdrop-blur-md border-2 border-slate-200 rounded-lg p-4 hover:border-rose-600 hover:shadow-lg transition-all duration-300 flex items-center justify-between"
-          >
-            <div>
-              <h3 class="text-small font-bold text-slate-700 group-hover:text-rose-600 transition mb-1">
-                {section.label}
-              </h3>
-              <p class="text-xs text-slate-500">{section.description}</p>
+    {availableCountries.map((country) => {
+      const primarySections = country.sections!.filter(s => s.showInBottomNav);
+      const secondarySections = country.sections!.filter(s => !s.showInBottomNav);
+
+      return (
+        <div
+          class="section-picker-list hidden p-6 max-h-[70vh] overflow-y-auto"
+          data-country-id={country.id}
+        >
+          <!-- Primary Sections (Start Here) -->
+          <div class="space-y-3 mb-4">
+            {primarySections.map((section) => {
+              const isRecommended = section.id === 'dashboard';
+              return (
+                <a
+                  href={section.url}
+                  class:list={[
+                    "group relative bg-white/80 backdrop-blur-md rounded-lg p-4 hover:shadow-lg transition-all duration-300 flex items-center justify-between",
+                    isRecommended
+                      ? "border-2 border-rose-500 shadow-md"
+                      : "border-2 border-slate-200 hover:border-rose-600"
+                  ]}
+                >
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                      <h3 class:list={[
+                        "text-small font-bold transition",
+                        isRecommended ? "text-rose-600" : "text-slate-700 group-hover:text-rose-600"
+                      ]}>
+                        {section.label}
+                      </h3>
+                      {isRecommended && (
+                        <span class="text-[10px] font-semibold uppercase tracking-wide bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full">
+                          Start Here
+                        </span>
+                      )}
+                    </div>
+                    <p class="text-xs text-slate-500">{section.description}</p>
+                  </div>
+                  <svg class:list={[
+                    "w-5 h-5 shrink-0 ml-3 transition",
+                    isRecommended
+                      ? "text-rose-500 group-hover:translate-x-1"
+                      : "text-slate-400 group-hover:text-rose-600 group-hover:translate-x-1"
+                  ]} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              );
+            })}
+          </div>
+
+          <!-- Divider -->
+          {secondarySections.length > 0 && (
+            <div class="flex items-center gap-3 my-4">
+              <div class="flex-1 h-px bg-slate-200"></div>
+              <span class="text-xs text-slate-400 font-medium">Explore More</span>
+              <div class="flex-1 h-px bg-slate-200"></div>
             </div>
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-rose-600 group-hover:translate-x-1 transition shrink-0 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-        ))}
-      </div>
-    ))}
+          )}
+
+          <!-- Secondary Sections (Compact) -->
+          {secondarySections.length > 0 && (
+            <div class="flex flex-wrap gap-2">
+              {secondarySections.map((section) => (
+                <a
+                  href={section.url}
+                  class="group inline-flex items-center gap-1.5 bg-slate-100 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-full px-3 py-1.5 transition-all duration-200"
+                  title={section.description}
+                >
+                  <span class="text-xs font-medium text-slate-600 group-hover:text-rose-600 transition">
+                    {section.label}
+                  </span>
+                  <svg class="w-3 h-3 text-slate-400 group-hover:text-rose-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    })}
 
     <!-- Footer Help Text -->
-    <div class="px-6 pb-6 pt-2">
+    <div class="px-6 pb-6 pt-4">
       <p class="text-xs text-slate-500 text-center">
-        Don't see your island? <a href={routes.report} class="text-rose-600 hover:text-rose-700 underline">Submit a report</a> to help us expand.
+        Don't see your island? <a href={routes.contact} class="text-rose-600 hover:text-rose-700 underline">Contact us</a> to request coverage.
       </p>
     </div>
   </div>
