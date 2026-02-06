@@ -12,13 +12,32 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Traffic:** ~4 real visitors/day, Google Search Console active (1,728 pages indexed)
-**Last Updated:** February 5, 2026
+**Last Updated:** February 6, 2026
 
 ---
 
 ## Recent Work (Last 30 Days)
 
 **February 2026:**
+- **WEEKLY BLOG AUTOMATION** (Feb 6) - **Fully Automatic Blog Pipeline**
+  - Created `weeklyBlogAutomation.gs` — end-to-end automated weekly blog generation
+  - Claude Haiku 4.5 writes blog posts from CSV crime statistics (~$0.01-0.03/post)
+  - 4-layer validation: minimum crimes (10), data freshness, backlog check, duplicate detection
+  - Auto-commits markdown to GitHub → Cloudflare auto-deploys
+  - Monday 10 AM Trinidad time trigger via Google Apps Script
+  - Email notifications on success/skip/error
+  - Uses CSV-based data fetching (avoids GAS sheet timezone mismatches)
+  - Test functions: `testBlogGeneration()`, `testClaudeBlogOnly()`, `forceGenerateWeeklyBlog()`
+- **BLOG INTERNAL LINKING** (Feb 6)
+  - Added "More Weekly Reports" section to blog post pages (`[slug].astro`)
+  - Shows 3 most recent posts from same country, excluding current post
+  - Cards with date, title, read time; links to blog index ("View all reports")
+  - Uses `buildRoute.blogPost()` from centralized routes
+- **CRIMEDETAILMODAL REFACTORING** (Feb 6)
+  - Refactored from 918 → 261 lines — thin orchestrator importing 5 focused modules
+  - Modules: `modalHtmlGenerators.ts`, `modalFeedbackHandler.ts`, `modalShareHandlers.ts`, `modalReportHandler.ts`, `modalLifecycle.ts`
+  - Eliminated duplicated utilities — now imports from shared `src/lib/` modules
+  - Area detail pages: `window.__crimesData` populated with area-specific crimes only
 - **📱 UX NAVIGATION OVERHAUL** (Feb 5) - **50% Mobile Discoverability Fix**
   - Created `BottomNav.astro` — persistent mobile tab bar (Dashboard, Headlines, Areas, Report, More)
   - Created `RelatedCrimes.astro` — actual crime cards instead of generic text links
@@ -282,6 +301,37 @@ To find a way to get goals accomplished efficiently and by using the least token
 - Test with `testRSSCollection()` functions
 - Verify Script Properties are set
 
+### Weekly Blog Automation (Feb 2026)
+
+**✅ IMPLEMENTED February 6, 2026** - Fully automatic weekly blog pipeline
+
+**How It Works:**
+1. Monday 10 AM Trinidad time → GAS trigger fires `generateWeeklyBlog()`
+2. Validates data readiness (4 safeguards: min crimes, freshness, backlog, duplicate)
+3. Fetches crime stats via CSV (`fetchCrimeData()` + `filterCrimesByDateRange()` from `socialMediaStats.gs`)
+4. Sends stats to Claude Haiku 4.5 → receives markdown blog post
+5. Wraps in Astro frontmatter → commits to GitHub via Contents API
+6. Cloudflare auto-deploys from GitHub push
+
+**Implementation:**
+- `google-apps-script/trinidad/weeklyBlogAutomation.gs` - Main automation script
+- Dependencies: `config.gs`, `socialMediaStats.gs`, `blogDataGenerator.gs`
+- Script Properties required: `CLAUDE_API_KEY`, `GITHUB_TOKEN`, `GITHUB_REPO`, `TRINIDAD_CSV_URL`
+
+**Key Functions:**
+- `generateWeeklyBlog()` — Main entry point (trigger calls this)
+- `testBlogGeneration()` — Full test without GitHub commit
+- `testClaudeBlogOnly()` — Tests Claude API with sample data
+- `forceGenerateWeeklyBlog()` — Bypasses all validation
+- `setupWeeklyBlogTrigger()` — Creates Monday 10 AM trigger
+
+**Cost:** ~$0.01-0.03 per blog post (Claude Haiku 4.5)
+
+**IMPORTANT:**
+- Uses CSV-based data fetching (NOT sheet `.getDataRange()`) to avoid GAS timezone mismatches
+- `SOCIAL_CONFIG.lagDays = 3` — crimes dated by incident date, 3-day reporting lag
+- Blog file path: `astro-poc/src/content/blog/trinidad-weekly-YYYY-MM-DD.md`
+
 ### CSV URL Configuration (SINGLE SOURCE OF TRUTH)
 
 **✅ UPDATED January 2026:** CSV URLs are now centralized.
@@ -418,9 +468,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 **🤖 Automation**
 - `google-apps-script/trinidad/README.md` - Trinidad automation
+- `google-apps-script/trinidad/weeklyBlogAutomation.gs` - **Weekly blog auto-generation (Claude Haiku)** ⭐
 - `google-apps-script/trinidad/facebookSubmitter.gs` - Facebook Post Submitter web app (daily use)
+- `google-apps-script/trinidad/socialMediaStats.gs` - Social media stats (daily/monthly/custom)
+- `google-apps-script/trinidad/claudeClient.gs` - Claude API client for crime extraction
+- `google-apps-script/trinidad/config.gs` - API keys, model config, sheet/source config
 - `docs/FACEBOOK-DATA-COLLECTION.md` - Facebook sources
-- `docs/automation/WEEKLY-REPORT-SAFEGUARDS.md` - Blog automation
+- `docs/automation/WEEKLY-REPORT-SAFEGUARDS.md` - Blog validation safeguards
 - `docs/automation/DUPLICATE-DETECTION-ARCHIVE.md` - Enhanced duplicate detection
 - `docs/automation/SEIZURES-CRIME-TYPE.md` - Seizures crime type
 
@@ -442,6 +496,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - SEO Phase 1 complete (sitemap, structured data, breadcrumbs, Google Search Console verified)
 - **Security Grade: A** - XSS fixed, CSP complete, npm vulnerabilities resolved
 - Google Analytics 4, cookie consent, user reporting
+- **Weekly blog automation** - Claude Haiku writes + auto-publishes every Monday
 - Social media accounts active (Facebook, X, Instagram) with content automation
 
 ### 🔄 In Progress
