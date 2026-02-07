@@ -142,26 +142,26 @@ function getSafetyTip(score: number, primaryCrimeType: string, areaName: string 
     'Robbery': [
       "Active Awareness Zone: This area has high reports of 'distraction' incidents. We recommend keeping mobile devices tucked away and avoiding the use of headphones while walking to remain fully alert.",
       "The Buddy System: Incident data shows that individuals walking alone after dark account for the majority of robbery reports here. Travel with a companion when possible during evening hours.",
-      "Cash Minimisation: Avoid carrying large amounts of cash in this area. Use contactless payment methods where possible, and keep valuables distributed across pockets rather than in a single bag."
+      "Cash Minimisation: Avoid carrying large amounts of cash in this area. Only take what you need for the day, and keep valuables distributed across pockets rather than in a single bag."
     ],
     'Burglary': [
-      "Secondary Security Deterrence: Standard locks are often bypassed in this area's incident reports. Consider secondary deterrents like steering wheel locks or reinforced door strike plates for home security.",
+      "Secondary Security Deterrence: Standard locks are often bypassed in this area's incident reports. Ensure your burglar proofing and window grilles are in good condition, and consider adding padlocks to gates as an additional layer of deterrence.",
       "The 'Occupied Home' Signal: Burglaries in this zone spike when homes appear vacant. Use timer-controlled lights, keep a radio on low volume, and vary your daily routine to avoid predictable absence patterns.",
-      "Entry Point Audit: Most burglaries here target side windows and back doors. Ensure all secondary entry points have reinforced locks and consider window security film as a low-cost deterrent."
+      "Entry Point Audit: Most burglaries here target side windows and back entrances. Ensure all windows have secure burglar bars or grilles, and check that padlocks on secondary gates and doors are not rusted or easily forced."
     ],
     'Home Invasion': [
       "Vigilant Staging: Before exiting your vehicle in this zone, scan your surroundings for loitering. If something feels off, trust your intuition and drive to a more populated area before stopping.",
-      "Door Reinforcement Priority: Home invasion data in this area shows front doors as the primary breach point. A reinforced strike plate and 3-inch screws in the door frame cost little but dramatically increase resistance.",
-      "Safe Room Planning: In high-risk zones like this, having a designated interior room with a lock and a charged phone provides critical seconds during an emergency. Plan and communicate this with household members."
+      "Gate & Grille Security Priority: Home invasion data in this area shows front entrances as the primary breach point. Ensure your yard gate locks are heavy-duty, burglar proofing is welded (not screwed) to frames, and exterior doors have deadbolts in working condition.",
+      "Routine Vulnerability Awareness: Home invasions in this area frequently occur during everyday moments — stepping outside to hang clothes, opening the gate for a delivery, or doing yard work with the front door open. Stay alert during routine activities and keep entry points secured even while you are home."
     ],
     'Assault': [
-      "The 'Distance' Rule: If approached by strangers for directions or help in this hotspot, maintain a 6-foot distance. If you feel uncomfortable, prioritize your safety and move toward a populated business.",
+      "The 'Distance' Rule: If approached by strangers in this hotspot, keep your distance and stay moving. If you feel uncomfortable, prioritize your safety and head toward a populated area, a shop, or anywhere with other people around.",
       "De-escalation Awareness: Assault incidents in this area frequently escalate from verbal confrontations. Avoid engaging in arguments with strangers and remove yourself from tense situations immediately.",
       "Peak Hour Caution: Assault reports in this zone cluster between 10 PM and 2 AM, particularly on weekends. Plan your movements to avoid isolated areas during these hours."
     ],
     'Theft': [
-      "Delivery Redirection: Package theft is frequent in this neighborhood. We suggest using 'Secure Pickup' locations or requiring a signature to ensure your deliveries aren't left unattended on porches.",
-      "The 'Front Pocket' Rule: Pickpocketing and snatch-theft reports are elevated here. Keep wallets in front pockets, use cross-body bags worn under jackets, and stay alert in crowded queues.",
+      "Yard Security Check: Theft of items left in yards and on premises is common in this area. Avoid leaving valuables, tools, or equipment unattended outside — if it can be carried, bring it inside or lock it behind a secure gate.",
+      "The 'Front Pocket' Rule: Pickpocketing and snatch-theft reports are elevated here. Keep wallets in front pockets, use cross-body bags held close to your body, and stay alert in crowded areas and queues.",
       "Secure Your Perimeter: Theft of outdoor items (tools, garden equipment, bicycles) is common in this area. If it's not bolted down or locked up, bring it inside overnight."
     ],
     'Murder': [
@@ -183,9 +183,10 @@ function getSafetyTip(score: number, primaryCrimeType: string, areaName: string 
       "Well-Lit Routes Only: Incident data shows a strong correlation with poorly lit and isolated pathways in this zone. Always choose the busier, well-lit route even if it takes longer."
     ],
     'default': [
-      "Lighting & Line-of-Sight: Incident data here correlates with low-visibility hours. If possible, park only under active streetlights and avoid 'shortcuts' through alleys or unlit residential passages.",
+      "Lighting & Line-of-Sight: Incident data here correlates with low-visibility hours. If possible, park only under active streetlights and avoid shortcuts through unlit back roads or residential passages.",
       "General Alertness Protocol: This area's elevated score warrants heightened awareness. Keep valuables concealed, stay on well-trafficked routes, and trust your instincts if a situation feels unsafe.",
-      "Report & Prevent: Active reporting helps law enforcement allocate resources effectively. If you witness suspicious activity in this zone, report it promptly — even anonymous tips help reduce repeat incidents."
+      "Report & Prevent: See something, say something. Active reporting helps law enforcement allocate resources effectively. If you witness suspicious activity in this zone, report it promptly — even anonymous tips help reduce repeat incidents.",
+      "Camera Check: If you have CCTV or a security camera, check that the footage quality is clear enough to identify faces and plate numbers. Poorly positioned or low-resolution cameras are common in high-crime areas and provide little help to authorities when incidents occur."
     ]
   };
 
@@ -193,24 +194,24 @@ function getSafetyTip(score: number, primaryCrimeType: string, areaName: string 
   const neutralTips = [
     "Baseline Awareness: This area currently maintains a stable safety standing. To help keep it that way, remain aware of your surroundings during 'transition times' like sunrise and sunset when visibility changes.",
     "The 9 PM Routine: Maintaining a '9 PM Routine'—checking that all car doors, house doors, and windows are locked every night—is often the difference between a neutral score and a high-crime score.",
-    "Strategic Lighting Maintenance: Check that your porch and motion-sensor lights are in working order. Well-lit neighborhoods statistically discourage the types of property 'probing' common in mid-tier areas.",
-    "Community Connection: Introduce yourself to your immediate neighbors. In areas with average crime scores, a connected block where people look out for each other's homes is the strongest deterrent available.",
+    "Strategic Lighting Maintenance: Check that your yard light and exterior lights are in working order. Well-lit properties statistically discourage the types of property 'probing' common in mid-tier areas.",
+    "Community Connection: Join or start a neighbourhood WhatsApp group for your block. In areas with average crime scores, a connected community where people look out for each other and share alerts in real-time is the strongest deterrent available.",
     "Vehicle 'Clean-Floor' Policy: Even in stable areas, leaving an empty box or a gym bag in your car can invite a window smash. Keep your car interior completely clear to avoid 'curiosity' break-ins.",
     "The 'Walk With Purpose' Principle: In areas with moderate activity, how you carry yourself matters. Walking confidently, making brief eye contact, and moving with direction signals awareness to potential opportunists.",
     "Digital Footprint Caution: Avoid posting real-time location updates on social media when you're away from home. Burglars in moderate-risk areas increasingly use social media to identify empty properties.",
-    "Landscaping as Security: Overgrown hedges and tall fences near entry points create concealment opportunities. Keep shrubs trimmed below window height and ensure your front door is visible from the street.",
-    "Spare Key Discipline: Never hide a spare key under mats, flower pots, or fake rocks. In areas with this crime profile, these are the first places checked. Use a trusted neighbor or a combination lockbox instead.",
+    "Perimeter Integrity: Ensure your yard walls and fencing have no gaps or weak points that could be exploited. Keep vegetation near entry gates trimmed so neighbours and passers-by can see your front door, and check that gate hinges and locks are in solid working order.",
+    "Spare Key Discipline: Never hide a spare key under mats, plant pots, or obvious spots around the yard. In areas with this crime profile, these are the first places checked. Leave a spare with a trusted neighbour instead.",
     "After-Dark Parking Protocol: When returning home after dark, park as close to your entrance as possible. Have your keys ready before you exit the vehicle and move directly to your door without lingering.",
-    "Window Security Check: Ground-floor windows in mid-tier areas are common entry points for opportunistic crime. Ensure all accessible windows have functioning locks and consider adding window pins for extra security.",
-    "Noise as Deterrent: A barking dog, a radio left on, or a TV timer can all signal occupancy. In areas with this safety profile, the perception of someone being home is often enough to deter a break-in attempt.",
-    "Cash Point Awareness: ATM-related incidents are more common in moderate areas during off-peak hours. Use machines inside banks or well-lit commercial areas, and shield your PIN entry from view."
+    "Window Security Check: Ground-floor windows in mid-tier areas are common entry points for opportunistic crime. Ensure all accessible windows have secure burglar bars or grilles, and check that louvre blades cannot be easily removed from the outside.",
+    "Noise as Deterrent: A barking dog, a radio left on, or an air horn kept by the door can all deter intruders. In areas with this safety profile, making noise and drawing attention to a break-in attempt is often enough to stop it.",
+    "Cash Point Awareness: ATM-related incidents are more common in moderate areas during off-peak hours. Use machines in well-lit, busy commercial areas rather than isolated locations, and always shield your PIN entry from view."
   ];
 
   // Low crime tips (score < 4)
   const lowCrimeTips = [
     "Maintain the Standard: Keep up the great neighborhood lighting and locked-door habits that have made this area one of the safest in the region.",
-    "Neighborhood Watch Excellence: Continue participating in community watch programs to maintain this area's superior safety standing.",
-    "Security Maintenance: Regular checks of home security systems and outdoor lighting help maintain your area's excellent safety record.",
+    "Neighbourhood Watch Excellence: Continue participating in community watch programs and neighbourhood WhatsApp groups to maintain this area's superior safety standing. Real-time communication between neighbours is one of the strongest tools for keeping crime low.",
+    "Security Maintenance: Regular checks of your home security — burglar proofing, gate locks, yard lighting, and perimeter fencing — help maintain your area's excellent safety record.",
     "Community Vigilance: Your area's low crime rate is a testament to community cooperation. Continue reporting suspicious activity to maintain this achievement.",
     "Proactive Awareness: While your area enjoys low crime rates, maintaining basic security practices ensures it stays that way for years to come.",
     "Welcome New Residents: A strong community fabric is the foundation of low-crime neighborhoods. Welcoming new neighbors and sharing local safety norms helps preserve the culture that keeps crime rates low.",
@@ -219,7 +220,7 @@ function getSafetyTip(score: number, primaryCrimeType: string, areaName: string 
     "Emergency Preparedness: Even in the safest areas, having an emergency plan for natural disasters or unexpected events keeps your household resilient. Review your plan annually with all household members.",
     "Share What Works: Your neighborhood's safety practices can inspire other communities. Consider sharing your community watch strategies or security tips with adjacent areas to help raise the regional standard.",
     "Seasonal Vigilance: Crime patterns can shift during holiday seasons even in safe areas. Maintain your security routines during festive periods when homes may be unoccupied for travel.",
-    "Digital Security Extension: Your physical safety record is strong — extend that discipline to your digital life. Use strong passwords, enable two-factor authentication, and be cautious with unsolicited messages."
+    "Guard Dog Advantage: A watchful dog remains one of the most effective deterrents in the Caribbean. Even in low-crime areas, the alertness of a yard dog adds an extra layer of security that reinforces your area's strong safety record."
   ];
 
   const seed = hashString(areaName.toLowerCase());
