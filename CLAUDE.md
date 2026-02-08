@@ -12,13 +12,29 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
 **Traffic:** ~4 real visitors/day, Google Search Console active (1,728 pages indexed)
-**Last Updated:** February 6, 2026
+**Last Updated:** February 8, 2026
 
 ---
 
 ## Recent Work (Last 30 Days)
 
 **February 2026:**
+- **TRENDING HOTSPOTS COMPONENT** (Feb 8) - **Page Views Per Session Booster**
+  - "Hot Areas This Week" — Top 5 areas by crime count (last 7 days), server-rendered from CSV data
+  - "Your Recent Views" — Last 3 crime pages visited (localStorage), client-side only
+  - Placed on every crime detail page (between article and SafetyContext) and CrimeDetailModal
+  - Zero additional API calls — reuses already-loaded `allCrimes` array
+  - Heat dot intensity by rank (rose-500/400/300), area links to area detail pages
+  - localStorage: 20-entry rolling buffer, deduplication by slug, graceful fallback
+  - Created `src/lib/trendingHelpers.ts`, `src/components/TrendingHotspots.astro`
+  - Added `generateTrendingHotspotsHTML()` to `modalHtmlGenerators.ts` for modal support
+- **LINK CHECKER AUTOMATION** (Feb 7) - **Dead Link Detection**
+  - Created `linkChecker.gs` — checks all news article source URLs in Trinidad CSVs
+  - Bi-weekly triggers (1st and 15th of each month)
+  - Parallel batch checking via `UrlFetchApp.fetchAll()`, HEAD-then-GET retry
+  - Trigger chaining for GAS 5-min execution limit (CacheService state persistence)
+  - Email report sorted by crime count impact (most affected URLs first)
+  - Social media URLs excluded (Facebook, Instagram, X, etc.)
 - **WEEKLY BLOG AUTOMATION** (Feb 6) - **Fully Automatic Blog Pipeline**
   - Created `weeklyBlogAutomation.gs` — end-to-end automated weekly blog generation
   - Claude Haiku 4.5 writes blog posts from CSV crime statistics (~$0.01-0.03/post)
@@ -463,6 +479,8 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 - `src/components/SectionPickerModal.astro` - Homepage section picker (dynamic from countries.ts)
 - `src/components/BottomNav.astro` - Mobile bottom tab bar (persistent, config-driven from countries.ts)
 - `src/components/RelatedCrimes.astro` - Actual crime cards for related content (same area/type priority)
+- `src/components/TrendingHotspots.astro` - Hot areas + recent views engagement component
+- `src/lib/trendingHelpers.ts` - Hot areas calculation + localStorage recent views tracking
 - `src/lib/safetyHelpers.ts` - Crime scoring & safety context calculation
 - `src/lib/generateOgImage.ts` - Dynamic OG image generator (satori + sharp)
 

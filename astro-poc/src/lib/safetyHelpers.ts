@@ -12,7 +12,7 @@
 import type { Crime } from './crimeData';
 
 /** Normalize a date value that may be a Date object or ISO string (client-side JSON serialization) */
-function toDate(d: Date | string | undefined, fallback?: string): Date {
+export function toDate(d: Date | string | undefined, fallback?: string): Date {
   if (d instanceof Date) return d;
   return new Date(d || fallback || 0);
 }

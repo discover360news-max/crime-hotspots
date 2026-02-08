@@ -2,13 +2,84 @@
 
 **For:** Complete details of recently implemented features
 
-**Last Updated:** February 5, 2026
+**Last Updated:** February 8, 2026
 
 **Note:** Features older than 90 days are archived to `docs/archive/accomplishments/`
 
 ---
 
 ## February 2026 Features
+
+### Trending Hotspots Component (Feb 8, 2026)
+
+**Context:** With 2,408 active users, page views per session needed improvement. Users were reading one crime story and leaving. The goal is to increase engagement by showing site-wide crime trends and personal browsing history at the bottom of every crime page.
+
+**What Was Implemented:**
+
+**Section 1: "Hot Areas This Week" (server-rendered)**
+- Top 5 areas by crime count in the last 7 days
+- Computed from existing `allCrimes` array (zero additional API calls)
+- Heat dot intensity by rank: rose-500 (hottest) → rose-400 → rose-300
+- Area names linked to area detail pages via `buildRoute.area()`
+- Crime count badge on each row
+- "View all areas" CTA linking to `/trinidad/areas/`
+
+**Section 2: "Your Recent Views" (client-side localStorage)**
+- Shows last 3 crime pages the user visited (title + area)
+- localStorage key: `crimehotspots_recent_views`
+- 20-entry rolling buffer with deduplication by slug
+- Hidden until user has browsing history
+- Graceful fallback (try/catch for SSR, private browsing, quota exceeded)
+
+**Placement:**
+- Crime detail pages: Between `</article>` and `<SafetyContext>` (full-width)
+- CrimeDetailModal: Between Related Crimes and Action Buttons
+
+**Complements RelatedCrimes (not redundant):**
+- RelatedCrimes = "Similar to what you're reading" (contextual)
+- Hot Areas = "Where crime is spiking right now" (site-wide awareness)
+- Recent Views = "Pick up where you left off" (re-engagement)
+
+**Files Created:**
+- `src/lib/trendingHelpers.ts` — `getHotAreas()`, `trackRecentView()`, `getRecentViews()`
+- `src/components/TrendingHotspots.astro` — Server + client sections
+
+**Files Modified:**
+- `src/lib/safetyHelpers.ts` — Exported `toDate()` for reuse
+- `src/pages/trinidad/crime/[slug].astro` — Added TrendingHotspots component
+- `src/scripts/modalHtmlGenerators.ts` — Added `generateTrendingHotspotsHTML()`
+- `src/components/CrimeDetailModal.astro` — Wired trending hotspots into modal
+
+**Status:** ✅ Complete
+
+---
+
+### Link Checker Automation (Feb 7, 2026)
+
+**Context:** Crime data references hundreds of news article URLs. Over time, news sites take down articles, change URLs, or go offline. Dead source links degrade user trust and SEO quality.
+
+**What Was Implemented:**
+- `linkChecker.gs` — Checks all news article source URLs in 2025 + 2026 CSVs
+- Bi-weekly triggers (1st and 15th of each month at 8 AM Trinidad time)
+- Parallel batch checking via `UrlFetchApp.fetchAll()` (50 URLs per batch)
+- HEAD-first, GET-retry strategy for servers that reject HEAD (405/501)
+- Trigger chaining: saves progress to CacheService, schedules continuation if GAS 5-min limit hit
+- Email report sorted by crime count impact (most affected dead URLs first)
+- Social media URLs excluded (Facebook, Instagram, X, YouTube, etc.)
+- Test functions: `testLinkChecker()` (first 20 URLs), `testLinkCheckerFull()` (all, no email)
+
+**Files Created:**
+- `google-apps-script/trinidad/linkChecker.gs`
+
+**Dependencies:** `config.gs` (NOTIFICATION_EMAIL), `socialMediaStats.gs` (parseCSV)
+
+**Script Properties Required:**
+- `TRINIDAD_CSV_URL` (already set by blog automation)
+- `TRINIDAD_CSV_URL_2025` (run `setLinkChecker2025CsvUrl()` once)
+
+**Status:** ✅ Complete
+
+---
 
 ### UX Navigation Overhaul (Feb 5, 2026)
 

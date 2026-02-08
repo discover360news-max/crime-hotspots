@@ -15,6 +15,7 @@ import AreaNameTooltip from '../../../components/AreaNameTooltip.astro';
 import SafetyContext from '../../../components/SafetyContext.astro';
 import FeedbackToggle from '../../../components/FeedbackToggle.astro';
 import RelatedCrimes from '../../../components/RelatedCrimes.astro';
+import TrendingHotspots from '../../../components/TrendingHotspots.astro';
 import { dataUpdateNotice } from '../../../config/siteNotifications';
 import { loadAreaAliases, getLocalName } from '../../../lib/areaAliases';
 import { getCountryName } from '../../../data/countries';
@@ -250,6 +251,14 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
         </div>
       </div>
     </article>
+
+    <!-- Trending Hotspots -->
+    <TrendingHotspots
+      allCrimes={allCrimes}
+      currentSlug={crime.slug}
+      currentHeadline={crime.headline}
+      currentArea={crime.area}
+    />
 
     <!-- Safety Context for Area -->
     <SafetyContext

@@ -6,8 +6,10 @@
 
 import { escapeHtml } from '../lib/escapeHtml';
 import { getCrimeHexColor } from '../lib/crimeColors';
-import { buildRoute } from '../config/routes';
+import { buildRoute, routes } from '../config/routes';
 import type { SafetyContext } from '../lib/safetyHelpers';
+import { toDate } from '../lib/safetyHelpers';
+import { trackRecentView, getRecentViews } from '../lib/trendingHelpers';
 
 /** Generate Safety Context HTML (color-coded area safety alert box) */
 export function generateSafetyContextHTML(areaName: string, context: SafetyContext): string {
@@ -210,6 +212,133 @@ export function generateRelatedCrimesHTML(currentCrime: any, allCrimes: any[], m
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
       </a>
+    </aside>
+  `;
+}
+
+/** Generate Trending Hotspots HTML (hot areas + recent views for modal) */
+export function generateTrendingHotspotsHTML(currentCrime: any, allCrimes: any[]): string {
+  const hotAreasHTML = generateHotAreasHTML_(allCrimes);
+  const recentViewsHTML = generateRecentViewsHTML_(currentCrime.slug);
+
+  // Track current view in localStorage
+  trackRecentView(currentCrime.slug, currentCrime.headline, currentCrime.area);
+
+  if (!hotAreasHTML && !recentViewsHTML) return '';
+  return `<div class="space-y-4">${hotAreasHTML}${recentViewsHTML}</div>`;
+}
+
+/** Generate Hot Areas HTML (client-side calculation from __crimesData) */
+function generateHotAreasHTML_(allCrimes: any[]): string {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 7);
+  cutoff.setHours(0, 0, 0, 0);
+
+  // Filter to last 7 days
+  const recentCrimes = allCrimes.filter(c => {
+    const d = toDate(c.dateObj, c.date);
+    return d >= cutoff;
+  });
+
+  // Aggregate by area
+  const areaCount = new Map<string, number>();
+  recentCrimes.forEach(crime => {
+    const area = crime.area || 'Unknown';
+    areaCount.set(area, (areaCount.get(area) || 0) + 1);
+  });
+
+  // Sort descending, take top 5
+  const hotAreas = Array.from(areaCount.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([area, count], index) => ({
+      area,
+      areaSlug: area.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      count,
+      rank: index + 1,
+    }));
+
+  if (hotAreas.length === 0) return '';
+
+  const getHeatColor = (rank: number): string => {
+    if (rank === 1) return 'bg-rose-500';
+    if (rank <= 3) return 'bg-rose-400';
+    return 'bg-rose-300';
+  };
+
+  const areaCards = hotAreas.map(hotArea => `
+    <a href="${escapeHtml(buildRoute.area(hotArea.areaSlug))}" class="block p-3 bg-white rounded-lg border border-slate-100 hover:border-rose-200 hover:shadow-sm transition-all group">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full flex-shrink-0 ${getHeatColor(hotArea.rank)}"></span>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-medium text-slate-700 group-hover:text-rose-600 transition-colors truncate">
+            ${escapeHtml(hotArea.area)}
+          </p>
+        </div>
+        <span class="text-[10px] px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded flex-shrink-0">
+          ${hotArea.count} ${hotArea.count === 1 ? 'crime' : 'crimes'}
+        </span>
+        <svg class="w-3 h-3 text-slate-300 group-hover:text-rose-400 transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </a>
+  `).join('');
+
+  return `
+    <aside class="p-4 bg-slate-50/80 backdrop-blur-sm rounded-lg border border-slate-200">
+      <h2 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+        <svg class="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 23a7 7 0 01-7-7c0-3.15 2.26-5.97 4.5-8.5.45-.5 1.55-.5 2 0C13.74 10.03 19 12.85 19 16a7 7 0 01-7 7zm0-12.5c-1.5 2-3.5 4.5-3.5 5.5a3.5 3.5 0 107 0c0-1-2-3.5-3.5-5.5z"/>
+        </svg>
+        Hot Areas This Week
+      </h2>
+      <div class="space-y-2">
+        ${areaCards}
+      </div>
+      <a href="${routes.trinidad.areas}" class="mt-3 flex items-center justify-center gap-1 w-full py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors">
+        View all areas
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </a>
+    </aside>
+  `;
+}
+
+/** Generate Recent Views HTML (from localStorage) */
+function generateRecentViewsHTML_(excludeSlug: string): string {
+  const recentViews = getRecentViews(excludeSlug, 3);
+  if (recentViews.length === 0) return '';
+
+  const viewCards = recentViews.map(view => `
+    <a href="${escapeHtml(buildRoute.crime(view.slug))}" class="block p-3 bg-white rounded-lg border border-slate-100 hover:border-rose-200 hover:shadow-sm transition-all group">
+      <div class="flex items-start gap-2">
+        <span class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 bg-slate-400"></span>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-medium text-slate-700 group-hover:text-rose-600 transition-colors line-clamp-2">
+            ${escapeHtml(view.headline)}
+          </p>
+          <span class="text-[10px] text-slate-400">${escapeHtml(view.area)}</span>
+        </div>
+        <svg class="w-3 h-3 text-slate-300 group-hover:text-rose-400 transition-colors flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </a>
+  `).join('');
+
+  return `
+    <aside class="p-4 bg-slate-50/80 backdrop-blur-sm rounded-lg border border-slate-200">
+      <h2 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+        <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Your Recent Views
+      </h2>
+      <div class="space-y-2">
+        ${viewCards}
+      </div>
     </aside>
   `;
 }
