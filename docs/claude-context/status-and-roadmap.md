@@ -31,7 +31,7 @@
   - Clickable stat cards for crime type filtering
 
 - **Site-Wide Search** (Pagefind)
-  - 1,584 pages indexed
+  - Auto-indexed at build time (grows with site)
   - Keyboard shortcut (Ctrl+K)
   - Crime detail pages only (excludes listings)
 
@@ -55,7 +55,7 @@
 
 ### SEO & Content
 - **Phase 1 SEO Implementation (Dec 25, 2025)** ✅
-  - Sitemap.xml (auto-generated, 1,728 pages)
+  - Sitemap.xml (auto-generated, grows with site)
   - robots.txt, breadcrumbs on ALL pages
   - Meta descriptions, Open Graph tags, Twitter Cards
   - Structured Data (Schema.org): Dataset, BreadcrumbList, FAQPage, Organization
@@ -70,7 +70,7 @@
   - Build-time "Updated" date reflects data freshness
 
 - **Traffic Analysis & SEO Foundation (Jan 5, 2026)** ✅
-  - Google Search Console verified, 1,728 pages discovered
+  - Google Search Console verified
   - Bot traffic analysis: 99% bots (search engines + malicious), 4 real visitors/day
   - Bot Fight Mode active (1,150 malicious requests blocked/day)
   - Zero-budget social media growth strategy (Reddit, Facebook groups, X tagging)

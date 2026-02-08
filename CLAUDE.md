@@ -11,7 +11,7 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Current Status:** ✅ Production - Trinidad & Tobago LIVE (Astro-powered)
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
-**Traffic:** ~4 real visitors/day, Google Search Console active (1,728 pages indexed)
+**Traffic:** ~4 real visitors/day, Google Search Console active
 **Last Updated:** February 8, 2026
 
 ---
@@ -151,7 +151,7 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 
 **December 2025:**
 - Site notification banner + 2026 crime type system launch
-- Search index cleanup + Pagefind production fix (1,584 pages indexed)
+- Search index cleanup + Pagefind production fix
 - Dashboard trend indicators + modal navigation (30-day comparisons)
 - Year filter system (CSV URL synchronization)
 
@@ -180,7 +180,7 @@ To find a way to get goals accomplished efficiently and by using the least token
 - **Tailwind CSS 4.1.18** - Via Vite plugin (@tailwindcss/vite)
 - **TypeScript** - Type safety for components and content
 - **Astro Content Collections** - Type-safe blog system
-- **Pagefind** - Site-wide static search (1,584 pages indexed)
+- **Pagefind** - Site-wide static search (auto-indexed at build time)
 - Cloudflare Turnstile for CAPTCHA
 - Leaflet.js for interactive maps
 - OpenStreetMap tiles
@@ -225,7 +225,7 @@ To find a way to get goals accomplished efficiently and by using the least token
 - TypeScript utilities → `src/scripts/` or `src/lib/`
 
 **Why This Matters:**
-- As the site grows (1,889+ pages), duplicated inline code becomes unmaintainable
+- As the site grows (2,100+ pages), duplicated inline code becomes unmaintainable
 - Changing a button style should update everywhere, not require 50 file edits
 - Consistency across the site improves UX and SEO
 
@@ -439,67 +439,36 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 ## Quick Reference Documentation
 
-**📂 Claude Context (Detailed Information)**
+**📂 Claude Context (Start Here)**
+- `docs/claude-context/site-features.md` - **All active features registry** ⭐ HOLISTIC VIEW
+- `docs/claude-context/recent-changes.md` - **Rolling 30-day changelog** (what changed recently)
 - `docs/claude-context/architecture.md` - Astro routing, file structure, SSG examples
 - `docs/claude-context/automation.md` - Google Apps Script details, data collection
 - `docs/claude-context/development-workflow.md` - Commands, deployment, CSV URL sync
-- `docs/claude-context/recent-features.md` - December 2025 - January 2026 implementations
 - `docs/claude-context/status-and-roadmap.md` - Completed features, next To-Do, vision
-- `docs/claude-context/MAINTENANCE-RULES.md` - **Rules for keeping project memory slim**
+- `docs/claude-context/MAINTENANCE-RULES.md` - Rules for keeping project memory slim
 
 **📊 Audits & Technical Debt**
-- `docs/Website-Audits/January-Audit-2026.md` - **Comprehensive audit with prioritized fixes** ⭐
-  - Security, SEO, UX/UI, Code Quality findings
-  - Priority matrix with timelines and seriousness levels
-  - Track completed vs pending items
+- `docs/Website-Audits/January-Audit-2026.md` - Comprehensive audit with prioritized fixes
 
 **🎨 Design & SEO**
 - `docs/guides/DESIGN-TOKENS.md` - **Official Design System (v1.0)** ⭐ CHECK THIS FIRST
-  - Button variants, frosted glass, typography, color palette, copy-paste templates
 - `docs/guides/DESIGN-Guidelines.md` - Complete design framework (v2.0)
 - `docs/guides/SEO-Framework.md` - Complete SEO strategy, phased roadmap
 
 **🧩 UI Patterns**
 - `docs/guides/ACCORDION-PATTERN.md` - Date accordion component pattern
 - `docs/guides/INFO-ICON-PATTERN.md` - Info icon hover pattern
-- `docs/guides/The-Safety-Strength-Engine.md` - **Safety Context System** ⭐
-  - Area-based crime scoring algorithm (1-10 scale)
-  - Contextual safety tips (high/neutral/low risk levels)
-  - Balanced messaging for SEO and user experience
-- `docs/guides/UX-NAVIGATION-AUDIT.md` - **Mobile Navigation Best Practices** ⭐
-  - Nielsen Norman, Material Design, Apple HIG research
-  - Priority matrix for navigation improvements
-  - Bottom nav, direct links, active indicators, related content patterns
-
-**🧱 Reusable Components** (COMPONENT-FIRST Architecture)
-- `src/components/Hero.astro` - Full-width gradient hero with CTAs (landing pages) + compact variant + slot for custom actions
-- `src/components/StatCards.astro` - Statistics grid with YoY comparisons
-- `src/components/DataTable.astro` - Responsive table wrapper with consistent styling
-- `src/components/SafetyContext.astro` - Color-coded area safety tips (high/neutral/low)
-- `src/components/SectionPickerModal.astro` - Homepage section picker (dynamic from countries.ts)
-- `src/components/BottomNav.astro` - Mobile bottom tab bar (persistent, config-driven from countries.ts)
-- `src/components/RelatedCrimes.astro` - Actual crime cards for related content (same area/type priority)
-- `src/components/TrendingHotspots.astro` - Hot areas + recent views engagement component
-- `src/lib/trendingHelpers.ts` - Hot areas calculation + localStorage recent views tracking
-- `src/lib/safetyHelpers.ts` - Crime scoring & safety context calculation
-- `src/lib/generateOgImage.ts` - Dynamic OG image generator (satori + sharp)
+- `docs/guides/The-Safety-Strength-Engine.md` - Safety Context System (scoring, tips, SEO)
+- `docs/guides/UX-NAVIGATION-AUDIT.md` - Mobile Navigation Best Practices (bottom nav, direct links)
 
 **🤖 Automation**
-- `google-apps-script/trinidad/README.md` - Trinidad automation
-- `google-apps-script/trinidad/weeklyBlogAutomation.gs` - **Weekly blog auto-generation (Claude Haiku)** ⭐
-- `google-apps-script/trinidad/facebookSubmitter.gs` - Facebook Post Submitter web app (daily use)
-- `google-apps-script/trinidad/socialMediaStats.gs` - Social media stats (daily/monthly/custom)
-- `google-apps-script/trinidad/claudeClient.gs` - Claude API client for crime extraction
-- `google-apps-script/trinidad/config.gs` - API keys, model config, sheet/source config
-- `docs/FACEBOOK-DATA-COLLECTION.md` - Facebook sources
+- `google-apps-script/trinidad/README.md` - Trinidad automation overview
 - `docs/automation/WEEKLY-REPORT-SAFEGUARDS.md` - Blog validation safeguards
-- `docs/automation/DUPLICATE-DETECTION-ARCHIVE.md` - Enhanced duplicate detection
-- `docs/automation/SEIZURES-CRIME-TYPE.md` - Seizures crime type
+- `docs/FACEBOOK-DATA-COLLECTION.md` - Facebook sources
 
-**📦 Architecture**
-- `docs/architecture/CSV-DATA-MANAGEMENT.md` - Phased implementation plan
-
-**📜 Archive**
+**📜 Archive (Deep Dive When Needed)**
+- `docs/archive/features/` - Full implementation narratives by month
 - `docs/archive/Development Progress/` - Historical development logs
 
 ---
@@ -507,10 +476,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 ## Current Status (Brief)
 
 ### ✅ Production Ready
-- Astro 5.16.5 framework (1,889 static pages)
+- Astro 5.16.5 framework (2,100+ pages)
 - Trinidad & Tobago manual entry workflow (100% functional)
 - Dashboard with Leaflet maps, year filtering, trend comparisons
-- Site-wide search (Pagefind, 1,584 pages indexed)
+- Site-wide search (Pagefind, auto-indexed at build time)
 - SEO Phase 1 complete (sitemap, structured data, breadcrumbs, Google Search Console verified)
 - **Security Grade: A** - XSS fixed, CSP complete, npm vulnerabilities resolved
 - Google Analytics 4, cookie consent, user reporting

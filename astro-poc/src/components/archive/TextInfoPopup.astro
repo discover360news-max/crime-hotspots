@@ -69,7 +69,7 @@ const { id, triggerText } = Astro.props;
 
     // Create overlay
     const overlay = document.createElement('div');
-    overlay.className = 'fixed inset-0 bg-black/30 z-[60] transition-opacity duration-300';
+    overlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] transition-opacity duration-300';
     overlay.style.opacity = '0';
     overlay.dataset.popupId = popupId;
 

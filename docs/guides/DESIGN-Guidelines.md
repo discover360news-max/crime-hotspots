@@ -68,8 +68,7 @@ Our palette creates a clean, clinical (but not cold) backdrop for serious crime 
 |-------|-------|
 | **White** | Primary backgrounds, cards |
 | **White 75%** | `rgba(255, 255, 255, 0.75)` — Frosted trays |
-| **White 60%** | `bg-white/60` — Mobile menu overlay |
-| **Black 50%** | `bg-black/50` — Modal backdrops |
+| **Black 50%** | `bg-black/50 backdrop-blur-sm` — All modal/overlay backdrops (unified sitewide) |
 
 ### Usage Rules
 
@@ -383,9 +382,9 @@ Our mobile-first approach uses these breakpoints:
 
 ### Mobile-Specific Features
 
-**iOS-Style Frosted Overlays:**
-- Mobile menu: `bg-white/60 backdrop-blur-lg`
-- Dashboard tray: `bg-white/75 backdrop-blur-[16px]`
+**Overlay Backdrops (Unified):**
+- All modals, trays, menus, popups: `bg-black/50 backdrop-blur-sm` (dark blur)
+- Tray/menu content panels retain frosted glass: `bg-white/25 backdrop-blur-lg`
 
 **Gesture Support:**
 - Swipe to close (future enhancement)

@@ -2,7 +2,7 @@
 
 **For:** AI agents (Claude Code and future assistants) to maintain lean, purposeful documentation
 
-**Last Updated:** January 6, 2026
+**Last Updated:** February 8, 2026
 
 ---
 
@@ -169,29 +169,27 @@ Need to drive traffic to blog content and improve visual hierarchy on Headlines 
 
 ### Immediate Update (Same Session)
 
-**Add to recent-features.md:**
-- Feature name + date
-- Problem solved (1-2 sentences)
-- Solution approach (3-5 bullets)
-- Key learnings (2-4 bullets)
-- Files affected (list only)
+**Add to `docs/claude-context/recent-changes.md`:**
+- Date + feature name
+- What changed (3-5 slim bullets)
+- Files created/modified
+- Gotchas (if any)
+
+**Add to `docs/claude-context/site-features.md`:**
+- New row in the appropriate category table
+- One-liner description + key files
 
 **Add to CLAUDE.md:**
-- 1-line summary in "Recent Accomplishments" section
+- 1-line summary in "Recent Work" section (if significant)
 - Update "Current Status" if production-ready
 
 ### Monthly Consolidation
 
 **Review all context files:**
-1. Merge accomplishments by theme
-2. Remove code examples (keep file references)
-3. Archive items older than 90 days
-4. Check file size limits
-
-**Archive to `docs/archive/accomplishments/YYYY-MM.md`:**
-- Full details of all work from that month
-- Code examples, screenshots, commit hashes
-- Complete implementation narratives
+1. Move entries older than 30 days from `recent-changes.md` to `docs/archive/features/YYYY-MM.md`
+2. Verify `site-features.md` is up-to-date with all active features
+3. Check file size limits
+4. Remove duplicate information across context files
 
 ---
 
@@ -257,7 +255,7 @@ Final solution: Made section full-width with justify-between"
 
 ## Template for Adding New Accomplishments
 
-**Use this template when adding to recent-features.md:**
+**Use this template when adding to `recent-changes.md`:**
 
 ```markdown
 ### [Feature Name] ([Date])
@@ -288,21 +286,20 @@ Final solution: Made section full-width with justify-between"
 
 ### When to Archive
 
-**Trigger:** Accomplishment is 90+ days old AND not actively referenced
+**Trigger:** Entry in `recent-changes.md` is 30+ days old
 
 **Action:**
-1. Create `docs/archive/accomplishments/YYYY-MM.md` if not exists
-2. Move full details to archive (keep code examples, narratives, commit hashes)
-3. Leave 1-line summary in recent-features.md if feature is still active
-4. Update status-and-roadmap.md "Completed Features" with consolidated entry
+1. Move full details to `docs/archive/features/YYYY-MM.md`
+2. Ensure feature still has a row in `site-features.md` (the holistic registry)
+3. Remove from `recent-changes.md`
 
 ### Archive Structure
 
 ```
-docs/archive/accomplishments/
+docs/archive/features/
 ├── 2025-12.md (December 2025 - detailed implementations)
 ├── 2026-01.md (January 2026 - detailed implementations)
-└── README.md (index of archived months)
+└── 2026-02.md (February 2026 - detailed implementations)
 ```
 
 ---
@@ -325,11 +322,12 @@ docs/archive/accomplishments/
 
 **When you're working on this project:**
 
-1. **Read CLAUDE.md first** - Get critical rules and quick context
-2. **Dive into context files** - Only when you need specific details
-3. **Update immediately** - Add accomplishments to recent-features.md as you work
-4. **Consolidate monthly** - Follow rules above to keep files lean
-5. **Ask the owner** - If unsure whether to keep/remove something
+1. **Read CLAUDE.md first** - Get critical rules and pointers
+2. **Check `site-features.md`** - Understand what the site does holistically
+3. **Check `recent-changes.md`** - See what changed in the last 30 days
+4. **Dive into archive** - Only when you need deep implementation details (`docs/archive/features/`)
+5. **Update immediately** - Add changes to `recent-changes.md` + `site-features.md` as you work
+6. **Ask the owner** - If unsure whether to keep/remove something
 
 **Your goal:** Make it easier for the NEXT AI agent, not harder.
 
