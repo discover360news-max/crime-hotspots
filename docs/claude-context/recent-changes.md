@@ -8,6 +8,19 @@
 
 ## February 2026
 
+### UX Foundation Improvements (Feb 9)
+
+- **Data freshness indicator** on dashboard — "Data as of [date]" below subtitle, updates with year filter
+- **Share buttons on area pages** — X, Facebook, WhatsApp (same pattern as crime detail pages)
+- **RSS feed** (`/rss.xml`) — blog posts + latest 20 crime headlines, pre-rendered, `<category>` tags per crime type
+- **RSS autodiscovery** `<link>` in Layout `<head>`, visible RSS icon in footer + blog index
+- **Empty state for headlines filters** — friendly message when filters return zero results
+- **Crime type tooltips on dashboard** — InfoPopup explaining all 9 crime type definitions
+- **Dataset license field** — CC BY 4.0 added to murder count structured data (GSC fix)
+- **Files created:** `src/pages/rss.xml.ts`
+- **Files modified:** `dashboard.astro`, `area/[slug].astro`, `Layout.astro`, `headlines.astro`, `blog/index.astro`, `murder-count.astro`
+- **Installed:** `@astrojs/rss`
+
 ### Trending Hotspots Component (Feb 8)
 - "Hot Areas This Week" (top 5 by crime count, 7-day window, server-rendered) + "Your Recent Views" (localStorage, client-side)
 - Placed on crime detail pages + CrimeDetailModal

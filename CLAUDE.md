@@ -19,6 +19,15 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 ## Recent Work (Last 30 Days)
 
 **February 2026:**
+
+- **UX FOUNDATION IMPROVEMENTS** (Feb 9) - **Pre-Country-Scaling Polish**
+  - Data freshness indicator on dashboard ("Data as of [date]"), updates with year filter
+  - Share buttons (X/Facebook/WhatsApp) on area pages — same pattern as crime detail pages
+  - RSS feed (`/rss.xml`) — blog posts + latest 20 crime headlines, pre-rendered, RSS icon in footer + blog index
+  - Empty state for headlines filters — friendly message when zero results
+  - Crime type tooltips on dashboard — InfoPopup with all 9 crime type definitions
+  - Dataset `license` field (CC BY 4.0) on murder count structured data (GSC fix)
+  - Created `src/pages/rss.xml.ts`; installed `@astrojs/rss`
 - **TRENDING HOTSPOTS COMPONENT** (Feb 8) - **Page Views Per Session Booster**
   - "Hot Areas This Week" — Top 5 areas by crime count (last 7 days), server-rendered from CSV data
   - "Your Recent Views" — Last 3 crime pages visited (localStorage), client-side only

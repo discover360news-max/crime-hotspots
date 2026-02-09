@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** February 8, 2026
+**Last Updated:** February 9, 2026
 
 ---
 
@@ -24,11 +24,11 @@
 ### Trinidad Crime Data
 | Page | Route | Rendering | Purpose |
 |------|-------|-----------|---------|
-| Dashboard | `/trinidad/` | Pre-rendered | Stats, Leaflet map, filters, trend indicators |
-| Headlines | `/trinidad/headlines/` | Pre-rendered | Latest crimes, date accordion, victim counts |
+| Dashboard | `/trinidad/` | Pre-rendered | Stats, Leaflet map, filters, trend indicators, data freshness, crime type tooltips |
+| Headlines | `/trinidad/headlines/` | Pre-rendered | Latest crimes, date accordion, victim counts, empty state for filters |
 | Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | Individual crime page, safety context, related crimes, trending hotspots |
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
-| Area Detail | `/trinidad/area/[slug]` | Pre-rendered | Area-specific crimes, stats |
+| Area Detail | `/trinidad/area/[slug]` | Pre-rendered | Area-specific crimes, stats, share buttons (X/Facebook/WhatsApp) |
 | Statistics | `/trinidad/statistics/` | Pre-rendered | Three-tier crime rates (previous year / YTD / projected) |
 | Regions | `/trinidad/regions/` | Pre-rendered | Browse by region |
 | Region Detail | `/trinidad/region/[slug]` | Pre-rendered | Region-specific crimes |
@@ -40,8 +40,9 @@
 ### Blog & Tools
 | Page | Route | Purpose |
 |------|-------|---------|
-| Blog Index | `/blog/` | All blog posts, weekly reports |
+| Blog Index | `/blog/` | All blog posts, weekly reports, RSS link |
 | Blog Post | `/blog/[slug]` | Individual post, "More Weekly Reports" section |
+| RSS Feed | `/rss.xml` | Blog posts + latest 20 crime headlines (pre-rendered) |
 | Social Image Generator | `/tools/social-image-generator/` | Create shareable crime stat images |
 
 ---
