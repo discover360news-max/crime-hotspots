@@ -130,7 +130,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       </div>
 
       <!-- Fade gradient + pulsing arrow (right side) -->
-      <div id="statsScrollHint" class="absolute right-0 top-0 bottom-7 w-16 bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none flex items-center justify-end pr-2 opacity-0 transition-opacity duration-300">
+      <div id="statsScrollHint" class="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none flex items-center justify-end pr-2 opacity-0 transition-opacity duration-300">
         <svg class="w-4 h-4 text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
@@ -287,9 +287,12 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
           <h3 class="font-semibold text-slate-800 text-sm">Crime Statistics & Rate</h3>
           <p class="text-xs text-slate-500 mt-1">Comprehensive statistics with year-over-year analysis and crime rate calculations</p>
         </a>
-        <a href={routes.trinidad.murderCount} class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
-          <h3 class="font-semibold text-slate-800 text-sm">Murder Count {currentYear}</h3>
-          <p class="text-xs text-slate-500 mt-1">Live murder count with animated counter and year-over-year comparison</p>
+        <a href={routes.trinidad.murderCount} class="block bg-rose-50 rounded-lg border border-rose-200 p-4 hover:border-rose-400 hover:shadow-md transition">
+          <div class="flex items-center gap-1.5 mb-1">
+            <svg class="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 23c-3.6 0-8-3.13-8-8.46C4 9.5 9.04 3.18 11.14.97a1.15 1.15 0 011.72 0C15 3.18 20 9.5 20 14.54 20 19.87 15.6 23 12 23zm0-19.73C9.64 6.1 6 11.47 6 14.54 6 18.62 9.07 21 12 21s6-2.38 6-6.46c0-3.07-3.64-8.44-6-11.27z"/><path d="M12 19a3.5 3.5 0 01-3.5-3.5c0-1.56 1.84-3.88 3.08-5.12a.58.58 0 01.84 0c1.24 1.24 3.08 3.56 3.08 5.12A3.5 3.5 0 0112 19z"/></svg>
+            <h3 class="font-semibold text-rose-700 text-sm">Murder Count {currentYear}</h3>
+          </div>
+          <p class="text-xs text-rose-600/70">Live murder count with year-over-year comparison</p>
         </a>
       </div>
     </div>

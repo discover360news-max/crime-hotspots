@@ -9,7 +9,7 @@
  * Adding a new section with showInBottomNav: false will auto-add it to More menu.
  */
 import { routes } from '../config/routes';
-import { getBottomNavSections, getMoreMenuSections, type CountrySection } from '../data/countries';
+import { getBottomNavSections, getMoreMenuSections, getCountryById, type CountrySection } from '../data/countries';
 
 interface Props {
   /** Current country ID (defaults to 'tt' for Trinidad) */
@@ -17,6 +17,11 @@ interface Props {
 }
 
 const { countryId = 'tt' } = Astro.props;
+
+// Get country data for indicator strip
+const country = getCountryById(countryId);
+const countryName = country?.name || 'Trinidad & Tobago';
+const countryFlag = country?.flag || '';
 
 // Get sections from config
 const primarySections = getBottomNavSections(countryId);
@@ -52,7 +57,20 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
   class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-slate-200 md:hidden safe-area-bottom"
   aria-label="Primary mobile navigation"
   data-pagefind-ignore
+  data-country-name={countryName}
+  data-country-flag={countryFlag}
 >
+  <!-- Country indicator strip (appears on scroll) -->
+  <div
+    id="countryIndicator"
+    class="overflow-hidden max-h-0 opacity-0 transition-all duration-300 ease-out"
+    aria-hidden="true"
+  >
+    <div class="flex items-center justify-center gap-1.5 py-1 border-b border-slate-100">
+      <span class="text-[10px] text-slate-400 font-medium tracking-wide">Viewing {countryFlag} {countryName}</span>
+    </div>
+  </div>
+
   <div class="flex items-center justify-around h-16 px-2">
     <!-- Primary Sections from Config -->
     {primarySections.map((section) => (
@@ -159,7 +177,7 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
 
   <!-- Menu Header -->
   <div class="flex items-center justify-between px-6 pb-3 border-b border-slate-200">
-    <h2 class="text-h3 font-bold text-slate-700">More</h2>
+    <h2 class="text-h3 font-bold text-slate-700">Explore {countryName} {countryFlag}</h2>
     <button
       id="moreMenuClose"
       class="p-2 rounded-full text-slate-500 hover:bg-slate-100 active:bg-slate-200 transition"
@@ -343,4 +361,41 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
       }, 200);
     });
   }
+
+  // Country indicator — show when page title scrolls out of view
+  (function() {
+    const indicator = document.getElementById('countryIndicator');
+    if (!indicator) return;
+
+    // Find the first h1 on the page (the page title that gives country context)
+    const pageTitle = document.querySelector('h1');
+    if (!pageTitle) {
+      // No h1 found (e.g., utility pages) — keep indicator hidden
+      return;
+    }
+
+    let indicatorVisible = false;
+
+    const observer = new IntersectionObserver(
+      function(entries) {
+        const isVisible = entries[0].isIntersecting;
+        if (!isVisible && !indicatorVisible) {
+          // Page title scrolled out of view — show indicator
+          indicator.style.maxHeight = '28px';
+          indicator.style.opacity = '1';
+          indicator.setAttribute('aria-hidden', 'false');
+          indicatorVisible = true;
+        } else if (isVisible && indicatorVisible) {
+          // Page title back in view — hide indicator
+          indicator.style.maxHeight = '0';
+          indicator.style.opacity = '0';
+          indicator.setAttribute('aria-hidden', 'true');
+          indicatorVisible = false;
+        }
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(pageTitle);
+  })();
 </script>

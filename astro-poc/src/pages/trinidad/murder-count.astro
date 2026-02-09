@@ -140,7 +140,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
           Trinidad & Tobago Murder Rate 2026
         </h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <!-- Current Year-to-Date Rate -->
           <div class="bg-rose-50 rounded-lg border border-rose-200 p-4 text-center">
             <div class="text-xs text-slate-500 font-medium mb-1">Current Rate (YTD)</div>
@@ -149,14 +149,14 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
           </div>
 
           <!-- Projected Annual Rate -->
-          <div class="bg-amber-50 rounded-lg border border-amber-200 p-4 text-center">
+          <div class="bg-slate-100 rounded-lg border border-slate-200 p-4 text-center">
             <div class="text-xs text-slate-500 font-medium mb-1">Projected Rate</div>
-            <div class="text-2xl font-bold text-amber-700">{projectedMurderRate}</div>
+            <div class="text-2xl font-bold text-slate-700">{projectedMurderRate}</div>
             <div class="text-xs text-slate-400 mt-1">per 100k (2026)</div>
           </div>
 
           <!-- 2025 Final Rate -->
-          <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 text-center">
+          <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 text-center col-span-2 sm:col-span-1">
             <div class="text-xs text-slate-500 font-medium mb-1">2025 Final Rate</div>
             <div class="text-2xl font-bold text-slate-700">{murderRate2025}</div>
             <div class="text-xs text-slate-400 mt-1">per 100k</div>
@@ -203,7 +203,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
           <a
             id="share-whatsapp"
             href="#"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-[#25D366] text-white hover:opacity-90 active:opacity-80 transition shadow-sm"
+            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-rose-100 hover:text-rose-600 active:bg-rose-200 transition shadow-sm"
             aria-label="Share on WhatsApp"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -214,7 +214,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
           <a
             id="share-facebook"
             href="#"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-[#1877F2] text-white hover:opacity-90 active:opacity-80 transition shadow-sm"
+            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-rose-100 hover:text-rose-600 active:bg-rose-200 transition shadow-sm"
             aria-label="Share on Facebook"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -225,7 +225,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
           <a
             id="share-twitter"
             href="#"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-black text-white hover:opacity-90 active:opacity-80 transition shadow-sm"
+            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-rose-100 hover:text-rose-600 active:bg-rose-200 transition shadow-sm"
             aria-label="Share on X"
           >
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -235,7 +235,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
           <!-- Copy Link -->
           <button
             id="share-copy"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 active:bg-slate-400 transition shadow-sm"
+            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-rose-100 hover:text-rose-600 active:bg-rose-200 transition shadow-sm"
             aria-label="Copy link"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

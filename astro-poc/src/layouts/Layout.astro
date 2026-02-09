@@ -33,6 +33,18 @@ const canonicalURL = Astro.site
   : `https://crimehotspots.com${Astro.url.pathname}`;
 
 const isHomepage = Astro.url.pathname === '/';
+
+// Detect country from URL path for BottomNav context
+// Maps URL prefix → country ID (add new countries here)
+const countryPathMap: Record<string, string> = {
+  '/trinidad': 'tt',
+  '/guyana': 'gy',
+  '/barbados': 'bb',
+  '/jamaica': 'jm',
+};
+const detectedCountryId = Object.entries(countryPathMap).find(
+  ([path]) => Astro.url.pathname.startsWith(path)
+)?.[1] || 'tt';
 ---
 
 <!doctype html>
@@ -344,6 +356,6 @@ const isHomepage = Astro.url.pathname === '/';
   </footer>
 
   <!-- Bottom Navigation (Mobile Only) -->
-  {!isHomepage && <BottomNav />}
+  {!isHomepage && <BottomNav countryId={detectedCountryId} />}
 </body>
 </html>

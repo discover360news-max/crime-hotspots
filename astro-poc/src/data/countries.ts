@@ -18,6 +18,8 @@ export interface CountrySection {
 export interface Country {
   id: string;
   name: string;
+  /** Flag emoji for country indicator UI */
+  flag: string;
   short: string;
   csvUrl: string;
   available: boolean;
@@ -31,6 +33,7 @@ export const COUNTRIES: Country[] = [
   {
     id: 'tt',
     name: 'Trinidad & Tobago',
+    flag: '\u{1F1F9}\u{1F1F9}',
     short: 'Nationwide coverage',
     csvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv",
     available: true,
@@ -51,6 +54,7 @@ export const COUNTRIES: Country[] = [
   {
     id: 'gy',
     name: 'Guyana',
+    flag: '\u{1F1EC}\u{1F1FE}',
     short: 'Coming Soon',
     csvUrl: "",
     available: false,
@@ -61,6 +65,7 @@ export const COUNTRIES: Country[] = [
   {
     id: 'bb',
     name: 'Barbados',
+    flag: '\u{1F1E7}\u{1F1E7}',
     short: 'Coming Soon',
     csvUrl: "",
     available: false,
@@ -71,6 +76,7 @@ export const COUNTRIES: Country[] = [
   {
     id: 'jm',
     name: 'Jamaica',
+    flag: '\u{1F1EF}\u{1F1F2}',
     short: 'Coming Soon',
     csvUrl: "",
     available: false,
