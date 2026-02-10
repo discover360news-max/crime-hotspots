@@ -272,14 +272,33 @@ Example: "Couple and their two teens tied up during robbery"
 → victimCount: 4 (couple=2 + teens=2)
 
 ═══════════════════════════════════════════════════════════════════════════════
+POLICE DIRECTIONALITY CHECK (READ BEFORE EXCLUSIONS)
+═══════════════════════════════════════════════════════════════════════════════
+
+⚠️ STOP: Before applying any police exclusion, determine WHO WAS SHOT:
+
+→ Criminal shoots AT police officer = ✅ EXTRACT (officer is the VICTIM)
+→ Police shoots suspect = ❌ EXCLUDE (suspect is not tracked)
+
+✅ POLICE AS VICTIM (ALWAYS EXTRACT — OVERRIDES ALL EXCLUSIONS):
+When a criminal ATTACKS, AMBUSHES, or SHOOTS a police officer, this IS a crime.
+- The officer is the VICTIM. List them in the victims array.
+- "Gunman opened fire on police" = ✅ Shooting, victim = officer(s)
+- "Officer ambushed and shot" = ✅ Shooting, victim = officer
+- "Constable killed by gunman" = ✅ Murder + Shooting, victim = constable
+- "Police vehicle shot at" = ✅ Shooting, victim = officer(s) in vehicle
+- If both officer AND civilian wounded in same attack, count ALL as victims.
+
+═══════════════════════════════════════════════════════════════════════════════
 CRITICAL EXCLUSIONS - Return {"crimes": [], "confidence": 0}
 ═══════════════════════════════════════════════════════════════════════════════
 
-❌ POLICE-INVOLVED SHOOTINGS: "shot by police", "shot by cops", "police sting operation", "police shootout", "killed by officers", "officer-involved shooting", "police killing"
-   → These are NOT crimes to track
+❌ POLICE AS SHOOTER (Exclude): "shot by police", "shot by cops", "police sting operation", "killed by officers", "officer-involved shooting", "police killing"
+   → Only exclude when police SHOOT/KILL a suspect during operations
    → EXCEPTION: If article mentions underlying crime (robbery, kidnapping) that LED to police response, extract ONLY the underlying crime with the ORIGINAL VICTIM (store owner, kidnap victim), NOT the suspect shot by police
    → Example: "Robber shot by police after store holdup" → Extract: Robbery, victim = store owner
    → Example: "Two men shot during police sting" → {"crimes": [], "confidence": 0} (no underlying crime)
+   → ⚠️ NEVER apply this exclusion when police are the ones BEING SHOT AT
 
 ❌ TRAFFIC ACCIDENTS: "crash", "crash victim", "runaway truck/vehicle", "lost control", "veered off road", "car crash", "collision", "hit-and-run", "vehicular accident"
 
