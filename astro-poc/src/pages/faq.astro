@@ -22,7 +22,7 @@ const faqData = [
       },
       {
         question: "How often is the crime data updated?",
-        answer: "Our data is updated daily. New incidents are processed and published with a typical lag of 1-2 days to allow for media reporting cycles and AI validation. This means when you visit the site on January 4th, you will see complete data through at least January 2nd. High-severity incidents may be processed faster."
+        answer: "Our data is updated daily as new incidents are reported by media outlets. Each crime is dated by when it happened, not when it was published — so a robbery that occurred on January 2nd but was reported on January 4th will appear under January 2nd. This means recent dates may initially show fewer entries until all reports for that period have been published. It is not a delay — it reflects our commitment to accurate, incident-based dating rather than publication-based dating."
       },
       {
         question: "What year of data am I viewing when I first visit the site?",
@@ -43,11 +43,11 @@ const faqData = [
     questions: [
       {
         question: "What sections are available on Crime Hotspots?",
-        answer: "The platform includes several sections: the Dashboard (interactive map and statistics), Headlines (latest crime reports with filtering), Areas (crime data for 180+ neighborhoods), Compare (side-by-side area comparison), Archive (historical data by year and month), Statistics (year-to-date breakdowns by crime type), Regions (crime grouped by region), and Murder Count (live running total for the year). On mobile, use the bottom navigation bar to switch between key sections."
+        answer: "The platform includes several sections: the Dashboard (interactive map and statistics), Headlines (latest crime reports with filtering), Areas (crime data by neighbourhood), Compare (side-by-side area comparison), Archive (historical data by year and month), Statistics (year-to-date breakdowns by crime type), Regions (crime grouped by region), and Murder Count (live running total for the year). On mobile, use the bottom navigation bar to switch between key sections."
       },
       {
         question: "How can I find the crime rate for my specific area?",
-        answer: "Visit the Areas page to browse all 180+ areas across Trinidad & Tobago, grouped by region. Each area shows a risk level score (1-10), recent incident count, and a safety assessment. You can search for your area by name or browse by region. Tap any area card to see detailed statistics, crime breakdowns, and recent headlines for that neighborhood."
+        answer: "Visit the Areas page to browse all covered neighbourhoods, grouped by region. Each area shows a risk level score (1-10), recent incident count, and a safety assessment. You can search for your area by name or browse by region. Tap any area card to see detailed statistics, crime breakdowns, and recent headlines for that neighbourhood."
       },
       {
         question: "How do I compare two areas?",
@@ -55,7 +55,7 @@ const faqData = [
       },
       {
         question: "What do the risk level scores mean?",
-        answer: "Each area is assigned a risk level score from 1 to 10, based on a 90-day rolling window of crime density relative to the rest of the country. A score below 4 is considered low risk, 4-7 is neutral, and above 7 is elevated. Each area page also includes a tailored safety insight with practical tips based on the most common crime type in that neighborhood."
+        answer: "Each area is assigned a risk level score from 1 to 10, based on a 90-day rolling window of crime density relative to the rest of the country. A score below 4 is considered low risk, 4-7 is neutral, and above 7 is elevated. Each area page also includes a tailored safety insight with practical tips based on the most common crime type in that neighbourhood."
       },
       {
         question: "How do I view crime details without leaving the page?",
@@ -102,6 +102,10 @@ const faqData = [
       {
         question: "Do you offer a way to report crime or submit a tip?",
         answer: "Yes. We provide a secure report form on our platform where you can submit crime information anonymously. This information is used to support local community awareness and is managed with confidentiality."
+      },
+      {
+        question: "How do I report an issue with a crime listing?",
+        answer: "Every crime detail page and crime preview modal includes a Report Issue button. Use it to flag incorrect information such as wrong location, crime type, date, or other details. Your submission is reviewed and helps us maintain data accuracy across the platform."
       },
       {
         question: "How can I get in touch with Crime Hotspots?",
