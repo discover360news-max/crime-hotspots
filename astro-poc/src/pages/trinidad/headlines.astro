@@ -94,12 +94,20 @@ const breadcrumbs = [
       icon: "dashboard"
     }}
   >
-    <button
-      id="filtersBtn"
-      class="px-4 py-1.5 min-h-[22px] inline-flex items-center justify-center border-2 border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 active:bg-rose-50 rounded-lg transition font-medium text-xs whitespace-nowrap"
-    >
-      Filters ›
-    </button>
+    <div class="flex items-center gap-2">
+      <button
+        id="filtersBtn"
+        class="px-4 py-1.5 min-h-[22px] inline-flex items-center justify-center border-2 border-slate-300 text-slate-700 hover:border-rose-600 hover:text-rose-600 active:bg-rose-50 rounded-lg transition font-medium text-xs whitespace-nowrap"
+      >
+        <span id="filtersBtnText">Filters ›</span>
+      </button>
+      <button
+        id="clearFiltersInline"
+        class="hidden text-xs text-rose-600 hover:text-rose-700 font-medium whitespace-nowrap transition"
+      >
+        Clear
+      </button>
+    </div>
   </Hero>
 
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5" data-pagefind-ignore>
@@ -279,13 +287,21 @@ const breadcrumbs = [
             </select>
           </div>
 
-          <!-- Clear Filters Button -->
-          <button
-            id="clearFilters"
-            class="w-full px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:bg-rose-800 transition font-medium text-xs"
-          >
-            Clear Filters
-          </button>
+          <!-- Action Buttons -->
+          <div class="flex gap-2 pt-2">
+            <button
+              id="clearFilters"
+              class="flex-1 px-4 py-2 text-rose-600 hover:text-rose-700 active:text-rose-800 transition font-medium text-xs"
+            >
+              Clear Filters
+            </button>
+            <button
+              id="applyFilters"
+              class="flex-1 px-4 py-2 border-2 border-slate-300 text-slate-500 rounded-lg transition-all duration-200 font-medium text-xs"
+            >
+              Apply
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -653,19 +669,70 @@ const breadcrumbs = [
       });
     }
 
-    // Event listeners
-    document.getElementById('dateFrom').addEventListener('change', applyFilters);
-    document.getElementById('dateTo').addEventListener('change', applyFilters);
-    document.getElementById('crimeType').addEventListener('change', applyFilters);
-    document.getElementById('area').addEventListener('change', applyFilters);
+    // Apply button highlight state
+    const applyBtn = document.getElementById('applyFilters');
 
-    document.getElementById('clearFilters').addEventListener('click', () => {
+    function highlightApplyBtn() {
+      applyBtn.classList.remove('border-slate-300', 'text-slate-500');
+      applyBtn.classList.add('bg-rose-600', 'text-white', 'border-rose-600', 'hover:bg-rose-700');
+    }
+
+    function unhighlightApplyBtn() {
+      applyBtn.classList.remove('bg-rose-600', 'text-white', 'border-rose-600', 'hover:bg-rose-700');
+      applyBtn.classList.add('border-slate-300', 'text-slate-500');
+    }
+
+    // Inline filter indicator (Hero button state + Clear link)
+    const filtersBtnEl = document.getElementById('filtersBtn');
+    const filtersBtnText = document.getElementById('filtersBtnText');
+    const clearFiltersInline = document.getElementById('clearFiltersInline');
+
+    function showFilterActive() {
+      filtersBtnText.textContent = 'Filters Active ›';
+      filtersBtnEl.classList.remove('border-slate-300', 'text-slate-700');
+      filtersBtnEl.classList.add('border-rose-600', 'text-rose-600', 'bg-rose-50');
+      clearFiltersInline.classList.remove('hidden');
+    }
+
+    function hideFilterActive() {
+      filtersBtnText.textContent = 'Filters ›';
+      filtersBtnEl.classList.remove('border-rose-600', 'text-rose-600', 'bg-rose-50');
+      filtersBtnEl.classList.add('border-slate-300', 'text-slate-700');
+      clearFiltersInline.classList.add('hidden');
+    }
+
+    // Shared clear filters logic
+    function clearAllFilters() {
       document.getElementById('dateFrom').value = '';
       document.getElementById('dateTo').value = '';
       document.getElementById('crimeType').value = '';
       document.getElementById('area').value = '';
       applyFilters();
-    });
+      unhighlightApplyBtn();
+      hideFilterActive();
+    }
+
+    // Update inline indicator based on current filter state
+    function syncFilterIndicator() {
+      if (isFiltered) {
+        highlightApplyBtn();
+        showFilterActive();
+      } else {
+        unhighlightApplyBtn();
+        hideFilterActive();
+      }
+    }
+
+    // Event listeners
+    document.getElementById('dateFrom').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
+    document.getElementById('dateTo').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
+    document.getElementById('crimeType').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
+    document.getElementById('area').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
+
+    document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
+    clearFiltersInline.addEventListener('click', clearAllFilters);
+
+    applyBtn.addEventListener('click', closeFiltersTray);
 
     document.getElementById('loadMore').addEventListener('click', () => {
       currentPage++;

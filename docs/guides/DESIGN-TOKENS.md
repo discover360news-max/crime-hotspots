@@ -420,6 +420,110 @@ Hero CTAs use larger sizing than standard buttons:
 
 ---
 
+## 💬 InfoPopup Pattern
+
+The `InfoPopup` component (`src/components/InfoPopup.astro`) provides contextual help across the site. All instances must follow these rules for visual consistency.
+
+### Container (Handled by Component)
+```html
+<!-- Trigger: Circle info icon -->
+<button class="cursor-pointer p-1 rounded hover:bg-slate-100 active:bg-slate-200 transition">
+  <svg class="w-5 h-5 text-slate-500 hover:text-slate-700 transition"><!-- info circle --></svg>
+</button>
+
+<!-- Overlay -->
+<div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999]">
+
+<!-- Content Card -->
+<div class="absolute top-4 left-1/2 -translate-x-1/2 w-[calc(100vw-2rem)] md:w-auto md:max-w-md bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-xl p-8">
+
+<!-- Close Button -->
+<button class="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded hover:bg-slate-200 transition text-slate-500 hover:text-slate-700">
+```
+
+**Container Rules:**
+- Frosted glass: `bg-white/80` (Level 3 opacity)
+- Border radius: `rounded-2xl` (modal-level)
+- Padding: `p-8` (spacious, content-focused)
+- Z-index: `z-[9999]` (above all other overlays)
+- Content wrapper: `text-sm text-slate-600 pr-6` (right padding for close button clearance)
+
+### Content Styling (Passed via Slot)
+
+**Main Title:**
+```html
+<p class="font-semibold mb-2 text-rose-700">Section Title</p>
+```
+- **Always `text-rose-700`** — rose accent provides visual hierarchy and brand consistency
+- Never `text-slate-700` for the main title (that's for body headings, not popup titles)
+
+**Body Text:**
+```html
+<p class="mb-3">Descriptive text inherits text-sm text-slate-600 from wrapper.</p>
+```
+
+**Subheadings (within popup):**
+```html
+<p class="font-semibold mb-2 text-rose-700">Subsection Title</p>
+```
+- Use `text-rose-700` for subheadings within the same popup to maintain hierarchy
+
+**Lists:**
+```html
+<ul class="list-disc list-inside space-y-1">
+  <li><span class="font-medium text-slate-700">Bold Term</span> — Description text</li>
+</ul>
+```
+
+**Feature Cards (optional, for richer popups):**
+```html
+<div class="p-4">
+  <div class="w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-3">
+    <svg class="w-6 h-6 text-slate-500"><!-- icon --></svg>
+  </div>
+  <h3 class="text-nav font-semibold text-rose-600 mb-2">Feature Name</h3>
+  <p class="text-small text-slate-500">Feature description</p>
+</div>
+```
+
+**CTA Button (optional, at bottom of popup):**
+```html
+<div class="mt-8">
+  <a href="/link" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border border-rose-600 text-rose-600 hover:bg-rose-600 hover:text-white active:bg-rose-700 transition text-xs font-medium">
+    Action Text
+    <svg class="w-4 h-4"><!-- arrow --></svg>
+  </a>
+</div>
+```
+
+### Content Variants
+
+| Variant | When to Use | Example |
+|---------|-------------|---------|
+| **Rich** (icons + cards) | Marketing/informational popups on landing pages | Homepage "Verified Crime Intelligence" |
+| **Reference** (title + list) | Definition lists, glossaries, how-to guides | Dashboard "Crime Type Definitions" |
+| **Instructional** (title + steps) | Feature explanations with ordered/unordered lists | Dashboard "Understanding the Map" |
+
+**All variants share:** `text-rose-700` main title, `text-sm text-slate-600` body, `text-slate-700` for bold terms in lists.
+
+### Common Mistakes
+```html
+<!-- Wrong: Slate title (inconsistent with brand) -->
+<p class="font-semibold mb-2 text-slate-700">Title</p>
+
+<!-- Correct: Rose accent title -->
+<p class="font-semibold mb-2 text-rose-700">Title</p>
+
+<!-- Wrong: Missing text class on body paragraphs -->
+<p class="mb-3">Some description</p>
+
+<!-- Correct: Explicit or inherited (wrapper provides text-sm text-slate-600) -->
+<p class="mb-3">Some description</p>  <!-- OK if inside the component slot -->
+<p class="text-small text-slate-500">Supporting text</p>  <!-- For secondary text -->
+```
+
+---
+
 ## 🔧 Known Issues to Fix
 
 ### Current Inconsistencies (as of Dec 9, 2025)
@@ -458,6 +562,18 @@ Hero CTAs use larger sizing than standard buttons:
   <h3 class="text-h3 font-semibold text-slate-600 mb-2">Title</h3>
   <p class="text-small text-slate-400">Description</p>
 </div>
+```
+
+**InfoPopup Content (slot):**
+```html
+<InfoPopup id="unique-id">
+  <p class="font-semibold mb-2 text-rose-700">Section Title</p>
+  <p class="mb-3">Body text (inherits text-sm text-slate-600).</p>
+  <p class="font-semibold mb-2 text-rose-700">Subsection</p>
+  <ul class="list-disc list-inside space-y-1">
+    <li><span class="font-medium text-slate-700">Term</span> — Definition</li>
+  </ul>
+</InfoPopup>
 ```
 
 **Text Input:**
@@ -525,5 +641,6 @@ Hero CTAs use larger sizing than standard buttons:
 ---
 
 **Version History:**
+- **v1.2 (Feb 10, 2026):** Added InfoPopup pattern (container + content styling rules, three content variants)
 - **v1.1 (Jan 23, 2026):** Added Hero Sections pattern (full-width gradient hero with enterprise CTAs)
 - **v1.0 (Dec 9, 2025):** Initial documentation based on index.html, dashboard-trinidad.html, and headlines-trinidad-and-tobago.html patterns
