@@ -16,6 +16,7 @@ import { countCrimeType } from '../../lib/dashboardHelpers';
 import { getCollection } from 'astro:content';
 import { generateMurderCountOgImage } from '../../lib/generateOgImage';
 import { routes } from '../../config/routes';
+import InfoPopup from '../../components/InfoPopup.astro';
 
 // Fetch current year's crime data
 const allCrimes = await getTrinidadCrimes();
@@ -124,9 +125,16 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
 
       <!-- 2025 Comparison -->
       <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 max-w-md mx-auto">
-        <p class="text-sm text-slate-600 text-center">
-          Same period in 2025: <span class="font-semibold text-slate-800">{murderCount2025SamePeriod}</span> murders
-        </p>
+        <div class="flex items-center justify-center gap-1">
+          <p class="text-sm text-slate-600 text-center">
+            Same period in 2025: <span class="font-semibold text-slate-800">{murderCount2025SamePeriod}</span> murders
+          </p>
+          <InfoPopup id="murder-comparison-info">
+            <p class="font-semibold mb-2 text-rose-700">How We Compare Years</p>
+            <p class="mb-3">To make a fair comparison, we only look at the same time window in both years. For example, if today is February 10, we compare January 1 to February 10 of 2026 against January 1 to February 10 of 2025.</p>
+            <p>The percentage below shows whether murders are trending higher or lower than the same point last year. A green arrow means fewer murders so far this year.</p>
+          </InfoPopup>
+        </div>
         {yoyDirection !== 'same' && (
           <p class={`text-xs text-center mt-2 ${yoyDirection === 'down' ? 'text-emerald-600' : 'text-rose-600'}`}>
             {yoyDirection === 'down' ? '↓' : '↑'} {Math.abs(yoyChange).toFixed(0)}% vs 2025
@@ -136,9 +144,25 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
 
       <!-- Murder Rate Section (SEO: "trinidad murder rate") -->
       <div class="mt-8 w-full max-w-md mx-auto">
-        <h2 class="text-xl font-bold text-slate-700 mb-4 text-center">
-          Trinidad & Tobago Murder Rate 2026
-        </h2>
+        <div class="flex items-center justify-center gap-1 mb-4">
+          <h2 class="text-xl font-bold text-slate-700 text-center">
+            Trinidad & Tobago Murder Rate 2026
+          </h2>
+          <InfoPopup id="murder-rate-info">
+            <p class="font-semibold mb-2 text-rose-700">Understanding Murder Rates</p>
+            <p class="mb-3">A murder rate shows how many murders happen for every 100,000 people in a country. This makes it easier to compare safety between places of different sizes.</p>
+
+            <p class="font-semibold mb-2 text-rose-700">What Each Card Means</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li><span class="font-medium text-slate-700">Current Rate (YTD)</span> — The murder rate so far this year, based on the first {daysPassed} days of data.</li>
+              <li><span class="font-medium text-slate-700">Projected Rate</span> — If murders continue at the current pace for the full year, this is the estimated annual rate. The ~{projectedAnnualMurders} shown is the projected total murders.</li>
+              <li><span class="font-medium text-slate-700">2025 Final Rate</span> — Last year's actual rate, based on {murderCount2025Full} total murders recorded.</li>
+            </ul>
+
+            <p class="font-semibold mb-2 text-rose-700 mt-3">About the Population</p>
+            <p>All rates use an estimated population of 1.5 million for Trinidad & Tobago. This is a commonly used approximation; the actual population may vary slightly.</p>
+          </InfoPopup>
+        </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <!-- Current Year-to-Date Rate -->
@@ -146,6 +170,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
             <div class="text-xs text-slate-500 font-medium mb-1">Current Rate (YTD)</div>
             <div class="text-2xl font-bold text-rose-600">{currentMurderRate}</div>
             <div class="text-xs text-slate-400 mt-1">per 100k</div>
+            <div class="text-xs text-slate-500 mt-2 pt-2 border-t border-rose-100">{murderCount} murders</div>
           </div>
 
           <!-- Projected Annual Rate -->
@@ -153,6 +178,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
             <div class="text-xs text-slate-500 font-medium mb-1">Projected Rate</div>
             <div class="text-2xl font-bold text-slate-700">{projectedMurderRate}</div>
             <div class="text-xs text-slate-400 mt-1">per 100k (2026)</div>
+            <div class="text-xs text-slate-500 mt-2 pt-2 border-t border-slate-200">~{projectedAnnualMurders} murders</div>
           </div>
 
           <!-- 2025 Final Rate -->
@@ -160,6 +186,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
             <div class="text-xs text-slate-500 font-medium mb-1">2025 Final Rate</div>
             <div class="text-2xl font-bold text-slate-700">{murderRate2025}</div>
             <div class="text-xs text-slate-400 mt-1">per 100k</div>
+            <div class="text-xs text-slate-500 mt-2 pt-2 border-t border-slate-100">{murderCount2025Full} murders</div>
           </div>
         </div>
 
@@ -299,6 +326,18 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
             "name": "Projected Annual Murder Rate",
             "value": projectedMurderRate,
             "unitText": "per 100,000 population"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Projected Annual Murder Count",
+            "value": projectedAnnualMurders,
+            "unitText": "murders"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "2025 Final Murder Count",
+            "value": murderCount2025Full,
+            "unitText": "murders"
           }
         ],
         "temporalCoverage": currentYear.toString(),
