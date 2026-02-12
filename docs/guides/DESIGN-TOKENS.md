@@ -178,6 +178,38 @@ White:     #ffffff (containers)
 <div class="bg-white/70 backdrop-blur-md rounded-2xl shadow-xl">
 ```
 
+### Floor Shadow (Elevation Effect)
+
+Used to make elements appear to hover above a surface. Creates a soft elliptical shadow beneath the element.
+
+```css
+/* Floor shadow via pseudo-element */
+.element {
+  position: relative;
+}
+
+.element::after {
+  content: '';
+  position: absolute;
+  bottom: -36px;             /* Distance from element — higher = more "float" */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;                /* Narrower than element for natural perspective */
+  height: 24px;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.18) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+```
+
+**Currently used on:** FlipCounter (murder count page)
+
+**Rules:**
+
+- Shadow width should be narrower than the element (`80%`) for natural perspective
+- Use `pointer-events: none` so shadow doesn't block clicks
+- Add extra bottom padding on the parent container to give the shadow room
+
 ---
 
 ## 📐 Spacing & Layout
@@ -641,6 +673,8 @@ The `InfoPopup` component (`src/components/InfoPopup.astro`) provides contextual
 ---
 
 **Version History:**
+
+- **v1.3 (Feb 12, 2026):** Added Floor Shadow (elevation effect) pattern for hovering elements
 - **v1.2 (Feb 10, 2026):** Added InfoPopup pattern (container + content styling rules, three content variants)
 - **v1.1 (Jan 23, 2026):** Added Hero Sections pattern (full-width gradient hero with enterprise CTAs)
 - **v1.0 (Dec 9, 2025):** Initial documentation based on index.html, dashboard-trinidad.html, and headlines-trinidad-and-tobago.html patterns
