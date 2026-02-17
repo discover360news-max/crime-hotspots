@@ -15,6 +15,10 @@ import { routes } from '../config/routes';
 import trinidadImg from '../assets/images/trinidad.jpg';
 import guyanaImg from '../assets/images/guyana.jpg';
 import barbadosImg from '../assets/images/barbados.jpg';
+// Dark mode variants (transparent background, blends with dark card)
+import trinidadDarkImg from '../assets/images/trinidad-card-trsp-bg.png';
+import guyanaDarkImg from '../assets/images/guyana-card-trsp-bg.png';
+import barbadosDarkImg from '../assets/images/barbados-card-trsp-bg.png';
 
 const title = "Crime Hotspots Caribbean — Live Crime Statistics for the Caribbean";
 const description = "Live crime statistics and interactive maps for Trinidad & Tobago. Track murders, robberies, and incidents by location with verified data from Guardian, Express, and Newsday.";
@@ -29,6 +33,7 @@ const countries = [
     dashboard: routes.trinidad.dashboard,
     available: true,
     image: trinidadImg,
+    darkImage: trinidadDarkImg,
   },
   {
     id: 'gy',
@@ -38,6 +43,7 @@ const countries = [
     dashboard: '/guyana/dashboard',
     available: false,
     image: guyanaImg,
+    darkImage: guyanaDarkImg,
   },
   {
     id: 'bdos',
@@ -47,6 +53,7 @@ const countries = [
     dashboard: '/barbados/dashboard',
     available: false,
     image: barbadosImg,
+    darkImage: barbadosDarkImg,
   }
 ];
 ---
@@ -56,13 +63,13 @@ const countries = [
     <!-- Hero Section -->
     <section class="flex flex-col items-center justify-center text-center mb-12">
       <div class="text-center max-w-2xl mx-auto mb-8">
-        <h1 class="text-h1 font-bold text-slate-900 mb-3">
+        <h1 class="text-display font-bold text-slate-900 dark:text-[hsl(0_0%_95%)] mb-3">
           See the Pattern | Know the Risk
         </h1>
-        <p class="text-small text-slate-600 mb-2">
+        <p class="text-body text-slate-600 dark:text-[hsl(0_0%_70%)] mb-2">
           Mapped crime data and headlines
         </p>
-        <p class="text-small text-slate-500">
+        <p class="text-body text-slate-500 dark:text-[hsl(0_0%_70%)]">
           Select a region for immediate intelligence, trend analysis, and updates.
         </p>
       </div>
@@ -75,10 +82,10 @@ const countries = [
       >
         {countries.map(country => (
           <div
-            class={`w-full max-w-[200px] sm:max-w-[220px] rounded-2xl shadow-sm overflow-hidden
+            class={`w-full max-w-[200px] sm:max-w-[220px] rounded-2xl shadow-sm overflow-hidden dark:ring-1 dark:ring-white/15
               ${country.available
-                ? 'bg-white/70 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer'
-                : 'bg-white/70 opacity-60 cursor-not-allowed'}`}
+                ? 'bg-white/70 dark:bg-[hsl(0_0%_5%)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer'
+                : 'bg-white/70 dark:bg-[hsl(0_0%_5%)] opacity-60 cursor-not-allowed'}`}
             role="listitem"
           >
             {country.available ? (
@@ -89,12 +96,22 @@ const countries = [
                 data-country-name={country.name}
                 onclick={`window.openSectionPickerModal('${country.id}', '${country.name}')`}
               >
-                <!-- Country Image (Astro optimized WebP) -->
-                <div class="w-full aspect-square overflow-hidden bg-white/70">
+                <!-- Country Image: light mode .jpg / dark mode transparent .png -->
+                <div class="w-full aspect-square overflow-hidden bg-white/70 dark:bg-transparent">
                   <Image
                     src={country.image}
                     alt={`${country.name} map`}
-                    class="w-full h-full object-cover"
+                    class="w-full h-full object-cover block dark:hidden"
+                    loading="eager"
+                    width={220}
+                    height={220}
+                    format="webp"
+                    quality={80}
+                  />
+                  <Image
+                    src={country.darkImage}
+                    alt={`${country.name} map`}
+                    class="w-full h-full object-cover hidden dark:block"
                     loading="eager"
                     width={220}
                     height={220}
@@ -107,7 +124,7 @@ const countries = [
                 <div class="pb-8 px-3 text-center">
 
                   <!-- Country Name -->
-                  <h2 class="text-small font-bold text-slate-500 mb-1">
+                  <h2 class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_70%)] mb-1">
                     {country.name}
                   </h2>
 
@@ -126,25 +143,35 @@ const countries = [
               <!-- Disabled Card (Coming Soon) -->
               <div class="block" aria-disabled="true" role="button" tabindex="-1">
                 <!-- Country Image (grayed out, low priority) -->
-                <div class="w-full aspect-square overflow-hidden bg-slate-200 relative">
+                <div class="w-full aspect-square overflow-hidden bg-slate-200 dark:bg-[hsl(0_0%_10%)] relative">
                   <Image
                     src={country.image}
                     alt={`${country.name} map`}
-                    class="w-full h-full object-cover grayscale"
+                    class="w-full h-full object-cover grayscale block dark:hidden"
                     loading="lazy"
                     width={220}
                     height={220}
                     format="webp"
                     quality={60}
                   />
-                  <div class="absolute inset-0 bg-slate-300/20"></div>
+                  <Image
+                    src={country.darkImage}
+                    alt={`${country.name} map`}
+                    class="w-full h-full object-cover grayscale hidden dark:block"
+                    loading="lazy"
+                    width={220}
+                    height={220}
+                    format="webp"
+                    quality={60}
+                  />
+                  <div class="absolute inset-0 bg-slate-300/20 dark:bg-slate-900/30"></div>
                 </div>
 
                 <!-- Country Info -->
                 <div class="pb-8 px-3 text-center">
                   
                   <!-- Country Name -->
-                  <h2 class="text-small font-bold text-slate-500 mb-1">
+                  <h2 class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_70%)] mb-1">
                     {country.name}
                   </h2>
 

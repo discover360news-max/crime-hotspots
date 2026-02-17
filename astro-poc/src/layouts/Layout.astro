@@ -2,10 +2,7 @@
 import Header from '../components/Header.astro';
 import BottomNav from '../components/BottomNav.astro';
 import { routes } from '../config/routes';
-import DashboardModal from '../components/DashboardModal.astro';
-import HeadlinesModal from '../components/HeadlinesModal.astro';
-import ArchivesModal from '../components/ArchivesModal.astro';
-import AreasModal from '../components/AreasModal.astro';
+import IslandSelectorModal from '../components/IslandSelectorModal.astro';
 import SearchModal from '../components/SearchModal.astro';
 import CrimeDetailModal from '../components/CrimeDetailModal.astro';
 import SectionPickerModal from '../components/SectionPickerModal.astro';
@@ -48,8 +45,16 @@ const detectedCountryId = Object.entries(countryPathMap).find(
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
+  <!-- DARK MODE ANTI-FLASH: Must be first script in <head>, before any CSS loads -->
+  <!-- TEMPORARY: Force light mode until dark mode polish is complete. Revert by restoring the stored-theme logic below. -->
+  <script is:inline>
+    (function() {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('crimehotspots-theme', 'light');
+    })();
+  </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -125,6 +130,9 @@ const detectedCountryId = Object.entries(countryPathMap).find(
   <!-- Cloudflare Web Analytics (cookieless, no consent needed, tracks all real visitors) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "9edc1888af84466fa5b067943e7c6f99"}'></script>
 
+  <!-- Grow Monetization -->
+  <script is:inline data-grow-initializer="">!(function(){window.growMe||((window.growMe=function(e){window.growMe._.push(e);}),(window.growMe._=[]));var e=document.createElement("script");(e.type="text/javascript"),(e.src="https://faves.grow.me/main.js"),(e.defer=!0),e.setAttribute("data-grow-faves-site-id","U2l0ZTpjYmI0YmEwMC0xM2ZhLTQ0ZmEtOTExYy0wNDNhY2MxMzI1NmQ=");var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t);})();</script>
+
   <!-- Cookie Consent & Analytics -->
   <script>
     import { initCookieConsent } from '../lib/utils/cookieConsent';
@@ -147,32 +155,42 @@ const detectedCountryId = Object.entries(countryPathMap).find(
 <style is:global>
   @import "tailwindcss";
 
+  /* Tailwind v4: class-based dark mode via .dark on <html> */
+  @variant dark (&:is(.dark, .dark *));
+
   @theme {
-    --text-display: 2.25rem;
-    --text-display--line-height: 2.5rem;
+    /* DESIGN SYSTEM v2: Strict 4-level type scale */
+    --text-display: 2rem;
+    --text-display--line-height: 1.2;
     --text-display--letter-spacing: -0.02em;
 
-    --text-h1: 2rem;
-    --text-h1--line-height: 2.5rem;
-    --text-h1--letter-spacing: -0.01em;
+    --text-heading: 1.375rem;
+    --text-heading--line-height: 1.35;
+    --text-heading--letter-spacing: -0.01em;
 
-    --text-h2: 1.5rem;
-    --text-h2--line-height: 2rem;
+    --text-body: 1.125rem;
+    --text-body--line-height: 1.65;
 
-    --text-h3: 1.25rem;
-    --text-h3--line-height: 1.75rem;
+    --text-caption: 0.75rem;
+    --text-caption--line-height: 1.35;
+    --text-caption--letter-spacing: 0.02em;
+  }
 
-    --text-body: 1rem;
-    --text-body--line-height: 1.5rem;
-
-    --text-small: 0.875rem;
-    --text-small--line-height: 1.25rem;
-
-    --text-tiny: 0.75rem;
-    --text-tiny--line-height: 1rem;
-
-    --text-nav: 0.9375rem;
-    --text-nav--line-height: 1.25rem;
+  /* Dark mode CSS custom properties — used in JS-generated innerHTML
+     where Tailwind dark: classes can't be scanned reliably */
+  :root {
+    --ch-bg: hsl(0 0% 94%);
+    --ch-surface: hsl(0 0% 100%);
+    --ch-text: hsl(0 0% 20%);
+    --ch-text-muted: hsl(0 0% 45%);
+    --ch-border: hsl(0 0% 88%);
+  }
+  .dark {
+    --ch-bg: hsl(0 0% 3%);
+    --ch-surface: hsl(0 0% 8%);
+    --ch-text: hsl(0 0% 92%);
+    --ch-text-muted: hsl(0 0% 70%);
+    --ch-border: hsl(0 0% 18%);
   }
 
   /* Self-hosted Inter font */
@@ -237,36 +255,27 @@ const detectedCountryId = Object.entries(countryPathMap).find(
   }
 
   .cluster-small {
-    background-color: #fca5a5 !important;
+    background-color: #fda4af !important; /* rose-300 — low density */
   }
 
   .cluster-medium {
-    background-color: #ef4444 !important;
+    background-color: #e11d48 !important; /* rose-600 — medium density */
   }
 
   .cluster-large {
-    background-color: #b91c1c !important;
+    background-color: #be123c !important; /* rose-700 — high density */
   }
 </style>
 
-<body class="bg-slate-100 text-slate-700 min-h-screen font-sans">
+<body class="bg-slate-100 dark:bg-[hsl(0_0%_3%)] text-slate-700 dark:text-[hsl(0_0%_92%)] min-h-screen font-sans transition-colors duration-200">
   <!-- Header Component -->
   <Header isHomepage={isHomepage} />
 
   <!-- Search Modal -->
   <SearchModal />
 
-  <!-- Dashboard Selection Modal -->
-  <DashboardModal />
-
-  <!-- Headlines Selection Modal -->
-  <HeadlinesModal />
-
-  <!-- Archives Selection Modal -->
-  <ArchivesModal />
-
-  <!-- Areas Selection Modal (fallback for non-country pages) -->
-  <AreasModal />
+  <!-- Unified Island Selector Modal (dashboard / headlines / archives / areas) -->
+  <IslandSelectorModal />
 
   <!-- Crime Detail Modal -->
   <CrimeDetailModal />
@@ -280,60 +289,60 @@ const detectedCountryId = Object.entries(countryPathMap).find(
   </main>
 
   <!-- Footer -->
-  <footer class="bg-white/85 border-t border-slate-200 mt-30" data-pagefind-ignore>
+  <footer class="bg-white/85 dark:bg-[hsl(0_0%_5%)] border-t border-slate-200 dark:border-[hsl(0_0%_18%)] mt-16" data-pagefind-ignore>
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Navigation Columns -->
       <div class="grid grid-cols-2 gap-8">
         <!-- Browse (Primary Navigation) -->
         <div>
-          <h4 class="text-nav font-semibold text-slate-700 mb-4">Browse</h4>
+          <h4 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-4 uppercase tracking-wider">Browse</h4>
           <ul class="space-y-1">
-            <li><a href={routes.trinidad.dashboard} class="text-small text-slate-400 hover:text-rose-600">Dashboard</a></li>
-            <li><a href={routes.trinidad.headlines} class="text-small text-slate-400 hover:text-rose-600">Headlines</a></li>
-            <li><a href={routes.trinidad.areas} class="text-small text-slate-400 hover:text-rose-600">Areas</a></li>
-            <li><a href={routes.trinidad.archive} class="text-small text-slate-400 hover:text-rose-600">Archive</a></li>
-            <li><a href={routes.report} class="text-small text-slate-400 hover:text-rose-600">Report a Crime</a></li>
+            <li><a href={routes.trinidad.dashboard} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Dashboard</a></li>
+            <li><a href={routes.trinidad.headlines} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Headlines</a></li>
+            <li><a href={routes.trinidad.areas} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Areas</a></li>
+            <li><a href={routes.trinidad.archive} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Archive</a></li>
+            <li><a href={routes.report} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Report a Crime</a></li>
           </ul>
         </div>
 
         <!-- Quick Links (Utility) -->
         <div>
-          <h4 class="text-nav font-semibold text-slate-700 mb-4">Quick Links</h4>
+          <h4 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-4 uppercase tracking-wider">Quick Links</h4>
           <ul class="space-y-1">
-            <li><a href={routes.about} class="text-small text-slate-400 hover:text-rose-600">About</a></li>
-            <li><a href={routes.contact} class="text-small text-slate-400 hover:text-rose-600">Contact</a></li>
-            <li><a href={routes.methodology} class="text-small text-slate-400 hover:text-rose-600">Methodology</a></li>
-            <li><a href={routes.faq} class="text-small text-slate-400 hover:text-rose-600">FAQ</a></li>
-            <li><a href={routes.privacy} class="text-small text-slate-400 hover:text-rose-600">Privacy Policy</a></li>
-            <li><a href={routes.businessSolutions} class="text-small text-slate-400 hover:text-rose-600">Business Solutions</a></li>
+            <li><a href={routes.about} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">About</a></li>
+            <li><a href={routes.contact} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Contact</a></li>
+            <li><a href={routes.methodology} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Methodology</a></li>
+            <li><a href={routes.faq} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">FAQ</a></li>
+            <li><a href={routes.privacy} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Privacy Policy</a></li>
+            <li><a href={routes.businessSolutions} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Business Solutions</a></li>
           </ul>
         </div>
       </div>
 
       <!-- Brand Signature + Socials -->
-      <div class="mt-8 pt-8 border-t border-slate-200">
+      <div class="mt-8 pt-8 border-t border-slate-200 dark:border-[hsl(0_0%_18%)]">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h3 class="text-body font-bold text-slate-700">Crime Hotspots</h3>
-            <p class="text-xs text-slate-400 mt-1">&copy; {new Date().getFullYear()} Crime Hotspots. All rights reserved.</p>
+            <h3 class="text-body font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Crime Hotspots</h3>
+            <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] mt-1">&copy; {new Date().getFullYear()} Crime Hotspots. All rights reserved.</p>
           </div>
           <div class="flex gap-4 items-center">
-            <a href="https://x.com/crimehotsp0ts" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-rose-600" aria-label="X (Twitter)">
+            <a href="https://x.com/crimehotsp0ts" target="_blank" rel="noopener noreferrer" class="text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400" aria-label="X (Twitter)">
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
             </a>
-            <a href="https://facebook.com/caribbeancrimehotspots" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-rose-600" aria-label="Facebook">
+            <a href="https://facebook.com/caribbeancrimehotspots" target="_blank" rel="noopener noreferrer" class="text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400" aria-label="Facebook">
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
             </a>
-            <a href="https://whatsapp.com/channel/0029VbBD2mC3gvWTuWxMO21P" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-rose-600" aria-label="WhatsApp">
+            <a href="https://whatsapp.com/channel/0029VbBD2mC3gvWTuWxMO21P" target="_blank" rel="noopener noreferrer" class="text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400" aria-label="WhatsApp">
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
               </svg>
             </a>
-            <a href="/rss.xml" class="text-slate-400 hover:text-rose-600" aria-label="RSS Feed" title="RSS Feed">
+            <a href="/rss.xml" class="text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400" aria-label="RSS Feed" title="RSS Feed">
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6.18 15.64a2.18 2.18 0 012.18 2.18C8.36 19.01 7.37 20 6.18 20 5 20 4 19.01 4 17.82a2.18 2.18 0 012.18-2.18M4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44m0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
               </svg>
@@ -357,5 +366,36 @@ const detectedCountryId = Object.entries(countryPathMap).find(
 
   <!-- Bottom Navigation (Mobile Only) -->
   {!isHomepage && <BottomNav countryId={detectedCountryId} />}
+
+  <!-- Theme Toggle Logic (must be inline — no ES module imports allowed in is:inline) -->
+  <script is:inline>
+    function applyTheme(isDark) {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      // Sun icon = shown in dark mode (clicking switches to light)
+      document.querySelectorAll('[id^="themeIconSun"]').forEach(function(el) {
+        el.classList.toggle('hidden', !isDark);
+      });
+      // Moon icon = shown in light mode (clicking switches to dark)
+      document.querySelectorAll('[id^="themeIconMoon"]').forEach(function(el) {
+        el.classList.toggle('hidden', isDark);
+      });
+      // BottomNav More menu label
+      var lbl = document.getElementById('moreMenuThemeLabel');
+      if (lbl) lbl.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+    }
+
+    window.toggleTheme = function() {
+      var isDark = !document.documentElement.classList.contains('dark');
+      localStorage.setItem('crimehotspots-theme', isDark ? 'dark' : 'light');
+      applyTheme(isDark);
+    };
+
+    // Initialise icon state on page load
+    applyTheme(document.documentElement.classList.contains('dark'));
+  </script>
 </body>
 </html>
