@@ -65,15 +65,22 @@ export class CookieConsent {
   createBanner() {
     const banner = document.createElement('div');
     banner.id = 'cookie-consent-banner';
+    const isDark = document.documentElement.classList.contains('dark');
+    const bg = isDark ? 'rgba(14, 14, 14, 0.97)' : 'rgba(255, 255, 255, 0.95)';
+    const borderColor = isDark ? 'rgba(40, 40, 40, 0.9)' : 'rgba(226, 232, 240, 0.8)';
+    const textColor = isDark ? '#e8e8e8' : '#334155';
+    const mutedColor = isDark ? '#a0a0a0' : '#64748b';
+    const declineBg = isDark ? '#2a2a2a' : '#e2e8f0';
+    const declineHover = isDark ? '#333' : '#cbd5e1';
     banner.style.cssText = `
       position: fixed;
       ${this.config.position}: 0;
       left: 0;
       right: 0;
-      background: rgba(255, 255, 255, 0.95);
+      background: ${bg};
       padding: 1.25rem 1.5rem;
       box-shadow: 0 -4px 12px -2px rgba(0, 0, 0, 0.1);
-      border-top: 1px solid rgba(226, 232, 240, 0.8);
+      border-top: 1px solid ${borderColor};
       z-index: 9999;
       opacity: 0;
       transform: translateY(${this.config.position === 'bottom' ? '100%' : '-100%'});
@@ -84,9 +91,9 @@ export class CookieConsent {
     banner.innerHTML = `
       <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;">
         <div style="flex: 1; min-width: 300px;">
-          <p style="margin: 0; font-size: 0.875rem; line-height: 1.5; color: #334155;">
-            <strong style="font-weight: 600; color: #334155;">We value your privacy</strong><br>
-            <span style="color: #64748b;">We use cookies to analyze site traffic and improve your experience. By clicking "Accept", you consent to our use of analytics cookies.</span>
+          <p style="margin: 0; font-size: 0.875rem; line-height: 1.5; color: ${textColor};">
+            <strong style="font-weight: 600; color: ${textColor};">We value your privacy</strong><br>
+            <span style="color: ${mutedColor};">We use cookies to analyze site traffic and improve your experience. By clicking "Accept", you consent to our use of analytics cookies.</span>
             <a href="/privacy/" style="color: ${this.config.primaryColor}; text-decoration: underline; font-weight: 500;">Learn more</a>
           </p>
         </div>
@@ -94,15 +101,15 @@ export class CookieConsent {
           <button id="cookie-decline" style="
             padding: 0.375rem 1rem;
             min-height: 22px;
-            background: #e2e8f0;
-            color: #334155;
+            background: ${declineBg};
+            color: ${textColor};
             border: none;
             border-radius: 0.5rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             font-size: 0.875rem;
-          " onmouseover="this.style.background='#cbd5e1'" onmouseout="this.style.background='#e2e8f0'">
+          " onmouseover="this.style.background='${declineHover}'" onmouseout="this.style.background='${declineBg}'">
             Decline
           </button>
           <button id="cookie-accept" style="

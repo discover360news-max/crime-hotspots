@@ -28,22 +28,22 @@ if (!notification.enabled) {
 // Style variants based on type
 const styleVariants = {
   info: {
-    bg: 'bg-rose-50',
-    border: 'border-rose-200',
-    text: 'text-slate-700',
-    icon: 'text-rose-600'
+    bg: 'bg-rose-50 dark:bg-rose-950/40',
+    border: 'border-rose-200 dark:border-rose-900',
+    text: 'text-slate-700 dark:text-[hsl(0_0%_90%)]',
+    icon: 'text-rose-600 dark:text-rose-400'
   },
   warning: {
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
-    text: 'text-slate-700',
-    icon: 'text-amber-600'
+    bg: 'bg-amber-50 dark:bg-amber-950/40',
+    border: 'border-amber-200 dark:border-amber-900',
+    text: 'text-slate-700 dark:text-[hsl(0_0%_90%)]',
+    icon: 'text-amber-600 dark:text-amber-400'
   },
   success: {
-    bg: 'bg-emerald-50',
-    border: 'border-emerald-200',
-    text: 'text-slate-700',
-    icon: 'text-emerald-600'
+    bg: 'bg-emerald-50 dark:bg-emerald-950/40',
+    border: 'border-emerald-200 dark:border-emerald-900',
+    text: 'text-slate-700 dark:text-[hsl(0_0%_90%)]',
+    icon: 'text-emerald-600 dark:text-emerald-400'
   }
 };
 
@@ -79,7 +79,7 @@ const styles = styleVariants[notification.type];
         {notification.message}
       </p>
       {notification.subMessage && (
-        <p class="text-slate-600 text-xs md:text-sm mt-1.5">
+        <p class="text-slate-600 dark:text-[hsl(0_0%_65%)] text-xs md:text-sm mt-1.5">
           {notification.subMessage}
         </p>
       )}
@@ -88,7 +88,7 @@ const styles = styleVariants[notification.type];
     <!-- Dismiss Button -->
     <button
       data-dismiss-notification
-      class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 transition-colors"
+      class="absolute top-3 right-3 text-slate-400 dark:text-[hsl(0_0%_50%)] hover:text-slate-600 dark:hover:text-[hsl(0_0%_75%)] transition-colors"
       aria-label="Dismiss notification"
     >
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

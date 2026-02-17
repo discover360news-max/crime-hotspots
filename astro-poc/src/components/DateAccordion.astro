@@ -25,13 +25,13 @@ const formattedDate = new Date(date).toLocaleDateString('en-US', {
 <div class="date-accordion mb-4" data-date={date}>
   <!-- Accordion Header -->
   <button
-    class="accordion-header w-full px-4 py-3 bg-white/70 backdrop-blur-md rounded-lg border border-slate-200 hover:bg-white/90 transition flex items-center justify-between group"
+    class="accordion-header w-full px-4 py-3 bg-white/70 dark:bg-[hsl(0_0%_10%)]/70 backdrop-blur-md rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-white/90 dark:hover:bg-[hsl(0_0%_14%)] transition flex items-center justify-between group"
     aria-expanded={isExpanded ? 'true' : 'false'}
   >
     <div class="flex items-center gap-3">
       <!-- Chevron Icon -->
       <svg
-        class="chevron w-5 h-5 text-slate-400 transition-transform duration-200"
+        class="chevron w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_55%)] transition-transform duration-200"
         class:list={[isExpanded && 'rotate-90']}
         fill="none"
         stroke="currentColor"
@@ -42,13 +42,13 @@ const formattedDate = new Date(date).toLocaleDateString('en-US', {
 
       <!-- Date & Victim Count -->
       <div class="text-left">
-        <h3 class="text-small font-semibold text-slate-700">{formattedDate}</h3>
-        <p class="text-xs text-slate-500">{victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+        <h3 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_90%)]">{formattedDate}</h3>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)]">{victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
       </div>
     </div>
 
     <!-- Badge -->
-    <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-medium">
+    <span class="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 text-xs font-medium">
       {victimCount}
     </span>
   </button>
