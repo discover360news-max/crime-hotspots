@@ -24,14 +24,14 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
   <!-- Modal Content -->
   <div
     id="sectionPickerModalContent"
-    class="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full opacity-0 scale-95 transition-all duration-300"
+    class="bg-white/90 dark:bg-[hsl(0_0%_8%)/95] backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full opacity-0 scale-95 transition-all duration-300"
   >
     <!-- Header -->
-    <div class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-      <h2 id="sectionPickerTitle" class="text-h2 font-bold text-slate-700">Select Section</h2>
+    <div class="sticky top-0 bg-white/80 dark:bg-[hsl(0_0%_8%)/90] backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
+      <h2 id="sectionPickerTitle" class="text-h2 font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Select Section</h2>
       <button
         id="closeSectionPickerModal"
-        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 active:bg-slate-200 transition text-slate-500 hover:text-slate-700"
+        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 dark:active:bg-[hsl(0_0%_15%)] transition text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
         aria-label="Close"
       >
         <span class="text-2xl leading-none">&times;</span>
@@ -56,47 +56,48 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
                 <a
                   href={section.url}
                   class:list={[
-                    "group relative bg-white/80 backdrop-blur-md rounded-lg p-4 hover:shadow-lg transition-all duration-300 flex items-center justify-between",
+                    "group relative bg-white/80 dark:bg-[hsl(0_0%_10%)] backdrop-blur-md rounded-lg p-4 hover:shadow-lg transition-all duration-300 flex items-center justify-between",
                     isRecommended
                       ? "border-2 border-rose-500 shadow-md"
-                      : "border-2 border-slate-200 hover:border-rose-600"
+                      : "border-2 border-slate-200 dark:border-[hsl(0_0%_20%)] hover:border-rose-600 dark:hover:border-rose-700"
                   ]}
                 >
                   <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1">
                       <h3 class:list={[
                         "text-small font-bold transition",
-                        isRecommended ? "text-rose-600" : "text-slate-700 group-hover:text-rose-600"
+                        isRecommended ? "text-rose-600" : "text-slate-700 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600"
                       ]}>
                         {section.label}
                       </h3>
                       {isRecommended && (
-                        <span class="text-[10px] font-semibold uppercase tracking-wide bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full">
+                        <span class="text-[10px] font-semibold uppercase tracking-wide bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-full">
                           Start Here
                         </span>
                       )}
                     </div>
-                    <p class="text-xs text-slate-500">{section.description}</p>
+                    <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{section.description}</p>
                   </div>
                   <svg class:list={[
                     "w-5 h-5 shrink-0 ml-3 transition",
                     isRecommended
                       ? "text-rose-500 group-hover:translate-x-1"
-                      : "text-slate-400 group-hover:text-rose-600 group-hover:translate-x-1"
+                      : "text-slate-400 dark:text-[hsl(0_0%_40%)] group-hover:text-rose-600 group-hover:translate-x-1"
                   ]} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
               );
             })}
+
           </div>
 
           <!-- Divider -->
           {secondarySections.length > 0 && (
             <div class="flex items-center gap-3 my-4">
-              <div class="flex-1 h-px bg-slate-200"></div>
-              <span class="text-xs text-slate-400 font-medium">Explore More</span>
-              <div class="flex-1 h-px bg-slate-200"></div>
+              <div class="flex-1 h-px bg-slate-200 dark:bg-[hsl(0_0%_22%)]"></div>
+              <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_40%)] font-medium">Explore More</span>
+              <div class="flex-1 h-px bg-slate-200 dark:bg-[hsl(0_0%_22%)]"></div>
             </div>
           )}
 
@@ -106,13 +107,13 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
               {secondarySections.map((section) => (
                 <a
                   href={section.url}
-                  class="group inline-flex items-center gap-1.5 bg-slate-100 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-full px-3 py-1.5 transition-all duration-200"
+                  class="group inline-flex items-center gap-1.5 bg-slate-100 dark:bg-[hsl(0_0%_12%)] hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-slate-200 dark:border-[hsl(0_0%_20%)] hover:border-rose-300 dark:hover:border-rose-800 rounded-full px-3 py-1.5 transition-all duration-200"
                   title={section.description}
                 >
-                  <span class="text-xs font-medium text-slate-600 group-hover:text-rose-600 transition">
+                  <span class="text-xs font-medium text-slate-600 dark:text-[hsl(0_0%_75%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">
                     {section.label}
                   </span>
-                  <svg class="w-3 h-3 text-slate-400 group-hover:text-rose-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-3 h-3 text-slate-400 dark:text-[hsl(0_0%_40%)] group-hover:text-rose-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </a>
@@ -125,7 +126,7 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
 
     <!-- Footer Help Text -->
     <div class="px-6 pb-6 pt-4">
-      <p class="text-xs text-slate-500 text-center">
+      <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] text-center">
         Don't see your island? <a href={routes.contact} class="text-rose-600 hover:text-rose-700 underline">Contact us</a> to request coverage.
       </p>
     </div>

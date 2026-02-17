@@ -8,6 +8,25 @@
 
 ## February 2026
 
+### Design System Audit — Full Token Pass (Feb 17)
+- **Type scale:** 8 tokens → 4 strict levels: `text-display` (32px), `text-heading` (22px), `text-body` (18px), `text-caption` (12px)
+- **Font weights:** Only `font-normal` and `font-bold` — `font-semibold` eliminated from headings
+- **IslandSelectorModal.astro** created — replaces 4 near-identical modals (`HeadlinesModal`, `DashboardModal`, `ArchivesModal`, `AreasModal`). Backward-compat aliases: `window.openDashboardModal()` etc.
+- **Card opacity standardized:** all `bg-white/70`, `bg-white/80`, `bg-white/90` → `bg-white/85`
+- **`gray-*` → `slate-*`** audit (DashboardInfoCards)
+- **`border-radius.lg`** changed from 8px → 12px in tailwind.config.mjs
+- **`min-h-button`** named token added (22px)
+- **`mt-30`** in footer → `mt-16` (8px grid fix)
+- **Leaflet cluster hex colors** → rose palette CSS vars
+- **Pages polished:** `crime/[slug].astro`, `blog/[slug].astro`, `headlines.astro`, `areas.astro`
+- **`aria-hidden="true"`** on timeline dots in headlines (a11y)
+- **Filter tray width** → `max-w-[min(20rem,calc(100vw-2rem))]` (375px phone fix)
+- **Blog content:** `max-w-prose` (65ch) wrapping `<Content />`
+- **Share buttons:** platform colors fixed (were `bg-slate-400`)
+- **DESIGN-TOKENS.md:** Updated to v1.4 with new type scale
+- **Files deleted:** `HeadlinesModal.astro`, `DashboardModal.astro`, `ArchivesModal.astro`, `AreasModal.astro`
+- **Files created:** `IslandSelectorModal.astro`, `docs/claude-context/ux-audit-progress.md`
+
 ### UX Foundation Improvements (Feb 9)
 
 - **Data freshness indicator** on dashboard — "Data as of [date]" below subtitle, updates with year filter

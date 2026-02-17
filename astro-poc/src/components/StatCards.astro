@@ -38,16 +38,16 @@ function formatPercentChange(change: number): string {
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
   {stats.map((stat) => (
-    <div class="bg-white/85 rounded-lg border border-slate-200 p-4 shadow-sm">
-      <div class="text-sm text-slate-500 font-medium">{stat.label}</div>
-      <div class="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{stat.current}</div>
+    <div class="bg-white/85 dark:bg-[hsl(0_0%_8%)/85] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-4 shadow-sm">
+      <div class="text-caption text-slate-500 dark:text-[hsl(0_0%_60%)] font-bold">{stat.label}</div>
+      <div class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-[hsl(0_0%_95%)] mt-1">{stat.current}</div>
       {stat.subtitle ? (
-        <div class="text-sm mt-1 text-slate-400">{stat.subtitle}</div>
+        <div class="text-caption mt-1 text-slate-400 dark:text-[hsl(0_0%_50%)]">{stat.subtitle}</div>
       ) : stat.direction && stat.yoyChange !== undefined ? (
-        <div class={`text-sm mt-1 ${
-          stat.direction === 'down' ? 'text-emerald-600' :
+        <div class={`text-caption mt-1 ${
+          stat.direction === 'down' ? 'text-emerald-600 dark:text-emerald-400' :
           stat.direction === 'up' ? 'text-rose-600' :
-          'text-slate-400'
+          'text-slate-400 dark:text-[hsl(0_0%_50%)]'
         }`}>
           {stat.direction === 'down' ? '↓' : stat.direction === 'up' ? '↑' : '→'}
           {formatPercentChange(stat.yoyChange)} vs {previousYear}

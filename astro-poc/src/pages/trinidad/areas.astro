@@ -105,14 +105,14 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
           type="text"
           id="areaSearch"
           placeholder="Search areas..."
-          class="w-full px-4 py-3 pl-10 rounded-lg border border-slate-300 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300"
+          class="w-full px-4 py-3 pl-10 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-sm text-slate-700 dark:text-[hsl(0_0%_85%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_45%)] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300 bg-white dark:bg-[hsl(0_0%_10%)]"
         />
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </div>
       <div class="flex items-center gap-1 self-end sm:self-center">
-        <span class="text-xs text-slate-500 mr-1">Sort:</span>
+        <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mr-1">Sort:</span>
         <button
           id="sortAZ"
           class="px-3 py-1.5 rounded-lg text-xs font-medium transition bg-rose-600 text-white"
@@ -120,7 +120,7 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
         >A–Z</button>
         <button
           id="sortCrime"
-          class="px-3 py-1.5 rounded-lg text-xs font-medium transition border border-slate-300 text-slate-600 hover:bg-slate-50"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_65%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)]"
           title="Sort by crime count"
         >Most incidents</button>
       </div>
@@ -133,12 +133,12 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
           <!-- Region Header -->
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="text-lg font-bold text-slate-800">{region}</h2>
-              <p class="text-xs text-slate-500">{areas.length} areas • {totalCrimes} incidents (90 days)</p>
+              <h2 class="text-heading font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] leading-tight">{region}</h2>
+              <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">{areas.length} areas • {totalCrimes} incidents (90 days)</p>
             </div>
             <a
               href={buildRoute.region(generateNameSlug(region))}
-              class="text-xs text-rose-600 hover:text-rose-700 font-medium"
+              class="text-caption text-rose-600 hover:text-rose-700 font-bold"
             >
               View Region
             </a>
@@ -149,35 +149,35 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
             {areas.map(area => (
               <a
                 href={buildRoute.area(area.slug)}
-                class="area-card block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-md transition group"
+                class="area-card block bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
                 data-area={area.name.toLowerCase()}
                 data-known-as={area.knownAs?.toLowerCase() || ''}
                 data-crime-count={area.crimeCount90d}
               >
                 <div class="flex items-start justify-between mb-2">
                   <div class="flex-1 min-w-0">
-                    <h3 class="text-sm font-semibold text-slate-800 group-hover:text-rose-600 transition truncate">
+                    <h3 class="text-caption font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600 transition line-clamp-1">
                       {area.name}
                     </h3>
                     {area.knownAs && area.knownAs !== area.name && (
-                      <p class="text-xs text-slate-400 truncate">
+                      <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_50%)] truncate">
                         Also known as: {area.knownAs}
                       </p>
                     )}
                   </div>
                   <!-- Safety Score Badge -->
-                  <span class={`flex-shrink-0 ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${
-                    area.level === 'low' ? 'bg-emerald-100 text-emerald-700' :
-                    area.level === 'neutral' ? 'bg-slate-100 text-slate-600' :
-                    'bg-amber-100 text-amber-700'
+                  <span class={`flex-shrink-0 ml-2 px-2 py-0.5 rounded-full text-caption font-bold ${
+                    area.level === 'low' ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400' :
+                    area.level === 'neutral' ? 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_65%)]' :
+                    'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
                   }`}>
                     Risk Level: {area.safetyScore.toFixed(1)}
                   </span>
                 </div>
 
-                <div class="flex items-center justify-between text-xs text-slate-500">
+                <div class="flex items-center justify-between text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">
                   <span>{area.crimeCount90d} incident{area.crimeCount90d !== 1 ? 's' : ''} (90d)</span>
-                  <span class="text-slate-400">{area.division}</span>
+                  <span class="text-slate-400 dark:text-[hsl(0_0%_45%)]">{area.division}</span>
                 </div>
               </a>
             ))}
@@ -188,7 +188,7 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
 
     <!-- No results message -->
     <div id="noResults" class="hidden text-center py-12">
-      <p class="text-slate-500 text-sm">No areas found matching your search.</p>
+      <p class="text-slate-500 dark:text-[hsl(0_0%_55%)] text-sm">No areas found matching your search.</p>
     </div>
   </div>
 </Layout>
@@ -201,7 +201,7 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
   const sortCrime = document.getElementById('sortCrime');
 
   const activeClass = 'bg-rose-600 text-white';
-  const inactiveClass = 'border border-slate-300 text-slate-600 hover:bg-slate-50';
+  const inactiveClass = 'border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_65%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)]';
 
   function setActiveSort(activeBtn, inactiveBtn) {
     activeBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' + activeClass;

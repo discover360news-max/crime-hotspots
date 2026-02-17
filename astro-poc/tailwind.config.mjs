@@ -22,26 +22,24 @@ export default {
 				'slate-900': '#0f172a',
 			},
 			fontFamily: {
-				sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+				sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
 			},
 			fontSize: {
-				// Typography system from DESIGN-TOKENS.md
-				'display': ['2.25rem', { lineHeight: '2.5rem', letterSpacing: '-0.02em' }],  // 36px
-				'h1': ['2rem', { lineHeight: '2.5rem', letterSpacing: '-0.01em' }],          // 32px
-				'h2': ['1.5rem', { lineHeight: '2rem' }],                                     // 24px
-				'h3': ['1.25rem', { lineHeight: '1.75rem' }],                                 // 20px
-				'body': ['1rem', { lineHeight: '1.5rem' }],                                   // 16px
-				'small': ['0.875rem', { lineHeight: '1.25rem' }],                            // 14px
-				'tiny': ['0.75rem', { lineHeight: '1rem' }],                                  // 12px
-				'nav': ['0.9375rem', { lineHeight: '1.25rem' }],                             // 15px
+				// DESIGN SYSTEM v2: Strict 4-level type scale
+				// 2 weights only: font-normal (400) and font-bold (700)
+				'display': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],      // 32px — hero text, page titles
+				'heading': ['1.375rem', { lineHeight: '1.35', letterSpacing: '-0.01em' }], // 22px — section/card headings
+				'body': ['1.125rem', { lineHeight: '1.65' }],                               // 18px — all reading content
+				'caption': ['0.75rem', { lineHeight: '1.35', letterSpacing: '0.02em' }],   // 12px — metadata, badges, labels
 			},
 			minHeight: {
-				'22': '22px',  // Standard button height
-				'30': '30px',  // Large button height
+				'22': '22px',     // Legacy — prefer min-h-button
+				'30': '30px',     // Large button height
+				'button': '22px', // Named token for standard button height
 			},
 			borderRadius: {
-				'DEFAULT': '0.5rem',  // 8px - default for all components
-				'lg': '0.5rem',       // 8px - buttons, cards
+				'DEFAULT': '0.5rem', // 8px — default for all components
+				'lg': '0.75rem',     // 12px — modals, large cards
 			},
 			backdropBlur: {
 				'xs': '2px',

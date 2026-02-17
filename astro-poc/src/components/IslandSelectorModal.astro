@@ -1,0 +1,176 @@
+---
+/**
+ * IslandSelectorModal — Unified island picker
+ * Consolidates the 4 separate island-selector modals:
+ * DashboardModal, HeadlinesModal, ArchivesModal, AreasModal
+ *
+ * Usage: window.openIslandModal('dashboard' | 'headlines' | 'areas' | 'archives')
+ *
+ * Backward-compat aliases:
+ *   window.openDashboardModal()  → window.openIslandModal('dashboard')
+ *   window.openHeadlinesModal()  → window.openIslandModal('headlines')
+ *   window.openArchivesModal()   → window.openIslandModal('archives')
+ *   window.openAreasModal()      → window.openIslandModal('areas')
+ */
+import { COUNTRIES } from '../data/countries';
+import { routes } from '../config/routes';
+
+type ModalType = 'dashboard' | 'headlines' | 'areas' | 'archives';
+
+const MODAL_TITLES: Record<ModalType, string> = {
+  dashboard: 'Select Island',
+  headlines: 'Select Island',
+  areas:     'Browse Areas',
+  archives:  'Select Island',
+};
+
+function getCountryUrl(country: typeof COUNTRIES[0], type: ModalType): string | null {
+  if (!country.available) return null;
+  switch (type) {
+    case 'dashboard': return country.dashboardUrl ?? null;
+    case 'headlines': return country.headlinesUrl ?? null;
+    case 'areas':     return country.areasUrl ?? null;
+    case 'archives':  return routes.trinidad.archive; // only Trinidad has archives
+  }
+}
+
+const modalTypes: ModalType[] = ['dashboard', 'headlines', 'areas', 'archives'];
+---
+
+<!-- Modal Overlay -->
+<div
+  id="islandSelectorModal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4"
+  data-pagefind-ignore
+>
+  <!-- Modal Content -->
+  <div
+    id="islandSelectorModalContent"
+    class="bg-white/90 dark:bg-[hsl(0_0%_8%)/95] backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full opacity-0 scale-95 transition-all duration-300"
+  >
+    <!-- Header -->
+    <div class="sticky top-0 bg-white/80 dark:bg-[hsl(0_0%_8%)/90] backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
+      <h2 id="islandSelectorTitle" class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Select Island</h2>
+      <button
+        id="closeIslandSelectorModal"
+        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 dark:active:bg-[hsl(0_0%_15%)] transition text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
+        aria-label="Close"
+      >
+        <span class="text-2xl leading-none">&times;</span>
+      </button>
+    </div>
+
+    <!-- Island Lists (one per modal type, toggled by JS) -->
+    {modalTypes.map((type) => (
+      <div
+        class="island-selector-list hidden p-6 space-y-3 max-h-[60vh] overflow-y-auto"
+        data-modal-type={type}
+      >
+        {COUNTRIES.map((country) => {
+          const url = getCountryUrl(country, type);
+          return country.available && url ? (
+            <a
+              href={url}
+              class="group relative bg-white/85 dark:bg-[hsl(0_0%_10%)] backdrop-blur-md border-2 border-slate-200 dark:border-[hsl(0_0%_20%)] rounded-lg p-4 hover:border-rose-600 dark:hover:border-rose-700 hover:shadow-lg transition-all duration-300 flex items-center justify-between"
+            >
+              <div>
+                <h3 class="text-body font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600 transition mb-1">
+                  {country.name}
+                </h3>
+                <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">{country.short}</p>
+              </div>
+              <svg class="w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_40%)] group-hover:text-rose-600 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          ) : !country.available ? (
+            <div class="relative bg-white/50 dark:bg-[hsl(0_0%_8%)/50] backdrop-blur-md border-2 border-slate-200 dark:border-[hsl(0_0%_18%)] rounded-lg p-4 opacity-60 cursor-not-allowed flex items-center justify-between">
+              <div>
+                <h3 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_45%)] mb-1">{country.name}</h3>
+                <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_40%)]">{country.short}</p>
+              </div>
+              <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+          ) : null;
+        })}
+      </div>
+    ))}
+
+    <!-- Footer Help Text -->
+    <div class="px-6 pb-6 pt-2">
+      <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)] text-center">
+        Don't see your island? <a href={routes.report} class="text-rose-600 hover:text-rose-700 underline">Submit a report</a> to help us expand.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById('islandSelectorModal');
+  const modalContent = document.getElementById('islandSelectorModalContent');
+  const closeBtn = document.getElementById('closeIslandSelectorModal');
+  const titleEl = document.getElementById('islandSelectorTitle');
+  const lists = document.querySelectorAll<HTMLElement>('.island-selector-list');
+
+  const TITLES: Record<string, string> = {
+    dashboard: 'Select Island',
+    headlines: 'Select Island',
+    areas: 'Browse Areas',
+    archives: 'Select Island',
+  };
+
+  function openModal() {
+    if (!modal || !modalContent) return;
+    modal.classList.remove('invisible', 'opacity-0');
+    modal.classList.add('visible', 'opacity-100');
+    setTimeout(() => {
+      modalContent.classList.remove('opacity-0', 'scale-95');
+      modalContent.classList.add('opacity-100', 'scale-100');
+    }, 50);
+  }
+
+  function closeModal() {
+    if (!modal || !modalContent) return;
+    modalContent.classList.remove('opacity-100', 'scale-100');
+    modalContent.classList.add('opacity-0', 'scale-95');
+    setTimeout(() => {
+      modal.classList.remove('visible', 'opacity-100');
+      modal.classList.add('invisible', 'opacity-0');
+    }, 300);
+  }
+
+  // Primary API
+  (window as any).openIslandModal = function(type: string) {
+    if (!modal || !modalContent) return;
+
+    // Update title
+    if (titleEl) titleEl.textContent = TITLES[type] ?? 'Select Island';
+
+    // Show correct list
+    lists.forEach(list => {
+      list.classList.toggle('hidden', list.dataset.modalType !== type);
+    });
+
+    openModal();
+  };
+
+  // Backward-compat aliases so existing callers don't break
+  (window as any).openDashboardModal  = () => (window as any).openIslandModal('dashboard');
+  (window as any).openHeadlinesModal  = () => (window as any).openIslandModal('headlines');
+  (window as any).openArchivesModal   = () => (window as any).openIslandModal('archives');
+  (window as any).openAreasModal      = () => (window as any).openIslandModal('areas');
+
+  closeBtn?.addEventListener('click', closeModal);
+
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal?.classList.contains('visible')) {
+      closeModal();
+    }
+  });
+</script>

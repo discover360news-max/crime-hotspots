@@ -81,8 +81,8 @@ const areaSlug = currentCrime.area.toLowerCase().replace(/\s+/g, '-').replace(/[
 ---
 
 {relatedCrimes.length > 0 && (
-  <aside class="p-4 bg-slate-50/80 backdrop-blur-sm rounded-lg border border-slate-200" data-pagefind-ignore>
-    <h2 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
+  <aside class="p-4 bg-slate-50/80 dark:bg-[hsl(0_0%_6%)/80] backdrop-blur-sm rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)]" data-pagefind-ignore>
+    <h2 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-3 flex items-center gap-2 uppercase tracking-wider">
       <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
       </svg>
@@ -97,7 +97,7 @@ const areaSlug = currentCrime.area.toLowerCase().replace(/\s+/g, '-').replace(/[
         return (
           <a
             href={buildRoute.crime(crime.slug)}
-            class="block p-3 bg-white rounded-lg border border-slate-100 hover:border-rose-200 hover:shadow-sm transition-all group"
+            class="block p-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-100 dark:border-[hsl(0_0%_15%)] hover:border-rose-200 dark:hover:border-rose-800 hover:shadow-sm transition-all group"
           >
             <div class="flex items-start gap-2">
               {/* Crime type indicator dot */}
@@ -105,21 +105,21 @@ const areaSlug = currentCrime.area.toLowerCase().replace(/\s+/g, '-').replace(/[
 
               <div class="flex-1 min-w-0">
                 {/* Headline */}
-                <p class="text-xs font-medium text-slate-700 group-hover:text-rose-600 transition-colors line-clamp-2">
+                <p class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors line-clamp-2">
                   {truncateHeadline(crime.headline)}
                 </p>
 
                 {/* Meta row */}
                 <div class="flex items-center gap-2 mt-1">
-                  <span class="text-[10px] text-slate-400">
+                  <span class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)]">
                     {formatDate(crime.date)}
                   </span>
                   {isSameArea ? (
-                    <span class="text-[10px] px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded">
+                    <span class="text-caption px-1.5 py-0.5 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded">
                       Same area
                     </span>
                   ) : (
-                    <span class="text-[10px] text-slate-400 truncate">
+                    <span class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] truncate">
                       {crime.area}
                     </span>
                   )}
@@ -139,7 +139,7 @@ const areaSlug = currentCrime.area.toLowerCase().replace(/\s+/g, '-').replace(/[
     {/* View all CTA */}
     <a
       href={buildRoute.area(areaSlug)}
-      class="mt-3 flex items-center justify-center gap-1 w-full py-2 text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition-colors"
+      class="mt-3 flex items-center justify-center gap-1 w-full py-2 text-caption font-bold text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors"
     >
       View all crimes in {currentCrime.area}
       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

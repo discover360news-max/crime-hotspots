@@ -116,20 +116,20 @@ const breadcrumbs = [
     <SiteNotificationBanner notification={dataUpdateNotice} />
 
     <!-- Results Count + Data Freshness -->
-    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-3"></div>
+    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent mb-3"></div>
     <div class="mb-3 text-xs flex flex-wrap items-center justify-between gap-y-1.5">
       <div class="text-rose-600">
         Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of all <a href={routes.trinidad.archive} class="border-b border-dotted border-rose-600 hover:border-rose-700 hover:text-rose-700 transition"><span id="resultsTotal">{allCrimes.length}</span></a> listed crimes
       </div>
-      <span class="text-slate-400 flex items-center gap-1">
+      <span class="text-slate-400 dark:text-[hsl(0_0%_50%)] flex items-center gap-1">
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         Data as of {freshnessText}
       </span>
       <div class="basis-full sm:basis-auto">
-        <a href={routes.trinidad.archive} class="text-slate-400 border-b border-dotted border-slate-400 hover:text-rose-600 hover:border-rose-600 transition">View Archive</a>
+        <a href={routes.trinidad.archive} class="text-slate-400 dark:text-[hsl(0_0%_50%)] border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition">View Archive</a>
       </div>
     </div>
-    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-6"></div>
+    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent mb-6"></div>
 
     <!-- Blog Rotating Banner -->
     <BlogRotatingBanner country="tt" limit={3} />
@@ -151,12 +151,12 @@ const breadcrumbs = [
         return (
           <div class="date-accordion mb-4" data-date={date}>
             <button
-              class={`accordion-header w-full px-4 py-3 bg-white/70 backdrop-blur-md rounded-lg hover:bg-white/90 transition flex items-center justify-between group ${isExpanded ? 'border border-rose-600' : 'border border-slate-200'}`}
+              class={`accordion-header w-full px-4 py-3 bg-white/70 dark:bg-[hsl(0_0%_8%)/70] backdrop-blur-md rounded-lg hover:bg-white/90 dark:hover:bg-[hsl(0_0%_10%)/90] transition flex items-center justify-between group ${isExpanded ? 'border border-rose-600' : 'border border-slate-200 dark:border-[hsl(0_0%_18%)]'}`}
               aria-expanded={isExpanded}
             >
               <div class="flex items-center gap-3">
                 <svg
-                  class={`chevron w-5 h-5 text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+                  class={`chevron w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_50%)] transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -165,12 +165,12 @@ const breadcrumbs = [
                 </svg>
 
                 <div class="text-left">
-                  <h3 class={`accordion-title text-small font-semibold ${isExpanded ? 'text-rose-600' : 'text-slate-700'}`}>{formattedDate}</h3>
-                  <p class="text-xs text-slate-500">{incidentCount} {incidentCount === 1 ? 'incident' : 'incidents'} affecting {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+                  <h3 class={`accordion-title text-caption font-bold leading-snug ${isExpanded ? 'text-rose-600' : 'text-slate-700 dark:text-[hsl(0_0%_85%)]'}`}>{formattedDate}</h3>
+                  <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">{incidentCount} {incidentCount === 1 ? 'incident' : 'incidents'} affecting {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
                 </div>
               </div>
 
-              <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-medium">
+              <span class="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 text-caption font-bold">
                 {incidentCount}
               </span>
             </button>
@@ -179,7 +179,7 @@ const breadcrumbs = [
               <!-- Mobile/Tablet Timeline View (single column with timeline) -->
               <div class="relative pl-8 pb-4 sm:hidden">
                 {/* Vertical dotted line */}
-                <div class="absolute left-3 top-0 bottom-4 w-px border-l-2 border-dotted border-slate-300"></div>
+                <div class="absolute left-3 top-0 bottom-4 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
 
                 {/* Crime cards with timeline dots */}
                 <div class="space-y-4">
@@ -188,7 +188,7 @@ const breadcrumbs = [
                     return (
                       <div class="relative">
                         {/* Timeline dot (filled red circle) - small dot at top of card */}
-                        <div class="absolute -left-[23px] top-4 w-1.5 h-1.5 rounded-full bg-rose-600"></div>
+                        <div aria-hidden="true" class="absolute -left-[23px] top-4 w-1.5 h-1.5 rounded-full bg-rose-600"></div>
                         <CrimeCard crime={crime} localName={localName} />
                       </div>
                     );
@@ -226,12 +226,12 @@ const breadcrumbs = [
     <div id="filtersBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
 
     <!-- Tray Content -->
-    <div id="filtersTrayContent" class="absolute right-0 top-0 h-full w-80 bg-white/80 backdrop-blur-lg rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto">
+    <div id="filtersTrayContent" class="absolute right-0 top-0 h-full max-w-[min(20rem,calc(100vw-2rem))] w-full bg-white/85 dark:bg-[hsl(0_0%_8%)/90] backdrop-blur-lg rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto">
       <div class="p-6">
         <!-- Header -->
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-lg font-bold text-slate-700">Filters</h2>
-          <button id="closeFiltersBtn" class="text-slate-400 hover:text-slate-600 transition">
+          <h2 class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)] leading-tight">Filters</h2>
+          <button id="closeFiltersBtn" class="text-slate-400 dark:text-[hsl(0_0%_50%)] hover:text-slate-600 dark:hover:text-[hsl(0_0%_75%)] transition">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -242,29 +242,29 @@ const breadcrumbs = [
         <div class="space-y-4">
           <!-- Date Range -->
           <div>
-            <label for="dateFrom" class="block text-sm font-medium text-slate-700 mb-2">From Date</label>
+            <label for="dateFrom" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">From Date</label>
             <input
               type="date"
               id="dateFrom"
-              class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50"
+              class="w-full px-4 py-2 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]"
             />
           </div>
 
           <div>
-            <label for="dateTo" class="block text-sm font-medium text-slate-700 mb-2">To Date</label>
+            <label for="dateTo" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">To Date</label>
             <input
               type="date"
               id="dateTo"
-              class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50"
+              class="w-full px-4 py-2 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]"
             />
           </div>
 
           <!-- Crime Type -->
           <div>
-            <label for="crimeType" class="block text-sm font-medium text-slate-700 mb-2">Crime Type</label>
+            <label for="crimeType" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Crime Type</label>
             <select
               id="crimeType"
-              class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50"
+              class="w-full px-4 py-2 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]"
             >
               <option value="">All Types</option>
               {crimeTypes.map(type => (
@@ -275,10 +275,10 @@ const breadcrumbs = [
 
           <!-- Area -->
           <div>
-            <label for="area" class="block text-sm font-medium text-slate-700 mb-2">Area</label>
+            <label for="area" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Area</label>
             <select
               id="area"
-              class="w-full px-4 py-2 border border-slate-300 text-slate-500 rounded-lg hover:bg-slate-50 transition font-medium text-xs bg-white/50"
+              class="w-full px-4 py-2 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]"
             >
               <option value="">All Areas</option>
               {areas.map(area => (
@@ -377,12 +377,12 @@ const breadcrumbs = [
       // Empty state when filters return no results
       if (filteredCrimes.length === 0) {
         container.innerHTML = `
-          <div class="bg-slate-50 rounded-lg border border-slate-200 p-8 text-center">
-            <svg class="w-12 h-12 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="rounded-lg p-8 text-center" style="background:var(--ch-surface);border:1px solid var(--ch-border)">
+            <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--ch-border)">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <p class="text-sm text-slate-500 mb-2">No crimes match your filters.</p>
-            <p class="text-xs text-slate-400">Try broadening your date range, area, or crime type.</p>
+            <p class="text-sm mb-2" style="color:var(--ch-text-muted)">No crimes match your filters.</p>
+            <p class="text-xs" style="color:var(--ch-text-muted)">Try broadening your date range, area, or crime type.</p>
           </div>`;
         loadMore.style.display = 'none';
         return;
@@ -455,21 +455,21 @@ const breadcrumbs = [
       const safeSlug = encodeURIComponent(crime.slug);
       const safeUrl = sanitizeUrl(crime.url);
       return `
-        <article class="crime-card bg-white/70 backdrop-blur-md rounded-xl shadow-md border border-slate-100 p-4 hover:shadow-lg transition cursor-pointer group" data-crime-slug="${escapeHtml(crime.slug)}">
+        <article class="crime-card rounded-xl shadow-md p-4 hover:shadow-lg transition cursor-pointer group" data-crime-slug="${escapeHtml(crime.slug)}" style="background:var(--ch-surface);border:1px solid var(--ch-border)">
           <div class="flex items-start justify-between mb-3">
             <span class="inline-block px-3 py-1 rounded-full text-white text-xs font-medium opacity-70" style="background-color: ${getCrimeColorHex(crime.crimeType)}">
               ${escapeHtml(crime.crimeType)}
             </span>
-            <span class="text-xs text-slate-500">
+            <span class="text-xs" style="color:var(--ch-text-muted)">
               ${escapeHtml(formatDate(crime.date))}
             </span>
           </div>
 
-          <h3 class="text-small font-semibold text-slate-700 mb-2">
+          <h3 class="text-small font-semibold mb-2" style="color:var(--ch-text)">
             ${escapeHtml(crime.headline)}
           </h3>
 
-          <p class="text-xs text-slate-500 mb-3 flex items-center gap-1">
+          <p class="text-xs mb-3 flex items-center gap-1" style="color:var(--ch-text-muted)">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -477,7 +477,7 @@ const breadcrumbs = [
             ${renderAreaName(crime.area)}
           </p>
 
-          <div class="flex items-center justify-between pt-3 border-t border-slate-200">
+          <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--ch-border)">
             <!-- Keep crime route in sync with src/config/routes.ts -->
             <a href="/trinidad/crime/${safeSlug}/" class="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1">
               View Details
@@ -518,18 +518,22 @@ const breadcrumbs = [
       const victimCount = calculateVictimCount(crimes);
       const expandedClass = isExpanded ? 'max-h-[10000px] mt-3' : 'max-h-0';
       const chevronClass = isExpanded ? 'rotate-90' : '';
-      const borderClass = isExpanded ? 'border border-rose-600' : 'border border-slate-200';
-      const textClass = isExpanded ? 'text-rose-600' : 'text-slate-700';
+      const borderStyle = isExpanded ? 'background:var(--ch-surface);border:1px solid #e11d48' : 'background:var(--ch-surface);border:1px solid var(--ch-border)';
+      const textStyle = isExpanded ? 'color:#e11d48' : 'color:var(--ch-text)';
+      const borderClass = '';
+      const textClass = '';
 
       return `
         <div class="date-accordion mb-4" data-date="${escapeHtml(date)}">
           <button
-            class="accordion-header w-full px-4 py-3 bg-white/70 backdrop-blur-md rounded-lg hover:bg-white/90 transition flex items-center justify-between group ${borderClass}"
+            class="accordion-header w-full px-4 py-3 rounded-lg transition flex items-center justify-between group"
+            style="${borderStyle}"
             aria-expanded="${isExpanded}"
           >
             <div class="flex items-center gap-3">
               <svg
-                class="chevron w-5 h-5 text-slate-400 transition-transform duration-200 ${chevronClass}"
+                class="chevron w-5 h-5 transition-transform duration-200 ${chevronClass}"
+                style="color:var(--ch-text-muted)"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -538,12 +542,12 @@ const breadcrumbs = [
               </svg>
 
               <div class="text-left">
-                <h3 class="accordion-title text-small font-semibold ${textClass}">${escapeHtml(formattedDate)}</h3>
-                <p class="text-xs text-slate-500">${incidentCount} ${incidentCount === 1 ? 'incident' : 'incidents'} affecting ${victimCount} ${victimCount === 1 ? 'victim' : 'victims'}</p>
+                <h3 class="accordion-title text-caption font-bold leading-snug" style="${textStyle}">${escapeHtml(formattedDate)}</h3>
+                <p class="text-caption" style="color:var(--ch-text-muted)">${incidentCount} ${incidentCount === 1 ? 'incident' : 'incidents'} affecting ${victimCount} ${victimCount === 1 ? 'victim' : 'victims'}</p>
               </div>
             </div>
 
-            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-medium">
+            <span class="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-caption font-bold">
               ${incidentCount}
             </span>
           </button>
@@ -559,7 +563,7 @@ const breadcrumbs = [
                 ${crimes.map(crime => `
                   <div class="relative">
                     <!-- Timeline dot (filled red circle) - small dot at top of card -->
-                    <div class="absolute -left-[23px] top-4 w-1.5 h-1.5 rounded-full bg-rose-600"></div>
+                    <div aria-hidden="true" class="absolute -left-[23px] top-4 w-1.5 h-1.5 rounded-full bg-rose-600"></div>
                     ${createCrimeCardHTML(crime)}
                   </div>
                 `).join('')}
@@ -594,22 +598,26 @@ const breadcrumbs = [
               content.classList.remove('max-h-[10000px]', 'mt-3');
               content.classList.add('max-h-0');
               chevron.classList.remove('rotate-90');
-              // Reset to grey border and text
+              // Reset border/text (CSS var for dark mode compat)
               header.classList.remove('border-rose-600');
               header.classList.add('border-slate-200');
+              header.style.borderColor = 'var(--ch-border)';
               title.classList.remove('text-rose-600');
               title.classList.add('text-slate-700');
+              if (title.style.color) title.style.color = 'var(--ch-text)';
             } else {
               // Expand
               header.setAttribute('aria-expanded', 'true');
               content.classList.add('max-h-[10000px]', 'mt-3');
               content.classList.remove('max-h-0');
               chevron.classList.add('rotate-90');
-              // Set to red border and text
+              // Set rose border/text
               header.classList.remove('border-slate-200');
               header.classList.add('border-rose-600');
+              header.style.borderColor = '#e11d48';
               title.classList.remove('text-slate-700');
               title.classList.add('text-rose-600');
+              if (title.style.color) title.style.color = '#e11d48';
             }
           }
         });
@@ -690,14 +698,16 @@ const breadcrumbs = [
     function showFilterActive() {
       filtersBtnText.textContent = 'Filters Active ›';
       filtersBtnEl.classList.remove('border-slate-300', 'text-slate-700');
-      filtersBtnEl.classList.add('border-rose-600', 'text-rose-600', 'bg-rose-50');
+      filtersBtnEl.classList.add('border-rose-600', 'text-rose-600');
+      filtersBtnEl.style.backgroundColor = 'color-mix(in srgb, #e11d48 10%, transparent)';
       clearFiltersInline.classList.remove('hidden');
     }
 
     function hideFilterActive() {
       filtersBtnText.textContent = 'Filters ›';
-      filtersBtnEl.classList.remove('border-rose-600', 'text-rose-600', 'bg-rose-50');
+      filtersBtnEl.classList.remove('border-rose-600', 'text-rose-600');
       filtersBtnEl.classList.add('border-slate-300', 'text-slate-700');
+      filtersBtnEl.style.backgroundColor = '';
       clearFiltersInline.classList.add('hidden');
     }
 
