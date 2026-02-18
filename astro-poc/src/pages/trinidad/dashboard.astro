@@ -51,7 +51,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
 <Layout title={title} description={description} includeLeaflet={true} includeTurnstile={true}>
 
-  <div class="container mx-auto px-4 py-2 max-w-7xl" data-pagefind-ignore>
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-2 max-w-6xl" data-pagefind-ignore>
     <!-- Page Header -->
     <div class="pt-4 mb-4">
       <Breadcrumbs items={[
@@ -60,21 +60,21 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       ]} />
       <div class="flex items-start justify-between gap-10 pt-4">
         <div>
-          <h1 class="text-2xl font-bold text-slate-700">Trinidad & Tobago</h1>
-          <p class="text-xs text-slate-500">Crime Statistics Dashboard <span id="dashboardYear" class="font-medium text-slate-600">for {currentYear}</span></p>
-          <p id="dataFreshness" class="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
+          <h1 class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">Trinidad & Tobago</h1>
+          <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)]">Crime Statistics Dashboard <span id="dashboardYear" class="font-medium text-slate-600 dark:text-[hsl(0_0%_70%)]">for {currentYear}</span></p>
+          <p id="dataFreshness" class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-0.5 flex items-center gap-1">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             Data as of {freshnessText}
           </p>
         </div>
         <div class="flex flex-col gap-2">
           <a href={routes.trinidad.headlines}
-            class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap">
+            class="px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-lg bg-[hsl(0_0%_45%)] dark:bg-[hsl(0_0%_30%)] text-white hover:bg-[hsl(0_0%_35%)] dark:hover:bg-[hsl(0_0%_25%)] active:bg-[hsl(0_0%_30%)] transition font-bold text-caption whitespace-nowrap">
             Headlines
           </a>
 
           <button id="filtersBtn"
-            class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap">
+            class="px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-lg bg-[hsl(0_0%_45%)] dark:bg-[hsl(0_0%_30%)] text-white hover:bg-[hsl(0_0%_35%)] dark:hover:bg-[hsl(0_0%_25%)] active:bg-[hsl(0_0%_30%)] transition font-bold text-caption whitespace-nowrap">
             Filters ›
           </button>
         </div>
@@ -82,7 +82,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     </div>
 
     <!-- Separator -->
-    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-4"></div>
+    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_20%)] to-transparent mb-4"></div>
 
     <!-- Site Notification Banner -->
     <SiteNotificationBanner notification={dataUpdateNotice} />
@@ -91,17 +91,17 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     <div class="flex items-center gap-1 mb-2">
       <h2 class="sr-only">Crime Statistics</h2>
       <InfoPopup id="crime-types-info">
-        <p class="font-semibold mb-2 text-rose-700">Crime Type Definitions</p>
+        <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Crime Type Definitions</p>
         <ul class="space-y-1.5">
-          <li><span class="font-medium text-slate-700">Murder</span> — Fatal violent crime</li>
-          <li><span class="font-medium text-slate-700">Robbery</span> — Theft with force or threat of force</li>
-          <li><span class="font-medium text-slate-700">Shooting</span> — Firearm discharge incident</li>
-          <li><span class="font-medium text-slate-700">Home Invasion</span> — Forced entry into an occupied residence</li>
-          <li><span class="font-medium text-slate-700">Seizures</span> — Confiscation of drugs, firearms, or contraband</li>
-          <li><span class="font-medium text-slate-700">Assault</span> — Physical attack causing bodily harm</li>
-          <li><span class="font-medium text-slate-700">Burglary</span> — Unlawful entry with intent to steal (unoccupied)</li>
-          <li><span class="font-medium text-slate-700">Theft</span> — Property taken without force</li>
-          <li><span class="font-medium text-slate-700">Kidnapping</span> — Unlawful abduction or restraint</li>
+          <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Murder</span> — Fatal violent crime</li>
+          <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Robbery</span> — Theft with force or threat of force</li>
+          <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Shooting</span> — Firearm discharge incident</li>
+          <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Home Invasion</span> — Forced entry into an occupied residence</li>
+          <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Seizures</span> — Confiscation of drugs, firearms, or contraband</li>
+          <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Assault</span> — Physical attack causing bodily harm</li>
+          <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Burglary</span> — Unlawful entry with intent to steal (unoccupied)</li>
+          <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Theft</span> — Property taken without force</li>
+          <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Kidnapping</span> — Unlawful abduction or restraint</li>
         </ul>
       </InfoPopup>
     </div>
@@ -138,7 +138,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     </div>
 
     <!-- Separator -->
-        <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent mb-4"></div>
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_20%)] to-transparent mb-4"></div>
 
     <!-- Quick Insights -->
     <div class="mb-6">
@@ -157,9 +157,9 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       <div class="flex items-center gap-2">
         <h2 class="text-h2 font-bold text-slate-500 pt-4 px-4 mb-4">Crime Incidents Map</h2>
         <InfoPopup id="map-info">
-          <p class="font-semibold mb-2 text-rose-700">Understanding the Map</p>
+          <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Understanding the Map</p>
           <p class="mb-3">This map shows estimated/reported locations of crimes and is updated daily.</p>
-          <p class="font-semibold mb-2 text-rose-700">How to Use:</p>
+          <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">How to Use:</p>
           <ul class="list-disc list-inside space-y-1">
             <li>Click clusters to zoom in</li>
             <li>Click markers for incident details</li>
@@ -248,16 +248,16 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
           </svg>
         </a>
         <InfoPopup id="top-areas-risk-info">
-          <p class="font-semibold mb-2 text-rose-700">Understanding Risk Assessment</p>
+          <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Understanding Risk Assessment</p>
           <p class="mb-3">Each area's risk level is calculated based on crime severity and victim impact.</p>
-          <p class="font-semibold mb-2 text-rose-700">How It Works:</p>
+          <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">How It Works:</p>
           <ul class="list-disc list-inside space-y-1 mb-3">
             <li>Each crime type has a severity weight (Murder=10, Theft=2, etc.)</li>
             <li>Victim counts multiply risk for serious crimes</li>
             <li>Area risk = sum of all crime risk scores</li>
             <li>Bar shows percentage relative to highest-risk area</li>
           </ul>
-          <p class="font-semibold mb-2 text-rose-700">Color Guide:</p>
+          <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Color Guide:</p>
           <ul class="list-disc list-inside space-y-1">
             <li><span class="text-green-600 font-medium">Green</span>: Low risk (0-33%)</li>
             <li><span class="text-yellow-600 font-medium">Yellow</span>: Medium risk (34-66%)</li>

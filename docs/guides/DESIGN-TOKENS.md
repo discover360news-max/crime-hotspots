@@ -145,6 +145,16 @@ Located in `Layout.astro` just before `</body>` as `<script is:inline>`. Exposes
 ```
 **Use for:** "Load More", "Submit Report", "Get Started" (page-level CTAs that need extra weight)
 
+### Muted Grey Button (Secondary Actions)
+```html
+<button class="px-4 py-1.5 min-h-button rounded-lg bg-[hsl(0_0%_45%)] dark:bg-[hsl(0_0%_30%)] text-white hover:bg-[hsl(0_0%_35%)] dark:hover:bg-[hsl(0_0%_25%)] active:bg-[hsl(0_0%_30%)] transition font-bold text-caption">
+  Secondary Action
+</button>
+```
+**Use for:** Subscribe, Filters, Headlines nav buttons, InfoPopup CTAs — any secondary action that sits alongside a primary CTA
+**Color:** Same neutral as `--ch-text-muted` family — no tint, professional, recedes behind rose primary
+**Rule:** Never use rose outline for secondary actions — use this pattern instead
+
 ### Subtle/Text Button (Low Priority)
 ```html
 <button class="text-rose-600 hover:text-rose-700 underline text-caption font-bold">
@@ -587,10 +597,10 @@ The `InfoPopup` component (`src/components/InfoPopup.astro`) provides contextual
 
 **Main Title:**
 ```html
-<p class="font-semibold mb-2 text-rose-700">Section Title</p>
+<p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Section Title</p>
 ```
-- **Always `text-rose-700`** — rose accent provides visual hierarchy and brand consistency
-- Never `text-slate-700` for the main title (that's for body headings, not popup titles)
+- **Always `text-slate-700`** — neutral, no rose accent on titles
+- **Always `font-bold`** — never `font-semibold` (design system rule: two weights only)
 
 **Body Text:**
 ```html
@@ -599,9 +609,9 @@ The `InfoPopup` component (`src/components/InfoPopup.astro`) provides contextual
 
 **Subheadings (within popup):**
 ```html
-<p class="font-semibold mb-2 text-rose-700">Subsection Title</p>
+<p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Subsection Title</p>
 ```
-- Use `text-rose-700` for subheadings within the same popup to maintain hierarchy
+- Use `text-slate-700` for all subheadings — consistent neutral hierarchy, no rose
 
 **Lists:**
 ```html
@@ -643,11 +653,14 @@ The `InfoPopup` component (`src/components/InfoPopup.astro`) provides contextual
 
 ### Common Mistakes
 ```html
-<!-- Wrong: Slate title (inconsistent with brand) -->
+<!-- Wrong: Rose accent on titles -->
+<p class="font-semibold mb-2 text-rose-700">Title</p>
+
+<!-- Wrong: font-semibold (not in design system) -->
 <p class="font-semibold mb-2 text-slate-700">Title</p>
 
-<!-- Correct: Rose accent title -->
-<p class="font-semibold mb-2 text-rose-700">Title</p>
+<!-- Correct: Neutral bold title, dark mode aware -->
+<p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Title</p>
 
 <!-- Wrong: Missing text class on body paragraphs -->
 <p class="mb-3">Some description</p>

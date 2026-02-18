@@ -64,13 +64,10 @@ const countries = [
     <section class="flex flex-col items-center justify-center text-center mb-12">
       <div class="text-center max-w-2xl mx-auto mb-8">
         <h1 class="text-display font-bold text-slate-900 dark:text-[hsl(0_0%_95%)] mb-3">
-          See the Pattern | Know the Risk
+          Know Your Neighborhood. Stay Safe.
         </h1>
-        <p class="text-body text-slate-600 dark:text-[hsl(0_0%_70%)] mb-2">
-          Mapped crime data and headlines
-        </p>
-        <p class="text-body text-slate-500 dark:text-[hsl(0_0%_70%)]">
-          Select a region for immediate intelligence, trend analysis, and updates.
+        <p class="text-body font-normal text-slate-500 dark:text-[hsl(0_0%_60%)]">
+          See live crime maps and local news at a glance. Select your area to track recent incidents and understand the safety trends where you live.
         </p>
       </div>
 
@@ -191,62 +188,49 @@ const countries = [
       <div class="mt-16 flex items-center gap-2">
         
         <InfoPopup id="homepage-info">
-          <p class="font-semibold mb-2 text-rose-700">Verified Crime Intelligence</p>
-          <p class="mb-3">Our platform aggregates data from Trinidad & Tobago's trusted news outlets, with plans to
-              expand across the Caribbean.</p>
-          
+          <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Verified Crime Intelligence</p>
+          <p class="mb-5 text-slate-500 dark:text-[hsl(0_0%_60%)]">Our platform aggregates data from Trinidad & Tobago's trusted news outlets, with plans to expand across the Caribbean.</p>
+
           <!-- Feature 1 -->
-          <div class="p-4">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-3">
-              <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
+          <div class="flex items-start gap-3 mb-4">
+            <svg class="w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_50%)] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+            <div>
+              <p class="text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_80%)] mb-0.5">Interactive Maps</p>
+              <p class="text-slate-500 dark:text-[hsl(0_0%_60%)]">Visualize crime hotspots with geographic precision and regional breakdowns.</p>
             </div>
-            <h3 class="text-nav font-semibold text-rose-600 mb-2">Interactive Maps</h3>
-            <p class="mb-3">
-              Visualize crime hotspots with geographic precision and regional breakdowns
-            </p>  
           </div>
 
           <!-- Feature 2 -->
-          <div class="p-4">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-3">
-              <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
+          <div class="flex items-start gap-3 mb-4">
+            <svg class="w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_50%)] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <div>
+              <p class="text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_80%)] mb-0.5">Live Statistics</p>
+              <p class="text-slate-500 dark:text-[hsl(0_0%_60%)]">Track crime trends over time with detailed analytics and reporting.</p>
             </div>
-            <h3 class="text-nav font-semibold text-rose-600 mb-2">Live Statistics</h3>
-            <p class="text-small text-slate-500">
-              Track crime trends over time with detailed analytics and reporting
-            </p>
           </div>
 
           <!-- Feature 3 -->
-          <div class="p-4">
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-3">
-              <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
+          <div class="flex items-start gap-3 mb-6">
+            <svg class="w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_50%)] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <div>
+              <p class="text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_80%)] mb-0.5">Trusted Sources</p>
+              <p class="text-slate-500 dark:text-[hsl(0_0%_60%)]">Data sourced from verified Caribbean news outlets and official reports.</p>
             </div>
-            <h3 class="text-nav font-semibold text-rose-600 mb-2">Trusted Sources</h3>
-            <p class="text-small text-slate-500">
-              Data sourced from verified Caribbean news outlets and official reports
-            </p>
           </div>
 
-          <div class="mt-8">
           <a
             href={routes.about}
             aria-label="Learn more about Crime Hotspots data sources and methodology"
-            class="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border border-rose-600 text-rose-600 hover:bg-rose-600 hover:text-white active:bg-rose-700 transition text-xs font-medium"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[hsl(0_0%_45%)] dark:bg-[hsl(0_0%_30%)] text-white hover:bg-[hsl(0_0%_35%)] dark:hover:bg-[hsl(0_0%_25%)] active:bg-[hsl(0_0%_30%)] transition text-caption font-bold"
           >
             Learn More About Our Data
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
           </a>
-        </div>
-          
         </InfoPopup>
       </div>
     </section>

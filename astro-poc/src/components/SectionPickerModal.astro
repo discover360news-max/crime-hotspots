@@ -24,10 +24,10 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
   <!-- Modal Content -->
   <div
     id="sectionPickerModalContent"
-    class="bg-white/90 dark:bg-[hsl(0_0%_8%)/95] backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full opacity-0 scale-95 transition-all duration-300"
+    class="bg-white/90 dark:bg-[hsl(0_0%_8%)]/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full opacity-0 scale-95 transition-all duration-300"
   >
     <!-- Header -->
-    <div class="sticky top-0 bg-white/80 dark:bg-[hsl(0_0%_8%)/90] backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
+    <div class="sticky top-0 bg-white/80 dark:bg-[hsl(0_0%_8%)]/90 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
       <h2 id="sectionPickerTitle" class="text-h2 font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Select Section</h2>
       <button
         id="closeSectionPickerModal"
@@ -127,7 +127,7 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
     <!-- Footer Help Text -->
     <div class="px-6 pb-6 pt-4">
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] text-center">
-        Don't see your island? <a href={routes.contact} class="text-rose-600 hover:text-rose-700 underline">Contact us</a> to request coverage.
+        Don't see your island? <a href={routes.contact} class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 underline">Contact us</a> to request coverage.
       </p>
     </div>
   </div>
