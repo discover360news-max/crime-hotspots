@@ -8,6 +8,17 @@
 
 ## February 2026
 
+### Headlines Dark Mode & CSS Minimalism Polish (Feb 18)
+
+- **CrimeCard.astro:** Muted badges (multi-color → neutral `bg-slate-200`/`text-slate-600`), unified grey tones, `font-medium` weight, View Details muted
+- **CrimeDetailModal.astro:** Full dark mode — shell, header, headline, details grid, action buttons, share buttons, JS-generated metadata/summary/details
+- **Headlines accordion:** Dark mode for server-rendered + JS-generated accordions, count pills match dashboard Top Areas style
+- **Filter tray:** Dark mode bg fix (`/90` opacity syntax), custom select chevron SVG (light/dark), `overflow-y-auto`, `color-scheme: dark` for native date icons
+- **Hero.astro:** Added `sm:px-6 lg:px-8` padding alignment with header
+- **Layout.astro:** Added `--ch-pill-bg`/`--ch-pill-text` CSS vars, `color-scheme: dark` for native form controls
+- **"Showing X of Y" text:** Muted to match "Data as of" and "View Archive" tone
+- **DESIGN-TOKENS.md:** Updated with pill CSS vars
+
 ### Design System Audit — Full Token Pass (Feb 17)
 - **Type scale:** 8 tokens → 4 strict levels: `text-display` (32px), `text-heading` (22px), `text-body` (18px), `text-caption` (12px)
 - **Font weights:** Only `font-normal` and `font-bold` — `font-semibold` eliminated from headings

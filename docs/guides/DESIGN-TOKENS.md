@@ -130,6 +130,8 @@ Defined in `Layout.astro` `<style is:global>`. Use these in JS template literals
   --ch-text: hsl(0 0% 20%);    /* primary text */
   --ch-text-muted: hsl(0 0% 45%); /* muted text */
   --ch-border: hsl(0 0% 88%);  /* border color */
+  --ch-pill-bg: #e2e8f0;          /* slate-200 pill/badge bg */
+  --ch-pill-text: #475569;        /* slate-600 pill/badge text */
 }
 .dark {
   --ch-bg: hsl(0 0% 3%);
@@ -137,6 +139,8 @@ Defined in `Layout.astro` `<style is:global>`. Use these in JS template literals
   --ch-text: hsl(0 0% 92%);
   --ch-text-muted: hsl(0 0% 70%);
   --ch-border: hsl(0 0% 18%);
+  --ch-pill-bg: hsl(0 0% 20%);           /* dark pill/badge bg */
+  --ch-pill-text: hsl(0 0% 55%);         /* dark pill/badge text */
 }
 ```
 
