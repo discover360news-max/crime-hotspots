@@ -1,7 +1,7 @@
 # Crime Hotspots Design Tokens
 
-**Version:** 1.5
-**Last Updated:** February 17, 2026
+**Version:** 1.6
+**Last Updated:** February 18, 2026
 **Status:** Living Document
 
 This document defines the design system for Crime Hotspots. All pages should follow these patterns for visual consistency.
@@ -51,19 +51,73 @@ White:     #ffffff (containers)
 
 ### HSL Neutral Palette (no blue tinting)
 
-| Token | Dark value | Light value |
-|-------|-----------|------------|
-| Page background | `hsl(0 0% 3%)` | `hsl(0 0% 94%)` |
-| Surface / header | `hsl(0 0% 5%)`–`hsl(0 0% 8%)` | `hsl(0 0% 100%)` |
-| Card background | `hsl(0 0% 8%)`–`hsl(0 0% 10%)` | `hsl(0 0% 100%)` |
-| Primary text | `hsl(0 0% 92%)` | `hsl(0 0% 20%)` |
-| Muted text | `hsl(0 0% 70%)` | `hsl(0 0% 45%)` |
-| Faint text | `hsl(0 0% 55%)` | `hsl(0 0% 59%)` |
-| Strong text | `hsl(0 0% 95%)` | `hsl(0 0% 12%)` |
-| Border | `hsl(0 0% 18%)` | `hsl(0 0% 88%)` |
-| Subtle border | `hsl(0 0% 22%)` | `hsl(0 0% 80%)` |
+| Token | Light Tailwind | Dark Tailwind |
+|-------|---------------|--------------|
+| Page background | `bg-slate-100` | `dark:bg-[hsl(0_0%_3%)]` |
+| Surface / header | `bg-white/85` | `dark:bg-[hsl(0_0%_5%)]` or `dark:bg-[hsl(0_0%_8%)]` |
+| Card background | `bg-white/85` | `dark:bg-[hsl(0_0%_8%)]/85` |
+| Shimmer background | `#e2e8f0` (CSS) | `hsl(0 0% 12%)` (CSS) |
+| Border | `border-slate-100` or `border-slate-200` | `dark:border-[hsl(0_0%_15%)]` or `dark:border-[hsl(0_0%_18%)]` |
+| Subtle border | `border-slate-300` | `dark:border-[hsl(0_0%_22%)]` |
+| Divider gradient | `via-slate-300` | `dark:via-[hsl(0_0%_20%)]` or `dark:via-[hsl(0_0%_22%)]` |
 
-Rose-600/700/800 accents: **unchanged** — visible in both modes.
+### Text Hierarchy
+
+| Role | Light Tailwind | Dark Tailwind |
+|------|---------------|--------------|
+| Heading / title | `text-slate-700` | `dark:text-[hsl(0_0%_90%)]` |
+| Strong heading | `text-slate-700 font-bold` | `dark:text-[hsl(0_0%_85%)]` |
+| Body text | `text-slate-700` | `dark:text-[hsl(0_0%_92%)]` (inherits from body) |
+| Label / secondary | `text-slate-500` | `dark:text-[hsl(0_0%_55%)]` |
+| Faint / date | `text-slate-400` | `dark:text-[hsl(0_0%_50%)]` |
+
+### Accent Colors
+
+**Rose accents stay the SAME in both modes** — do NOT use muted variants like `dark:text-rose-400`.
+
+| Usage | Class |
+|-------|-------|
+| Primary accent (links, CTAs, murder numbers) | `text-rose-600` (both modes) |
+| Active border | `border-rose-600` or `#e11d48` (both modes) |
+| Badge on dark bg | `bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400` (exception: badge needs contrast on dark surface) |
+
+### Standard Card Pattern
+
+**Reference component:** `CrimeCard.astro` — all new cards should match this pattern.
+
+```html
+<!-- Card container -->
+bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md rounded-xl
+border border-slate-100 dark:border-[hsl(0_0%_15%)]
+shadow-md hover:shadow-lg transition
+
+<!-- Card heading -->
+text-body font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]
+
+<!-- Card secondary text -->
+text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]
+
+<!-- Card divider -->
+border-t border-slate-200 dark:border-[hsl(0_0%_18%)]
+```
+
+### Scoped Dark Styles (CSS)
+
+For `<style>` blocks inside Astro components, use `:global(.dark)` prefix:
+
+```css
+/* Light mode (default) */
+.my-element { background: rgba(255, 255, 255, 0.7); }
+
+/* Dark mode override */
+:global(.dark) .my-element { background: rgba(255, 255, 255, 0.08); }
+```
+
+For raw CSS files (e.g., `dashboard.css`), use `:root.dark` instead:
+
+```css
+:root.dark .my-element { background: hsl(0 0% 12%); }
+```
 
 ### CSS Custom Properties (for JS-generated HTML)
 
@@ -193,30 +247,43 @@ Located in `Layout.astro` just before `</body>` as `<script is:inline>`. Exposes
 
 **2 font weights only:** `font-normal` (400) and `font-bold` (700). Never use `font-semibold` on headings.
 
-**Migration from old tokens:**
-- `text-h1`, `text-display` (old 36px) → `text-display`
-- `text-h2`, `text-h3` → `text-heading`
+**Migration from old tokens (COMPLETED Feb 18, 2026):**
+- `text-h1` → `text-display` (all 19 files migrated)
+- `text-h2` → `text-heading` (all files migrated)
+- `text-h3` → `text-body` (all files migrated)
 - `text-small`, `text-tiny`, `text-nav` → `text-caption`
-- `text-body` stays but is now **18px** (was 16px)
+
+**CRITICAL: `text-h1`, `text-h2`, `text-h3` are NOT defined in tailwind.config.mjs and will be silently ignored, causing headings to render at browser defaults. Always use the tokens above.**
 
 ### Typography Usage Rules
 
-#### Headings
+#### Heading Hierarchy by Page Type
+
+**Content pages** (about, privacy, FAQ, methodology — long-form reading):
 ```html
-<!-- Page Title (H1) -->
-<h1 class="text-display font-bold text-slate-700 leading-tight">Trinidad & Tobago</h1>
+<h1 class="text-display font-bold text-slate-700 leading-tight">Page Title</h1>
+<h2 class="text-heading font-bold text-slate-700 leading-snug">Section Title</h2>
+<h3 class="text-body font-bold text-slate-600">Subsection</h3>
+```
 
-<!-- Section Title (H2) -->
-<h2 class="text-heading font-bold text-slate-700 leading-snug">Crime Statistics Dashboard</h2>
+**Dashboard/app pages** (dashboard, statistics — data-heavy, compact):
+```html
+<h1 class="text-2xl font-bold text-slate-700">Trinidad & Tobago</h1>  <!-- page title -->
+<h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)]">Quick Insights</h2>  <!-- section labels -->
+```
+Section labels on dashboards use `text-body` (18px) in muted `text-slate-500` to stay subordinate to the page title (`text-2xl` = 24px). Using `text-heading` (22px) creates no visual hierarchy.
 
-<!-- Subsection (H3) -->
-<h3 class="text-heading font-bold text-slate-600 leading-snug">Real-Time Data</h3>
+**Modals and cards** (inside components):
+```html
+<h2 class="text-heading font-bold text-slate-700 leading-snug">Card Title</h2>
+<h3 class="text-body font-bold text-slate-600">Card Subtitle</h3>
 ```
 
 **Rules:**
 - All headings must have an explicit text color (`text-slate-700` or `text-slate-600`)
 - All headings must have an explicit `leading-*` class (`leading-tight` for H1, `leading-snug` for H2/H3)
 - Never use `font-semibold` — use `font-bold`
+- Never use `text-h1`, `text-h2`, `text-h3` — these are undefined and silently ignored
 
 #### Body Text
 ```html
@@ -234,6 +301,19 @@ Located in `Layout.astro` just before `</body>` as `<script is:inline>`. Exposes
 ```html
 <label for="startDate" class="text-caption text-slate-600 font-bold">From:</label>
 ```
+
+### SVG Icon Stroke Width
+
+All outline-style SVG icons must use `stroke-width="1"` for a light, refined look that matches the design system.
+
+```html
+<!-- Correct: thin stroke -->
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="..." />
+</svg>
+```
+
+**Exception:** Small chevron arrows (e.g., `w-3 h-3` navigation indicators) may use `stroke-width="2"` for visibility at small sizes.
 
 ---
 
@@ -774,6 +854,7 @@ The `InfoPopup` component (`src/components/InfoPopup.astro`) provides contextual
 
 **Version History:**
 
+- **v1.6 (Feb 18, 2026):** Typography token migration complete (text-h1/h2/h3 → text-display/heading/body across 19 files), added heading hierarchy rules by page type, SVG icon stroke-width convention (stroke-width="1"), DashboardInfoCards dark mode + border
 - **v1.5 (Feb 17, 2026):** Added Dark Mode System section (HSL palette, CSS vars, toggle script, Tailwind scanning rules)
 - **v1.3 (Feb 12, 2026):** Added Floor Shadow (elevation effect) pattern for hovering elements
 - **v1.2 (Feb 10, 2026):** Added InfoPopup pattern (container + content styling rules, three content variants)

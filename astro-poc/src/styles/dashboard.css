@@ -76,6 +76,35 @@
   border-radius: 6px;
 }
 
+/* Dark mode Leaflet controls (need !important to override Leaflet's .leaflet-bar styles) */
+:root.dark .leaflet-control-expand {
+  background: hsl(0 0% 10%) !important;
+  border-color: hsl(0 0% 18%) !important;
+}
+
+:root.dark .leaflet-control-expand a {
+  color: hsl(0 0% 90%) !important;
+}
+
+:root.dark .leaflet-control-expand a:hover {
+  background: hsl(0 0% 15%) !important;
+}
+
+:root.dark .leaflet-bar {
+  border-color: hsl(0 0% 18%) !important;
+}
+
+:root.dark .leaflet-bar a {
+  background-color: hsl(0 0% 10%) !important;
+  color: hsl(0 0% 90%) !important;
+  border-bottom-color: hsl(0 0% 18%) !important;
+}
+
+:root.dark .leaflet-bar a:hover {
+  background-color: hsl(0 0% 15%) !important;
+}
+
+
 .leaflet-pane,
 .leaflet-map-pane {
   z-index: 1 !important;
@@ -114,6 +143,15 @@
 .stats-scroll-container::-webkit-scrollbar-thumb {
   background: #e11d48;
   border-radius: 3px;
+}
+
+/* Dark mode scrollbar */
+:root.dark .stats-scroll-container {
+  scrollbar-color: #e11d48 hsl(0 0% 12%);
+}
+
+:root.dark .stats-scroll-container::-webkit-scrollbar-track {
+  background: hsl(0 0% 12%);
 }
 
 .stat-card {

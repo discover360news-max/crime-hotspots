@@ -18,14 +18,14 @@ const { value, label, id, crimeType } = Astro.props;
 ---
 
 <div
-  class="stat-card bg-white/70 backdrop-blur-md rounded-lg p-4 shadow-sm cursor-pointer transition-all duration-200 hover:shadow-lg border-2 border-transparent"
+  class="stat-card bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md rounded-lg p-4 shadow-sm cursor-pointer transition-all duration-200 hover:shadow-lg border-2 border-transparent dark:border-[hsl(0_0%_15%)]"
   id={id}
   data-crime-type={crimeType}
 >
-  <div class="text-3xl font-bold text-rose-600">{value}</div>
-  <div class="text-xs text-slate-500">{label}</div>
+  <div class={`text-3xl font-bold ${crimeType === 'Murder' ? 'text-rose-600' : 'text-slate-700 dark:text-[hsl(0_0%_90%)]'}`}>{value}</div>
+  <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{label}</div>
   <!-- Trend indicator (populated by JavaScript) -->
-  <div class="trend-indicator text-xs text-slate-500 mt-4 hidden"></div>
+  <div class="trend-indicator text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-4 hidden"></div>
 </div>
 
 <style>
@@ -36,5 +36,9 @@ const { value, label, id, crimeType } = Astro.props;
   .stat-card.active {
     border-color: #e11d48;
     background: rgba(255, 255, 255, 0.7);
+  }
+
+  :global(.dark) .stat-card.active {
+    background: rgba(255, 255, 255, 0.08);
   }
 </style>

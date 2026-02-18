@@ -392,7 +392,7 @@ export function updateLeafletMap(crimes: Crime[], crimeDetailPath: string) {
       <div class="p-2">
         <div class="text-xs text-slate-500 mb-2">${formatPopupDate(crime.dateObj)}</div>
         <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
-        <div class="text-h3 font-bold text-slate-600 mb-4">${crime.headline}</div>
+        <div class="text-body font-bold text-slate-600 mb-4">${crime.headline}</div>
         <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
         <div class="text-xs text-rose-600">${areaDisplay}</div>
         <button

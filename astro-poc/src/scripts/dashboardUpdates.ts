@@ -477,20 +477,21 @@ export function updateTopRegions(crimes: Crime[]) {
     const riskTextColor = getRiskTextColor(riskPercentage);
     const areaSlug = toAreaSlug(area);
     return `
-    <a href="${buildRoute.area(areaSlug)}" class="flex flex-col gap-1 pb-3 border-b border-slate-200 hover:bg-slate-50 active:bg-slate-50 rounded-lg px-2 -mx-2 py-2 transition">
+    <a href="${buildRoute.area(areaSlug)}" class="flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
-        <span class="text-xs text-slate-500 truncate flex-1 underline decoration-slate-300 underline-offset-2">${renderAreaName(area)}</span>
+        <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] truncate flex-1 underline decoration-slate-300 underline-offset-2">${renderAreaName(area)}</span>
         <div class="flex items-center gap-1.5 flex-shrink-0">
-          <span class="px-2 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-rose-600 text-white text-xs font-medium">
+          <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_55%)] text-xs font-medium">
             ${count}
           </span>
-          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">${count === 1 ? 'crime' : 'crimes'}</span>
+          <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[hsl(0_0%_50%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
       </div>
       <!-- Gradient reveal bar -->
-      <div class="relative w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+      <div class="relative w-full h-2 bg-slate-200 dark:bg-[hsl(0_0%_18%)] rounded-full overflow-hidden">
         <!-- Gradient bar wrapper (clips at percentage) -->
         <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style="width: ${riskPercentage}%">
           <!-- Gradient spans full container width, clipped by wrapper -->

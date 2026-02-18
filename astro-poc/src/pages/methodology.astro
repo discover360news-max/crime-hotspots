@@ -32,22 +32,22 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
 
       <!-- Our Data Sources -->
       <section class="mb-5">
-        <h2 class="text-h2 font-semibold text-slate-700 mb-4">Our Data Sources</h2>
+        <h2 class="text-heading font-semibold text-slate-700 mb-4">Our Data Sources</h2>
         <p class="text-xs text-slate-500 mb-4">
           We rely exclusively on publicly available, high-authority sources to build our comprehensive crime datasets for all nations. Using diverse sources helps mitigate reliance on a single news outlet or platform.
         </p>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Trinidad & Tobago Sources</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Trinidad & Tobago Sources</h3>
         <p class="text-xs text-slate-500 mb-4">
           For Trinidad & Tobago, our primary data streams are RSS feeds from established media houses: the Trinidad Express, the Guardian TT, CNC 3 and Newsday. This provides a foundational layer of verified reports. Additionally, we integrate data from high-traffic, community-focused social media pages, specifically the Ian Alleyne Network and DJ Sherrif, to capture localized incidents and community alerts that may precede formal media reports.
         </p>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Guyana Sources</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Guyana Sources</h3>
         <p class="text-xs text-slate-500 mb-4">
           In Guyana, our data is sourced exclusively from the RSS feeds of leading, established news organizations: Stabroek News, Kaieteur News, and the Guyana Chronicle.
         </p>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Source Verification and Reliability</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Source Verification and Reliability</h3>
         <p class="text-xs text-slate-500 mb-4">
           We choose these sources because they have established reputations for journalistic integrity and high update frequency. Every entry on our platform is explicitly linked back to its original source article or post, allowing users to verify the context and details immediately. We treat official media reports as primary verification and community sources (like Facebook) as timely alerts, prioritizing the media sources for final classification and location confirmation.
         </p>
@@ -55,17 +55,17 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
 
       <!-- How We Collect Data -->
       <section class="mb-10">
-        <h2 class="text-h2 font-semibold text-slate-700 mb-4">How We Collect Data</h2>
+        <h2 class="text-heading font-semibold text-slate-700 mb-4">How We Collect Data</h2>
         <p class="text-xs text-slate-500 mb-4">
           Our collection process is designed for speed, consistency, and structured data output, relying on automation and advanced AI technology.
         </p>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Automated RSS Collection</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Automated RSS Collection</h3>
         <p class="text-xs text-slate-500 mb-4">
           The foundation of our system is an automated script built on Google Apps Script. This script executes at regular intervals, querying the RSS feeds of all our specified media partners. When a new article is detected, the script pulls the URL and headline and initiates the next stage of processing.
         </p>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Google Gemini AI Extraction Methodology</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Google Gemini AI Extraction Methodology</h3>
         <p class="text-xs text-slate-500 mb-4">
           This is the core of our Expertise. The text from each collected news article or social media post is fed into the Google Gemini AI model. The AI is trained to perform a critical extraction task: reading the unstructured narrative of a crime report and converting it into a structured data format.
         </p>
@@ -79,7 +79,7 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
           <li><strong>Source URL:</strong> (Direct link to the original article for verification)</li>
         </ul>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Human Oversight and Validation</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Human Oversight and Validation</h3>
         <p class="text-xs text-slate-500 mb-4">
           While automation is efficient, human expertise is essential. All data entries classified as 'High Severity' or those flagged with ambiguous location data by the AI undergo a mandatory human validation step. Our team reviews the original source article to confirm the crime type, verify the location against a map, and ensure the classification is accurate before the data is published to the live dashboard.
         </p>
@@ -87,23 +87,23 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
 
       <!-- Data Accuracy & Limitations -->
       <section class="mb-10">
-        <h2 class="text-h2 font-semibold text-slate-700 mb-4">Data Accuracy & Limitations</h2>
+        <h2 class="text-heading font-semibold text-slate-700 mb-4">Data Accuracy & Limitations</h2>
         <p class="text-xs text-slate-500 mb-4">
           We strive for maximum accuracy, but the nature of sourcing media reports introduces inherent limitations that users must be aware of.
         </p>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Ensuring Accuracy</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Ensuring Accuracy</h3>
         <p class="text-xs text-slate-500 mb-4">
           Our primary commitment to accuracy is achieved through our Source-to-Record link and the Human Validation step. We categorize reported incidents using standardized police terminology whenever possible. Furthermore, all data is stored in Google Sheets, which is publicly exported as a CSV file, providing full transparency into the raw, underlying data we use.
         </p>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Limitations and Biases</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Limitations and Biases</h3>
         <ul class="list-disc list-inside text-xs text-slate-500 mb-4 ml-4">
           <li><strong>Reported Crimes Only:</strong> We only capture incidents that are reported by our media sources or community feeds. We cannot account for the "dark figure" of crime (unreported crimes).</li>
           <li><strong>Media Coverage Gaps:</strong> Crime distribution on our map is influenced by where media organizations choose to focus. This can lead to Geographic Biases, often showing higher density in urban and populated areas (Port of Spain, Georgetown) simply because they receive more media coverage than remote rural areas.</li>
         </ul>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Disclaimer on Official Statistics</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Disclaimer on Official Statistics</h3>
         <p class="text-xs text-slate-500 mb-4">
           Our platform provides valuable real-time trend data and geographic insight, but it is not a substitute for official Government or Police crime statistics. Our numbers may differ due to timing, reporting categories, and the inclusion of data from non-official (but community-verified) sources.
         </p>
@@ -111,24 +111,24 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
 
       <!-- Privacy & Ethics -->
       <section class="mb-10">
-        <h2 class="text-h2 font-semibold text-slate-700 mb-4">Privacy & Ethics: Data Fidelity and Public Record Accountability</h2>
+        <h2 class="text-heading font-semibold text-slate-700 mb-4">Privacy & Ethics: Data Fidelity and Public Record Accountability</h2>
         <p class="text-xs text-slate-500 mb-4">
           Our approach to PII (Personally Identifiable Information) is governed by a policy of Data Fidelity to our authoritative sources. Unlike many data platforms that anonymize records, Crime Hotspots Caribbean maintains the integrity of the public record established by the originating news media.
         </p>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Policy on Personally Identifiable Information (PII)</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Policy on Personally Identifiable Information (PII)</h3>
         <p class="text-xs text-slate-500 mb-4">
           We retain the PII—including names, specific addresses, and vehicle details—when that information is explicitly included in the public news article or social media post we source.
         </p>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Rationale: Verification and Data Fidelity</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Rationale: Verification and Data Fidelity</h3>
         <p class="text-xs text-slate-500 mb-2">We retain these specific details for two primary reasons:</p>
         <ul class="list-disc list-inside text-xs text-slate-500 mb-4 ml-4">
           <li><strong>Verification and Accountability:</strong> Retaining the original context allows users, researchers, and policymakers to fully verify the incident against the source material. This ensures maximum authoritativeness and allows for precise geographic analysis, which is critical for understanding specific crime hotspots.</li>
           <li><strong>Public Record Integrity:</strong> Our platform functions as an aggregate library of incidents already published by established journalistic organizations. We rely on the established editorial and ethical standards of our media sources (Trinidad Express, Stabroek News, etc.) for the initial decision to publish PII.</li>
         </ul>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Ethical Constraints and Disclaimer</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Ethical Constraints and Disclaimer</h3>
         <p class="text-xs text-slate-500 mb-2">By accessing our platform, users acknowledge that the data presented reflects the public record created by third-party journalistic outlets.</p>
         <ul class="list-disc list-inside text-xs text-slate-500 mb-4 ml-4">
           <li>Our platform uses this data strictly for the purpose of community safety, research, and trend analysis.</li>
@@ -139,12 +139,12 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
 
       <!-- Updates & Maintenance -->
       <section class="mb-10">
-        <h2 class="text-h2 font-semibold text-slate-700 mb-4">Updates & Maintenance</h2>
+        <h2 class="text-heading font-semibold text-slate-700 mb-4">Updates & Maintenance</h2>
         <p class="text-xs text-slate-700 mb-4">
           Maintaining data freshness is crucial for safety awareness. Our schedules are optimized to provide the most current view of the crime landscape.
         </p>
 
-        <h3 class="text-h3 font-semibold text-slate-700 mb-3">Update Schedules</h3>
+        <h3 class="text-body font-semibold text-slate-700 mb-3">Update Schedules</h3>
         <p class="text-xs text-slate-500 mb-2">Our platform maintains two distinct update schedules:</p>
         <ul class="list-disc list-inside text-xs text-slate-500 mb-4 ml-4">
           <li><strong>Trinidad & Tobago:</strong> The RSS feeds are checked for new reports every two hours. Facebook sources are monitored manually throughout the day.</li>
@@ -157,7 +157,7 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
 
       <!-- CTA Section -->
       <section class="bg-white border border-slate-200 rounded-lg p-6 mt-10">
-        <h2 class="text-h3 font-semibold text-slate-700 mb-2">Have questions about our methodology?</h2>
+        <h2 class="text-body font-semibold text-slate-700 mb-2">Have questions about our methodology?</h2>
         <p class="text-xs text-slate-700 mb-4">
           If you need more information or have specific questions about how we collect and verify data, check out our FAQ page.
         </p>
