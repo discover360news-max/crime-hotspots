@@ -8,6 +8,17 @@
 
 ## February 2026
 
+### User Journey Overhaul — "Lead with the Story" (Feb 19)
+
+- **HomepagePulse.astro** (created) — live Trinidad stats below country card: incidents this week (±%), top area, murders, latest headline, CTA to dashboard
+- **DashboardStory.astro** (created) — narrative summary at top of dashboard: week-over-week incidents, top area, murder trend
+- **AreaNarrative.astro** (created) — "This Week in [Area]" prose with contextual CTAs (compare, archive) and "New Since Last Visit" badge slot
+- **Homepage** (`index.astro`) — Trinidad card now links directly to dashboard (skip modal), restructured layout: Trinidad + pulse grouped, Coming Soon cards below
+- **Area detail** (`area/[slug].astro`) — added AreaNarrative, contextual compare prompt (suggests related area), "New since your last visit" badge (localStorage)
+- **Dashboard** (`dashboard.astro`) — added DashboardStory after notification banner
+- **DESIGN-TOKENS.md** — v1.7: Feature Index table, Live Pulse Indicator / Alert Badge / Contextual CTA Links patterns
+- **Gotcha:** "New Since" badge uses localStorage key `crimehotspots_area_visit_{slug}`, client-side only
+
 ### Headlines Dark Mode & CSS Minimalism Polish (Feb 18)
 
 - **CrimeCard.astro:** Muted badges (multi-color → neutral `bg-slate-200`/`text-slate-600`), unified grey tones, `font-medium` weight, View Details muted

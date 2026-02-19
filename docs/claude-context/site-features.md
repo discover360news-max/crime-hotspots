@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** February 9, 2026
+**Last Updated:** February 19, 2026
 
 ---
 
@@ -11,7 +11,7 @@
 ### Marketing & Static
 | Page | Route | Purpose |
 |------|-------|---------|
-| Homepage | `/` | Island map, section picker modal, blog banner |
+| Homepage | `/` | Country cards (direct link to dashboard), HomepagePulse live stats, InfoPopup |
 | About | `/about/` | Project background |
 | Contact | `/contact/` | Contact information |
 | Methodology | `/methodology/` | Data collection process |
@@ -24,11 +24,11 @@
 ### Trinidad Crime Data
 | Page | Route | Rendering | Purpose |
 |------|-------|-----------|---------|
-| Dashboard | `/trinidad/` | Pre-rendered | Stats, Leaflet map, filters, trend indicators, data freshness, crime type tooltips |
+| Dashboard | `/trinidad/` | Pre-rendered | DashboardStory narrative, stats, Leaflet map, filters, trend indicators, data freshness, crime type tooltips |
 | Headlines | `/trinidad/headlines/` | Pre-rendered | Latest crimes, date accordion, victim counts, empty state for filters |
 | Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | Individual crime page, safety context, related crimes, trending hotspots |
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
-| Area Detail | `/trinidad/area/[slug]` | Pre-rendered | Area-specific crimes, stats, share buttons (X/Facebook/WhatsApp) |
+| Area Detail | `/trinidad/area/[slug]` | Pre-rendered | AreaNarrative summary, "New Since" badge, compare prompt, stats, share buttons |
 | Statistics | `/trinidad/statistics/` | Pre-rendered | Three-tier crime rates (previous year / YTD / projected) |
 | Regions | `/trinidad/regions/` | Pre-rendered | Browse by region |
 | Region Detail | `/trinidad/region/[slug]` | Pre-rendered | Region-specific crimes |
@@ -47,7 +47,7 @@
 
 ---
 
-## Components (32 active)
+## Components (35 active)
 
 ### Navigation & Layout
 | Component | Purpose | Key Files |
@@ -68,6 +68,13 @@
 | TrendingHotspots.astro | "Hot Areas This Week" (server) + "Your Recent Views" (localStorage) |
 | SafetyContext.astro | Color-coded area safety tips (high/neutral/low risk) |
 | FlipCounter.astro | iOS-style split-flap counter (murder count page) |
+
+### Narrative & Engagement
+| Component | Purpose |
+|-----------|---------|
+| HomepagePulse.astro | Live Trinidad stats below country card (incidents, top area, murders, latest headline) |
+| DashboardStory.astro | Narrative summary at top of dashboard (week-over-week incidents, top area, murder trend) |
+| AreaNarrative.astro | "This Week in [Area]" prose + contextual CTAs (compare, archive) + "New Since" badge slot |
 
 ### Dashboard & Stats
 | Component | Purpose |

@@ -1,10 +1,37 @@
 # Crime Hotspots Design Tokens
 
-**Version:** 1.6
-**Last Updated:** February 18, 2026
+**Version:** 1.7
+**Last Updated:** February 19, 2026
 **Status:** Living Document
 
 This document defines the design system for Crime Hotspots. All pages should follow these patterns for visual consistency.
+
+---
+
+## Feature Index
+
+Jump to the design pattern for a specific feature. Each entry links to the tokens section it relies on and lists its source file.
+
+| Feature | File | Uses Tokens |
+|---------|------|-------------|
+| **HomepagePulse** | `src/components/HomepagePulse.astro` | [Live Pulse Indicator](#-live-pulse-indicator), [Standard Card](#standard-card-pattern), [Dark Mode](#-dark-mode-system) |
+| **AreaNarrative** | `src/components/AreaNarrative.astro` | [Live Pulse Indicator](#-live-pulse-indicator), [Standard Card](#standard-card-pattern), [Contextual CTA Links](#contextual-cta-links), [Dark Mode](#-dark-mode-system) |
+| **DashboardStory** | `src/components/DashboardStory.astro` | [Live Pulse Indicator](#-live-pulse-indicator), [Standard Card](#standard-card-pattern), [Dark Mode](#-dark-mode-system) |
+| **"New Since" Badge** | `src/pages/trinidad/area/[slug].astro` (inline script) | [Alert Badge](#alert-badge-pattern), [Dark Mode](#-dark-mode-system) |
+| **Compare Prompt** | `src/pages/trinidad/area/[slug].astro` | [Contextual CTA Links](#contextual-cta-links), [Standard Card](#standard-card-pattern), [Dark Mode](#-dark-mode-system) |
+| **SafetyContext** | `src/components/SafetyContext.astro` | [Safety Context Colors](#safety-context-colors-dark), [Dark Mode](#-dark-mode-system) |
+| **CrimeDetailModal** | `src/components/CrimeDetailModal.astro` | [Frosted Glass](#-frosted-glass-containers), [CSS Custom Properties](#css-custom-properties-for-js-generated-html), [Dark Mode](#-dark-mode-system) |
+| **FlipCounter** | `src/components/FlipCounter.astro` | [Floor Shadow](#floor-shadow-elevation-effect), [Dark Mode](#-dark-mode-system) |
+| **InfoPopup** | `src/components/InfoPopup.astro` | [InfoPopup Pattern](#-infopopup-pattern), [Frosted Glass](#-frosted-glass-containers), [Dark Mode](#-dark-mode-system) |
+| **Hero** | `src/components/Hero.astro` | [Hero Sections](#-hero-sections), [Button System](#-button-system) |
+| **TrendingHotspots** | `src/components/TrendingHotspots.astro` | [Standard Card](#standard-card-pattern), [Dark Mode](#-dark-mode-system) |
+| **StatCards** | `src/components/StatCards.astro` | [Standard Card](#standard-card-pattern), [Typography](#-typography-system), [Dark Mode](#-dark-mode-system) |
+| **BottomNav** | `src/components/BottomNav.astro` | [Dark Mode](#-dark-mode-system), Rose accent for active dot |
+| **Header** | `src/components/Header.astro` | [Button System](#-button-system), [Dark Mode](#-dark-mode-system) |
+| **Homepage** | `src/pages/index.astro` | [Standard Card](#standard-card-pattern), [Typography](#-typography-system), [Dark Mode](#-dark-mode-system) |
+| **Dashboard** | `src/pages/trinidad/dashboard.astro` | [Button System](#-button-system), [Loading Skeleton](#loading-skeleton), [Dark Mode](#-dark-mode-system) |
+| **Area Detail** | `src/pages/trinidad/area/[slug].astro` | [Standard Card](#standard-card-pattern), [Button System](#-button-system), [Dark Mode](#-dark-mode-system) |
+| **Headlines** | `src/pages/trinidad/headlines.astro` | [CSS Custom Properties](#css-custom-properties-for-js-generated-html), [Dark Mode](#-dark-mode-system) |
 
 ---
 
@@ -756,6 +783,97 @@ The `InfoPopup` component (`src/components/InfoPopup.astro`) provides contextual
 
 ---
 
+## 🔴 Live Pulse Indicator
+
+Animated dot showing live/active data. Used by HomepagePulse, AreaNarrative, and DashboardStory.
+
+```html
+<span class="relative flex h-2 w-2 shrink-0">
+  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+  <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+</span>
+```
+
+**Rules:**
+- Outer span: `relative flex h-2 w-2 shrink-0` — prevents layout shift
+- Ping layer: `animate-ping absolute` + `bg-rose-400 opacity-75` — subtle pulse
+- Solid dot: `relative` + `bg-rose-500` — always visible core
+- Always pair with `shrink-0` and `mt-1.5` when used alongside text (keeps dot aligned to first line)
+
+**Container pattern (narrative card):**
+```html
+<div class="rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-white/70 dark:bg-[hsl(0_0%_5%)] p-3">
+  <div class="flex items-start gap-2">
+    <!-- pulse dot here -->
+    <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_80%)] leading-relaxed">
+      Narrative text with <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">bold callouts</span>.
+    </p>
+  </div>
+</div>
+```
+
+**Currently used on:** HomepagePulse, DashboardStory, AreaNarrative
+
+---
+
+## 🔔 Alert Badge Pattern
+
+Notification-style badge for "new since last visit" or similar alerts. Client-side rendered.
+
+```html
+<div class="rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 p-3 flex items-center gap-2">
+  <svg class="w-4 h-4 text-rose-500 shrink-0"><!-- bell icon --></svg>
+  <p class="text-sm text-rose-700 dark:text-rose-300">
+    <span class="font-bold">3</span> new incidents since your last visit
+  </p>
+</div>
+```
+
+**Rules:**
+- Light: `bg-rose-50` background, `border-rose-200` border, `text-rose-700` text
+- Dark: `bg-rose-950/30`, `border-rose-800/50`, `text-rose-300`
+- Icon: `text-rose-500` (same in both modes)
+- Hidden by default (`hidden` class), shown via JS when count > 0
+- Uses localStorage timestamp pattern (see `trendingHelpers.ts` for reference)
+
+**Currently used on:** Area detail "New Since Last Visit" badge
+
+---
+
+## 🔗 Contextual CTA Links
+
+Inline text-based CTAs within narrative blocks (not full buttons). Used for cross-page navigation suggestions.
+
+```html
+<!-- Inline within narrative text -->
+<a href="/trinidad/compare/?a=slug" class="text-rose-600 hover:text-rose-700 font-medium underline">
+  How does this compare?
+</a>
+
+<!-- Standalone compare prompt card -->
+<div class="rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-slate-50 dark:bg-[hsl(0_0%_5%)] p-3">
+  <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_70%)]">
+    See how <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">Area Name</span> compares to
+    <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">Other Area</span>
+  </p>
+  <a href="/trinidad/compare/?a=slug&b=slug"
+     class="inline-flex items-center gap-1 mt-2 text-sm text-rose-600 hover:text-rose-700 font-medium">
+    Compare areas
+    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    </svg>
+  </a>
+</div>
+```
+
+**Rules:**
+- Inline links: `text-rose-600 hover:text-rose-700 font-medium underline`
+- Standalone card: `bg-slate-50` (not `bg-white`) to visually distinguish from content cards
+- Arrow chevron: `w-3 h-3`, `stroke-width="2"` (small icon exception)
+- Always pass area slugs as query params (`?a=slug&b=slug`) to pre-populate compare page
+
+**Currently used on:** AreaNarrative CTAs, Compare Prompt card on area detail pages
+
 ---
 
 ## 📖 Quick Reference Cheatsheet
@@ -858,6 +976,7 @@ The `InfoPopup` component (`src/components/InfoPopup.astro`) provides contextual
 
 **Version History:**
 
+- **v1.7 (Feb 19, 2026):** Added Feature Index (jump-to-feature table), Live Pulse Indicator pattern, Alert Badge pattern, Contextual CTA Links pattern — supports HomepagePulse, AreaNarrative, DashboardStory, "New Since" badge, Compare Prompt
 - **v1.6 (Feb 18, 2026):** Typography token migration complete (text-h1/h2/h3 → text-display/heading/body across 19 files), added heading hierarchy rules by page type, SVG icon stroke-width convention (stroke-width="1"), DashboardInfoCards dark mode + border
 - **v1.5 (Feb 17, 2026):** Added Dark Mode System section (HSL palette, CSS vars, toggle script, Tailwind scanning rules)
 - **v1.3 (Feb 12, 2026):** Added Floor Shadow (elevation effect) pattern for hovering elements
