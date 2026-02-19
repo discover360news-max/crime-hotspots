@@ -19,6 +19,7 @@ import FiltersTray from '../../components/FiltersTray.astro';
 import InfoPopup from '../../components/InfoPopup.astro';
 import LoadingShimmer from '../../components/LoadingShimmer.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
+import DashboardStory from '../../components/DashboardStory.astro';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { getCountryName } from '../../data/countries';
 import { routes } from '../../config/routes';
@@ -86,6 +87,9 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
     <!-- Site Notification Banner -->
     <SiteNotificationBanner notification={dataUpdateNotice} />
+
+    <!-- Dashboard Story — narrative summary -->
+    <DashboardStory allCrimes={allCrimes} />
 
     <!-- Statistics Cards - Horizontal Scroll -->
     <div class="flex items-center gap-1 mb-2">

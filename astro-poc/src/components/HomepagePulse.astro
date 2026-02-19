@@ -1,0 +1,120 @@
+---
+/**
+ * HomepagePulse — "Right Now" data snapshot for a country
+ * Server-rendered at build time, zero runtime cost
+ * Reusable per country when Guyana/Barbados go live
+ */
+import { getTrinidadCrimes } from '../lib/crimeData';
+import { getHotAreas } from '../lib/trendingHelpers';
+import { countCrimeType } from '../lib/dashboardHelpers';
+import { escapeHtml } from '../lib/escapeHtml';
+import { routes, buildRoute } from '../config/routes';
+
+interface Props {
+  countryName: string;
+  dashboardUrl: string;
+}
+
+const { countryName, dashboardUrl } = Astro.props;
+
+const allCrimes = await getTrinidadCrimes();
+
+// This week's crimes
+const now = new Date();
+const weekAgo = new Date();
+weekAgo.setDate(now.getDate() - 7);
+const twoWeeksAgo = new Date();
+twoWeeksAgo.setDate(now.getDate() - 14);
+
+const thisWeekCrimes = allCrimes.filter(c => c.dateObj >= weekAgo);
+const lastWeekCrimes = allCrimes.filter(c => c.dateObj >= twoWeeksAgo && c.dateObj < weekAgo);
+
+// Week-over-week change
+const weekChange = lastWeekCrimes.length > 0
+  ? Math.round(((thisWeekCrimes.length - lastWeekCrimes.length) / lastWeekCrimes.length) * 100)
+  : 0;
+
+// Top trending area
+const hotAreas = getHotAreas(allCrimes, 1);
+const topArea = hotAreas[0];
+
+// Murders this week
+const murdersThisWeek = countCrimeType(thisWeekCrimes, 'Murder');
+
+// Latest headline
+const latestCrime = allCrimes[0]; // Already sorted newest first
+---
+
+{thisWeekCrimes.length > 0 && (
+  <section class="mt-10 max-w-2xl mx-auto">
+    <div class="rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-white/70 dark:bg-[hsl(0_0%_5%)] p-5">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+        </span>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[hsl(0_0%_55%)]">
+          {countryName} This Week
+        </h2>
+      </div>
+
+      <!-- Stats row -->
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <div>
+          <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">
+            {thisWeekCrimes.length}
+          </div>
+          <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">
+            incidents
+            {weekChange !== 0 && (
+              <span class={weekChange > 0 ? 'text-rose-600' : 'text-emerald-600'}>
+                {' '}{weekChange > 0 ? '+' : ''}{weekChange}%
+              </span>
+            )}
+          </div>
+        </div>
+
+        {topArea && (
+          <div>
+            <div class="text-sm font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] truncate">
+              {topArea.area}
+            </div>
+            <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">
+              top area ({topArea.count})
+            </div>
+          </div>
+        )}
+
+        <div>
+          <div class="text-2xl font-bold text-rose-600">
+            {murdersThisWeek}
+          </div>
+          <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">
+            murders
+          </div>
+        </div>
+      </div>
+
+      <!-- Latest headline -->
+      {latestCrime && (
+        <div class="border-t border-slate-100 dark:border-[hsl(0_0%_15%)] pt-3">
+          <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mb-1">Latest</p>
+          <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_80%)] line-clamp-1">
+            {escapeHtml(latestCrime.headline)}
+          </p>
+        </div>
+      )}
+
+      <!-- CTA -->
+      <a
+        href={dashboardUrl}
+        class="mt-4 inline-flex items-center gap-1 text-sm font-bold text-rose-600 hover:text-rose-700 transition"
+      >
+        Explore Trinidad Dashboard
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+  </section>
+)}

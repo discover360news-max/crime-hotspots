@@ -1,0 +1,107 @@
+---
+/**
+ * AreaNarrative — "This Week in [Area]" narrative summary
+ * Server-rendered story block for area detail pages
+ * Provides the "connective tissue" between data and user journey
+ */
+import { routes } from '../config/routes';
+
+interface Props {
+  areaName: string;
+  areaSlug: string;
+  thisWeekCount: number;
+  lastWeekCount: number;
+  primaryCrimeType: string;
+  total90d: number;
+  compareUrl: string;
+}
+
+const { areaName, areaSlug, thisWeekCount, lastWeekCount, primaryCrimeType, total90d, compareUrl } = Astro.props;
+
+// Calculate week-over-week change
+const weekChange = lastWeekCount > 0
+  ? Math.round(((thisWeekCount - lastWeekCount) / lastWeekCount) * 100)
+  : 0;
+const isUp = weekChange > 0;
+const isDown = weekChange < 0;
+---
+
+<div class="rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-white/70 dark:bg-[hsl(0_0%_5%)] p-4 mt-4 mb-2">
+  <div class="flex items-center gap-2 mb-2">
+    <span class="relative flex h-2 w-2">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+    </span>
+    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[hsl(0_0%_55%)]">
+      This Week in {areaName}
+    </h2>
+  </div>
+
+  <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_80%)] leading-relaxed">
+    {thisWeekCount === 0 ? (
+      <>
+        <span class="font-medium text-emerald-600">{areaName} has had no reported incidents this week.</span>
+        {total90d > 0 && (
+          <> There have been {total90d} incidents over the last 90 days.</>
+        )}
+      </>
+    ) : isDown ? (
+      <>
+        Incidents in {areaName} <span class="font-medium text-emerald-600">dropped {Math.abs(weekChange)}%</span> this
+        week — <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{thisWeekCount} incident{thisWeekCount !== 1 ? 's' : ''}</span> reported,
+        down from {lastWeekCount} last week.
+        {primaryCrimeType && primaryCrimeType !== 'General Crime' && (
+          <> <span class="font-medium">{primaryCrimeType}</span> remains the most reported type.</>
+        )}
+      </>
+    ) : isUp ? (
+      <>
+        {areaName} has seen <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{thisWeekCount} incident{thisWeekCount !== 1 ? 's' : ''}</span> in
+        the last 7 days, <span class="font-medium text-rose-600">up {weekChange}%</span> from last week.
+        {primaryCrimeType && primaryCrimeType !== 'General Crime' && (
+          <> <span class="font-medium">{primaryCrimeType}</span> is the most reported crime type.</>
+        )}
+      </>
+    ) : (
+      <>
+        {areaName} recorded <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{thisWeekCount} incident{thisWeekCount !== 1 ? 's' : ''}</span> this
+        week, consistent with last week.
+        {primaryCrimeType && primaryCrimeType !== 'General Crime' && (
+          <> <span class="font-medium">{primaryCrimeType}</span> is the most reported type.</>
+        )}
+      </>
+    )}
+  </p>
+
+  <!-- Contextual CTAs -->
+  <div class="flex flex-wrap items-center gap-3 mt-3 text-xs">
+    <a
+      href={compareUrl}
+      class="inline-flex items-center gap-1 font-medium text-rose-600 hover:text-rose-700 transition"
+    >
+      How does this compare?
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </a>
+    <a
+      href={routes.trinidad.archive}
+      class="inline-flex items-center gap-1 font-medium text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 transition"
+    >
+      Full timeline
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </a>
+  </div>
+</div>
+
+<!-- "New since your last visit" badge — populated client-side -->
+<div id="newSinceBadge" class="hidden mb-2">
+  <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-rose-50 dark:bg-[hsl(0_0%_8%)] border border-rose-200 dark:border-rose-900/30 text-sm text-rose-700 dark:text-rose-400">
+    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <span id="newSinceText"></span>
+  </div>
+</div>

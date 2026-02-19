@@ -17,6 +17,7 @@ import DataTable from '../../../components/DataTable.astro';
 import SafetyContext from '../../../components/SafetyContext.astro';
 import FeedbackToggle from '../../../components/FeedbackToggle.astro';
 import MailchimpSignup from '../../../components/MailchimpSignup.astro';
+import AreaNarrative from '../../../components/AreaNarrative.astro';
 import { getTrinidadCrimes, generateNameSlug } from '../../../lib/crimeData';
 import { loadFullAreaData } from '../../../lib/areaAliases';
 import { getSafetyContext } from '../../../lib/safetyHelpers';
@@ -70,6 +71,14 @@ cutoff30d.setDate(cutoff30d.getDate() - 30);
 
 const recentCrimes90d = areaCrimes.filter(c => c.dateObj >= cutoff90d);
 const recentCrimes30d = areaCrimes.filter(c => c.dateObj >= cutoff30d);
+
+// 7-day and 14-day windows for AreaNarrative week-over-week
+const cutoff7d = new Date();
+cutoff7d.setDate(cutoff7d.getDate() - 7);
+const cutoff14d = new Date();
+cutoff14d.setDate(cutoff14d.getDate() - 14);
+const thisWeekCrimes = areaCrimes.filter(c => c.dateObj >= cutoff7d);
+const lastWeekCrimes = areaCrimes.filter(c => c.dateObj >= cutoff14d && c.dateObj < cutoff7d);
 
 // Same 90-day window last year (for YoY comparison of the incidents card)
 const cutoff90dPrevStart = new Date(cutoff90d);
@@ -155,6 +164,15 @@ const relatedAreas = areaData
     hasCrimes: allCrimes.some(c => c.area === a.area),
   }));
 
+// Suggested compare area: related area with most recent crime (for contextual compare CTA)
+const suggestedCompare = relatedAreas
+  .filter(a => a.hasCrimes)
+  .map(a => ({
+    ...a,
+    recentCount: allCrimes.filter(c => c.area === a.name && c.dateObj >= cutoff90d).length,
+  }))
+  .sort((a, b) => b.recentCount - a.recentCount)[0];
+
 // Random areas from other regions (for cross-linking / internal SEO)
 const otherRegionAreas = areaData
   .filter(a => a.region !== region && a.area !== areaName && allCrimes.some(c => c.area === a.area))
@@ -232,6 +250,17 @@ const breadcrumbs = [
       </button>
     </div>
 
+    <!-- Area Narrative — "This Week in [Area]" -->
+    <AreaNarrative
+      areaName={areaName}
+      areaSlug={slug!}
+      thisWeekCount={thisWeekCrimes.length}
+      lastWeekCount={lastWeekCrimes.length}
+      primaryCrimeType={safety.primaryCrimeType || 'General Crime'}
+      total90d={recentCrimes90d.length}
+      compareUrl={`${routes.trinidad.compare}?a=${slug}`}
+    />
+
     <!-- Stat Cards -->
     <div class="mt-6">
       <StatCards stats={statCards} />
@@ -263,6 +292,29 @@ const breadcrumbs = [
       positiveNote={safety.positiveNote}
       primaryCrimeType={safety.primaryCrimeType}
     />
+
+    <!-- Contextual Compare Prompt -->
+    {suggestedCompare && (
+      <a
+        href={`${routes.trinidad.compare}?a=${slug}&b=${suggestedCompare.slug}`}
+        class="block mt-4 p-3 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-white/70 dark:bg-[hsl(0_0%_5%)] hover:border-rose-300 dark:hover:border-rose-900/40 transition group"
+      >
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-slate-600 dark:text-[hsl(0_0%_80%)]">
+              See how <span class="text-slate-700 dark:text-[hsl(0_0%_90%)] font-bold">{areaName}</span> compares
+              to <span class="text-slate-700 dark:text-[hsl(0_0%_90%)] font-bold">{suggestedCompare.name}</span>
+            </p>
+            <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-0.5">
+              Side-by-side safety scores and crime breakdown
+            </p>
+          </div>
+          <svg class="w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_50%)] group-hover:text-rose-600 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </a>
+    )}
 
     <!-- Feedback + Email Signup -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 mb-6 items-start">
@@ -483,4 +535,28 @@ const breadcrumbs = [
       }
     });
   });
+
+  // "New since your last visit" badge
+  try {
+    var visitKey = 'crimehotspots_area_visit_' + slug;
+    var lastVisit = localStorage.getItem(visitKey);
+    if (lastVisit) {
+      var lastVisitDate = new Date(parseInt(lastVisit, 10));
+      var newCrimes = areaCrimes.filter(function(c) {
+        var d = c.dateObj ? new Date(c.dateObj) : new Date(c.date);
+        return d > lastVisitDate;
+      });
+      if (newCrimes.length > 0) {
+        var badge = document.getElementById('newSinceBadge');
+        var text = document.getElementById('newSinceText');
+        if (badge && text) {
+          text.textContent = newCrimes.length + ' new incident' + (newCrimes.length !== 1 ? 's' : '') + ' since your last visit';
+          badge.classList.remove('hidden');
+        }
+      }
+    }
+    localStorage.setItem(visitKey, String(Date.now()));
+  } catch(e) {
+    // localStorage unavailable
+  }
 </script>
