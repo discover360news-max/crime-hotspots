@@ -29,40 +29,60 @@ The DateAccordion component provides a collapsible container for grouping conten
 
 ## Design Specifications
 
+### Expanded Wrapper (Container)
+
+When expanded, the `.date-accordion` wrapper visually groups the header and cards together:
+
+- **Background:** `bg-slate-50/60 dark:bg-[hsl(0_0%_6%)]/60` (subtle tint)
+- **Border:** `border border-rose-200 dark:border-rose-900/40` (rose accent)
+- **Shape:** `rounded-xl` (container-level radius)
+- **Transition:** `transition-colors duration-300`
+- **When collapsed:** No wrapper styling (transparent, borderless)
+
 ### Accordion Header
-- **Background:** `bg-white/70 backdrop-blur-md` (frosted glass)
-- **Border:** `border border-slate-200` with `rounded-lg`
+
+- **Background:** `bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md` (frosted glass)
+- **Border:** `border` with `border-color:#e11d48` when expanded, `var(--ch-border)` when collapsed
+- **Shape:** `rounded-lg`
 - **Padding:** `px-4 py-3`
-- **Hover state:** `hover:bg-white/90` (subtle increase in opacity)
-- **Layout:** Flexbox with space-between (content left, badge right)
+- **Hover state:** `hover:bg-white/90 dark:hover:bg-[hsl(0_0%_10%)]/90`
+- **Layout:** Flexbox with space-between (content left, badge + hint right)
 
 ### Header Content (Left Side)
 - **Chevron icon:**
   - Size: `w-5 h-5`
-  - Color: `text-slate-400`
+  - Color: `text-slate-400 dark:text-[hsl(0_0%_50%)]`
   - Rotation: `rotate-90` when expanded, `rotate-0` when collapsed
   - Transition: `transition-transform duration-200`
 - **Date text:**
-  - Font: `text-small font-semibold text-slate-700`
+  - Font: `text-caption font-bold`
+  - Color: `#e11d48` when expanded, `var(--ch-text)` when collapsed
   - Format: "Weekday, Month Day, Year" (e.g., "Friday, January 3, 2026")
 - **Subtext:**
-  - Font: `text-xs text-slate-500`
-  - Content: Dynamic metric with pluralization (e.g., "5 victims", "1 victim")
+  - Font: `text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]`
+  - Content: "{N} incidents affecting {N} victims" with pluralization
 
-### Badge (Right Side)
-- **Background:** `bg-rose-100`
-- **Text:** `text-rose-600 text-xs font-medium`
-- **Padding:** `px-3 py-1`
-- **Shape:** `rounded-full`
-- **Content:** Numeric value matching subtext metric
+### Right Side (Badge + Tap Hint)
+
+- **"Tap to view" hint:**
+  - Font: `text-caption text-slate-400 dark:text-[hsl(0_0%_45%)]`
+  - Visibility: Shown when collapsed, hidden when expanded
+  - Purpose: UX affordance — tells users the accordion is clickable
+- **Count badge:**
+  - Background: `bg-slate-200 dark:bg-[hsl(0_0%_20%)]`
+  - Text: `text-slate-600 dark:text-[hsl(0_0%_55%)] text-caption font-medium`
+  - Padding: `px-1.5 py-0.5 min-h-[20px]`
+  - Shape: `rounded-full`
+  - Content: Incident count number
 
 ### Accordion Content
 - **Overflow:** `overflow-hidden` (required for smooth height transitions)
 - **Transition:** `transition-all duration-300`
 - **Height:** `max-h-0` when collapsed, `max-h-[10000px]` when expanded
 - **Top margin:** `mt-3` when expanded (spacing from header)
-- **Bottom padding:** `pb-4` (prevents shadow clipping on nested content)
+- **Padding:** `px-3 pb-3` when expanded (inset within wrapper container)
 - **Grid layout:** `grid gap-4 sm:grid-cols-2 lg:grid-cols-3` (matches CrimeCard grid)
+- **Mobile timeline:** `pl-8` with dotted vertical line and rose-600 dots
 
 ---
 

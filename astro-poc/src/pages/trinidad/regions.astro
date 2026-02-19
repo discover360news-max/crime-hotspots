@@ -78,8 +78,8 @@ const pageDescription = `Crime statistics for all ${regions.length} regions in T
       title="Crime Statistics by Region"
       subtitle={`Compare crime data across ${regions.length} regions in Trinidad & Tobago.`}
       badge="Updated daily • Based on 90-day rolling window"
-      primaryCTA={{ text: 'View by Area', href: '/trinidad/areas/', icon: 'arrow' }}
-      secondaryCTA={{ text: 'Compare Areas', href: '/trinidad/compare/', icon: 'arrow' }}
+      primaryCTA={{ text: 'Compare Areas', href: '/trinidad/compare/', icon: 'arrow' }}
+      secondaryCTA={{ text: 'View by Area', href: '/trinidad/areas/', icon: 'arrow' }}
     />
 
     <!-- Region Cards -->
@@ -87,27 +87,27 @@ const pageDescription = `Crime statistics for all ${regions.length} regions in T
       {regions.map((region, index) => (
         <a
           href={`/trinidad/region/${region.slug}`}
-          class="block bg-white rounded-lg border border-slate-200 p-5 hover:border-rose-300 hover:shadow-md transition group"
+          class="block bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
         >
           <div class="flex items-start justify-between mb-3">
-            <h2 class="text-base font-bold text-slate-800 group-hover:text-rose-600 transition">
+            <h2 class="text-base font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600 transition">
               {region.name}
             </h2>
-            <span class="text-xs text-slate-400 font-medium">#{index + 1}</span>
+            <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] font-medium">#{index + 1}</span>
           </div>
 
           <div class="grid grid-cols-3 gap-3 text-center">
             <div>
-              <div class="text-lg font-bold text-slate-800">{region.crimeCount90d}</div>
-              <div class="text-xs text-slate-400">Incidents (90d)</div>
+              <div class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_90%)]">{region.crimeCount90d}</div>
+              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">Incidents (90d)</div>
             </div>
             <div>
               <div class="text-lg font-bold text-rose-600">{region.murders}</div>
-              <div class="text-xs text-slate-400">Murders (YTD)</div>
+              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">Murders (YTD)</div>
             </div>
             <div>
-              <div class="text-lg font-bold text-slate-600">{region.areaCount}</div>
-              <div class="text-xs text-slate-400">Areas</div>
+              <div class="text-lg font-bold text-slate-600 dark:text-[hsl(0_0%_70%)]">{region.areaCount}</div>
+              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">Areas</div>
             </div>
           </div>
         </a>

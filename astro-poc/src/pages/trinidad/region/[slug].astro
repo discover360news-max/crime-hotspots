@@ -183,7 +183,7 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
         <div class="mt-2">
           <button
             id="moreStatsToggle"
-            class="w-full flex items-center justify-center gap-1 py-2 text-xs font-medium text-slate-400 hover:text-rose-600 transition cursor-pointer"
+            class="w-full flex items-center justify-center gap-1 py-2 text-xs font-medium text-slate-400 dark:text-[hsl(0_0%_45%)] hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer"
           >
             <span id="moreStatsLabel">More stats</span>
             <svg id="moreStatsChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,40 +199,40 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
 
     <!-- Area Ranking -->
     <section class="mt-8">
-      <h2 class="text-lg font-bold text-slate-800 mb-4">Areas in {regionName}</h2>
+      <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-4">Areas in {regionName}</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {regionAreas.map((area, index) => (
           <a
             href={area.hasCrimes ? `/trinidad/area/${area.slug}` : '#'}
             class={`block rounded-lg border p-4 transition ${
               area.hasCrimes
-                ? 'bg-white border-slate-200 hover:border-rose-300 hover:shadow-md group'
-                : 'bg-slate-50 border-slate-100 cursor-default'
+                ? 'bg-white dark:bg-[hsl(0_0%_10%)] border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md group'
+                : 'bg-slate-50 dark:bg-[hsl(0_0%_8%)] border-slate-100 dark:border-[hsl(0_0%_15%)] cursor-default'
             }`}
           >
             <div class="flex items-start justify-between mb-2">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <span class="text-xs text-slate-400 font-medium">#{index + 1}</span>
+                  <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] font-medium">#{index + 1}</span>
                   <h3 class={`text-sm font-semibold truncate ${
-                    area.hasCrimes ? 'text-slate-800 group-hover:text-rose-600 transition' : 'text-slate-400'
+                    area.hasCrimes ? 'text-slate-800 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600 transition' : 'text-slate-400 dark:text-[hsl(0_0%_40%)]'
                   }`}>
                     {area.name}
                   </h3>
                 </div>
                 {area.knownAs && area.knownAs !== area.name && (
-                  <p class="text-xs text-slate-400 truncate ml-6">Also known as: {area.knownAs}</p>
+                  <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] truncate ml-6">Also known as: {area.knownAs}</p>
                 )}
               </div>
               <span class={`flex-shrink-0 ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${
-                area.level === 'low' ? 'bg-emerald-100 text-emerald-700' :
-                area.level === 'neutral' ? 'bg-slate-100 text-slate-600' :
-                'bg-amber-100 text-amber-700'
+                area.level === 'low' ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400' :
+                area.level === 'neutral' ? 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_65%)]' :
+                'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
               }`}>
                 Risk Level: {area.score.toFixed(1)}
               </span>
             </div>
-            <div class="text-xs text-slate-500">
+            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">
               {area.crimeCount} incident{area.crimeCount !== 1 ? 's' : ''} (90d)
             </div>
           </a>
@@ -243,13 +243,13 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
     <!-- Crime Type Breakdown -->
     {crimeTypeBreakdown.length > 0 && (
       <section class="mt-8">
-        <h2 class="text-lg font-bold text-slate-800 mb-4">Crime Breakdown (Year-to-Date)</h2>
+        <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-4">Crime Breakdown (Year-to-Date)</h2>
         <DataTable headers={['Crime Type', String(currentYear), String(previousYear), 'Change']}>
           {crimeTypeBreakdown.map(row => (
-            <tr class="hover:bg-slate-50">
-              <td class="px-4 py-3 text-sm font-medium text-slate-700">{row.type}</td>
-              <td class="px-4 py-3 text-sm text-right text-slate-700">{row.currentCount}</td>
-              <td class="px-4 py-3 text-sm text-right text-slate-500">{row.previousCount}</td>
+            <tr class="hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)]">
+              <td class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)]">{row.type}</td>
+              <td class="px-4 py-3 text-sm text-right text-slate-700 dark:text-[hsl(0_0%_80%)]">{row.currentCount}</td>
+              <td class="px-4 py-3 text-sm text-right text-slate-500 dark:text-[hsl(0_0%_55%)]">{row.previousCount}</td>
               <td class={`px-4 py-3 text-sm text-right font-medium ${
                 row.direction === 'up' ? 'text-rose-600' :
                 row.direction === 'down' ? 'text-emerald-600' :
@@ -267,39 +267,39 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
     <!-- Recent Headlines -->
     {recentCrimes30d.length > 0 && (
       <section class="mt-8">
-        <h2 class="text-lg font-bold text-slate-800 mb-4">
+        <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-4">
           Recent Headlines
-          <span class="text-sm font-normal text-slate-500 ml-2">Last 30 days</span>
+          <span class="text-sm font-normal text-slate-500 dark:text-[hsl(0_0%_55%)] ml-2">Last 30 days</span>
         </h2>
 
         <div class="space-y-2">
           {Array.from(headlinesByDate.entries()).map(([dateStr, crimes]) => (
-            <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+            <div class="bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] overflow-hidden">
               <button
-                class="accordion-toggle w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition cursor-pointer"
+                class="accordion-toggle w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition cursor-pointer"
                 aria-expanded="false"
               >
                 <div class="flex items-center gap-2">
-                  <svg class="accordion-chevron w-4 h-4 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="accordion-chevron w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_45%)] transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                   </svg>
-                  <span class="text-sm font-medium text-slate-700">{dateStr}</span>
+                  <span class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)]">{dateStr}</span>
                 </div>
-                <span class="text-xs text-slate-400">{crimes.length} incident{crimes.length !== 1 ? 's' : ''}</span>
+                <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">{crimes.length} incident{crimes.length !== 1 ? 's' : ''}</span>
               </button>
 
               <div class="accordion-content hidden">
-                <div class="border-t border-slate-100 px-4 py-3 space-y-3">
+                <div class="border-t border-slate-100 dark:border-[hsl(0_0%_15%)] px-4 py-3 space-y-3">
                   {crimes.map(crime => (
                     <a
                       href={`/trinidad/crime/${crime.slug}`}
-                      class="block p-3 rounded-lg hover:bg-slate-50 transition group"
+                      class="block p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group"
                     >
-                      <div class="text-sm font-medium text-slate-700 group-hover:text-rose-600 transition">
+                      <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-rose-600 transition">
                         {escapeHtml(crime.headline)}
                       </div>
-                      <div class="flex items-center gap-2 mt-1 text-xs text-slate-400">
-                        <span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">{crime.primaryCrimeType || crime.crimeType}</span>
+                      <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">
+                        <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">{crime.primaryCrimeType || crime.crimeType}</span>
                         <span>{escapeHtml(crime.area)}</span>
                       </div>
                     </a>

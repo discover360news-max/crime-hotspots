@@ -38,7 +38,7 @@ function formatPercentChange(change: number): string {
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
   {stats.map((stat) => (
-    <div class="bg-white/85 dark:bg-[hsl(0_0%_8%)/85] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-4 shadow-sm">
+    <div class="bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-4 shadow-sm">
       <div class="text-caption text-slate-500 dark:text-[hsl(0_0%_60%)] font-bold">{stat.label}</div>
       <div class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-[hsl(0_0%_95%)] mt-1">{stat.current}</div>
       {stat.subtitle ? (

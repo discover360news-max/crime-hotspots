@@ -87,7 +87,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
 ---
 
 <Layout title={title} description={description} includePagefind={false} ogImage={`https://crimehotspots.com${ogImagePath}`}>
-  <main class="px-4 py-8" data-pagefind-ignore>
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-pagefind-ignore>
     <!-- Breadcrumbs -->
     <div class="mb-6">
       <Breadcrumbs items={[
@@ -102,10 +102,10 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
       <div class="text-center space-y-4 max-w-lg mx-auto">
       <!-- Header -->
       <div class="space-y-1">
-        <h1 class="text-2xl sm:text-3xl font-bold text-slate-700">
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">
           Trinidad & Tobago
         </h1>
-        <p class="text-lg sm:text-xl text-slate-500 font-medium">
+        <p class="text-lg sm:text-xl text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium">
           Murder Count
         </p>
         <p class="text-4xl sm:text-5xl font-bold text-rose-600">
@@ -119,15 +119,15 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
       </div>
 
       <!-- Last Updated -->
-      <p class="text-sm text-slate-400">
+      <p class="text-sm text-slate-400 dark:text-[hsl(0_0%_50%)]">
         Updated: {lastUpdated}
       </p>
 
       <!-- 2025 Comparison -->
-      <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 max-w-md mx-auto">
+      <div class="bg-slate-50 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 max-w-md mx-auto">
         <div class="flex items-center justify-center gap-1">
-          <p class="text-sm text-slate-600 text-center">
-            Same period in 2025: <span class="font-semibold text-slate-800">{murderCount2025SamePeriod}</span> murders
+          <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_70%)] text-center">
+            Same period in 2025: <span class="font-bold text-slate-800 dark:text-[hsl(0_0%_90%)]">{murderCount2025SamePeriod}</span> murders
           </p>
           <InfoPopup id="murder-comparison-info">
             <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">How We Compare Years</p>
@@ -145,7 +145,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
       <!-- Murder Rate Section (SEO: "trinidad murder rate") -->
       <div class="mt-8 w-full max-w-md mx-auto">
         <div class="flex items-center justify-center gap-1 mb-4">
-          <h2 class="text-xl font-bold text-slate-700 text-center">
+          <h2 class="text-xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] text-center">
             Trinidad & Tobago Murder Rate 2026
           </h2>
           <InfoPopup id="murder-rate-info">
@@ -166,31 +166,31 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
 
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
           <!-- Current Year-to-Date Rate -->
-          <div class="bg-rose-50 rounded-lg border border-rose-200 p-4 text-center">
-            <div class="text-xs text-slate-500 font-medium mb-1">Current Rate (YTD)</div>
+          <div class="bg-rose-50 dark:bg-rose-950/30 rounded-lg border border-rose-200 dark:border-rose-900/50 p-4 text-center">
+            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium mb-1">Current Rate (YTD)</div>
             <div class="text-2xl font-bold text-rose-600">{currentMurderRate}</div>
-            <div class="text-xs text-slate-400 mt-1">per 100k</div>
-            <div class="text-xs text-slate-500 mt-2 pt-2 border-t border-rose-100">{murderCount} murders</div>
+            <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">per 100k</div>
+            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2 pt-2 border-t border-rose-100 dark:border-rose-900/40">{murderCount} murders</div>
           </div>
 
           <!-- Projected Annual Rate -->
-          <div class="bg-slate-100 rounded-lg border border-slate-200 p-4 text-center">
-            <div class="text-xs text-slate-500 font-medium mb-1">Projected Rate</div>
-            <div class="text-2xl font-bold text-slate-700">{projectedMurderRate}</div>
-            <div class="text-xs text-slate-400 mt-1">per 100k (2026)</div>
-            <div class="text-xs text-slate-500 mt-2 pt-2 border-t border-slate-200">~{projectedAnnualMurders} murders</div>
+          <div class="bg-slate-100 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 text-center">
+            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium mb-1">Projected Rate</div>
+            <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{projectedMurderRate}</div>
+            <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">per 100k (2026)</div>
+            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2 pt-2 border-t border-slate-200 dark:border-[hsl(0_0%_18%)]">~{projectedAnnualMurders} murders</div>
           </div>
 
           <!-- 2025 Final Rate -->
-          <div class="bg-slate-50 rounded-lg border border-slate-200 p-4 text-center col-span-2 sm:col-span-1">
-            <div class="text-xs text-slate-500 font-medium mb-1">2025 Final Rate</div>
-            <div class="text-2xl font-bold text-slate-700">{murderRate2025}</div>
-            <div class="text-xs text-slate-400 mt-1">per 100k</div>
-            <div class="text-xs text-slate-500 mt-2 pt-2 border-t border-slate-100">{murderCount2025Full} murders</div>
+          <div class="bg-slate-50 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 text-center col-span-2 sm:col-span-1">
+            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium mb-1">2025 Final Rate</div>
+            <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{murderRate2025}</div>
+            <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">per 100k</div>
+            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2 pt-2 border-t border-slate-100 dark:border-[hsl(0_0%_18%)]">{murderCount2025Full} murders</div>
           </div>
         </div>
 
-        <p class="text-xs text-slate-500 text-center mt-3">
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] text-center mt-3">
           Based on population estimate of {(POPULATION / 1000000).toFixed(1)}M
         </p>
       </div>
@@ -205,7 +205,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
         </a>
         <a
           href={routes.trinidad.statistics}
-          class="px-6 py-3 min-h-[44px] flex items-center justify-center border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 active:bg-slate-100 transition font-medium text-sm"
+          class="px-6 py-3 min-h-[44px] flex items-center justify-center border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition font-medium text-sm"
         >
           All Crime Statistics
         </a>
@@ -214,23 +214,23 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
       <!-- Latest Analysis -->
       {latestPost && (
         <div class="mt-8 max-w-md mx-auto">
-          <p class="text-sm text-slate-500 mb-3">Latest Analysis</p>
-          <a href={`/blog/${latestPost.slug}/`} class="block bg-white rounded-lg border border-slate-200 p-4 hover:border-rose-300 hover:shadow-sm transition">
-            <h3 class="font-semibold text-slate-800 text-sm mb-2">{latestPost.data.title}</h3>
-            <p class="text-xs text-slate-500">{latestPost.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} &bull; {latestPost.data.readTime}</p>
+          <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_55%)] mb-3">Latest Analysis</p>
+          <a href={`/blog/${latestPost.slug}/`} class="block bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
+            <h3 class="font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] text-sm mb-2">{latestPost.data.title}</h3>
+            <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{latestPost.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} &bull; {latestPost.data.readTime}</p>
           </a>
         </div>
       )}
 
       <!-- Share Section -->
-      <div class="pt-6 border-t border-slate-200 mt-6">
-        <p class="text-sm text-slate-400 mb-3">Share this page</p>
+      <div class="pt-6 border-t border-slate-200 dark:border-[hsl(0_0%_18%)] mt-6">
+        <p class="text-sm text-slate-400 dark:text-[hsl(0_0%_50%)] mb-3">Share this page</p>
         <div class="flex gap-3 justify-center">
           <!-- WhatsApp -->
           <a
             id="share-whatsapp"
             href="#"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-rose-100 hover:text-rose-600 active:bg-rose-200 transition shadow-sm"
+            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/50 hover:text-rose-600 active:bg-rose-200 dark:active:bg-rose-950/70 transition shadow-sm"
             aria-label="Share on WhatsApp"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -241,7 +241,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
           <a
             id="share-facebook"
             href="#"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-rose-100 hover:text-rose-600 active:bg-rose-200 transition shadow-sm"
+            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/50 hover:text-rose-600 active:bg-rose-200 dark:active:bg-rose-950/70 transition shadow-sm"
             aria-label="Share on Facebook"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -252,7 +252,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
           <a
             id="share-twitter"
             href="#"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-rose-100 hover:text-rose-600 active:bg-rose-200 transition shadow-sm"
+            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/50 hover:text-rose-600 active:bg-rose-200 dark:active:bg-rose-950/70 transition shadow-sm"
             aria-label="Share on X"
           >
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -262,7 +262,7 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
           <!-- Copy Link -->
           <button
             id="share-copy"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-rose-100 hover:text-rose-600 active:bg-rose-200 transition shadow-sm"
+            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/50 hover:text-rose-600 active:bg-rose-200 dark:active:bg-rose-950/70 transition shadow-sm"
             aria-label="Copy link"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

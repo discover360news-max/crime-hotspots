@@ -21,22 +21,22 @@ function formatDate(date: Date) {
 ---
 
 <Layout title={title} description={description}>
-  <main class="container mx-auto px-4 py-8 sm:py-12 max-w-6xl">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
     <Breadcrumbs items={[
       { label: 'Home', href: '/' },
       { label: 'Blog' }  // Last item has NO href (current page)
     ]} />
     <div class="mb-8 sm:mb-12">
       <div class="flex items-center justify-between">
-        <h1 class="text-display font-bold text-slate-900 mb-4">Crime Statistics Blog</h1>
-        <a href="/rss.xml" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 text-slate-500 hover:text-rose-600 hover:border-rose-300 transition text-xs" title="Subscribe via RSS">
+        <h1 class="text-display font-bold text-slate-900 dark:text-[hsl(0_0%_95%)] mb-4">Crime Statistics Blog</h1>
+        <a href="/rss.xml" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-800 transition text-xs" title="Subscribe via RSS">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
             <path d="M6.18 15.64a2.18 2.18 0 012.18 2.18C8.36 19.01 7.37 20 6.18 20 5 20 4 19.01 4 17.82a2.18 2.18 0 012.18-2.18M4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44m0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
           </svg>
           RSS
         </a>
       </div>
-      <p class="text-xs text-slate-600">Weekly data-driven analysis of crime trends across the Caribbean</p>
+      <p class="text-xs text-slate-600 dark:text-[hsl(0_0%_65%)]">Weekly data-driven analysis of crime trends across the Caribbean</p>
     </div>
 
     <!-- Country Filter -->
@@ -44,10 +44,10 @@ function formatDate(date: Date) {
       <button id="filter-all" class="px-4 py-1 min-h-[22px] rounded-lg bg-rose-600 text-white font-medium hover:bg-rose-700 active:bg-rose-800 transition text-xs">
         All Countries
       </button>
-      <button id="filter-tt" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 text-slate-700 font-medium hover:bg-slate-50 active:bg-slate-100 transition text-xs">
+      <button id="filter-tt" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] font-medium hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 transition text-xs">
         Trinidad & Tobago
       </button>
-      <button id="filter-gy" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 text-slate-700 font-medium hover:bg-slate-50 active:bg-slate-100 transition text-xs">
+      <button id="filter-gy" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] font-medium hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 transition text-xs">
         Guyana
       </button>
     </div>
@@ -56,25 +56,25 @@ function formatDate(date: Date) {
     <div id="blog-posts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
       {sortedPosts.map((post) => (
         <article
-          class="blog-post bg-white/70 backdrop-blur-md rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all border border-slate-100"
+          class="blog-post bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all border border-slate-100 dark:border-[hsl(0_0%_18%)]"
           data-country={post.data.country}
         >
-          <a href={`/blog/${post.slug}`} class="block">
+          <a href={`/blog/${post.slug}`} class="flex flex-col h-full">
             <img src={post.data.image} alt={post.data.countryName} class="w-full h-32 md:h-48 object-cover">
-            <div class="p-3 md:p-6">
+            <div class="p-3 md:p-6 flex flex-col flex-1">
               <div class="flex items-center gap-1 md:gap-2 mb-2 md:mb-3 flex-wrap">
-                <span class="text-xs font-semibold px-2 py-1 rounded-full bg-rose-50 text-rose-600">
+                <span class="text-xs font-semibold px-2 py-1 rounded-full bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
                   {post.data.countryName}
                 </span>
-                <span class="text-xs text-slate-500">{formatDate(post.data.date)}</span>
+                <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{formatDate(post.data.date)}</span>
               </div>
-              <h2 class="text-small md:text-body font-bold text-slate-900 mb-1 md:mb-2 hover:text-rose-600 transition line-clamp-2">
+              <h2 class="text-small md:text-body font-bold text-slate-900 dark:text-[hsl(0_0%_92%)] mb-1 md:mb-2 hover:text-rose-600 dark:hover:text-rose-400 transition line-clamp-2">
                 {post.data.title}
               </h2>
-              <p class="text-tiny md:text-small text-slate-500 mb-2 md:mb-4 line-clamp-2 md:line-clamp-3 hidden md:block">
+              <p class="text-tiny md:text-small text-slate-500 dark:text-[hsl(0_0%_60%)] mb-2 md:mb-4 line-clamp-2 md:line-clamp-3 hidden md:block">
                 {post.data.excerpt}
               </p>
-              <div class="flex items-center justify-between text-tiny md:text-xs text-slate-500">
+              <div class="flex items-center justify-between text-tiny md:text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-auto">
                 <span class="hidden md:inline">{post.data.author}</span>
                 <span>{post.data.readTime}</span>
               </div>
@@ -86,7 +86,7 @@ function formatDate(date: Date) {
 
     <!-- Empty State -->
     <div id="empty-state" class="hidden col-span-full text-center py-12">
-      <p class="text-slate-600 text-body">No blog posts found for this filter.</p>
+      <p class="text-slate-600 dark:text-[hsl(0_0%_65%)] text-body">No blog posts found for this filter.</p>
     </div>
   </main>
 
@@ -120,11 +120,11 @@ function formatDate(date: Date) {
       ['filter-all', 'filter-tt', 'filter-gy'].forEach(id => {
         const button = document.getElementById(id);
         if (id === activeId) {
-          button.classList.remove('border-2', 'border-slate-300', 'text-slate-700', 'hover:bg-slate-50');
+          button.classList.remove('border-2', 'border-slate-300', 'dark:border-[hsl(0_0%_30%)]', 'text-slate-700', 'dark:text-[hsl(0_0%_85%)]', 'hover:bg-slate-50', 'dark:hover:bg-[hsl(0_0%_14%)]');
           button.classList.add('bg-rose-600', 'text-white', 'hover:bg-rose-700');
         } else {
           button.classList.remove('bg-rose-600', 'text-white', 'hover:bg-rose-700');
-          button.classList.add('border-2', 'border-slate-300', 'text-slate-700', 'hover:bg-slate-50');
+          button.classList.add('border-2', 'border-slate-300', 'dark:border-[hsl(0_0%_30%)]', 'text-slate-700', 'dark:text-[hsl(0_0%_85%)]', 'hover:bg-slate-50', 'dark:hover:bg-[hsl(0_0%_14%)]');
         }
       });
     }
