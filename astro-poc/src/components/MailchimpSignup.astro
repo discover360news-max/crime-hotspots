@@ -12,16 +12,16 @@ interface Props {
 const { areaName } = Astro.props;
 ---
 
-<div class="email-signup bg-white/70 backdrop-blur-md rounded-lg border border-slate-200 p-5 mt-6">
+<div class="email-signup bg-white/70 dark:bg-[hsl(0_0%_8%)]/70 backdrop-blur-md rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-5">
   <div class="flex items-start gap-3">
     <svg class="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
     </svg>
     <div class="flex-1">
-      <h3 class="text-sm font-semibold text-slate-800 mb-1">
+      <h3 class="text-sm font-semibold text-slate-800 dark:text-[hsl(0_0%_90%)] mb-1">
         {areaName ? `Get updates for ${areaName}` : 'Get crime updates'}
       </h3>
-      <p class="text-xs text-slate-500 mb-3">
+      <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mb-3">
         Receive weekly crime summaries and safety alerts. No spam.
       </p>
 
@@ -36,7 +36,7 @@ const { areaName } = Astro.props;
           name="email"
           required
           placeholder="your@email.com"
-          class="flex-1 px-3 py-2 rounded-lg border border-slate-300 text-sm text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300"
+          class="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] bg-white dark:bg-[hsl(0_0%_5%)] text-sm text-slate-700 dark:text-[hsl(0_0%_90%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_40%)] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300"
         />
         <button
           type="submit"
@@ -46,7 +46,7 @@ const { areaName } = Astro.props;
         </button>
       </form>
 
-      <p class="email-signup-status text-xs mt-2 text-slate-400">
+      <p class="email-signup-status text-xs mt-2 text-slate-400 dark:text-[hsl(0_0%_50%)]">
         Free. Unsubscribe anytime.
       </p>
     </div>

@@ -42,7 +42,7 @@ const {
 {showButton && (
   <button
     id={`${idPrefix}reportIssueBtn`}
-    class="px-4 py-1.5 min-h-[22px] flex items-center justify-center gap-2 border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 active:bg-rose-100 transition font-medium text-xs whitespace-nowrap"
+    class="px-4 py-1.5 min-h-[22px] flex items-center justify-center gap-2 border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 active:bg-rose-100 dark:active:bg-rose-950/60 transition font-medium text-xs whitespace-nowrap"
   >
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -59,14 +59,14 @@ const {
   <!-- Modal Content -->
   <div
     id={`${idPrefix}reportIssueContent`}
-    class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto opacity-0 scale-95 transition-all duration-300"
+    class="bg-white dark:bg-[hsl(0_0%_10%)] rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto opacity-0 scale-95 transition-all duration-300"
   >
     <!-- Modal Header -->
-    <div class="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-      <h2 class="text-heading font-bold text-slate-700">Report Issue</h2>
+    <div class="sticky top-0 bg-white dark:bg-[hsl(0_0%_10%)] border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between">
+      <h2 class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Report Issue</h2>
       <button
         id={`${idPrefix}closeModalBtn`}
-        class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 active:bg-slate-200 transition text-slate-500 hover:text-slate-700"
+        class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_15%)] active:bg-slate-200 dark:active:bg-[hsl(0_0%_20%)] transition text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
         aria-label="Close"
       >
         <span class="text-2xl leading-none">×</span>
@@ -76,15 +76,15 @@ const {
     <!-- Form -->
     <form id={`${idPrefix}reportIssueForm`} class="p-6 space-y-6">
       <!-- Crime Info Preview -->
-      <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
-        <p class="text-xs font-semibold text-slate-500 mb-2">Reporting issue for:</p>
-        <p class="text-sm font-semibold text-slate-700">{crimeHeadline}</p>
-        <p class="text-xs text-slate-500 mt-1">{crimeDate} • {crimeArea}</p>
+      <div class="p-4 bg-slate-50 dark:bg-[hsl(0_0%_6%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)]">
+        <p class="text-xs font-semibold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-2">Reporting issue for:</p>
+        <p class="text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_92%)]">{crimeHeadline}</p>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-1">{crimeDate} • {crimeArea}</p>
       </div>
 
       <!-- Issue Type Selection -->
       <div>
-        <label class="block text-sm font-semibold text-slate-700 mb-2">
+        <label class="block text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">
           What's wrong? <span class="text-rose-600">*</span>
         </label>
         <div class="space-y-2">
@@ -95,7 +95,7 @@ const {
               value="Incorrect Headline/Summary"
               class="mt-1"
             />
-            <span class="text-sm text-slate-700">Incorrect Headline/Summary</span>
+            <span class="text-sm text-slate-700 dark:text-[hsl(0_0%_85%)]">Incorrect Headline/Summary</span>
           </label>
           <label class="flex items-start gap-2 cursor-pointer">
             <input
@@ -104,7 +104,7 @@ const {
               value="Wrong Date/Location"
               class="mt-1"
             />
-            <span class="text-sm text-slate-700">Wrong Date/Location</span>
+            <span class="text-sm text-slate-700 dark:text-[hsl(0_0%_85%)]">Wrong Date/Location</span>
           </label>
           <label class="flex items-start gap-2 cursor-pointer">
             <input
@@ -113,21 +113,21 @@ const {
               value="Duplicate Entry"
               class="mt-1"
             />
-            <span class="text-sm text-slate-700">Duplicate Entry</span>
+            <span class="text-sm text-slate-700 dark:text-[hsl(0_0%_85%)]">Duplicate Entry</span>
           </label>
         </div>
       </div>
 
       <!-- Information Source -->
       <div>
-        <label for="informationSource" class="block text-sm font-semibold text-slate-700 mb-2">
+        <label for="informationSource" class="block text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">
           Source of Your Information <span class="text-rose-600">*</span>
         </label>
         <select
           id="informationSource"
           name="informationSource"
           required
-          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-rose-600 focus:border-transparent"
+          class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_22%)] rounded-lg text-sm text-slate-700 dark:text-[hsl(0_0%_85%)] bg-white dark:bg-[hsl(0_0%_8%)] focus:ring-2 focus:ring-rose-600 focus:border-transparent"
         >
           <option value="">Select a source</option>
           <option value="Eye-witness">Eye-witness</option>
@@ -140,7 +140,7 @@ const {
 
       <!-- Description -->
       <div>
-        <label for="issueDescription" class="block text-sm font-semibold text-slate-700 mb-2">
+        <label for="issueDescription" class="block text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">
           Please describe the issue <span class="text-rose-600">*</span>
         </label>
         <textarea
@@ -149,14 +149,14 @@ const {
           required
           rows="4"
           placeholder="Provide details about what's incorrect and what the correct information should be..."
-          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-rose-600 focus:border-transparent resize-none"
+          class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_22%)] rounded-lg text-sm text-slate-700 dark:text-[hsl(0_0%_85%)] bg-white dark:bg-[hsl(0_0%_8%)] focus:ring-2 focus:ring-rose-600 focus:border-transparent resize-none"
         ></textarea>
-        <p class="text-xs text-slate-500 mt-1">Minimum 20 characters</p>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-1">Minimum 20 characters</p>
       </div>
 
       <!-- Contact Email (Optional) -->
       <div>
-        <label for="contactEmail" class="block text-sm font-semibold text-slate-700 mb-2">
+        <label for="contactEmail" class="block text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">
           Contact Email (Optional)
         </label>
         <input
@@ -164,9 +164,9 @@ const {
           id="contactEmail"
           name="contactEmail"
           placeholder="your@email.com"
-          class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-rose-600 focus:border-transparent"
+          class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_22%)] rounded-lg text-sm text-slate-700 dark:text-[hsl(0_0%_85%)] bg-white dark:bg-[hsl(0_0%_8%)] focus:ring-2 focus:ring-rose-600 focus:border-transparent"
         />
-        <p class="text-xs text-slate-500 mt-1">If you'd like us to follow up with you</p>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-1">If you'd like us to follow up with you</p>
       </div>
 
       <!-- Hidden fields with crime data -->
@@ -193,7 +193,7 @@ const {
         <button
           type="button"
           id={`${idPrefix}cancelReportBtn`}
-          class="px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition font-medium text-xs"
+          class="px-4 py-1.5 min-h-[22px] flex items-center justify-center rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_15%)] transition font-medium text-xs"
         >
           Cancel
         </button>

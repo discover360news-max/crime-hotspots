@@ -143,7 +143,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
     <!-- Site Notification Banner -->
     <SiteNotificationBanner notification={dataUpdateNotice} />
 
-    <article class="bg-white/70 dark:bg-[hsl(0_0%_8%)/70] rounded-lg shadow-sm border border-slate-200 dark:border-[hsl(0_0%_18%)] p-6 sm:p-8">
+    <article class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-lg shadow-sm border border-slate-200 dark:border-[hsl(0_0%_18%)] p-6 sm:p-8">
       <!-- Two-column layout: Desktop only, stack on mobile -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- LEFT COLUMN: Crime Metadata (Row 1, Col 1) -->
@@ -224,7 +224,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
           )}
 
           <!-- Report Issue Section -->
-          <div class="p-4 bg-white/70 dark:bg-[hsl(0_0%_8%)/70] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)]" data-pagefind-ignore>
+          <div class="p-4 bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)]" data-pagefind-ignore>
             <div class="mb-3">
               <p class="text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_90%)]">Found incorrect information?</p>
               <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-1">Help us keep our data accurate by reporting issues.</p>
@@ -284,7 +284,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
           {prevCrime && (
             <a
               href={`/trinidad/crime/${prevCrime.slug}/`}
-              class="block p-4 bg-white/70 dark:bg-[hsl(0_0%_8%)/70] rounded-lg shadow-sm border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-600 dark:hover:border-rose-700 active:bg-rose-50 dark:active:bg-rose-950/40 transition group"
+              class="block p-4 bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-lg shadow-sm border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-600 dark:hover:border-rose-700 active:bg-rose-50 dark:active:bg-rose-950/40 transition group"
             >
               <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mb-1">← Previous Crime</div>
               <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_88%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition line-clamp-2">
@@ -302,7 +302,7 @@ const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${c
           {nextCrime && (
             <a
               href={`/trinidad/crime/${nextCrime.slug}/`}
-              class="block p-4 bg-white/70 dark:bg-[hsl(0_0%_8%)/70] rounded-lg shadow-sm border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-600 dark:hover:border-rose-700 active:bg-rose-50 dark:active:bg-rose-950/40 transition group"
+              class="block p-4 bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-lg shadow-sm border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-600 dark:hover:border-rose-700 active:bg-rose-50 dark:active:bg-rose-950/40 transition group"
             >
               <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mb-1">Next Crime →</div>
               <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_88%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition line-clamp-2">
