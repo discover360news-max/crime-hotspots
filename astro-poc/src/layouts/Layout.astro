@@ -73,12 +73,12 @@ const detectedCountryId = Object.entries(countryPathMap).find(
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
   <meta property="og:image" content={ogImage}>
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
+  <meta property="og:image:width" content={ogImage.includes('/crime-types/') ? '200' : '1200'}>
+  <meta property="og:image:height" content={ogImage.includes('/crime-types/') ? '200' : '630'}>
   <meta property="og:site_name" content="Crime Hotspots">
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
+  <!-- Twitter Card — square thumbnails use "summary", full-width use "summary_large_image" -->
+  <meta name="twitter:card" content={ogImage.includes('/crime-types/') ? 'summary' : 'summary_large_image'}>
   <meta name="twitter:url" content={canonicalURL}>
   <meta name="twitter:title" content={title}>
   <meta name="twitter:description" content={description}>
@@ -135,6 +135,29 @@ const detectedCountryId = Object.entries(countryPathMap).find(
 
   <!-- Grow Monetization -->
   <script is:inline data-grow-initializer="">!(function(){window.growMe||((window.growMe=function(e){window.growMe._.push(e);}),(window.growMe._=[]));var e=document.createElement("script");(e.type="text/javascript"),(e.src="https://faves.grow.me/main.js"),(e.defer=!0),e.setAttribute("data-grow-faves-site-id","U2l0ZTpjYmI0YmEwMC0xM2ZhLTQ0ZmEtOTExYy0wNDNhY2MxMzI1NmQ=");var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t);})();</script>
+
+  <!-- Shift Grow widget above BottomNav on mobile (BottomNav is 64px tall) -->
+  <script is:inline>
+  (function(){
+    if(window.matchMedia('(min-width:768px)').matches)return;
+    var OFFSET=64;
+    function shiftGrow(){
+      var root=document.getElementById('grow-me-root');
+      if(!root||!root.shadowRoot)return false;
+      var sr=root.shadowRoot;
+      if(sr.querySelector('style[data-ch-offset]'))return true;
+      var s=document.createElement('style');
+      s.setAttribute('data-ch-offset','1');
+      s.textContent='@media(max-width:767px){div[class*="MiniCarousel"]{bottom:'+(24+OFFSET)+'px!important}div[class*="App"]>div{bottom:'+(15+OFFSET)+'px!important}}';
+      sr.appendChild(s);
+      return true;
+    }
+    if(!shiftGrow()){
+      var obs=new MutationObserver(function(){if(shiftGrow())obs.disconnect();});
+      obs.observe(document.body,{childList:true,subtree:true});
+    }
+  })();
+  </script>
 
   <!-- Cookie Consent & Analytics -->
   <script>

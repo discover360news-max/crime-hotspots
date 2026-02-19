@@ -21,6 +21,7 @@ import { loadAreaAliases, getLocalName } from '../../../lib/areaAliases';
 import { getCountryName } from '../../../data/countries';
 import { getSafetyContext } from '../../../lib/safetyHelpers';
 import { routes, buildRoute } from '../../../config/routes';
+import { getCrimeTypeThumbnailUrl } from '../../../lib/generateCrimeTypeThumbnails';
 
 // Fetch all crimes once per request (used for slug lookup, navigation, and safety context)
 const { slug } = Astro.params;
@@ -58,9 +59,10 @@ const monthName = crime.dateObj.toLocaleDateString('en-US', { month: 'long' });
 // SEO Meta Tags
 const title = `${crime.headline} | Crime Hotspots Trinidad`;
 const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${crime.date}. View details, location, and related crimes.`;
+const ogImage = getCrimeTypeThumbnailUrl(crime.crimeType);
 ---
 
-<Layout title={title} description={description} includeTurnstile={true}>
+<Layout title={title} description={description} ogImage={ogImage} includeTurnstile={true}>
   <!-- Schema.org NewsArticle Markup -->
   <script type="application/ld+json" slot="head">
     {
