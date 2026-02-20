@@ -19,6 +19,7 @@ interface StatCard {
   yoyChange?: number;
   direction?: 'up' | 'down' | 'flat';
   subtitle?: string;
+  highlight?: boolean; // true = render count in rose-600 (e.g. murder stats)
 }
 
 interface Props {
@@ -40,7 +41,7 @@ function formatPercentChange(change: number): string {
   {stats.map((stat) => (
     <div class="bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-4 shadow-sm">
       <div class="text-caption text-slate-500 dark:text-[hsl(0_0%_60%)] font-bold">{stat.label}</div>
-      <div class="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-[hsl(0_0%_95%)] mt-1">{stat.current}</div>
+      <div class={`text-2xl sm:text-3xl font-bold mt-1 ${stat.highlight ? 'text-rose-600 dark:text-rose-400' : 'text-slate-800 dark:text-[hsl(0_0%_95%)]'}`}>{stat.current}</div>
       {stat.subtitle ? (
         <div class="text-caption mt-1 text-slate-400 dark:text-[hsl(0_0%_50%)]">{stat.subtitle}</div>
       ) : stat.direction && stat.yoyChange !== undefined ? (

@@ -35,6 +35,10 @@ const archives = Array.from(archiveMap.values()).sort((a, b) => {
   return b.month - a.month;
 });
 
+const now = new Date();
+const currentYear = now.getFullYear();
+const currentMonth = now.getMonth() + 1;
+
 const title = "Trinidad & Tobago Crime Archives | Crime Hotspots";
 const description = "Browse crime statistics archives for Trinidad & Tobago by month. View trends, statistics, and detailed reports.";
 ---
@@ -51,7 +55,7 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
     <!-- Page Header -->
     <div class="text-center mb-4">
       <h1 class="text-display text-slate-700 dark:text-[hsl(0_0%_90%)] mb-2">Crime Archives</h1>
-      <p class="text-display font-bold text-rose-600">Trinidad & Tobago</p>
+      <p class="text-display font-bold text-slate-600 dark:text-[hsl(0_0%_65%)]">Trinidad & Tobago</p>
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2">
         Browse {crimes.length} crime incidents organized by month
       </p>
@@ -61,13 +65,13 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
     <div class="flex justify-center gap-2 mb-8">
       <a
         href={routes.trinidad.dashboard}
-        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/60 active:bg-rose-100 dark:active:bg-rose-950/80 transition font-medium text-xs whitespace-nowrap"
+        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_65%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition font-medium text-xs whitespace-nowrap"
       >
         Dashboard
       </a>
       <a
         href={routes.trinidad.headlines}
-        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/60 active:bg-rose-100 dark:active:bg-rose-950/80 transition font-medium text-xs whitespace-nowrap"
+        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_65%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition font-medium text-xs whitespace-nowrap"
       >
         Headlines
       </a>
@@ -89,14 +93,14 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
           >
             <div class="flex items-start justify-between">
               <div>
-                <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] group-hover:text-rose-600 transition">
+                <h2 class={`text-body font-bold transition ${archive.year === currentYear && archive.month === currentMonth ? 'text-rose-600 group-hover:text-rose-700' : 'text-slate-500 dark:text-[hsl(0_0%_55%)] group-hover:text-rose-600'}`}>
                   {monthName} <br>{archive.year}</br>
                 </h2>
-                <p class="text-tiny text-rose-600 mt-1">
+                <p class="text-tiny text-slate-500 dark:text-[hsl(0_0%_55%)] mt-1">
                   {archive.count} {archive.count === 1 ? 'crime' : 'crimes'}
                 </p>
               </div>
-              <svg class="w-5 h-5 text-rose-600 group-hover:text-rose-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_45%)] group-hover:text-rose-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </div>

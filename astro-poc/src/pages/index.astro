@@ -11,6 +11,7 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import InfoPopup from '../components/InfoPopup.astro';
 import HomepagePulse from '../components/HomepagePulse.astro';
+import QuickAnswers from '../components/QuickAnswers.astro';
 import { routes } from '../config/routes';
 // Import optimized images (Astro converts to WebP automatically)
 import trinidadImg from '../assets/images/trinidad.jpg';
@@ -172,6 +173,8 @@ const countries = [
           ))}
         </div>
       </div>
+
+      <QuickAnswers />
 
       <div class="mt-16 flex items-center gap-2">
         

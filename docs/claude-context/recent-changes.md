@@ -8,6 +8,19 @@
 
 ## February 2026
 
+### UI Polish — Accent Discipline & FAQ (Feb 20)
+
+- **QuickAnswers.astro** (created) — FAQ component on homepage bottom: 4 Q&As (40-50 words each), FAQPage JSON-LD schema, per-question deep-dive links, "Read full Methodology" CTA
+- **StatCards.astro** — added `highlight?: boolean` prop; murder stat cards now render count in `text-rose-600` site-wide
+- **`area/[slug].astro`, `region/[slug].astro`** — Murders (YTD) card passes `highlight: true`
+- **`statistics.astro`** — previous year murder rate number fixed to rose-600 (YTD was already rose); all section headings muted to `text-body font-bold text-slate-500`; full dark mode pass
+- **`statistics.astro`, `archive/index.astro`, `archive/[year]/[month].astro`** — nav buttons changed from rose outline → neutral grey border pattern
+- **`archive/index.astro`** — "Trinidad & Tobago" subtitle muted to slate; crime count text on cards muted; arrow chevron only rose on hover; current month heading stays rose-600
+- **`archive/[year]/[month].astro`** — scroll hint arrow muted (removed animate-pulse)
+- **`FeedbackToggle.astro`** — background changed from `bg-white` → `bg-slate-50` for visual separation
+- **Areas/regions/compare pages** — responsive padding fixed (`px-4` → `px-4 sm:px-6 lg:px-8`) to align with header
+- **DESIGN-TOKENS.md** — v1.8: muted section heading rule codified, antipattern added, page-type distinction documented
+
 ### User Journey Overhaul — "Lead with the Story" (Feb 19)
 
 - **HomepagePulse.astro** (created) — live Trinidad stats below country card: incidents this week (±%), top area, murders, latest headline, CTA to dashboard

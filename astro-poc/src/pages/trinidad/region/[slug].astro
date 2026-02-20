@@ -90,7 +90,7 @@ const avgRiskScore = regionAreaScores.length > 0
 // Primary stat cards (visible)
 const statCards = [
   makeYoYCard('Incidents (90d)', recentCrimes90d.length, recentCrimes90dPrev.length),
-  makeYoYCard('Murders (YTD)', countCrimeType(crimesCurrentYTD, 'Murder'), countCrimeType(crimesPreviousYTD, 'Murder')),
+  { ...makeYoYCard('Murders (YTD)', countCrimeType(crimesCurrentYTD, 'Murder'), countCrimeType(crimesPreviousYTD, 'Murder')), highlight: true },
   makeYoYCard('Robberies (YTD)', countCrimeType(crimesCurrentYTD, 'Robbery'), countCrimeType(crimesPreviousYTD, 'Robbery')),
   {
     label: 'Risk Level',
@@ -163,7 +163,7 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  <div class="max-w-6xl mx-auto px-4 py-6" data-pagefind-body>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6" data-pagefind-body>
     <Breadcrumbs items={breadcrumbs} />
 
     <Hero

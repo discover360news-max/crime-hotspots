@@ -10,7 +10,7 @@ const { areaName, pageUrl, pageTitle } = Astro.props;
 
 <div class="feedback-toggle" data-area={areaName} data-url={pageUrl} data-title={pageTitle}>
   <!-- Vote state -->
-  <div class="feedback-vote flex items-center justify-between p-4 bg-white dark:bg-[hsl(0_0%_8%)] border border-slate-200 dark:border-[hsl(0_0%_15%)] rounded-lg">
+  <div class="feedback-vote flex items-center justify-between p-4 bg-slate-50 dark:bg-[hsl(0_0%_11%)] border border-slate-200 dark:border-[hsl(0_0%_15%)] rounded-lg">
     <span class="text-sm text-slate-600 dark:text-[hsl(0_0%_55%)] font-medium">Was this safety insight helpful?</span>
     <div class="flex items-center gap-2">
       <button
@@ -31,7 +31,7 @@ const { areaName, pageUrl, pageTitle } = Astro.props;
   </div>
 
   <!-- Thanks + Share state (hidden by default) -->
-  <div class="feedback-thanks hidden p-4 bg-white dark:bg-[hsl(0_0%_8%)] border border-slate-200 dark:border-[hsl(0_0%_15%)] rounded-lg">
+  <div class="feedback-thanks hidden p-4 bg-slate-50 dark:bg-[hsl(0_0%_11%)] border border-slate-200 dark:border-[hsl(0_0%_15%)] rounded-lg">
     <div class="flex items-center gap-2 mb-3">
       <span class="feedback-spark relative inline-flex items-center justify-center w-5 h-5">
         <svg class="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">

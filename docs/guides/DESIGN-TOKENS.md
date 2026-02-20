@@ -1,7 +1,7 @@
 # Crime Hotspots Design Tokens
 
-**Version:** 1.7
-**Last Updated:** February 19, 2026
+**Version:** 1.8
+**Last Updated:** February 20, 2026
 **Status:** Living Document
 
 This document defines the design system for Crime Hotspots. All pages should follow these patterns for visual consistency.
@@ -58,9 +58,12 @@ White:     #ffffff (containers)
 
 ### Color Usage Rules
 - **Rose-600:** All primary CTAs, links, active filter states, error states
-- **Slate-700:** All H1-H3 headings, primary body text
+- **Slate-700:** Page-level H1 headings and content-page section headings (about, methodology, blog)
+- **Slate-500:** Section labels on data/app pages (dashboard, statistics) — muted so data dominates
 - **Slate-400/500:** Supporting text, captions, metadata
 - **Never use:** Blue, green, yellow (except for crime type indicators)
+
+> **Rule:** On data-heavy pages (dashboard, statistics), section `<h2>` labels use `text-slate-500 dark:text-[hsl(0_0%_55%)]` — NOT `text-slate-700`. This keeps headings subordinate to the data they introduce. See [Heading Hierarchy by Page Type](#heading-hierarchy-by-page-type).
 
 ---
 
@@ -638,6 +641,12 @@ Hero CTAs use larger sizing than standard buttons:
 <!-- Wrong: Deprecated radius -->
 <div class="rounded-md">  <!-- Use rounded-lg -->
 
+<!-- Wrong: text-xl/semibold on data page section headings — overpowers the data -->
+<h2 class="text-xl font-semibold text-slate-700">Quick Insights</h2>
+
+<!-- Correct: muted section label on data pages -->
+<h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)]">Quick Insights</h2>
+
 <!-- Wrong: Old type tokens -->
 <h1 class="text-h1 font-semibold">
 <p class="text-caption text-slate-400">
@@ -962,7 +971,7 @@ Inline text-based CTAs within narrative blocks (not full buttons). Used for cros
 **Before Adding New Pages:**
 1. Copy button patterns from this file (don't create new variants)
 2. Use frosted glass opacity scale (25/50/70/80 only)
-3. All headings must have `text-slate-700` or `text-slate-600`
+3. Heading color depends on page type — **content pages** use `text-slate-700`; **data/app pages** use `text-slate-500 dark:text-[hsl(0_0%_55%)]` for section labels (see [Heading Hierarchy by Page Type](#heading-hierarchy-by-page-type))
 4. Form inputs use `rounded-lg`, not `rounded-md`
 5. Test on mobile (ensure `min-h-button` on all interactive elements)
 
@@ -976,6 +985,7 @@ Inline text-based CTAs within narrative blocks (not full buttons). Used for cros
 
 **Version History:**
 
+- **v1.8 (Feb 20, 2026):** Clarified section heading colors by page type — data/app pages use `text-slate-500` (muted), content pages use `text-slate-700`. Added antipattern (`text-xl font-semibold text-slate-700`) to Common Mistakes. Fixed contradictions in Color Usage Rules and Maintenance Notes.
 - **v1.7 (Feb 19, 2026):** Added Feature Index (jump-to-feature table), Live Pulse Indicator pattern, Alert Badge pattern, Contextual CTA Links pattern — supports HomepagePulse, AreaNarrative, DashboardStory, "New Since" badge, Compare Prompt
 - **v1.6 (Feb 18, 2026):** Typography token migration complete (text-h1/h2/h3 → text-display/heading/body across 19 files), added heading hierarchy rules by page type, SVG icon stroke-width convention (stroke-width="1"), DashboardInfoCards dark mode + border
 - **v1.5 (Feb 17, 2026):** Added Dark Mode System section (HSL palette, CSS vars, toggle script, Tailwind scanning rules)
