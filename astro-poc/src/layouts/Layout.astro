@@ -133,8 +133,9 @@ const detectedCountryId = Object.entries(countryPathMap).find(
   <!-- Cloudflare Web Analytics (cookieless, no consent needed, tracks all real visitors) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "9edc1888af84466fa5b067943e7c6f99"}'></script>
 
-  <!-- Grow Monetization -->
+  <!-- Grow Monetization (script active for traffic tracking; widget hidden via opacity) -->
   <script is:inline data-grow-initializer="">!(function(){window.growMe||((window.growMe=function(e){window.growMe._.push(e);}),(window.growMe._=[]));var e=document.createElement("script");(e.type="text/javascript"),(e.src="https://faves.grow.me/main.js"),(e.defer=!0),e.setAttribute("data-grow-faves-site-id","U2l0ZTpjYmI0YmEwMC0xM2ZhLTQ0ZmEtOTExYy0wNDNhY2MxMzI1NmQ=");var t=document.getElementsByTagName("script")[0];t.parentNode.insertBefore(e,t);})();</script>
+  <style is:global>#grow-me-root{opacity:0!important;pointer-events:none!important;}</style>
 
   <!-- Shift Grow widget above BottomNav on mobile (BottomNav is 64px tall) -->
   <script is:inline>
