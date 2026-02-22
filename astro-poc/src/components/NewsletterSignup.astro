@@ -149,20 +149,31 @@ const sub = areaName
 
         if (btn) { btn.disabled = true; btn.textContent = '...'; }
 
-        fetch('/api/subscribe', {
+        // POST directly to Buttondown's public embed endpoint (no API key needed,
+        // no Cloudflare Worker hop — avoids connectivity issues with api.buttondown.email)
+        var formData = new URLSearchParams();
+        formData.append('email', email);
+
+        fetch('https://buttondown.com/api/emails/embed-subscribe/discover_360', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email, source: source }),
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: formData.toString(),
         })
-          .then(function (r) { return r.json(); })
-          .then(function (data) {
-            if (data.success) {
-              setStatus(form, data.message || 'Subscribed. Check your inbox for a confirmation.', 'text-emerald-600');
+          .then(function (r) {
+            if (r.ok) {
+              setStatus(form, 'Subscribed. Check your inbox for a confirmation.', 'text-emerald-600');
               if (emailInput) { emailInput.value = ''; emailInput.disabled = true; }
               if (btn) { btn.textContent = 'Done'; }
             } else {
-              setStatus(form, data.error || 'Something went wrong. Please try again.', 'text-rose-500');
-              if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+              return r.text().then(function (text) {
+                var lower = text.toLowerCase();
+                if (lower.includes('already') || lower.includes('exists') || lower.includes('duplicate')) {
+                  setStatus(form, "You're already subscribed.", 'text-emerald-600');
+                } else {
+                  setStatus(form, 'Something went wrong. Please try again.', 'text-rose-500');
+                  if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+                }
+              });
             }
           })
           .catch(function () {
