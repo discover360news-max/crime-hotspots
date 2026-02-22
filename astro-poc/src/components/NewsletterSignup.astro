@@ -1,0 +1,184 @@
+---
+/**
+ * Newsletter Signup — Buttondown
+ *
+ * Submits to /api/subscribe (server-side Astro endpoint → Buttondown API).
+ * BUTTONDOWN_API_KEY must be set in Cloudflare Pages environment variables.
+ *
+ * Props:
+ *   areaName  - personalises heading on area pages (optional)
+ *   variant   - 'card' (default, area pages) | 'inline' (statistics) | 'footer' (Layout footer)
+ *   source    - tag sent to Buttondown for segmenting (default: 'website')
+ */
+
+interface Props {
+  areaName?: string;
+  variant?: 'card' | 'inline' | 'footer';
+  source?: string;
+}
+
+const { areaName, variant = 'card', source = 'website' } = Astro.props;
+
+const heading = areaName
+  ? `Stay informed about ${areaName}`
+  : 'Get the weekly Caribbean crime digest';
+
+const sub = areaName
+  ? 'Clean data, no ads — straight to your inbox. Unsubscribe anytime.'
+  : 'Clean data, no ads, straight to your inbox.';
+---
+
+{variant === 'card' && (
+  <div class="newsletter-signup-root bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-5">
+    <div class="flex items-start gap-3">
+      <svg class="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+      <div class="flex-1">
+        <h3 class="text-sm font-semibold text-slate-800 dark:text-[hsl(0_0%_90%)] mb-1">{heading}</h3>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mb-3">{sub}</p>
+
+        <form class="newsletter-signup-form flex gap-2" data-source={source}>
+          {/* Honeypot anti-spam */}
+          <div style="position:absolute;left:-5000px;" aria-hidden="true">
+            <input type="text" name="hp" tabindex="-1" value="" autocomplete="off" />
+          </div>
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="your@email.com"
+            class="newsletter-email flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] bg-white dark:bg-[hsl(0_0%_5%)] text-sm text-slate-700 dark:text-[hsl(0_0%_90%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_40%)] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300"
+          />
+          <button
+            type="submit"
+            class="newsletter-btn px-4 py-2 rounded-lg bg-rose-600 text-white text-xs font-medium hover:bg-rose-700 active:bg-rose-800 transition"
+          >
+            Subscribe
+          </button>
+        </form>
+
+        <p class="newsletter-status text-xs mt-2 text-slate-400 dark:text-[hsl(0_0%_50%)]">Free. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </div>
+)}
+
+{variant === 'inline' && (
+  <div class="newsletter-signup-root rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-white dark:bg-[hsl(0_0%_8%)] p-6 shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold text-slate-800 dark:text-[hsl(0_0%_90%)]">{heading}</p>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-0.5">{sub}</p>
+      </div>
+      <form class="newsletter-signup-form flex gap-2 shrink-0" data-source={source}>
+        <div style="position:absolute;left:-5000px;" aria-hidden="true">
+          <input type="text" name="hp" tabindex="-1" value="" autocomplete="off" />
+        </div>
+        <input
+          type="email"
+          name="email"
+          required
+          placeholder="your@email.com"
+          class="newsletter-email w-52 px-3 py-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] bg-white dark:bg-[hsl(0_0%_5%)] text-sm text-slate-700 dark:text-[hsl(0_0%_90%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_40%)] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300"
+        />
+        <button
+          type="submit"
+          class="newsletter-btn px-4 py-2 rounded-lg bg-rose-600 text-white text-xs font-medium hover:bg-rose-700 active:bg-rose-800 transition whitespace-nowrap"
+        >
+          Subscribe
+        </button>
+      </form>
+    </div>
+    <p class="newsletter-status text-xs mt-3 text-slate-400 dark:text-[hsl(0_0%_50%)]">Free. Unsubscribe anytime.</p>
+  </div>
+)}
+
+{variant === 'footer' && (
+  <div class="newsletter-signup-root">
+    <p class="text-caption font-semibold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-2">
+      Weekly crime digest
+    </p>
+    <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] mb-3">
+      Clean data, no ads, straight to your inbox.
+    </p>
+    <form class="newsletter-signup-form flex gap-2" data-source={source}>
+      <div style="position:absolute;left:-5000px;" aria-hidden="true">
+        <input type="text" name="hp" tabindex="-1" value="" autocomplete="off" />
+      </div>
+      <input
+        type="email"
+        name="email"
+        required
+        placeholder="your@email.com"
+        class="newsletter-email flex-1 min-w-0 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] bg-white dark:bg-[hsl(0_0%_5%)] text-xs text-slate-700 dark:text-[hsl(0_0%_90%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_40%)] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300"
+      />
+      <button
+        type="submit"
+        class="newsletter-btn px-3 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-medium hover:bg-rose-700 active:bg-rose-800 transition whitespace-nowrap"
+      >
+        Subscribe
+      </button>
+    </form>
+    <p class="newsletter-status text-xs mt-2 text-slate-400 dark:text-[hsl(0_0%_50%)]">Free. Unsubscribe anytime.</p>
+  </div>
+)}
+
+<script is:inline>
+  (function () {
+    // Guard: only initialise forms that haven't been set up yet
+    document.querySelectorAll('.newsletter-signup-form:not([data-ns-ready])').forEach(function (form) {
+      form.setAttribute('data-ns-ready', '1');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Honeypot check
+        var hp = form.querySelector('[name="hp"]');
+        if (hp && hp.value) return;
+
+        var emailInput = form.querySelector('.newsletter-email');
+        var email = emailInput ? emailInput.value.trim() : '';
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          setStatus(form, 'Please enter a valid email address.', 'text-rose-500');
+          return;
+        }
+
+        var btn = form.querySelector('.newsletter-btn');
+        var source = form.dataset.source || 'website';
+
+        if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
+        fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, source: source }),
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.success) {
+              setStatus(form, data.message || 'Subscribed. Check your inbox for a confirmation.', 'text-emerald-600');
+              if (emailInput) { emailInput.value = ''; emailInput.disabled = true; }
+              if (btn) { btn.textContent = 'Done'; }
+            } else {
+              setStatus(form, data.error || 'Something went wrong. Please try again.', 'text-rose-500');
+              if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+            }
+          })
+          .catch(function () {
+            setStatus(form, 'Network error. Please try again.', 'text-rose-500');
+            if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+          });
+      });
+    });
+
+    function setStatus(form, msg, cls) {
+      var root = form.closest('.newsletter-signup-root');
+      var status = root ? root.querySelector('.newsletter-status') : null;
+      if (status) {
+        status.textContent = msg;
+        status.className = 'newsletter-status text-xs mt-2 ' + cls;
+      }
+    }
+  })();
+</script>

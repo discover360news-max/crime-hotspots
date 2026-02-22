@@ -1,5 +1,6 @@
 ---
 import Header from '../components/Header.astro';
+import NewsletterSignup from '../components/NewsletterSignup.astro';
 import BottomNav from '../components/BottomNav.astro';
 import { routes } from '../config/routes';
 import IslandSelectorModal from '../components/IslandSelectorModal.astro';
@@ -362,6 +363,36 @@ const detectedCountryId = Object.entries(countryPathMap).find(
             <li><a href={routes.privacy} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Privacy Policy</a></li>
             <li><a href={routes.businessSolutions} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Business Solutions</a></li>
           </ul>
+        </div>
+      </div>
+
+      <!-- Newsletter + Support -->
+      <div class="mt-8 pt-8 border-t border-slate-200 dark:border-[hsl(0_0%_18%)] grid sm:grid-cols-2 gap-8">
+        <!-- Newsletter -->
+        <div>
+          <NewsletterSignup variant="footer" source="footer" />
+        </div>
+
+        <!-- Support this project -->
+        <div>
+          <p class="text-caption font-semibold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-2">
+            Support this project
+          </p>
+          <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] mb-3">
+            CrimeHotspots is free, ad-free, and independent. If you find it valuable, you can help keep it that way.
+          </p>
+          <!-- TODO: Replace # with your Buy Me a Coffee URL, e.g. https://buymeacoffee.com/discover360 -->
+          <a
+            href="https://ko-fi.com/crimehotspots"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_65%)] text-xs font-medium hover:border-amber-400 hover:text-amber-700 dark:hover:text-amber-400 dark:hover:border-amber-700 transition"
+          >
+            <svg class="w-4 h-4 text-amber-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M20.216 6.415l-.132-.666c-.119-.598-.388-1.163-1.001-1.379-.197-.069-.42-.098-.57-.241-.152-.143-.196-.366-.231-.572-.065-.378-.125-.756-.192-1.133-.057-.325-.102-.69-.25-.987-.195-.4-.597-.634-.996-.788a5.723 5.723 0 00-.626-.194c-1-.263-2.05-.36-3.077-.416a25.834 25.834 0 00-3.7.062c-.915.083-1.88.184-2.75.5-.318.116-.646.256-.888.501-.297.302-.393.77-.177 1.146.154.267.415.456.692.58.36.162.737.284 1.123.366 1.075.238 2.189.masterpageWidth.345 3.308.345 1.059 0 2.11-.098 3.15-.29.527-.1 1.05-.219 1.565-.37.33-.095.75-.192.993-.46.157-.175.184-.43.072-.634-.062-.11-.161-.196-.267-.278-.13-.1-.281-.178-.43-.248-.602-.29-1.264-.419-1.917-.506-.964-.128-1.94-.152-2.91-.104-.61.032-1.22.1-1.817.228-.347.074-.69.17-1.014.318-.257.115-.55.305-.55.623 0 .278.228.48.456.576.285.12.6.174.908.21.987.116 1.986.146 2.982.072.67-.05 1.337-.14 1.994-.276.37-.076.74-.166 1.097-.292.213-.076.47-.178.588-.386.067-.12.076-.27.022-.394-.066-.153-.226-.246-.38-.317-.55-.247-1.146-.37-1.744-.436a16.558 16.558 0 00-1.776-.07c-.86.012-1.72.084-2.567.236-.508.09-1.013.21-1.495.393-.32.12-.674.294-.82.624-.082.189-.057.412.074.576.133.166.346.26.554.33.602.197 1.24.29 1.873.34 1.146.094 2.3.084 3.445-.023.632-.06 1.265-.155 1.88-.304.38-.092.786-.218 1.095-.47.218-.176.366-.43.321-.71-.038-.237-.2-.435-.393-.572-.55-.389-1.222-.555-1.884-.677-.982-.182-1.979-.26-2.98-.29a23.21 23.21 0 00-2.965.158c-.595.067-1.185.17-1.76.334-.388.11-.81.265-1.068.594-.153.193-.198.455-.1.674.106.239.34.388.574.492.646.287 1.353.41 2.057.495 1.101.133 2.214.16 3.322.072.652-.052 1.301-.144 1.936-.293.39-.091.79-.208 1.143-.397.265-.14.553-.346.64-.64.075-.252.002-.533-.18-.722z"/>
+            </svg>
+            Support the Project
+          </a>
         </div>
       </div>
 

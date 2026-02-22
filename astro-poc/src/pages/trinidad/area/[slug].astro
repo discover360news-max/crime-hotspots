@@ -16,7 +16,7 @@ import StatCards from '../../../components/StatCards.astro';
 import DataTable from '../../../components/DataTable.astro';
 import SafetyContext from '../../../components/SafetyContext.astro';
 import FeedbackToggle from '../../../components/FeedbackToggle.astro';
-import MailchimpSignup from '../../../components/MailchimpSignup.astro';
+import NewsletterSignup from '../../../components/NewsletterSignup.astro';
 import AreaNarrative from '../../../components/AreaNarrative.astro';
 import { getTrinidadCrimes, generateNameSlug } from '../../../lib/crimeData';
 import { loadFullAreaData } from '../../../lib/areaAliases';
@@ -326,7 +326,7 @@ const breadcrumbs = [
         />
       </div>
       <div class="sm:col-span-2">
-        <MailchimpSignup areaName={areaName} />
+        <NewsletterSignup areaName={areaName} source="area-page" />
       </div>
     </div>
 

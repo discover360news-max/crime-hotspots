@@ -5,6 +5,7 @@
  * Keeps SEO benefits while improving UX
  */
 import ReportIssueModal from './ReportIssueModal.astro';
+import NewsletterSignup from './NewsletterSignup.astro';
 ---
 
 <!-- Modal Backdrop -->
@@ -14,7 +15,7 @@ import ReportIssueModal from './ReportIssueModal.astro';
 <div id="crimeDetailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
   <div id="crimeDetailContent" class="bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300">
     <!-- Modal Header -->
-    <div class="sticky top-0 bg-white/90 dark:bg-[hsl(0_0%_8%)]/90 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
+    <div class="sticky top-0 z-10 bg-white/90 dark:bg-[hsl(0_0%_8%)]/90 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
       <h2 class="text-lg font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Crime Details</h2>
       <button id="closeCrimeDetailBtn" class="p-2 rounded-full text-slate-600 dark:text-[hsl(0_0%_55%)] hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_15%)] active:bg-slate-200 dark:active:bg-[hsl(0_0%_20%)] transition-all" aria-label="Close modal">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,6 +93,29 @@ import ReportIssueModal from './ReportIssueModal.astro';
             </svg>
           </button>
           <span id="copyFeedback" class="text-xs text-emerald-600 opacity-0 transition-opacity">Copied!</span>
+        </div>
+      </div>
+
+      <!-- Newsletter + Support -->
+      <div class="mt-6 pt-6 border-t border-slate-200 dark:border-[hsl(0_0%_18%)] grid sm:grid-cols-2 gap-6">
+        <NewsletterSignup variant="footer" source="crime-modal" />
+
+        <div>
+          <p class="text-caption font-semibold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-2">Support this project</p>
+          <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] mb-3">
+            CrimeHotspots is free, ad-free, and independent. If you find it valuable, you can help keep it that way.
+          </p>
+          <a
+            href="https://ko-fi.com/crimehotspots"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_65%)] text-xs font-medium hover:border-amber-400 hover:text-amber-700 dark:hover:text-amber-400 dark:hover:border-amber-700 transition"
+          >
+            <svg class="w-4 h-4 text-amber-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"/>
+            </svg>
+            Support the Project
+          </a>
         </div>
       </div>
     </div>

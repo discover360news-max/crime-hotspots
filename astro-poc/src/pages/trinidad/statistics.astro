@@ -33,6 +33,7 @@ import {
   getCurrentPeriodDescription,
   TRACKED_CRIME_TYPES
 } from '../../lib/statisticsHelpers';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
 
 // Fetch all crimes at build time
 const allCrimes = await getTrinidadCrimes();
@@ -586,6 +587,11 @@ const breadcrumbData = {
           <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-1">Anonymous crime reporting form</p>
         </a>
       </div>
+    </section>
+
+    <!-- Newsletter Signup -->
+    <section class="mb-10">
+      <NewsletterSignup variant="inline" source="statistics-page" />
     </section>
 
     <!-- Structured Data -->
