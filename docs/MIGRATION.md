@@ -33,7 +33,7 @@
 
 - **List slug / public URL:** https://buttondown.com/discover_360
 - **Tags applied per signup:** `website` + source tag (e.g. `footer`, `area-page`, `statistics-page`)
-- **API endpoint used:** `POST https://api.buttondown.email/v1/subscribers`
+- **API endpoint used:** `POST https://api.buttondown.com/v1/subscribers`
 - **Duplicate handling:** 400 responses with "already" / "exists" in body are treated as soft-success (subscriber stays on the list, user sees a friendly "already subscribed" message)
 
 ### Ko-fi URL

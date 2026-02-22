@@ -36,7 +36,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   let bdResponse: Response;
   try {
-    bdResponse = await fetch('https://api.buttondown.email/v1/subscribers', {
+    bdResponse = await fetch('https://api.buttondown.com/v1/subscribers', {
       method: 'POST',
       headers: {
         Authorization: `Token ${apiKey}`,
