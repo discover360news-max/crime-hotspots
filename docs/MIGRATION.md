@@ -33,7 +33,9 @@
 
 - **List slug / public URL:** https://buttondown.com/discover_360
 - **Tags applied per signup:** `website` + source tag (e.g. `footer`, `area-page`, `statistics-page`)
-- **API endpoint used:** `POST https://api.buttondown.email/v1/subscribers`
+- **Embed endpoint used:** `POST https://buttondown.com/api/emails/embed-subscribe/discover_360`
+- **Field name:** `email` (matches Buttondown's official WordPress embed code)
+- **Submission:** Direct browser POST — no Cloudflare Worker hop (Worker connectivity to Buttondown API was unreliable)
 - **Duplicate handling:** 400 responses with "already" / "exists" in body are treated as soft-success (subscriber stays on the list, user sees a friendly "already subscribed" message)
 
 ### Ko-fi URL
@@ -42,7 +44,7 @@ Support links point to `https://ko-fi.com/crimehotspots`. Both the footer (`Layo
 
 ### CSP / headers
 
-No changes to `public/_headers` were required. The browser never calls Buttondown directly — all API traffic goes through the Astro server endpoint (`/api/subscribe`), which is same-origin from the browser's perspective. The existing `connect-src 'self'` already covers this.
+`https://buttondown.com` added to `connect-src` in `public/_headers`. Required because the form POSTs directly from the browser to Buttondown's embed endpoint.
 
 ### Google Apps Script cleanup (manual, optional)
 
