@@ -373,6 +373,19 @@ function processReadyArticles() {
   Trinidad and Tobago`;
     const geocoded = geocodeAddress(fullAddress);
 
+    // Check for duplicate in Production (another source may have captured it with high confidence)
+    const prodSheet = getActiveSheet(SHEET_NAMES.PRODUCTION);
+    if (isDuplicateCrime(prodSheet, crime, geocoded)) {
+      Logger.log(`⚠️ Duplicate detected in Production (review queue entry skipped): ${crime.headline}`);
+      return;
+    }
+
+    // Check for duplicate already in Review Queue (same article processed twice)
+    if (isDuplicateCrime(reviewSheet, crime, geocoded)) {
+      Logger.log(`⚠️ Duplicate detected in Review Queue, skipping: ${crime.headline}`);
+      return;
+    }
+
     // Validate and format crime date
     const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
@@ -455,15 +468,17 @@ function isDuplicateCrime(sheet, crime, geocoded) {
                        : null;
 
     for (let row of data) {
-      // ← UPDATED column indices to match new order
-      const existingHeadline = row[0];  // Column A: Headline
-      const existingCrimeType = row[4];  // Column E: crimeType (backward compat)
-      const existingDate = row[5];       // Column F: Date
-      const existingStreet = row[6];     // Column G: Street Address
-      const existingLat = row[7];        // Column H: Latitude
-      const existingLng = row[8];        // Column I: Longitude
-      const existingArea = row[10];      // Column K: Area
-      const existingUrl = row[13];       // Column N: URL
+      // Column layout (0-indexed): 0=Headline, 1=Summary, 2=primaryType, 3=relatedTypes,
+      // 4=victimCount, 5=crimeType, 6=Date, 7=Street, 8=Lat, 9=Lng, 10=PlusCode,
+      // 11=Area, 12=Region, 13=Island, 14=URL
+      const existingHeadline = row[0];   // Column A: Headline
+      const existingCrimeType = row[5];  // Column F: crimeType (backward compat)
+      const existingDate = row[6];       // Column G: Date
+      const existingStreet = row[7];     // Column H: Street Address
+      const existingLat = row[8];        // Column I: Latitude
+      const existingLng = row[9];        // Column J: Longitude
+      const existingArea = row[11];      // Column L: Area
+      const existingUrl = row[14];       // Column O: URL
 
       // ═══════════════════════════════════════════════════════════
       // PRE-CHECK: Same exact coordinates + same date + same crime type + some headline similarity
@@ -848,9 +863,9 @@ function findPotentialDuplicate(sheet, crime, geocoded) {
     const rowNumber = i + 2;
 
     const existingHeadline = row[0];
-    const existingCrimeType = row[4];
-    const existingDate = row[5];
-    const existingArea = row[10];
+    const existingCrimeType = row[5];  // col 5: crimeType (victimCount shifted indices)
+    const existingDate = row[6];       // col 6: Date
+    const existingArea = row[11];      // col 11: Area
 
     if (!existingDate || !crime.crime_date) continue;
 

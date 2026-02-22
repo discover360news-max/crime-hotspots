@@ -66,6 +66,7 @@ function collectAllFeeds() {
 
     } catch (error) {
       Logger.log(`✗ Error processing ${feed.name}: ${error.message}`);
+      Logger.log(`  ⚠️ WARNING: Feed failed — investigate this URL: ${feed.rssUrl}`);
     }
   });
 
@@ -87,10 +88,19 @@ function collectAllFeeds() {
  * @returns {Array<Object>} Array of article objects
  */
 function fetchAndParseFeed(feed) {
-  const response = UrlFetchApp.fetch(feed.rssUrl, {muteHttpExceptions: true});
+  const options = {
+    muteHttpExceptions: true,
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+      'Accept-Language': 'en-US,en;q=0.9'
+    }
+  };
+  const response = UrlFetchApp.fetch(feed.rssUrl, options);
+  const statusCode = response.getResponseCode();
 
-  if (response.getResponseCode() !== 200) {
-    throw new Error(`HTTP ${response.getResponseCode()}`);
+  if (statusCode !== 200) {
+    throw new Error(`HTTP ${statusCode}`);
   }
 
   const xml = XmlService.parse(response.getContentText());
@@ -253,8 +263,20 @@ function levenshteinDistance(str1, str2) {
 }
 
 /**
- * Check for duplicate URLs and headlines
- * Checks both exact URL match and headline similarity (80%+)
+ * Strip query strings and fragments for URL dedup comparison.
+ * Article identity is always in the path for CNC3/Express/Newsday.
+ * @param {string} url
+ * @returns {string} Normalized URL (lowercase, no trailing slash, no query/fragment)
+ */
+function normalizeUrlForDedup(url) {
+  if (!url || typeof url !== 'string') return url;
+  return url.split('?')[0].split('#')[0].toLowerCase().replace(/\/$/, '');
+}
+
+/**
+ * Check for duplicate URLs and headlines.
+ * CHECK 1: Exact URL match (fast TextFinder).
+ * CHECK 2: Combined loop — normalized URL match OR headline similarity ≥80%.
  *
  * @param {Sheet} sheet - Raw Articles sheet
  * @param {string} url - Article URL to check
@@ -264,7 +286,7 @@ function levenshteinDistance(str1, str2) {
 function isDuplicate(sheet, url, title) {
   if (sheet.getLastRow() < 2) return false;
 
-  // CHECK 1: Exact URL match (fast)
+  // CHECK 1: Fast exact URL match
   const urlFinder = sheet.createTextFinder(url)
     .matchEntireCell(true)
     .findNext();
@@ -273,12 +295,22 @@ function isDuplicate(sheet, url, title) {
     return true; // Exact URL duplicate
   }
 
-  // CHECK 2: Headline similarity (catches same story, different URL)
+  // CHECK 2: Combined loop — normalized URL OR headline similarity
+  // One pass avoids double iteration and catches UTM-stripped URL variants
+  const normalizedNew = normalizeUrlForDedup(url);
   const data = sheet.getDataRange().getValues();
 
   for (let i = 1; i < data.length; i++) {
+    const existingUrl = data[i][3];   // Column D (URL)
     const existingTitle = data[i][2]; // Column C (Title)
 
+    // Normalized URL match (handles ?utm_source= variants)
+    if (existingUrl && normalizedNew && normalizeUrlForDedup(existingUrl) === normalizedNew) {
+      Logger.log(`   ⚠️ Normalized URL duplicate detected: "${url}"`);
+      return true;
+    }
+
+    // Headline similarity match
     if (existingTitle && title) {
       const similarity = calculateSimilarity(existingTitle, title);
 
@@ -286,7 +318,7 @@ function isDuplicate(sheet, url, title) {
         Logger.log(`   ⚠️ Headline duplicate detected (${similarity}% similar):`);
         Logger.log(`      Existing: "${existingTitle}"`);
         Logger.log(`      New:      "${title}"`);
-        return true; // Headline too similar
+        return true;
       }
     }
   }
