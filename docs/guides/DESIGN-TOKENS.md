@@ -428,6 +428,105 @@ Used to make elements appear to hover above a surface. Creates a soft elliptical
 
 ---
 
+## 📄 Standard Page Layout (Wireframe)
+
+**Established:** February 23, 2026
+**The Rule:** All content pages use `max-w-3xl` as the single column width. The hero text, card, and footer all align to the same horizontal boundary at every breakpoint.
+
+### Pages With Hero
+
+Used for section-level pages with a generic title (Headlines, Archive Index, Monthly Archive).
+
+```
+┌──────────────────────────────────────────────┐
+│  ~~~~~~~~ Hero (full-width gradient) ~~~~~~~~ │
+│  ┌─────── max-w-3xl px-4 sm:px-6 ────────┐   │
+│  │ Breadcrumbs                            │   │
+│  │ H1 Title                               │   │
+│  │ Subtitle · Freshness indicator         │   │
+│  │ [Primary CTA]  [Secondary CTA]         │   │
+│  └────────────────────────────────────────┘   │
+└──────────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│  ┌─────── max-w-3xl px-4 sm:px-6 ────────┐   │
+│  │ ┌──────────── CARD ─────────────────┐ │   │
+│  │ │  Content (accordions, grid, etc.) │ │   │
+│  │ └───────────────────────────────────┘ │   │
+│  └────────────────────────────────────────┘   │
+└──────────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│  ┌─────── max-w-3xl px-4 sm:px-6 ────────┐   │
+│  │  Footer links · socials · copyright   │   │
+│  └────────────────────────────────────────┘   │
+└──────────────────────────────────────────────┘
+```
+
+**Astro template:**
+```astro
+<Hero
+  title="Page Title"
+  subtitle="Supporting description"
+  compact={true}
+  narrowContainer={true}
+  primaryCTA={{ text: "Dashboard", href: routes.trinidad.dashboard, icon: "dashboard" }}
+  secondaryCTA={{ text: "Headlines", href: routes.trinidad.headlines }}
+>
+  <Breadcrumbs items={breadcrumbs} slot="before" />
+</Hero>
+
+<main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+  <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+    <!-- Page content here -->
+  </div>
+</main>
+```
+
+**Why `narrowContainer={true}` aligns:** This prop removes horizontal padding from the Hero's `<section>` and places it on the inner `max-w-3xl` div — the exact same layout model as `<main class="max-w-3xl mx-auto px-4 sm:px-6">`. Both elements calculate their left edge identically at every breakpoint.
+
+### Pages Without Hero (Article/Content Pages)
+
+Used for article-level pages where the title is specific to the page instance (crime detail, blog posts, About, Methodology, etc.).
+
+```
+┌──────────────────────────────────────────────┐
+│  ┌─────── max-w-3xl mx-auto px-4 sm:px-6 ─┐  │
+│  │ Breadcrumbs                             │  │
+│  │ ┌──────────── CARD ─────────────────┐  │  │
+│  │ │ H1 — Article/Content Title        │  │  │
+│  │ │ Article metadata, content...      │  │  │
+│  │ └───────────────────────────────────┘  │  │
+│  └─────────────────────────────────────────┘  │
+└──────────────────────────────────────────────┘
+```
+
+**Astro template:**
+```astro
+<main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+  <Breadcrumbs items={breadcrumbs} />
+  <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+    <!-- Article content here -->
+  </div>
+</main>
+```
+
+### Dividers
+
+Use the gradient fader everywhere — inside cards, between sections, in the footer:
+```html
+<div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent my-6"></div>
+```
+
+**Never use** `border-t border-slate-200` between sections. Hard borders are only used as the card's outer border (`border border-slate-100`).
+
+### The `max-w-3xl` Column
+
+- **Width:** 768px (`48rem`)
+- **Shared by:** Hero inner text, card container, footer
+- **Pages using this standard:** About, Headlines, Archive Index, Monthly Archive, Crime Detail, Statistics, Areas, Regions, Area Detail, Region Detail, Blog Index, Blog Post
+- **Pages NOT using this standard:** Dashboard (data-heavy, wide layout intentional)
+
+---
+
 ## 📐 Spacing & Layout
 
 ### Container Padding

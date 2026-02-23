@@ -86,20 +86,23 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6" data-pagefind-body>
-    <Breadcrumbs items={breadcrumbs} />
+  <Hero
+    compact
+    narrowContainer={true}
+    title="Crime Statistics by Area"
+    subtitle={`Explore crime data across ${sortedRegions.length} regions and ${totalAreas} areas in Trinidad & Tobago.`}
+    badge="Updated daily • Risk levels based on 90-day rolling window"
+    primaryCTA={{ text: 'Compare Areas', href: routes.trinidad.compare, icon: 'arrow' }}
+    secondaryCTA={{ text: 'View Regions', href: routes.trinidad.regions, icon: 'arrow' }}
+  >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
+  </Hero>
 
-    <Hero
-      compact
-      title="Crime Statistics by Area"
-      subtitle={`Explore crime data across ${sortedRegions.length} regions and ${totalAreas} areas in Trinidad & Tobago.`}
-      badge="Updated daily • Risk levels based on 90-day rolling window"
-      primaryCTA={{ text: 'Compare Areas', href: routes.trinidad.compare, icon: 'arrow' }}
-      secondaryCTA={{ text: 'View Regions', href: routes.trinidad.regions, icon: 'arrow' }}
-    />
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
 
     <!-- Search/Filter + Sort -->
-    <div class="mt-6 mb-6 flex flex-col sm:flex-row gap-3">
+    <div class="mb-6 flex flex-col sm:flex-row gap-3">
       <div class="relative flex-1">
         <input
           type="text"
@@ -145,7 +148,7 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
           </div>
 
           <!-- Area Cards Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {areas.map(area => (
               <a
                 href={buildRoute.area(area.slug)}
@@ -190,7 +193,9 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
     <div id="noResults" class="hidden text-center py-12">
       <p class="text-slate-500 dark:text-[hsl(0_0%_55%)] text-sm">No areas found matching your search.</p>
     </div>
-  </div>
+
+    </div>
+  </main>
 </Layout>
 
 <script is:inline>

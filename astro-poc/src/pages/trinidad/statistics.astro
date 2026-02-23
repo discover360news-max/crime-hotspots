@@ -203,17 +203,10 @@ const breadcrumbData = {
 ---
 
 <Layout title={title} description={description}>
-  <!-- Breadcrumbs (Above Hero) -->
-  <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-4">
-    <Breadcrumbs items={[
-      { label: 'Home', href: '/' },
-      { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
-      { label: 'Statistics' }
-    ]} />
-  </div>
-
   <!-- Hero Section -->
   <Hero
+    compact
+    narrowContainer={true}
     title="Trinidad & Tobago Crime Statistics"
     subtitle="Real-time crime statistics and data analysis for Trinidad & Tobago. Track the crime rate, murder statistics, robbery trends, and regional crime data. Updated daily from verified sources."
     badge={`Updated daily • Last updated: ${lastUpdated}`}
@@ -229,10 +222,16 @@ const breadcrumbData = {
       target: "_blank",
       rel: "noopener noreferrer"
     }}
-  />
+  >
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
+      { label: 'Statistics' }
+    ]} slot="before" />
+  </Hero>
 
   <!-- Main Content -->
-  <main class="max-w-4xl mx-auto px-4 py-8">
+  <main class="max-w-3xl mx-auto px-4 py-8">
 
     <!-- Current Year Summary -->
     <section class="mb-10">

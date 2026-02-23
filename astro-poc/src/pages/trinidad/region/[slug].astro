@@ -163,17 +163,19 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6" data-pagefind-body>
-    <Breadcrumbs items={breadcrumbs} />
+  <Hero
+    compact
+    narrowContainer={true}
+    title={`${regionName} Region`}
+    subtitle={`${regionAreas.length} areas • ${regionCrimes.length} total recorded incidents`}
+    badge={`${recentCrimes90d.length} incidents in the last 90 days • Updated daily`}
+    primaryCTA={{ text: 'All Regions', href: '/trinidad/regions/', icon: 'arrow' }}
+    secondaryCTA={{ text: 'View All Areas', href: '/trinidad/areas/', icon: 'arrow' }}
+  >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
+  </Hero>
 
-    <Hero
-      compact
-      title={`${regionName} Region`}
-      subtitle={`${regionAreas.length} areas • ${regionCrimes.length} total recorded incidents`}
-      badge={`${recentCrimes90d.length} incidents in the last 90 days • Updated daily`}
-      primaryCTA={{ text: 'All Regions', href: '/trinidad/regions/', icon: 'arrow' }}
-      secondaryCTA={{ text: 'View All Areas', href: '/trinidad/areas/', icon: 'arrow' }}
-    />
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
 
     <!-- Stat Cards -->
     <div class="mt-6">
@@ -200,7 +202,7 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
     <!-- Area Ranking -->
     <section class="mt-8">
       <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-4">Areas in {regionName}</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {regionAreas.map((area, index) => (
           <a
             href={area.hasCrimes ? `/trinidad/area/${area.slug}` : '#'}
@@ -311,7 +313,7 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
         </div>
       </section>
     )}
-  </div>
+  </main>
 </Layout>
 
 <script is:inline>

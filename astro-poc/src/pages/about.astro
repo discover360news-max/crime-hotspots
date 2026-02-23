@@ -6,20 +6,28 @@
 
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Hero from '../components/Hero.astro';
 
 const title = "About Crime Hotspots — Caribbean Crime Data Transparency & Methodology";
 const description = "Learn about Crime Hotspots Caribbean and our rigorous data methodology. We provide verified crime statistics to empower communities. Read our mission.";
 ---
 
 <Layout title={title} description={description}>
-  <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-12 text-slate-700 dark:text-[hsl(0_0%_82%)]">
+  <Hero
+    compact
+    narrowContainer={true}
+    title="About Crime Hotspots"
+    subtitle="Caribbean crime data transparency — verified statistics to empower communities."
+  >
     <Breadcrumbs items={[
       { label: 'Home', href: '/' },
       { label: 'About' }
-    ]} />
-    <h1 class="text-display font-semibold mb-3 text-center pt-4 dark:text-[hsl(0_0%_95%)]">About Crime Hotspots</h1>
+    ]} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5 text-slate-700 dark:text-[hsl(0_0%_82%)]">
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)] leading-relaxed">
-      <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">Our Mission</h2>
+      <h2 class="text-heading font-bold mb-3 text-slate-700 leading-snug dark:text-[hsl(0_0%_88%)]">Our Mission</h2>
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-6">
         <strong class="dark:text-[hsl(0_0%_92%)]">Crime Hotspots</strong> is a regional initiative designed to
         create greater awareness and provide accessible, data-driven insights
@@ -28,7 +36,7 @@ const description = "Learn about Crime Hotspots Caribbean and our rigorous data 
         patterns through verified reporting and transparent data aggregation.
       </p>
 
-      <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">How We Collect Data</h2>
+      <h2 class="text-heading font-bold mb-3 text-slate-700 leading-snug dark:text-[hsl(0_0%_88%)]">How We Collect Data</h2>
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-6">
         All statistics presented on this platform are compiled from verified
         media reports, police statements, and open-source data. Each incident
@@ -43,7 +51,7 @@ const description = "Learn about Crime Hotspots Caribbean and our rigorous data 
         intended for investigative use.
       </p>
 
-      <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">Data Sources</h2>
+      <h2 class="text-heading font-bold mb-3 text-slate-700 leading-snug dark:text-[hsl(0_0%_88%)]">Data Sources</h2>
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-6">
         Our crime data is currrently sourced from:
       </p>
@@ -55,7 +63,7 @@ const description = "Learn about Crime Hotspots Caribbean and our rigorous data 
         <li>Community social media sources (Ian Alleyne Network, DJ Sherrif)</li>
       </ul>
 
-      <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">Transparency and Accuracy</h2>
+      <h2 class="text-heading font-bold mb-3 text-slate-700 leading-snug dark:text-[hsl(0_0%_88%)]">Transparency and Accuracy</h2>
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-6">
         While we use <strong class="dark:text-[hsl(0_0%_92%)]">Google's Gemini and Claude AI</strong> to help structure thousands of reports for speed,
         we maintain a 'Human-in-the-loop' architecture. Every high-severity incident is
@@ -68,7 +76,7 @@ const description = "Learn about Crime Hotspots Caribbean and our rigorous data 
         immediately.
       </p>
 
-      <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">Why the Caribbean?</h2>
+      <h2 class="text-heading font-bold mb-3 text-slate-700 leading-snug dark:text-[hsl(0_0%_88%)]">Why the Caribbean?</h2>
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-6">
         The Caribbean region often faces fragmented crime reporting. <strong class="dark:text-[hsl(0_0%_92%)]">Crime Hotspots was founded
         to bridge this gap</strong>, providing a unified, visual dashboard that empowers residents with
@@ -76,7 +84,7 @@ const description = "Learn about Crime Hotspots Caribbean and our rigorous data 
         We believe that accessible data is the first step toward safer communities.
       </p>
 
-      <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">Privacy and Ethics</h2>
+      <h2 class="text-heading font-bold mb-3 text-slate-700 leading-snug dark:text-[hsl(0_0%_88%)]">Privacy and Ethics</h2>
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-6">
         We adhere to strict ethical standards. Our platform focuses on crime
         statistics and trends. We do not solicit or publish private, unverified
@@ -85,12 +93,12 @@ const description = "Learn about Crime Hotspots Caribbean and our rigorous data 
         record.
       </p>
 
-      <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">Fact-Checking Policy</h2>
+      <h2 class="text-heading font-bold mb-3 text-slate-700 leading-snug dark:text-[hsl(0_0%_88%)]">Fact-Checking Policy</h2>
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-6">
         We only report incidents confirmed by at least two independent sources or an official police statement.
       </p>
 
-      <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">Contact Us</h2>
+      <h2 class="text-heading font-bold mb-3 text-slate-700 leading-snug dark:text-[hsl(0_0%_88%)]">Contact Us</h2>
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
         For inquiries, partnerships, or data requests, visit our{' '}
         <a href="/contact/" class="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 underline">
@@ -100,3 +108,4 @@ const description = "Learn about Crime Hotspots Caribbean and our rigorous data 
     </div>
   </main>
 </Layout>
+

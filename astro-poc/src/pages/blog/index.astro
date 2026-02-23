@@ -7,6 +7,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Hero from '../../components/Hero.astro';
 
 const allPosts = await getCollection('blog');
 const sortedPosts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -21,63 +22,65 @@ function formatDate(date: Date) {
 ---
 
 <Layout title={title} description={description}>
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-12">
+  <Hero
+    compact
+    narrowContainer={true}
+    title="Crime Statistics Blog"
+    subtitle="Weekly data-driven analysis of crime trends across the Caribbean."
+  >
     <Breadcrumbs items={[
       { label: 'Home', href: '/' },
-      { label: 'Blog' }  // Last item has NO href (current page)
-    ]} />
-    <div class="mb-8 sm:mb-12">
-      <div class="flex items-center justify-between">
-        <h1 class="text-display font-bold text-slate-900 dark:text-[hsl(0_0%_95%)] mb-4">Crime Statistics Blog</h1>
-        <a href="/rss.xml" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-800 transition text-xs" title="Subscribe via RSS">
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M6.18 15.64a2.18 2.18 0 012.18 2.18C8.36 19.01 7.37 20 6.18 20 5 20 4 19.01 4 17.82a2.18 2.18 0 012.18-2.18M4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44m0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
-          </svg>
-          RSS
-        </a>
+      { label: 'Blog' }
+    ]} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+
+    <!-- Country Filter + RSS -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex flex-wrap gap-2">
+        <button id="filter-all" class="px-4 py-1 min-h-[22px] rounded-lg bg-rose-600 text-white font-medium hover:bg-rose-700 active:bg-rose-800 transition text-xs">
+          All Countries
+        </button>
+        <button id="filter-tt" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] font-medium hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 transition text-xs">
+          Trinidad & Tobago
+        </button>
+        <button id="filter-gy" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] font-medium hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 transition text-xs">
+          Guyana
+        </button>
       </div>
-      <p class="text-xs text-slate-600 dark:text-[hsl(0_0%_65%)]">Weekly data-driven analysis of crime trends across the Caribbean</p>
+      <a href="/rss.xml" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-800 transition text-xs" title="Subscribe via RSS">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6.18 15.64a2.18 2.18 0 012.18 2.18C8.36 19.01 7.37 20 6.18 20 5 20 4 19.01 4 17.82a2.18 2.18 0 012.18-2.18M4 4.44A15.56 15.56 0 0119.56 20h-2.83A12.73 12.73 0 004 7.27V4.44m0 5.66a9.9 9.9 0 019.9 9.9h-2.83A7.07 7.07 0 004 12.93V10.1z"/>
+        </svg>
+        RSS
+      </a>
     </div>
 
-    <!-- Country Filter -->
-    <div class="mb-6 sm:mb-8 flex flex-wrap gap-3">
-      <button id="filter-all" class="px-4 py-1 min-h-[22px] rounded-lg bg-rose-600 text-white font-medium hover:bg-rose-700 active:bg-rose-800 transition text-xs">
-        All Countries
-      </button>
-      <button id="filter-tt" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] font-medium hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 transition text-xs">
-        Trinidad & Tobago
-      </button>
-      <button id="filter-gy" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] font-medium hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 transition text-xs">
-        Guyana
-      </button>
-    </div>
-
-    <!-- Blog Posts Grid -->
-    <div id="blog-posts" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+    <!-- Blog Posts List -->
+    <div id="blog-posts" class="space-y-4">
       {sortedPosts.map((post) => (
         <article
-          class="blog-post bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all border border-slate-100 dark:border-[hsl(0_0%_18%)]"
+          class="blog-post border-b border-slate-100 dark:border-[hsl(0_0%_15%)] last:border-0 pb-4 last:pb-0"
           data-country={post.data.country}
         >
-          <a href={`/blog/${post.slug}`} class="flex flex-col h-full">
-            <img src={post.data.image} alt={post.data.countryName} class="w-full h-32 md:h-48 object-cover">
-            <div class="p-3 md:p-6 flex flex-col flex-1">
-              <div class="flex items-center gap-1 md:gap-2 mb-2 md:mb-3 flex-wrap">
-                <span class="text-xs font-semibold px-2 py-1 rounded-full bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
+          <a href={`/blog/${post.slug}`} class="flex gap-4 items-start group">
+            <img src={post.data.image} alt={post.data.countryName} class="w-20 h-20 object-cover rounded-lg shrink-0">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <span class="text-caption font-bold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
                   {post.data.countryName}
                 </span>
-                <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{formatDate(post.data.date)}</span>
+                <span class="text-caption text-slate-400 dark:text-[hsl(0_0%_50%)]">{formatDate(post.data.date)}</span>
               </div>
-              <h2 class="text-small md:text-body font-bold text-slate-900 dark:text-[hsl(0_0%_92%)] mb-1 md:mb-2 hover:text-rose-600 dark:hover:text-rose-400 transition line-clamp-2">
+              <h2 class="text-body font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug line-clamp-2">
                 {post.data.title}
               </h2>
-              <p class="text-tiny md:text-small text-slate-500 dark:text-[hsl(0_0%_60%)] mb-2 md:mb-4 line-clamp-2 md:line-clamp-3 hidden md:block">
+              <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_60%)] mt-1 line-clamp-2">
                 {post.data.excerpt}
               </p>
-              <div class="flex items-center justify-between text-tiny md:text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-auto">
-                <span class="hidden md:inline">{post.data.author}</span>
-                <span>{post.data.readTime}</span>
-              </div>
+              <span class="text-caption text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1 inline-block">{post.data.readTime}</span>
             </div>
           </a>
         </article>
@@ -85,8 +88,10 @@ function formatDate(date: Date) {
     </div>
 
     <!-- Empty State -->
-    <div id="empty-state" class="hidden col-span-full text-center py-12">
+    <div id="empty-state" class="hidden text-center py-12">
       <p class="text-slate-600 dark:text-[hsl(0_0%_65%)] text-body">No blog posts found for this filter.</p>
+    </div>
+
     </div>
   </main>
 

@@ -218,17 +218,19 @@ const breadcrumbs = [
 <Layout title={pageTitle} description={pageDescription}>
   <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
 
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6" data-pagefind-body>
-    <Breadcrumbs items={breadcrumbs} />
+  <Hero
+    compact
+    narrowContainer={true}
+    title={subtitle}
+    subtitle={`${region} Region • ${division} Division • ${areaCrimes.length} total recorded incidents`}
+    badge={`Risk Level: ${safety.score.toFixed(1)}/10 • Updated daily`}
+    primaryCTA={{ text: 'View Dashboard', href: routes.trinidad.dashboard, icon: 'dashboard' }}
+    secondaryCTA={{ text: 'Compare Area', href: `${routes.trinidad.compare}?a=${slug}`, icon: 'arrow' }}
+  >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
+  </Hero>
 
-    <Hero
-      compact
-      title={subtitle}
-      subtitle={`${region} Region • ${division} Division • ${areaCrimes.length} total recorded incidents`}
-      badge={`Risk Level: ${safety.score.toFixed(1)}/10 • Updated daily`}
-      primaryCTA={{ text: 'View Dashboard', href: routes.trinidad.dashboard, icon: 'dashboard' }}
-      secondaryCTA={{ text: 'Compare Area', href: `${routes.trinidad.compare}?a=${slug}`, icon: 'arrow' }}
-    />
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
 
     <!-- Share Buttons -->
     <div class="flex items-center gap-2 mt-4">
@@ -421,7 +423,7 @@ const breadcrumbs = [
             <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] mb-4">
               Other Areas in {region}
             </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-2 gap-3">
               {relatedAreas.map(a => (
                 <a
                   href={a.hasCrimes ? buildRoute.area(a.slug) : '#'}
@@ -446,7 +448,7 @@ const breadcrumbs = [
             <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] mb-4">
               Other Areas in Trinidad
             </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-2 gap-3">
               {otherRegionAreas.map(a => (
                 <a
                   href={buildRoute.area(a.slug)}
@@ -463,7 +465,7 @@ const breadcrumbs = [
         )}
       </div>
     )}
-  </div>
+  </main>
 </Layout>
 
 <script is:inline>
