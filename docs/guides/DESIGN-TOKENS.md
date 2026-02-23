@@ -522,8 +522,7 @@ Use the gradient fader everywhere — inside cards, between sections, in the foo
 
 - **Width:** 768px (`48rem`)
 - **Shared by:** Hero inner text, card container, footer
-- **Pages using this standard:** About, Headlines, Archive Index, Monthly Archive, Crime Detail, Statistics, Areas, Regions, Area Detail, Region Detail, Blog Index, Blog Post
-- **Pages NOT using this standard:** Dashboard (data-heavy, wide layout intentional)
+- **Pages using this standard:** About, Headlines, Archive Index, Monthly Archive, Crime Detail, Statistics, Areas, Regions, Area Detail, Region Detail, Blog Index, Blog Post, Dashboard
 
 ---
 

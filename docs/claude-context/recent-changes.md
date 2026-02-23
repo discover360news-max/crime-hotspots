@@ -8,6 +8,33 @@
 
 ## February 2026
 
+### Dashboard max-w-3xl + Collapsible Legend (Feb 23)
+- Applied `max-w-3xl` standard to dashboard (was `max-w-6xl`) — hero and main content wrapper now match all other pages
+- Map layout: removed `lg:grid-cols-3` side-by-side; map is full-width, legend moved to collapsible `<details>` below map
+- Legend label: "View Legend" when closed, "Legend" when open (pure CSS, `group-open:hidden` / `group-open:block`)
+- Spacing: Top Areas `mb-12` → `mb-6`, added missing `pt-4` to Top Areas heading to match Quick Insights + Map
+- `docs/guides/DESIGN-TOKENS.md` updated: Dashboard added to standard pages list, exception note removed
+
+### CSV Fetch Pipeline Resilience (Feb 23)
+- **`csvBuildPlugin.ts`** (new Astro integration) — fetch with 3-retry exponential backoff (2s/4s/8s), row validation (missing fields, duplicate Story_IDs, >10% row count drop), writes `csv-cache.json` + `health-data.json` at build:start
+- **`crimeData.ts`** — `fetchWithRetry()` + cache fallback at runtime (uses bundled `csv-cache.json`)
+- **`/api/health.json`** — pre-rendered static endpoint (`prerender = true`), imports `health-data.json` written by csvBuildPlugin
+- **Files created:** `src/integrations/csvBuildPlugin.ts`, `src/data/csv-cache.json`, `src/data/health-data.json`, `src/pages/api/health.json.ts`
+- **CRITICAL GOTCHA:** Dynamic `await import()` inside Astro integration hooks causes "Vite module runner has been closed" — always use static top-level imports in integrations (`redirectGenerator.ts` also fixed)
+- **Infrastructure:** Deleted `crime-hotspots-guyana` Cloudflare Pages project; fixed expired `CLOUDFLARE_API_TOKEN` in GitHub Actions secrets
+
+### Story_ID-Based Slug Migration (Feb 23)
+
+- **New URL format:** `/trinidad/crime/00842-missing-man-found-dead-princes-town/` (Story_ID prefix + 6 headline words)
+- **Old URL format:** `/trinidad/crime/missing-man-found-dead-princes-town-2026-01-15/` — SSR 301-redirects to new URL (scales infinitely, no `_redirects` file needed)
+- **Crimes with no Story_ID:** slug unchanged (old headline-date format stays)
+- **`csvParser.ts`** — added `generateSlugWithId(storyId, headline)`
+- **`Crime` interface** — new fields: `storyId: string | null`, `oldSlug: string`
+- **`crimeData.ts` + `dashboardDataLoader.ts`** — read `story_id` column; compute conditional slug
+- **`[slug].astro`** — SSR fallback: `oldSlug` match → `Astro.redirect(newSlug, 301)` before 404
+- **`src/integrations/redirectGenerator.ts`** — new Astro integration: build-time CSV fetch, duplicate-slug validation (blocks build on collision), writes `src/data/redirect-map.json`
+- **1,984 redirects** mapped at build time; missing Story_ID rows warn (non-blocking)
+
 ### UI Polish — Accent Discipline & FAQ (Feb 20)
 
 - **QuickAnswers.astro** (created) — FAQ component on homepage bottom: 4 Q&As (40-50 words each), FAQPage JSON-LD schema, per-question deep-dive links, "Read full Methodology" CTA
