@@ -23,19 +23,27 @@ export const GET: APIRoute = async () => {
     // Blog collection might not exist yet
   }
 
-  // Static pages with priorities
+  // SEO CRITICAL: static pages sitemap. Update this list whenever adding a new section or country.
+  // priority: 1.0=homepage, 0.9=high-value stats, 0.8=content hubs, 0.7=archive/areas, 0.5=utility
+  // changefreq: set to actual update cadence (Google ignores inflated values).
+  // See docs/claude-context/SEO-CONFIG.md — Sitemap section.
   const staticPages = [
     { url: '', priority: 1.0, changefreq: 'daily' },
     { url: 'trinidad/dashboard', priority: 1.0, changefreq: 'daily' },
-    { url: 'headlines', priority: 0.9, changefreq: 'daily' },
     { url: 'trinidad/headlines', priority: 0.9, changefreq: 'daily' },
+    { url: 'trinidad/statistics', priority: 0.9, changefreq: 'weekly' },
+    { url: 'trinidad/murder-count', priority: 0.8, changefreq: 'daily' },
+    { url: 'headlines', priority: 0.8, changefreq: 'daily' },
+    { url: 'blog', priority: 0.8, changefreq: 'weekly' },
+    { url: 'trinidad/areas', priority: 0.7, changefreq: 'weekly' },
+    { url: 'trinidad/archive', priority: 0.7, changefreq: 'weekly' },
+    { url: 'trinidad/regions', priority: 0.6, changefreq: 'weekly' },
+    { url: 'trinidad/compare', priority: 0.5, changefreq: 'monthly' },
+    { url: 'report', priority: 0.6, changefreq: 'monthly' },
     { url: 'about', priority: 0.7, changefreq: 'monthly' },
     { url: 'faq', priority: 0.7, changefreq: 'monthly' },
     { url: 'methodology', priority: 0.7, changefreq: 'monthly' },
     { url: 'privacy', priority: 0.5, changefreq: 'yearly' },
-    { url: 'report', priority: 0.6, changefreq: 'monthly' },
-    { url: 'blog', priority: 0.8, changefreq: 'weekly' },
-    { url: 'trinidad/archive', priority: 0.7, changefreq: 'weekly' },
     { url: 'tools/social-image-generator', priority: 0.4, changefreq: 'monthly' },
   ];
 

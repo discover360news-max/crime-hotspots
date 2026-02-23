@@ -1,9 +1,9 @@
 {
   "status": "ok",
-  "csv_last_fetched": "2026-02-23T10:36:01.749Z",
+  "csv_last_fetched": "2026-02-23T13:01:35.021Z",
   "csv_row_count": 2403,
   "csv_cache_age_minutes": 0,
   "oldest_story": "2025-01-01",
   "newest_story": "2026-02-22",
-  "build_time": "2026-02-23T10:36:01.749Z"
+  "build_time": "2026-02-23T13:01:35.021Z"
 }

@@ -43,6 +43,13 @@
 /*.otf
   Cache-Control: public, max-age=31536000, immutable
 
+# SEO CRITICAL: Crime story pages get stale-while-revalidate for faster repeat loads.
+# Cloudflare serves stale content instantly while revalidating in background.
+# DO NOT raise max-age above 3600 — content must refresh within 1h for accuracy.
+# See docs/claude-context/SEO-CONFIG.md — Cloudflare Headers section.
+/trinidad/crime/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
 # Cache HTML pages for 1 hour
 # Short cache time so content updates propagate quickly
 /*
@@ -53,10 +60,15 @@
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=()
+  X-Robots-Tag: index, follow
 
 # Cache Pagefind search index files for 1 day
 /pagefind/*
   Cache-Control: public, max-age=86400
+
+# Health endpoint: no-cache so monitoring tools always get fresh data
+/api/health.json
+  Cache-Control: no-cache
 
 # Don't cache dynamic endpoints (if you add any later)
 /api/*

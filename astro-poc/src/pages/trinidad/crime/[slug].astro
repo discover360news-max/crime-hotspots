@@ -75,8 +75,10 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
 ---
 
 {crime ? (
-<Layout title={title} description={description} ogImage={ogImage} includeTurnstile={true}>
-  <!-- Schema.org NewsArticle Markup -->
+<Layout title={title} description={description} ogImage={ogImage} ogType="article" includeTurnstile={true}>
+  <!-- SEO CRITICAL: NewsArticle structured data — injected into <head> via slot="head".
+       Google uses this for news carousels, rich snippets, and article indexing signals.
+       DO NOT remove fields or the slot="head" attribute. See docs/claude-context/SEO-CONFIG.md. -->
   <script type="application/ld+json" slot="head">
     {
       JSON.stringify({
@@ -84,7 +86,13 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
         "@type": "NewsArticle",
         "headline": crime.headline,
         "datePublished": crime.dateObj.toISOString(),
+        "dateModified": crime.dateObj.toISOString(),
         "articleSection": crime.crimeType,
+        "keywords": [crime.crimeType, crime.area, crime.region, "crime trinidad", "trinidad news"].filter(Boolean).join(", "),
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": buildRoute.crimeAbsolute(crime.slug)
+        },
         "locationCreated": {
           "@type": "Place",
           "name": crime.area,
@@ -96,10 +104,23 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
         },
         "description": crime.summary,
         "url": buildRoute.crimeAbsolute(crime.slug),
-        "publisher": {
+        "author": crime.source ? {
+          "@type": "NewsMediaOrganization",
+          "name": crime.source,
+          ...(crime.url ? { "url": crime.url } : {})
+        } : {
           "@type": "Organization",
           "name": "Crime Hotspots",
           "url": "https://crimehotspots.com"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Crime Hotspots",
+          "url": "https://crimehotspots.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://crimehotspots.com/og-image.jpg"
+          }
         }
       })
     }

@@ -12,6 +12,9 @@ interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  // SEO CRITICAL: pass "article" for story/blog pages, "website" for everything else.
+  // See docs/claude-context/SEO-CONFIG.md — og:type section.
+  ogType?: string;
   includeLeaflet?: boolean;
   includePagefind?: boolean;
   includeTurnstile?: boolean;
@@ -21,6 +24,7 @@ const {
   title,
   description = "Real-time crime statistics and interactive dashboards for the Caribbean",
   ogImage = "https://crimehotspots.com/og-image.jpg",
+  ogType = "website",
   includeLeaflet = false,
   includePagefind = true,
   includeTurnstile = false
@@ -69,7 +73,8 @@ const detectedCountryId = Object.entries(countryPathMap).find(
   <link rel="canonical" href={canonicalURL} />
 
   <!-- Open Graph / Facebook -->
-  <meta property="og:type" content="website">
+  <!-- SEO CRITICAL: og:type must be "article" on story/blog pages. Pass ogType prop. See SEO-CONFIG.md. -->
+  <meta property="og:type" content={ogType}>
   <meta property="og:url" content={canonicalURL}>
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
@@ -124,6 +129,12 @@ const detectedCountryId = Object.entries(countryPathMap).find(
     <!-- Cloudflare Turnstile (loaded only on pages with forms) -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
   )}
+
+  <!-- SEO CRITICAL: named slot for page-level structured data (JSON-LD schemas).
+       Pages pass <script type="application/ld+json" slot="head"> to inject into <head>.
+       DO NOT REMOVE — crime pages depend on this for NewsArticle schema injection.
+       See docs/claude-context/SEO-CONFIG.md — Structured Data section. -->
+  <slot name="head" />
 
   <!-- Critical inline styles to prevent CLS before main CSS bundle loads -->
   <style>
