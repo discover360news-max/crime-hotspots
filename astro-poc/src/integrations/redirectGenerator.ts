@@ -14,6 +14,7 @@ import type { AstroIntegration } from 'astro';
 import { writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
+import { TRINIDAD_CSV_URLS } from '../config/csvUrls.ts';
 
 // Inline the CSV utilities to avoid ESM/CJS issues in the integration context
 function parseCSVLine(line: string): string[] {
@@ -137,9 +138,6 @@ export default function redirectGenerator(): AstroIntegration {
     hooks: {
       'astro:build:start': async ({ logger }) => {
         logger.info('[redirectGenerator] Generating redirect-map.json...');
-
-        // Import CSV URLs — using dynamic import to support ESM
-        const { TRINIDAD_CSV_URLS } = await import('../config/csvUrls.ts');
 
         const allEntries: CrimeEntry[] = [];
 
