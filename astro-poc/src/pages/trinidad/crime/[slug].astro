@@ -28,6 +28,14 @@ const { slug } = Astro.params;
 const allCrimes = await getTrinidadCrimes();
 const crime = allCrimes.find(c => c.slug === slug);
 
+// Fallback: check if this is a legacy slug → 301 to new URL
+if (!crime) {
+  const redirect = allCrimes.find(c => c.oldSlug === slug);
+  if (redirect) {
+    return Astro.redirect(`/trinidad/crime/${redirect.slug}/`, 301);
+  }
+}
+
 // Return proper 404 for unknown slugs
 if (!crime) {
   return new Response(null, { status: 404, statusText: 'Not Found' });

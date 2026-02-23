@@ -9,7 +9,7 @@
  * - This reduces build time significantly (from ~30 min to ~5-10 min)
  */
 
-import { parseCSVLine, parseDate, generateSlug, createColumnMap, getColumnValue } from './csvParser';
+import { parseCSVLine, parseDate, generateSlug, generateSlugWithId, createColumnMap, getColumnValue } from './csvParser';
 import { TRINIDAD_CSV_URLS } from '../config/csvUrls';
 
 // ============================================================================
@@ -36,6 +36,8 @@ export interface Crime {
   summary: string;
   // Computed fields
   slug: string;
+  storyId: string | null; // Story_ID from CSV; null if blank
+  oldSlug: string;        // Legacy headline-date slug (for redirect fallback)
   dateObj: Date;
   year: number;
   month: number;
@@ -95,7 +97,9 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
         continue;
       }
 
-      const slug = generateSlug(headline, dateObj);
+      const storyId = getColumn('story_id') || null;
+      const oldSlug = generateSlug(headline, dateObj);
+      const slug = storyId ? generateSlugWithId(storyId, headline) : oldSlug;
 
       // Parse victim count (default to 1 if not provided, allow 0 for victimless crimes)
       const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
@@ -117,6 +121,8 @@ async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
         longitude: Number(longitude),
         summary,
         slug,
+        storyId,
+        oldSlug,
         dateObj,
         year: dateObj.getFullYear(),
         month: dateObj.getMonth() + 1,

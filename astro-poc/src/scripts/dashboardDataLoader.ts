@@ -4,11 +4,11 @@
  */
 
 // Import shared utilities - SINGLE SOURCE OF TRUTH
-import { parseCSVLine, parseDate, generateSlug, createColumnMap, getColumnValue } from '../lib/csvParser';
+import { parseCSVLine, parseDate, generateSlug, generateSlugWithId, createColumnMap, getColumnValue } from '../lib/csvParser';
 import { TRINIDAD_CSV_URLS, REGION_DATA_CSV_URL } from '../config/csvUrls';
 
 // Re-export for backwards compatibility with any code that imports from here
-export { parseCSVLine, parseDate, generateSlug };
+export { parseCSVLine, parseDate, generateSlug, generateSlugWithId };
 export { TRINIDAD_CSV_URLS, REGION_DATA_CSV_URL };
 
 /**
@@ -61,7 +61,9 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
         continue;
       }
 
-      const slug = generateSlug(headline, dateObj);
+      const storyId = getColumn('story_id') || null;
+      const oldSlug = generateSlug(headline, dateObj);
+      const slug = storyId ? generateSlugWithId(storyId, headline) : oldSlug;
 
       // Parse victim count (default to 1 if not provided, allow 0 for victimless crimes)
       const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
@@ -83,6 +85,8 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
         longitude: Number(longitude),
         summary,
         slug,
+        storyId,
+        oldSlug,
         dateObj,
         year: dateObj.getFullYear(),
         month: dateObj.getMonth() + 1,

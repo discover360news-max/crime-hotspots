@@ -74,6 +74,26 @@ export function generateSlug(headline: string, date: Date): string {
 }
 
 /**
+ * Generate stable slug from Story_ID prefix + headline words
+ * Format: "00842-missing-man-found-dead-princes-town"
+ *
+ * @param storyId - Story_ID from CSV (e.g. "00842")
+ * @param headline - Crime headline
+ * @returns URL-safe slug with ID prefix
+ */
+export function generateSlugWithId(storyId: string, headline: string): string {
+  const words = headline
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(w => w.length > 0)
+    .slice(0, 6)
+    .join('-');
+  return `${storyId}-${words}`;
+}
+
+/**
  * Strips surrounding quotes and smart quotes from a string
  * Useful for cleaning up CSV values
  *

@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
+import redirectGenerator from './src/integrations/redirectGenerator.ts';
 
 // https://astro.build/config
 export default defineConfig({
@@ -13,7 +14,8 @@ export default defineConfig({
     imageService: 'passthrough', // Use Astro's default image service
   }),
   integrations: [
-    sitemap()
+    sitemap(),
+    redirectGenerator()
   ],
   vite: {
     plugins: [tailwindcss()]
