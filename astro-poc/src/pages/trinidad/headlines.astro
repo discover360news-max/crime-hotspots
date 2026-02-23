@@ -26,9 +26,20 @@ const currentYear = availableYears[0];
 
 console.log(`📰 Headlines loaded ${allCrimes.length} total crimes (${availableYears.join(', ')})`);
 
-// Get unique areas and crime types for filters (from all years)
+// Get unique areas, regions, and crime types for filters (from all years)
 const areas = [...new Set(allCrimes.map(c => c.area).filter(Boolean))].sort();
+const regions = [...new Set(allCrimes.map(c => c.region).filter(Boolean))].sort();
 const crimeTypes = [...new Set(allCrimes.map(c => c.crimeType).filter(Boolean))].sort();
+
+// Build region → areas mapping for cascading area dropdown
+const regionToAreas: Record<string, string[]> = {};
+allCrimes.forEach(c => {
+  if (c.region && c.area) {
+    if (!regionToAreas[c.region]) regionToAreas[c.region] = [];
+    if (!regionToAreas[c.region].includes(c.area)) regionToAreas[c.region].push(c.area);
+  }
+});
+Object.values(regionToAreas).forEach(arr => (arr as string[]).sort());
 
 // Group crimes by date for initial render (first 30 crimes)
 const initialCrimes = allCrimes.slice(0, 30);
@@ -72,16 +83,13 @@ const breadcrumbs = [
 ---
 
 <Layout title={title} description={description} includeTurnstile={true}>
-  <!-- Breadcrumbs (Above Hero) -->
-  <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-    <Breadcrumbs items={breadcrumbs} />
-  </div>
-
   <!-- Hero Section -->
   <Hero
     title="Trinidad & Tobago Crime Headlines"
-    subtitle="Latest crime reports from all years. Filter incidents by area, crime type, and date."
+    subtitle="Browse the latest crime reports."
     compact={true}
+    narrowContainer={true}
+    freshness={`Data as of ${freshnessText}`}
     primaryCTA={{
       text: "Dashboard",
       href: routes.trinidad.dashboard,
@@ -92,6 +100,7 @@ const breadcrumbs = [
       href: routes.trinidad.murderCount
     }}
   >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
     <div class="flex items-center gap-2">
       <button
         id="filtersBtn"
@@ -108,7 +117,8 @@ const breadcrumbs = [
     </div>
   </Hero>
 
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5" data-pagefind-ignore>
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-ignore>
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
 
     <!-- Site Notification Banner -->
     <SiteNotificationBanner notification={dataUpdateNotice} />
@@ -119,10 +129,6 @@ const breadcrumbs = [
       <div class="text-slate-400 dark:text-[hsl(0_0%_50%)]">
         Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of all <a href={routes.trinidad.archive} class="border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition"><span id="resultsTotal">{allCrimes.length}</span></a> listed crimes
       </div>
-      <span class="text-slate-400 dark:text-[hsl(0_0%_50%)] flex items-center gap-1">
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Data as of {freshnessText}
-      </span>
       <div class="basis-full sm:basis-auto">
         <a href={routes.trinidad.archive} class="text-slate-400 dark:text-[hsl(0_0%_50%)] border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition">View Archive</a>
       </div>
@@ -180,7 +186,7 @@ const breadcrumbs = [
             <div class={`accordion-content overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[10000px] mt-3 px-3 pb-3' : 'max-h-0'}`}>
               <div class="relative pl-7">
                 {/* Vertical dotted line (muted grey) */}
-                <div class="absolute left-2.5 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
+                <div class="absolute left-3.5 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
 
                 <div class="space-y-1">
                   {crimes.map(crime => (
@@ -217,6 +223,8 @@ const breadcrumbs = [
         Load More
       </button>
     </div>
+
+    </div><!-- /card -->
   </main>
 
   <!-- Filters Tray -->
@@ -272,7 +280,21 @@ const breadcrumbs = [
             </select>
           </div>
 
-          <!-- Area -->
+          <!-- Region -->
+          <div>
+            <label for="region" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Region</label>
+            <select
+              id="region"
+              class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]"
+            >
+              <option value="">All Regions</option>
+              {regions.map(region => (
+                <option value={region}>{region}</option>
+              ))}
+            </select>
+          </div>
+
+          <!-- Area (cascades based on region selection) -->
           <div>
             <label for="area" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Area</label>
             <select
@@ -307,7 +329,7 @@ const breadcrumbs = [
   </div>
 
   <!-- Client-side filtering script -->
-  <script define:vars={{ allCrimes }}>
+  <script define:vars={{ allCrimes, regionToAreas, allAreas: areas }}>
     // Expose crimes data globally for modal safety context
     window.__crimesData = allCrimes;
 
@@ -327,15 +349,34 @@ const breadcrumbs = [
     let filteredCrimes = [...allCrimes];
     let isFiltered = false;
 
+    // Cascade: repopulate area dropdown based on selected region
+    function updateAreaOptions(selectedRegion) {
+      const areaSelect = document.getElementById('area');
+      const currentArea = areaSelect.value;
+      areaSelect.innerHTML = '<option value="">All Areas</option>';
+
+      const areasToShow = selectedRegion ? (regionToAreas[selectedRegion] || []) : allAreas;
+      areasToShow.forEach(area => {
+        const opt = document.createElement('option');
+        opt.value = area;
+        opt.textContent = area;
+        if (area === currentArea && (!selectedRegion || (regionToAreas[selectedRegion] || []).includes(currentArea))) {
+          opt.selected = true;
+        }
+        areaSelect.appendChild(opt);
+      });
+    }
+
     // Filter function
     function applyFilters() {
       const dateFrom = document.getElementById('dateFrom').value;
       const dateTo = document.getElementById('dateTo').value;
       const crimeType = document.getElementById('crimeType').value;
+      const region = document.getElementById('region').value;
       const area = document.getElementById('area').value;
 
       // Check if any filter is active
-      isFiltered = !!(dateFrom || dateTo || crimeType || area);
+      isFiltered = !!(dateFrom || dateTo || crimeType || region || area);
 
       filteredCrimes = allCrimes.filter(crime => {
         const crimeDate = new Date(crime.date);
@@ -346,6 +387,9 @@ const breadcrumbs = [
 
         // Crime type filter
         if (crimeType && crime.crimeType !== crimeType) return false;
+
+        // Region filter
+        if (region && crime.region !== region) return false;
 
         // Area filter
         if (area && crime.area !== area) return false;
@@ -617,6 +661,8 @@ const breadcrumbs = [
       document.getElementById('dateFrom').value = '';
       document.getElementById('dateTo').value = '';
       document.getElementById('crimeType').value = '';
+      document.getElementById('region').value = '';
+      updateAreaOptions('');
       document.getElementById('area').value = '';
       applyFilters();
       unhighlightApplyBtn();
@@ -638,6 +684,11 @@ const breadcrumbs = [
     document.getElementById('dateFrom').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
     document.getElementById('dateTo').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
     document.getElementById('crimeType').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
+    document.getElementById('region').addEventListener('change', () => {
+      updateAreaOptions(document.getElementById('region').value);
+      applyFilters();
+      syncFilterIndicator();
+    });
     document.getElementById('area').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
 
     document.getElementById('clearFilters').addEventListener('click', clearAllFilters);

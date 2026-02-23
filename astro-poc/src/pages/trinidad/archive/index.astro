@@ -10,6 +10,7 @@ export const prerender = true;
 
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import Hero from '../../../components/Hero.astro';
 import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
 import { getTrinidadCrimes } from '../../../lib/crimeData';
 import { dataUpdateNotice } from '../../../config/siteNotifications';
@@ -44,46 +45,29 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
 ---
 
 <Layout title={title} description={description}>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-    <!-- Breadcrumbs -->
+  <Hero
+    title="Crime Archives"
+    subtitle={`Browse ${crimes.length} crime incidents organized by month — Trinidad & Tobago`}
+    compact={true}
+    narrowContainer={true}
+    primaryCTA={{ text: "Dashboard", href: routes.trinidad.dashboard, icon: "dashboard" }}
+    secondaryCTA={{ text: "Headlines", href: routes.trinidad.headlines }}
+  >
     <Breadcrumbs items={[
       { label: 'Home', href: routes.home },
       { label: getCountryName('tt'), href: routes.trinidad.dashboard },
       { label: 'Archive' }
-    ]} />
+    ]} slot="before" />
+  </Hero>
 
-    <!-- Page Header -->
-    <div class="text-center mb-4">
-      <h1 class="text-display text-slate-700 dark:text-[hsl(0_0%_90%)] mb-2">Crime Archives</h1>
-      <p class="text-display font-bold text-slate-600 dark:text-[hsl(0_0%_65%)]">Trinidad & Tobago</p>
-      <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2">
-        Browse {crimes.length} crime incidents organized by month
-      </p>
-    </div>
-
-    <!-- Navigation Buttons -->
-    <div class="flex justify-center gap-2 mb-8">
-      <a
-        href={routes.trinidad.dashboard}
-        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_65%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition font-medium text-xs whitespace-nowrap"
-      >
-        Dashboard
-      </a>
-      <a
-        href={routes.trinidad.headlines}
-        class="px-4 py-1.5 min-h-[22px] flex items-center justify-center border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_65%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition font-medium text-xs whitespace-nowrap"
-      >
-        Headlines
-      </a>
-    </div>
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
 
     <!-- Site Notification Banner -->
-    <div class="max-w-4xl mx-auto">
-      <SiteNotificationBanner notification={dataUpdateNotice} />
-    </div>
+    <SiteNotificationBanner notification={dataUpdateNotice} />
 
     <!-- Archive List -->
-    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
       {archives.map(archive => {
         const monthName = new Date(archive.year, archive.month - 1).toLocaleDateString('en-US', { month: 'long' });
         return (
@@ -118,5 +102,7 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
         <p class="text-body text-slate-600 dark:text-[hsl(0_0%_55%)]">No archives available yet.</p>
       </div>
     )}
-  </div>
+
+    </div><!-- /card -->
+  </main>
 </Layout>

@@ -126,7 +126,7 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
     }
   </script>
 
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
     <!-- Breadcrumbs -->
     <Breadcrumbs items={[
       { label: 'Home', href: routes.home },
@@ -136,6 +136,8 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
       { label: monthName, href: buildRoute.archive(crime.year, String(crime.month).padStart(2, '0')) },
       { label: truncatedHeadline }
     ]} />
+
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
 
     <!-- Navigation Buttons with Share -->
     <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
@@ -179,7 +181,7 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
     <!-- Site Notification Banner -->
     <SiteNotificationBanner notification={dataUpdateNotice} />
 
-    <article class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-lg shadow-sm border border-slate-200 dark:border-[hsl(0_0%_18%)] p-6 sm:p-8">
+    <article>
       <!-- Two-column layout: Desktop only, stack on mobile -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <!-- LEFT COLUMN: Crime Metadata (Row 1, Col 1) -->
@@ -352,7 +354,9 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
         </div>
       </nav>
     )}
-  </div>
+
+    </div><!-- /card -->
+  </main>
 </Layout>
 ) : (
 <Layout title={title} description={description}>

@@ -115,27 +115,30 @@ function processReadyArticles() {
 
                   if (daysDiff > 30) {
                     Logger.log(`    ⚠️ Crime date is ${daysDiff} days old - likely court verdict or historical reference`);
-                    // Force to review queue with low confidence
-                    if (extracted.confidence >= PROCESSING_CONFIG.CONFIDENCE_THRESHOLD) {
-                      extracted.confidence = 5; // Override to force review
+                    // Force this crime to review queue with low confidence
+                    if (crime.confidence >= PROCESSING_CONFIG.CONFIDENCE_THRESHOLD) {
+                      crime.confidence = 5; // Override to force review
                     }
-                    if (!extracted.ambiguities) extracted.ambiguities = [];
-                    extracted.ambiguities.push(`Crime date (${crime.crime_date}) is ${daysDiff} days before publication - verify this is a new crime report, not court verdict`);
+                    if (!Array.isArray(crime.ambiguities)) crime.ambiguities = [];
+                    crime.ambiguities.push(`Crime date (${crime.crime_date}) is ${daysDiff} days before publication - verify this is a new crime report, not court verdict`);
                   }
                 } catch (e) {
                   Logger.log(`    ⚠️ Error validating date: ${e.message}`);
                 }
               }
 
-              // Use overall confidence for routing decision
-              if (extracted.confidence >= PROCESSING_CONFIG.CONFIDENCE_THRESHOLD) {
+              // Use per-crime confidence for routing decision
+              const crimeConfidence = crime.confidence !== undefined ? crime.confidence : 5;
+              const crimeAmbiguities = Array.isArray(crime.ambiguities) ? crime.ambiguities : [];
+
+              if (crimeConfidence >= PROCESSING_CONFIG.CONFIDENCE_THRESHOLD) {
                 appendToProduction(crime, publishedDate, crimeTypes);
                 highConfCrimes++;
-                Logger.log(`    ✅ Added to Production`);
-              } else if (extracted.confidence > 0) {
-                appendToReviewQueue(crime, extracted.confidence,extracted.ambiguities, publishedDate, crimeTypes);
+                Logger.log(`    ✅ Added to Production (confidence: ${crimeConfidence})`);
+              } else if (crimeConfidence > 0) {
+                appendToReviewQueue(crime, crimeConfidence, crimeAmbiguities, publishedDate, crimeTypes);
                 lowConfCrimes++;
-                Logger.log(`    ⚠️ Added to Review Queue`);
+                Logger.log(`    ⚠️ Added to Review Queue (confidence: ${crimeConfidence})`);
               }
             });
 
@@ -143,12 +146,14 @@ function processReadyArticles() {
 
             // Update article status
             if (highConfCrimes > 0) {
+              const confScores = extracted.crimes.map(c => c.confidence || '?').join(', ');
               sheet.getRange(rowNumber, 7).setValue('completed');
-              sheet.getRange(rowNumber, 8).setValue(`✅ Extracted ${extracted.crimes.length} crime(s), confidence: ${extracted.confidence}`);
+              sheet.getRange(rowNumber, 8).setValue(`✅ Extracted ${extracted.crimes.length} crime(s), confidence: [${confScores}]`);
               successCount += highConfCrimes;
             } else if (lowConfCrimes > 0) {
+              const confScores = extracted.crimes.map(c => c.confidence || '?').join(', ');
               sheet.getRange(rowNumber, 7).setValue('needs_review');
-              sheet.getRange(rowNumber, 8).setValue(`⚠️ ${extracted.crimes.length} crime(s) need review, confidence: ${extracted.confidence}`);
+              sheet.getRange(rowNumber, 8).setValue(`⚠️ ${extracted.crimes.length} crime(s) need review, confidence: [${confScores}]`);
               reviewCount += lowConfCrimes;
             }
 

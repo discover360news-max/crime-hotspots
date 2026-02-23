@@ -26,12 +26,14 @@ interface Props {
   title: string;
   subtitle: string;
   badge?: string;
+  freshness?: string;
   primaryCTA?: CTA;
   secondaryCTA?: CTA;
   compact?: boolean;
+  narrowContainer?: boolean;
 }
 
-const { title, subtitle, badge, primaryCTA, secondaryCTA, compact = false } = Astro.props;
+const { title, subtitle, badge, freshness, primaryCTA, secondaryCTA, compact = false, narrowContainer = false } = Astro.props;
 
 // Icon SVG paths
 const icons = {
@@ -42,22 +44,31 @@ const icons = {
 };
 ---
 
-<section class={`w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-rose-950/30 dark:via-[hsl(0_0%_5%)] dark:to-[hsl(0_0%_5%)] px-4 sm:px-6 lg:px-8 ${compact ? 'py-6 sm:py-8' : 'py-12 sm:py-20'}`}>
-  <div class={`mx-auto ${compact ? 'max-w-6xl' : 'max-w-4xl text-center'}`}>
+<section class={`w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-rose-950/30 dark:via-[hsl(0_0%_5%)] dark:to-[hsl(0_0%_5%)] ${narrowContainer ? '' : 'px-4 sm:px-6 lg:px-8'} ${compact ? 'py-6 sm:py-8' : 'py-12 sm:py-20'}`}>
+  <div class={`mx-auto ${compact ? (narrowContainer ? 'max-w-3xl px-4 sm:px-6' : 'max-w-6xl') : 'max-w-4xl text-center'}`}>
+    <slot name="before" />
     <!-- Main Headline -->
     <h1 class={`font-bold text-slate-800 dark:text-[hsl(0_0%_95%)] ${compact ? 'text-heading leading-snug mb-2' : 'text-display leading-tight mb-4 sm:mb-6'}`}>
       {title}
     </h1>
 
     <!-- Subheadline -->
-    <p class={`text-body text-slate-600 dark:text-[hsl(0_0%_75%)] leading-relaxed ${compact ? 'mb-4 max-w-2xl' : 'mb-6 max-w-3xl mx-auto'}`}>
+    <p class={`text-body text-slate-400 dark:text-[hsl(0_0%_50%)] leading-relaxed ${compact ? 'mb-4 max-w-2xl' : 'mb-6 max-w-3xl mx-auto'}`}>
       {subtitle}
     </p>
 
     <!-- Optional Badge (e.g., "Updated daily • Last updated: Jan 24") -->
     {badge && (
-      <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_60%)] mb-4">
+      <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_60%)] mb-4">
         {badge}
+      </p>
+    )}
+
+    <!-- Data freshness indicator (optional) -->
+    {freshness && (
+      <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] flex items-center gap-1 mb-3">
+        <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        {freshness}
       </p>
     )}
 

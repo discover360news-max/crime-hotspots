@@ -11,7 +11,7 @@
 - `index.astro` → `/` (homepage)
 - `trinidad/dashboard.astro` → `/trinidad/dashboard`
 - `trinidad/headlines.astro` → `/trinidad/headlines`
-- `trinidad/crime/[slug].astro` → `/trinidad/crime/murder-port-of-spain-2025-12-15` (1,300+ pages)
+- `trinidad/crime/[slug].astro` → `/trinidad/crime/00842-missing-man-found-dead-princes-town/` (2,300+ pages, Story_ID-prefixed slugs; legacy `headline-YYYY-MM-DD` slugs 301-redirect to new format)
 - `trinidad/archive/[year]/[month].astro` → `/trinidad/archive/2025/12`
 - `blog/[slug].astro` → `/blog/trinidad-weekly-2025-11-10`
 

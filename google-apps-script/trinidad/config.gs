@@ -281,6 +281,14 @@ const NEWS_SOURCES = [
     enabled: true,
     priority: 1,
     crimeKeywords: ["murder", "shoot", "rob", "assault", "kill", "crime", "police", "victim", "attack", "gang", "arrest", "home invasion"]
+  },
+  {
+    name: "Trinidad Guardian",
+    country: "TT",
+    rssUrl: "https://guardian.co.tt/feed", // No RSS feed as of Feb 2026 — fully JS-rendered. Re-check periodically.
+    enabled: false, // DISABLED: Guardian has no RSS feed; use Facebook Post Submitter instead
+    priority: 2,
+    crimeKeywords: ["murder", "shoot", "rob", "assault", "kill", "crime", "police", "victim", "attack", "gang", "arrest", "home invasion"]
   }
 ];
 

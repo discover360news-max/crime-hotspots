@@ -289,30 +289,36 @@ To find a way to get goals accomplished efficiently and by using the least token
 ### CRIME PAGE RENDERING ⭐⭐⭐ (Full SSR + CDN Cache)
 
 **✅ UPDATED February 4, 2026** — Switched from hybrid (90-day prerender) to full SSR
-
-**Why the change:** The previous hybrid approach with `prerender = true` caused old crime pages (>90 days) to 404 silently. Cloudflare served the homepage as SPA fallback, causing Google Search Console to report 446+ pages as "Alternate page with proper canonical tag" — effectively de-indexing old crime pages.
+**✅ UPDATED February 23, 2026** — Story_ID-based slug migration added
 
 **How It Works Now:**
 - ALL crime pages are server-rendered (SSR) on request
 - `CDN-Cache-Control: max-age=86400` — Cloudflare edge caches for 24h after first visit
 - `Cache-Control: public, max-age=3600` — Browser caches for 1h
-- Unknown slugs return proper HTTP 404 (not homepage redirect)
-- Build time: ~4.5 min (no crime pages pre-rendered, faster than before)
+- **New slug format:** `/trinidad/crime/00842-missing-man-found-dead-princes-town/` (Story_ID + 6 words)
+- **Legacy slug format:** `/trinidad/crime/headline-words-YYYY-MM-DD/` — 301-redirected to new URL via SSR
+- **No Story_ID:** slug stays as old headline-date format (unchanged)
+- Unknown slugs return proper HTTP 404
 
 **Implementation:**
-- `astro.config.mjs`: `output: 'server'`
-- `[slug].astro`: No `prerender`, no `getStaticPaths()` — pure SSR
-- `Astro.response.headers` sets CDN + browser cache headers
+- `astro.config.mjs`: `output: 'server'` + `redirectGenerator()` integration
+- `[slug].astro`: SSR slug lookup → `oldSlug` fallback → 301 redirect → 404
+- `csvParser.ts`: `generateSlug()` (legacy) + `generateSlugWithId()` (new)
+- `crimeData.ts` + `dashboardDataLoader.ts`: `Crime.storyId`, `Crime.oldSlug`, `Crime.slug`
+- `src/integrations/redirectGenerator.ts`: build-time redirect map generator
+- `src/data/redirect-map.json`: ~1,984 old→new path mappings (inspection/validation only)
 
 **NEVER:**
-- Add `prerender = true` back to `[slug].astro` — this breaks old crime pages (GSC canonical issue)
+- Add `prerender = true` back to `[slug].astro` — breaks old crime pages (GSC canonical issue)
 - Use `Astro.redirect('/404')` for missing crimes — return `new Response(null, { status: 404 })` instead
+- Remove the `oldSlug` fallback redirect block from `[slug].astro` — this is how legacy URLs stay alive
 - Remove CDN cache headers — SSR without caching degrades LCP
+- Write old→new redirects to `public/_redirects` — Cloudflare's 2,000-rule limit makes this unviable; SSR handles it
 
 **ALWAYS:**
 - Test build time after changes (`npm run build` must complete under 15 minutes)
 - Monitor LCP metrics after deployment (SSR pages should be <5,000ms first load, <2,500ms cached)
-- Verify old crime URLs return real content (not homepage)
+- Verify old crime URLs 301-redirect to new URL (not 404)
 
 ### When Working on Automation
 

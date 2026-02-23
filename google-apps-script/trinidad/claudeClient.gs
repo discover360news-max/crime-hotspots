@@ -138,9 +138,11 @@ function extractCrimeData(articleText, articleTitle, articleUrl, publishedDate, 
 
       // If we got some crimes, use them but lower confidence
       if (partial.crimes && partial.crimes.length > 0) {
-        partial.confidence = Math.min(partial.confidence, 3);
-        partial.ambiguities = partial.ambiguities || [];
-        partial.ambiguities.push('TRUNCATED: Response incomplete, may be missing crimes');
+        partial.crimes.forEach(crime => {
+          crime.confidence = Math.min(crime.confidence || 5, 3);
+          crime.ambiguities = crime.ambiguities || [];
+          crime.ambiguities.push('TRUNCATED: Response incomplete, may be missing crimes');
+        });
         Logger.log(`⚠️ Partial extraction: ${partial.crimes.length} crime(s) found, but response was truncated`);
         return partial;
       }
@@ -200,14 +202,14 @@ JSON SCHEMA:
       "area": "Neighborhood (e.g., Maraval, Port of Spain)",
       "street": "Street address INCLUDING business names/landmarks",
       "headline": "Brief headline with victim name/age in parentheses if known",
-      "details": "4-5 complete sentences (minimum 60 words). Separate logical paragraphs with || delimiter. Group: (1) what happened + when/where, (2) victim details + circumstances/motive, (3) police response/investigation. Example: 'First paragraph about the incident.||Second paragraph about the victim.||Third paragraph about police response.'",
+      "details": "4-5 complete sentences using ONLY facts stated in the article — do NOT infer or add details not present. Separate logical paragraphs with || delimiter. Group: (1) what happened + when/where, (2) victim details + circumstances/motive, (3) police response/investigation. If the article is thin, use fewer sentences rather than padding. Example: 'First paragraph about the incident.||Second paragraph about the victim.||Third paragraph about police response.'",
       "victims": [{"name": "Name or null", "age": number, "aliases": []}],
       "victimCount": number,
-      "location_country": "Trinidad and Tobago|Venezuela|Guyana|Other"
+      "location_country": "Trinidad|Tobago|Trinidad and Tobago|Venezuela|Guyana|Other",
+      "confidence": 1-10,
+      "ambiguities": ["reason if confidence < 7"]
     }
-  ],
-  "confidence": 1-10,
-  "ambiguities": []
+  ]
 }
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -215,6 +217,25 @@ MULTI-CRIME LOGIC (CRITICAL)
 ═══════════════════════════════════════════════════════════════════════════════
 ✅ SEPARATE objects when: Different victims OR different dates OR different locations
 ❌ DO NOT create separate objects for: Same victim with multiple crime types (use all_crime_types array)
+
+ISOLATION RULE — MULTI-INCIDENT ARTICLES (CRITICAL):
+When one article reports crimes at different locations or times, each crime object is FULLY INDEPENDENT:
+- "area" and "street" MUST come ONLY from the sentences describing THAT specific incident
+- "crime_date" MUST come ONLY from the time reference for THAT specific incident
+- "victims" MUST include ONLY the people harmed in THAT specific incident
+- "victimCount" is per crime object — NOT a total across the whole article
+- NEVER carry over area, date, or victims from one incident to another
+
+Example — article: "Kyle Alexander and Curtis Pierre shot dead in El Dorado. In a separate incident, a man was killed in Valsayn."
+✅ Crime 1: area="El Dorado", victims=[Kyle Alexander, Curtis Pierre], victimCount=2
+✅ Crime 2: area="Valsayn", victims=[other victim], victimCount=1
+❌ WRONG: Crime 1: area="Valsayn", victims=[Kyle Alexander, Curtis Pierre]
+❌ WRONG: Crime 1: victimCount=3 (that's the article total, not this incident's count)
+
+MULTI-INCIDENT vs BRIEF MENTION:
+- If an article covers multiple full incidents (e.g., "3 murders in 4 hours"), extract EACH incident as its own crime object — they are all main subjects
+- Only apply the BRIEF MENTION exclusion to incidents described in 1 sentence with no victim/date/location details
+- A secondary incident in a multi-incident article is NOT a brief mention
 
 IMPORTANT - Shooting as Method:
 - "Shot dead" / "shot and killed" / "gunned down" = ["Murder", "Shooting"]
@@ -349,6 +370,25 @@ Example: "Decomposed body found with marks, cellphone missing"
 ❌ OTHER: Court/sentencing, opinion pieces (NOT historical articles - those are valid for backfill)
 
 ═══════════════════════════════════════════════════════════════════════════════
+CONFIDENCE SCORING (PER CRIME — assign individually)
+═══════════════════════════════════════════════════════════════════════════════
+Each crime object has its OWN confidence score (1-10) and ambiguities array.
+Do NOT use a single score for the whole article — different incidents can have different certainty levels.
+
+Score each crime based on how clearly the article establishes it:
+- 9-10: Clear crime, named victim(s), confirmed by police, specific location and date
+- 7-8:  Clear crime, location and date known, minor details missing (e.g. victim name only)
+- 5-6:  Ambiguous — uncertain cause of death, vague location, or date missing (goes to review queue)
+- 3-4:  Weak signal — only 1 indicator of crime, most details absent
+- 1-2:  Highly speculative — barely mentioned, no confirmation
+
+ambiguities: List specific concerns only when confidence < 7. Leave empty array [] when confidence ≥ 7.
+Examples:
+- "Victim identity unconfirmed"
+- "Location unclear — only 'east Trinidad' mentioned"
+- "Date ambiguous — no day reference in article"
+
+═══════════════════════════════════════════════════════════════════════════════
 CLASSIFICATION RULES
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -378,6 +418,10 @@ STEP 3: Calculate the ACTUAL crime date using these rules:
 | "last [day]"   | PREVIOUS WEEK's [day]        | Go back to week BEFORE, find that day |
 | "this [day]"   | Same week as published       | Find [day] in current week            |
 | No date        | Use published date           | Default fallback                      |
+| "Sat night into Sun morning" | Overnight, spans midnight | Use SATURDAY (the earlier/start date) |
+| "between Sat night and Sun morning" | Overnight, spans midnight | Use SATURDAY (the earlier/start date) |
+
+OVERNIGHT CRIMES: When a crime spans midnight (e.g., "Saturday night into Sunday morning"), always use the EARLIER date (the night it started). The night belongs to the day it began.
 
 ═══════════════════════════════════════════════════════════════════════════════
 WORKED EXAMPLES (MEMORIZE THESE PATTERNS)
@@ -534,15 +578,21 @@ function parseClaudeResponse(responseText, articleUrl) {
 
     extracted.source_url = articleUrl;
 
-    if (!extracted.hasOwnProperty('confidence')) {
-      extracted.confidence = 5;
-      extracted.ambiguities = extracted.ambiguities || [];
-      extracted.ambiguities.push('Confidence score missing from AI response');
-    }
-
-    if (!Array.isArray(extracted.ambiguities)) {
-      extracted.ambiguities = [];
-    }
+    // Normalise per-crime confidence — new format has confidence on each crime object.
+    // Fall back to top-level confidence for backward compat (cached prompt responses).
+    const articleLevelConfidence = extracted.hasOwnProperty('confidence') ? extracted.confidence : 5;
+    extracted.crimes.forEach(crime => {
+      if (!crime.hasOwnProperty('confidence') || crime.confidence === null || crime.confidence === undefined) {
+        crime.confidence = articleLevelConfidence;
+        crime.ambiguities = crime.ambiguities || [];
+        if (articleLevelConfidence === 5) {
+          crime.ambiguities.push('Confidence score missing from AI response — defaulted to 5');
+        }
+      }
+      if (!Array.isArray(crime.ambiguities)) {
+        crime.ambiguities = [];
+      }
+    });
 
     Logger.log(`✅ Successfully parsed extraction: ${extracted.crimes.length} crime(s) found, confidence: ${extracted.confidence}`);
     return extracted;
