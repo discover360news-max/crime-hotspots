@@ -16,6 +16,7 @@ import type { AstroIntegration } from 'astro';
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
+import { TRINIDAD_CSV_URLS } from '../config/csvUrls.ts';
 
 // ---------------------------------------------------------------------------
 // Inline CSV utilities (avoids ESM/CJS import issues inside integration hooks)
@@ -240,9 +241,6 @@ export default function csvBuildPlugin(): AstroIntegration {
       'astro:build:start': async ({ logger }) => {
         const buildStartedAt = new Date().toISOString();
         logger.info('[csvBuildPlugin] Starting CSV fetch with retry...');
-
-        // Dynamically import CSV URLs (avoids ESM resolution issues)
-        const { TRINIDAD_CSV_URLS } = await import('../config/csvUrls.ts');
 
         // Read previous cache so we can compare row counts and use as fallback
         const previousCache = readExistingCache();
