@@ -36,40 +36,45 @@ if (!crime) {
   }
 }
 
-// Return proper 404 for unknown slugs
+// Unknown slug — render a crime-specific 404 page with helpful navigation
 if (!crime) {
-  return new Response(null, { status: 404, statusText: 'Not Found' });
+  Astro.response.status = 404;
 }
 
-// Sort for prev/next navigation
-const sortedCrimes = [...allCrimes].sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
-const crimeIndex = sortedCrimes.findIndex(c => c.slug === slug);
+// Sort for prev/next navigation (guarded — only when crime exists)
+const sortedCrimes = crime ? [...allCrimes].sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime()) : [];
+const crimeIndex = crime ? sortedCrimes.findIndex(c => c.slug === slug) : -1;
 const prevCrime = crimeIndex > 0 ? sortedCrimes[crimeIndex - 1] : null;
-const nextCrime = crimeIndex < sortedCrimes.length - 1 ? sortedCrimes[crimeIndex + 1] : null;
+const nextCrime = crimeIndex > -1 && crimeIndex < sortedCrimes.length - 1 ? sortedCrimes[crimeIndex + 1] : null;
 
-// Load area aliases for tooltip
-const areaAliases = await loadAreaAliases();
-const localName = getLocalName(areaAliases, crime.area);
+// Load area aliases for tooltip (guarded)
+const areaAliases = crime ? await loadAreaAliases() : {};
+const localName = crime ? getLocalName(areaAliases, crime.area) : '';
 
-// Calculate safety context for this area (reuses allCrimes — no duplicate fetch)
-const safetyContext = getSafetyContext(crime.area, allCrimes);
+// Calculate safety context for this area (guarded)
+const safetyContext = crime ? getSafetyContext(crime.area, allCrimes) : null;
 
-// CDN cache: Cloudflare caches SSR response for 24h, browser caches for 1h
-Astro.response.headers.set('CDN-Cache-Control', 'max-age=86400');
-Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+// CDN cache: only for valid crime pages, not 404s
+if (crime) {
+  Astro.response.headers.set('CDN-Cache-Control', 'max-age=86400');
+  Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+}
 
 // Truncate headline for breadcrumbs (first 3-5 words)
-const truncatedHeadline = crime.headline.split(' ').slice(0, 5).join(' ') + (crime.headline.split(' ').length > 5 ? '...' : '');
+const truncatedHeadline = crime ? crime.headline.split(' ').slice(0, 5).join(' ') + (crime.headline.split(' ').length > 5 ? '...' : '') : '';
 
 // Format month name for breadcrumbs
-const monthName = crime.dateObj.toLocaleDateString('en-US', { month: 'long' });
+const monthName = crime ? crime.dateObj.toLocaleDateString('en-US', { month: 'long' }) : '';
 
 // SEO Meta Tags
-const title = `${crime.headline} | Crime Hotspots Trinidad`;
-const description = crime.summary || `${crime.crimeType} in ${crime.area} on ${crime.date}. View details, location, and related crimes.`;
-const ogImage = getCrimeTypeThumbnailUrl(crime.crimeType);
+const title = crime ? `${crime.headline} | Crime Hotspots Trinidad` : 'Story Not Found | Crime Hotspots Trinidad';
+const description = crime
+  ? (crime.summary || `${crime.crimeType} in ${crime.area} on ${crime.date}. View details, location, and related crimes.`)
+  : 'This story may have been updated or removed. Browse our latest crime reports.';
+const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
 ---
 
+{crime ? (
 <Layout title={title} description={description} ogImage={ogImage} includeTurnstile={true}>
   <!-- Schema.org NewsArticle Markup -->
   <script type="application/ld+json" slot="head">
@@ -328,8 +333,35 @@ const ogImage = getCrimeTypeThumbnailUrl(crime.crimeType);
     )}
   </div>
 </Layout>
+) : (
+<Layout title={title} description={description}>
+  <div class="min-h-screen flex items-center justify-center px-4 py-16">
+    <div class="max-w-2xl w-full text-center">
+      <h1 class="text-9xl font-bold text-rose-600 mb-4">404</h1>
+      <h2 class="text-display font-bold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-4">Story Not Found</h2>
+      <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mb-8">
+        This story may have been updated or removed. Browse our latest crime reports.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:bg-rose-800 transition font-medium text-xs"
+        >
+          Go to Homepage
+        </a>
+        <a
+          href={routes.trinidad.statistics}
+          class="inline-flex items-center gap-2 px-6 py-3 border border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 active:bg-rose-100 dark:active:bg-rose-950/60 transition font-medium text-xs"
+        >
+          Statistics Page
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>
+)}
 
-<script define:vars={{ crimeHeadline: crime.headline, crimeSlug: crime.slug }}>
+<script define:vars={{ crimeHeadline: crime?.headline ?? '', crimeSlug: crime?.slug ?? '' }}>
   // Share button functionality
   const shareTwitterBtn = document.getElementById('shareTwitterBtn');
   const shareFacebookBtn = document.getElementById('shareFacebookBtn');

@@ -11,13 +11,54 @@
 
 import { parseCSVLine, parseDate, generateSlug, generateSlugWithId, createColumnMap, getColumnValue } from './csvParser';
 import { TRINIDAD_CSV_URLS } from '../config/csvUrls';
+import csvCacheRaw from '../data/csv-cache.json';
 
 // ============================================================================
-// BUILD-TIME CACHE
-// Module-level cache persists across all page builds in a single Astro build
+// RUNTIME FALLBACK CACHE
+// Bundled at build time from src/data/csv-cache.json (written by csvBuildPlugin).
+// Used when Google Sheets is temporarily unreachable at runtime.
+// ============================================================================
+interface CsvCache {
+  timestamp: string;
+  rowCount: number;
+  csvTexts: Record<string, string>;
+}
+const csvCache = csvCacheRaw as CsvCache;
+
+// ============================================================================
+// MODULE-LEVEL RUNTIME CACHE
+// Persists across requests within the same Worker instance (warm requests).
 // ============================================================================
 let cachedCrimes: Crime[] | null = null;
 let fetchPromise: Promise<Crime[]> | null = null;
+
+// ============================================================================
+// FETCH WITH RETRY (exponential backoff: 2s → 4s → 8s)
+// 1 initial attempt + up to 3 retries = 4 total attempts maximum.
+// ============================================================================
+async function fetchWithRetry(url: string, maxRetries = 3): Promise<string> {
+  const delays = [2000, 4000, 8000];
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      if (attempt > 0) {
+        const delay = delays[attempt - 1] ?? 8000;
+        const ts = new Date().toISOString();
+        console.log(`[CSV] ${ts} Retry ${attempt}/${maxRetries} for ${url.slice(0, 60)}... (waiting ${delay / 1000}s)`);
+        await new Promise(r => setTimeout(r, delay));
+      }
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      return await response.text();
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      console.warn(`[CSV] Attempt ${attempt + 1}/${maxRetries + 1} failed: ${lastError.message}`);
+    }
+  }
+
+  throw lastError ?? new Error('All retries exhausted');
+}
 
 export interface Crime {
   date: string;
@@ -45,96 +86,111 @@ export interface Crime {
 }
 
 /**
- * Fetch and parse crime data from a CSV URL
- * Uses column header mapping to support different CSV layouts
+ * Parse crime data from raw CSV text.
+ * Uses column header mapping so column order doesn't matter.
  */
-async function fetchCrimeDataFromURL(csvUrl: string): Promise<Crime[]> {
-  try {
-    const response = await fetch(csvUrl);
-    const csvText = await response.text();
+function parseCrimeDataFromText(csvText: string): Crime[] {
+  const lines = csvText.split('\n');
+  if (lines.length < 2) return [];
 
-    const lines = csvText.split('\n');
+  // Parse headers and create column mapping using shared utility
+  const columnMap = createColumnMap(lines[0]);
 
-    // Parse headers and create column mapping using shared utility
-    const columnMap = createColumnMap(lines[0]);
+  // Debug: Log all column headers found (only once per session)
+  console.log('📋 CSV Column Headers:', Array.from(columnMap.keys()));
 
-    // Debug: Log all column headers found
-    console.log('📋 CSV Column Headers:', Array.from(columnMap.keys()));
+  const crimes: Crime[] = [];
 
-    const crimes: Crime[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.trim()) continue;
 
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
-      if (!line.trim()) continue;
+    const values = parseCSVLine(line);
 
-      const values = parseCSVLine(line);
+    // Helper function using shared getColumnValue — never accesses by index directly
+    const getColumn = (columnName: string): string => getColumnValue(values, columnMap, columnName);
 
-      // Helper function using shared getColumnValue
-      const getColumn = (columnName: string): string => getColumnValue(values, columnMap, columnName);
+    // Extract values using column names (resilient to column reordering)
+    const headline = getColumn('Headline');
+    const summary = getColumn('Summary');
+    const primaryCrimeType = getColumn('primaryCrimeType');
+    const relatedCrimeTypes = getColumn('relatedCrimeType') || getColumn('relatedCrimeTypes');
+    const victimCountStr = getColumn('victimCount') || getColumn('victimcount') || getColumn('Victim Count');
+    const crimeType = getColumn('Crime Type') || getColumn('crimeType');
+    const date = getColumn('Date');
+    const street = getColumn('Street Address') || getColumn('Street');
+    const area = getColumn('Area');
+    const region = getColumn('Region');
+    const url = getColumn('URL');
+    const source = getColumn('Source');
+    const latitude = getColumn('Latitude');
+    const longitude = getColumn('Longitude');
 
-      // Extract values using column mapping
-      const headline = getColumn('Headline');
-      const summary = getColumn('Summary');
-      const primaryCrimeType = getColumn('primaryCrimeType');
-      const relatedCrimeTypes = getColumn('relatedCrimeType') || getColumn('relatedCrimeTypes');
-      const victimCountStr = getColumn('victimCount') || getColumn('victimcount') || getColumn('Victim Count');
-      const crimeType = getColumn('Crime Type') || getColumn('crimeType');
-      const date = getColumn('Date');
-      const street = getColumn('Street Address') || getColumn('Street');
-      const area = getColumn('Area');
-      const region = getColumn('Region');
-      const url = getColumn('URL');
-      const source = getColumn('Source');
-      const latitude = getColumn('Latitude');
-      const longitude = getColumn('Longitude');
+    if (!headline || !date) continue;
 
-      if (!headline || !date) continue;
+    const dateObj = parseDate(date);
 
-      const dateObj = parseDate(date);
-
-      // Skip entries with invalid dates
-      if (isNaN(dateObj.getTime())) {
-        continue;
-      }
-
-      const storyId = getColumn('story_id') || null;
-      const oldSlug = generateSlug(headline, dateObj);
-      const slug = storyId ? generateSlugWithId(storyId, headline) : oldSlug;
-
-      // Parse victim count (default to 1 if not provided, allow 0 for victimless crimes)
-      const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
-      const validVictimCount = !isNaN(victimCount) && victimCount >= 0 ? victimCount : 1;
-
-      crimes.push({
-        date,
-        headline,
-        crimeType,
-        primaryCrimeType: primaryCrimeType || undefined,
-        relatedCrimeTypes: relatedCrimeTypes || undefined,
-        victimCount: validVictimCount,
-        street,
-        area,
-        region,
-        url,
-        source,
-        latitude: Number(latitude),
-        longitude: Number(longitude),
-        summary,
-        slug,
-        storyId,
-        oldSlug,
-        dateObj,
-        year: dateObj.getFullYear(),
-        month: dateObj.getMonth() + 1,
-        day: dateObj.getDate(),
-      });
+    // Skip entries with invalid dates
+    if (isNaN(dateObj.getTime())) {
+      continue;
     }
 
-    return crimes;
-  } catch (error) {
-    console.error('Error fetching crime data from URL:', csvUrl, error);
-    return [];
+    const storyId = getColumn('story_id') || null;
+    const oldSlug = generateSlug(headline, dateObj);
+    const slug = storyId ? generateSlugWithId(storyId, headline) : oldSlug;
+
+    // Parse victim count (default to 1 if not provided, allow 0 for victimless crimes)
+    const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
+    const validVictimCount = !isNaN(victimCount) && victimCount >= 0 ? victimCount : 1;
+
+    crimes.push({
+      date,
+      headline,
+      crimeType,
+      primaryCrimeType: primaryCrimeType || undefined,
+      relatedCrimeTypes: relatedCrimeTypes || undefined,
+      victimCount: validVictimCount,
+      street,
+      area,
+      region,
+      url,
+      source,
+      latitude: Number(latitude),
+      longitude: Number(longitude),
+      summary,
+      slug,
+      storyId,
+      oldSlug,
+      dateObj,
+      year: dateObj.getFullYear(),
+      month: dateObj.getMonth() + 1,
+      day: dateObj.getDate(),
+    });
   }
+
+  return crimes;
+}
+
+/**
+ * Fetch CSV from a URL with retry, falling back to bundled cache on failure.
+ * cacheKey matches the key in csv-cache.json (e.g. '2025', 'current').
+ */
+async function fetchCrimeDataFromURL(csvUrl: string, cacheKey: string): Promise<Crime[]> {
+  let csvText: string;
+  try {
+    csvText = await fetchWithRetry(csvUrl);
+  } catch (error) {
+    // All retries failed — fall back to the bundled cache snapshot
+    const cachedText = csvCache.csvTexts[cacheKey] ?? '';
+    if (!cachedText) {
+      console.error(`[CSV] FETCH FAILED for '${cacheKey}' — no cached data available. Returning empty.`);
+      return [];
+    }
+    const cacheTs = csvCache.timestamp || 'unknown';
+    console.warn(`[CSV] ⚠️ CSV FETCH FAILED — using cached data from ${cacheTs} (key: ${cacheKey})`);
+    csvText = cachedText;
+  }
+  return parseCrimeDataFromText(csvText);
 }
 
 /**
@@ -164,13 +220,13 @@ export async function getTrinidadCrimes(): Promise<Crime[]> {
 
     // Fetch 2025 data (only if it's different from current sheet)
     if (TRINIDAD_CSV_URLS[2025] && TRINIDAD_CSV_URLS[2025] !== TRINIDAD_CSV_URLS.current) {
-      const crimes2025 = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS[2025]);
+      const crimes2025 = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS[2025], '2025');
       allCrimes.push(...crimes2025);
       console.log(`✅ Loaded ${crimes2025.length} crimes from 2025 sheet`);
     }
 
     // Fetch current/production sheet (always load this)
-    const currentCrimes = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS.current);
+    const currentCrimes = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS.current, 'current');
     allCrimes.push(...currentCrimes);
     console.log(`✅ Loaded ${currentCrimes.length} crimes from current sheet`);
 

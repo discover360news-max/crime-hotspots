@@ -86,8 +86,16 @@ interface CrimeEntry {
 }
 
 async function fetchAndParseCSV(csvUrl: string, logger: { warn: (msg: string) => void }): Promise<CrimeEntry[]> {
-  const response = await fetch(csvUrl);
-  const csvText = await response.text();
+  let csvText: string;
+  try {
+    const response = await fetch(csvUrl);
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    csvText = await response.text();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    logger.warn(`[redirectGenerator] CSV fetch failed (${msg}) — skipping redirect map update for this URL`);
+    return [];
+  }
   const lines = csvText.split('\n');
   if (lines.length < 2) return [];
 
