@@ -1,7 +1,7 @@
 # SEO-CONFIG.md
 
 Complete reference for all SEO infrastructure in Crime Hotspots.
-**Last updated:** February 23, 2026
+**Last updated:** February 23, 2026 (monitoring added)
 
 ---
 
@@ -289,3 +289,105 @@ Cloudflare Pages applies ALL matching rules and uses the more specific path when
 | No Organization schema on homepage | Not yet added | Low — WebSite schema present |
 | Statistics canonical is hardcoded string | That URL never changes | None |
 | JSON-LD in body for statistics page | Uses `set:html` instead of `slot="head"` | None — Google accepts body JSON-LD |
+
+---
+
+## 9. Monitoring and Health Checks
+
+Lightweight automated monitoring to catch SEO and pipeline issues before Google does.
+
+### Architecture
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| Health check script | `astro-poc/scripts/health-check.js` | Validates live site on 4 dimensions |
+| Build log script | `astro-poc/scripts/update-build-log.js` | Appends metrics to rolling history |
+| GitHub Actions workflow | `.github/workflows/health-check.yml` | Runs both scripts on a daily schedule |
+| Build history log | `logs/build-history.json` | Rolling 90-entry history of build health |
+
+### When It Runs
+
+- **Daily at 8 AM UTC** (4 AM Trinidad time) via GitHub Actions cron
+- **On every push to `main`** — catches regressions before deployment settles
+- **Manual trigger** — GitHub UI → Actions → "Daily Health Check" → "Run workflow"
+
+### What Gets Checked
+
+**Check 1 — `/api/health.json`**
+- All six fields present: `status`, `csv_last_fetched`, `csv_row_count`, `oldest_story`, `newest_story`, `build_time`
+- `status === "ok"`
+- `csv_row_count > 100` (catches catastrophic CSV pipeline failure)
+- `csv_last_fetched` within 48 hours (tolerates weekend build gaps)
+- `newest_story` within 14 days (data pipeline is alive)
+
+**Check 2 — `/sitemap-0.xml`**
+- Fetches the sitemap and counts `<loc>` tags
+- Fails if fewer than 100 URLs (catches sitemap generation breakage)
+
+**Check 3 — 5 random story pages (new slug format)**
+- Samples 5 random values from `astro-poc/src/data/redirect-map.json`
+- These are new-format URLs: `/trinidad/crime/{id}-{words}/`
+- Expects HTTP 200 (SSR renders correctly)
+
+**Check 4 — 5 random old redirect URLs**
+- Samples 5 random keys from `redirect-map.json`
+- These are legacy-format URLs: `/trinidad/crime/{headline}-{date}/`
+- Expects HTTP 301 (SSR redirect is working)
+- **Explicitly flags 5xx** as a separate failure (server crash vs. routing issue)
+
+### Failure Notifications
+
+GitHub Actions sends an automatic email to the repository owner when a workflow fails. No additional setup required. Email goes to the address registered with your GitHub account.
+
+To change the notification email: GitHub → Settings → Notifications → "Email" section.
+
+### Build History Log
+
+**File:** `logs/build-history.json`
+
+Appended after every health check run (pass or fail). Keeps the last 90 entries.
+
+**Entry shape:**
+```json
+{
+  "logged_at": "2026-02-24T08:05:00.000Z",
+  "health_check": "PASS",
+  "status": "ok",
+  "csv_row_count": 2403,
+  "build_time": "2026-02-23T13:01:35.021Z",
+  "csv_last_fetched": "2026-02-23T13:01:35.021Z",
+  "newest_story": "2026-02-22",
+  "oldest_story": "2025-01-01"
+}
+```
+
+Use this log to spot trends: CSV row count growth over time, data freshness gaps, recurring failures.
+
+### Optional: Make.com Webhook Enhancement
+
+If you later want richer alerting (Slack, SMS, custom email template), you can add Make.com on top of the existing workflow without changing any code:
+
+1. **Create a Make.com account** at make.com (free tier: 1,000 operations/month)
+2. **Create a new Scenario:** HTTP → Webhooks → "Custom webhook"
+3. **Copy the webhook URL** Make.com gives you
+4. **Add a GitHub Actions step** to `health-check.yml` after "Fail if health check failed":
+   ```yaml
+   - name: Notify Make.com on failure
+     if: steps.health.outcome == 'failure'
+     run: |
+       curl -s -X POST "${{ secrets.MAKE_WEBHOOK_URL }}" \
+         -H "Content-Type: application/json" \
+         -d '{"status":"FAIL","run_url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}'
+   ```
+5. **Add `MAKE_WEBHOOK_URL`** as a GitHub secret (Settings → Secrets → Actions)
+6. **In Make.com,** connect the webhook to Email / Slack / SMS module of your choice
+
+**Note:** GitHub's native failure emails are sufficient for current traffic levels. Add Make.com only if you need multi-channel alerts.
+
+### Adding New Checks
+
+To add a check to `health-check.js`:
+1. Write an `async function checkXxx(failures)` following the same pattern
+2. Call it in `main()` after the existing checks
+3. Push any failure descriptions into the `failures` array
+4. The summary and exit code are handled automatically

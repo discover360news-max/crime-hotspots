@@ -1,0 +1,63 @@
+name: Daily Health Check
+
+# Runs 2 hours after the daily build (deploy.yml fires at 6 AM UTC).
+# Schedule: 8 AM UTC = 4 AM Trinidad time.
+# Also triggers automatically on every push to main so we catch regressions
+# the moment code is merged (before Google finds them).
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # 8 AM UTC daily
+  push:
+    branches:
+      - main
+  workflow_dispatch:       # Manual trigger from GitHub UI
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # Required to commit build-history.json back to repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Run the health check. continue-on-error lets subsequent steps run
+      # so we always log the result — even on failure.
+      - name: Run health check
+        id: health
+        run: node astro-poc/scripts/health-check.js
+        continue-on-error: true
+
+      # Always append an entry to logs/build-history.json with today's metrics.
+      - name: Update build history log
+        run: node astro-poc/scripts/update-build-log.js
+        env:
+          HEALTH_CHECK_STATUS: ${{ steps.health.outcome }}
+
+      # Commit the updated log back to main (skip CI to prevent loop).
+      - name: Commit build history
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add logs/build-history.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: health check log $(date -u +%Y-%m-%d) [skip ci]"
+            git push
+          fi
+
+      # Fail the workflow AFTER the log is committed.
+      # A failed workflow triggers GitHub's native email notification to the repo owner.
+      - name: Fail if health check failed
+        if: steps.health.outcome == 'failure'
+        run: |
+          echo "Health check failed — see step output above for details."
+          exit 1
