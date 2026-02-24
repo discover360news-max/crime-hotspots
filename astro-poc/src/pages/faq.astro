@@ -139,52 +139,48 @@ const allQuestions = faqData.flatMap(category => category.questions);
       { label: 'Home', href: routes.home },
       { label: 'FAQ' }
     ]} />
-    <h1 class="text-display text-slate-700 font-semibold mb-3 text-center pt-4">Frequently Asked Questions</h1>
-    <p class="text-xs text-slate-500 mb-8 text-center">Common questions about Crime Hotspots, our data sources, and how to use the platform.</p>
+    <h1 class="text-display text-slate-700 dark:text-[hsl(0_0%_95%)] font-semibold mb-3 text-center pt-4">Frequently Asked Questions</h1>
+    <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-8 text-center">Common questions about Crime Hotspots, our data sources, and how to use the platform.</p>
 
-    <div class="bg-white/70 backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
       {faqData.map((category) => (
         <div class="mb-8 last:mb-0">
-          <h2 class="text-heading font-semibold mb-4 text-slate-600">{category.category}</h2>
+          <h2 class="text-heading font-semibold mb-4 text-slate-600 dark:text-[hsl(0_0%_75%)]">{category.category}</h2>
           <div class="space-y-3">
             {category.questions.map((item, index) => (
-              <div class="border border-slate-200 rounded-lg overflow-hidden">
+              <div class="border border-slate-200 dark:border-[hsl(0_0%_20%)] rounded-lg overflow-hidden">
                 <button
-                  class="faq-question w-full text-left px-4 py-3 flex justify-between items-start gap-3 hover:bg-rose-50 active:bg-rose-100 transition-colors"
+                  class="faq-question w-full text-left px-4 py-3 flex justify-between items-start gap-3 hover:bg-rose-50 dark:hover:bg-rose-950/20 active:bg-rose-100 dark:active:bg-rose-950/30 transition-colors"
                   aria-expanded="false"
                   data-faq-id={`${category.category}-${index}`}
                 >
-                  <span class="text-sm font-medium text-slate-500 
-                  flex-1">{item.question}</span>
+                  <span class="text-sm font-medium text-slate-500 dark:text-[hsl(0_0%_75%)] flex-1">{item.question}</span>
                   <span class="flex-shrink-0">
-                    <svg class="faq-icon w-4 h-4 text-rose-600 transform 
-                  transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 
-                  24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 4v16m8-8H4"/>
+                    <svg class="faq-icon w-4 h-4 text-rose-600 dark:text-rose-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                   </span>
                 </button>
-                <div class="faq-answer hidden px-4 pb-4 text-xs text-slate-500">
+                <div class="faq-answer px-4 text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
                   {item.answer}
                   {item.question.includes("report crime") && (
                     <span>
-                      {' '}<a href={routes.report} class="text-rose-600 hover:text-rose-700 font-medium underline">Submit a report here</a>.
+                      {' '}<a href={routes.report} class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium underline">Submit a report here</a>.
                     </span>
                   )}
                   {item.question.includes("protect privacy") && (
                     <span>
-                      {' '}<a href={routes.privacy} class="text-rose-600 hover:text-rose-700 font-medium underline">Read our Privacy Policy</a>.
+                      {' '}<a href={routes.privacy} class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium underline">Read our Privacy Policy</a>.
                     </span>
                   )}
                   {item.question.includes("get in touch") && (
                     <span>
-                      {' '}<a href={routes.contact} class="text-rose-600 hover:text-rose-700 font-medium underline">Go to Contact page</a>.
+                      {' '}<a href={routes.contact} class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium underline">Go to Contact page</a>.
                     </span>
                   )}
                   {item.question.includes("countries do you currently") && (
                     <span>
-                      {' '}<a href={routes.contact} class="text-rose-600 hover:text-rose-700 font-medium underline">Contact us</a>.
+                      {' '}<a href={routes.contact} class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium underline">Contact us</a>.
                     </span>
                   )}
                 </div>
@@ -195,6 +191,22 @@ const allQuestions = faqData.flatMap(category => category.questions);
       ))}
     </div>
   </main>
+
+  <style>
+    .faq-answer {
+      overflow: hidden;
+      max-height: 0;
+      padding-bottom: 0;
+      transition: max-height 0.3s ease, padding-bottom 0.3s ease;
+    }
+    .faq-answer.open {
+      max-height: 600px;
+      padding-bottom: 1rem;
+    }
+    .faq-icon {
+      transition: transform 0.3s ease;
+    }
+  </style>
 
   <!-- FAQ Accordion Script -->
   <script is:inline>
@@ -207,13 +219,12 @@ const allQuestions = faqData.flatMap(category => category.questions);
           const icon = this.querySelector('.faq-icon');
           const isExpanded = this.getAttribute('aria-expanded') === 'true';
 
-          // Toggle answer visibility
           if (isExpanded) {
-            answer.classList.add('hidden');
+            answer.classList.remove('open');
             icon.style.transform = 'rotate(0deg)';
             this.setAttribute('aria-expanded', 'false');
           } else {
-            answer.classList.remove('hidden');
+            answer.classList.add('open');
             icon.style.transform = 'rotate(45deg)';
             this.setAttribute('aria-expanded', 'true');
           }

@@ -562,11 +562,55 @@ details.querySelector('summary').addEventListener('click', function(e) {
 ## 📄 Standard Page Layout (Wireframe)
 
 **Established:** February 23, 2026
-**The Rule:** All content pages use `max-w-3xl` as the single column width. The hero text, card, and footer all align to the same horizontal boundary at every breakpoint.
+**Updated:** February 24, 2026 — Browse/selection pages documented as a distinct layout.
+
+**Two layout standards exist depending on page type:**
+| Page Type | Outer container | Inner wrapper |
+|-----------|-----------------|---------------|
+| Browse/Selection pages (Headlines, Compare) | `max-w-6xl` | `max-w-3xl mx-auto` |
+| Article/Content pages (About, Crime Detail, Blog, etc.) | — | `max-w-3xl mx-auto` |
+
+---
+
+### Browse / Selection Pages (no Hero)
+
+Used for pages that let users pick or compare items: Headlines island selector, Compare Areas. No Hero component — the H1 + description sit directly inside the page.
+
+```
+┌──────────────────────────────────────────────┐
+│  ┌──────────────── max-w-6xl ──────────────┐  │
+│  │  ┌────────── max-w-4xl mx-auto ───────┐ │  │
+│  │  │ Breadcrumbs                        │ │  │
+│  │  │ H1 Title (text-center mb-12)       │ │  │
+│  │  │ Subtitle                           │ │  │
+│  │  │ ── selection grid / tool ──        │ │  │
+│  │  │ Help text                          │ │  │
+│  │  └────────────────────────────────────┘ │  │
+│  └──────────────────────────────────────────┘  │
+└──────────────────────────────────────────────┘
+```
+
+**Astro template:**
+```astro
+<main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+  <div class="max-w-3xl mx-auto">
+    <Breadcrumbs items={breadcrumbs} />
+    <div class="text-center mb-12">
+      <h1 class="text-display font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] leading-tight mb-3">Page Title</h1>
+      <p class="text-body text-slate-600 dark:text-[hsl(0_0%_70%)] max-w-2xl mx-auto">Subtitle</p>
+    </div>
+    <!-- Selection grid, tool, or content here -->
+  </div>
+</main>
+```
+
+**Pages using this pattern:** Headlines (`src/pages/headlines.astro`), Compare (`src/pages/trinidad/compare.astro`)
+
+---
 
 ### Pages With Hero
 
-Used for section-level pages with a generic title (Headlines, Archive Index, Monthly Archive).
+Used for section-level pages with a generic title (Archive Index, Monthly Archive).
 
 ```
 ┌──────────────────────────────────────────────┐
@@ -681,8 +725,8 @@ Use the gradient fader everywhere — inside cards, between sections, in the foo
 ### The `max-w-3xl` Column
 
 - **Width:** 768px (`48rem`)
-- **Shared by:** Hero inner text, card container, footer
-- **Pages using this standard:** About, Headlines, Archive Index, Monthly Archive, Crime Detail, Statistics, Areas, Regions, Area Detail, Region Detail, Blog Index, Blog Post, Dashboard
+- **Shared by:** Browse/selection pages inner wrapper, article card container, footer nav
+- **Pages using this standard:** Headlines, Compare, About, Archive Index, Monthly Archive, Crime Detail, Statistics, Areas, Regions, Area Detail, Region Detail, Blog Index, Blog Post, Dashboard
 
 ---
 
