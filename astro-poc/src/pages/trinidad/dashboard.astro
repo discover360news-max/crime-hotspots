@@ -174,7 +174,15 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
     <!-- Quick Insights -->
     <div class="mb-6">
-      <h2 id="quickInsightsTitle" class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] pt-4 px-4 mb-4">Quick Insights</h2>
+      <div class="flex items-center gap-2 pt-4 px-4 mb-4">
+        <h2 id="quickInsightsTitle" class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)]">Quick Insights</h2>
+        <a href={routes.trinidad.statistics} class="ml-auto text-xs text-rose-600 hover:text-rose-700 active:text-rose-800 font-medium transition">
+          Full Statistics
+          <svg class="w-3 h-3 inline-block ml-0.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
       <div class="relative min-h-[280px]">
         <div id="insightsShimmer" class="absolute inset-0 transition-opacity duration-300">
           <LoadingShimmer height="280px" />

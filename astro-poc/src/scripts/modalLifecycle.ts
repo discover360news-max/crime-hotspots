@@ -33,7 +33,9 @@ export function createModalLifecycle(elements: ModalElements): ModalLifecycle {
   function open(): void {
     backdrop.classList.remove('hidden', 'pointer-events-none');
     modal.classList.remove('hidden');
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) document.body.style.paddingRight = scrollbarWidth + 'px';
 
     requestAnimationFrame(() => {
       backdrop.classList.remove('opacity-0');
@@ -59,6 +61,7 @@ export function createModalLifecycle(elements: ModalElements): ModalLifecycle {
       backdrop.classList.add('hidden', 'pointer-events-none');
       modal.classList.add('hidden');
       document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
     }, 300);
   }
 
