@@ -188,3 +188,24 @@
 .leaflet-control-zoom a {
   border-radius: 4px !important;
 }
+
+/* Dark mode popup card — sheen gradient + dark surface */
+:root.dark .leaflet-popup-content-wrapper {
+  background: linear-gradient(180deg, hsl(0 0% 13%) 0%, hsl(0 0% 9%) 100%);
+  border: 1px solid hsl(0 0% 22%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), inset 0 1px 0 hsl(0 0% 20%);
+  color: hsl(0 0% 90%);
+}
+
+:root.dark .leaflet-popup-tip {
+  background: hsl(0 0% 9%);
+}
+
+:root.dark .leaflet-popup-close-button {
+  color: hsl(0 0% 50%) !important;
+}
+
+:root.dark .leaflet-popup-close-button:hover {
+  color: hsl(0 0% 85%) !important;
+  background: transparent !important;
+}

@@ -308,15 +308,17 @@ export function initializeLeafletMap(
         : crime.area;
 
       marker.bindPopup(`
-        <div class="p-2">
-          <div class="text-xs text-slate-500 mb-2">${formatPopupDate(crime.dateObj)}</div>
-          <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
-          <div class="text-small font-bold text-slate-600 mb-4">${crime.headline}</div>
-          <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
-          <div class="text-xs text-rose-600">${areaDisplay}</div>
+        <div style="padding:8px;min-width:175px">
+          <div style="font-size:0.75rem;color:var(--ch-text-muted);margin-bottom:6px">${formatPopupDate(crime.dateObj)}</div>
+          <div style="font-size:0.75rem;color:#e11d48;margin-bottom:4px">${crime.crimeType}</div>
+          <div style="font-size:0.875rem;font-weight:700;color:var(--ch-text);margin-bottom:12px;line-height:1.4">${crime.headline}</div>
+          <div style="font-size:0.75rem;color:var(--ch-text-muted);margin-bottom:4px">${crime.street}</div>
+          <div style="font-size:0.75rem;color:#e11d48">${areaDisplay}</div>
           <button
             onclick="window.openCrimeDetailModal('${crime.slug}')"
-            class="text-tiny text-rose-600 border border-rose-600 hover:bg-rose-600 hover:text-white active:bg-rose-700 transition px-3 py-1.5 rounded-lg mt-4 inline-block font-medium"
+            style="font-size:0.75rem;color:#e11d48;border:1px solid #e11d48;border-radius:8px;padding:4px 12px;margin-top:12px;display:inline-block;font-weight:500;background:transparent;cursor:pointer"
+            onmouseover="this.style.background='#e11d48';this.style.color='white'"
+            onmouseout="this.style.background='transparent';this.style.color='#e11d48'"
           >
             View Details
           </button>
@@ -401,15 +403,17 @@ export function updateLeafletMap(crimes: Crime[], crimeDetailPath: string) {
       : crime.area;
 
     marker.bindPopup(`
-      <div class="p-2">
-        <div class="text-xs text-slate-500 mb-2">${formatPopupDate(crime.dateObj)}</div>
-        <div class="text-xs bg-white/50 text-rose-600 mb-1">${crime.crimeType}</div>
-        <div class="text-body font-bold text-slate-600 mb-4">${crime.headline}</div>
-        <div class="text-xs text-slate-500 mb-1">${crime.street}</div>
-        <div class="text-xs text-rose-600">${areaDisplay}</div>
+      <div style="padding:8px;min-width:175px">
+        <div style="font-size:0.75rem;color:var(--ch-text-muted);margin-bottom:6px">${formatPopupDate(crime.dateObj)}</div>
+        <div style="font-size:0.75rem;color:#e11d48;margin-bottom:4px">${crime.crimeType}</div>
+        <div style="font-size:0.875rem;font-weight:700;color:var(--ch-text);margin-bottom:12px;line-height:1.4">${crime.headline}</div>
+        <div style="font-size:0.75rem;color:var(--ch-text-muted);margin-bottom:4px">${crime.street}</div>
+        <div style="font-size:0.75rem;color:#e11d48">${areaDisplay}</div>
         <button
           onclick="window.openCrimeDetailModal('${crime.slug}')"
-          class="text-tiny text-rose-600 border border-rose-600 hover:bg-rose-600 hover:text-white active:bg-rose-700 transition px-3 py-1.5 rounded-lg mt-4 inline-block font-medium"
+          style="font-size:0.75rem;color:#e11d48;border:1px solid #e11d48;border-radius:8px;padding:4px 12px;margin-top:12px;display:inline-block;font-weight:500;background:transparent;cursor:pointer"
+          onmouseover="this.style.background='#e11d48';this.style.color='white'"
+          onmouseout="this.style.background='transparent';this.style.color='#e11d48'"
         >
           View Details
         </button>
