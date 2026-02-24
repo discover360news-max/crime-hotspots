@@ -99,7 +99,6 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
   </Hero>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
 
     <!-- Search/Filter + Sort -->
     <div class="mb-6 flex flex-col sm:flex-row gap-3">
@@ -130,9 +129,9 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
     </div>
 
     <!-- Region Groups -->
-    <div id="regionContainer" class="space-y-8">
+    <div id="regionContainer" class="space-y-4">
       {sortedRegions.map(({ region, areas, totalCrimes }) => (
-        <section class="region-group" data-region={region.toLowerCase()}>
+        <section class="region-group bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[hsl(0_0%_18%)]" data-region={region.toLowerCase()}>
           <!-- Region Header -->
           <div class="flex items-center justify-between mb-4">
             <div>
@@ -194,7 +193,6 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
       <p class="text-slate-500 dark:text-[hsl(0_0%_55%)] text-sm">No areas found matching your search.</p>
     </div>
 
-    </div>
   </main>
 </Layout>
 

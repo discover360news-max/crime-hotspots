@@ -20,16 +20,13 @@ const currentPath = Astro.url.pathname;
 const isOnTrinidadPage = currentPath.startsWith('/trinidad');
 
 // Phase 3: Detect active section for visual indicator
-type Section = 'dashboard' | 'headlines' | 'archive' | 'areas' | 'blog' | 'about' | 'report' | null;
+type Section = 'dashboard' | 'headlines' | 'areas' | 'blog' | null;
 
 function getActiveSection(path: string): Section {
   if (path.startsWith('/trinidad/dashboard')) return 'dashboard';
   if (path.startsWith('/trinidad/headlines')) return 'headlines';
-  if (path.startsWith('/trinidad/archive') || path.startsWith('/trinidad/crime/')) return 'archive';
   if (path.startsWith('/trinidad/areas') || path.startsWith('/trinidad/area/')) return 'areas';
   if (path.startsWith('/blog')) return 'blog';
-  if (path.startsWith('/about')) return 'about';
-  if (path.startsWith('/report')) return 'report';
   return null;
 }
 
@@ -76,10 +73,10 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
           class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] transition text-slate-700 dark:text-[hsl(0_0%_70%)] hover:text-rose-600 dark:hover:text-rose-400"
           aria-label="Toggle light/dark mode"
         >
-          <svg id="themeIconSunMobile" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg id="themeIconSunMobile" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M18.364 18.364l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
           </svg>
-          <svg id="themeIconMoonMobile" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg id="themeIconMoonMobile" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
           </svg>
         </button>
@@ -97,10 +94,10 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
 
       <!-- Desktop nav -->
       <nav id="mainNav" class="hidden md:flex items-center gap-4" role="navigation" aria-label="Primary">
+        <!-- Primary links -->
         {!isHomepage && (
           <>
             {isOnTrinidadPage ? (
-              /* Direct links when on Trinidad pages (Phase 2: reduce modal friction) */
               <>
                 <a href={routes.trinidad.dashboard} class={activeSection === 'dashboard' ? activeNavClass : inactiveNavClass}>
                   Dashboard
@@ -108,21 +105,14 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
                 <a href={routes.trinidad.headlines} class={activeSection === 'headlines' ? activeNavClass : inactiveNavClass}>
                   Headlines
                 </a>
-                <a href={routes.trinidad.archive} class={activeSection === 'archive' ? activeNavClass : inactiveNavClass}>
-                  Archives
-                </a>
               </>
             ) : (
-              /* Modal buttons for non-country pages */
               <>
                 <button onclick="window.openDashboardModal()" class={`${inactiveNavClass} cursor-pointer`}>
                   Dashboard
                 </button>
                 <button onclick="window.openHeadlinesModal()" class={`${inactiveNavClass} cursor-pointer`}>
                   Headlines
-                </button>
-                <button onclick="window.openArchivesModal()" class={`${inactiveNavClass} cursor-pointer`}>
-                  Archives
                 </button>
               </>
             )}
@@ -143,14 +133,7 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
           Blog
         </a>
 
-        <a href={routes.report} class="px-4 py-1.5 min-h-[22px] rounded-lg bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 transition text-xs font-medium">
-          Report a Crime
-        </a>
-
-        <a href={routes.about} class={activeSection === 'about' ? activeNavClass : inactiveNavClass}>
-          About
-        </a>
-
+        <!-- Utility icons -->
         <button
           onclick="window.openSearchModal()"
           class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 transition text-slate-700 dark:text-[hsl(0_0%_70%)] hover:text-rose-600"
@@ -162,7 +145,6 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
           </svg>
         </button>
 
-        <!-- Desktop: Theme toggle -->
         <button
           id="themeToggleDesktop"
           onclick="window.toggleTheme()"
@@ -170,17 +152,22 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
           aria-label="Toggle light/dark mode"
           title="Toggle theme"
         >
-          <svg id="themeIconSunDesktop" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg id="themeIconSunDesktop" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M18.364 18.364l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
           </svg>
-          <svg id="themeIconMoonDesktop" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg id="themeIconMoonDesktop" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
           </svg>
         </button>
 
+        <!-- CTAs -->
+        <a href={routes.report} class="px-4 py-1.5 min-h-[22px] rounded-lg bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 transition text-xs font-medium">
+          Report a Crime
+        </a>
+
         <button
           id="subscribeToggle"
-          class="px-4 py-1.5 min-h-[22px] rounded-lg bg-[hsl(0_0%_70%)] dark:bg-[hsl(0_0%_30%)] text-white hover:bg-[hsl(0_0%_35%)] dark:hover:bg-[hsl(0_0%_25%)] active:bg-[hsl(0_0%_30%)] transition text-caption font-bold"
+          class="px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:border-slate-400 dark:hover:border-[hsl(0_0%_45%)] hover:text-slate-800 dark:hover:text-[hsl(0_0%_90%)] transition text-caption font-bold"
           aria-label="Subscribe to our channels"
         >
           Subscribe
@@ -400,13 +387,6 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
         Report a Crime
       </a>
 
-      <a href={routes.about} class="flex items-center gap-2 text-body text-slate-700 dark:text-[hsl(0_0%_85%)] hover:text-rose-600 dark:hover:text-rose-400 font-bold py-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)]">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        About
-      </a>
-
       <a href={routes.faq} class="flex items-center gap-2 text-body text-slate-700 dark:text-[hsl(0_0%_85%)] hover:text-rose-600 dark:hover:text-rose-400 font-bold py-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)]">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -426,6 +406,20 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
 
 
 <script is:inline>
+  // Scroll lock helpers — compensate for scrollbar width to prevent content shift
+  function lockScroll() {
+    var scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = scrollbarWidth + 'px';
+    }
+  }
+
+  function unlockScroll() {
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+  }
+
   // Mobile menu
   const menuToggle = document.getElementById('menuToggle');
   const mobileNav = document.getElementById('mobileNav');
@@ -437,7 +431,7 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
     mobileBackdrop.classList.remove('hidden');
     mobileNav.classList.remove('translate-x-full', 'invisible');
     mobileNav.classList.add('translate-x-0');
-    document.body.style.overflow = 'hidden';
+    lockScroll();
 
     requestAnimationFrame(() => {
       mobileBackdrop.classList.remove('opacity-0');
@@ -453,7 +447,7 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
     mobileNav.classList.add('translate-x-full');
     mobileBackdrop.classList.remove('opacity-100');
     mobileBackdrop.classList.add('opacity-0');
-    document.body.style.overflow = '';
+    unlockScroll();
 
     setTimeout(() => {
       mobileBackdrop.classList.add('hidden');
@@ -504,7 +498,7 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
     subscribeBackdrop.classList.remove('hidden');
     subscribeTray.classList.remove('translate-x-full', 'invisible');
     subscribeTray.classList.add('translate-x-0');
-    document.body.style.overflow = 'hidden';
+    lockScroll();
 
     requestAnimationFrame(() => {
       subscribeBackdrop.classList.remove('opacity-0');
@@ -518,7 +512,7 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
     subscribeTray.classList.add('translate-x-full');
     subscribeBackdrop.classList.remove('opacity-100');
     subscribeBackdrop.classList.add('opacity-0');
-    document.body.style.overflow = '';
+    unlockScroll();
 
     setTimeout(() => {
       subscribeBackdrop.classList.add('hidden');

@@ -249,12 +249,22 @@ export function initializeLeafletMap(
     // Add expand/collapse control
     addExpandControl(map, containerId);
 
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    // Add CARTO tiles — swap between light/dark based on theme
+    const cartoLight = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+    const cartoDark  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    const isDark = () => document.documentElement.classList.contains('dark');
+
+    const tileLayer = L.tileLayer(isDark() ? cartoDark : cartoLight, {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 18
     }).addTo(map);
+
+    // Watch for theme changes and swap tile URL reactively
+    const themeObserver = new MutationObserver(() => {
+      tileLayer.setUrl(isDark() ? cartoDark : cartoLight);
+    });
+    themeObserver.observe(document.documentElement, { attributeFilter: ['class'] });
 
     // Create marker cluster group
     const markers = L.markerClusterGroup({

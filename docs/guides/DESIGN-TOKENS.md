@@ -1,7 +1,7 @@
 # Crime Hotspots Design Tokens
 
-**Version:** 1.8
-**Last Updated:** February 20, 2026
+**Version:** 1.9
+**Last Updated:** February 24, 2026
 **Status:** Living Document
 
 This document defines the design system for Crime Hotspots. All pages should follow these patterns for visual consistency.
@@ -186,6 +186,20 @@ Located in `Layout.astro` just before `</body>` as `<script is:inline>`. Exposes
 - **Sun icon** (`id="themeIconSun*"`) — shown in dark mode (click → go light)
 - **Moon icon** (`id="themeIconMoon*"`) — shown in light mode (click → go dark)
 - Toggle buttons: `id="themeToggleDesktop"` in Header, `id="moreMenuThemeToggle"` in BottomNav More menu
+
+### Theme Icon Visibility — CSS-Only (CORRECT Pattern)
+
+Icon visibility is controlled by CSS `dark:` classes, **not JS**. Do not toggle icons with JavaScript.
+
+```html
+<!-- Sun icon: hidden by default, visible in dark mode -->
+<svg id="themeIconSunDesktop" class="w-5 h-5 hidden dark:block">...</svg>
+
+<!-- Moon icon: visible by default, hidden in dark mode -->
+<svg id="themeIconMoonDesktop" class="w-5 h-5 block dark:hidden">...</svg>
+```
+
+**Why:** The anti-flash script applies `.dark` to `<html>` before paint, so Tailwind `dark:` classes render correctly on first load with no flicker. JS-driven icon toggling was removed — CSS is simpler and reliable.
 
 ### Dark Mode Tailwind Class Rules
 
@@ -428,6 +442,123 @@ Used to make elements appear to hover above a surface. Creates a soft elliptical
 
 ---
 
+## 🗺️ Leaflet Map (Dashboard)
+
+There is **one Leaflet map** on the site — the Crime Incidents Map on the dashboard. All map-related tokens live here.
+
+### Tile URLs
+
+```js
+const cartoLight = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+const cartoDark  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+```
+
+**Critical:** The dark variant is `dark_all` — **not** `dark_matter`. `dark_matter` returns 404. This mirrors the naming of `light_all`.
+
+### Dark Mode Tile Swap (Reactive)
+
+Read the current theme at init time and swap live via `MutationObserver`:
+
+```js
+const isDark = () => document.documentElement.classList.contains('dark');
+
+const tileLayer = L.tileLayer(isDark() ? cartoDark : cartoLight, {
+  attribution: '...',
+  subdomains: 'abcd',
+  maxZoom: 18
+}).addTo(map);
+
+const themeObserver = new MutationObserver(() => {
+  tileLayer.setUrl(isDark() ? cartoDark : cartoLight);
+});
+themeObserver.observe(document.documentElement, { attributeFilter: ['class'] });
+```
+
+- Observer watches only `class` attribute on `<html>` — efficient, fires only on theme change
+- `setUrl()` auto-calls `redraw()` — no manual redraw needed
+- Crime markers (`divIcon`) live in `.leaflet-marker-pane` — unaffected by tile swap
+
+### Dark Mode Tile Brightness
+
+CARTO `dark_all` tiles are intentionally very dark. Apply a CSS brightness boost to make labels and roads legible:
+
+```css
+/* In dashboard.css */
+:root.dark .leaflet-tile-pane {
+  filter: brightness(1.4);
+}
+```
+
+**Tuning guide:**
+- `1.2` — subtle lift, labels still dim
+- `1.4` — default, good balance
+- `1.6` — noticeably bright, approaches "inverted" look
+- Markers are unaffected (they're in `.leaflet-marker-pane`, a sibling)
+
+---
+
+## 🔒 Scroll Lock (Overlay/Tray Pattern)
+
+When opening mobile nav, subscribe tray, or any full-screen overlay, always use the `lockScroll` / `unlockScroll` helpers defined in `Header.astro`. **Never** set `document.body.style.overflow = 'hidden'` directly — it causes a layout shift because the scrollbar disappears.
+
+```js
+function lockScroll() {
+  var scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.overflow = 'hidden';
+  if (scrollbarWidth > 0) {
+    document.body.style.paddingRight = scrollbarWidth + 'px';
+  }
+}
+
+function unlockScroll() {
+  document.body.style.overflow = '';
+  document.body.style.paddingRight = '';
+}
+```
+
+**Why:** `window.innerWidth - document.documentElement.clientWidth` gives the exact scrollbar width. Padding compensation prevents the page from jumping left when the scrollbar disappears.
+
+---
+
+## 🎬 Collapsible Animation (Grid Trick)
+
+For smooth height transitions on `<details>` or any collapsible element, use the CSS grid row trick — **not** `height: 0 → auto` (which can't be transitioned) and **not** the native `<details>` `group-open:` CSS trick (unreliable in Tailwind).
+
+```html
+<details id="myDetails">
+  <summary>...</summary>
+  <!-- Wrapper: grid rows transition -->
+  <div id="myBody" style="display:grid; grid-template-rows:0fr; transition:grid-template-rows 300ms ease">
+    <div style="overflow:hidden">
+      <!-- Actual content here -->
+    </div>
+  </div>
+</details>
+```
+
+```js
+// In <script is:inline>
+details.querySelector('summary').addEventListener('click', function(e) {
+  e.preventDefault();
+  if (details.open) {
+    body.style.gridTemplateRows = '0fr';  // collapse
+    setTimeout(() => { details.removeAttribute('open'); }, 300);
+  } else {
+    details.setAttribute('open', '');
+    requestAnimationFrame(() => { body.style.gridTemplateRows = '1fr'; }); // expand
+  }
+});
+```
+
+**Currently used on:** Dashboard map legend (`#legendDetails`)
+
+**Rules:**
+- Always use `e.preventDefault()` on summary click to take full control of open/close
+- `requestAnimationFrame` before setting `1fr` ensures the browser registers the open state before animating
+- 300ms matches Tailwind's `transition-300` convention
+
+---
+
 ## 📄 Standard Page Layout (Wireframe)
 
 **Established:** February 23, 2026
@@ -508,6 +639,35 @@ Used for article-level pages where the title is specific to the page instance (c
   </div>
 </main>
 ```
+
+### Footer Structure
+
+The footer uses 3 columns on desktop, 2 on mobile. The brand signature sits in a wider container (`max-w-6xl`) to match the header, while the nav links stay in `max-w-3xl`.
+
+```
+┌──────────────────────────────────────────────┐
+│  ┌─────── max-w-3xl px-4 sm:px-6 ────────┐   │
+│  │  Browse        Explore       Help      │   │
+│  │  Dashboard     Areas         About     │   │
+│  │  Headlines     Regions       FAQ       │   │
+│  │  Archive       Compare       ...       │   │
+│  └────────────────────────────────────────┘   │
+└──────────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│  ┌─────── max-w-6xl px-4 sm:px-6 ────────┐   │
+│  │  ── divider ──────────────────────    │   │
+│  │  Logo + tagline    Socials + Ko-fi    │   │
+│  │  Copyright                            │   │
+│  └────────────────────────────────────────┘   │
+└──────────────────────────────────────────────┘
+```
+
+**Columns:** `grid grid-cols-2 sm:grid-cols-3` in `Layout.astro`
+- **Browse** — primary nav (Dashboard, Headlines, Archive, Murder Count, Blog)
+- **Explore** — discovery nav (Areas, Regions, Compare, Statistics)
+- **Help** — utility nav (About, FAQ, Methodology, Contact, Report, Privacy, Business Solutions). On mobile (`col-span-2 sm:col-span-1`) uses a 2-column inner grid.
+
+**Brand signature** uses `max-w-6xl` to align with the header width — the wider container is intentional, keeping socials/copyright at full page width.
 
 ### Dividers
 
@@ -1083,6 +1243,7 @@ Inline text-based CTAs within narrative blocks (not full buttons). Used for cros
 
 **Version History:**
 
+- **v1.9 (Feb 24, 2026):** Added Leaflet Map section (CARTO tile URLs, dark mode swap, brightness filter), Theme Icon CSS-only pattern, Scroll Lock helper (scrollbar compensation), Collapsible Grid Animation pattern, Footer 3-column structure.
 - **v1.8 (Feb 20, 2026):** Clarified section heading colors by page type — data/app pages use `text-slate-500` (muted), content pages use `text-slate-700`. Added antipattern (`text-xl font-semibold text-slate-700`) to Common Mistakes. Fixed contradictions in Color Usage Rules and Maintenance Notes.
 - **v1.7 (Feb 19, 2026):** Added Feature Index (jump-to-feature table), Live Pulse Indicator pattern, Alert Badge pattern, Contextual CTA Links pattern — supports HomepagePulse, AreaNarrative, DashboardStory, "New Since" badge, Compare Prompt
 - **v1.6 (Feb 18, 2026):** Typography token migration complete (text-h1/h2/h3 → text-display/heading/body across 19 files), added heading hierarchy rules by page type, SVG icon stroke-width convention (stroke-width="1"), DashboardInfoCards dark mode + border

@@ -351,27 +351,39 @@ const detectedCountryId = Object.entries(countryPathMap).find(
     <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
       <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent mb-8"></div>
       <!-- Navigation Columns -->
-      <div class="grid grid-cols-2 gap-8">
-        <!-- Browse (Primary Navigation) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-8">
+        <!-- Browse -->
         <div>
           <h4 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-4 uppercase tracking-wider">Browse</h4>
           <ul class="space-y-1">
             <li><a href={routes.trinidad.dashboard} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Dashboard</a></li>
             <li><a href={routes.trinidad.headlines} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Headlines</a></li>
-            <li><a href={routes.trinidad.areas} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Areas</a></li>
             <li><a href={routes.trinidad.archive} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Archive</a></li>
-            <li><a href={routes.report} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Report a Crime</a></li>
+            <li><a href={routes.trinidad.murderCount} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Murder Count</a></li>
+            <li><a href={routes.blog} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Blog</a></li>
           </ul>
         </div>
 
-        <!-- Quick Links (Utility) -->
+        <!-- Explore -->
         <div>
-          <h4 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-4 uppercase tracking-wider">Quick Links</h4>
+          <h4 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-4 uppercase tracking-wider">Explore</h4>
           <ul class="space-y-1">
+            <li><a href={routes.trinidad.areas} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Areas</a></li>
+            <li><a href={routes.trinidad.regions} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Regions</a></li>
+            <li><a href={routes.trinidad.compare} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Compare</a></li>
+            <li><a href={routes.trinidad.statistics} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Statistics</a></li>
+          </ul>
+        </div>
+
+        <!-- Help -->
+        <div class="col-span-2 sm:col-span-1">
+          <h4 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-4 uppercase tracking-wider">Help</h4>
+          <ul class="grid grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-1">
             <li><a href={routes.about} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">About</a></li>
-            <li><a href={routes.contact} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Contact</a></li>
-            <li><a href={routes.methodology} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Methodology</a></li>
             <li><a href={routes.faq} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">FAQ</a></li>
+            <li><a href={routes.methodology} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Methodology</a></li>
+            <li><a href={routes.contact} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Contact</a></li>
+            <li><a href={routes.report} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Report a Crime</a></li>
             <li><a href={routes.privacy} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Privacy Policy</a></li>
             <li><a href={routes.businessSolutions} class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400">Business Solutions</a></li>
           </ul>
@@ -409,7 +421,10 @@ const detectedCountryId = Object.entries(countryPathMap).find(
         </div>
       </div>
 
-      <!-- Brand Signature + Socials -->
+    </div>
+
+    <!-- Brand Signature + Socials (max-w-6xl matches header width) -->
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-8">
       <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent mt-8 mb-8"></div>
       <div>
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -466,14 +481,7 @@ const detectedCountryId = Object.entries(countryPathMap).find(
       } else {
         document.documentElement.classList.remove('dark');
       }
-      // Sun icon = shown in dark mode (clicking switches to light)
-      document.querySelectorAll('[id^="themeIconSun"]').forEach(function(el) {
-        el.classList.toggle('hidden', !isDark);
-      });
-      // Moon icon = shown in light mode (clicking switches to dark)
-      document.querySelectorAll('[id^="themeIconMoon"]').forEach(function(el) {
-        el.classList.toggle('hidden', isDark);
-      });
+      // Icons are controlled via CSS dark:block / dark:hidden — no JS needed
       // BottomNav More menu label
       var lbl = document.getElementById('moreMenuThemeLabel');
       if (lbl) lbl.textContent = isDark ? 'Light Mode' : 'Dark Mode';
@@ -485,8 +493,9 @@ const detectedCountryId = Object.entries(countryPathMap).find(
       applyTheme(isDark);
     };
 
-    // Initialise icon state on page load
-    applyTheme(document.documentElement.classList.contains('dark'));
+    // Initialise BottomNav theme label on page load
+    var lbl = document.getElementById('moreMenuThemeLabel');
+    if (lbl) lbl.textContent = document.documentElement.classList.contains('dark') ? 'Light Mode' : 'Dark Mode';
   </script>
 </body>
 </html>

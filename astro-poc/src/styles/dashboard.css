@@ -161,6 +161,11 @@
 }
 
 
+/* Brighten tile labels/roads slightly in dark mode */
+:root.dark .leaflet-tile-pane {
+  filter: brightness(1.4);
+}
+
 /* Leaflet popup z-index fix - ensure popups appear above zoom controls */
 .leaflet-popup-pane {
   z-index: 1000 !important;
