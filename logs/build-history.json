@@ -19,6 +19,16 @@
       "csv_last_fetched": null,
       "newest_story": null,
       "oldest_story": null
+    },
+    {
+      "logged_at": "2026-02-24T20:35:15.481Z",
+      "health_check": "FAIL",
+      "status": null,
+      "csv_row_count": null,
+      "build_time": null,
+      "csv_last_fetched": null,
+      "newest_story": null,
+      "oldest_story": null
     }
   ]
 }
