@@ -187,9 +187,11 @@ export function initializeLeafletMap(
     const L = (window as any).L;
 
     // Initialize map
+    // scrollWheelZoom enabled on desktop; touch handler disables it for single-finger mobile scroll
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     const map = L.map(containerId, {
       dragging: true,
-      scrollWheelZoom: false,
+      scrollWheelZoom: !isTouchDevice,
       zoomControl: false,
       tap: false  // Disable tap handler to prevent blocking touch scroll
     }).setView(config.center, config.zoom);
