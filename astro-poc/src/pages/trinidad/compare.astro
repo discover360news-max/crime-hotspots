@@ -133,7 +133,8 @@ const breadcrumbs = [
   </main>
 
   <!-- Dark mode styles for dynamically-generated comparison results -->
-  <style>
+  <!-- is:global required — Astro scoped styles don't apply to innerHTML-injected elements -->
+  <style is:global>
     /* Surfaces */
     .dark #comparisonResults .bg-white {
       background-color: hsl(0 0% 8%);
@@ -169,9 +170,14 @@ const breadcrumbs = [
     .dark #comparisonResults tr:hover {
       background-color: hsl(0 0% 11%) !important;
     }
-    /* tbody dividers */
-    .dark #comparisonResults tbody tr {
-      border-top-color: hsl(0 0% 15%);
+    /* All table-internal borders — catch-all beats divide-* regardless of specificity */
+    .dark #comparisonResults table,
+    .dark #comparisonResults thead,
+    .dark #comparisonResults tbody,
+    .dark #comparisonResults tr,
+    .dark #comparisonResults td,
+    .dark #comparisonResults th {
+      border-color: hsl(0 0% 15%) !important;
     }
     /* Score card: winner (emerald) */
     .dark #comparisonResults .bg-emerald-50 {

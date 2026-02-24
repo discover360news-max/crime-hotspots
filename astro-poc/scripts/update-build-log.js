@@ -13,13 +13,13 @@
  *   HEALTH_CHECK_STATUS=success node astro-poc/scripts/update-build-log.js
  */
 
-'use strict';
-
-const fs   = require('fs');
-const path = require('path');
+import fs   from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // logs/ lives at the repo root, two levels up from astro-poc/scripts/
-const LOG_PATH = path.join(__dirname, '../../logs/build-history.json');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const LOG_PATH  = path.join(__dirname, '../../logs/build-history.json');
 const BASE_URL = 'https://crimehotspots.com';
 const MAX_ENTRIES = 90;
 
