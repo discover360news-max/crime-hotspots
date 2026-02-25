@@ -391,3 +391,50 @@ To add a check to `health-check.js`:
 2. Call it in `main()` after the existing checks
 3. Push any failure descriptions into the `failures` array
 4. The summary and exit code are handled automatically
+
+---
+
+## Analytics Audit — February 2026
+
+**Date:** February 25, 2026
+**Trigger:** GA4 showing impossible data — active users dramatically higher than new + returning users combined.
+
+### Root Cause: Grow.me Dual Tracking
+
+**Grow.me** (a Mediavine content monetization tool) was integrated in late February 2026 and ran for several days in a state where the widget was visually hidden but the JavaScript was kept active for "traffic tracking" (commit `465314b`). Grow.me runs its own session/user tracking and pushes events into the global `window.dataLayer`, which GA4 also uses. This caused GA4 to count Grow-generated sessions as additional active users, making the active user count exceed the combined new + returning user total.
+
+**Timeline:**
+- `b020ed1` — Grow added (script + CSP entries)
+- `465314b` — Grow widget hidden but script kept active ("for traffic tracking")
+- `bf3afb7` (Feb 24, 2026) — Grow fully removed, CSP domains removed
+
+### Current Analytics Setup (Post-Audit)
+
+| Script | Location | Fires | Purpose |
+|--------|----------|-------|---------|
+| Cloudflare Web Analytics | `Layout.astro:146` | Always (cookieless) | Accurate real visitor count, no consent needed |
+| GA4 (`G-JMQ8B4DYEG`) | `Layout.astro:148-164` | After cookie consent | Detailed behavior tracking |
+
+**No other third-party tracking scripts exist in the codebase.**
+
+### What Was Removed
+
+- `grow.me` script (`https://faves.grow.me/main.js`) from `Layout.astro`
+- `#grow-me-root` opacity/pointer-events override CSS from `Layout.astro`
+- Grow widget BottomNav offset script from `Layout.astro`
+- `grow.me` CSP domains from `public/_headers`
+
+### GA4 Data Quality Warning
+
+GA4 data from approximately February 8–24, 2026 is **unreliable** due to Grow.me dual tracking. Active user counts and session counts from this period are inflated. Cloudflare Web Analytics data from the same period is unaffected (separate system).
+
+### Guard Rails Added
+
+- Comment added above GA4 script in `Layout.astro`: `PRIMARY ANALYTICS — do not add additional tracking scripts without checking with site owner`
+- This audit document as a reference for the root cause
+
+### Rules Going Forward
+
+- **Never add a third-party script** that touches `window.dataLayer` without auditing GA4 impact first
+- **Grow.me / Mediavine products** are incompatible with clean GA4 data — do not re-integrate
+- Any new analytics/monetization tool must be reviewed against the CSP in `public/_headers` — adding domains is a signal to check what the script actually does

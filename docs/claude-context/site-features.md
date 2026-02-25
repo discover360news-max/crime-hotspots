@@ -17,7 +17,8 @@
 | Methodology | `/methodology/` | Data collection process |
 | FAQ | `/faq/` | Frequently asked questions |
 | Privacy | `/privacy/` | Privacy policy, cookie consent |
-| Business Solutions | `/business-solutions/` | B2B offerings |
+| Business Solutions | `/business-solutions/` | B2B offerings — links to capability sheet |
+| Data Capability Sheet | `/data-capability-sheet/` | Institutional document (insurers, researchers, grant committees). Content driven by `src/config/capabilitySheetConfig.ts`. Month count is dynamic from `health-data.json`. Placeholders: set `contact.email`, `contact.entity`, `contact.dataEthicsPath` to non-null when ready. |
 | Report | `/report/` | Anonymous crime reporting form (Turnstile CAPTCHA) |
 | 404 | `/404` | Custom error page |
 

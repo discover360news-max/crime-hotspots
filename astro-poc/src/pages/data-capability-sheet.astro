@@ -1,0 +1,486 @@
+---
+/**
+ * Data Capability Sheet
+ * Institutional-grade overview of CrimeHotSpots.com data assets.
+ * Intended audience: insurance companies, risk consultancies,
+ * researchers, and grant committees.
+ *
+ * To update content: edit src/config/capabilitySheetConfig.ts
+ * To export PDF: open in browser → File → Print → Save as PDF
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { capabilitySheetConfig as rawCfg } from '../config/capabilitySheetConfig';
+import healthData from '../data/health-data.json';
+
+// ── Dynamic month count ───────────────────────────────────────────────────────
+// Derived from the oldest_story date written into health-data.json at every build.
+// Displays as "14+ months", ticking up automatically over time.
+const oldestStoryDate = new Date(healthData.oldest_story);
+const monthsElapsed = Math.floor(
+  (Date.now() - oldestStoryDate.getTime()) / (1000 * 60 * 60 * 24 * 30.4375)
+);
+const monthsDisplay = `${monthsElapsed}+ months`;
+
+// Apply {MONTHS} token substitution across config strings
+function applyTokens(s: string) {
+  return s.replace('{MONTHS}', monthsDisplay);
+}
+
+const cfg = {
+  ...rawCfg,
+  overview: rawCfg.overview.map(applyTokens),
+  datasets: rawCfg.datasets.map(d => ({ ...d, coverage: applyTokens(d.coverage) })),
+};
+
+const title = "Data Capability Sheet — CrimeHotSpots.com";
+const description = "Institutional data capability overview for CrimeHotSpots.com. Incident-level crime data for Trinidad & Tobago — available for insurance risk banding, underwriting, security assessments, and research.";
+---
+
+<Layout title={title} description={description} includePagefind={false}>
+  <!-- Breadcrumbs -->
+  <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 pt-4 no-print">
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: 'Business Solutions', href: '/business-solutions' },
+      { label: 'Data Capability Sheet' }
+    ]} />
+  </div>
+
+  <!-- Print action bar (web only) -->
+  <div class="no-print w-full max-w-4xl mx-auto px-4 sm:px-6 pt-3 pb-1 flex items-center justify-between">
+    <p class="text-xs text-slate-500 dark:text-slate-400">
+      For institutional distribution. Print or export as PDF.
+    </p>
+    <button
+      onclick="window.print()"
+      class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-slate-800 dark:bg-slate-700 text-white text-xs font-medium hover:bg-slate-700 dark:hover:bg-slate-600 transition min-h-[34px]"
+    >
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+      </svg>
+      Export PDF
+    </button>
+  </div>
+
+  <!-- Document wrapper -->
+  <main class="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 print:max-w-none print:px-0 print:py-0">
+    <div class="capability-doc bg-white dark:bg-slate-900 rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-700 print:shadow-none print:rounded-none print:border-none">
+
+      <!-- ── HEADER ──────────────────────────────────────────────────────── -->
+      <header class="doc-header bg-slate-900 px-8 py-8 print:px-10 print:py-8">
+        <div class="flex items-start justify-between gap-6">
+          <div>
+            <div class="flex items-center gap-3 mb-3">
+              <!-- Brand mark -->
+              <div class="w-8 h-8 rounded bg-rose-700 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <span class="text-white font-bold text-lg tracking-tight">CrimeHotSpots.com</span>
+            </div>
+            <p class="text-slate-300 text-sm mb-1">{cfg.subtitle}</p>
+            <h1 class="text-white text-2xl font-bold leading-tight">{cfg.documentTitle}</h1>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <div class="inline-block bg-rose-700 text-white text-xs font-semibold px-3 py-1.5 rounded mb-2">
+              CONFIDENTIAL
+            </div>
+            <p class="text-slate-400 text-xs">{cfg.date}</p>
+            <p class="text-slate-400 text-xs mt-0.5">crimehotspots.com</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- ── BODY ───────────────────────────────────────────────────────── -->
+      <div class="doc-body px-8 py-6 print:px-10 space-y-6">
+
+        <!-- Platform Overview -->
+        <section>
+          <h2 class="doc-section-title">Platform Overview</h2>
+          <div class="space-y-1.5">
+            {cfg.overview.map(sentence => (
+              <p class="doc-body-text">{sentence}</p>
+            ))}
+          </div>
+        </section>
+
+        <div class="doc-divider"></div>
+
+        <!-- Data Asset Summary -->
+        <section>
+          <h2 class="doc-section-title">Data Asset Summary</h2>
+          <div class="overflow-x-auto">
+            <table class="doc-table w-full">
+              <thead>
+                <tr>
+                  <th class="doc-th">Dataset</th>
+                  <th class="doc-th">Coverage</th>
+                  <th class="doc-th">Update Frequency</th>
+                  <th class="doc-th">Formats Available</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cfg.datasets.map((row, i) => (
+                  <tr class={i % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50 dark:bg-slate-800/50'}>
+                    <td class="doc-td font-medium text-slate-800 dark:text-slate-200">{row.name}</td>
+                    <td class="doc-td">{row.coverage}</td>
+                    <td class="doc-td">{row.frequency}</td>
+                    <td class="doc-td">{row.formats}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="doc-divider"></div>
+
+        <!-- Two-column section: Schema + Use Cases -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 print:grid-cols-2">
+
+          <!-- Data Schema -->
+          <section>
+            <h2 class="doc-section-title">Incident Record Schema</h2>
+            <p class="doc-caption mb-2">Each incident record contains the following fields:</p>
+            <div class="flex flex-wrap gap-1.5">
+              {cfg.schemaFields.map(field => (
+                <span class="schema-tag">{field}</span>
+              ))}
+            </div>
+          </section>
+
+          <!-- Unreported Crime Layer -->
+          <section>
+            <h2 class="doc-section-title">The Unreported Crime Layer</h2>
+            <p class="doc-body-text">
+              The "dark figure" of crime refers to incidents never officially reported to police and therefore
+              absent from government statistics. CrimeHotSpots manually curates community-reported incidents
+              from Trinidad &amp; Tobago Facebook groups, capturing crimes invisible to official sources.
+              To protect community members, this data is provided as aggregate statistics only — not raw
+              incident-level records. This represents a unique dataset with no equivalent source in the Caribbean,
+              providing analysts with a fuller picture of the true crime environment.
+            </p>
+          </section>
+        </div>
+
+        <div class="doc-divider"></div>
+
+        <!-- Institutional Use Cases -->
+        <section>
+          <h2 class="doc-section-title">Institutional Use Cases</h2>
+          <div class="grid grid-cols-2 gap-3 print:grid-cols-2">
+            {cfg.useCases.map(uc => (
+              <div class="use-case-item">
+                <div class="flex items-start gap-2">
+                  <span class="use-case-dot"></span>
+                  <div>
+                    <p class="use-case-title">{uc.title}</p>
+                    <p class="doc-caption">{uc.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div class="doc-divider"></div>
+
+        <!-- Data Packages -->
+        <section>
+          <h2 class="doc-section-title">Data Packages</h2>
+          <div class="grid grid-cols-3 gap-3 print:grid-cols-3">
+            {cfg.packages.map(pkg => (
+              <div class={`package-card ${pkg.featured ? 'package-featured' : ''}`}>
+                <p class={`package-tier ${pkg.featured ? 'package-tier-featured' : ''}`}>{pkg.tier}</p>
+                <p class="doc-body-text mt-1.5 flex-1">{pkg.description}</p>
+                <p class="doc-caption mt-1 italic">{pkg.format}</p>
+                <p class={`package-cta ${pkg.featured ? 'package-cta-featured' : ''}`}>{pkg.cta}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div class="doc-divider"></div>
+
+        <!-- Footer row: Roadmap + Contact -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 print:grid-cols-2">
+
+          <!-- Expansion Roadmap -->
+          <section>
+            <h2 class="doc-section-title">Expansion Roadmap</h2>
+            <div class="flex flex-wrap gap-3 mt-1">
+              {cfg.roadmap.map((item, i) => (
+                <div class="flex items-center gap-2">
+                  <span class="roadmap-dot"></span>
+                  <div>
+                    <p class="text-xs font-semibold text-slate-700 dark:text-slate-300">{item.country}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">{item.target}</p>
+                  </div>
+                  {i < cfg.roadmap.length - 1 && (
+                    <svg class="w-3 h-3 text-slate-300 dark:text-slate-600 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <!-- Contact & Legal -->
+          <section>
+            <h2 class="doc-section-title">Contact &amp; Legal</h2>
+            <dl class="space-y-1">
+              <div class="flex gap-2">
+                <dt class="doc-caption w-20 flex-shrink-0">Website</dt>
+                <dd class="doc-body-text font-medium">{cfg.contact.website}</dd>
+              </div>
+              {cfg.contact.email && (
+                <div class="flex gap-2">
+                  <dt class="doc-caption w-20 flex-shrink-0">Contact</dt>
+                  <dd class="doc-body-text font-medium">{cfg.contact.email}</dd>
+                </div>
+              )}
+              {cfg.contact.entity && (
+                <div class="flex gap-2">
+                  <dt class="doc-caption w-20 flex-shrink-0">Entity</dt>
+                  <dd class="doc-body-text font-medium">{cfg.contact.entity}</dd>
+                </div>
+              )}
+              {cfg.contact.dataEthicsPath && (
+                <div class="flex gap-2">
+                  <dt class="doc-caption w-20 flex-shrink-0">Data Ethics</dt>
+                  <dd class="doc-body-text font-medium">{cfg.contact.website}{cfg.contact.dataEthicsPath}</dd>
+                </div>
+              )}
+            </dl>
+          </section>
+        </div>
+
+        <!-- Document footer bar -->
+        <div class="doc-footer-bar">
+          <span>CrimeHotSpots.com — Confidential &amp; Proprietary</span>
+          <span>{cfg.date}</span>
+        </div>
+
+      </div><!-- /doc-body -->
+    </div><!-- /capability-doc -->
+  </main>
+</Layout>
+
+<style>
+  /* ── Document tokens ──────────────────────────────────────────────────── */
+  .doc-section-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #be123c;
+    margin-bottom: 0.5rem;
+  }
+  :global(.dark) .doc-section-title { color: #f43f5e; }
+
+  .doc-body-text {
+    font-size: 0.75rem;
+    color: #475569;
+    line-height: 1.625;
+  }
+  :global(.dark) .doc-body-text { color: #94a3b8; }
+
+  .doc-caption {
+    font-size: 0.6875rem;
+    color: #64748b;
+    line-height: 1.625;
+  }
+  :global(.dark) .doc-caption { color: #64748b; }
+
+  .doc-divider {
+    border: none;
+    border-top: 1px solid #f1f5f9;
+  }
+  :global(.dark) .doc-divider { border-top-color: #1e293b; }
+
+  /* ── Table ────────────────────────────────────────────────────────────── */
+  .doc-table {
+    font-size: 0.75rem;
+    border-collapse: collapse;
+  }
+  .doc-th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  :global(.dark) .doc-th { color: #94a3b8; background: #1e293b; border-bottom-color: #334155; }
+
+  .doc-td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    color: #475569;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  :global(.dark) .doc-td { color: #94a3b8; border-bottom-color: #1e293b; }
+
+  /* ── Schema tags ──────────────────────────────────────────────────────── */
+  .schema-tag {
+    display: inline-block;
+    font-size: 0.6875rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+  :global(.dark) .schema-tag { background: #1e293b; color: #94a3b8; border-color: #334155; }
+
+  /* ── Use cases ────────────────────────────────────────────────────────── */
+  .use-case-item {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background: #f8fafc;
+    border: 1px solid #f1f5f9;
+  }
+  :global(.dark) .use-case-item { background: rgba(30,41,59,0.5); border-color: #1e293b; }
+
+  .use-case-dot {
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #e11d48;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+  }
+
+  .use-case-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #334155;
+    line-height: 1.3;
+  }
+  :global(.dark) .use-case-title { color: #cbd5e1; }
+
+  /* ── Packages ─────────────────────────────────────────────────────────── */
+  .package-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+  }
+  :global(.dark) .package-card { background: rgba(30,41,59,0.5); border-color: #334155; }
+
+  .package-featured {
+    border-color: #be123c;
+    background: #fff1f2;
+  }
+  :global(.dark) .package-featured { border-color: #be123c; background: rgba(136,19,55,0.15); }
+
+  .package-tier {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+  }
+  :global(.dark) .package-tier { color: #94a3b8; }
+
+  .package-tier-featured { color: #be123c; }
+  :global(.dark) .package-tier-featured { color: #f43f5e; }
+
+  .package-cta {
+    margin-top: 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #64748b;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e2e8f0;
+  }
+  :global(.dark) .package-cta { color: #94a3b8; border-top-color: #334155; }
+
+  .package-cta-featured { color: #be123c; border-top-color: #fecdd3; }
+  :global(.dark) .package-cta-featured { color: #f43f5e; border-top-color: #4c0519; }
+
+  /* ── Roadmap ──────────────────────────────────────────────────────────── */
+  .roadmap-dot {
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: #e11d48;
+    flex-shrink: 0;
+  }
+
+  /* ── Footer bar ───────────────────────────────────────────────────────── */
+  .doc-footer-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.6875rem;
+    color: #94a3b8;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 0.5rem;
+  }
+  :global(.dark) .doc-footer-bar { color: #475569; border-top-color: #1e293b; }
+
+  /* ── Print styles ─────────────────────────────────────────────────────── */
+  @media print {
+    @page {
+      size: A4;
+      margin: 12mm 15mm;
+    }
+
+    /* Hide site chrome */
+    :global(header),
+    :global(footer),
+    :global(nav),
+    :global(.bottom-nav),
+    .no-print {
+      display: none !important;
+    }
+
+    /* Force color rendering */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Document container fills page */
+    main {
+      padding: 0 !important;
+      margin: 0 !important;
+      max-width: none !important;
+    }
+
+    .capability-doc {
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+
+    .doc-header {
+      background-color: #0f172a !important;
+      padding: 20px 24px !important;
+    }
+
+    .doc-section-title { color: #be123c !important; }
+    .doc-body-text { color: #334155 !important; }
+    .doc-caption { color: #64748b !important; }
+    .doc-th { background-color: #f1f5f9 !important; color: #64748b !important; }
+    .schema-tag { background-color: #f1f5f9 !important; color: #475569 !important; }
+    .use-case-item { background-color: #f8fafc !important; }
+    .package-featured { background-color: #fff1f2 !important; border-color: #be123c !important; }
+    .package-tier-featured, .package-cta-featured { color: #be123c !important; }
+    .use-case-dot, .roadmap-dot { background-color: #e11d48 !important; }
+  }
+</style>

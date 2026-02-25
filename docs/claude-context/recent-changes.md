@@ -8,6 +8,16 @@
 
 ## February 2026
 
+### Institutional Data Capability Sheet (Feb 25)
+- **New page:** `/data-capability-sheet/` — SSR, institutional document for insurers, risk consultancies, researchers, grant committees
+- **Content config:** `src/config/capabilitySheetConfig.ts` — single source of truth for all copy, datasets, packages, roadmap
+- **Placeholders:** `contact.email`, `contact.entity`, `contact.dataEthicsPath` are `null` → hidden from render. Set to real values when ready — no other files to touch.
+- **Dynamic month count:** Reads `health-data.json` (`oldest_story` field) at render time → computes "X+ months" automatically. Token `{MONTHS}` in config is substituted in overview text and data asset table.
+- **Print/PDF:** "Export PDF" button calls `window.print()`; `@media print` CSS hides site chrome, forces A4 layout, preserves brand colours.
+- **Standalone HTML:** `docs/data-capability-sheet.html` — fully self-contained, no framework dependency, for sending directly to contacts.
+- **Markdown:** `docs/data-capability-sheet.md` — internal reference version.
+- **business-solutions.astro** — dark CTA banner added linking to capability sheet.
+
 ### Dashboard max-w-3xl + Collapsible Legend (Feb 23)
 - Applied `max-w-3xl` standard to dashboard (was `max-w-6xl`) — hero and main content wrapper now match all other pages
 - Map layout: removed `lg:grid-cols-3` side-by-side; map is full-width, legend moved to collapsible `<details>` below map

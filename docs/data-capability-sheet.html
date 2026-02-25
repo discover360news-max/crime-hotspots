@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Capability Sheet — CrimeHotSpots.com</title>
+  <style>
+    /* ── Reset & base ───────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 11px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Document container ─────────────────────────────────────────────── */
+    .page {
+      max-width: 800px;
+      margin: 24px auto;
+      background: #fff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+    .doc-header {
+      background: #0f172a;
+      padding: 28px 36px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      background: #be123c;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .brand-mark svg { display: block; }
+    .brand-name {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .doc-subtitle {
+      color: #94a3b8;
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    .doc-title {
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .doc-meta {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .doc-badge {
+      display: inline-block;
+      background: #be123c;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+    .doc-date {
+      color: #64748b;
+      font-size: 10px;
+      display: block;
+    }
+    .doc-site {
+      color: #64748b;
+      font-size: 10px;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* ── Body ────────────────────────────────────────────────────────────── */
+    .doc-body {
+      padding: 24px 36px;
+    }
+
+    section { margin-bottom: 20px; }
+    section:last-child { margin-bottom: 0; }
+
+    .section-title {
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #be123c;
+      margin-bottom: 8px;
+    }
+
+    .body-text {
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.55;
+    }
+
+    .caption {
+      font-size: 10px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+      margin: 18px 0;
+    }
+
+    /* ── Two-column grid ──────────────────────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* ── Table ────────────────────────────────────────────────────────────── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+    }
+    th {
+      text-align: left;
+      padding: 6px 10px;
+      background: #f1f5f9;
+      color: #64748b;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    td {
+      padding: 6px 10px;
+      color: #475569;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    td:first-child {
+      font-weight: 600;
+      color: #334155;
+    }
+    tr:nth-child(even) td { background: #f8fafc; }
+
+    /* ── Schema tags ──────────────────────────────────────────────────────── */
+    .schema-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 4px;
+    }
+    .schema-tag {
+      display: inline-block;
+      font-family: "SF Mono", "Consolas", "Monaco", monospace;
+      font-size: 9.5px;
+      padding: 2px 7px;
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #e2e8f0;
+      border-radius: 4px;
+    }
+
+    /* ── Use cases ────────────────────────────────────────────────────────── */
+    .use-case-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .use-case-card {
+      padding: 10px 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .use-case-dot {
+      width: 7px;
+      height: 7px;
+      background: #e11d48;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+    .use-case-title {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 2px;
+    }
+
+    /* ── Packages ─────────────────────────────────────────────────────────── */
+    .package-card {
+      padding: 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .package-card.featured {
+      border-color: #be123c;
+      background: #fff1f2;
+    }
+    .package-tier {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+    }
+    .package-card.featured .package-tier { color: #be123c; }
+    .package-desc {
+      font-size: 10.5px;
+      color: #475569;
+      flex: 1;
+      margin-top: 4px;
+    }
+    .package-format {
+      font-size: 10px;
+      color: #64748b;
+      font-style: italic;
+    }
+    .package-cta {
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748b;
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 4px;
+    }
+    .package-card.featured .package-cta {
+      color: #be123c;
+      border-top-color: #fecdd3;
+    }
+
+    /* ── Roadmap ──────────────────────────────────────────────────────────── */
+    .roadmap-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .roadmap-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .roadmap-dot {
+      width: 7px;
+      height: 7px;
+      background: #e11d48;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .roadmap-country { font-size: 10.5px; font-weight: 600; color: #334155; }
+    .roadmap-target { font-size: 10px; color: #64748b; }
+    .roadmap-arrow { color: #cbd5e1; font-size: 10px; margin: 0 2px; }
+
+    /* ── Contact list ─────────────────────────────────────────────────────── */
+    .contact-list { list-style: none; }
+    .contact-list li {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 4px;
+      font-size: 11px;
+    }
+    .contact-label {
+      color: #64748b;
+      width: 72px;
+      flex-shrink: 0;
+      font-size: 10px;
+    }
+    .contact-value { color: #334155; font-weight: 600; }
+
+    /* ── Footer bar ───────────────────────────────────────────────────────── */
+    .doc-footer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9.5px;
+      color: #94a3b8;
+      padding-top: 12px;
+      border-top: 1px solid #e2e8f0;
+      margin-top: 16px;
+    }
+
+    /* ── Print-only button bar ────────────────────────────────────────────── */
+    .print-bar {
+      max-width: 800px;
+      margin: 0 auto 12px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .print-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: #1e293b;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .print-btn:hover { background: #334155; }
+
+    /* ── Print media ──────────────────────────────────────────────────────── */
+    @media print {
+      @page { size: A4; margin: 12mm 15mm; }
+
+      body { background: #fff; }
+
+      .print-bar { display: none !important; }
+
+      .page {
+        max-width: none;
+        margin: 0;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .doc-header { background: #0f172a !important; }
+      .brand-mark { background: #be123c !important; }
+      .doc-badge { background: #be123c !important; }
+      .section-title { color: #be123c !important; }
+      .use-case-dot, .roadmap-dot { background: #e11d48 !important; }
+      .package-card.featured { background: #fff1f2 !important; border-color: #be123c !important; }
+      .package-card.featured .package-tier,
+      .package-card.featured .package-cta { color: #be123c !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Print button (screen only) -->
+  <div class="print-bar">
+    <button class="print-btn" onclick="window.print()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+      </svg>
+      Export PDF
+    </button>
+  </div>
+
+  <div class="page">
+
+    <!-- HEADER -->
+    <div class="doc-header">
+      <div>
+        <div class="brand">
+          <div class="brand-mark">
+            <svg width="14" height="14" fill="#fff" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <span class="brand-name">CrimeHotSpots.com</span>
+        </div>
+        <p class="doc-subtitle">Caribbean Crime Data — Trinidad &amp; Tobago</p>
+        <h1 class="doc-title">Institutional Data Capability Overview</h1>
+      </div>
+      <div class="doc-meta">
+        <span class="doc-badge">Confidential</span>
+        <span class="doc-date">February 2026</span>
+        <span class="doc-site">crimehotspots.com</span>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="doc-body">
+
+      <!-- Platform Overview -->
+      <section>
+        <p class="section-title">Platform Overview</p>
+        <p class="body-text">
+          CrimeHotSpots.com is the only near-real-time, incident-level crime data platform covering Trinidad &amp; Tobago.
+          Data is collected via automated RSS monitoring of TT news sources and manual curation of community-reported incidents —
+          capturing both reported and unreported crime activity invisible to official statistics.
+          Our structured dataset spans 18 months of incidents, updated daily, with geolocation, crime type classification,
+          and victim count for each record.
+          All data is licensed under Creative Commons (CC BY 4.0) for academic and non-commercial use;
+          institutional licences are available for commercial applications.
+        </p>
+      </section>
+
+      <hr class="divider">
+
+      <!-- Data Asset Summary -->
+      <section>
+        <p class="section-title">Data Asset Summary</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Dataset</th>
+              <th>Coverage</th>
+              <th>Update Frequency</th>
+              <th>Formats Available</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Incident-level crime data</td>
+              <td>TT-wide, 18 months</td>
+              <td>Daily</td>
+              <td>CSV, JSON, API</td>
+            </tr>
+            <tr>
+              <td>Area statistics</td>
+              <td>District and community level</td>
+              <td>Weekly</td>
+              <td>CSV, PDF Report</td>
+            </tr>
+            <tr>
+              <td>Crime type breakdown</td>
+              <td>8 categories</td>
+              <td>Weekly</td>
+              <td>CSV, PDF Report</td>
+            </tr>
+            <tr>
+              <td>Week-over-week trends</td>
+              <td>TT-wide and by area</td>
+              <td>Weekly</td>
+              <td>Dashboard, CSV</td>
+            </tr>
+            <tr>
+              <td>Unreported crime estimates</td>
+              <td>Selected areas</td>
+              <td>Monthly</td>
+              <td>Aggregate PDF only</td>
+            </tr>
+            <tr>
+              <td>Historical comparisons</td>
+              <td>18-month baseline</td>
+              <td>Quarterly</td>
+              <td>CSV, PDF Report</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <hr class="divider">
+
+      <!-- Two-column: Schema + Unreported -->
+      <div class="two-col">
+
+        <section>
+          <p class="section-title">Incident Record Schema</p>
+          <p class="caption" style="margin-bottom:6px;">Each incident record contains:</p>
+          <div class="schema-tags">
+            <span class="schema-tag">Date</span>
+            <span class="schema-tag">Headline</span>
+            <span class="schema-tag">Summary</span>
+            <span class="schema-tag">Location</span>
+            <span class="schema-tag">Area</span>
+            <span class="schema-tag">Latitude</span>
+            <span class="schema-tag">Longitude</span>
+            <span class="schema-tag">Victim Count</span>
+            <span class="schema-tag">Primary Crime Type</span>
+            <span class="schema-tag">Related Crime Types</span>
+            <span class="schema-tag">Source Type (Reported / Unreported)</span>
+          </div>
+        </section>
+
+        <section>
+          <p class="section-title">The Unreported Crime Layer</p>
+          <p class="body-text">
+            The "dark figure" of crime refers to incidents never officially reported to police and therefore
+            absent from government statistics. CrimeHotSpots manually curates community-reported incidents
+            from Trinidad &amp; Tobago Facebook groups, capturing crimes invisible to official sources.
+            To protect community members, this data is available as aggregate statistics only — not raw
+            incident-level records. This represents a unique dataset with no equivalent source in the Caribbean,
+            providing analysts with a fuller picture of the true crime environment.
+          </p>
+        </section>
+
+      </div><!-- /two-col -->
+
+      <hr class="divider">
+
+      <!-- Use Cases -->
+      <section>
+        <p class="section-title">Institutional Use Cases</p>
+        <div class="use-case-grid">
+          <div class="use-case-card">
+            <div class="use-case-dot"></div>
+            <div>
+              <p class="use-case-title">Property Insurance Risk Banding</p>
+              <p class="caption">Area-level crime scores for residential and commercial risk banding</p>
+            </div>
+          </div>
+          <div class="use-case-card">
+            <div class="use-case-dot"></div>
+            <div>
+              <p class="use-case-title">Commercial Underwriting</p>
+              <p class="caption">Location-based risk scoring for underwriting decisions</p>
+            </div>
+          </div>
+          <div class="use-case-card">
+            <div class="use-case-dot"></div>
+            <div>
+              <p class="use-case-title">Security Risk Assessments</p>
+              <p class="caption">Area-level threat intelligence for business security planning</p>
+            </div>
+          </div>
+          <div class="use-case-card">
+            <div class="use-case-dot"></div>
+            <div>
+              <p class="use-case-title">Academic &amp; Policy Research</p>
+              <p class="caption">Structured incident data for criminology and public policy studies</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- Data Packages -->
+      <section>
+        <p class="section-title">Data Packages</p>
+        <div class="three-col">
+          <div class="package-card">
+            <p class="package-tier">Basic</p>
+            <p class="package-desc">Quarterly area statistics report</p>
+            <p class="package-format">PDF format</p>
+            <p class="package-cta">Contact for pricing</p>
+          </div>
+          <div class="package-card featured">
+            <p class="package-tier">Professional</p>
+            <p class="package-desc">Monthly data subscription + CSV export</p>
+            <p class="package-format">CSV + PDF</p>
+            <p class="package-cta">Contact for pricing</p>
+          </div>
+          <div class="package-card">
+            <p class="package-tier">Enterprise</p>
+            <p class="package-desc">Annual licence + API access + custom reports</p>
+            <p class="package-format">All formats + dedicated support</p>
+            <p class="package-cta">Contact for pricing</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider">
+
+      <!-- Bottom row: Roadmap + Contact -->
+      <div class="two-col">
+
+        <section>
+          <p class="section-title">Expansion Roadmap</p>
+          <div class="roadmap-row">
+            <div class="roadmap-item">
+              <div class="roadmap-dot"></div>
+              <div>
+                <span class="roadmap-country">Jamaica</span>
+                <span class="roadmap-target"> &nbsp;Q3 2026</span>
+              </div>
+            </div>
+            <span class="roadmap-arrow">›</span>
+            <div class="roadmap-item">
+              <div class="roadmap-dot"></div>
+              <div>
+                <span class="roadmap-country">Guyana</span>
+                <span class="roadmap-target"> &nbsp;Q1 2027</span>
+              </div>
+            </div>
+            <span class="roadmap-arrow">›</span>
+            <div class="roadmap-item">
+              <div class="roadmap-dot"></div>
+              <div>
+                <span class="roadmap-country">Full Caribbean</span>
+                <span class="roadmap-target"> &nbsp;2028</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <p class="section-title">Contact &amp; Legal</p>
+          <ul class="contact-list">
+            <li>
+              <span class="contact-label">Website</span>
+              <span class="contact-value">crimehotspots.com</span>
+            </li>
+            <!--
+              PLACEHOLDER: Uncomment and fill in when ready.
+
+              <li>
+                <span class="contact-label">Contact</span>
+                <span class="contact-value">data@crimehotspots.com</span>
+              </li>
+              <li>
+                <span class="contact-label">Entity</span>
+                <span class="contact-value">Crime Hotspots Ltd.</span>
+              </li>
+              <li>
+                <span class="contact-label">Data Ethics</span>
+                <span class="contact-value">crimehotspots.com/data-ethics</span>
+              </li>
+            -->
+          </ul>
+        </section>
+
+      </div>
+
+      <!-- Footer bar -->
+      <div class="doc-footer-bar">
+        <span>CrimeHotSpots.com &mdash; Confidential &amp; Proprietary</span>
+        <span>February 2026</span>
+      </div>
+
+    </div><!-- /doc-body -->
+  </div><!-- /page -->
+
+</body>
+</html>

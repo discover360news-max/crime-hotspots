@@ -11,8 +11,11 @@ Crime Hotspots is a web-based data visualization platform for Caribbean crime st
 **Current Status:** ✅ Production - Trinidad & Tobago LIVE (Astro-powered)
 **Live Site:** https://crimehotspots.com
 **Framework:** Astro 5.16.5 (migrated from Vite, December 16, 2025)
-**Traffic:** ~4 real visitors/day, Google Search Console active
-**Last Updated:** February 8, 2026
+**Traffic (Last 28 days, as of Feb 2026):**
+- GA4: ~119 unique users (~4/day), ~2,307 page views (~82/day), ~3,372 active sessions (~120/day)
+- GSC: 494 clicks (~18/day), 8,410 impressions (~300/day), 5.9% CTR, avg position 7.5
+- Engagement is high per visitor (many page views per session); organic search visibility is strong and growing
+**Last Updated:** February 25, 2026
 
 ---
 
