@@ -43,12 +43,12 @@ export const countCrimeType = (crimeData: Crime[], targetType: string): number =
       return;
     }
 
-    // Check if relatedCrimeTypes contains the target type (always count as 1)
+    // Check if relatedCrimeTypes contains the target type — count each occurrence
+    // e.g. "Murder, Murder" in related crimes = +2 (not +1)
     if (crime.relatedCrimeTypes) {
       const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
-      if (relatedTypes.includes(targetType)) {
-        totalCount += 1;
-      }
+      const matchCount = relatedTypes.filter(t => t === targetType).length;
+      totalCount += matchCount;
     }
   });
 

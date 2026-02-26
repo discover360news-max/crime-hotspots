@@ -28,7 +28,10 @@ const lastWeekCrimes = allCrimes.filter(c => c.dateObj >= twoWeeksAgo && c.dateO
 const hotAreas = getHotAreas(allCrimes, 1);
 const topArea = hotAreas[0];
 
-// Murders comparison
+// Murders comparison — uses countCrimeType which correctly:
+// - Applies victimCount for primary Murder (double murder = 2)
+// - Counts each "Murder" occurrence in related crimes (Murder, Murder = 2)
+// - Does NOT use victimCount when Murder is a related crime (robbery victimCount won't inflate murder stats)
 const murdersThisWeek = countCrimeType(thisWeekCrimes, 'Murder');
 const murdersLastWeek = countCrimeType(lastWeekCrimes, 'Murder');
 const murderChange = murdersLastWeek > 0
@@ -60,7 +63,7 @@ const weekChange = lastWeekCrimes.length > 0
         )}
         {murdersThisWeek > 0 && murderChange !== 0 && (
           <> Murders <span class={murderChange > 0 ? 'font-medium text-rose-600' : 'font-medium text-emerald-600'}>
-            {murderChange > 0 ? 'up' : 'down'} {Math.abs(murderChange)}%
+            {`${murderChange > 0 ? 'up' : 'down'} ${Math.abs(murderChange)}%`}
           </span> week-over-week.</>
         )}
       </p>

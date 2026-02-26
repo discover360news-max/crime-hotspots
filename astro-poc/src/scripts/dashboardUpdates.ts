@@ -45,7 +45,7 @@ interface Crime {
  * VICTIM COUNT RULES:
  * - Only applies to PRIMARY crime type (not related crimes)
  * - Only for crime types configured with useVictimCount=true
- * - Related crimes ALWAYS count as +1 (incident-based)
+ * - Related crimes count by occurrence ("Murder, Murder" = +2)
  *
  * Example:
  * - Primary: Murder, victimCount: 3, Related: [Shooting]
@@ -78,13 +78,15 @@ function countCrimeType(crimeData: Crime[], targetType: string): number {
       return;
     }
 
-    // Check if relatedCrimeTypes contains the target type (always count as 1)
+    // Check if relatedCrimeTypes contains the target type — count each occurrence
+    // e.g. "Murder, Murder" in related crimes = +2 (not +1)
     if (crime.relatedCrimeTypes) {
       const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
-      if (relatedTypes.includes(targetType)) {
-        totalCount += 1;
-        relatedCount += 1;
-        console.log(`🔍 Found ${targetType} in relatedCrimeTypes:`, {
+      const matchCount = relatedTypes.filter(t => t === targetType).length;
+      if (matchCount > 0) {
+        totalCount += matchCount;
+        relatedCount += matchCount;
+        console.log(`🔍 Found ${matchCount}× ${targetType} in relatedCrimeTypes:`, {
           headline: crime.headline,
           primaryCrimeType: crime.primaryCrimeType,
           relatedCrimeTypes: crime.relatedCrimeTypes,

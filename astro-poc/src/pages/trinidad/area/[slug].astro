@@ -223,7 +223,11 @@ const breadcrumbs = [
     narrowContainer={true}
     title={subtitle}
     subtitle={`${region} Region • ${division} Division • ${areaCrimes.length} total recorded incidents`}
-    badge={`Risk Level: ${safety.score.toFixed(1)}/10 • Updated daily`}
+    badge="Updated daily"
+    riskBadge={{
+      level: safety.level,
+      label: safety.level === 'high' ? `High Risk · ${safety.score.toFixed(1)}/10` : safety.level === 'low' ? `Low Risk · ${safety.score.toFixed(1)}/10` : `Stable · ${safety.score.toFixed(1)}/10`,
+    }}
     primaryCTA={{ text: 'View Dashboard', href: routes.trinidad.dashboard, icon: 'dashboard' }}
     secondaryCTA={{ text: 'Compare Area', href: `${routes.trinidad.compare}?a=${slug}`, icon: 'arrow' }}
   >
