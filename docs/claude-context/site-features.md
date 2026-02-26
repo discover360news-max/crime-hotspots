@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** February 19, 2026
+**Last Updated:** February 26, 2026
 
 ---
 
@@ -48,16 +48,21 @@
 
 ---
 
-## Components (35 active)
+## Components (34 active)
+
+### Core Layout (`src/layouts/`)
+| File | Purpose | Key Props |
+|------|---------|-----------|
+| Layout.astro | Root layout wrapper — `<head>`, fonts, CSP, GA4, Pagefind, Turnstile, footer | `ogType` (default `"website"`, pass `"article"` on crime/blog pages), `includePagefind` (default `true`), `includeTurnstile` (default `false`). **`<slot name="head" />`** at line 137 — DO NOT REMOVE (crime pages inject JSON-LD here). |
 
 ### Navigation & Layout
-| Component | Purpose | Key Files |
-|-----------|---------|-----------|
-| Header.astro | Top nav, direct links on Trinidad pages, active section indicator | `src/components/` |
-| BottomNav.astro | Mobile bottom tab bar (Dashboard, Headlines, Areas, Report, More) | Config-driven from `countries.ts` |
-| Breadcrumbs.astro | Breadcrumb navigation for SEO | |
-| SectionPickerModal.astro | Homepage island click → section chooser | Sections from `countries.ts` |
-| Hero.astro | Full-width gradient hero with CTAs, compact variant, slot support | |
+| Component | Purpose |
+|-----------|---------|
+| Header.astro | Top nav, direct links on Trinidad pages, active section indicator |
+| BottomNav.astro | Mobile bottom tab bar (Dashboard, Headlines, Areas, Report, More). Config-driven from `countries.ts` |
+| Breadcrumbs.astro | Breadcrumb navigation for SEO |
+| SectionPickerModal.astro | Homepage island click → section chooser. Sections driven from `countries.ts` |
+| Hero.astro | Full-width gradient hero with CTAs, compact variant, `<slot>` support |
 
 ### Crime Display
 | Component | Purpose |
@@ -76,6 +81,7 @@
 | HomepagePulse.astro | Live Trinidad stats below country card (incidents, top area, murders, latest headline) |
 | DashboardStory.astro | Narrative summary at top of dashboard (week-over-week incidents, top area, murder trend) |
 | AreaNarrative.astro | "This Week in [Area]" prose + contextual CTAs (compare, archive) + "New Since" badge slot |
+| QuickAnswers.astro | FAQPage schema + H3 questions targeting Google "People Also Ask" boxes. 40-50 word answers with internal deep-dive links. Used on homepage. |
 
 ### Dashboard & Stats
 | Component | Purpose |
@@ -91,10 +97,7 @@
 ### Modals
 | Component | Purpose |
 |-----------|---------|
-| DashboardModal.astro | Dashboard section modal |
-| HeadlinesModal.astro | Headlines section modal |
-| ArchivesModal.astro | Archive section modal |
-| AreasModal.astro | Areas section modal |
+| IslandSelectorModal.astro | Unified island picker (dashboard/headlines/archives/areas). Exposes `window.openIslandModal(section)`. Backward-compat aliases: `openDashboardModal()`, `openHeadlinesModal()`, etc. Replaced 4 separate modal files. |
 | SearchModal.astro | Site-wide Pagefind search (Ctrl+K) |
 | ReportIssueModal.astro | Report crime data issues |
 
@@ -107,7 +110,7 @@
 | BlogRotatingBanner.astro | Auto-rotating blog promotion (5s, country-filtered) |
 | SiteNotificationBanner.astro | Dismissible site-wide notification |
 | FeedbackToggle.astro | Helpful/not helpful toggle on crime pages |
-| MailchimpSignup.astro | Email newsletter signup |
+| NewsletterSignup.astro | Buttondown email signup — 3 variants: `card` (area pages), `inline` (statistics), `footer` (Layout footer, subscribe tray, crime modal). POSTs directly to Buttondown embed endpoint (browser-side). |
 
 ---
 
@@ -130,20 +133,30 @@
 
 ---
 
+## Build Integrations (`src/integrations/`)
+
+| File | Purpose |
+|------|---------|
+| csvBuildPlugin.ts | Vite plugin — fetches CSV at build:start with retry (2s/4s/8s), validates rows, writes `csv-cache.json` + `health-data.json`. **NEVER use `await import()` inside hook — causes Vite runner error.** |
+| redirectGenerator.ts | Build-time redirect map generator — writes `src/data/redirect-map.json` (~1,984 old→new slug mappings). Static top-level imports only. |
+
+---
+
 ## Server & Shared Utilities (`src/lib/`)
 
-| Utility | Purpose |
-|---------|---------|
-| crimeData.ts | Fetches/parses crime CSV (server-side at build time) |
-| csvParser.ts | CSV parsing utilities |
-| crimeColors.ts | Crime type → color hex mapping |
-| areaAliases.ts | Area name aliases (handles quoted CSV fields) |
-| dashboardHelpers.ts | Dashboard calculation helpers |
-| statisticsHelpers.ts | Statistics page calculations |
-| safetyHelpers.ts | Area crime scoring (1-10), safety tips, `toDate()` helper |
-| trendingHelpers.ts | `getHotAreas()` (7-day), `trackRecentView()`, `getRecentViews()` |
-| escapeHtml.ts | `escapeHtml()` for XSS protection, `validateUrl()` for DOM hrefs |
-| generateOgImage.ts | Dynamic OG image generation (satori + sharp) |
+| Utility | Purpose | Key Exports |
+|---------|---------|-------------|
+| crimeData.ts | Fetches/parses crime CSV (server-side). Runtime fallback via bundled `csv-cache.json`. | `getTrinidadCrimes()`, `getCrimesByArea()`, `getCrimesByMonth()`, `getCrimesByRegion()`, `getAvailableYears()`, `generateNameSlug()` |
+| csvParser.ts | Raw CSV parsing utilities. Slug generation lives here. | `parseCSVLine()`, `parseDate()`, `generateSlug()` (legacy, headline+date), `generateSlugWithId()` (current, StoryID+6 words), `createColumnMap()`, `stripQuotes()` |
+| safetyHelpers.ts | Area crime scoring + safety tip engine | `calculateAreaCrimeScore()` (1-10 scale, 90-day window), `getSafetyContext()` (returns tip + risk level), `getPrimaryCrimeType()`, `toDate()` (shared date normalizer) |
+| dashboardHelpers.ts | Dashboard stat calculations | `countCrimeType()`, `calculateInsights()` (highest/lowest crime areas) |
+| statisticsHelpers.ts | Statistics page calculations | `calculatePercentChange()`, `compareYearToDate()`, `getCrimeTypeBreakdown()`, `getTopRegions()`, `filterToSamePeriod()`, `formatPercentChange()` |
+| trendingHelpers.ts | Trending areas + recent views (localStorage) | `getHotAreas()` (top 5 areas, last 7 days), `trackRecentView()`, `getRecentViews()` |
+| escapeHtml.ts | XSS protection utilities | `escapeHtml()` (innerHTML), `sanitizeUrl()` (anchor hrefs), `validateUrl()` (DOM hrefs) |
+| crimeColors.ts | Crime type → color hex mapping | Default export: color map object |
+| areaAliases.ts | Area name aliases (handles quoted CSV fields) | Used by tooltip + area pages |
+| generateOgImage.ts | Dynamic OG image generation (satori + sharp) | Used by murder-count page (1200×630 PNG) |
+| generateCrimeTypeThumbnails.ts | Build-time crime type thumbnail images | Used during build |
 
 ---
 
@@ -237,3 +250,61 @@
 - **CI/CD:** GitHub Actions → Cloudflare Pages
 - **Daily Rebuild:** 6 AM UTC (2 AM Trinidad)
 - **Build Time:** ~31 seconds
+
+---
+
+## Key Algorithms Index
+
+> Use this to find where specific logic lives without grepping.
+
+| Algorithm / Logic | Location | Notes |
+|-------------------|----------|-------|
+| Area crime scoring (1-10) | `src/lib/safetyHelpers.ts` → `calculateAreaCrimeScore()` | 90-day rolling window |
+| Safety tip selection | `src/lib/safetyHelpers.ts` → `getSafetyContext()` | Returns tip + risk level (high/neutral/low) |
+| Risk weights per crime type | `src/config/riskWeights.ts` | Imported by `safetyHelpers.ts` |
+| Slug generation (legacy) | `src/lib/csvParser.ts` → `generateSlug()` | headline + date format |
+| Slug generation (current) | `src/lib/csvParser.ts` → `generateSlugWithId()` | StoryID + 6 words |
+| Area name → route slug | `src/lib/crimeData.ts` → `generateNameSlug()` | Used for area pages |
+| Trending hot areas (7-day) | `src/lib/trendingHelpers.ts` → `getHotAreas()` | Top 5 by crime count |
+| Recent views tracking | `src/lib/trendingHelpers.ts` → `trackRecentView()` / `getRecentViews()` | localStorage, 20-entry rolling buffer |
+| Dashboard insights | `src/lib/dashboardHelpers.ts` → `calculateInsights()` | Highest/lowest crime areas |
+| YoY % comparison | `src/lib/statisticsHelpers.ts` → `compareYearToDate()` | Same-period prior year |
+| Top regions | `src/lib/statisticsHelpers.ts` → `getTopRegions()` | Used by dashboard + stats page |
+| Crime type breakdown | `src/lib/statisticsHelpers.ts` → `getCrimeTypeBreakdown()` | Returns Map<type, count> |
+| Victim count rules | `src/config/crimeTypeConfig.ts` | PRIMARY crime only gets victim count; related always +1 |
+| Date normalization | `src/lib/safetyHelpers.ts` → `toDate()` | Exported, used by trendingHelpers too |
+| OG image generation | `src/lib/generateOgImage.ts` | satori + sharp, 1200×630 |
+| XSS escaping | `src/lib/escapeHtml.ts` → `escapeHtml()` | Use on ALL innerHTML/set:html |
+| URL sanitization | `src/lib/escapeHtml.ts` → `sanitizeUrl()` | Use on external URLs in anchor hrefs |
+
+---
+
+## Key Data Flows
+
+> What reads/writes what — critical for avoiding breakage when editing.
+
+### `window.__crimesData` (client-side crime array)
+Set on these pages (area-specific crimes only on area pages, all crimes elsewhere):
+- `src/pages/trinidad/dashboard.astro`
+- `src/pages/trinidad/headlines.astro`
+- `src/pages/trinidad/archive/[year]/[month].astro`
+- `src/pages/trinidad/area/[slug].astro` ← area-scoped only
+- `src/pages/trinidad/murder-count.astro`
+
+Read by: `CrimeDetailModal.astro` (safety scoring, trending, related crimes)
+
+### Files that must stay in sync with `routes.ts`
+- Inline scripts (`<script is:inline>`) can't import modules — hardcoded paths must mirror `routes.ts`
+- `BottomNav.astro` — nav links
+- `Header.astro` — section links
+- Any `<a href=...>` in inline scripts
+
+### CSV URL change propagation
+Only update `src/config/csvUrls.ts` — everything else imports from it:
+- `src/lib/crimeData.ts` (SSR/build)
+- `src/scripts/dashboardDataLoader.ts` (client)
+- `src/lib/areaAliases.ts`
+
+### Crime page slug resolution (SSR)
+`[slug].astro` → try new StoryID slug → try `oldSlug` fallback → 301 redirect → 404
+Old→new map: `src/data/redirect-map.json` (generated by `redirectGenerator.ts` at build)

@@ -216,6 +216,20 @@ To find a way to get goals accomplished efficiently and by using the least token
 
 ## Critical Rules
 
+### PRE-CHECK RULE ⭐⭐⭐ (Every Request, No Exceptions)
+
+**Before responding to ANY implementation request:**
+
+1. Read `docs/claude-context/site-features.md` — check Pages, Components, Scripts, Lib, and the Key Algorithms Index
+2. If UI is involved, run `Glob pattern="*.astro" path="src/components/"` to see all components
+3. **State explicitly** what already exists that's relevant before proposing anything
+4. If something exists → use it or modify it. Never rebuild what already exists.
+5. If nothing exists → propose creating it and confirm with Kavell before writing code
+
+**Why:** Context is lost between sessions. This rule ensures continuity and prevents duplicate work as the codebase grows.
+
+---
+
 ### COMPONENT-FIRST PRINCIPLE ⭐⭐⭐
 
 **CRITICAL TWO-STEP PROCESS** - Follow this order EVERY TIME:
