@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getTrinidadCrimes } from '../lib/crimeData';
+import { getTrinidadCrimes, generateNameSlug } from '../lib/crimeData';
 import { getCollection } from 'astro:content';
 import { buildRoute } from '../config/routes';
 
@@ -27,24 +27,27 @@ export const GET: APIRoute = async () => {
   // priority: 1.0=homepage, 0.9=high-value stats, 0.8=content hubs, 0.7=archive/areas, 0.5=utility
   // changefreq: set to actual update cadence (Google ignores inflated values).
   // See docs/claude-context/SEO-CONFIG.md — Sitemap section.
+  // IMPORTANT: All URLs must include trailing slashes.
+  // Astro is configured with trailingSlash: 'always' — URLs without trailing slashes
+  // receive a 308 redirect, which GSC reports as "Page with redirect" and won't index.
   const staticPages = [
     { url: '', priority: 1.0, changefreq: 'daily' },
-    { url: 'trinidad/dashboard', priority: 1.0, changefreq: 'daily' },
-    { url: 'trinidad/headlines', priority: 0.9, changefreq: 'daily' },
-    { url: 'trinidad/statistics', priority: 0.9, changefreq: 'weekly' },
-    { url: 'trinidad/murder-count', priority: 0.8, changefreq: 'daily' },
-    { url: 'headlines', priority: 0.8, changefreq: 'daily' },
-    { url: 'blog', priority: 0.8, changefreq: 'weekly' },
-    { url: 'trinidad/areas', priority: 0.7, changefreq: 'weekly' },
-    { url: 'trinidad/archive', priority: 0.7, changefreq: 'weekly' },
-    { url: 'trinidad/regions', priority: 0.6, changefreq: 'weekly' },
-    { url: 'trinidad/compare', priority: 0.5, changefreq: 'monthly' },
-    { url: 'report', priority: 0.6, changefreq: 'monthly' },
-    { url: 'about', priority: 0.7, changefreq: 'monthly' },
-    { url: 'faq', priority: 0.7, changefreq: 'monthly' },
-    { url: 'methodology', priority: 0.7, changefreq: 'monthly' },
-    { url: 'privacy', priority: 0.5, changefreq: 'yearly' },
-    { url: 'tools/social-image-generator', priority: 0.4, changefreq: 'monthly' },
+    { url: 'trinidad/dashboard/', priority: 1.0, changefreq: 'daily' },
+    { url: 'trinidad/headlines/', priority: 0.9, changefreq: 'daily' },
+    { url: 'trinidad/statistics/', priority: 0.9, changefreq: 'weekly' },
+    { url: 'trinidad/murder-count/', priority: 0.8, changefreq: 'daily' },
+    { url: 'headlines/', priority: 0.8, changefreq: 'daily' },
+    { url: 'blog/', priority: 0.8, changefreq: 'weekly' },
+    { url: 'trinidad/areas/', priority: 0.7, changefreq: 'weekly' },
+    { url: 'trinidad/archive/', priority: 0.7, changefreq: 'weekly' },
+    { url: 'trinidad/regions/', priority: 0.6, changefreq: 'weekly' },
+    { url: 'trinidad/compare/', priority: 0.5, changefreq: 'monthly' },
+    { url: 'report/', priority: 0.6, changefreq: 'monthly' },
+    { url: 'about/', priority: 0.7, changefreq: 'monthly' },
+    { url: 'faq/', priority: 0.7, changefreq: 'monthly' },
+    { url: 'methodology/', priority: 0.7, changefreq: 'monthly' },
+    { url: 'privacy/', priority: 0.5, changefreq: 'yearly' },
+    { url: 'tools/social-image-generator/', priority: 0.4, changefreq: 'monthly' },
   ];
 
   // Crime pages - prioritize recent crimes
@@ -76,6 +79,15 @@ export const GET: APIRoute = async () => {
     }
   }
 
+  // Area pages — all unique areas with crime data
+  const uniqueAreas = [...new Set(crimes.map(c => c.area).filter(a => a))];
+  const areaPages = uniqueAreas.map(area => ({
+    url: buildRoute.area(generateNameSlug(area)).slice(1),
+    lastmod: new Date().toISOString(),
+    priority: 0.6,
+    changefreq: 'weekly' as const
+  }));
+
   // Blog posts
   const blogPages = blogPosts.map(post => ({
     url: buildRoute.blogPost(post.slug).slice(1),
@@ -88,6 +100,7 @@ export const GET: APIRoute = async () => {
   const allPages = [
     ...staticPages.map(p => ({ ...p, lastmod: new Date().toISOString() })),
     ...archivePages,
+    ...areaPages,
     ...blogPages,
     ...crimePages
   ];
