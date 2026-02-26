@@ -52,7 +52,7 @@ const areaAliases = crime ? await loadAreaAliases() : {};
 const localName = crime ? getLocalName(areaAliases, crime.area) : '';
 
 // Calculate safety context for this area (guarded)
-const safetyContext = crime ? getSafetyContext(crime.area, allCrimes) : null;
+const safetyContext = crime ? getSafetyContext(crime.area, allCrimes, crime.primaryCrimeType || crime.crimeType) : null;
 
 // CDN cache: only for valid crime pages, not 404s
 if (crime) {

@@ -26,6 +26,7 @@ export interface SafetyContext {
   tip: string; // Actionable safety tip
   positiveNote?: string; // Positive community highlight
   primaryCrimeType?: string; // Most common crime in area
+  resolvedCrimeType?: string; // The crime type the tip is actually based on
 }
 
 /**
@@ -128,11 +129,25 @@ function hashString(str: string): number {
 }
 
 /**
- * Get safety tip based on score and crime type
+ * Get safety tip based on score and crime type.
+ *
+ * Selection logic (Option C — combined relevance):
+ * Priority 1: currentCrimeType (what the user is reading about right now)
+ * Priority 2: primaryCrimeType (area's most frequent crime pattern)
+ * Fallback:   score-level generic tip pool
+ *
  * Selection is deterministic per area name (seeded hash, not random)
  */
-function getSafetyTip(score: number, primaryCrimeType: string, areaName: string = ''): string {
-  // High crime tips (score > 7) — crime-type-specific with multiple variants
+function getSafetyTip(score: number, primaryCrimeType: string, areaName: string = '', currentCrimeType?: string): string {
+  const seed = hashString(areaName.toLowerCase());
+
+  // Build priority list: try current crime first, then area's primary pattern
+  const typePriority = currentCrimeType && currentCrimeType !== primaryCrimeType
+    ? [currentCrimeType, primaryCrimeType]
+    : [primaryCrimeType];
+
+  // ── HIGH CRIME TIPS (score > 7) ──────────────────────────────────────────
+  // Crime-type-specific with multiple variants
   const highCrimeTips: Record<string, string[]> = {
     'Vehicle Theft': [
       "The 'Empty Seat' Protocol: Vehicle break-ins are a primary driver of the score in this zone. Never leave bags, charging cables, or even loose change visible; an empty car is rarely a target.",
@@ -142,7 +157,10 @@ function getSafetyTip(score: number, primaryCrimeType: string, areaName: string 
     'Robbery': [
       "Active Awareness Zone: This area has high reports of 'distraction' incidents. We recommend keeping mobile devices tucked away and avoiding the use of headphones while walking to remain fully alert.",
       "The Buddy System: Incident data shows that individuals walking alone after dark account for the majority of robbery reports here. Travel with a companion when possible during evening hours.",
-      "Cash Minimisation: Avoid carrying large amounts of cash in this area. Only take what you need for the day, and keep valuables distributed across pockets rather than in a single bag."
+      "Cash Minimisation: Avoid carrying large amounts of cash in this area. Only take what you need for the day, and keep valuables distributed across pockets rather than in a single bag.",
+      "Drive-Up Ambush Awareness: A rising pattern in high-activity areas involves criminals arriving by vehicle, exiting quickly to target victims on foot or in stationary cars. At junctions, roundabouts, and car parks, keep your windows up, doors locked, and stay alert to vehicles positioning unusually close to you.",
+      "Car Park Protocol: Before exiting your vehicle in this area, scan the surroundings for loitering individuals or vehicles with occupants who appear to be watching. If something feels wrong, trust that instinct — drive to a busier area or delay your exit. Building car parks and quiet lots are prime locations for drive-up robbery attempts.",
+      "Carjacking Response: In a carjacking scenario, your life is worth more than the vehicle. If confronted by armed individuals, comply, do not resist, and focus on remembering vehicle descriptions and directions of travel for authorities. Activate your phone's location sharing if you can safely do so after handing over the vehicle."
     ],
     'Burglary': [
       "Secondary Security Deterrence: Standard locks are often bypassed in this area's incident reports. Ensure your burglar proofing and window grilles are in good condition, and consider adding padlocks to gates as an additional layer of deterrence.",
@@ -190,7 +208,79 @@ function getSafetyTip(score: number, primaryCrimeType: string, areaName: string 
     ]
   };
 
-  // Neutral tips (score 4-6)
+  // ── NEUTRAL CRIME-TYPE TIPS (score 4-6, crime-type specific) ────────────
+  // Used when a specific crime type is known but area is not high-risk.
+  // Shown before the generic neutral pool — more relevant to what's on screen.
+  const neutralCrimeTypeTips: Record<string, string[]> = {
+    'Robbery': [
+      "Junction Vigilance: Robbery incidents in areas with this profile tend to cluster at junctions and traffic stops. Keep windows up and doors locked while stationary in traffic. Avoid leaving bags, phones, or valuables visible on passenger seats.",
+      "The 5-Second Car Park Scan: Before opening your car door, take 5 seconds to scan your surroundings. Look for loitering individuals or vehicles positioned unusually close. This simple pause eliminates most opportunistic car-side robbery attempts.",
+      "Drive-Up Awareness: A rising pattern in Trinidad involves criminals arriving by vehicle and quickly approaching targets in car parks or at road junctions. Stay alert to vehicles that slow down without reason near you — if something feels off, drive to a busier area rather than stopping."
+    ],
+    'Vehicle Theft': [
+      "Visual Deterrence Works: In moderate-risk areas, visible security measures like steering wheel locks or steering column covers deter opportunistic thieves without requiring a confrontation. They signal effort to move on to an easier target.",
+      "Parking Spot Selection: Choose parking spots in active, well-lit areas with foot traffic. Vehicles parked in quiet side streets, behind trees, or in unmonitored lots in moderate-risk zones are significantly more vulnerable to theft and break-ins."
+    ],
+    'Burglary': [
+      "The 'Occupied Home' Signal: Burglary attempts in moderate-risk areas tend to target homes that appear unoccupied. Use timer-controlled lights when away, keep a radio on low, and vary your routine to avoid predictable absence windows.",
+      "Gate & Window Check: Ensure all ground-floor windows have secure burglar bars or grilles, and check that louvre blades cannot be easily removed from outside. Secondary gate padlocks in working condition are often the simplest deterrent in areas with this risk profile."
+    ],
+    'Home Invasion': [
+      "Arrival Awareness: In areas with this crime profile, pause briefly before entering your property to check for anything unusual — loitering individuals, unfamiliar vehicles, or gates that appear tampered with. A 10-second scan before opening your gate can prevent a staged entry.",
+      "Avoid Predictable Entry Times: Home invasions in moderate-risk areas often involve prior observation of routine entry times. Vary when you arrive home, especially in the evenings, to make pre-planned ambush attempts harder."
+    ],
+    'Theft': [
+      "Yard Security Habits: Moderate-risk areas see opportunistic theft of outdoor items left accessible. Tools, garden equipment, and loose items near fences or gates are regular targets. Bring valuables inside or secure them behind a locked gate each evening.",
+      "Bag Positioning: Cross-body bags held close, wallets in front pockets, and phones tucked away in crowded areas (markets, transport hubs, queues) significantly reduce snatch-theft risk in areas with this crime profile."
+    ],
+    'Assault': [
+      "Peak Hour Pattern: Assault incidents in moderate-risk areas tend to cluster during specific windows — typically late evenings on weekends. Being aware of when and where incidents are more likely lets you make smarter choices about route and timing.",
+      "Exit Route Awareness: When spending time in social venues in areas with this profile, note the exits and quieter routes available. Having a simple exit strategy reduces time spent in transitional spaces — car parks, alleyways, unlit entrances — where incidents are more likely."
+    ],
+    'Shooting': [
+      "Sound Identification Habit: Even in moderate-risk areas, knowing how to respond to unexpected loud sounds is valuable. If you hear what could be gunfire, move immediately to a solid interior wall, stay low, and wait for confirmation before resuming normal activity.",
+      "Social Media Location Caution: Avoid tagging your real-time location in areas with this crime profile. Broadcasting your presence in specific venues can attract unwanted attention in zones with elevated firearms activity."
+    ],
+    'Murder': [
+      "Conflict Avoidance: Even in areas with a moderate risk score, interpersonal disputes that escalate can turn deadly quickly. Remove yourself from heated confrontations, avoid mediating unknown disputes in public, and trust your instincts if a situation feels volatile.",
+      "Know Your Exits: In areas where serious violent incidents occur even at moderate frequency, having a mental exit plan when entering unfamiliar social environments is a valuable habit — not paranoia."
+    ],
+    'Kidnapping': [
+      "Routine Variation: Kidnapping attempts rely on predictable patterns. Even in moderate-risk areas, varying your departure times and routes to regular destinations significantly reduces vulnerability to surveillance-based targeting.",
+      "Vehicle Awareness: Keep car doors locked at all times while driving. In areas with kidnapping in the incident history, never leave windows fully open at traffic stops in isolated locations."
+    ]
+  };
+
+  // ── LOW CRIME-TYPE TIPS (score < 4, crime-type specific) ─────────────────
+  // Even safe areas can show crime-type relevant advice.
+  // Framed positively — maintain habits, not alarm.
+  const lowCrimeTypeTips: Record<string, string[]> = {
+    'Robbery': [
+      "Keep the Record Clean: Robbery is rare in this area, and a big reason is that residents stay alert. Keep car doors locked while driving, stay aware at junctions, and avoid displaying valuables in your vehicle — these habits are what keeps this area's score where it is.",
+      "Vehicle Safety as a Habit: Most vehicle-related robberies are opportunistic — a car with a visible bag and an unlocked door is a target even in safe areas. Keeping windows up and doing a quick scan before exiting costs nothing and maintains the safety standard your neighbourhood has built."
+    ],
+    'Vehicle Theft': [
+      "Keep the Score Low: Vehicle theft remains low here largely due to the security habits of residents. Continue using steering locks when parked away from home, choosing lit spots, and keeping your car interior clear — these habits are the reason the score stays low."
+    ],
+    'Burglary': [
+      "Maintain Good Habits: Burglary is uncommon in this area, and that's no accident. The community's consistent habits around gate locks, working burglar bars, and occupied-home signals are what sustain this record. Keep those standards in place."
+    ],
+    'Home Invasion': [
+      "Stay Alert Even in Safe Areas: Home invasions are rare here, but the habits that prevent them — locking up while at home, not opening gates without verifying callers, keeping yard lighting functional — are worth maintaining year-round."
+    ],
+    'Theft': [
+      "Consistent Vigilance: Low-crime areas maintain their status because residents stay consistent — securing yards, keeping valuables out of sight, and looking out for neighbours. No security routine should be dropped just because the score is low.",
+      "Out of Sight, Out of Mind: Yard items, tools, and outdoor furniture left unattended are easy targets even in safe areas. A locked gate and a clear yard signal to any passing opportunist that this household is aware."
+    ],
+    'Assault': [
+      "The Standard That Works: Assault is rare here. The community habits of staying aware, avoiding late-night isolated routes, and looking out for neighbours are what makes that possible. Keep those practices going.",
+    ],
+    'Shooting': [
+      "Stay Informed: Even in low-crime areas, being aware of community alerts and incident patterns nearby keeps you a step ahead. Join or stay active in neighbourhood groups — early alerts are the best safety tool in any zone."
+    ]
+  };
+
+  // ── GENERIC NEUTRAL TIPS (score 4-6, no crime-type match) ────────────────
   const neutralTips = [
     "Baseline Awareness: This area currently maintains a stable safety standing. To help keep it that way, remain aware of your surroundings during 'transition times' like sunrise and sunset when visibility changes.",
     "The 9 PM Routine: Maintaining a '9 PM Routine'—checking that all car doors, house doors, and windows are locked every night—is often the difference between a neutral score and a high-crime score.",
@@ -207,8 +297,8 @@ function getSafetyTip(score: number, primaryCrimeType: string, areaName: string 
     "Cash Point Awareness: ATM-related incidents are more common in moderate areas during off-peak hours. Use machines in well-lit, busy commercial areas rather than isolated locations, and always shield your PIN entry from view."
   ];
 
-  // Low crime tips (score < 4)
-  const lowCrimeTips = [
+  // ── GENERIC LOW CRIME TIPS (score < 4, no crime-type match) ──────────────
+  const genericLowCrimeTips = [
     "Maintain the Standard: Keep up the great neighborhood lighting and locked-door habits that have made this area one of the safest in the region.",
     "Neighbourhood Watch Excellence: Continue participating in community watch programs and neighbourhood WhatsApp groups to maintain this area's superior safety standing. Real-time communication between neighbours is one of the strongest tools for keeping crime low.",
     "Security Maintenance: Regular checks of your home security — burglar proofing, gate locks, yard lighting, and perimeter fencing — help maintain your area's excellent safety record.",
@@ -223,15 +313,21 @@ function getSafetyTip(score: number, primaryCrimeType: string, areaName: string 
     "Guard Dog Advantage: A watchful dog remains one of the most effective deterrents in the Caribbean. Even in low-crime areas, the alertness of a yard dog adds an extra layer of security that reinforces your area's strong safety record."
   ];
 
-  const seed = hashString(areaName.toLowerCase());
-
   if (score > 7) {
-    const tips = highCrimeTips[primaryCrimeType] || highCrimeTips['default'];
-    return tips[seed % tips.length];
+    for (const type of typePriority) {
+      if (highCrimeTips[type]) return highCrimeTips[type][seed % highCrimeTips[type].length];
+    }
+    return highCrimeTips['default'][seed % highCrimeTips['default'].length];
   } else if (score >= 4) {
+    for (const type of typePriority) {
+      if (neutralCrimeTypeTips[type]) return neutralCrimeTypeTips[type][seed % neutralCrimeTypeTips[type].length];
+    }
     return neutralTips[seed % neutralTips.length];
   } else {
-    return lowCrimeTips[seed % lowCrimeTips.length];
+    for (const type of typePriority) {
+      if (lowCrimeTypeTips[type]) return lowCrimeTypeTips[type][seed % lowCrimeTypeTips[type].length];
+    }
+    return genericLowCrimeTips[seed % genericLowCrimeTips.length];
   }
 }
 
@@ -270,15 +366,19 @@ function getPositiveNote(score: number, areaName: string): string | undefined {
 }
 
 /**
- * Get complete safety context for an area
+ * Get complete safety context for an area.
  *
  * @param areaName - Name of the area
  * @param allCrimes - All crimes dataset
+ * @param currentCrimeType - Optional: crime type of the specific crime being viewed.
+ *   When provided, tips are matched to this type first (Option C relevance logic),
+ *   then fall back to the area's primary crime type, then to generic score-level tips.
  * @returns Complete safety context with score, tips, and positive notes
  */
 export function getSafetyContext(
   areaName: string,
-  allCrimes: Crime[]
+  allCrimes: Crime[],
+  currentCrimeType?: string
 ): SafetyContext {
   const score = calculateAreaCrimeScore(areaName, allCrimes);
   const primaryCrimeType = getPrimaryCrimeType(areaName, allCrimes);
@@ -288,7 +388,7 @@ export function getSafetyContext(
   else if (score >= 4) level = 'neutral';
   else level = 'low';
 
-  const tip = getSafetyTip(score, primaryCrimeType, areaName);
+  const tip = getSafetyTip(score, primaryCrimeType, areaName, currentCrimeType);
   const positiveNote = getPositiveNote(score, areaName);
 
   return {
@@ -296,6 +396,7 @@ export function getSafetyContext(
     level,
     tip,
     positiveNote,
-    primaryCrimeType
+    primaryCrimeType,
+    resolvedCrimeType: currentCrimeType || primaryCrimeType
   };
 }

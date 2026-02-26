@@ -231,7 +231,7 @@ import NewsletterSignup from './NewsletterSignup.astro';
 
     // Safety context
     const allCrimes = (window as any).__crimesData || [];
-    const safetyContext = getSafetyContext(crime.area, allCrimes);
+    const safetyContext = getSafetyContext(crime.area, allCrimes, crime.primaryCrimeType || crime.crimeType);
     const safetyContextEl = document.getElementById('modalSafetyContext');
     if (safetyContextEl) {
       const feedbackUrl = buildRoute.crimeAbsolute(crime.slug);
