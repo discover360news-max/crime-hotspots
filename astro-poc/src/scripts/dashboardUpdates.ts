@@ -47,20 +47,12 @@ function calculateCrimeRisk(crime: Crime): number {
 }
 
 /**
- * Hybrid risk level calculation — returns two percentages per area:
- *
- * bar:   share of total weighted risk (area / all areas × 100)
- *        → honest proportional display; POS at 35% of crime shows a 35% bar
- *
- * label: relative to the highest-risk area (area / max area × 100)
- *        → the #1 area is always 100% → "Extremely Dangerous"
- *        → ensures the label never undersells a genuinely dangerous area
- *
- * The two values answer different questions:
- *   bar   = "what share of total crime does this area hold?"
- *   label = "how dangerous is this area compared to the worst?"
+ * Calculate risk scores for all areas, normalised relative to the highest-risk area.
+ * The #1 area always scores 100%; every other area is proportional to it.
+ * This drives both bar width and label — POS fills the bar and reads as Extremely Dangerous,
+ * every other area is visually relative to that benchmark.
  */
-export function calculateAreaRiskLevels(crimes: Crime[]): Map<string, { bar: number; label: number }> {
+export function calculateAreaRiskLevels(crimes: Crime[]): Map<string, number> {
   const areaRiskScores = new Map<string, number>();
 
   crimes.forEach(crime => {
@@ -69,15 +61,11 @@ export function calculateAreaRiskLevels(crimes: Crime[]): Map<string, { bar: num
     areaRiskScores.set(area, (areaRiskScores.get(area) || 0) + riskScore);
   });
 
-  const totalRiskScore = Array.from(areaRiskScores.values()).reduce((sum, s) => sum + s, 0);
   const maxRiskScore = Math.max(...Array.from(areaRiskScores.values()), 0);
 
-  const result = new Map<string, { bar: number; label: number }>();
+  const result = new Map<string, number>();
   areaRiskScores.forEach((score, area) => {
-    result.set(area, {
-      bar:   totalRiskScore > 0 ? Math.round((score / totalRiskScore) * 100) : 0,
-      label: maxRiskScore   > 0 ? Math.round((score / maxRiskScore)   * 100) : 0,
-    });
+    result.set(area, maxRiskScore > 0 ? Math.round((score / maxRiskScore) * 100) : 0);
   });
 
   return result;
@@ -373,14 +361,14 @@ export function updateTopRegions(crimes: Crime[]) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
 
-  // Calculate hybrid risk levels for all areas
+  // Calculate risk levels for all areas
   const riskLevels = calculateAreaRiskLevels(crimes);
 
   // Update using ID selector (2-column grid with gradient risk bars)
   container.innerHTML = topAreas.map(([area, count]) => {
-    const risk = riskLevels.get(area) || { bar: 0, label: 0 };
-    const riskLevelText = getRiskLevelText(risk.label);
-    const riskTextColor = getRiskTextColor(risk.label);
+    const riskPercentage = riskLevels.get(area) || 0;
+    const riskLevelText = getRiskLevelText(riskPercentage);
+    const riskTextColor = getRiskTextColor(riskPercentage);
     const areaSlug = generateNameSlug(area);
     return `
     <a href="${buildRoute.area(areaSlug)}" class="flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
@@ -396,10 +384,11 @@ export function updateTopRegions(crimes: Crime[]) {
           </svg>
         </div>
       </div>
-      <!-- Bar width = share of total crime burden; color = risk level -->
+      <!-- Bar width + gradient both relative to max — #1 area fills full red end -->
       <div class="relative w-full h-2 bg-slate-200 dark:bg-[hsl(0_0%_18%)] rounded-full overflow-hidden">
-        <div class="absolute top-0 left-0 h-full rounded-full transition-all duration-300"
-          style="width: ${risk.bar}%; background-color: ${getRiskBarColor(risk.label)}"></div>
+        <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style="width: ${riskPercentage}%">
+          <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style="width: ${riskPercentage > 0 ? (100 / riskPercentage) * 100 : 100}%"></div>
+        </div>
       </div>
       <!-- Risk level text -->
       <span class="text-xs font-medium ${riskTextColor}">Risk: ${riskLevelText}</span>
@@ -453,15 +442,3 @@ function getRiskTextColor(percentage: number): string {
   }
 }
 
-/**
- * Bar fill color — solid color matching risk level so danger reads instantly
- * without needing to look at the label. Hex values used to avoid Tailwind purge issues.
- */
-function getRiskBarColor(percentage: number): string {
-  if (percentage <= 10) return '#22c55e';  // green-500  — Low
-  if (percentage <= 25) return '#60a5fa';  // blue-400   — Medium
-  if (percentage <= 45) return '#eab308';  // yellow-500 — Concerning
-  if (percentage <= 65) return '#f59e0b';  // amber-500  — High
-  if (percentage <= 85) return '#f97316';  // orange-500 — Dangerous
-  return '#e11d48';                        // rose-600   — Extremely Dangerous
-}

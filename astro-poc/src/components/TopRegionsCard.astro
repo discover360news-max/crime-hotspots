@@ -61,11 +61,10 @@ crimes.forEach(crime => {
   areaRiskScores.set(area, (areaRiskScores.get(area) || 0) + riskScore);
 });
 
-// Hybrid: bar width = share of total, label = relative to max
-const totalRiskScore = Array.from(areaRiskScores.values()).reduce((sum, s) => sum + s, 0);
+// Normalise relative to max — #1 area = 100%, everyone else proportional to it
 const maxRiskScore = Math.max(...Array.from(areaRiskScores.values()), 0);
 
-// Calculate top areas with both percentages
+// Calculate top areas — single percentage drives both bar width and label
 const areaCounts = Array.from(
   crimes.reduce((acc, crime) => {
     const area = crime.area || 'Unknown';
@@ -77,9 +76,8 @@ const areaCounts = Array.from(
   .slice(0, 10)
   .map(([area, count]) => {
     const riskScore = areaRiskScores.get(area) || 0;
-    const barPct   = totalRiskScore > 0 ? Math.round((riskScore / totalRiskScore) * 100) : 0;
-    const labelPct = maxRiskScore   > 0 ? Math.round((riskScore / maxRiskScore)   * 100) : 0;
-    return { area, count, barPct, labelPct };
+    const riskPercentage = maxRiskScore > 0 ? Math.round((riskScore / maxRiskScore) * 100) : 0;
+    return { area, count, riskPercentage };
   });
 
 // Risk label based on relative-to-max (0–100%, #1 area = 100%).
@@ -111,24 +109,14 @@ function getRiskTextColor(percentage: number): string {
   }
 }
 
-// Bar fill color — solid color matching risk level so danger reads instantly
-// without needing to look at the label. Uses inline hex to avoid Tailwind purge issues.
-function getRiskBarColor(percentage: number): string {
-  if (percentage <= 10) return '#22c55e';  // green-500  — Low
-  if (percentage <= 25) return '#60a5fa';  // blue-400   — Medium
-  if (percentage <= 45) return '#eab308';  // yellow-500 — Concerning
-  if (percentage <= 65) return '#f59e0b';  // amber-500  — High
-  if (percentage <= 85) return '#f97316';  // orange-500 — Dangerous
-  return '#e11d48';                        // rose-600   — Extremely Dangerous
-}
 ---
 
 <div class="bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md rounded-lg p-4 shadow-md border border-slate-100 dark:border-[hsl(0_0%_15%)]">
   <div id="topRegionsContainer" class="grid grid-cols-2 gap-x-8 gap-y-3">
-    {areaCounts.map(({ area, count, barPct, labelPct }) => {
+    {areaCounts.map(({ area, count, riskPercentage }) => {
       const localName = getLocalName(areaAliases, area);
-      const riskLevelText = getRiskLevelText(labelPct);
-      const riskTextColor = getRiskTextColor(labelPct);
+      const riskLevelText = getRiskLevelText(riskPercentage);
+      const riskTextColor = getRiskTextColor(riskPercentage);
       const areaSlug = generateNameSlug(area);
       return (
         <a href={`/trinidad/area/${areaSlug}/`} class="flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
@@ -146,12 +134,13 @@ function getRiskBarColor(percentage: number): string {
               </svg>
             </div>
           </div>
-          <!-- Bar width = share of total crime burden; color = risk level -->
+          <!-- Bar width + gradient both relative to max — #1 area fills full red end -->
           <div class="relative w-full h-2 bg-slate-200 dark:bg-[hsl(0_0%_18%)] rounded-full overflow-hidden">
-            <div class="absolute top-0 left-0 h-full rounded-full transition-all duration-300"
-              style={`width: ${barPct}%; background-color: ${getRiskBarColor(labelPct)}`}></div>
+            <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style={`width: ${riskPercentage}%`}>
+              <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style={`width: ${riskPercentage > 0 ? (100 / riskPercentage) * 100 : 100}%`}></div>
+            </div>
           </div>
-          <!-- Risk label = relative to worst area -->
+          <!-- Risk level text -->
           <span class={`text-xs font-medium ${riskTextColor}`}>Risk: {riskLevelText}</span>
         </a>
       );
