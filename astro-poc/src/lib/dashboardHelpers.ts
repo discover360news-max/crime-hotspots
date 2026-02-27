@@ -85,14 +85,17 @@ export const calculateInsights = (crimeData: Crime[]) => {
     return sum + crimeCount;
   }, 0);
 
-  // Calculate total victims (victimCount is per INCIDENT, not per crime type)
-  // Each row counts as victimCount victims, regardless of how many crime types it has
+  // Calculate total victims — only apply victimCount for crime types that support it.
+  // This mirrors the client-side logic in updateQuickInsights() exactly.
   const totalVictims = crimeData.reduce((sum, crime) => {
-    // Use victimCount if present (including 0), otherwise default to 1
-    const victimCount = crime.victimCount !== undefined && crime.victimCount !== null
-      ? Number(crime.victimCount)
-      : 1;
-    return sum + victimCount;
+    const primaryType = crime.primaryCrimeType || crime.crimeType;
+    if (primaryType && usesVictimCount(primaryType)) {
+      const victimCount = crime.victimCount !== undefined && crime.victimCount !== null
+        ? Number(crime.victimCount)
+        : 1;
+      return sum + victimCount;
+    }
+    return sum + 1;
   }, 0);
 
   // Average crimes per day
