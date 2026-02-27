@@ -34,6 +34,26 @@ function processReadyArticles() {
     let failedCount = 0;
     let timeoutReached = false;
 
+    // Pre-load Production + Archive sheet data once to avoid 3 full sheet reads per crime
+    // in appendToProduction(). Cuts per-crime write time from ~80s → <5s.
+    const prodSheetForCache = getActiveSheet(SHEET_NAMES.PRODUCTION);
+    const prodCacheLastRow = prodSheetForCache.getLastRow();
+    let cachedProdData = prodCacheLastRow >= 2
+      ? prodSheetForCache.getRange(2, 1, prodCacheLastRow - 1, 15).getValues()
+      : [];
+
+    let cachedArchiveData = [];
+    try {
+      const archiveSheetForCache = getActiveSheet(SHEET_NAMES.PRODUCTION_ARCHIVE);
+      const archiveCacheLastRow = archiveSheetForCache.getLastRow();
+      if (archiveCacheLastRow >= 2) {
+        cachedArchiveData = archiveSheetForCache.getRange(2, 1, archiveCacheLastRow - 1, 15).getValues();
+      }
+    } catch (e) {
+      Logger.log('ℹ️ Production Archive not found for caching (may not exist yet)');
+    }
+    Logger.log(`📦 Cache loaded: ${cachedProdData.length} Production rows, ${cachedArchiveData.length} Archive rows`);
+
     for (let i = 0; i < data.length && articlesProcessed < PROCESSING_CONFIG.MAX_ARTICLES_PER_RUN; i++) {
       // ═══════════════════════════════════════════════════════════
       // CHECK EXECUTION TIME - Stop before hitting 6-minute limit
@@ -132,7 +152,7 @@ function processReadyArticles() {
               const crimeAmbiguities = Array.isArray(crime.ambiguities) ? crime.ambiguities : [];
 
               if (crimeConfidence >= PROCESSING_CONFIG.CONFIDENCE_THRESHOLD) {
-                appendToProduction(crime, publishedDate, crimeTypes);
+                appendToProduction(crime, publishedDate, crimeTypes, cachedProdData, cachedArchiveData);
                 highConfCrimes++;
                 Logger.log(`    ✅ Added to Production (confidence: ${crimeConfidence})`);
               } else if (crimeConfidence > 0) {
@@ -247,7 +267,7 @@ function processReadyArticles() {
    * @param {Date} publishedDate - Article publication date (fallback)
    * @param {Object} crimeTypes - Pre-calculated crime types (primary/related)
    */
-  function appendToProduction(crime, publishedDate, crimeTypes) {
+  function appendToProduction(crime, publishedDate, crimeTypes, cachedProdData, cachedArchiveData) {
     // Acquire lock to prevent race conditions when multiple processes run simultaneously
     const lock = LockService.getScriptLock();
 
@@ -261,8 +281,8 @@ function processReadyArticles() {
       const fullAddress = `${crime.street || ''}, ${crime.area || ''}, Trinidad and Tobago`;
       const geocoded = geocodeAddress(fullAddress);
 
-      // Check for duplicate in Production sheet
-      if (isDuplicateCrime(prodSheet, crime, geocoded)) {
+      // Check for duplicate in Production sheet (uses pre-loaded cache if available)
+      if (isDuplicateCrime(prodSheet, crime, geocoded, cachedProdData)) {
         Logger.log(`⚠️ Duplicate detected in Production, skipping: ${crime.headline}`);
         return;
       }
@@ -270,7 +290,7 @@ function processReadyArticles() {
       // Check for duplicate in Production Archive (may be archived already)
       try {
         const archiveSheet = getActiveSheet(SHEET_NAMES.PRODUCTION_ARCHIVE);
-        if (archiveSheet && isDuplicateCrime(archiveSheet, crime, geocoded)) {
+        if (archiveSheet && isDuplicateCrime(archiveSheet, crime, geocoded, cachedArchiveData)) {
           Logger.log(`⚠️ Duplicate detected in Production Archive, skipping: ${crime.headline}`);
           return;
         }
@@ -283,7 +303,7 @@ function processReadyArticles() {
       // NEW: Check for POTENTIAL duplicates - redirect to Review Queue
       // These are near-misses that a human should verify
       // ═══════════════════════════════════════════════════════════
-      const potentialDupe = findPotentialDuplicate(prodSheet, crime, geocoded);
+      const potentialDupe = findPotentialDuplicate(prodSheet, crime, geocoded, cachedProdData);
       if (potentialDupe.isPotential) {
         Logger.log(`⚠️ Potential duplicate detected, routing to Review Queue: ${crime.headline}`);
         Logger.log(`   Reason: ${potentialDupe.reason}`);
@@ -348,7 +368,11 @@ function processReadyArticles() {
         '',                                      // 13. Region (formula fills this)
         'Trinidad',                              // 14. Island
         crime.source_url || '',                  // 15. URL
-        ''                                       // 16. Source (formula fills this)
+        '',                                      // 16. Source (formula fills this)
+        crime.safety_tip_flag || '',             // 17. Safety_Tip_Flag
+        crime.safety_tip_category || '',         // 18. Safety_Tip_Category
+        crime.safety_tip_context || '',          // 19. Safety_Tip_Context
+        crime.tactic_noted || ''                 // 20. Tactic_Noted
       ]);
 
       Logger.log(`✅ Added to production: ${crime.headline}
@@ -457,15 +481,16 @@ function normalizeUrl(url) {
  * @param {Object} geocoded - Geocoded coordinates {lat, lng, plus_code, formatted_address}
  * @returns {boolean} True if duplicate found
  */
-function isDuplicateCrime(sheet, crime, geocoded) {
-    const lastRow = sheet.getLastRow();
-
-    if (lastRow < 2) {
-      return false; // Empty sheet
+function isDuplicateCrime(sheet, crime, geocoded, cachedData) {
+    let data;
+    if (cachedData) {
+      data = cachedData;
+    } else {
+      const lastRow = sheet.getLastRow();
+      if (lastRow < 2) return false;
+      data = sheet.getRange(2, 1, lastRow - 1, 15).getValues();
     }
-
-    const dataRange = sheet.getRange(2, 1, lastRow - 1, 15);
-    const data = dataRange.getValues();
+    if (!data || data.length === 0) return false;
 
     // Extract victim name from crime if available
     const victimName = (crime.victims && crime.victims.length > 0 && crime.victims[0].name)
@@ -853,15 +878,16 @@ function checkSemanticDuplicate(headline1, headline2, area1, area2) {
  * @param {Object} geocoded - Geocoded coordinates
  * @returns {Object} {isPotential: boolean, reason: string, matchRow: number}
  */
-function findPotentialDuplicate(sheet, crime, geocoded) {
-  const lastRow = sheet.getLastRow();
-
-  if (lastRow < 2) {
-    return { isPotential: false, reason: '', matchRow: -1 };
+function findPotentialDuplicate(sheet, crime, geocoded, cachedData) {
+  let data;
+  if (cachedData) {
+    data = cachedData;
+  } else {
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) return { isPotential: false, reason: '', matchRow: -1 };
+    data = sheet.getRange(2, 1, lastRow - 1, 15).getValues();
   }
-
-  const dataRange = sheet.getRange(2, 1, lastRow - 1, 15);
-  const data = dataRange.getValues();
+  if (!data || data.length === 0) return { isPotential: false, reason: '', matchRow: -1 };
 
   for (let i = 0; i < data.length; i++) {
     const row = data[i];

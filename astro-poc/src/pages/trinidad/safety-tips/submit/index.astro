@@ -1,0 +1,232 @@
+---
+export const prerender = true;
+
+import Layout from '../../../../layouts/Layout.astro';
+import Hero from '../../../../components/Hero.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import { routes } from '../../../../config/routes';
+
+const categories = ['Robbery', 'Carjacking', 'Home Invasion', 'ATM Crime', 'Online Scam', 'Kidnapping', 'Sexual Violence', 'Fraud', 'Assault', 'Other'];
+const contexts = ['At Home', 'In Your Car', 'At the ATM', 'In a Mall', 'Walking Alone', 'Online', 'At Work', 'Using Public Transport', 'At an Event', 'Other'];
+const gasUrl = import.meta.env.PUBLIC_SAFETY_TIPS_GAS_URL || '';
+---
+
+<Layout
+  title="Submit a Safety Tip — CrimeHotSpots.com"
+  description="Share a crime safety tip for Trinidad & Tobago residents. Community-sourced tips are reviewed and published to help others stay safer."
+>
+  <Hero
+    compact
+    narrowContainer={true}
+    title="Submit a Safety Tip"
+    subtitle="Share practical advice based on what you've seen or experienced. All submissions are reviewed before publishing."
+  >
+    <Breadcrumbs items={[
+      { label: 'Home', href: routes.home },
+      { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
+      { label: 'Safety Tips', href: routes.trinidad.safetyTips },
+      { label: 'Submit a Tip' }
+    ]} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+
+      <form id="tip-form" class="space-y-5" novalidate>
+
+        <!-- Title -->
+        <div>
+          <label for="tip-title" class="block text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-1">
+            Tip title <span class="text-rose-600">*</span>
+          </label>
+          <input
+            id="tip-title"
+            name="title"
+            type="text"
+            required
+            placeholder="e.g. Empty seat protocol when driving alone at night"
+            class="w-full px-3 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-body text-slate-700 dark:text-[hsl(0_0%_85%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_45%)] bg-white dark:bg-[hsl(0_0%_10%)] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300 transition"
+          />
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="tip-desc" class="block text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-1">
+            Description <span class="text-rose-600">*</span>
+          </label>
+          <textarea
+            id="tip-desc"
+            name="description"
+            required
+            minlength="20"
+            rows="5"
+            placeholder="Describe what people should do and why it works. Be specific."
+            class="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-body text-slate-700 dark:text-[hsl(0_0%_85%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_45%)] bg-white dark:bg-[hsl(0_0%_10%)] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300 transition resize-vertical"
+          ></textarea>
+        </div>
+
+        <!-- Category + Context -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="tip-category" class="block text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-1">
+              Category <span class="text-rose-600">*</span>
+            </label>
+            <select
+              id="tip-category"
+              name="category"
+              required
+              class="w-full px-3 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] bg-white dark:bg-[hsl(0_0%_10%)] text-body text-slate-700 dark:text-[hsl(0_0%_85%)] focus:outline-none focus:ring-2 focus:ring-rose-300"
+            >
+              <option value="">Select category…</option>
+              {categories.map(c => <option value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div>
+            <label for="tip-context" class="block text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-1">
+              Context <span class="text-rose-600">*</span>
+            </label>
+            <select
+              id="tip-context"
+              name="context"
+              required
+              class="w-full px-3 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] bg-white dark:bg-[hsl(0_0%_10%)] text-body text-slate-700 dark:text-[hsl(0_0%_85%)] focus:outline-none focus:ring-2 focus:ring-rose-300"
+            >
+              <option value="">Select context…</option>
+              {contexts.map(c => <option value={c}>{c}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <!-- Area (optional) -->
+        <div>
+          <label for="tip-area" class="block text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-1">
+            Area <span class="text-slate-400 dark:text-[hsl(0_0%_50%)] font-normal">(optional — leave blank for a national tip)</span>
+          </label>
+          <input
+            id="tip-area"
+            name="area"
+            type="text"
+            placeholder="e.g. Port of Spain, Arima, San Fernando…"
+            class="w-full px-3 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-body text-slate-700 dark:text-[hsl(0_0%_85%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_45%)] bg-white dark:bg-[hsl(0_0%_10%)] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300 transition"
+          />
+        </div>
+
+        <!-- Submitter details -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="tip-name" class="block text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-1">
+              Name <span class="text-slate-400 dark:text-[hsl(0_0%_50%)] font-normal">(optional)</span>
+            </label>
+            <input
+              id="tip-name"
+              name="submitterName"
+              type="text"
+              placeholder="Anonymous"
+              class="w-full px-3 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-body text-slate-700 dark:text-[hsl(0_0%_85%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_45%)] bg-white dark:bg-[hsl(0_0%_10%)] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300 transition"
+            />
+          </div>
+          <div>
+            <label for="tip-email" class="block text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-1">
+              Email <span class="text-slate-400 dark:text-[hsl(0_0%_50%)] font-normal">(optional)</span>
+            </label>
+            <input
+              id="tip-email"
+              name="submitterEmail"
+              type="email"
+              placeholder="you@example.com"
+              class="w-full px-3 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-body text-slate-700 dark:text-[hsl(0_0%_85%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_45%)] bg-white dark:bg-[hsl(0_0%_10%)] focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-rose-300 transition"
+            />
+          </div>
+        </div>
+
+        <!-- Error -->
+        <p id="form-error" class="hidden text-caption text-rose-600 dark:text-rose-400"></p>
+
+        <!-- Submit -->
+        <div class="flex items-center gap-4">
+          <button
+            type="submit"
+            id="submit-btn"
+            class="px-4 py-1.5 min-h-[22px] rounded-lg bg-rose-600 text-white text-caption font-bold hover:bg-rose-700 active:bg-rose-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Submit tip
+          </button>
+          <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">
+            Cancel
+          </a>
+        </div>
+      </form>
+
+      <!-- Success -->
+      <div id="success-msg" class="hidden py-8 text-center">
+        <p class="text-heading font-bold text-emerald-700 dark:text-emerald-400 mb-2">Tip submitted!</p>
+        <p class="text-body text-slate-500 dark:text-[hsl(0_0%_55%)] mb-4">Thank you. Your tip will be reviewed and published if approved.</p>
+        <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline">
+          ← Back to all tips
+        </a>
+      </div>
+
+    </div>
+  </main>
+</Layout>
+
+<script is:inline define:vars={{ gasUrl }}>
+  (function () {
+    var form = document.getElementById('tip-form');
+    var submitBtn = document.getElementById('submit-btn');
+    var successMsg = document.getElementById('success-msg');
+    var errorEl = document.getElementById('form-error');
+
+    if (!form) return;
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      if (!gasUrl) {
+        show('Submission endpoint not configured. Please contact us.');
+        return;
+      }
+
+      var title = form.querySelector('#tip-title').value.trim();
+      var desc = form.querySelector('#tip-desc').value.trim();
+      var category = form.querySelector('#tip-category').value;
+      var context = form.querySelector('#tip-context').value;
+
+      if (!title)           { show('Please enter a tip title.'); return; }
+      if (desc.length < 20) { show('Description must be at least 20 characters.'); return; }
+      if (!category)        { show('Please select a category.'); return; }
+      if (!context)         { show('Please select a context.'); return; }
+
+      hide();
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      try {
+        var res = await fetch(gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title, description: desc, category, context,
+            area: form.querySelector('#tip-area').value.trim(),
+            submitterName: form.querySelector('#tip-name').value.trim(),
+            submitterEmail: form.querySelector('#tip-email').value.trim(),
+          }),
+        });
+        var data = await res.json();
+        if (data.success) {
+          form.style.display = 'none';
+          successMsg.classList.remove('hidden');
+        } else {
+          throw new Error(data.error || 'Submission failed');
+        }
+      } catch {
+        show('Something went wrong. Please try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit tip';
+      }
+    });
+
+    function show(msg) { if (errorEl) { errorEl.textContent = msg; errorEl.classList.remove('hidden'); } }
+    function hide()    { if (errorEl) errorEl.classList.add('hidden'); }
+  })();
+</script>

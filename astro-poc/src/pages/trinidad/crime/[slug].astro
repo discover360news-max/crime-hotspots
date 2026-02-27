@@ -22,6 +22,9 @@ import { getCountryName } from '../../../data/countries';
 import { getSafetyContext } from '../../../lib/safetyHelpers';
 import { routes, buildRoute } from '../../../config/routes';
 import { getCrimeTypeThumbnailUrl } from '../../../lib/generateCrimeTypeThumbnails';
+import { getCollection } from 'astro:content';
+import CompactTipCard from '../../../components/CompactTipCard.astro';
+import { normalizedCrimeType, sortTipsByAreaRelevance } from '../../../lib/safetyTipsHelpers';
 
 // Fetch all crimes once per request (used for slug lookup, navigation, and safety context)
 const { slug } = Astro.params;
@@ -65,6 +68,16 @@ const truncatedHeadline = crime ? crime.headline.split(' ').slice(0, 5).join(' '
 
 // Format month name for breadcrumbs
 const monthName = crime ? crime.dateObj.toLocaleDateString('en-US', { month: 'long' }) : '';
+
+// Match safety tips: same crime type category, area match prioritized, max 3
+let matchedTips: Awaited<ReturnType<typeof getCollection<'tips'>>> = [];
+if (crime) {
+  const tipCategory = normalizedCrimeType(crime.primaryCrimeType || crime.crimeType);
+  const allTips = await getCollection('tips', ({ data }) =>
+    data.status === 'published' && data.category === tipCategory
+  );
+  matchedTips = sortTipsByAreaRelevance(allTips, crime.area).slice(0, 3);
+}
 
 // SEO Meta Tags
 const title = crime ? `${crime.headline} | Crime Hotspots Trinidad` : 'Story Not Found | Crime Hotspots Trinidad';
@@ -307,6 +320,17 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
       positiveNote={safetyContext.positiveNote}
       primaryCrimeType={safetyContext.primaryCrimeType}
     />
+
+    <!-- Curated Safety Tips (matched by crime type + area) -->
+    {matchedTips.length > 0 && (
+      <div class="mt-4 mb-6 bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] border border-slate-200 dark:border-[hsl(0_0%_18%)] rounded-lg p-4">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] uppercase tracking-wider">Safety Tips</h3>
+          <a href="/safety-tips/" class="text-caption text-rose-600 dark:text-rose-400 hover:underline">View all →</a>
+        </div>
+        {matchedTips.map(tip => <CompactTipCard tip={tip} />)}
+      </div>
+    )}
 
     <FeedbackToggle
       areaName={crime.area}

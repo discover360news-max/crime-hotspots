@@ -49,6 +49,7 @@ export const COUNTRIES: Country[] = [
       { id: 'statistics', label: 'Statistics', description: 'Detailed crime breakdowns and trends', url: routes.trinidad.statistics },
       { id: 'regions', label: 'Regions', description: 'Regional crime analysis', url: routes.trinidad.regions },
       { id: 'murder-count', label: 'Murder Count', description: 'Live murder count tracker', url: routes.trinidad.murderCount },
+      { id: 'safety-tips', label: 'Safety Tips', description: 'Actionable crime safety advice for residents', url: routes.trinidad.safetyTips },
     ],
   },
   {

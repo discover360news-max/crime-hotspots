@@ -1,0 +1,69 @@
+---
+/**
+ * TipCard Component
+ * Full card for tip grid pages (index, category, context, area).
+ * Matches area card pattern from areas.astro.
+ */
+
+import type { CollectionEntry } from 'astro:content';
+import { buildRoute } from '../config/routes';
+
+interface Props {
+  tip: CollectionEntry<'tips'>;
+}
+
+const { tip } = Astro.props;
+const { data } = tip;
+
+const severityDot: Record<string, string> = {
+  high:   'bg-rose-500',
+  medium: 'bg-amber-400',
+  low:    'bg-emerald-500',
+};
+
+const href = buildRoute.safetyTip(tip.slug);
+const relatedCount = data.related_story_ids.length;
+---
+
+<a
+  href={href}
+  class="block bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
+>
+  <!-- Title row with severity dot -->
+  <div class="flex items-start gap-2 mb-2">
+    <span
+      class={`flex-shrink-0 mt-1.5 w-2 h-2 rounded-full ${severityDot[data.severity]}`}
+      title={`${data.severity} severity`}
+    ></span>
+    <h3 class="text-body font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug">
+      {data.title}
+    </h3>
+  </div>
+
+  <!-- Badges -->
+  <div class="flex flex-wrap gap-1.5 mb-3">
+    <span class="text-caption font-bold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
+      {data.category}
+    </span>
+    <span class="text-caption font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_14%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">
+      {data.context}
+    </span>
+    {data.area && (
+      <span class="text-caption font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_14%)] text-slate-400 dark:text-[hsl(0_0%_55%)]">
+        {data.area}
+      </span>
+    )}
+  </div>
+
+  <!-- Footer -->
+  <div class="flex items-center justify-between">
+    {relatedCount > 0 ? (
+      <span class="text-caption text-slate-400 dark:text-[hsl(0_0%_50%)]">
+        {relatedCount} related incident{relatedCount !== 1 ? 's' : ''}
+      </span>
+    ) : <span />}
+    <span class="text-caption font-bold text-rose-600 dark:text-rose-400 group-hover:underline">
+      Read →
+    </span>
+  </div>
+</a>

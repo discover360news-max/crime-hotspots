@@ -34,6 +34,8 @@ export const routes = {
     statistics: '/trinidad/statistics/',
     regions: '/trinidad/regions/',
     murderCount: '/trinidad/murder-count/',
+    safetyTips: '/trinidad/safety-tips/',
+    safetyTipsSubmit: '/trinidad/safety-tips/submit/',
   },
 } as const;
 
@@ -46,4 +48,13 @@ export const buildRoute = {
   archive: (year: number, month?: string) =>
     month ? `/trinidad/archive/${year}/${month}/` : `/trinidad/archive/${year}/`,
   blogPost: (slug: string) => `/blog/${slug}/`,
+  safetyTip: (slug: string) => `/trinidad/safety-tips/${slug}/`,
+  safetyTipsCategory: (category: string) => `/trinidad/safety-tips/category/${slugifyParam(category)}/`,
+  safetyTipsContext: (context: string) => `/trinidad/safety-tips/context/${slugifyParam(context)}/`,
+  safetyTipsArea: (area: string) => `/trinidad/safety-tips/area/${area}/`,
 } as const;
+
+/** Slugify a category/context string for use in URL path segments */
+function slugifyParam(value: string): string {
+  return value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}

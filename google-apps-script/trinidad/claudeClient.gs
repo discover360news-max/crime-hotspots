@@ -207,10 +207,16 @@ JSON SCHEMA:
       "victimCount": number,
       "location_country": "Trinidad|Tobago|Trinidad and Tobago|Venezuela|Guyana|Other",
       "confidence": 1-10,
-      "ambiguities": ["reason if confidence < 7"]
+      "ambiguities": ["reason if confidence < 7"],
+      "safety_tip_flag": "Yes or No — Yes ONLY if this incident reveals a specific criminal tactic that residents could protect themselves against by changing their behaviour.",
+      "safety_tip_category": "If flagged: Robbery|Carjacking|Home Invasion|ATM Crime|Online Scam|Kidnapping|Sexual Violence|Fraud|Assault|Other. Leave blank if not flagged.",
+      "safety_tip_context": "If flagged: At Home|In Your Car|At the ATM|In a Mall|Walking Alone|Online|At Work|Using Public Transport|At an Event|Other. Leave blank if not flagged.",
+      "tactic_noted": "If flagged: one plain English sentence describing the SPECIFIC tactic used. Be precise — not 'robbery occurred' but 'criminal posed as stranded motorist to get victim to stop'. Leave blank if not flagged."
     }
   ]
 }
+
+Safety tip guidance: Routine incidents with no notable new tactic = No. Only flag when the tactic is genuinely preventable by residents changing their behaviour. Example worth flagging: victim withdrew cash from ATM and was followed home. Example NOT worth flagging: man shot in front of home (no actionable tactic revealed).
 
 ═══════════════════════════════════════════════════════════════════════════════
 MULTI-CRIME LOGIC (CRITICAL)

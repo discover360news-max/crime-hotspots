@@ -1,0 +1,75 @@
+---
+export const prerender = true;
+
+import { getCollection } from 'astro:content';
+import Layout from '../../../../layouts/Layout.astro';
+import Hero from '../../../../components/Hero.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import TipCard from '../../../../components/TipCard.astro';
+import { routes, buildRoute } from '../../../../config/routes';
+import { slugifyCategory } from '../../../../lib/safetyTipsHelpers';
+
+export async function getStaticPaths() {
+  const allTips = await getCollection('tips', ({ data }) => data.status === 'published');
+  const categories = [...new Set(allTips.map(t => t.data.category))];
+  return categories.map(category => ({
+    params: { category: slugifyCategory(category) },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props as { category: string };
+
+const tips = await getCollection('tips', ({ data }) =>
+  data.status === 'published' && data.category === category
+);
+tips.sort((a, b) => b.data.date_added.getTime() - a.data.date_added.getTime());
+---
+
+<Layout
+  title={`${category} Safety Tips Trinidad — CrimeHotSpots.com`}
+  description={`Actionable tips to protect yourself from ${category.toLowerCase()} in Trinidad & Tobago. Based on real incident patterns.`}
+>
+  <Hero
+    compact
+    narrowContainer={true}
+    title={`${category} Safety Tips`}
+    subtitle={`${tips.length} tip${tips.length !== 1 ? 's' : ''} to help protect yourself in Trinidad & Tobago.`}
+  >
+    <Breadcrumbs items={[
+      { label: 'Home', href: routes.home },
+      { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
+      { label: 'Safety Tips', href: routes.trinidad.safetyTips },
+      { label: category }
+    ]} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+
+      <div class="flex items-center justify-between mb-4">
+        <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">
+          {tips.length} tip{tips.length !== 1 ? 's' : ''} in this category
+        </p>
+        <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline">
+          View all →
+        </a>
+      </div>
+
+      {tips.length === 0 ? (
+        <p class="py-10 text-center text-body text-slate-500 dark:text-[hsl(0_0%_55%)]">
+          No published tips in this category yet.
+        </p>
+      ) : (
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {tips.map(tip => <TipCard tip={tip} />)}
+        </div>
+      )}
+
+      <div class="mt-5 pt-5 border-t border-slate-100 dark:border-[hsl(0_0%_15%)] text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">
+        Looking for {category.toLowerCase()} incidents?
+        <a href={routes.trinidad.headlines} class="ml-1 font-bold text-rose-600 dark:text-rose-400 hover:underline">Browse crime headlines →</a>
+      </div>
+    </div>
+  </main>
+</Layout>
