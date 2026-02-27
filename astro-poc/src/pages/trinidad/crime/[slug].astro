@@ -92,52 +92,48 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
   <!-- SEO CRITICAL: NewsArticle structured data — injected into <head> via slot="head".
        Google uses this for news carousels, rich snippets, and article indexing signals.
        DO NOT remove fields or the slot="head" attribute. See docs/claude-context/SEO-CONFIG.md. -->
-  <script type="application/ld+json" slot="head">
-    {
-      JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "NewsArticle",
-        "headline": crime.headline,
-        "datePublished": crime.dateObj.toISOString(),
-        "dateModified": crime.dateObj.toISOString(),
-        "articleSection": crime.crimeType,
-        "keywords": [crime.crimeType, crime.area, crime.region, "crime trinidad", "trinidad news"].filter(Boolean).join(", "),
-        "mainEntityOfPage": {
-          "@type": "WebPage",
-          "@id": buildRoute.crimeAbsolute(crime.slug)
-        },
-        "locationCreated": {
-          "@type": "Place",
-          "name": crime.area,
-          "address": {
-            "@type": "PostalAddress",
-            "addressRegion": crime.region,
-            "addressCountry": "TT"
-          }
-        },
-        "description": crime.summary,
-        "url": buildRoute.crimeAbsolute(crime.slug),
-        "author": crime.source ? {
-          "@type": "NewsMediaOrganization",
-          "name": crime.source,
-          ...(crime.url ? { "url": crime.url } : {})
-        } : {
-          "@type": "Organization",
-          "name": "Crime Hotspots",
-          "url": "https://crimehotspots.com"
-        },
-        "publisher": {
-          "@type": "Organization",
-          "name": "Crime Hotspots",
-          "url": "https://crimehotspots.com",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://crimehotspots.com/og-image.jpg"
-          }
-        }
-      })
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": crime.headline,
+    "datePublished": crime.dateObj.toISOString(),
+    "dateModified": crime.dateObj.toISOString(),
+    "articleSection": crime.crimeType,
+    "keywords": [crime.crimeType, crime.area, crime.region, "crime trinidad", "trinidad news"].filter(Boolean).join(", "),
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": buildRoute.crimeAbsolute(crime.slug)
+    },
+    "locationCreated": {
+      "@type": "Place",
+      "name": crime.area,
+      "address": {
+        "@type": "PostalAddress",
+        "addressRegion": crime.region,
+        "addressCountry": "TT"
+      }
+    },
+    "description": crime.summary,
+    "url": buildRoute.crimeAbsolute(crime.slug),
+    "author": crime.source ? {
+      "@type": "NewsMediaOrganization",
+      "name": crime.source,
+      ...(crime.url ? { "url": crime.url } : {})
+    } : {
+      "@type": "Organization",
+      "name": "Crime Hotspots",
+      "url": "https://crimehotspots.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Crime Hotspots",
+      "url": "https://crimehotspots.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://crimehotspots.com/og-image.jpg"
+      }
     }
-  </script>
+  })} />
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
     <!-- Breadcrumbs -->
