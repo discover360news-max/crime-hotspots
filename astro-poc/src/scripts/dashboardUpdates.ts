@@ -4,104 +4,12 @@
  * Used by year filter and stat card filtering
  */
 
-import { usesVictimCount } from '../config/crimeTypeConfig';
+import type { Crime } from '../lib/crimeData';
+import { countCrimeType } from '../lib/dashboardHelpers';
+import { generateNameSlug } from '../lib/csvParser';
 import { getRiskWeight } from '../config/riskWeights';
+import { usesVictimCount } from '../config/crimeTypeConfig';
 import { buildRoute } from '../config/routes';
-
-/** Client-side slug generator (mirrors generateNameSlug from crimeData.ts) */
-function toAreaSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 80);
-}
-
-interface Crime {
-  date: string;
-  headline: string;
-  crimeType: string;
-  primaryCrimeType?: string; // New 2026 field
-  relatedCrimeTypes?: string; // New 2026 field (comma-separated)
-  victimCount?: number; // New 2026 field (applies to primary crime only)
-  street: string;
-  area: string;
-  region: string;
-  url: string;
-  source: string;
-  latitude: number;
-  longitude: number;
-  summary: string;
-  slug: string;
-  dateObj: Date;
-  year: number;
-  month: number;
-  day: number;
-}
-
-/**
- * Count crimes by type across both primaryCrimeType and relatedCrimeTypes
- *
- * VICTIM COUNT RULES:
- * - Only applies to PRIMARY crime type (not related crimes)
- * - Only for crime types configured with useVictimCount=true
- * - Related crimes count by occurrence ("Murder, Murder" = +2)
- *
- * Example:
- * - Primary: Murder, victimCount: 3, Related: [Shooting]
- * - Result: Murder +3, Shooting +1
- */
-function countCrimeType(crimeData: Crime[], targetType: string): number {
-  let totalCount = 0;
-  let primaryCount = 0;
-  let legacyCount = 0;
-  let relatedCount = 0;
-
-  crimeData.forEach(crime => {
-    // Check if primaryCrimeType matches
-    if (crime.primaryCrimeType === targetType) {
-      // Apply victim count ONLY if this crime type uses it AND it's the primary crime
-      if (usesVictimCount(targetType) && crime.victimCount && crime.victimCount > 1) {
-        totalCount += crime.victimCount;
-        primaryCount += crime.victimCount;
-      } else {
-        totalCount += 1;
-        primaryCount += 1;
-      }
-      return;
-    }
-
-    // Check if crimeType matches (fallback for old data - always count as 1)
-    if (crime.crimeType === targetType) {
-      totalCount += 1;
-      legacyCount += 1;
-      return;
-    }
-
-    // Check if relatedCrimeTypes contains the target type — count each occurrence
-    // e.g. "Murder, Murder" in related crimes = +2 (not +1)
-    if (crime.relatedCrimeTypes) {
-      const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
-      const matchCount = relatedTypes.filter(t => t === targetType).length;
-      if (matchCount > 0) {
-        totalCount += matchCount;
-        relatedCount += matchCount;
-        console.log(`🔍 Found ${matchCount}× ${targetType} in relatedCrimeTypes:`, {
-          headline: crime.headline,
-          primaryCrimeType: crime.primaryCrimeType,
-          relatedCrimeTypes: crime.relatedCrimeTypes,
-          parsed: relatedTypes
-        });
-      }
-    }
-  });
-
-  if (relatedCount > 0 || primaryCount > 0) {
-    console.log(`📊 ${targetType} count breakdown: Primary=${primaryCount}, Legacy=${legacyCount}, Related=${relatedCount}, Total=${totalCount}`);
-  }
-
-  return totalCount;
-}
 
 /**
  * Calculate risk score for a single crime
@@ -197,9 +105,6 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
 
   const finalCrimesForTrends = (isViewingAllData || isViewingCurrentYear) && allCrimes ? allCrimes : crimes;
 
-  console.log(`📊 Trend calculation: viewingAllData=${isViewingAllData}, isViewingCurrentYear=${isViewingCurrentYear}, using ${finalCrimesForTrends.length} crimes`);
-  console.log(`📅 Date ranges: Last 30 = ${thirtyThreeDaysAgo.toLocaleDateString()} to ${threeDaysAgo.toLocaleDateString()}, Prev 30 = ${sixtyThreeDaysAgo.toLocaleDateString()} to ${thirtyThreeDaysAgo.toLocaleDateString()}`);
-
   // Trend data: last 30 days (ending 3 days ago)
   const last30DaysCrimes = finalCrimesForTrends.filter(c => {
     const crimeDate = new Date(c.date);
@@ -211,8 +116,6 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
     const crimeDate = new Date(c.date);
     return crimeDate >= sixtyThreeDaysAgo && crimeDate < thirtyThreeDaysAgo;
   });
-
-  console.log(`📊 Trend data: Last 30 days = ${last30DaysCrimes.length} crimes, Previous 30 days = ${prev30DaysCrimes.length} crimes`);
 
   // Helper function to update card with trend
   function updateCardWithTrend(card: Element | null, displayValue: number, last30Count: number, prev30Count: number) {
@@ -288,8 +191,6 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
   updateCardWithTrend(statCards[7], displayBurglaries, last30Burglaries, prev30Burglaries);
   updateCardWithTrend(statCards[8], displaySeizures, last30Seizures, prev30Seizures);
   updateCardWithTrend(statCards[9], displayKidnappings, last30Kidnappings, prev30Kidnappings);
-
-  console.log('✅ Stats cards updated with trends');
 }
 
 /**
@@ -317,8 +218,6 @@ export function updateQuickInsights(crimes: Crime[]) {
     if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = '0 incidents';
     if (safestRegionEl) safestRegionEl.textContent = 'N/A';
     if (safestRegionCountEl) safestRegionCountEl.textContent = '0 incidents';
-
-    console.log('✅ Quick Insights cleared (no data)');
     return;
   }
 
@@ -415,17 +314,15 @@ export function updateQuickInsights(crimes: Crime[]) {
   if (mostDangerousRegionEl) {
     mostDangerousRegionEl.textContent = mostDangerousRegion;
     const dangerousLink = mostDangerousRegionEl.closest('a');
-    if (dangerousLink) dangerousLink.href = buildRoute.area(toAreaSlug(mostDangerousRegion));
+    if (dangerousLink) dangerousLink.href = buildRoute.area(generateNameSlug(mostDangerousRegion));
   }
   if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = `${mostDangerousRegionCount} incidents`;
   if (safestRegionEl) {
     safestRegionEl.textContent = safestRegion;
     const safestLink = safestRegionEl.closest('a');
-    if (safestLink) safestLink.href = buildRoute.area(toAreaSlug(safestRegion));
+    if (safestLink) safestLink.href = buildRoute.area(generateNameSlug(safestRegion));
   }
   if (safestRegionCountEl) safestRegionCountEl.textContent = `${safestRegionCount} incidents`;
-
-  console.log('✅ Quick Insights updated');
 }
 
 /**
@@ -454,7 +351,6 @@ export function updateTopRegions(crimes: Crime[]) {
   // If no crimes, show "No data" message
   if (crimes.length === 0) {
     container.innerHTML = '<div class="text-xs text-slate-400 text-center py-4">No data available</div>';
-    console.log('✅ Top Areas cleared (no data)');
     return;
   }
 
@@ -477,7 +373,7 @@ export function updateTopRegions(crimes: Crime[]) {
     const riskPercentage = riskLevels.get(area) || 0;
     const riskLevelText = getRiskLevelText(riskPercentage);
     const riskTextColor = getRiskTextColor(riskPercentage);
-    const areaSlug = toAreaSlug(area);
+    const areaSlug = generateNameSlug(area);
     return `
     <a href="${buildRoute.area(areaSlug)}" class="flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
@@ -508,8 +404,6 @@ export function updateTopRegions(crimes: Crime[]) {
 
   // Dispatch event to re-initialize tooltips
   window.dispatchEvent(new CustomEvent('topAreasRendered'));
-
-  console.log('✅ Top Areas updated with risk levels');
 }
 
 /**

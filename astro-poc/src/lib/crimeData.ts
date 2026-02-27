@@ -9,7 +9,8 @@
  * - This reduces build time significantly (from ~30 min to ~5-10 min)
  */
 
-import { parseCSVLine, parseDate, generateSlug, generateSlugWithId, createColumnMap, getColumnValue } from './csvParser';
+import { parseCSVLine, parseDate, generateSlug, generateSlugWithId, createColumnMap, getColumnValue, generateNameSlug } from './csvParser';
+export { generateNameSlug }; // Re-exported for backward compatibility — canonical definition is in csvParser.ts
 import { TRINIDAD_CSV_URLS } from '../config/csvUrls';
 import csvCacheRaw from '../data/csv-cache.json';
 
@@ -317,13 +318,3 @@ export async function getAvailableAreas(): Promise<string[]> {
   return Array.from(areas).sort();
 }
 
-/**
- * Generate URL-safe slug from a name (area, region, etc.)
- */
-export function generateNameSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 80);
-}

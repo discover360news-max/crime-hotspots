@@ -140,3 +140,15 @@ export function getColumnValue(
   const index = columnMap.get(columnName.toLowerCase());
   return index !== undefined ? (values[index] || '') : '';
 }
+
+/**
+ * Generate URL-safe slug from a name (area, region, etc.)
+ * Canonical implementation — used by both server and client code.
+ */
+export function generateNameSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 80);
+}
