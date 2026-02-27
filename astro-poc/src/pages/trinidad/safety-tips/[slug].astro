@@ -157,9 +157,14 @@ const severityBadge: Record<string, string> = {
 
       <!-- Share + back -->
       <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">
-        <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">
-          ← All tips
-        </a>
+        <div class="flex items-center gap-4">
+          <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">
+            ← All tips
+          </a>
+          <a href={routes.trinidad.safetyTipsSubmit} class="text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline transition">
+            Submit a tip →
+          </a>
+        </div>
         <button
           id="shareTipBtn"
           class="px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-rose-500 dark:hover:border-rose-700 hover:text-rose-600 dark:hover:text-rose-400 transition"

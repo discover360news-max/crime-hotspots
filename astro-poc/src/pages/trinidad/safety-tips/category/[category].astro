@@ -35,6 +35,7 @@ tips.sort((a, b) => b.data.date_added.getTime() - a.data.date_added.getTime());
     narrowContainer={true}
     title={`${category} Safety Tips`}
     subtitle={`${tips.length} tip${tips.length !== 1 ? 's' : ''} to help protect yourself in Trinidad & Tobago.`}
+    primaryCTA={{ text: 'Submit a Tip', href: routes.trinidad.safetyTipsSubmit }}
   >
     <Breadcrumbs items={[
       { label: 'Home', href: routes.home },

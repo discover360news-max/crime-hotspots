@@ -43,6 +43,7 @@ tips.sort((a, b) => b.data.date_added.getTime() - a.data.date_added.getTime());
     narrowContainer={true}
     title={`Safety Tips: ${areaName}`}
     subtitle={`${tips.length} tip${tips.length !== 1 ? 's' : ''} specific to ${areaName}.`}
+    primaryCTA={{ text: 'Submit a Tip', href: routes.trinidad.safetyTipsSubmit }}
   >
     <Breadcrumbs items={[
       { label: 'Home', href: routes.home },

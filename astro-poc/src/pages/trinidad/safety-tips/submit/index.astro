@@ -204,7 +204,6 @@ const gasUrl = import.meta.env.PUBLIC_SAFETY_TIPS_GAS_URL || '';
       try {
         var res = await fetch(gasUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             title, description: desc, category, context,
             area: form.querySelector('#tip-area').value.trim(),

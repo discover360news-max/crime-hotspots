@@ -38,6 +38,16 @@
 | Archive Index | `/trinidad/archive/` | Pre-rendered | Browse by year |
 | Archive Month | `/trinidad/archive/[year]/[month]` | Pre-rendered | Crimes for specific month |
 
+### Safety Tips
+| Page | Route | Rendering | Purpose |
+|------|-------|-----------|---------|
+| Safety Tips Index | `/trinidad/safety-tips/` | Pre-rendered | Category accordion (sorted by tip count), 25 launch tips |
+| Tip Detail | `/trinidad/safety-tips/[slug]` | **SSR + CDN cache** | Full tip with body, related incidents, related tips, back link |
+| Category | `/trinidad/safety-tips/category/[cat]/` | Pre-rendered | All tips for one category |
+| Context | `/trinidad/safety-tips/context/[ctx]/` | Pre-rendered | Tips by situation context |
+| Area | `/trinidad/safety-tips/area/[area]/` | Pre-rendered | Area-specific tips (min 3 to render) |
+| Submit | `/trinidad/safety-tips/submit/` | Pre-rendered | Community submission form → GAS → "Safety Tip Submissions" sheet |
+
 ### Blog & Tools
 | Page | Route | Purpose |
 |------|-------|---------|
@@ -101,6 +111,13 @@
 | SearchModal.astro | Site-wide Pagefind search (Ctrl+K) |
 | ReportIssueModal.astro | Report crime data issues |
 
+### Safety Tips
+| Component | Purpose |
+|-----------|---------|
+| TipCard.astro | Full tip card for index/category/context/area pages. Badge reads "Category while Context" (muted slate). |
+| CompactTipCard.astro | Inline tip card on crime detail pages (max 3, matched by crime type + area) |
+| CategoryAccordion.astro | Collapsible category section for safety tips index. Sorted by tip count, first expanded. Own class names (`cat-*`) — does not conflict with DateAccordion. |
+
 ### Utility & Engagement
 | Component | Purpose |
 |-----------|---------|
@@ -149,6 +166,7 @@
 | crimeData.ts | Fetches/parses crime CSV (server-side). Runtime fallback via bundled `csv-cache.json`. | `getTrinidadCrimes()`, `getCrimesByArea()`, `getCrimesByMonth()`, `getCrimesByRegion()`, `getAvailableYears()`, `generateNameSlug()` |
 | csvParser.ts | Raw CSV parsing utilities. Slug generation lives here. | `parseCSVLine()`, `parseDate()`, `generateSlug()` (legacy, headline+date), `generateSlugWithId()` (current, StoryID+6 words), `createColumnMap()`, `stripQuotes()` |
 | safetyHelpers.ts | Area crime scoring + safety tip engine | `calculateAreaCrimeScore()` (1-10 scale, 90-day window), `getSafetyContext()` (returns tip + risk level), `getPrimaryCrimeType()`, `toDate()` (shared date normalizer) |
+| safetyTipsHelpers.ts | Curated safety tips utilities | `normalizedCrimeType()` (CSV type → tip category), `sortTipsByAreaRelevance()` (area-specific first), `slugifyCategory()` (category → URL slug) |
 | dashboardHelpers.ts | Dashboard stat calculations | `countCrimeType()`, `calculateInsights()` (highest/lowest crime areas) |
 | statisticsHelpers.ts | Statistics page calculations | `calculatePercentChange()`, `compareYearToDate()`, `getCrimeTypeBreakdown()`, `getTopRegions()`, `filterToSamePeriod()`, `formatPercentChange()` |
 | trendingHelpers.ts | Trending areas + recent views (localStorage) | `getHotAreas()` (top 5 areas, last 7 days), `trackRecentView()`, `getRecentViews()` |
@@ -196,6 +214,11 @@
 | plusCodeConverter.gs | Plus Codes → coordinates |
 | syncToLive.gs | Staging → production sheet sync |
 | archiveScraper.gs | Historical crime data scraping |
+
+### Safety Tips
+| Script | Purpose |
+|--------|---------|
+| safetyTipSubmissions.gs | Web app — receives POST from `/safety-tips/submit/`, appends to "Safety Tip Submissions" sheet tab, sends notification email. Deploy as: Execute as Me, Access: Anyone. Script Property: `NOTIFICATION_EMAIL`. Env var needed: `PUBLIC_SAFETY_TIPS_GAS_URL` in Cloudflare Pages. |
 
 ### Content & Distribution
 | Script | Purpose |
