@@ -47,10 +47,13 @@ function calculateCrimeRisk(crime: Crime): number {
 }
 
 /**
- * Calculate risk scores for all areas and return normalized percentages
+ * Calculate risk scores for all areas and return each area's share of total weighted risk.
  *
  * Returns a Map of area -> risk percentage (0-100)
- * Percentage is relative to the highest-risk area
+ * Percentage = area_risk_score / total_risk_across_all_areas × 100
+ *
+ * This means an area with 50% of total weighted crime scores 50, not 100.
+ * Labels and bar widths reflect actual crime burden share, not rank relative to the worst area.
  */
 export function calculateAreaRiskLevels(crimes: Crime[]): Map<string, number> {
   // Calculate raw risk scores per area
@@ -62,13 +65,13 @@ export function calculateAreaRiskLevels(crimes: Crime[]): Map<string, number> {
     areaRiskScores.set(area, (areaRiskScores.get(area) || 0) + riskScore);
   });
 
-  // Find maximum risk score
-  const maxRiskScore = Math.max(...Array.from(areaRiskScores.values()), 0);
+  // Sum total risk across ALL areas (denominator)
+  const totalRiskScore = Array.from(areaRiskScores.values()).reduce((sum, s) => sum + s, 0);
 
-  // Normalize to percentages (0-100)
+  // Each area's share of total weighted risk
   const normalizedRisks = new Map<string, number>();
   areaRiskScores.forEach((score, area) => {
-    const percentage = maxRiskScore > 0 ? Math.round((score / maxRiskScore) * 100) : 0;
+    const percentage = totalRiskScore > 0 ? Math.round((score / totalRiskScore) * 100) : 0;
     normalizedRisks.set(area, percentage);
   });
 
@@ -407,18 +410,23 @@ export function updateTopRegions(crimes: Crime[]) {
 }
 
 /**
- * Get risk level text based on percentage
+ * Get risk level text based on share of total weighted crime burden.
+ *
+ * Thresholds are calibrated for share-of-total normalization:
+ * - With ~10 areas shown, average share ≈ 5-10%
+ * - A dominant area (e.g. Port of Spain) typically holds 20-40%
+ * - Smaller areas tail off below 5%
  */
 function getRiskLevelText(percentage: number): string {
-  if (percentage <= 16) {
+  if (percentage <= 3) {
     return 'Low';
-  } else if (percentage <= 33) {
+  } else if (percentage <= 8) {
     return 'Medium';
-  } else if (percentage <= 50) {
+  } else if (percentage <= 15) {
     return 'Concerning';
-  } else if (percentage <= 66) {
+  } else if (percentage <= 25) {
     return 'High';
-  } else if (percentage <= 83) {
+  } else if (percentage <= 40) {
     return 'Dangerous';
   } else {
     return 'Extremely Dangerous';
@@ -426,12 +434,12 @@ function getRiskLevelText(percentage: number): string {
 }
 
 /**
- * Get text color based on risk level
+ * Get text color based on risk level (share-of-total thresholds)
  */
 function getRiskTextColor(percentage: number): string {
-  if (percentage <= 33) {
+  if (percentage <= 8) {
     return 'text-green-600';
-  } else if (percentage <= 66) {
+  } else if (percentage <= 25) {
     return 'text-yellow-600';
   } else {
     return 'text-rose-600';

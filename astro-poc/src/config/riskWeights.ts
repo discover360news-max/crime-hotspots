@@ -10,13 +10,15 @@
  * How it works:
  * 1. Each crime's risk contribution = weight × victimCount (for victim-based crimes)
  * 2. Area's total risk score = sum of all crime risk contributions in that area
- * 3. Risk percentage = (area risk score / max risk score across all areas) × 100
- * 4. Bar color based on percentage: 0-33% green, 34-66% yellow, 67-100% red
+ * 3. Risk percentage = (area risk score / TOTAL risk across ALL areas) × 100
+ *    — each area's label reflects its share of the overall crime burden
+ * 4. Label thresholds: ≤3% Low, ≤8% Medium, ≤15% Concerning, ≤25% High, ≤40% Dangerous, >40% Extremely Dangerous
  *
  * Example:
- * Area A: 2 murders (weight 10 each) + 3 robberies (weight 4 each) = (2×10) + (3×4) = 32 points
- * Area B: 10 thefts (weight 2 each) = 10×2 = 20 points
- * Max risk = 32, so Area A = 100% (red), Area B = 62.5% (yellow)
+ * Area A: 2 murders (weight 10 each) + 3 robberies (weight 4 each) = 32 points
+ * Area B: 10 thefts (weight 2 each) = 20 points
+ * Total risk = 52 points, so Area A = 62% (Dangerous), Area B = 38% (Dangerous)
+ * If total across all areas = 320 points: Area A = 10% (Concerning), Area B = 6% (Medium)
  *
  * Adjust weights to reflect your assessment of crime severity.
  */
