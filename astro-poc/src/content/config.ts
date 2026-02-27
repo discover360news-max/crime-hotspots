@@ -34,7 +34,7 @@ const tips = defineCollection({
     status: z.enum(['published', 'pending-review']),
     related_story_ids: z.array(z.string()).default([]),
     date_added: z.date(),
-    date_updated: z.date().optional(),
+    date_updated: z.date().nullish(),
   }),
 });
 

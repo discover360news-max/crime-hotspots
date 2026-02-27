@@ -6,19 +6,32 @@ import Layout from '../../../layouts/Layout.astro';
 import Hero from '../../../components/Hero.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import TipCard from '../../../components/TipCard.astro';
-import { routes } from '../../../config/routes';
+import CategoryAccordion from '../../../components/CategoryAccordion.astro';
+import { routes, buildRoute } from '../../../config/routes';
+import { slugifyCategory } from '../../../lib/safetyTipsHelpers';
 
 const allTips = await getCollection('tips', ({ data }) => data.status === 'published');
-allTips.sort((a, b) => b.data.date_added.getTime() - a.data.date_added.getTime());
 
-const categoryCounts: Record<string, number> = {};
-allTips.forEach(t => {
-  categoryCounts[t.data.category] = (categoryCounts[t.data.category] || 0) + 1;
+// Group by category, sort each group high→medium→low then newest first
+const severityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+
+const byCategory: Record<string, typeof allTips> = {};
+allTips.forEach(tip => {
+  const cat = tip.data.category;
+  if (!byCategory[cat]) byCategory[cat] = [];
+  byCategory[cat].push(tip);
 });
-const topCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-const categories = ['Robbery', 'Carjacking', 'Home Invasion', 'ATM Crime', 'Online Scam', 'Kidnapping', 'Sexual Violence', 'Fraud', 'Assault', 'Other'] as const;
-const severities = ['high', 'medium', 'low'] as const;
+Object.values(byCategory).forEach(tips => {
+  tips.sort((a, b) => {
+    const sev = severityOrder[a.data.severity] - severityOrder[b.data.severity];
+    if (sev !== 0) return sev;
+    return b.data.date_added.getTime() - a.data.date_added.getTime();
+  });
+});
+
+// Categories sorted by tip count descending
+const sortedCategories = Object.entries(byCategory).sort((a, b) => b[1].length - a[1].length);
 ---
 
 <Layout
@@ -40,95 +53,26 @@ const severities = ['high', 'medium', 'low'] as const;
   </Hero>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
 
-      <!-- Top categories -->
-      {topCategories.length > 0 && (
-        <div class="mb-5">
-          <p class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] uppercase tracking-wider mb-2">Browse by category</p>
-          <div class="flex flex-wrap gap-2">
-            {topCategories.map(([cat, count]) => (
-              <a
-                href={`/trinidad/safety-tips/category/${cat.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')}/`}
-                class="inline-flex items-center gap-1.5 px-3 py-1 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-caption font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-500 dark:hover:border-rose-700 hover:text-rose-600 dark:hover:text-rose-400 transition bg-white dark:bg-[hsl(0_0%_10%)]"
-              >
-                {cat}
-                <span class="px-1.5 py-0.5 rounded bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 text-caption">{count}</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <!-- Filter bar -->
-      <div class="flex flex-wrap gap-2 mb-5 pb-5 border-b border-slate-100 dark:border-[hsl(0_0%_15%)]">
-        <select id="filter-category" class="px-3 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] bg-white dark:bg-[hsl(0_0%_10%)] text-caption text-slate-700 dark:text-[hsl(0_0%_85%)] focus:outline-none focus:ring-2 focus:ring-rose-300">
-          <option value="">All Categories</option>
-          {categories.map(c => <option value={c}>{c}</option>)}
-        </select>
-        <select id="filter-severity" class="px-3 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] bg-white dark:bg-[hsl(0_0%_10%)] text-caption text-slate-700 dark:text-[hsl(0_0%_85%)] focus:outline-none focus:ring-2 focus:ring-rose-300">
-          <option value="">All Severities</option>
-          {severities.map(s => <option value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
-        </select>
-        <button id="filter-reset" class="hidden px-3 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-caption text-slate-500 dark:text-[hsl(0_0%_55%)] hover:border-rose-500 dark:hover:border-rose-700 hover:text-rose-600 dark:hover:text-rose-400 transition">
-          Reset
-        </button>
+    {allTips.length === 0 ? (
+      <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)] text-center">
+        <p class="text-body text-slate-500 dark:text-[hsl(0_0%_55%)]">No safety tips published yet — check back soon.</p>
+        <a href={routes.trinidad.safetyTipsSubmit} class="mt-3 inline-block text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline">
+          Submit the first tip
+        </a>
       </div>
+    ) : (
+      sortedCategories.map(([category, tips], i) => (
+        <CategoryAccordion
+          category={category}
+          count={tips.length}
+          categoryHref={buildRoute.safetyTipsCategory(slugifyCategory(category))}
+          isExpanded={i === 0}
+        >
+          {tips.map(tip => <TipCard tip={tip} />)}
+        </CategoryAccordion>
+      ))
+    )}
 
-      <!-- Empty state -->
-      <p id="empty-state" class="hidden py-10 text-center text-body text-slate-500 dark:text-[hsl(0_0%_55%)]">
-        No tips match the selected filters.
-      </p>
-
-      <!-- Tips grid / empty -->
-      {allTips.length === 0 ? (
-        <div class="py-12 text-center">
-          <p class="text-body text-slate-500 dark:text-[hsl(0_0%_55%)]">No safety tips published yet — check back soon.</p>
-          <a href={routes.trinidad.safetyTipsSubmit} class="mt-3 inline-block text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline">
-            Submit the first tip
-          </a>
-        </div>
-      ) : (
-        <div id="tips-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {allTips.map(tip => (
-            <div class="tip-item" data-category={tip.data.category} data-severity={tip.data.severity}>
-              <TipCard tip={tip} />
-            </div>
-          ))}
-        </div>
-      )}
-
-    </div>
   </main>
 </Layout>
-
-<script is:inline>
-  (function () {
-    var catSel = document.getElementById('filter-category');
-    var sevSel = document.getElementById('filter-severity');
-    var resetBtn = document.getElementById('filter-reset');
-    var emptyState = document.getElementById('empty-state');
-    var items = document.querySelectorAll('.tip-item');
-
-    function applyFilters() {
-      var cat = catSel ? catSel.value : '';
-      var sev = sevSel ? sevSel.value : '';
-      var visible = 0;
-      items.forEach(function (el) {
-        var show = (!cat || el.getAttribute('data-category') === cat) && (!sev || el.getAttribute('data-severity') === sev);
-        el.style.display = show ? '' : 'none';
-        if (show) visible++;
-      });
-      if (emptyState) emptyState.classList.toggle('hidden', visible > 0);
-      if (resetBtn) resetBtn.classList.toggle('hidden', !cat && !sev);
-    }
-
-    if (catSel) catSel.addEventListener('change', applyFilters);
-    if (sevSel) sevSel.addEventListener('change', applyFilters);
-    if (resetBtn) resetBtn.addEventListener('click', function () {
-      if (catSel) catSel.value = '';
-      if (sevSel) sevSel.value = '';
-      applyFilters();
-    });
-  })();
-</script>

@@ -85,6 +85,13 @@ const severityBadge: Record<string, string> = {
   </Hero>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+    <div class="mb-3">
+      <a href={routes.trinidad.safetyTips} class="inline-flex items-center gap-1.5 text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        All Safety Tips
+      </a>
+    </div>
+
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
 
       <!-- Badges -->
@@ -115,7 +122,7 @@ const severityBadge: Record<string, string> = {
       </div>
 
       <!-- Tip body -->
-      <div class="prose prose-sm dark:prose-invert max-w-none text-slate-700 dark:text-[hsl(0_0%_85%)] leading-relaxed mb-5">
+      <div class="tip-body text-body text-slate-700 dark:text-[hsl(0_0%_85%)] leading-relaxed mb-5">
         <Content />
       </div>
 
@@ -173,6 +180,21 @@ const severityBadge: Record<string, string> = {
     )}
   </main>
 </Layout>
+
+<style is:global>
+  .tip-body p { margin-bottom: 1rem; }
+  .tip-body p:last-child { margin-bottom: 0; }
+  .tip-body strong { font-weight: 700; color: inherit; }
+  .tip-body ul {
+    list-style: disc;
+    padding-left: 1.4rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .tip-body li { line-height: 1.6; }
+</style>
 
 <script is:inline>
   (function () {

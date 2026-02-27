@@ -42,11 +42,8 @@ const relatedCount = data.related_story_ids.length;
 
   <!-- Badges -->
   <div class="flex flex-wrap gap-1.5 mb-3">
-    <span class="text-caption font-bold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
-      {data.category}
-    </span>
     <span class="text-caption font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_14%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">
-      {data.context}
+      {data.category} <span class="font-normal text-slate-400 dark:text-[hsl(0_0%_45%)]">while</span> {data.context}
     </span>
     {data.area && (
       <span class="text-caption font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_14%)] text-slate-400 dark:text-[hsl(0_0%_55%)]">

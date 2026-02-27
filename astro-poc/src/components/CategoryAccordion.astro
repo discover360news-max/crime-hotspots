@@ -1,0 +1,91 @@
+---
+/**
+ * CategoryAccordion
+ * Collapsible section grouping safety tips by category.
+ * Used on the safety tips index page.
+ */
+
+interface Props {
+  category: string;
+  count: number;
+  categoryHref: string;
+  isExpanded?: boolean;
+}
+
+const { category, count, categoryHref, isExpanded = false } = Astro.props;
+---
+
+<div class="cat-accordion mb-3">
+  <button
+    class="cat-header w-full px-4 py-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group"
+    aria-expanded={isExpanded ? 'true' : 'false'}
+  >
+    <div class="flex items-center gap-3">
+      <svg
+        class="cat-chevron w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_55%)] transition-transform duration-200 flex-shrink-0"
+        class:list={[isExpanded && 'rotate-90']}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+      <span class="text-body font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{category}</span>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <span class="px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 text-caption font-bold">
+        {count} {count === 1 ? 'tip' : 'tips'}
+      </span>
+      <a
+        href={categoryHref}
+        class="hidden sm:inline text-caption text-slate-400 dark:text-[hsl(0_0%_50%)] hover:text-rose-600 dark:hover:text-rose-400 hover:underline transition"
+        onclick="event.stopPropagation()"
+      >
+        See all →
+      </a>
+    </div>
+  </button>
+
+  <div
+    class="cat-content overflow-hidden transition-all duration-300"
+    class:list={[isExpanded ? 'max-h-[10000px] mt-3' : 'max-h-0']}
+  >
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">
+      <slot />
+    </div>
+    <a
+      href={categoryHref}
+      class="sm:hidden mt-2 mb-1 inline-block text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline"
+    >
+      See all {category} tips →
+    </a>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll<HTMLButtonElement>('.cat-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const accordion = header.closest('.cat-accordion');
+        const content = accordion?.querySelector('.cat-content');
+        const chevron = header.querySelector('.cat-chevron');
+        const expanded = header.getAttribute('aria-expanded') === 'true';
+
+        if (content && chevron) {
+          if (expanded) {
+            header.setAttribute('aria-expanded', 'false');
+            content.classList.remove('max-h-[10000px]', 'mt-3');
+            content.classList.add('max-h-0');
+            chevron.classList.remove('rotate-90');
+          } else {
+            header.setAttribute('aria-expanded', 'true');
+            content.classList.add('max-h-[10000px]', 'mt-3');
+            content.classList.remove('max-h-0');
+            chevron.classList.add('rotate-90');
+          }
+        }
+      });
+    });
+  });
+</script>
