@@ -8,9 +8,8 @@ import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import TipCard from '../../../../components/TipCard.astro';
 import { routes, buildRoute } from '../../../../config/routes';
 
-const MIN_TIPS = 3;
-
 export async function getStaticPaths() {
+  const MIN_TIPS = 3;
   const allTips = await getCollection('tips', ({ data }) =>
     data.status === 'published' && !!data.area.trim()
   );
