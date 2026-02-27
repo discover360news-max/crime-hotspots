@@ -61,10 +61,11 @@ crimes.forEach(crime => {
   areaRiskScores.set(area, (areaRiskScores.get(area) || 0) + riskScore);
 });
 
-// Sum total risk across ALL areas (denominator for share-of-total normalization)
+// Hybrid: bar width = share of total, label = relative to max
 const totalRiskScore = Array.from(areaRiskScores.values()).reduce((sum, s) => sum + s, 0);
+const maxRiskScore = Math.max(...Array.from(areaRiskScores.values()), 0);
 
-// Calculate top areas — each area's % = its share of total weighted crime burden
+// Calculate top areas with both percentages
 const areaCounts = Array.from(
   crimes.reduce((acc, crime) => {
     const area = crime.area || 'Unknown';
@@ -76,34 +77,34 @@ const areaCounts = Array.from(
   .slice(0, 10)
   .map(([area, count]) => {
     const riskScore = areaRiskScores.get(area) || 0;
-    const riskPercentage = totalRiskScore > 0 ? Math.round((riskScore / totalRiskScore) * 100) : 0;
-    return { area, count, riskPercentage };
+    const barPct   = totalRiskScore > 0 ? Math.round((riskScore / totalRiskScore) * 100) : 0;
+    const labelPct = maxRiskScore   > 0 ? Math.round((riskScore / maxRiskScore)   * 100) : 0;
+    return { area, count, barPct, labelPct };
   });
 
-// Get risk level text based on share of total weighted crime burden.
-// Thresholds calibrated for share-of-total: dominant area typically 20-40%,
-// average top-10 area ~5-10%, smaller areas <3%.
+// Risk label based on relative-to-max (0–100%, #1 area = 100%).
+// Tighter thresholds so areas 2–10 spread across the full label range.
 function getRiskLevelText(percentage: number): string {
-  if (percentage <= 3) {
+  if (percentage <= 10) {
     return 'Low';
-  } else if (percentage <= 8) {
-    return 'Medium';
-  } else if (percentage <= 15) {
-    return 'Concerning';
   } else if (percentage <= 25) {
+    return 'Medium';
+  } else if (percentage <= 45) {
+    return 'Concerning';
+  } else if (percentage <= 65) {
     return 'High';
-  } else if (percentage <= 40) {
+  } else if (percentage <= 85) {
     return 'Dangerous';
   } else {
     return 'Extremely Dangerous';
   }
 }
 
-// Get text color based on risk level (share-of-total thresholds)
+// Text color for risk label (relative-to-max thresholds)
 function getRiskTextColor(percentage: number): string {
-  if (percentage <= 8) {
+  if (percentage <= 25) {
     return 'text-green-600';
-  } else if (percentage <= 25) {
+  } else if (percentage <= 65) {
     return 'text-yellow-600';
   } else {
     return 'text-rose-600';
@@ -113,10 +114,10 @@ function getRiskTextColor(percentage: number): string {
 
 <div class="bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md rounded-lg p-4 shadow-md border border-slate-100 dark:border-[hsl(0_0%_15%)]">
   <div id="topRegionsContainer" class="grid grid-cols-2 gap-x-8 gap-y-3">
-    {areaCounts.map(({ area, count, riskPercentage }) => {
+    {areaCounts.map(({ area, count, barPct, labelPct }) => {
       const localName = getLocalName(areaAliases, area);
-      const riskLevelText = getRiskLevelText(riskPercentage);
-      const riskTextColor = getRiskTextColor(riskPercentage);
+      const riskLevelText = getRiskLevelText(labelPct);
+      const riskTextColor = getRiskTextColor(labelPct);
       const areaSlug = generateNameSlug(area);
       return (
         <a href={`/trinidad/area/${areaSlug}/`} class="flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
@@ -134,15 +135,13 @@ function getRiskTextColor(percentage: number): string {
               </svg>
             </div>
           </div>
-          <!-- Gradient reveal bar -->
+          <!-- Bar width = share of total crime burden (proportional) -->
           <div class="relative w-full h-2 bg-slate-200 dark:bg-[hsl(0_0%_18%)] rounded-full overflow-hidden">
-            <!-- Gradient bar wrapper (clips at percentage) -->
-            <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style={`width: ${riskPercentage}%`}>
-              <!-- Gradient spans full container width, clipped by wrapper -->
-              <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style={`width: ${riskPercentage > 0 ? (100 / riskPercentage) * 100 : 100}%`}></div>
+            <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style={`width: ${barPct}%`}>
+              <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style={`width: ${barPct > 0 ? (100 / barPct) * 100 : 100}%`}></div>
             </div>
           </div>
-          <!-- Risk level text -->
+          <!-- Risk label = relative to worst area -->
           <span class={`text-xs font-medium ${riskTextColor}`}>Risk: {riskLevelText}</span>
         </a>
       );

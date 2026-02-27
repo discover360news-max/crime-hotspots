@@ -47,16 +47,20 @@ function calculateCrimeRisk(crime: Crime): number {
 }
 
 /**
- * Calculate risk scores for all areas and return each area's share of total weighted risk.
+ * Hybrid risk level calculation — returns two percentages per area:
  *
- * Returns a Map of area -> risk percentage (0-100)
- * Percentage = area_risk_score / total_risk_across_all_areas × 100
+ * bar:   share of total weighted risk (area / all areas × 100)
+ *        → honest proportional display; POS at 35% of crime shows a 35% bar
  *
- * This means an area with 50% of total weighted crime scores 50, not 100.
- * Labels and bar widths reflect actual crime burden share, not rank relative to the worst area.
+ * label: relative to the highest-risk area (area / max area × 100)
+ *        → the #1 area is always 100% → "Extremely Dangerous"
+ *        → ensures the label never undersells a genuinely dangerous area
+ *
+ * The two values answer different questions:
+ *   bar   = "what share of total crime does this area hold?"
+ *   label = "how dangerous is this area compared to the worst?"
  */
-export function calculateAreaRiskLevels(crimes: Crime[]): Map<string, number> {
-  // Calculate raw risk scores per area
+export function calculateAreaRiskLevels(crimes: Crime[]): Map<string, { bar: number; label: number }> {
   const areaRiskScores = new Map<string, number>();
 
   crimes.forEach(crime => {
@@ -65,17 +69,18 @@ export function calculateAreaRiskLevels(crimes: Crime[]): Map<string, number> {
     areaRiskScores.set(area, (areaRiskScores.get(area) || 0) + riskScore);
   });
 
-  // Sum total risk across ALL areas (denominator)
   const totalRiskScore = Array.from(areaRiskScores.values()).reduce((sum, s) => sum + s, 0);
+  const maxRiskScore = Math.max(...Array.from(areaRiskScores.values()), 0);
 
-  // Each area's share of total weighted risk
-  const normalizedRisks = new Map<string, number>();
+  const result = new Map<string, { bar: number; label: number }>();
   areaRiskScores.forEach((score, area) => {
-    const percentage = totalRiskScore > 0 ? Math.round((score / totalRiskScore) * 100) : 0;
-    normalizedRisks.set(area, percentage);
+    result.set(area, {
+      bar:   totalRiskScore > 0 ? Math.round((score / totalRiskScore) * 100) : 0,
+      label: maxRiskScore   > 0 ? Math.round((score / maxRiskScore)   * 100) : 0,
+    });
   });
 
-  return normalizedRisks;
+  return result;
 }
 
 /**
@@ -368,14 +373,14 @@ export function updateTopRegions(crimes: Crime[]) {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
 
-  // Calculate risk levels for all areas
+  // Calculate hybrid risk levels for all areas
   const riskLevels = calculateAreaRiskLevels(crimes);
 
   // Update using ID selector (2-column grid with gradient risk bars)
   container.innerHTML = topAreas.map(([area, count]) => {
-    const riskPercentage = riskLevels.get(area) || 0;
-    const riskLevelText = getRiskLevelText(riskPercentage);
-    const riskTextColor = getRiskTextColor(riskPercentage);
+    const risk = riskLevels.get(area) || { bar: 0, label: 0 };
+    const riskLevelText = getRiskLevelText(risk.label);
+    const riskTextColor = getRiskTextColor(risk.label);
     const areaSlug = generateNameSlug(area);
     return `
     <a href="${buildRoute.area(areaSlug)}" class="flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
@@ -391,12 +396,10 @@ export function updateTopRegions(crimes: Crime[]) {
           </svg>
         </div>
       </div>
-      <!-- Gradient reveal bar -->
+      <!-- Bar width = share of total crime burden (proportional) -->
       <div class="relative w-full h-2 bg-slate-200 dark:bg-[hsl(0_0%_18%)] rounded-full overflow-hidden">
-        <!-- Gradient bar wrapper (clips at percentage) -->
-        <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style="width: ${riskPercentage}%">
-          <!-- Gradient spans full container width, clipped by wrapper -->
-          <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style="width: ${riskPercentage > 0 ? (100 / riskPercentage) * 100 : 100}%"></div>
+        <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style="width: ${risk.bar}%">
+          <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style="width: ${risk.bar > 0 ? (100 / risk.bar) * 100 : 100}%"></div>
         </div>
       </div>
       <!-- Risk level text -->
@@ -410,23 +413,28 @@ export function updateTopRegions(crimes: Crime[]) {
 }
 
 /**
- * Get risk level text based on share of total weighted crime burden.
+ * Risk label based on relative-to-max score (0–100%, #1 area = 100%).
+ * Tighter thresholds than the old system so areas 2–10 spread across
+ * the full label range rather than bunching at Low/Medium.
  *
- * Thresholds are calibrated for share-of-total normalization:
- * - With ~10 areas shown, average share ≈ 5-10%
- * - A dominant area (e.g. Port of Spain) typically holds 20-40%
- * - Smaller areas tail off below 5%
+ * Semantics:
+ *   ≤10%  = Low              (tiny fraction of the worst area)
+ *   ≤25%  = Medium           (up to a quarter of the worst)
+ *   ≤45%  = Concerning       (approaching half)
+ *   ≤65%  = High             (more than half)
+ *   ≤85%  = Dangerous        (close to the worst)
+ *   >85%  = Extremely Dangerous (essentially as bad as the #1 area)
  */
 function getRiskLevelText(percentage: number): string {
-  if (percentage <= 3) {
+  if (percentage <= 10) {
     return 'Low';
-  } else if (percentage <= 8) {
-    return 'Medium';
-  } else if (percentage <= 15) {
-    return 'Concerning';
   } else if (percentage <= 25) {
+    return 'Medium';
+  } else if (percentage <= 45) {
+    return 'Concerning';
+  } else if (percentage <= 65) {
     return 'High';
-  } else if (percentage <= 40) {
+  } else if (percentage <= 85) {
     return 'Dangerous';
   } else {
     return 'Extremely Dangerous';
@@ -434,12 +442,12 @@ function getRiskLevelText(percentage: number): string {
 }
 
 /**
- * Get text color based on risk level (share-of-total thresholds)
+ * Text color for risk label (relative-to-max thresholds)
  */
 function getRiskTextColor(percentage: number): string {
-  if (percentage <= 8) {
+  if (percentage <= 25) {
     return 'text-green-600';
-  } else if (percentage <= 25) {
+  } else if (percentage <= 65) {
     return 'text-yellow-600';
   } else {
     return 'text-rose-600';
