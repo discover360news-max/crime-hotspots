@@ -61,10 +61,10 @@ crimes.forEach(crime => {
   areaRiskScores.set(area, (areaRiskScores.get(area) || 0) + riskScore);
 });
 
-// Find maximum risk score for normalization
-const maxRiskScore = Math.max(...Array.from(areaRiskScores.values()), 0);
+// Sum total risk across ALL areas (denominator for share-of-total normalization)
+const totalRiskScore = Array.from(areaRiskScores.values()).reduce((sum, s) => sum + s, 0);
 
-// Calculate top areas with risk percentages
+// Calculate top areas — each area's % = its share of total weighted crime burden
 const areaCounts = Array.from(
   crimes.reduce((acc, crime) => {
     const area = crime.area || 'Unknown';
@@ -76,32 +76,34 @@ const areaCounts = Array.from(
   .slice(0, 10)
   .map(([area, count]) => {
     const riskScore = areaRiskScores.get(area) || 0;
-    const riskPercentage = maxRiskScore > 0 ? Math.round((riskScore / maxRiskScore) * 100) : 0;
+    const riskPercentage = totalRiskScore > 0 ? Math.round((riskScore / totalRiskScore) * 100) : 0;
     return { area, count, riskPercentage };
   });
 
-// Get risk level text based on percentage
+// Get risk level text based on share of total weighted crime burden.
+// Thresholds calibrated for share-of-total: dominant area typically 20-40%,
+// average top-10 area ~5-10%, smaller areas <3%.
 function getRiskLevelText(percentage: number): string {
-  if (percentage <= 16) {
+  if (percentage <= 3) {
     return 'Low';
-  } else if (percentage <= 33) {
+  } else if (percentage <= 8) {
     return 'Medium';
-  } else if (percentage <= 50) {
+  } else if (percentage <= 15) {
     return 'Concerning';
-  } else if (percentage <= 66) {
+  } else if (percentage <= 25) {
     return 'High';
-  } else if (percentage <= 83) {
+  } else if (percentage <= 40) {
     return 'Dangerous';
   } else {
     return 'Extremely Dangerous';
   }
 }
 
-// Get text color based on risk level
+// Get text color based on risk level (share-of-total thresholds)
 function getRiskTextColor(percentage: number): string {
-  if (percentage <= 33) {
+  if (percentage <= 8) {
     return 'text-green-600';
-  } else if (percentage <= 66) {
+  } else if (percentage <= 25) {
     return 'text-yellow-600';
   } else {
     return 'text-rose-600';
