@@ -396,11 +396,10 @@ export function updateTopRegions(crimes: Crime[]) {
           </svg>
         </div>
       </div>
-      <!-- Bar width = share of total crime burden (proportional) -->
+      <!-- Bar width = share of total crime burden; color = risk level -->
       <div class="relative w-full h-2 bg-slate-200 dark:bg-[hsl(0_0%_18%)] rounded-full overflow-hidden">
-        <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style="width: ${risk.bar}%">
-          <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style="width: ${risk.bar > 0 ? (100 / risk.bar) * 100 : 100}%"></div>
-        </div>
+        <div class="absolute top-0 left-0 h-full rounded-full transition-all duration-300"
+          style="width: ${risk.bar}%; background-color: ${getRiskBarColor(risk.label)}"></div>
       </div>
       <!-- Risk level text -->
       <span class="text-xs font-medium ${riskTextColor}">Risk: ${riskLevelText}</span>
@@ -452,4 +451,17 @@ function getRiskTextColor(percentage: number): string {
   } else {
     return 'text-rose-600';
   }
+}
+
+/**
+ * Bar fill color — solid color matching risk level so danger reads instantly
+ * without needing to look at the label. Hex values used to avoid Tailwind purge issues.
+ */
+function getRiskBarColor(percentage: number): string {
+  if (percentage <= 10) return '#22c55e';  // green-500  — Low
+  if (percentage <= 25) return '#60a5fa';  // blue-400   — Medium
+  if (percentage <= 45) return '#eab308';  // yellow-500 — Concerning
+  if (percentage <= 65) return '#f59e0b';  // amber-500  — High
+  if (percentage <= 85) return '#f97316';  // orange-500 — Dangerous
+  return '#e11d48';                        // rose-600   — Extremely Dangerous
 }
