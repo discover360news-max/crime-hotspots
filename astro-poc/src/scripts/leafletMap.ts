@@ -182,10 +182,7 @@ export function initializeLeafletMap(
   function initMap() {
     // Check if map is already initialized
     const mapContainer = document.getElementById(containerId);
-    if (!mapContainer) {
-      console.error(`❌ Map container #${containerId} not found`);
-      return;
-    }
+    if (!mapContainer) return;
 
     if ((mapContainer as any)._leaflet_id) {
       console.log('⚠️ Map already initialized, skipping');
