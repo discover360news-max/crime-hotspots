@@ -143,13 +143,8 @@ export function initializeYearFilter(
     console.log('✅ Year filter event listener attached');
   }
 
-  // Initialize year filter when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initYearFilter);
-  } else {
-    // DOM already loaded
-    initYearFilter();
-  }
+  // DOM is always ready when initializeYearFilter is called (via waitForCrimesData polling)
+  initYearFilter();
 
   console.log('📌 Year filter setup complete');
 }

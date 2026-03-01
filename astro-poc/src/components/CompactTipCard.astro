@@ -15,9 +15,9 @@ const { tip } = Astro.props;
 const { data } = tip;
 
 const severityDot: Record<string, string> = {
-  high:   'bg-rose-500',
-  medium: 'bg-amber-400',
-  low:    'bg-emerald-500',
+  high:   'bg-slate-300 dark:bg-[hsl(0_0%_35%)]',
+  medium: 'bg-slate-300 dark:bg-[hsl(0_0%_35%)]',
+  low:    'bg-slate-300 dark:bg-[hsl(0_0%_35%)]',
 };
 ---
 
@@ -31,13 +31,13 @@ const severityDot: Record<string, string> = {
       <span class="text-caption font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] leading-snug">
         {data.title}
       </span>
-      <span class="text-caption font-bold px-1.5 py-0.5 rounded bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex-shrink-0">
+      <span class="text-caption font-medium px-1.5 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)] flex-shrink-0">
         {data.category}
       </span>
     </div>
     <a
       href={buildRoute.safetyTip(tip.slug)}
-      class="text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline"
+      class="text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:text-rose-600 dark:hover:text-rose-400 hover:underline transition-colors"
     >
       Read tip →
     </a>

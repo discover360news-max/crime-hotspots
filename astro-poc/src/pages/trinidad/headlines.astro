@@ -104,7 +104,7 @@ const breadcrumbs = [
     <div class="flex items-center gap-2">
       <button
         id="filtersBtn"
-        class="px-4 py-1.5 min-h-[22px] inline-flex items-center justify-center border-2 border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 hover:text-rose-600 active:bg-rose-50 dark:active:bg-rose-950/30 rounded-lg transition font-medium text-xs whitespace-nowrap"
+        class="px-4 py-1.5 min-h-[22px] inline-flex items-center justify-center border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 rounded-lg transition font-medium text-xs whitespace-nowrap"
       >
         <span id="filtersBtnText">Filters ›</span>
       </button>
@@ -120,122 +120,99 @@ const breadcrumbs = [
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-ignore>
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
 
-    <!-- Site Notification Banner -->
-    <SiteNotificationBanner notification={dataUpdateNotice} />
+      <!-- Site Notification Banner -->
+      <SiteNotificationBanner notification={dataUpdateNotice} />
 
-    <!-- Results Count + Data Freshness -->
-    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent mb-3"></div>
-    <div class="mb-3 text-xs flex flex-wrap items-center justify-between gap-y-1.5">
-      <div class="text-slate-400 dark:text-[hsl(0_0%_50%)]">
-        Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of all <a href={routes.trinidad.archive} class="border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition"><span id="resultsTotal">{allCrimes.length}</span></a> listed crimes
+      <!-- Results Count -->
+      <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent mb-3"></div>
+      <div class="mb-3 text-xs flex flex-wrap items-center justify-between gap-y-1.5">
+        <div class="text-slate-400 dark:text-[hsl(0_0%_50%)]">
+          Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of <a href={routes.trinidad.archive} class="border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition"><span id="resultsTotal">{allCrimes.length}</span></a> listed crimes
+        </div>
+        <div class="basis-full sm:basis-auto">
+          <a href={routes.trinidad.archive} class="text-slate-400 dark:text-[hsl(0_0%_50%)] border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition">View Archive</a>
+        </div>
       </div>
-      <div class="basis-full sm:basis-auto">
-        <a href={routes.trinidad.archive} class="text-slate-400 dark:text-[hsl(0_0%_50%)] border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition">View Archive</a>
-      </div>
-    </div>
-    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent mb-6"></div>
+      <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent mb-6"></div>
 
-    <!-- Blog Rotating Banner -->
-    <BlogRotatingBanner country="tt" limit={3} />
+      <!-- Blog Rotating Banner -->
+      <BlogRotatingBanner country="tt" limit={3} />
 
-    <!-- Crime Accordions by Date -->
-    <div id="crimeAccordions">
-      {sortedDates.map((date, index) => {
-        const crimes = crimesByDate.get(date)!;
-        const incidentCount = crimes.length;
-        const victimCount = calculateVictimCount(crimes);
-        const isExpanded = index === 0;
-        const formattedDate = new Date(date).toLocaleDateString('en-US', {
-          weekday: 'long',
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric'
-        });
-
-        return (
-          <div class={`date-accordion mb-3 rounded-xl transition-colors duration-300 ${isExpanded ? 'bg-slate-50/60 dark:bg-[hsl(0_0%_6%)]/60 border border-rose-200 dark:border-rose-900/40' : ''}`} data-date={date}>
-            <button
-              class="accordion-header w-full px-4 py-3 bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md rounded-lg hover:bg-white/90 dark:hover:bg-[hsl(0_0%_10%)]/90 transition flex items-center justify-between group border"
-              style={isExpanded ? 'border-color:#e11d48' : 'border-color:var(--ch-border)'}
-              aria-expanded={isExpanded}
-            >
-              <div class="flex items-center gap-3">
-                <svg
-                  class={`chevron w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_50%)] transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-
-                <div class="text-left">
-                  <h3 class="accordion-title text-caption font-bold leading-snug" style={isExpanded ? 'color:#e11d48' : 'color:var(--ch-text)'}>{formattedDate}</h3>
-                  <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">{incidentCount} {incidentCount === 1 ? 'incident' : 'incidents'} affecting {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+      <!-- Crime Accordions by Date -->
+      <div id="crimeAccordions">
+        {sortedDates.map((date, index) => {
+          const crimes = crimesByDate.get(date)!;
+          const incidentCount = crimes.length;
+          const victimCount = calculateVictimCount(crimes);
+          const isExpanded = index === 0;
+          const formattedDate = new Date(date).toLocaleDateString('en-US', {
+            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+          });
+          return (
+            <div class="date-accordion mb-3" data-date={date}>
+              <button
+                class="da-header w-full px-4 py-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group"
+                aria-expanded={isExpanded ? 'true' : 'false'}
+              >
+                <div class="flex items-center gap-3">
+                  <svg
+                    class={`da-chevron w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_55%)] transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                  <div class="text-left">
+                    <h3 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] leading-snug">{formattedDate}</h3>
+                    <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)]">{incidentCount} {incidentCount === 1 ? 'incident' : 'incidents'} · {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+                  </div>
                 </div>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <span class={`tap-hint text-caption text-slate-400 dark:text-[hsl(0_0%_45%)] ${isExpanded ? 'hidden' : ''}`}>Tap to view</span>
-                <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_55%)] text-caption font-medium">
+                <span class="px-2 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)] text-caption font-medium">
                   {incidentCount}
                 </span>
-              </div>
-            </button>
-
-            <div class={`accordion-content overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[10000px] mt-3 px-3 pb-3' : 'max-h-0'}`}>
-              <div class="relative pl-7">
-                {/* Vertical dotted line (muted grey) */}
-                <div class="absolute left-3.5 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
-
-                <div class="space-y-1">
-                  {crimes.map(crime => (
-                    <div
-                      class="crime-card relative pl-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition cursor-pointer group"
-                      data-crime-slug={crime.slug}
-                    >
-                      {/* Timeline dot (muted grey) */}
-                      <div aria-hidden="true" class="absolute left-[-18px] top-4 w-2 h-2 rounded-full bg-slate-300 dark:bg-[hsl(0_0%_35%)]"></div>
-
-                      <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-rose-600 transition">
-                        {crime.headline}
-                      </div>
-                      <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">
-                        <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">{crime.primaryCrimeType || crime.crimeType}</span>
-                        <span>{crime.area}</span>
-                      </div>
-                    </div>
-                  ))}
+              </button>
+              <div class={`da-content overflow-hidden${isExpanded ? ' is-open' : ''}`}>
+                <div class="relative pl-7 py-2">
+                  <div class="absolute left-3.5 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
+                  <div class="space-y-1">
+                    {crimes.map(crime => (
+                      <a
+                        href={`/trinidad/crime/${crime.slug}/`}
+                        class="crime-card relative pl-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group block"
+                      >
+                        <div aria-hidden="true" class="absolute left-[-18px] top-4 w-2 h-2 rounded-full bg-slate-300 dark:bg-[hsl(0_0%_35%)]"></div>
+                        <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-rose-600 transition">{crime.headline}</div>
+                        <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">
+                          <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">{crime.primaryCrimeType || crime.crimeType}</span>
+                          <span>{crime.area}</span>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
 
-    <!-- Load More -->
-    <div class="mt-8 text-center">
-      <button
-        id="loadMore"
-        class="px-6 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:bg-rose-800 transition font-medium text-xs"
-      >
-        Load More
-      </button>
-    </div>
+      <!-- Load More -->
+      <div class="mt-8 text-center">
+        <button
+          id="loadMore"
+          class="px-4 py-1.5 min-h-[22px] border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 rounded-lg transition font-medium text-xs whitespace-nowrap"
+        >
+          Load More
+        </button>
+      </div>
 
-    </div><!-- /card -->
+    </div>
   </main>
 
   <!-- Filters Tray -->
   <div id="filtersTray" class="fixed inset-0 z-50 pointer-events-none overflow-hidden">
-    <!-- Backdrop -->
     <div id="filtersBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
-
-    <!-- Tray Content -->
     <div id="filtersTrayContent" class="absolute right-0 top-0 h-full max-w-[min(20rem,calc(100vw-2rem))] w-full bg-white/85 dark:bg-[hsl(0_0%_8%)]/90 backdrop-blur-lg rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto overflow-y-auto">
       <div class="p-5">
-        <!-- Header -->
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)] leading-tight">Filters</h2>
           <button id="closeFiltersBtn" class="text-slate-400 dark:text-[hsl(0_0%_50%)] hover:text-slate-600 dark:hover:text-[hsl(0_0%_75%)] transition">
@@ -245,7 +222,6 @@ const breadcrumbs = [
           </button>
         </div>
 
-        <!-- Filter Options -->
         <div class="space-y-4">
           <!-- Date Range -->
           <div>
@@ -256,7 +232,6 @@ const breadcrumbs = [
               class="filter-date-input w-full px-4 py-2.5 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]"
             />
           </div>
-
           <div>
             <label for="dateTo" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">To Date</label>
             <input
@@ -268,9 +243,9 @@ const breadcrumbs = [
 
           <!-- Crime Type -->
           <div>
-            <label for="crimeType" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Crime Type</label>
+            <label for="crimeTypeFilter" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Crime Type</label>
             <select
-              id="crimeType"
+              id="crimeTypeFilter"
               class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]"
             >
               <option value="">All Types</option>
@@ -282,9 +257,9 @@ const breadcrumbs = [
 
           <!-- Region -->
           <div>
-            <label for="region" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Region</label>
+            <label for="regionFilter" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Region</label>
             <select
-              id="region"
+              id="regionFilter"
               class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]"
             >
               <option value="">All Regions</option>
@@ -294,11 +269,11 @@ const breadcrumbs = [
             </select>
           </div>
 
-          <!-- Area (cascades based on region selection) -->
+          <!-- Area (cascades on region) -->
           <div>
-            <label for="area" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Area</label>
+            <label for="areaFilter" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Area</label>
             <select
-              id="area"
+              id="areaFilter"
               class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]"
             >
               <option value="">All Areas</option>
@@ -328,463 +303,15 @@ const breadcrumbs = [
     </div>
   </div>
 
-  <!-- Client-side filtering script -->
-  <script define:vars={{ allCrimes, regionToAreas, allAreas: areas }}>
-    // Expose crimes data globally for modal safety context
-    window.__crimesData = allCrimes;
-
-    // XSS Prevention: Escape HTML special characters
-    function escapeHtml(str) {
-      if (str == null) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    let currentPage = 1;
-    const perPage = 30;
-    let filteredCrimes = [...allCrimes];
-    let isFiltered = false;
-
-    // Cascade: repopulate area dropdown based on selected region
-    function updateAreaOptions(selectedRegion) {
-      const areaSelect = document.getElementById('area');
-      const currentArea = areaSelect.value;
-      areaSelect.innerHTML = '<option value="">All Areas</option>';
-
-      const areasToShow = selectedRegion ? (regionToAreas[selectedRegion] || []) : allAreas;
-      areasToShow.forEach(area => {
-        const opt = document.createElement('option');
-        opt.value = area;
-        opt.textContent = area;
-        if (area === currentArea && (!selectedRegion || (regionToAreas[selectedRegion] || []).includes(currentArea))) {
-          opt.selected = true;
-        }
-        areaSelect.appendChild(opt);
-      });
-    }
-
-    // Filter function
-    function applyFilters() {
-      const dateFrom = document.getElementById('dateFrom').value;
-      const dateTo = document.getElementById('dateTo').value;
-      const crimeType = document.getElementById('crimeType').value;
-      const region = document.getElementById('region').value;
-      const area = document.getElementById('area').value;
-
-      // Check if any filter is active
-      isFiltered = !!(dateFrom || dateTo || crimeType || region || area);
-
-      filteredCrimes = allCrimes.filter(crime => {
-        const crimeDate = new Date(crime.date);
-
-        // Date filters
-        if (dateFrom && crimeDate < new Date(dateFrom)) return false;
-        if (dateTo && crimeDate > new Date(dateTo)) return false;
-
-        // Crime type filter
-        if (crimeType && crime.crimeType !== crimeType) return false;
-
-        // Region filter
-        if (region && crime.region !== region) return false;
-
-        // Area filter
-        if (area && crime.area !== area) return false;
-
-        return true;
-      });
-
-      // Reset to page 1
-      currentPage = 1;
-      renderCrimes();
-      updateResultsCount();
-    }
-
-    // Render crimes (accordion mode when no filters, grid mode when filtered)
-    function renderCrimes() {
-      const container = document.getElementById('crimeAccordions');
-      const loadMore = document.getElementById('loadMore');
-
-      // Empty state when filters return no results
-      if (filteredCrimes.length === 0) {
-        container.innerHTML = `
-          <div class="rounded-lg p-8 text-center" style="background:var(--ch-surface);border:1px solid var(--ch-border)">
-            <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--ch-border)">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <p class="text-sm mb-2" style="color:var(--ch-text-muted)">No crimes match your filters.</p>
-            <p class="text-xs" style="color:var(--ch-text-muted)">Try broadening your date range, area, or crime type.</p>
-          </div>`;
-        loadMore.style.display = 'none';
-        return;
-      }
-
-      const crimes = filteredCrimes.slice(0, currentPage * perPage);
-
-      if (isFiltered) {
-        // FILTERED MODE: Show flat compact list (no accordions, no timeline)
-        container.innerHTML = `
-          <div class="space-y-1">
-            ${crimes.map(crime => createCrimeListItemHTML(crime)).join('')}
-          </div>
-        `;
-      } else {
-        // ACCORDION MODE: Group by date
-        const crimesByDate = new Map();
-
-        crimes.forEach(crime => {
-          const dateKey = crime.date;
-          if (!crimesByDate.has(dateKey)) {
-            crimesByDate.set(dateKey, []);
-          }
-          crimesByDate.get(dateKey).push(crime);
-        });
-
-        // Sort dates descending
-        const sortedDates = Array.from(crimesByDate.keys()).sort((a, b) =>
-          new Date(b).getTime() - new Date(a).getTime()
-        );
-
-        // Render accordions
-        container.innerHTML = sortedDates.map((date, index) => {
-          const dateCrimes = crimesByDate.get(date);
-          const isExpanded = index === 0;
-          return createAccordionHTML(date, dateCrimes, isExpanded);
-        }).join('');
-
-        // Reattach accordion event listeners
-        attachAccordionListeners();
-      }
-
-      // Show/hide load more button
-      if (crimes.length >= filteredCrimes.length) {
-        loadMore.style.display = 'none';
-      } else {
-        loadMore.style.display = 'block';
-      }
-
-    }
-
-    // Create compact crime list item HTML
-    function createCrimeListItemHTML(crime) {
-      const crimeType = crime.primaryCrimeType || crime.crimeType;
-      return `
-        <div class="crime-card relative py-2.5 px-3 rounded-lg transition cursor-pointer group" data-crime-slug="${escapeHtml(crime.slug)}" style="background:transparent" onmouseover="this.style.background='var(--ch-surface-hover)'" onmouseout="this.style.background='transparent'">
-          <div class="text-sm font-medium group-hover:text-rose-600 transition" style="color:var(--ch-text)">
-            ${escapeHtml(crime.headline)}
-          </div>
-          <div class="flex items-center gap-2 mt-1 text-xs" style="color:var(--ch-text-muted)">
-            <span class="px-1.5 py-0.5 rounded" style="background:var(--ch-pill-bg);color:var(--ch-pill-text)">${escapeHtml(crimeType)}</span>
-            <span>${escapeHtml(crime.area)}</span>
-          </div>
-        </div>
-      `;
-    }
-
-    // Calculate victim count for a group of crimes
-    function calculateVictimCount(crimes) {
-      return crimes.reduce((total, crime) => {
-        const victimCount = crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1;
-        return total + victimCount;
-      }, 0);
-    }
-
-    // Create accordion HTML
-    function createAccordionHTML(date, crimes, isExpanded) {
-      const formattedDate = new Date(date).toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric'
-      });
-
-      const incidentCount = crimes.length;
-      const victimCount = calculateVictimCount(crimes);
-      const expandedClass = isExpanded ? 'max-h-[10000px] mt-3 px-3 pb-3' : 'max-h-0';
-      const chevronClass = isExpanded ? 'rotate-90' : '';
-      const borderStyle = isExpanded ? 'background:var(--ch-surface);border:1px solid #e11d48' : 'background:var(--ch-surface);border:1px solid var(--ch-border)';
-      const textStyle = isExpanded ? 'color:#e11d48' : 'color:var(--ch-text)';
-      const wrapperClass = isExpanded ? 'bg-slate-50/60 dark:bg-[hsl(0_0%_6%)]/60 border border-rose-200 dark:border-rose-900/40' : '';
-      const tapHintClass = isExpanded ? 'hidden' : '';
-
-      return `
-        <div class="date-accordion mb-3 rounded-xl transition-colors duration-300 ${wrapperClass}" data-date="${escapeHtml(date)}">
-          <button
-            class="accordion-header w-full px-4 py-3 rounded-lg transition flex items-center justify-between group"
-            style="${borderStyle}"
-            aria-expanded="${isExpanded}"
-          >
-            <div class="flex items-center gap-3">
-              <svg
-                class="chevron w-5 h-5 transition-transform duration-200 ${chevronClass}"
-                style="color:var(--ch-text-muted)"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-
-              <div class="text-left">
-                <h3 class="accordion-title text-caption font-bold leading-snug" style="${textStyle}">${escapeHtml(formattedDate)}</h3>
-                <p class="text-caption" style="color:var(--ch-text-muted)">${incidentCount} ${incidentCount === 1 ? 'incident' : 'incidents'} affecting ${victimCount} ${victimCount === 1 ? 'victim' : 'victims'}</p>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <span class="tap-hint text-caption ${tapHintClass}" style="color:var(--ch-text-muted)">Tap to view</span>
-              <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full text-caption font-medium" style="background:var(--ch-pill-bg);color:var(--ch-pill-text)">
-                ${incidentCount}
-              </span>
-            </div>
-          </button>
-
-          <div class="accordion-content overflow-hidden transition-all duration-300 ${expandedClass}">
-            <div class="relative pl-7">
-              <div class="absolute left-2.5 top-0 bottom-0 w-px border-l-2 border-dotted" style="border-color:var(--ch-border)"></div>
-              <div class="space-y-1">
-                ${crimes.map(crime => {
-                  const crimeType = crime.primaryCrimeType || crime.crimeType;
-                  return `
-                    <div class="crime-card relative pl-4 py-2.5 rounded-lg transition cursor-pointer group" data-crime-slug="${escapeHtml(crime.slug)}" style="background:transparent" onmouseover="this.style.background='var(--ch-surface-hover)'" onmouseout="this.style.background='transparent'">
-                      <div aria-hidden="true" class="absolute left-[-18px] top-4 w-2 h-2 rounded-full" style="background:var(--ch-border)"></div>
-                      <div class="text-sm font-medium group-hover:text-rose-600 transition" style="color:var(--ch-text)">
-                        ${escapeHtml(crime.headline)}
-                      </div>
-                      <div class="flex items-center gap-2 mt-1 text-xs" style="color:var(--ch-text-muted)">
-                        <span class="px-1.5 py-0.5 rounded" style="background:var(--ch-pill-bg);color:var(--ch-pill-text)">${escapeHtml(crimeType)}</span>
-                        <span>${escapeHtml(crime.area)}</span>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    // Attach accordion click listeners
-    function attachAccordionListeners() {
-      const headers = document.querySelectorAll('.accordion-header');
-
-      headers.forEach(header => {
-        header.addEventListener('click', () => {
-          const accordion = header.closest('.date-accordion');
-          const content = accordion?.querySelector('.accordion-content');
-          const chevron = header.querySelector('.chevron');
-          const title = header.querySelector('.accordion-title');
-          const tapHint = header.querySelector('.tap-hint');
-          const isExpanded = header.getAttribute('aria-expanded') === 'true';
-
-          if (content && chevron && title && accordion) {
-            if (isExpanded) {
-              // Collapse
-              header.setAttribute('aria-expanded', 'false');
-              content.classList.remove('max-h-[10000px]', 'mt-3', 'px-3', 'pb-3');
-              content.classList.add('max-h-0');
-              chevron.classList.remove('rotate-90');
-              header.style.borderColor = 'var(--ch-border)';
-              title.style.color = 'var(--ch-text)';
-              // Remove wrapper styling
-              accordion.classList.remove('bg-slate-50/60', 'dark:bg-[hsl(0_0%_6%)]/60', 'border', 'border-rose-200', 'dark:border-rose-900/40');
-              // Show tap hint
-              if (tapHint) tapHint.classList.remove('hidden');
-            } else {
-              // Expand
-              header.setAttribute('aria-expanded', 'true');
-              content.classList.add('max-h-[10000px]', 'mt-3', 'px-3', 'pb-3');
-              content.classList.remove('max-h-0');
-              chevron.classList.add('rotate-90');
-              header.style.borderColor = '#e11d48';
-              title.style.color = '#e11d48';
-              // Add wrapper styling
-              accordion.classList.add('bg-slate-50/60', 'dark:bg-[hsl(0_0%_6%)]/60', 'border', 'border-rose-200', 'dark:border-rose-900/40');
-              // Hide tap hint
-              if (tapHint) tapHint.classList.add('hidden');
-            }
-          }
-        });
-      });
-    }
-
-    // Update results count
-    function updateResultsCount() {
-      const showing = Math.min(currentPage * perPage, filteredCrimes.length);
-      document.getElementById('resultsShowing').textContent = showing;
-      document.getElementById('resultsTotal').textContent = filteredCrimes.length;
-    }
-
-
-    // Apply button highlight state
-    const applyBtn = document.getElementById('applyFilters');
-
-    function highlightApplyBtn() {
-      applyBtn.style.backgroundColor = '#e11d48';
-      applyBtn.style.color = '#fff';
-      applyBtn.style.borderColor = '#e11d48';
-    }
-
-    function unhighlightApplyBtn() {
-      applyBtn.style.backgroundColor = '';
-      applyBtn.style.color = '';
-      applyBtn.style.borderColor = '';
-    }
-
-    // Inline filter indicator (Hero button state + Clear link)
-    const filtersBtnEl = document.getElementById('filtersBtn');
-    const filtersBtnText = document.getElementById('filtersBtnText');
-    const clearFiltersInline = document.getElementById('clearFiltersInline');
-
-    function showFilterActive() {
-      filtersBtnText.textContent = 'Filters Active ›';
-      filtersBtnEl.style.borderColor = '#e11d48';
-      filtersBtnEl.style.color = '#e11d48';
-      filtersBtnEl.style.backgroundColor = 'color-mix(in srgb, #e11d48 10%, transparent)';
-      clearFiltersInline.classList.remove('hidden');
-    }
-
-    function hideFilterActive() {
-      filtersBtnText.textContent = 'Filters ›';
-      filtersBtnEl.style.borderColor = '';
-      filtersBtnEl.style.color = '';
-      filtersBtnEl.style.backgroundColor = '';
-      clearFiltersInline.classList.add('hidden');
-    }
-
-    // Shared clear filters logic
-    function clearAllFilters() {
-      document.getElementById('dateFrom').value = '';
-      document.getElementById('dateTo').value = '';
-      document.getElementById('crimeType').value = '';
-      document.getElementById('region').value = '';
-      updateAreaOptions('');
-      document.getElementById('area').value = '';
-      applyFilters();
-      unhighlightApplyBtn();
-      hideFilterActive();
-    }
-
-    // Update inline indicator based on current filter state
-    function syncFilterIndicator() {
-      if (isFiltered) {
-        highlightApplyBtn();
-        showFilterActive();
-      } else {
-        unhighlightApplyBtn();
-        hideFilterActive();
-      }
-    }
-
-    // Event listeners
-    document.getElementById('dateFrom').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
-    document.getElementById('dateTo').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
-    document.getElementById('crimeType').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
-    document.getElementById('region').addEventListener('change', () => {
-      updateAreaOptions(document.getElementById('region').value);
-      applyFilters();
-      syncFilterIndicator();
-    });
-    document.getElementById('area').addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
-
-    document.getElementById('clearFilters').addEventListener('click', clearAllFilters);
-    clearFiltersInline.addEventListener('click', clearAllFilters);
-
-    applyBtn.addEventListener('click', closeFiltersTray);
-
-    document.getElementById('loadMore').addEventListener('click', () => {
-      currentPage++;
-      renderCrimes();
-      updateResultsCount();
-    });
-
-    // Initial render - don't re-render (server already rendered first 30 cards)
-    // Only update the count and set up load more button visibility
-    updateResultsCount();
-
-    // Check if Load More button should be visible
-    const loadMore = document.getElementById('loadMore');
-    if (filteredCrimes.length <= perPage) {
-      loadMore.style.display = 'none';
-    } else {
-      loadMore.style.display = 'block';
-    }
-
-    // Attach accordion listeners to initial server-rendered accordions
-    attachAccordionListeners();
-
-    // Event delegation for crime card clicks
-    const crimeAccordions = document.getElementById('crimeAccordions');
-    if (crimeAccordions) {
-      crimeAccordions.addEventListener('click', (e) => {
-        // Don't open modal if clicking on a link
-        if (e.target.closest('a')) {
-          return;
-        }
-
-        const card = e.target.closest('.crime-card');
-        if (card) {
-          e.preventDefault();
-          const slug = card.dataset.crimeSlug;
-          const crime = allCrimes.find(c => c.slug === slug);
-          if (crime && window.openCrimeModal) {
-            window.openCrimeModal(crime);
-          }
-        }
-      });
-    }
-
-    // Filters Tray Controls
-    const filtersBtn = document.getElementById('filtersBtn');
-    const filtersTray = document.getElementById('filtersTray');
-    const filtersTrayContent = document.getElementById('filtersTrayContent');
-    const filtersBackdrop = document.getElementById('filtersBackdrop');
-    const closeFiltersBtn = document.getElementById('closeFiltersBtn');
-
-    function openFiltersTray() {
-      filtersTray.classList.remove('pointer-events-none');
-      filtersBackdrop.classList.remove('pointer-events-none');
-      setTimeout(() => {
-        filtersBackdrop.classList.remove('opacity-0');
-        filtersTrayContent.classList.remove('translate-x-full');
-      }, 10);
-    }
-
-    function closeFiltersTray() {
-      filtersBackdrop.classList.add('opacity-0');
-      filtersTrayContent.classList.add('translate-x-full');
-      setTimeout(() => {
-        filtersTray.classList.add('pointer-events-none');
-        filtersBackdrop.classList.add('pointer-events-none');
-      }, 300);
-    }
-
-    if (filtersBtn) {
-      filtersBtn.addEventListener('click', openFiltersTray);
-    }
-
-    if (closeFiltersBtn) {
-      closeFiltersBtn.addEventListener('click', closeFiltersTray);
-    }
-
-    if (filtersBackdrop) {
-      filtersBackdrop.addEventListener('click', closeFiltersTray);
-    }
-
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !filtersTray.classList.contains('pointer-events-none')) {
-        closeFiltersTray();
-      }
-    });
-  </script>
-
 <style>
-  /* Date input native icon spacing */
+  :global(.da-content) {
+    height: 0;
+    transition: height 300ms ease, margin-top 200ms ease;
+  }
+  :global(.da-content.is-open) {
+    height: auto;
+    margin-top: 0.75rem;
+  }
   .filter-date-input::-webkit-calendar-picker-indicator {
     padding: 2px;
     margin-right: 2px;
@@ -795,4 +322,332 @@ const breadcrumbs = [
     opacity: 0.8;
   }
 </style>
+
+<!-- Data only: expose to window for module script to read after SPA navigation -->
+<script define:vars={{ allCrimes, regionToAreas, allAreas: areas }}>
+  window.__hlData = { allCrimes, regionToAreas, allAreas };
+</script>
+
+<!-- Filter tray + filter logic: module script, re-runs callback on every navigation -->
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const { allCrimes, regionToAreas, allAreas } = (window as any).__hlData || {};
+    if (!allCrimes) return;
+
+    // ── State ──────────────────────────────────────────────────────────────
+    let currentPage = 1;
+    const perPage = 30;
+    let filteredCrimes = [...allCrimes];
+    let isFiltered = false;
+
+    // ── Tray open/close ────────────────────────────────────────────────────
+    const filtersTray = document.getElementById('filtersTray')!;
+    const filtersTrayContent = document.getElementById('filtersTrayContent')!;
+    const filtersBackdrop = document.getElementById('filtersBackdrop')!;
+    const filtersBtn = document.getElementById('filtersBtn')!;
+    const closeFiltersBtn = document.getElementById('closeFiltersBtn')!;
+
+    function openTray() {
+      filtersTray.classList.remove('pointer-events-none');
+      filtersBackdrop.classList.remove('pointer-events-none');
+      setTimeout(() => {
+        filtersBackdrop.classList.remove('opacity-0');
+        filtersTrayContent.classList.remove('translate-x-full');
+      }, 10);
+    }
+
+    function closeTray() {
+      filtersBackdrop.classList.add('opacity-0');
+      filtersTrayContent.classList.add('translate-x-full');
+      setTimeout(() => {
+        filtersTray.classList.add('pointer-events-none');
+        filtersBackdrop.classList.add('pointer-events-none');
+      }, 300);
+    }
+
+    if (filtersBtn) filtersBtn.addEventListener('click', openTray);
+    if (closeFiltersBtn) closeFiltersBtn.addEventListener('click', closeTray);
+    if (filtersBackdrop) filtersBackdrop.addEventListener('click', closeTray);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !filtersTray.classList.contains('pointer-events-none')) closeTray();
+    });
+
+    // ── XSS helper ─────────────────────────────────────────────────────────
+    function escapeHtml(str: any): string {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // ── Cascading area dropdown ────────────────────────────────────────────
+    function updateAreaOptions(selectedRegion: string) {
+      const areaSelect = document.getElementById('areaFilter') as HTMLSelectElement;
+      const currentArea = areaSelect.value;
+      areaSelect.innerHTML = '<option value="">All Areas</option>';
+
+      const areasToShow: string[] = selectedRegion
+        ? (regionToAreas[selectedRegion] || [])
+        : allAreas;
+
+      areasToShow.forEach((area: string) => {
+        const opt = document.createElement('option');
+        opt.value = area;
+        opt.textContent = area;
+        if (area === currentArea && (!selectedRegion || (regionToAreas[selectedRegion] || []).includes(currentArea))) {
+          opt.selected = true;
+        }
+        areaSelect.appendChild(opt);
+      });
+    }
+
+    // ── Filtering ──────────────────────────────────────────────────────────
+    function applyFilters() {
+      const dateFrom = (document.getElementById('dateFrom') as HTMLInputElement).value;
+      const dateTo = (document.getElementById('dateTo') as HTMLInputElement).value;
+      const crimeType = (document.getElementById('crimeTypeFilter') as HTMLSelectElement).value;
+      const region = (document.getElementById('regionFilter') as HTMLSelectElement).value;
+      const area = (document.getElementById('areaFilter') as HTMLSelectElement).value;
+
+      isFiltered = !!(dateFrom || dateTo || crimeType || region || area);
+
+      filteredCrimes = allCrimes.filter((crime: any) => {
+        const crimeDate = new Date(crime.date);
+        if (dateFrom && crimeDate < new Date(dateFrom)) return false;
+        if (dateTo && crimeDate > new Date(dateTo)) return false;
+        if (crimeType && crime.crimeType !== crimeType) return false;
+        if (region && crime.region !== region) return false;
+        if (area && crime.area !== area) return false;
+        return true;
+      });
+
+      currentPage = 1;
+      renderCrimes();
+      updateResultsCount();
+    }
+
+    // ── Rendering ──────────────────────────────────────────────────────────
+    function renderCrimes() {
+      const container = document.getElementById('crimeAccordions')!;
+      const loadMoreEl = document.getElementById('loadMore')!;
+
+      if (filteredCrimes.length === 0) {
+        container.innerHTML = `
+          <div class="rounded-lg p-8 text-center border border-slate-200 dark:border-[hsl(0_0%_18%)]">
+            <svg class="w-12 h-12 mx-auto mb-4 text-slate-300 dark:text-[hsl(0_0%_25%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <p class="text-sm mb-2 text-slate-500 dark:text-[hsl(0_0%_50%)]">No crimes match your filters.</p>
+            <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_40%)]">Try broadening your date range, area, or crime type.</p>
+          </div>`;
+        loadMoreEl.style.display = 'none';
+        return;
+      }
+
+      const crimes = filteredCrimes.slice(0, currentPage * perPage);
+
+      if (isFiltered) {
+        // Flat list when filters are active
+        container.innerHTML = `<div class="space-y-1">${crimes.map(createCrimeListItemHTML).join('')}</div>`;
+      } else {
+        // Accordion mode grouped by date
+        const byDate = new Map<string, any[]>();
+        crimes.forEach((crime: any) => {
+          if (!byDate.has(crime.date)) byDate.set(crime.date, []);
+          byDate.get(crime.date)!.push(crime);
+        });
+
+        const sortedDates = Array.from(byDate.keys()).sort((a, b) =>
+          new Date(b).getTime() - new Date(a).getTime()
+        );
+
+        container.innerHTML = sortedDates
+          .map((date, index) => createAccordionHTML(date, byDate.get(date)!, index === 0))
+          .join('');
+      }
+
+      loadMoreEl.style.display = crimes.length >= filteredCrimes.length ? 'none' : 'inline-block';
+    }
+
+    function createCrimeListItemHTML(crime: any): string {
+      const crimeType = escapeHtml(crime.primaryCrimeType || crime.crimeType);
+      return `
+        <a href="/trinidad/crime/${escapeHtml(crime.slug)}/" class="crime-card relative py-2.5 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group block">
+          <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-rose-600 transition">${escapeHtml(crime.headline)}</div>
+          <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">
+            <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">${crimeType}</span>
+            <span>${escapeHtml(crime.area)}</span>
+          </div>
+        </a>`;
+    }
+
+    function calculateVictimCount(crimes: any[]): number {
+      return crimes.reduce((total: number, crime: any) => {
+        const v = crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1;
+        return total + v;
+      }, 0);
+    }
+
+    // Generates accordion HTML using the same da-* classes as server-rendered HTML
+    // so the event-delegation accordion toggle script works on dynamically rendered items too.
+    function createAccordionHTML(date: string, crimes: any[], isExpanded: boolean): string {
+      const formattedDate = new Date(date).toLocaleDateString('en-US', {
+        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+      });
+      const incidentCount = crimes.length;
+      const victimCount = calculateVictimCount(crimes);
+
+      const crimeItems = crimes.map((crime: any) => {
+        const crimeType = escapeHtml(crime.primaryCrimeType || crime.crimeType);
+        return `
+          <a href="/trinidad/crime/${escapeHtml(crime.slug)}/" class="crime-card relative pl-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group block">
+            <div aria-hidden="true" class="absolute left-[-18px] top-4 w-2 h-2 rounded-full bg-slate-300 dark:bg-[hsl(0_0%_35%)]"></div>
+            <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-rose-600 transition">${escapeHtml(crime.headline)}</div>
+            <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">
+              <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">${crimeType}</span>
+              <span>${escapeHtml(crime.area)}</span>
+            </div>
+          </a>`;
+      }).join('');
+
+      return `
+        <div class="date-accordion mb-3" data-date="${escapeHtml(date)}">
+          <button
+            class="da-header w-full px-4 py-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group"
+            aria-expanded="${isExpanded}"
+          >
+            <div class="flex items-center gap-3">
+              <svg class="da-chevron w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_55%)] transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+              <div class="text-left">
+                <h3 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] leading-snug">${escapeHtml(formattedDate)}</h3>
+                <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)]">${incidentCount} ${incidentCount === 1 ? 'incident' : 'incidents'} · ${victimCount} ${victimCount === 1 ? 'victim' : 'victims'}</p>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)] text-caption font-medium">${incidentCount}</span>
+          </button>
+          <div class="da-content overflow-hidden${isExpanded ? ' is-open' : ''}">
+            <div class="relative pl-7 py-2">
+              <div class="absolute left-3.5 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
+              <div class="space-y-1">${crimeItems}</div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ── Results count ──────────────────────────────────────────────────────
+    function updateResultsCount() {
+      const showing = Math.min(currentPage * perPage, filteredCrimes.length);
+      const showingEl = document.getElementById('resultsShowing');
+      const totalEl = document.getElementById('resultsTotal');
+      if (showingEl) showingEl.textContent = String(showing);
+      if (totalEl) totalEl.textContent = String(filteredCrimes.length);
+    }
+
+    // ── Filter indicator (Filters button state + inline Clear) ─────────────
+    const filtersBtnEl = document.getElementById('filtersBtn')!;
+    const filtersBtnText = document.getElementById('filtersBtnText')!;
+    const clearFiltersInline = document.getElementById('clearFiltersInline')!;
+    const applyBtn = document.getElementById('applyFilters')!;
+
+    function showFilterActive() {
+      filtersBtnText.textContent = 'Filters Active ›';
+      (filtersBtnEl as HTMLElement).style.borderColor = '#e11d48';
+      (filtersBtnEl as HTMLElement).style.color = '#e11d48';
+      (filtersBtnEl as HTMLElement).style.backgroundColor = 'color-mix(in srgb, #e11d48 10%, transparent)';
+      clearFiltersInline.classList.remove('hidden');
+      (applyBtn as HTMLElement).style.backgroundColor = '#e11d48';
+      (applyBtn as HTMLElement).style.color = '#fff';
+      (applyBtn as HTMLElement).style.borderColor = '#e11d48';
+    }
+
+    function hideFilterActive() {
+      filtersBtnText.textContent = 'Filters ›';
+      (filtersBtnEl as HTMLElement).style.borderColor = '';
+      (filtersBtnEl as HTMLElement).style.color = '';
+      (filtersBtnEl as HTMLElement).style.backgroundColor = '';
+      clearFiltersInline.classList.add('hidden');
+      (applyBtn as HTMLElement).style.backgroundColor = '';
+      (applyBtn as HTMLElement).style.color = '';
+      (applyBtn as HTMLElement).style.borderColor = '';
+    }
+
+    function syncFilterIndicator() {
+      if (isFiltered) showFilterActive(); else hideFilterActive();
+    }
+
+    // ── Clear all filters ──────────────────────────────────────────────────
+    function clearAllFilters() {
+      (document.getElementById('dateFrom') as HTMLInputElement).value = '';
+      (document.getElementById('dateTo') as HTMLInputElement).value = '';
+      (document.getElementById('crimeTypeFilter') as HTMLSelectElement).value = '';
+      (document.getElementById('regionFilter') as HTMLSelectElement).value = '';
+      updateAreaOptions('');
+      (document.getElementById('areaFilter') as HTMLSelectElement).value = '';
+      applyFilters();
+      hideFilterActive();
+    }
+
+    // ── Event listeners ────────────────────────────────────────────────────
+    document.getElementById('dateFrom')!.addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
+    document.getElementById('dateTo')!.addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
+    document.getElementById('crimeTypeFilter')!.addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
+    document.getElementById('regionFilter')!.addEventListener('change', () => {
+      updateAreaOptions((document.getElementById('regionFilter') as HTMLSelectElement).value);
+      applyFilters();
+      syncFilterIndicator();
+    });
+    document.getElementById('areaFilter')!.addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
+
+    document.getElementById('clearFilters')!.addEventListener('click', clearAllFilters);
+    clearFiltersInline.addEventListener('click', clearAllFilters);
+
+    // Apply button closes the tray
+    applyBtn.addEventListener('click', closeTray);
+
+    document.getElementById('loadMore')!.addEventListener('click', () => {
+      currentPage++;
+      renderCrimes();
+      updateResultsCount();
+    });
+
+    // ── Initial setup ──────────────────────────────────────────────────────
+    // Server already rendered the first 30 accordions — only sync count + Load More visibility.
+    updateResultsCount();
+    const loadMoreEl = document.getElementById('loadMore')!;
+    loadMoreEl.style.display = filteredCrimes.length <= perPage ? 'none' : 'inline-block';
+  });
+</script>
+
+<!-- Accordion toggle: event delegation on container, re-fires on every navigation -->
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const container = document.getElementById('crimeAccordions');
+    if (!container) return;
+    container.addEventListener('click', (e) => {
+      const header = (e.target as Element).closest('.da-header');
+      if (!header) return;
+      const accordion = header.closest('.date-accordion');
+      const content = accordion && accordion.querySelector('.da-content');
+      const chevron = header.querySelector('.da-chevron');
+      const expanded = header.getAttribute('aria-expanded') === 'true';
+      if (content && chevron) {
+        if (expanded) {
+          header.setAttribute('aria-expanded', 'false');
+          content.classList.remove('is-open');
+          chevron.classList.remove('rotate-90');
+        } else {
+          header.setAttribute('aria-expanded', 'true');
+          content.classList.add('is-open');
+          chevron.classList.add('rotate-90');
+        }
+      }
+    });
+  });
+</script>
+
 </Layout>

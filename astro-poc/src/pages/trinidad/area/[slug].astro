@@ -282,7 +282,7 @@ const breadcrumbs = [
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
-          <div id="moreStatsContent" class="hidden mt-2">
+          <div id="moreStatsContent" class="more-stats-content mt-2">
             <StatCards stats={extraStatCards} />
           </div>
         </div>
@@ -386,7 +386,7 @@ const breadcrumbs = [
               </button>
 
               <!-- Accordion Content -->
-              <div class="accordion-content hidden">
+              <div class="accordion-content">
                 <div class="border-t border-slate-100 dark:border-[hsl(0_0%_15%)] px-4 py-3 space-y-3">
                   {crimes.map(crime => (
                     <a
@@ -472,97 +472,78 @@ const breadcrumbs = [
   </main>
 </Layout>
 
-<script is:inline>
-  // Accordion toggle
-  document.querySelectorAll('.accordion-toggle').forEach(button => {
-    button.addEventListener('click', function() {
-      const content = this.nextElementSibling;
-      const chevron = this.querySelector('.accordion-chevron');
-      const isOpen = this.getAttribute('aria-expanded') === 'true';
-
-      this.setAttribute('aria-expanded', String(!isOpen));
-      content.classList.toggle('hidden');
-      chevron.style.transform = isOpen ? '' : 'rotate(90deg)';
-    });
-  });
-
-  // More stats toggle
-  const moreStatsToggle = document.getElementById('moreStatsToggle');
-  const moreStatsContent = document.getElementById('moreStatsContent');
-  const moreStatsLabel = document.getElementById('moreStatsLabel');
-  const moreStatsChevron = document.getElementById('moreStatsChevron');
-
-  if (moreStatsToggle && moreStatsContent) {
-    moreStatsToggle.addEventListener('click', function() {
-      const isOpen = !moreStatsContent.classList.contains('hidden');
-      moreStatsContent.classList.toggle('hidden');
-      moreStatsChevron.style.transform = isOpen ? '' : 'rotate(180deg)';
-      moreStatsLabel.textContent = isOpen ? 'More stats' : 'Less stats';
-    });
+<style>
+  /* height: auto is animatable because Layout.astro sets html { interpolate-size: allow-keywords } */
+  .accordion-content,
+  .more-stats-content {
+    height: 0;
+    overflow: hidden;
+    transition: height 300ms ease;
   }
-</script>
-
-<script define:vars={{ areaCrimes, areaName: subtitle, safetyScore: safety.score.toFixed(1), slug }}>
-  // Share button functionality
-  var pageUrl = 'https://crimehotspots.com/trinidad/area/' + slug + '/';
-  var shareText = 'Crime stats for ' + areaName + ', Trinidad \u2014 Risk Level: ' + safetyScore + '/10. View details at Crime Hotspots.';
-
-  var twitterBtn = document.getElementById('area-shareTwitterBtn');
-  var facebookBtn = document.getElementById('area-shareFacebookBtn');
-  var whatsAppBtn = document.getElementById('area-shareWhatsAppBtn');
-
-  if (twitterBtn) {
-    twitterBtn.addEventListener('click', function() {
-      window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) + '&url=' + encodeURIComponent(pageUrl), '_blank', 'width=550,height=420');
-    });
+  .accordion-content.is-open,
+  .more-stats-content.is-open {
+    height: auto;
   }
-  if (facebookBtn) {
-    facebookBtn.addEventListener('click', function() {
-      window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(pageUrl), '_blank', 'width=550,height=420');
-    });
-  }
-  if (whatsAppBtn) {
-    whatsAppBtn.addEventListener('click', function() {
-      window.open('https://wa.me/?text=' + encodeURIComponent(shareText + ' ' + pageUrl), '_blank');
-    });
-  }
+</style>
 
-  // Expose area crimes for CrimeDetailModal
-  window.__crimesData = areaCrimes;
+{/* Data element — read by module script on every astro:page-load */}
+<div id="areaPageData" class="hidden"
+  data-slug={slug}
+  data-name={subtitle}
+  data-safety={safety.score.toFixed(1)}
+></div>
 
-  // Intercept crime card clicks to open modal instead of navigating
-  document.querySelectorAll('.crime-card-link').forEach(function(card) {
-    card.addEventListener('click', function(e) {
-      var slug = card.getAttribute('data-crime-slug');
-      var crime = areaCrimes.find(function(c) { return c.slug === slug; });
-      if (crime && window.openCrimeModal) {
-        e.preventDefault();
-        window.openCrimeModal(crime);
-      }
-    });
-  });
-
-  // "New since your last visit" badge
-  try {
-    var visitKey = 'crimehotspots_area_visit_' + slug;
-    var lastVisit = localStorage.getItem(visitKey);
-    if (lastVisit) {
-      var lastVisitDate = new Date(parseInt(lastVisit, 10));
-      var newCrimes = areaCrimes.filter(function(c) {
-        var d = c.dateObj ? new Date(c.dateObj) : new Date(c.date);
-        return d > lastVisitDate;
+<script>
+  document.addEventListener('astro:page-load', () => {
+    // --- Accordion toggle ---
+    document.querySelectorAll('.accordion-toggle').forEach(button => {
+      button.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        const chevron = this.querySelector('.accordion-chevron');
+        const isOpen = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', String(!isOpen));
+        content.classList.toggle('is-open');
+        chevron.style.transform = isOpen ? '' : 'rotate(90deg)';
       });
-      if (newCrimes.length > 0) {
-        var badge = document.getElementById('newSinceBadge');
-        var text = document.getElementById('newSinceText');
-        if (badge && text) {
-          text.textContent = newCrimes.length + ' new incident' + (newCrimes.length !== 1 ? 's' : '') + ' since your last visit';
-          badge.classList.remove('hidden');
-        }
-      }
+    });
+
+    // --- More stats toggle ---
+    const moreStatsToggle = document.getElementById('moreStatsToggle');
+    const moreStatsContent = document.getElementById('moreStatsContent');
+    const moreStatsLabel = document.getElementById('moreStatsLabel');
+    const moreStatsChevron = document.getElementById('moreStatsChevron');
+    if (moreStatsToggle && moreStatsContent && moreStatsLabel && moreStatsChevron) {
+      moreStatsToggle.addEventListener('click', () => {
+        const isOpen = moreStatsContent.classList.contains('is-open');
+        moreStatsContent.classList.toggle('is-open');
+        (moreStatsChevron as HTMLElement).style.transform = isOpen ? '' : 'rotate(180deg)';
+        moreStatsLabel.textContent = isOpen ? 'More stats' : 'Less stats';
+      });
     }
-    localStorage.setItem(visitKey, String(Date.now()));
-  } catch(e) {
-    // localStorage unavailable
-  }
+
+    // --- Share buttons ---
+    const dataEl = document.getElementById('areaPageData');
+    if (!dataEl) return;
+    const slug = dataEl.dataset.slug || '';
+    const areaName = dataEl.dataset.name || '';
+    const safetyScore = dataEl.dataset.safety || '';
+
+    const pageUrl = `https://crimehotspots.com/trinidad/area/${slug}/`;
+    const shareText = `Crime stats for ${areaName}, Trinidad \u2014 Risk Level: ${safetyScore}/10. View details at Crime Hotspots.`;
+
+    document.getElementById('area-shareTwitterBtn')?.addEventListener('click', () => {
+      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`, '_blank', 'width=550,height=420');
+    });
+    document.getElementById('area-shareFacebookBtn')?.addEventListener('click', () => {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`, '_blank', 'width=550,height=420');
+    });
+    document.getElementById('area-shareWhatsAppBtn')?.addEventListener('click', () => {
+      window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`, '_blank');
+    });
+
+    // --- Visit tracking ---
+    try {
+      localStorage.setItem(`crimehotspots_area_visit_${slug}`, String(Date.now()));
+    } catch(e) { /* localStorage unavailable */ }
+  });
 </script>

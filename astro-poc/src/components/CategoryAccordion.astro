@@ -34,7 +34,7 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
     </div>
 
     <div class="flex items-center gap-2">
-      <span class="px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 text-caption font-bold">
+      <span class="px-2 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)] text-caption font-medium">
         {count} {count === 1 ? 'tip' : 'tips'}
       </span>
       <a
@@ -56,7 +56,7 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
     </div>
     <a
       href={categoryHref}
-      class="sm:hidden mt-2 mb-1 inline-block text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline"
+      class="sm:hidden mt-2 mb-1 inline-block text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:text-rose-600 dark:hover:text-rose-400 hover:underline transition-colors"
     >
       See all {category} tips →
     </a>
@@ -75,28 +75,25 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
   }
 </style>
 
-<script is:inline>
-  /* is:inline re-runs on every View Transitions navigation — no DOMContentLoaded needed */
-  (function () {
-    document.querySelectorAll('.cat-header').forEach(function (header) {
-      header.addEventListener('click', function () {
-        var accordion = header.closest('.cat-accordion');
-        var content = accordion && accordion.querySelector('.cat-content');
-        var chevron = header.querySelector('.cat-chevron');
-        var expanded = header.getAttribute('aria-expanded') === 'true';
-
-        if (content && chevron) {
-          if (expanded) {
-            header.setAttribute('aria-expanded', 'false');
-            content.classList.remove('is-open');
-            chevron.classList.remove('rotate-90');
-          } else {
-            header.setAttribute('aria-expanded', 'true');
-            content.classList.add('is-open');
-            chevron.classList.add('rotate-90');
-          }
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll('.cat-accordion').forEach((accordion) => {
+      const header = accordion.querySelector('.cat-header');
+      const content = accordion.querySelector('.cat-content');
+      const chevron = accordion.querySelector('.cat-chevron');
+      if (!header || !content || !chevron) return;
+      header.addEventListener('click', () => {
+        const expanded = header.getAttribute('aria-expanded') === 'true';
+        if (expanded) {
+          header.setAttribute('aria-expanded', 'false');
+          content.classList.remove('is-open');
+          chevron.classList.remove('rotate-90');
+        } else {
+          header.setAttribute('aria-expanded', 'true');
+          content.classList.add('is-open');
+          chevron.classList.add('rotate-90');
         }
       });
     });
-  })();
+  });
 </script>

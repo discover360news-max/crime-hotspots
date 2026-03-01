@@ -215,12 +215,9 @@ export class CookieConsent {
 export function initCookieConsent(config = {}) {
   const consent = new CookieConsent(config);
 
-  // Show banner when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => consent.show());
-  } else {
-    consent.show();
-  }
+  // Show banner on each page load (astro:page-load fires on initial load + after navigations)
+  // consent.show() is a no-op if user has already consented
+  document.addEventListener('astro:page-load', () => consent.show());
 
   return consent;
 }

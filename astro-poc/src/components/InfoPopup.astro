@@ -97,8 +97,9 @@ const { id } = Astro.props;
     currentlyOpenPopup = popupId;
   }
 
-  // Initialize all info popups on page load
-  document.addEventListener('DOMContentLoaded', () => {
+  // Initialize all info popups on each page load (astro:page-load works with ClientRouter)
+  document.addEventListener('astro:page-load', () => {
+    currentlyOpenPopup = null; // Reset state on navigation
     // Trigger buttons
     const triggers = document.querySelectorAll('.info-popup-trigger');
     triggers.forEach(trigger => {

@@ -6,6 +6,37 @@
 
 ---
 
+## March 2026
+
+### Muted UI Pass + SPA Script Fixes (Mar 1–2)
+
+**Muted UI — resting-state rose removed across components:**
+- `RelatedCrimes.astro` — lightning bolt icon + "View all" link: rose → slate at rest
+- `TrendingHotspots.astro` — flame icon, clock icon, "View all areas" link: rose → slate at rest
+- `CompactTipCard.astro` — "Read tip →" link: rose → slate at rest
+- `CategoryAccordion.astro` — mobile "See all" link: rose → slate at rest
+- `areas.astro` — "View Region" link: rose → slate at rest
+- `blog/index.astro` — country badge: `bg-rose-50` fill → muted pill (border-only, no fill); Guyana filter button removed; thumbnail `w-20→w-24` to match "All Countries" button width (`w-24`); filter script fixed
+- `faq.astro` — accordion `+` icon + hover: rose → slate/light-grey
+- **Kept semantic colour:** SafetyContext fills, SiteNotificationBanner fills, QuickInsightsCard rose/emerald, Hero risk badge, Layout subscribe button
+
+**Accordion CSS transitions — `height: auto` pattern applied to:**
+- `area/[slug].astro` — date accordion + "More stats" tray (`more-stats-content` class)
+- `region/[slug].astro` — date accordion
+- `faq.astro` — replaced `max-height: 600px` hack with `height: auto`
+- `DateAccordion.astro` — already used `height: auto`, confirmed correct
+
+**SPA navigation bug fixed (`is:inline` → `<script>` + `astro:page-load`) on:**
+- `areas.astro` — search + sort listeners
+- `area/[slug].astro` — accordion, more-stats toggle, share buttons; `define:vars` → hidden `<div id="areaPageData">` data element; dead badge code removed
+- `region/[slug].astro` — accordion + more-stats toggle
+- `compare.astro` — `define:vars` data split to `window.__compareData`; all logic in `astro:page-load`
+- `faq.astro` — tag change only (`is:inline` → `<script>`); logic already had `astro:page-load`
+- `DateAccordion.astro` — fixed wrong comment ("is:inline re-runs" was incorrect)
+- `blog/index.astro` — filter vars moved inside `astro:page-load`
+
+---
+
 ## February 2026
 
 ### Institutional Data Capability Sheet (Feb 25)

@@ -71,6 +71,11 @@ Primary entry point — jump to the token files for any component.
 <button class="px-4 py-1.5 min-h-button border-2 border-rose-600 text-rose-600 rounded-lg hover:bg-rose-50 transition font-bold text-caption">Action</button>
 ```
 
+**Ghost Button:**
+```html
+<button class="px-4 py-1.5 min-h-button border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 rounded-lg transition font-medium text-xs whitespace-nowrap">Action</button>
+```
+
 **Frosted Card:**
 ```html
 <div class="bg-white/85 backdrop-blur-md rounded-lg shadow-md p-4">

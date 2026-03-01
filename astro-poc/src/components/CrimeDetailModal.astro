@@ -151,25 +151,28 @@ import NewsletterSignup from './NewsletterSignup.astro';
   import { initReportIssueHandler } from '../scripts/modalReportHandler';
   import { createModalLifecycle } from '../scripts/modalLifecycle';
 
-  // === DOM References ===
-  const backdrop = document.getElementById('crimeDetailBackdrop')!;
-  const modal = document.getElementById('crimeDetailModal')!;
-  const contentEl = document.getElementById('crimeDetailContent')!;
-  const closeBtn = document.getElementById('closeCrimeDetailBtn');
-
   // === State ===
   let currentCrimeUrl = '';
   let currentCrimeHeadline = '';
   let currentCrimeData: any = null;
 
-  // === Initialize modules ===
-  const lifecycle = createModalLifecycle({ backdrop, modal, content: contentEl });
+  // === Initialize lifecycle with IDs (not element refs) ===
+  // createModalLifecycle now queries getElementById on each call so refs are always
+  // live — no stale-ref issues after Astro View Transitions body swaps.
+  const lifecycle = createModalLifecycle({
+    backdropId: 'crimeDetailBackdrop',
+    modalId: 'crimeDetailModal',
+    contentId: 'crimeDetailContent',
+  });
   initShareHandlers(() => currentCrimeUrl, () => currentCrimeHeadline);
   initReportIssueHandler(() => currentCrimeData);
 
-  // === Close handlers (backdrop + close button) ===
-  closeBtn?.addEventListener('click', () => lifecycle.close());
-  backdrop?.addEventListener('click', () => lifecycle.close());
+  // === Close handlers via event delegation (document persists across SPA navigations) ===
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('#closeCrimeDetailBtn')) lifecycle.close();
+    else if (target.id === 'crimeDetailBackdrop') lifecycle.close();
+  });
 
   // === Bind related crime links for in-place navigation ===
   function bindRelatedCrimeLinks() {
@@ -272,7 +275,7 @@ import NewsletterSignup from './NewsletterSignup.astro';
     // History + animation
     if (isAlreadyOpen) {
       lifecycle.replaceUrl(crime.slug);
-      contentEl.scrollTop = 0;
+      (document.getElementById('crimeDetailContent') as HTMLElement | null)?.scrollTo({ top: 0 });
     } else {
       lifecycle.setOriginalUrl(window.location.pathname + window.location.search);
       lifecycle.open();

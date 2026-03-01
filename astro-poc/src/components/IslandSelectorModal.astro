@@ -108,11 +108,10 @@ const modalTypes: ModalType[] = ['dashboard', 'headlines', 'areas', 'archives'];
 </div>
 
 <script>
-  const modal = document.getElementById('islandSelectorModal');
-  const modalContent = document.getElementById('islandSelectorModalContent');
-  const closeBtn = document.getElementById('closeIslandSelectorModal');
-  const titleEl = document.getElementById('islandSelectorTitle');
-  const lists = document.querySelectorAll<HTMLElement>('.island-selector-list');
+  // NOTE: This is a module script — it runs ONCE per session (not re-run on SPA nav).
+  // All DOM queries MUST happen inside each function call (fresh query every time),
+  // never captured at module scope. After SPA nav the body is replaced with fresh
+  // HTML, so any module-level element references become stale detached nodes.
 
   const TITLES: Record<string, string> = {
     dashboard: 'Select Island',
@@ -122,6 +121,8 @@ const modalTypes: ModalType[] = ['dashboard', 'headlines', 'areas', 'archives'];
   };
 
   function openModal() {
+    const modal = document.getElementById('islandSelectorModal');
+    const modalContent = document.getElementById('islandSelectorModalContent');
     if (!modal || !modalContent) return;
     modal.classList.remove('invisible', 'opacity-0');
     modal.classList.add('visible', 'opacity-100');
@@ -132,6 +133,8 @@ const modalTypes: ModalType[] = ['dashboard', 'headlines', 'areas', 'archives'];
   }
 
   function closeModal() {
+    const modal = document.getElementById('islandSelectorModal');
+    const modalContent = document.getElementById('islandSelectorModalContent');
     if (!modal || !modalContent) return;
     modalContent.classList.remove('opacity-100', 'scale-100');
     modalContent.classList.add('opacity-0', 'scale-95');
@@ -141,14 +144,15 @@ const modalTypes: ModalType[] = ['dashboard', 'headlines', 'areas', 'archives'];
     }, 300);
   }
 
-  // Primary API
+  // Primary API — queries DOM fresh on every call so SPA nav never breaks it
   (window as any).openIslandModal = function(type: string) {
+    const modal = document.getElementById('islandSelectorModal');
+    const modalContent = document.getElementById('islandSelectorModalContent');
+    const titleEl = document.getElementById('islandSelectorTitle');
+    const lists = document.querySelectorAll<HTMLElement>('.island-selector-list');
     if (!modal || !modalContent) return;
 
-    // Update title
     if (titleEl) titleEl.textContent = TITLES[type] ?? 'Select Island';
-
-    // Show correct list
     lists.forEach(list => {
       list.classList.toggle('hidden', list.dataset.modalType !== type);
     });
@@ -156,21 +160,28 @@ const modalTypes: ModalType[] = ['dashboard', 'headlines', 'areas', 'archives'];
     openModal();
   };
 
-  // Backward-compat aliases so existing callers don't break
-  (window as any).openDashboardModal  = () => (window as any).openIslandModal('dashboard');
-  (window as any).openHeadlinesModal  = () => (window as any).openIslandModal('headlines');
-  (window as any).openArchivesModal   = () => (window as any).openIslandModal('archives');
-  (window as any).openAreasModal      = () => (window as any).openIslandModal('areas');
+  // Backward-compat aliases
+  (window as any).openDashboardModal = () => (window as any).openIslandModal('dashboard');
+  (window as any).openHeadlinesModal = () => (window as any).openIslandModal('headlines');
+  (window as any).openArchivesModal  = () => (window as any).openIslandModal('archives');
+  (window as any).openAreasModal     = () => (window as any).openIslandModal('areas');
 
-  closeBtn?.addEventListener('click', closeModal);
+  // Re-attach click listeners after every SPA navigation (body is replaced each time)
+  document.addEventListener('astro:page-load', () => {
+    const closeBtn = document.getElementById('closeIslandSelectorModal');
+    const modal = document.getElementById('islandSelectorModal');
 
-  modal?.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
+    closeBtn?.addEventListener('click', closeModal);
+    modal?.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
   });
 
+  // Escape — registered once at module level; queries DOM fresh on each keypress
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal?.classList.contains('visible')) {
-      closeModal();
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('islandSelectorModal');
+      if (modal?.classList.contains('visible')) closeModal();
     }
   });
 </script>

@@ -140,7 +140,7 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
             </div>
             <a
               href={buildRoute.region(generateNameSlug(region))}
-              class="text-caption text-rose-600 hover:text-rose-700 font-bold"
+              class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
             >
               View Region
             </a>
@@ -196,74 +196,60 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
   </main>
 </Layout>
 
-<script is:inline>
-  const searchInput = document.getElementById('areaSearch');
-  const regionContainer = document.getElementById('regionContainer');
-  const noResults = document.getElementById('noResults');
-  const sortAZ = document.getElementById('sortAZ');
-  const sortCrime = document.getElementById('sortCrime');
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const searchInput = document.getElementById('areaSearch');
+    const regionContainer = document.getElementById('regionContainer');
+    const noResults = document.getElementById('noResults');
+    const sortAZ = document.getElementById('sortAZ');
+    const sortCrime = document.getElementById('sortCrime');
 
-  const activeClass = 'bg-rose-600 text-white';
-  const inactiveClass = 'border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_65%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)]';
+    const activeClass = 'bg-rose-600 text-white';
+    const inactiveClass = 'border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_65%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)]';
 
-  function setActiveSort(activeBtn, inactiveBtn) {
-    activeBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' + activeClass;
-    inactiveBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' + inactiveClass;
-  }
+    function setActiveSort(activeBtn: HTMLElement, inactiveBtn: HTMLElement) {
+      activeBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' + activeClass;
+      inactiveBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-medium transition ' + inactiveClass;
+    }
 
-  function sortCards(mode) {
-    if (!regionContainer) return;
-    const groups = regionContainer.querySelectorAll('.region-group');
-    groups.forEach(function(group) {
-      var grid = group.querySelector('.grid');
-      if (!grid) return;
-      var cards = Array.from(grid.querySelectorAll('.area-card'));
-      cards.sort(function(a, b) {
-        if (mode === 'az') {
-          return (a.getAttribute('data-area') || '').localeCompare(b.getAttribute('data-area') || '');
-        }
-        return (parseInt(b.getAttribute('data-crime-count')) || 0) - (parseInt(a.getAttribute('data-crime-count')) || 0);
-      });
-      cards.forEach(function(card) { grid.appendChild(card); });
-    });
-  }
-
-  if (sortAZ && sortCrime) {
-    sortAZ.addEventListener('click', function() {
-      setActiveSort(sortAZ, sortCrime);
-      sortCards('az');
-    });
-    sortCrime.addEventListener('click', function() {
-      setActiveSort(sortCrime, sortAZ);
-      sortCards('crime');
-    });
-  }
-
-  if (searchInput && regionContainer && noResults) {
-    searchInput.addEventListener('input', function() {
-      const query = this.value.toLowerCase().trim();
-      const regionGroups = regionContainer.querySelectorAll('.region-group');
-      let anyVisible = false;
-
-      regionGroups.forEach(group => {
-        const cards = group.querySelectorAll('.area-card');
-        let groupHasVisible = false;
-
-        cards.forEach(card => {
-          const areaName = card.getAttribute('data-area') || '';
-          const knownAs = card.getAttribute('data-known-as') || '';
-          const regionName = group.getAttribute('data-region') || '';
-          const matches = !query || areaName.includes(query) || knownAs.includes(query) || regionName.includes(query);
-
-          card.style.display = matches ? '' : 'none';
-          if (matches) groupHasVisible = true;
+    function sortCards(mode: string) {
+      if (!regionContainer) return;
+      regionContainer.querySelectorAll('.region-group').forEach(group => {
+        const grid = group.querySelector('.grid');
+        if (!grid) return;
+        const cards = Array.from(grid.querySelectorAll('.area-card'));
+        cards.sort((a, b) => {
+          if (mode === 'az') return (a.getAttribute('data-area') || '').localeCompare(b.getAttribute('data-area') || '');
+          return (parseInt(b.getAttribute('data-crime-count') || '0') || 0) - (parseInt(a.getAttribute('data-crime-count') || '0') || 0);
         });
-
-        group.style.display = groupHasVisible ? '' : 'none';
-        if (groupHasVisible) anyVisible = true;
+        cards.forEach(card => grid.appendChild(card));
       });
+    }
 
-      noResults.classList.toggle('hidden', anyVisible);
-    });
-  }
+    if (sortAZ && sortCrime) {
+      sortAZ.addEventListener('click', () => { setActiveSort(sortAZ as HTMLElement, sortCrime as HTMLElement); sortCards('az'); });
+      sortCrime.addEventListener('click', () => { setActiveSort(sortCrime as HTMLElement, sortAZ as HTMLElement); sortCards('crime'); });
+    }
+
+    if (searchInput && regionContainer && noResults) {
+      searchInput.addEventListener('input', function(this: HTMLInputElement) {
+        const query = this.value.toLowerCase().trim();
+        let anyVisible = false;
+        regionContainer.querySelectorAll('.region-group').forEach(group => {
+          let groupHasVisible = false;
+          group.querySelectorAll('.area-card').forEach(card => {
+            const matches = !query
+              || (card.getAttribute('data-area') || '').includes(query)
+              || (card.getAttribute('data-known-as') || '').includes(query)
+              || (group.getAttribute('data-region') || '').includes(query);
+            (card as HTMLElement).style.display = matches ? '' : 'none';
+            if (matches) groupHasVisible = true;
+          });
+          (group as HTMLElement).style.display = groupHasVisible ? '' : 'none';
+          if (groupHasVisible) anyVisible = true;
+        });
+        noResults.classList.toggle('hidden', anyVisible);
+      });
+    }
+  });
 </script>

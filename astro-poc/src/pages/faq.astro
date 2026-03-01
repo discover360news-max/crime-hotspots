@@ -150,13 +150,13 @@ const allQuestions = faqData.flatMap(category => category.questions);
             {category.questions.map((item, index) => (
               <div class="border border-slate-200 dark:border-[hsl(0_0%_20%)] rounded-lg overflow-hidden">
                 <button
-                  class="faq-question w-full text-left px-4 py-3 flex justify-between items-start gap-3 hover:bg-rose-50 dark:hover:bg-rose-950/20 active:bg-rose-100 dark:active:bg-rose-950/30 transition-colors"
+                  class="faq-question w-full text-left px-4 py-3 flex justify-between items-start gap-3 hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition-colors"
                   aria-expanded="false"
                   data-faq-id={`${category.category}-${index}`}
                 >
                   <span class="text-sm font-medium text-slate-500 dark:text-[hsl(0_0%_75%)] flex-1">{item.question}</span>
                   <span class="flex-shrink-0">
-                    <svg class="faq-icon w-4 h-4 text-rose-600 dark:text-rose-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="faq-icon w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_45%)] transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                   </span>
@@ -193,14 +193,14 @@ const allQuestions = faqData.flatMap(category => category.questions);
   </main>
 
   <style>
+    /* height: auto is animatable because Layout.astro sets html { interpolate-size: allow-keywords } */
     .faq-answer {
+      height: 0;
       overflow: hidden;
-      max-height: 0;
-      padding-bottom: 0;
-      transition: max-height 0.3s ease, padding-bottom 0.3s ease;
+      transition: height 300ms ease;
     }
     .faq-answer.open {
-      max-height: 600px;
+      height: auto;
       padding-bottom: 1rem;
     }
     .faq-icon {
@@ -209,8 +209,8 @@ const allQuestions = faqData.flatMap(category => category.questions);
   </style>
 
   <!-- FAQ Accordion Script -->
-  <script is:inline>
-    document.addEventListener('DOMContentLoaded', () => {
+  <script>
+    document.addEventListener('astro:page-load', () => {
       const questions = document.querySelectorAll('.faq-question');
 
       questions.forEach(question => {

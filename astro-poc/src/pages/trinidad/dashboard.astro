@@ -95,7 +95,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
           <div class="flex items-center gap-2">
             <button
               id="filtersBtn"
-              class="px-4 py-1.5 min-h-[22px] inline-flex items-center justify-center border-2 border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 hover:text-rose-600 active:bg-rose-50 dark:active:bg-rose-950/30 rounded-lg transition font-medium text-xs whitespace-nowrap"
+              class="px-4 py-1.5 min-h-[22px] inline-flex items-center justify-center border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 rounded-lg transition font-medium text-xs whitespace-nowrap cursor-pointer"
             >
               <span id="filtersBtnText">Filters ›</span>
             </button>
@@ -396,55 +396,58 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
   <script>
     import { initializeDashboardData } from '../../scripts/dashboardDataLoader';
 
-    // Wait for DOM and load crimes data
-    window.addEventListener('DOMContentLoaded', initializeDashboardData);
+    // astro:page-load fires on initial load (with ClientRouter) and after each navigation
+    document.addEventListener('astro:page-load', initializeDashboardData);
   </script>
 
   <!-- Leaflet Map Initialization -->
   <script>
     import { initializeLeafletMap } from '../../scripts/leafletMap';
 
-    // Track when map shimmer started
-    const mapShimmerStartTime = Date.now();
+    function initMap() {
+      // Record shimmer start time per navigation (reset on each astro:page-load)
+      const mapShimmerStartTime = Date.now();
 
-    // Wait for crimes data to be available
-    function waitForMapData() {
-      if (!window.__crimesData) {
-        setTimeout(waitForMapData, 100);
-        return;
+      function poll() {
+        if (!window.__crimesData) {
+          setTimeout(poll, 100);
+          return;
+        }
+
+        // Get current year
+        const availableYears = [...new Set(window.__crimesData.map((c: any) => c.year))].sort((a: number, b: number) => b - a);
+        const currentYear = availableYears[0];
+        const currentYearCrimes = window.__crimesData.filter((c: any) => c.year === currentYear);
+
+        initializeLeafletMap('leafletMap', currentYearCrimes, {
+          center: [10.634963, -61.197207],
+          zoom: 8,
+          country: 'Trinidad',
+          crimeDetailPath: '/trinidad/crime/',
+          onMapReady: async () => {
+            // Hide map shimmer with minimum display time (500ms)
+            const elapsed = Date.now() - mapShimmerStartTime;
+            const remaining = Math.max(0, 500 - elapsed);
+
+            if (remaining > 0) {
+              await new Promise(resolve => setTimeout(resolve, remaining));
+            }
+
+            const mapShimmer = document.getElementById('mapShimmer');
+            const leafletMap = document.getElementById('leafletMap');
+
+            if (mapShimmer) mapShimmer.style.display = 'none';
+            if (leafletMap) leafletMap.style.opacity = '1';
+
+            console.log('✅ Map shimmer hidden, map visible');
+          }
+        });
       }
 
-      // Get current year
-      const availableYears = [...new Set(window.__crimesData.map((c: any) => c.year))].sort((a: number, b: number) => b - a);
-      const currentYear = availableYears[0];
-      const currentYearCrimes = window.__crimesData.filter((c: any) => c.year === currentYear);
-
-      initializeLeafletMap('leafletMap', currentYearCrimes, {
-        center: [10.634963, -61.197207],
-        zoom: 8,
-        country: 'Trinidad',
-        crimeDetailPath: '/trinidad/crime/',
-        onMapReady: async () => {
-          // Hide map shimmer with minimum display time (500ms)
-          const elapsed = Date.now() - mapShimmerStartTime;
-          const remaining = Math.max(0, 500 - elapsed);
-
-          if (remaining > 0) {
-            await new Promise(resolve => setTimeout(resolve, remaining));
-          }
-
-          const mapShimmer = document.getElementById('mapShimmer');
-          const leafletMap = document.getElementById('leafletMap');
-
-          if (mapShimmer) mapShimmer.style.display = 'none';
-          if (leafletMap) leafletMap.style.opacity = '1';
-
-          console.log('✅ Map shimmer hidden, map visible');
-        }
-      });
+      poll();
     }
 
-    waitForMapData();
+    document.addEventListener('astro:page-load', initMap);
   </script>
 
   <!-- Year Filtering Script -->
@@ -563,25 +566,17 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       });
     }
 
-    // Start waiting for crimes data
-    waitForCrimesData();
+    // astro:page-load fires on initial load (with ClientRouter) and after each navigation
+    document.addEventListener('astro:page-load', () => {
+      waitForCrimesData();
 
-    // Initialize stat card filtering after DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        initializeStatCardFiltering({
-          updateQuickInsights,
-          updateTopRegions,
-          updateLeafletMap
-        });
-      });
-    } else {
+      // DOM is ready at astro:page-load time
       initializeStatCardFiltering({
         updateQuickInsights,
         updateTopRegions,
         updateLeafletMap
       });
-    }
+    });
   </script>
 
   <!-- Filters Tray Component -->
@@ -801,24 +796,25 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       checkDashboardFilterState();
     }
 
-    waitForLocationFilterElements();
+    // astro:page-load fires on initial load (with ClientRouter) and after each navigation
+    document.addEventListener('astro:page-load', () => {
+      waitForLocationFilterElements();
+    });
   </script>
 
   <!-- Sync Stat Cards with Tray Checkboxes -->
   <script>
     import { initializeTraySync } from '../../scripts/statCardFiltering';
 
-    // Initialize after DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initializeTraySync);
-    } else {
-      initializeTraySync();
-    }
+    // DOM is ready at astro:page-load time
+    document.addEventListener('astro:page-load', initializeTraySync);
   </script>
 
   <!-- Mouse Wheel Horizontal Scroll for Stats Cards -->
   <script>
     import { initializeStatsScroll } from '../../scripts/statsScroll';
-    initializeStatsScroll();
+
+    // DOM is ready at astro:page-load time
+    document.addEventListener('astro:page-load', () => { initializeStatsScroll(); });
   </script>
 </Layout>

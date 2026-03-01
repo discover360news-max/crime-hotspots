@@ -45,6 +45,15 @@ Part of [DESIGN-TOKENS.md](../DESIGN-TOKENS.md)
 **Use for:** Subscribe, Filters, Headlines nav — secondary action alongside a primary CTA.
 **Rule:** Never use rose outline for secondary actions — use this instead.
 
+### Ghost Button
+```html
+<button class="px-4 py-1.5 min-h-button border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 rounded-lg transition font-medium text-xs whitespace-nowrap">
+  Ghost Action
+</button>
+```
+**Use for:** Murder Count, Filters — secondary actions that sit beside a Primary CTA without competing with it.
+**Rule:** Grey border at rest, transitions to rose border + text on hover. No background fill on hover — that's what separates it from Secondary.
+
 ### Subtle/Text Button
 ```html
 <button class="text-rose-600 hover:text-rose-700 underline text-caption font-bold">

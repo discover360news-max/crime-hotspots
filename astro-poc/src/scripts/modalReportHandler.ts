@@ -1,16 +1,18 @@
 /**
  * Modal Report Issue Handler
  * Populates hidden ReportIssueModal form fields with current crime data
- * and opens the report modal. Uses a getter function so it always reads
- * the latest crime data (even after in-place navigation).
+ * and opens the report modal.
+ *
+ * Uses event delegation on document (not a direct element ref) so the handler
+ * survives Astro View Transitions body swaps without going stale.
  */
 
 /** Initialize the Report Issue button handler */
 export function initReportIssueHandler(getCrimeData: () => any): void {
-  const modalReportIssueBtn = document.getElementById('modalReportIssueBtn');
-  if (!modalReportIssueBtn) return;
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('#modalReportIssueBtn')) return;
 
-  modalReportIssueBtn.addEventListener('click', () => {
     const crimeData = getCrimeData();
     if (!crimeData) {
       console.error('No crime data available');

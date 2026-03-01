@@ -82,13 +82,14 @@ const crimeTypes = [
 </div>
 
 <script>
-  const filtersBtn = document.getElementById('filtersBtn');
-  const filtersTray = document.getElementById('filtersTray');
-  const filtersTrayContent = document.getElementById('filtersTrayContent');
-  const filtersBackdrop = document.getElementById('filtersBackdrop');
-  const closeFiltersBtn = document.getElementById('closeFiltersBtn');
+  // Fresh DOM query each call — never capture references at module level.
+  // Module scripts run ONCE per session; SPA navigation swaps the body,
+  // making any top-level element references stale on re-visit.
 
   function openFiltersTray() {
+    const filtersTray = document.getElementById('filtersTray');
+    const filtersBackdrop = document.getElementById('filtersBackdrop');
+    const filtersTrayContent = document.getElementById('filtersTrayContent');
     if (!filtersTray || !filtersBackdrop || !filtersTrayContent) return;
 
     filtersTray.classList.remove('pointer-events-none');
@@ -100,6 +101,9 @@ const crimeTypes = [
   }
 
   function closeFiltersTray() {
+    const filtersTray = document.getElementById('filtersTray');
+    const filtersBackdrop = document.getElementById('filtersBackdrop');
+    const filtersTrayContent = document.getElementById('filtersTrayContent');
     if (!filtersTray || !filtersBackdrop || !filtersTrayContent) return;
 
     filtersBackdrop.classList.add('opacity-0');
@@ -110,16 +114,25 @@ const crimeTypes = [
     }, 300);
   }
 
-  if (filtersBtn && closeFiltersBtn && filtersBackdrop) {
-    filtersBtn.addEventListener('click', openFiltersTray);
-    closeFiltersBtn.addEventListener('click', closeFiltersTray);
-    filtersBackdrop.addEventListener('click', closeFiltersTray);
-
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && filtersTray && !filtersTray.classList.contains('pointer-events-none')) {
+  // Keydown registered once at module level — queries DOM fresh each invocation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const filtersTray = document.getElementById('filtersTray');
+      if (filtersTray && !filtersTray.classList.contains('pointer-events-none')) {
         closeFiltersTray();
       }
-    });
-  }
+    }
+  });
+
+  // Re-attach click listeners on every navigation (astro:page-load fires on
+  // initial load + after each SPA navigation via ClientRouter)
+  document.addEventListener('astro:page-load', () => {
+    const filtersBtn = document.getElementById('filtersBtn');
+    const filtersBackdrop = document.getElementById('filtersBackdrop');
+    const closeFiltersBtn = document.getElementById('closeFiltersBtn');
+
+    if (filtersBtn) filtersBtn.addEventListener('click', openFiltersTray);
+    if (closeFiltersBtn) closeFiltersBtn.addEventListener('click', closeFiltersTray);
+    if (filtersBackdrop) filtersBackdrop.addEventListener('click', closeFiltersTray);
+  });
 </script>

@@ -55,8 +55,8 @@ const formattedDate = new Date(date).toLocaleDateString('en-US', {
 
   <!-- Accordion Content -->
   <div
-    class="accordion-content overflow-hidden transition-all duration-300"
-    class:list={[isExpanded ? 'max-h-[10000px] mt-3' : 'max-h-0']}
+    class="accordion-content overflow-hidden"
+    class:list={[isExpanded && 'is-open']}
   >
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
       <slot />
@@ -64,30 +64,35 @@ const formattedDate = new Date(date).toLocaleDateString('en-US', {
   </div>
 </div>
 
-<script>
-  // Add click handlers to all accordion headers
-  document.addEventListener('DOMContentLoaded', () => {
-    const headers = document.querySelectorAll('.accordion-header');
+<style>
+  /* height: auto is animatable because Layout.astro sets html { interpolate-size: allow-keywords } */
+  .accordion-content {
+    height: 0;
+    transition: height 300ms ease, margin-top 200ms ease;
+  }
+  .accordion-content.is-open {
+    height: auto;
+    margin-top: 0.75rem;
+  }
+</style>
 
-    headers.forEach(header => {
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll('.accordion-header').forEach(header => {
       header.addEventListener('click', () => {
         const accordion = header.closest('.date-accordion');
-        const content = accordion?.querySelector('.accordion-content');
+        const content = accordion && accordion.querySelector('.accordion-content');
         const chevron = header.querySelector('.chevron');
-        const isExpanded = header.getAttribute('aria-expanded') === 'true';
+        const expanded = header.getAttribute('aria-expanded') === 'true';
 
         if (content && chevron) {
-          if (isExpanded) {
-            // Collapse
+          if (expanded) {
             header.setAttribute('aria-expanded', 'false');
-            content.classList.remove('max-h-[10000px]', 'mt-3');
-            content.classList.add('max-h-0');
+            content.classList.remove('is-open');
             chevron.classList.remove('rotate-90');
           } else {
-            // Expand
             header.setAttribute('aria-expanded', 'true');
-            content.classList.add('max-h-[10000px]', 'mt-3');
-            content.classList.remove('max-h-0');
+            content.classList.add('is-open');
             chevron.classList.add('rotate-90');
           }
         }

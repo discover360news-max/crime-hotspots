@@ -117,14 +117,10 @@ const initialDigits = animateOnLoad
       });
     }
 
-    // Run animation after page load with small delay for smooth effect
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(initFlipCounter, 300);
-      });
-    } else {
+    // Run animation after page load (astro:page-load works with ClientRouter)
+    document.addEventListener('astro:page-load', () => {
       setTimeout(initFlipCounter, 300);
-    }
+    });
   </script>
 )}
 

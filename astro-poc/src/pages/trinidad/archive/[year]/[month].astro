@@ -13,7 +13,7 @@ import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import Hero from '../../../../components/Hero.astro';
 import SiteNotificationBanner from '../../../../components/SiteNotificationBanner.astro';
 import QuickInsightsCard from '../../../../components/QuickInsightsCard.astro';
-import CrimeDetailModal from '../../../../components/CrimeDetailModal.astro';
+// import CrimeDetailModal from '../../../../components/CrimeDetailModal.astro';
 import { getTrinidadCrimes, type Crime } from '../../../../lib/crimeData';
 import { dataUpdateNotice } from '../../../../config/siteNotifications';
 import { getCountryName } from '../../../../data/countries';
@@ -352,9 +352,9 @@ const breadcrumbs = [
 
                   <div class="space-y-1">
                     {dateCrimes.map(crime => (
-                      <div
-                        class="crime-card relative pl-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition cursor-pointer group"
-                        data-crime-slug={crime.slug}
+                      <a
+                        href={buildRoute.crime(crime.slug)}
+                        class="crime-card relative pl-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group block"
                       >
                         {/* Timeline dot */}
                         <div aria-hidden="true" class="absolute left-[-18px] top-4 w-2 h-2 rounded-full bg-slate-300 dark:bg-[hsl(0_0%_35%)]"></div>
@@ -366,7 +366,7 @@ const breadcrumbs = [
                           <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">{crime.primaryCrimeType || crime.crimeType}</span>
                           <span>{crime.area}</span>
                         </div>
-                      </div>
+                      </a>
                     ))}
                   </div>
                 </div>
@@ -380,15 +380,10 @@ const breadcrumbs = [
     </div><!-- /card -->
   </main>
 
-  <!-- Crime Detail Modal -->
-  <CrimeDetailModal />
 </Layout>
 
-<script define:vars={{ crimes }}>
-  // Expose crimes data globally for modal safety context
-  window.__crimesData = crimes;
-
-  document.addEventListener('DOMContentLoaded', () => {
+<script>
+  document.addEventListener('astro:page-load', () => {
     // Accordion toggle listeners
     const headers = document.querySelectorAll('.accordion-header');
     headers.forEach(header => {
@@ -424,23 +419,6 @@ const breadcrumbs = [
       });
     });
 
-    // Event delegation for crime card clicks
-    const container = document.getElementById('crimeAccordions');
-    if (container) {
-      container.addEventListener('click', (e) => {
-        if (e.target.closest('a')) return;
-        if (e.target.closest('.accordion-header')) return;
-
-        const card = e.target.closest('.crime-card');
-        if (card) {
-          const slug = card.dataset.crimeSlug;
-          const crime = crimes.find(c => c.slug === slug);
-          if (crime && window.openCrimeModal) {
-            window.openCrimeModal(crime);
-          }
-        }
-      });
-    }
   });
 </script>
 

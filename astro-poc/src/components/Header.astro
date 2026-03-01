@@ -363,7 +363,7 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
       {/* Browse button — homepage only, opens Section Picker for Trinidad */}
       {isHomepage && (
         <button
-          onclick="closeMobileMenu(); setTimeout(function(){ window.openSectionPickerModal('tt', 'Trinidad & Tobago'); }, 200);"
+          onclick="window.closeMobileMenu && window.closeMobileMenu(); setTimeout(function(){ window.openSectionPickerModal('tt', 'Trinidad & Tobago'); }, 200);"
           class="flex items-center gap-2 text-body text-slate-700 dark:text-[hsl(0_0%_85%)] hover:text-rose-600 dark:hover:text-rose-400 font-bold py-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] w-full text-left cursor-pointer"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -405,14 +405,16 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
 </nav>
 
 
-<script is:inline>
-  // Scroll lock helpers — compensate for scrollbar width to prevent content shift
+<script>
+  // NOTE: Module script — runs ONCE per session. All interactive setup MUST be
+  // inside astro:page-load so it re-fires after every SPA navigation (body swap).
+  // window.closeMobileMenu and window.navigateAreas are set here so inline
+  // onclick attributes in the template can call them.
+
   function lockScroll() {
-    var scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     document.body.style.overflow = 'hidden';
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = scrollbarWidth + 'px';
-    }
+    if (scrollbarWidth > 0) document.body.style.paddingRight = scrollbarWidth + 'px';
   }
 
   function unlockScroll() {
@@ -420,144 +422,45 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
     document.body.style.paddingRight = '';
   }
 
-  // Mobile menu
-  const menuToggle = document.getElementById('menuToggle');
-  const mobileNav = document.getElementById('mobileNav');
-  const mobileBackdrop = document.getElementById('mobileMenuBackdrop');
-  const mobileMenuClose = document.getElementById('mobileMenuClose');
-
-  function openMobileMenu() {
-    if (!mobileBackdrop || !mobileNav || !menuToggle) return;
-    mobileBackdrop.classList.remove('hidden');
-    mobileNav.classList.remove('translate-x-full', 'invisible');
-    mobileNav.classList.add('translate-x-0');
-    lockScroll();
-
-    requestAnimationFrame(() => {
-      mobileBackdrop.classList.remove('opacity-0');
-      mobileBackdrop.classList.add('opacity-100');
-    });
-
-    menuToggle.setAttribute('aria-expanded', 'true');
-  }
-
-  function closeMobileMenu() {
-    if (!mobileBackdrop || !mobileNav || !menuToggle) return;
-    mobileNav.classList.remove('translate-x-0');
-    mobileNav.classList.add('translate-x-full');
-    mobileBackdrop.classList.remove('opacity-100');
-    mobileBackdrop.classList.add('opacity-0');
-    unlockScroll();
-
-    setTimeout(() => {
-      mobileBackdrop.classList.add('hidden');
-      mobileNav.classList.add('invisible');
-    }, 300);
-
-    menuToggle.setAttribute('aria-expanded', 'false');
-  }
-
-  if (menuToggle && mobileNav) {
-    menuToggle.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
-      if (isOpen) closeMobileMenu();
-      else openMobileMenu();
-    });
-
-    if (mobileMenuClose) {
-      mobileMenuClose.addEventListener('click', closeMobileMenu);
+  // Escape key — registered once at module level, queries DOM fresh on each press
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const menuToggle = document.getElementById('menuToggle');
+    const subscribeTray = document.getElementById('subscribeTray');
+    if (menuToggle?.getAttribute('aria-expanded') === 'true') {
+      (window as any).closeMobileMenu?.();
     }
-
-    if (mobileBackdrop) {
-      mobileBackdrop.addEventListener('click', closeMobileMenu);
+    if (subscribeTray?.classList.contains('translate-x-0')) {
+      closeSubscribeTray();
     }
+  });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') {
-        closeMobileMenu();
-      }
-    });
-
-    mobileNav.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        closeMobileMenu();
-      });
-    });
-  }
-
-  // Subscribe tray
-  const subscribeToggle = document.getElementById('subscribeToggle');
-  const subscribeToggleMobile = document.getElementById('subscribeToggleMobile');
-  const subscribeTray = document.getElementById('subscribeTray');
-  const subscribeBackdrop = document.getElementById('subscribeBackdrop');
-  const subscribeClose = document.getElementById('subscribeClose');
-
-  function openSubscribeTray() {
-    if (!subscribeBackdrop || !subscribeTray) return;
-    subscribeBackdrop.classList.remove('hidden');
-    subscribeTray.classList.remove('translate-x-full', 'invisible');
-    subscribeTray.classList.add('translate-x-0');
-    lockScroll();
-
-    requestAnimationFrame(() => {
-      subscribeBackdrop.classList.remove('opacity-0');
-      subscribeBackdrop.classList.add('opacity-100');
-    });
-  }
-
+  // Subscribe tray helpers (used inside and outside page-load callback)
   function closeSubscribeTray() {
+    const subscribeTray = document.getElementById('subscribeTray');
+    const subscribeBackdrop = document.getElementById('subscribeBackdrop');
     if (!subscribeBackdrop || !subscribeTray) return;
     subscribeTray.classList.remove('translate-x-0');
     subscribeTray.classList.add('translate-x-full');
     subscribeBackdrop.classList.remove('opacity-100');
     subscribeBackdrop.classList.add('opacity-0');
     unlockScroll();
-
     setTimeout(() => {
       subscribeBackdrop.classList.add('hidden');
       subscribeTray.classList.add('invisible');
     }, 300);
   }
 
-  if (subscribeToggle && subscribeTray) {
-    subscribeToggle.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openSubscribeTray();
-    });
-  }
-
-  if (subscribeToggleMobile && subscribeTray) {
-    subscribeToggleMobile.addEventListener('click', (e) => {
-      e.stopPropagation();
-      openSubscribeTray();
-    });
-  }
-
-  if (subscribeClose) {
-    subscribeClose.addEventListener('click', closeSubscribeTray);
-  }
-
-  if (subscribeBackdrop) {
-    subscribeBackdrop.addEventListener('click', closeSubscribeTray);
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && subscribeTray && subscribeTray.classList.contains('translate-x-0')) {
-      closeSubscribeTray();
-    }
-  });
-
-  // Context-aware Areas navigation
-  // Keep in sync with src/config/routes.ts (inline script can't import modules)
+  // Areas navigation — context-aware, no DOM refs needed
+  // Keep country paths in sync with src/config/routes.ts
   const countryPaths = [
     { prefix: '/trinidad', areasUrl: '/trinidad/areas/' },
-    { prefix: '/guyana', areasUrl: '/guyana/areas/' },
+    { prefix: '/guyana',   areasUrl: '/guyana/areas/' },
     { prefix: '/barbados', areasUrl: '/barbados/areas/' },
-    { prefix: '/jamaica', areasUrl: '/jamaica/areas/' },
+    { prefix: '/jamaica',  areasUrl: '/jamaica/areas/' },
   ];
 
-  window.navigateAreas = function() {
+  function navigateAreas() {
     const path = window.location.pathname;
     for (const country of countryPaths) {
       if (path.startsWith(country.prefix)) {
@@ -565,10 +468,89 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
         return;
       }
     }
-    // Not on a country page — open island picker modal
-    if (typeof window.openAreasModal === 'function') {
-      window.openAreasModal();
+    if (typeof (window as any).openAreasModal === 'function') {
+      (window as any).openAreasModal();
     }
-  };
+  }
 
+  // Expose for inline onclick attributes in the template
+  (window as any).navigateAreas = navigateAreas;
+
+  // Re-attach all element-specific listeners on every navigation
+  document.addEventListener('astro:page-load', () => {
+    // ── Mobile menu ──────────────────────────────────────────────────────────
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileNav = document.getElementById('mobileNav');
+    const mobileBackdrop = document.getElementById('mobileMenuBackdrop');
+    const mobileMenuClose = document.getElementById('mobileMenuClose');
+
+    function openMobileMenu() {
+      if (!mobileBackdrop || !mobileNav || !menuToggle) return;
+      mobileBackdrop.classList.remove('hidden');
+      mobileNav.classList.remove('translate-x-full', 'invisible');
+      mobileNav.classList.add('translate-x-0');
+      lockScroll();
+      requestAnimationFrame(() => {
+        mobileBackdrop.classList.remove('opacity-0');
+        mobileBackdrop.classList.add('opacity-100');
+      });
+      menuToggle.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeMobileMenu() {
+      if (!mobileBackdrop || !mobileNav || !menuToggle) return;
+      mobileNav.classList.remove('translate-x-0');
+      mobileNav.classList.add('translate-x-full');
+      mobileBackdrop.classList.remove('opacity-100');
+      mobileBackdrop.classList.add('opacity-0');
+      unlockScroll();
+      setTimeout(() => {
+        mobileBackdrop.classList.add('hidden');
+        mobileNav.classList.add('invisible');
+      }, 300);
+      menuToggle.setAttribute('aria-expanded', 'false');
+    }
+
+    // Expose for inline onclick (e.g. the homepage Browse button)
+    (window as any).closeMobileMenu = closeMobileMenu;
+
+    if (menuToggle && mobileNav) {
+      menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (menuToggle.getAttribute('aria-expanded') === 'true') closeMobileMenu();
+        else openMobileMenu();
+      });
+
+      mobileMenuClose?.addEventListener('click', closeMobileMenu);
+      mobileBackdrop?.addEventListener('click', closeMobileMenu);
+
+      mobileNav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+      });
+    }
+
+    // ── Subscribe tray ───────────────────────────────────────────────────────
+    const subscribeToggle = document.getElementById('subscribeToggle');
+    const subscribeToggleMobile = document.getElementById('subscribeToggleMobile');
+    const subscribeTray = document.getElementById('subscribeTray');
+    const subscribeBackdrop = document.getElementById('subscribeBackdrop');
+    const subscribeClose = document.getElementById('subscribeClose');
+
+    function openSubscribeTray() {
+      if (!subscribeBackdrop || !subscribeTray) return;
+      subscribeBackdrop.classList.remove('hidden');
+      subscribeTray.classList.remove('translate-x-full', 'invisible');
+      subscribeTray.classList.add('translate-x-0');
+      lockScroll();
+      requestAnimationFrame(() => {
+        subscribeBackdrop.classList.remove('opacity-0');
+        subscribeBackdrop.classList.add('opacity-100');
+      });
+    }
+
+    subscribeToggle?.addEventListener('click', (e) => { e.stopPropagation(); openSubscribeTray(); });
+    subscribeToggleMobile?.addEventListener('click', (e) => { e.stopPropagation(); openSubscribeTray(); });
+    subscribeClose?.addEventListener('click', closeSubscribeTray);
+    subscribeBackdrop?.addEventListener('click', closeSubscribeTray);
+  });
 </script>

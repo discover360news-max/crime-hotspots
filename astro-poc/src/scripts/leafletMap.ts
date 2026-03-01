@@ -159,6 +159,14 @@ export function initializeLeafletMap(
 ) {
   console.log('🗺️ Initializing Leaflet map...');
 
+  // If Leaflet + cluster plugin are already loaded (e.g. SPA back-navigation),
+  // skip dynamic script loading and init directly — onload won't fire for duplicate scripts
+  const _Lcheck = (window as any).L;
+  if (_Lcheck && _Lcheck.markerClusterGroup) {
+    initMap();
+    return;
+  }
+
   // Load Leaflet scripts
   const leafletScript = document.createElement('script');
   leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
@@ -314,14 +322,14 @@ export function initializeLeafletMap(
           <div style="font-size:0.875rem;font-weight:700;color:var(--ch-text);margin-bottom:12px;line-height:1.4">${crime.headline}</div>
           <div style="font-size:0.75rem;color:var(--ch-text-muted);margin-bottom:4px">${crime.street}</div>
           <div style="font-size:0.75rem;color:#e11d48">${areaDisplay}</div>
-          <button
-            onclick="window.openCrimeDetailModal('${crime.slug}')"
-            style="font-size:0.75rem;color:#e11d48;border:1px solid #e11d48;border-radius:8px;padding:4px 12px;margin-top:12px;display:inline-block;font-weight:500;background:transparent;cursor:pointer"
+          <a
+            href="/trinidad/crime/${crime.slug}/"
+            style="font-size:0.75rem;color:#e11d48;border:1px solid #e11d48;border-radius:8px;padding:4px 12px;margin-top:12px;display:inline-block;font-weight:500;text-decoration:none"
             onmouseover="this.style.background='#e11d48';this.style.color='white'"
             onmouseout="this.style.background='transparent';this.style.color='#e11d48'"
           >
             View Details
-          </button>
+          </a>
         </div>
       `, { autoPanPaddingTopLeft: L.point(10, 50), autoPanPaddingBottomRight: L.point(10, 10) });
       markers.addLayer(marker);
@@ -409,14 +417,14 @@ export function updateLeafletMap(crimes: Crime[], crimeDetailPath: string) {
         <div style="font-size:0.875rem;font-weight:700;color:var(--ch-text);margin-bottom:12px;line-height:1.4">${crime.headline}</div>
         <div style="font-size:0.75rem;color:var(--ch-text-muted);margin-bottom:4px">${crime.street}</div>
         <div style="font-size:0.75rem;color:#e11d48">${areaDisplay}</div>
-        <button
-          onclick="window.openCrimeDetailModal('${crime.slug}')"
-          style="font-size:0.75rem;color:#e11d48;border:1px solid #e11d48;border-radius:8px;padding:4px 12px;margin-top:12px;display:inline-block;font-weight:500;background:transparent;cursor:pointer"
+        <a
+          href="/trinidad/crime/${crime.slug}/"
+          style="font-size:0.75rem;color:#e11d48;border:1px solid #e11d48;border-radius:8px;padding:4px 12px;margin-top:12px;display:inline-block;font-weight:500;text-decoration:none"
           onmouseover="this.style.background='#e11d48';this.style.color='white'"
           onmouseout="this.style.background='transparent';this.style.color='#e11d48'"
         >
           View Details
-        </button>
+        </a>
       </div>
     `, { autoPanPaddingTopLeft: L.point(10, 50), autoPanPaddingBottomRight: L.point(10, 10) });
 

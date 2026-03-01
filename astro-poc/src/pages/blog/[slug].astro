@@ -400,7 +400,7 @@ const blogPostingSchema = {
 
   <!-- Social Share Script -->
   <script is:inline define:vars={{ title: post.data.title }}>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('astro:page-load', () => {
       const url = window.location.href;
       const text = title;
 

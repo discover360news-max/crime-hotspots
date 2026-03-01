@@ -196,16 +196,25 @@ const breadcrumbs = [
   </style>
 </Layout>
 
-<script is:inline define:vars={{ availableAreas, areaStatsMap }}>
+<script define:vars={{ availableAreas, areaStatsMap }}>
+  // Expose build-time data for the module script below
+  window.__compareData = { availableAreas, areaStatsMap };
+</script>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
   // Area links: keep in sync with src/config/routes.ts
-  const selectA = document.getElementById('selectA');
-  const selectB = document.getElementById('selectB');
+  const { availableAreas, areaStatsMap } = (window as any).__compareData || {};
+  if (!availableAreas || !areaStatsMap) return;
+
+  const selectA = document.getElementById('selectA') as HTMLSelectElement;
+  const selectB = document.getElementById('selectB') as HTMLSelectElement;
   const resultsEl = document.getElementById('comparisonResults');
-  const emptyEl = document.getElementById('emptyState');
+  const emptyEl = document.getElementById('emptyState') as HTMLElement;
 
   // Build slug → area info lookup
-  const slugToArea = {};
-  availableAreas.forEach(a => { slugToArea[a.slug] = a; });
+  const slugToArea: Record<string, any> = {};
+  availableAreas.forEach((a: any) => { slugToArea[a.slug] = a; });
 
   // Set dropdowns from URL on load
   const params = new URLSearchParams(window.location.search);
@@ -394,4 +403,5 @@ const breadcrumbs = [
   if (initialA && initialB) {
     renderComparison(initialA, initialB);
   }
+  }); // astro:page-load
 </script>

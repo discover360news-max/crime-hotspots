@@ -1,11 +1,12 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import NewsletterSignup from '../components/NewsletterSignup.astro';
 import BottomNav from '../components/BottomNav.astro';
 import { routes } from '../config/routes';
 import IslandSelectorModal from '../components/IslandSelectorModal.astro';
 import SearchModal from '../components/SearchModal.astro';
-import CrimeDetailModal from '../components/CrimeDetailModal.astro';
+// import CrimeDetailModal from '../components/CrimeDetailModal.astro'; // removed — crime cards now navigate directly
 import SectionPickerModal from '../components/SectionPickerModal.astro';
 
 interface Props {
@@ -129,6 +130,10 @@ const detectedCountryId = Object.entries(countryPathMap).find(
     <!-- Cloudflare Turnstile (loaded only on pages with forms) -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
   )}
+
+  <!-- View Transitions: smooth crossfade between page navigations.
+       Must come before <slot name="head" /> so page-level schemas are preserved across navigations. -->
+  <ClientRouter />
 
   <!-- SEO CRITICAL: named slot for page-level structured data (JSON-LD schemas).
        Pages pass <script type="application/ld+json" slot="head"> to inject into <head>.
@@ -312,8 +317,7 @@ const detectedCountryId = Object.entries(countryPathMap).find(
   <!-- Unified Island Selector Modal (dashboard / headlines / archives / areas) -->
   <IslandSelectorModal />
 
-  <!-- Crime Detail Modal -->
-  <CrimeDetailModal />
+  <!-- Crime Detail Modal removed — crime cards now navigate directly to crime pages -->
 
   <!-- Section Picker Modal (island sections) -->
   <SectionPickerModal />

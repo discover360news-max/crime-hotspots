@@ -40,14 +40,11 @@ function formatDate(date: Date) {
     <!-- Country Filter + RSS -->
     <div class="flex items-center justify-between mb-6">
       <div class="flex flex-wrap gap-2">
-        <button id="filter-all" class="px-4 py-1 min-h-[22px] rounded-lg bg-rose-600 text-white font-medium hover:bg-rose-700 active:bg-rose-800 transition text-xs">
+        <button id="filter-all" class="w-24 py-1 min-h-[22px] rounded-lg bg-rose-600 text-white font-medium hover:bg-rose-700 active:bg-rose-800 transition text-xs">
           All Countries
         </button>
         <button id="filter-tt" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] font-medium hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 transition text-xs">
           Trinidad & Tobago
-        </button>
-        <button id="filter-gy" class="px-4 py-1 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] font-medium hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 transition text-xs">
-          Guyana
         </button>
       </div>
       <a href="/rss.xml" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-300 dark:hover:border-rose-800 transition text-xs" title="Subscribe via RSS">
@@ -66,10 +63,10 @@ function formatDate(date: Date) {
           data-country={post.data.country}
         >
           <a href={`/blog/${post.slug}`} class="flex gap-4 items-start group">
-            <img src={post.data.image} alt={post.data.countryName} class="w-20 h-20 object-cover rounded-lg shrink-0">
+            <img src={post.data.image} alt={post.data.countryName} class="w-24 h-24 object-cover rounded-lg shrink-0">
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-1 flex-wrap">
-                <span class="text-caption font-bold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
+                <span class="text-caption font-medium px-1.5 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)]">
                   {post.data.countryName}
                 </span>
                 <span class="text-caption text-slate-400 dark:text-[hsl(0_0%_50%)]">{formatDate(post.data.date)}</span>
@@ -96,54 +93,43 @@ function formatDate(date: Date) {
   </main>
 
   <!-- Filter Script -->
-  <script is:inline>
-    let currentFilter = 'all';
+  <script>
+    document.addEventListener('astro:page-load', () => {
+      let currentFilter = 'all';
 
-    function filterPosts() {
-      const posts = document.querySelectorAll('.blog-post');
-      const emptyState = document.getElementById('empty-state');
-      let visibleCount = 0;
-
-      posts.forEach(post => {
-        const country = post.getAttribute('data-country');
-        if (currentFilter === 'all' || country === currentFilter) {
-          post.classList.remove('hidden');
-          visibleCount++;
-        } else {
-          post.classList.add('hidden');
-        }
-      });
-
-      if (visibleCount === 0) {
-        emptyState.classList.remove('hidden');
-      } else {
-        emptyState.classList.add('hidden');
+      function filterPosts() {
+        const posts = document.querySelectorAll('.blog-post');
+        const emptyState = document.getElementById('empty-state');
+        let visibleCount = 0;
+        posts.forEach(post => {
+          const country = post.getAttribute('data-country');
+          if (currentFilter === 'all' || country === currentFilter) {
+            post.classList.remove('hidden');
+            visibleCount++;
+          } else {
+            post.classList.add('hidden');
+          }
+        });
+        emptyState?.classList.toggle('hidden', visibleCount > 0);
       }
-    }
 
-    function updateFilterButtons(activeId) {
-      ['filter-all', 'filter-tt', 'filter-gy'].forEach(id => {
-        const button = document.getElementById(id);
-        if (id === activeId) {
-          button.classList.remove('border-2', 'border-slate-300', 'dark:border-[hsl(0_0%_30%)]', 'text-slate-700', 'dark:text-[hsl(0_0%_85%)]', 'hover:bg-slate-50', 'dark:hover:bg-[hsl(0_0%_14%)]');
-          button.classList.add('bg-rose-600', 'text-white', 'hover:bg-rose-700');
-        } else {
-          button.classList.remove('bg-rose-600', 'text-white', 'hover:bg-rose-700');
-          button.classList.add('border-2', 'border-slate-300', 'dark:border-[hsl(0_0%_30%)]', 'text-slate-700', 'dark:text-[hsl(0_0%_85%)]', 'hover:bg-slate-50', 'dark:hover:bg-[hsl(0_0%_14%)]');
-        }
-      });
-    }
+      function updateFilterButtons(activeId: string) {
+        ['filter-all', 'filter-tt'].forEach(id => {
+          const button = document.getElementById(id);
+          if (!button) return;
+          if (id === activeId) {
+            button.classList.remove('border-2', 'border-slate-300', 'dark:border-[hsl(0_0%_30%)]', 'text-slate-700', 'dark:text-[hsl(0_0%_85%)]', 'hover:bg-slate-50', 'dark:hover:bg-[hsl(0_0%_14%)]');
+            button.classList.add('bg-rose-600', 'text-white', 'hover:bg-rose-700');
+          } else {
+            button.classList.remove('bg-rose-600', 'text-white', 'hover:bg-rose-700');
+            button.classList.add('border-2', 'border-slate-300', 'dark:border-[hsl(0_0%_30%)]', 'text-slate-700', 'dark:text-[hsl(0_0%_85%)]', 'hover:bg-slate-50', 'dark:hover:bg-[hsl(0_0%_14%)]');
+          }
+        });
+      }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const filterButtons = {
-        'filter-all': 'all',
-        'filter-tt': 'tt',
-        'filter-gy': 'gy'
-      };
-
+      const filterButtons: Record<string, string> = { 'filter-all': 'all', 'filter-tt': 'tt' };
       Object.entries(filterButtons).forEach(([buttonId, filter]) => {
-        const button = document.getElementById(buttonId);
-        button.addEventListener('click', () => {
+        document.getElementById(buttonId)?.addEventListener('click', () => {
           currentFilter = filter;
           updateFilterButtons(buttonId);
           filterPosts();
