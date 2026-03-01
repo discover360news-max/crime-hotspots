@@ -50,7 +50,5 @@ export function initializeStatsScroll(
     }
 
     console.log('✅ Stats horizontal scroll initialized');
-  } else {
-    console.warn('⚠️ Stats scroll elements not found');
   }
 }
