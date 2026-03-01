@@ -9,6 +9,7 @@ import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import Hero from '../../../components/Hero.astro';
 import TipCard from '../../../components/TipCard.astro';
+import TipVote from '../../../components/TipVote.astro';
 import { getTrinidadCrimes } from '../../../lib/crimeData';
 import { routes, buildRoute } from '../../../config/routes';
 
@@ -41,6 +42,7 @@ const relatedTips = allTips
   .slice(0, 3);
 
 const { Content } = await tip.render();
+const gasUrl = import.meta.env.PUBLIC_SAFETY_TIPS_GAS_URL || '';
 
 const title = `${tip.data.title} | Safety Tips Trinidad — CrimeHotSpots.com`;
 const description = `Safety tip for ${tip.data.category} in Trinidad & Tobago. Context: ${tip.data.context}. Actionable advice to keep you safer.`;
@@ -154,6 +156,9 @@ const severityBadge: Record<string, string> = {
           </ul>
         </div>
       )}
+
+      <!-- Tip voting -->
+      <TipVote tipId={tip.slug} gasUrl={gasUrl} />
 
       <!-- Share + back -->
       <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">

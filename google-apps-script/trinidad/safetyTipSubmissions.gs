@@ -34,11 +34,18 @@ var NOTIFICATION_EMAIL_PROPERTY = 'NOTIFICATION_EMAIL';
 // ============================================================================
 
 /**
- * doPost — receives form submission from /safety-tips/submit/
+ * doPost — receives tip submissions AND tip votes
+ *   action: 'vote'  → recordTipVote()
+ *   (no action)     → tip submission (original behaviour)
  */
 function doPost(e) {
   try {
     var body = JSON.parse(e.postData.contents);
+
+    // Route vote requests
+    if (body.action === 'vote') {
+      return handleVote(body);
+    }
 
     // Basic validation
     if (!body.title || !body.title.trim()) {
@@ -66,6 +73,38 @@ function doPost(e) {
     Logger.log('❌ safetyTipSubmissions.doPost error: ' + err.message);
     return jsonResponse({ success: false, error: 'Internal error. Please try again.' }, 500);
   }
+}
+
+// ============================================================================
+// VOTE HANDLERS
+// ============================================================================
+
+/**
+ * Handle a tip vote POST { action:'vote', tip_id, vote:'helpful'|'not_helpful' }
+ */
+function handleVote(body) {
+  if (!body.tip_id || !body.vote) {
+    return jsonResponse({ success: false, error: 'tip_id and vote are required' }, 400);
+  }
+  var validVotes = ['helpful', 'not_helpful'];
+  if (validVotes.indexOf(body.vote) === -1) {
+    return jsonResponse({ success: false, error: 'Invalid vote value' }, 400);
+  }
+  appendVote(body.tip_id, body.vote);
+  return jsonResponse({ success: true });
+}
+
+function appendVote(tipId, vote) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Tip Votes');
+
+  if (!sheet) {
+    sheet = ss.insertSheet('Tip Votes');
+    sheet.appendRow(['Timestamp', 'Tip ID', 'Vote']);
+    sheet.setFrozenRows(1);
+  }
+
+  sheet.appendRow([new Date(), tipId, vote]);
 }
 
 /**

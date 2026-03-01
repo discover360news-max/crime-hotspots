@@ -1,0 +1,82 @@
+---
+/**
+ * TipVote — "Was this tip helpful?" widget for safety tip detail pages.
+ *
+ * - localStorage prevents repeat voting from same browser (key: tip_vote:[tipId])
+ * - Votes posted fire-and-forget to GAS webhook (same URL as tip submissions)
+ * - Vote counts never displayed publicly
+ */
+
+interface Props {
+  tipId: string;
+  gasUrl: string;
+}
+
+const { tipId, gasUrl } = Astro.props;
+---
+
+<div
+  class="tip-vote-widget mt-5 pt-5 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]"
+  data-tip-id={tipId}
+  data-gas-url={gasUrl}
+>
+  <div class="tip-vote-buttons flex items-center justify-between">
+    <span class="text-caption font-medium text-slate-500 dark:text-[hsl(0_0%_55%)]">Was this tip helpful?</span>
+    <div class="flex items-center gap-2">
+      <button
+        class="tip-vote-btn px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-emerald-500 hover:text-emerald-600 dark:hover:border-emerald-600 dark:hover:text-emerald-400 transition"
+        data-vote="helpful"
+        aria-label="Yes, this tip was helpful"
+      >Yes, helpful</button>
+      <button
+        class="tip-vote-btn px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-slate-400 dark:hover:border-[hsl(0_0%_35%)] transition"
+        data-vote="not_helpful"
+        aria-label="No, this tip needs improvement"
+      >Needs improvement</button>
+    </div>
+  </div>
+
+  <div class="tip-vote-thanks hidden">
+    <span class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">Thanks for your feedback</span>
+  </div>
+</div>
+
+<script is:inline>
+(function () {
+  var widgets = document.querySelectorAll('.tip-vote-widget');
+  widgets.forEach(function (widget) {
+    var tipId = widget.dataset.tipId;
+    var gasUrl = widget.dataset.gasUrl;
+    var storageKey = 'tip_vote:' + tipId;
+    var buttonsEl = widget.querySelector('.tip-vote-buttons');
+    var thanksEl = widget.querySelector('.tip-vote-thanks');
+
+    // Already voted — show thanks immediately
+    if (localStorage.getItem(storageKey)) {
+      buttonsEl.classList.add('hidden');
+      thanksEl.classList.remove('hidden');
+      return;
+    }
+
+    widget.querySelectorAll('.tip-vote-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var vote = btn.dataset.vote;
+        localStorage.setItem(storageKey, vote);
+        buttonsEl.classList.add('hidden');
+        thanksEl.classList.remove('hidden');
+
+        // Fire-and-forget to GAS
+        if (gasUrl) {
+          fetch(gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'vote', tip_id: tipId, vote: vote })
+          }).catch(function () {
+            // Silently ignore — localStorage already recorded the vote
+          });
+        }
+      });
+    });
+  });
+})();
+</script>
