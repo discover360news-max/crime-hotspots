@@ -48,8 +48,8 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
   </button>
 
   <div
-    class="cat-content overflow-hidden transition-all duration-300"
-    class:list={[isExpanded ? 'max-h-[10000px] mt-3' : 'max-h-0']}
+    class="cat-content overflow-hidden"
+    class:list={[isExpanded && 'is-open']}
   >
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">
       <slot />
@@ -63,29 +63,40 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
   </div>
 </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll<HTMLButtonElement>('.cat-header').forEach(header => {
-      header.addEventListener('click', () => {
-        const accordion = header.closest('.cat-accordion');
-        const content = accordion?.querySelector('.cat-content');
-        const chevron = header.querySelector('.cat-chevron');
-        const expanded = header.getAttribute('aria-expanded') === 'true';
+<style>
+  /* height: auto is animatable because Layout.astro sets html { interpolate-size: allow-keywords } */
+  .cat-content {
+    height: 0;
+    transition: height 300ms ease, margin-top 200ms ease;
+  }
+  .cat-content.is-open {
+    height: auto;
+    margin-top: 0.75rem;
+  }
+</style>
+
+<script is:inline>
+  /* is:inline re-runs on every View Transitions navigation — no DOMContentLoaded needed */
+  (function () {
+    document.querySelectorAll('.cat-header').forEach(function (header) {
+      header.addEventListener('click', function () {
+        var accordion = header.closest('.cat-accordion');
+        var content = accordion && accordion.querySelector('.cat-content');
+        var chevron = header.querySelector('.cat-chevron');
+        var expanded = header.getAttribute('aria-expanded') === 'true';
 
         if (content && chevron) {
           if (expanded) {
             header.setAttribute('aria-expanded', 'false');
-            content.classList.remove('max-h-[10000px]', 'mt-3');
-            content.classList.add('max-h-0');
+            content.classList.remove('is-open');
             chevron.classList.remove('rotate-90');
           } else {
             header.setAttribute('aria-expanded', 'true');
-            content.classList.add('max-h-[10000px]', 'mt-3');
-            content.classList.remove('max-h-0');
+            content.classList.add('is-open');
             chevron.classList.add('rotate-90');
           }
         }
       });
     });
-  });
+  })();
 </script>

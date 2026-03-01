@@ -212,6 +212,10 @@ const detectedCountryId = Object.entries(countryPathMap).find(
     color-scheme: dark;                     /* native form icons (date picker, select arrows) */
   }
 
+  /* CSS interpolate-size: enables animating height/width to keyword values (e.g. height: auto).
+     Required for accordion open/close to animate correctly without the max-height hack. */
+  html { interpolate-size: allow-keywords; }
+
   /* Custom select chevron — replaces inconsistent native arrow */
   .filter-select {
     appearance: none;
