@@ -330,6 +330,9 @@ const breadcrumbs = [
 
 <!-- Filter tray + filter logic: module script, re-runs callback on every navigation -->
 <script>
+  // Clear headlines data when navigating away so the page-load guard works correctly on other pages
+  document.addEventListener('astro:before-swap', () => { delete (window as any).__hlData; });
+
   document.addEventListener('astro:page-load', () => {
     const { allCrimes, regionToAreas, allAreas } = (window as any).__hlData || {};
     if (!allCrimes) return;

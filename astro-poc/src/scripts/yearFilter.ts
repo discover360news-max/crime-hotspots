@@ -62,19 +62,10 @@ export function initializeYearFilter(
     const crimeYear = new Date(c.date).getFullYear();
     return crimeYear === currentYear;
   });
-  console.log(`📊 Showing ${filteredCrimes.length} crimes from ${currentYear}`);
-
   // Wait for DOM to be ready before attaching event listeners
   function initYearFilter() {
-    console.log('🔧 Initializing year filter...');
-
     const yearFilterElement = document.getElementById('yearFilter') as HTMLSelectElement;
-    if (!yearFilterElement) {
-      console.error('❌ Year filter dropdown not found!');
-      return;
-    }
-
-    console.log('✅ Year filter dropdown found');
+    if (!yearFilterElement) return;
 
     // Populate dropdown with available years
     yearFilterElement.innerHTML = '';
