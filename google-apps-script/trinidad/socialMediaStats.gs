@@ -139,23 +139,24 @@ function generateDailyStats() {
     // Calculate date ranges (accounting for reporting lag)
     const now = new Date();
 
-    // Account for reporting lag: end week on (today - lagDays - 1) to ensure complete data
-    // Example: On Dec 31 with 3-day lag, end on Dec 27 (giving time for Dec 27 crimes to be reported by Dec 30)
+    // Account for reporting lag: end week on (today - lagDays) to ensure complete data
+    // 8-day window (end-of-day to start-of-day) buffers boundary dates since CSV entries
+    // have no timestamps and parse as midnight
     const currentWeekEnd = new Date(now);
-    currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays - 1);
-    currentWeekEnd.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+    currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays);
+    currentWeekEnd.setHours(23, 59, 59, 999);
 
     const currentWeekStart = new Date(currentWeekEnd);
-    currentWeekStart.setDate(currentWeekStart.getDate() - 6); // 7-day week
-    currentWeekStart.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+    currentWeekStart.setDate(currentWeekStart.getDate() - 7); // 8-day window
+    currentWeekStart.setHours(0, 0, 0, 0);
 
     const previousWeekEnd = new Date(currentWeekStart);
     previousWeekEnd.setDate(previousWeekEnd.getDate() - 1); // Day before current week
-    previousWeekEnd.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+    previousWeekEnd.setHours(23, 59, 59, 999);
 
     const previousWeekStart = new Date(previousWeekEnd);
-    previousWeekStart.setDate(previousWeekStart.getDate() - 6); // Previous 7 days
-    previousWeekStart.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+    previousWeekStart.setDate(previousWeekStart.getDate() - 7); // 8-day window
+    previousWeekStart.setHours(0, 0, 0, 0);
 
     Logger.log(`📅 Current week: ${formatDateShort(currentWeekStart)} - ${formatDateShort(currentWeekEnd)}`);
     Logger.log(`📅 Previous week: ${formatDateShort(previousWeekStart)} - ${formatDateShort(previousWeekEnd)}`);
@@ -862,12 +863,6 @@ ${SOCIAL_CONFIG.dashboardUrl}
 function saveToSheet(posts, stats) {
   const sheet = getOrCreateSocialPostsSheet();
 
-  // Clear previous content (keep last 30 rows for history)
-  const lastRow = sheet.getLastRow();
-  if (lastRow > 31) {
-    sheet.deleteRows(2, lastRow - 31); // Keep header + last 30
-  }
-
   // Add new row at top (below header)
   sheet.insertRowBefore(2);
 
@@ -884,6 +879,12 @@ function saveToSheet(posts, stats) {
     posts.short,
     statSummary
   ]]);
+
+  // Trim oldest rows from the bottom (keep header + last 30 entries)
+  const lastRow = sheet.getLastRow();
+  if (lastRow > 31) {
+    sheet.deleteRows(32, lastRow - 31);
+  }
 
   // Set row height for better readability
   sheet.setRowHeight(2, 150);
@@ -1089,11 +1090,11 @@ function debugDates() {
   // Show what the script is looking for (with lag adjustment)
   const now = new Date();
   const currentWeekEnd = new Date(now);
-  currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays - 1);
-  currentWeekEnd.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+  currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays);
+  currentWeekEnd.setHours(23, 59, 59, 999);
   const currentWeekStart = new Date(currentWeekEnd);
-  currentWeekStart.setDate(currentWeekStart.getDate() - 6);
-  currentWeekStart.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+  currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+  currentWeekStart.setHours(0, 0, 0, 0);
 
   Logger.log(`\n🎯 Script is looking for crimes between:`);
   Logger.log(`  ${currentWeekStart} and ${currentWeekEnd}`);
@@ -1188,11 +1189,11 @@ function testStatsGeneration() {
 
   const now = new Date();
   const currentWeekEnd = new Date(now);
-  currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays - 1);
-  currentWeekEnd.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+  currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays);
+  currentWeekEnd.setHours(23, 59, 59, 999);
   const currentWeekStart = new Date(currentWeekEnd);
-  currentWeekStart.setDate(currentWeekStart.getDate() - 6);
-  currentWeekStart.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
+  currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+  currentWeekStart.setHours(0, 0, 0, 0);
 
   const currentWeekCrimes = filterCrimesByDateRange(crimes, currentWeekStart, currentWeekEnd);
   Logger.log(`✅ Current week: ${currentWeekCrimes.length} crimes`);
