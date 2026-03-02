@@ -59,16 +59,22 @@ function generateBlogData() {
     const crimes = fetchCrimeData();
 
     // Calculate date ranges (same logic as social posts)
+    // End = end-of-day, Start = start-of-day, 8-day window buffers boundary dates
+    // since sheet entries have no timestamps and parse as midnight
     const now = new Date();
     const currentWeekEnd = new Date(now);
     currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays);
+    currentWeekEnd.setHours(23, 59, 59, 999);
     const currentWeekStart = new Date(currentWeekEnd);
-    currentWeekStart.setDate(currentWeekStart.getDate() - 6);
+    currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+    currentWeekStart.setHours(0, 0, 0, 0);
 
     const previousWeekEnd = new Date(currentWeekStart);
     previousWeekEnd.setDate(previousWeekEnd.getDate() - 1);
+    previousWeekEnd.setHours(23, 59, 59, 999);
     const previousWeekStart = new Date(previousWeekEnd);
-    previousWeekStart.setDate(previousWeekStart.getDate() - 6);
+    previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+    previousWeekStart.setHours(0, 0, 0, 0);
 
     // Filter crimes
     const currentWeekCrimes = filterCrimesByDateRange(crimes, currentWeekStart, currentWeekEnd);
@@ -169,8 +175,8 @@ function getDetailedAreaBreakdown(crimes, limit) {
     areaData[area].incidents.push(crime);
 
     // Get crime types (support both 2026 and 2025 formats)
-    const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'];
-    const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || '';
+    const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'] || crime['primaryType'];
+    const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || crime['relatedTypes'] || '';
     const victimCount = parseInt(crime['victimCount'] || crime['Victim Count'] || '1', 10) || 1;
 
     if (primaryType && primaryType.trim() !== '') {
@@ -193,15 +199,17 @@ function getDetailedAreaBreakdown(crimes, limit) {
         areaData[area].totalVictims += 1;
       }
 
-      // Count related crime types (always +1 for related)
+      // Count related crime types (each entry = +1 victim)
+      // Duplicates are intentional (e.g., Murder|Murder = 2 deaths in one shooting)
+      // Only exclude entries matching primaryType (prevents double-counting same type)
       if (relatedTypes && relatedTypes.trim() !== '') {
-        const related = relatedTypes.split('|').map(t => t.trim()).filter(t => t !== '');
+        const related = relatedTypes.split('|').map(t => t.trim()).filter(t => t !== '' && t !== primaryType);
         related.forEach(type => {
           if (!areaData[area].types[type]) {
             areaData[area].types[type] = { incidents: 0, victims: 0 };
           }
           areaData[area].types[type].incidents++;
-          areaData[area].types[type].victims += 1; // Related crimes always count as 1
+          areaData[area].types[type].victims += 1; // Each related entry = 1 victim
           areaData[area].totalVictims += 1;
         });
       }
@@ -282,16 +290,26 @@ function formatBlogData(startDate, endDate, stats, timeAnalysis, areaBreakdown, 
   stats.changes.forEach((c, index) => {
     const sign = c.diff >= 0 ? '+' : '';
     output += `${index + 1}. ${c.type}:\n`;
-    output += `   - This Week: ${c.current} incidents`;
 
-    // Add victim count if this crime type uses it
     if (usesVictimCount(c.type)) {
-      const victimsCurrent = calculateVictimsForCrimeType(crimes, c.type);
-      output += ` (${victimsCurrent} victims)`;
+      // For victim-count crimes: show primary incident rows + victim total separately
+      // c.current is the victim-count-based total (primary victimCount + related occurrences)
+      const primaryRows = crimes.filter(crime => {
+        const pt = crime['primaryCrimeType'] || crime['Primary Crime Type'] || crime['primaryType'];
+        return pt === c.type;
+      }).length;
+      const totalVictims = calculateVictimsForCrimeType(crimes, c.type);
+      output += `   - This Week: ${totalVictims} victims total (${primaryRows} primary incidents`;
+      if (totalVictims > primaryRows) {
+        output += `, ${totalVictims - primaryRows} from related crimes`;
+      }
+      output += `)\n`;
+      output += `   - Last Week: ${c.previous} victims total\n`;
+    } else {
+      output += `   - This Week: ${c.current} incidents\n`;
+      output += `   - Last Week: ${c.previous} incidents\n`;
     }
-    output += `\n`;
 
-    output += `   - Last Week: ${c.previous} incidents\n`;
     output += `   - Change: ${sign}${c.diff} (${c.percentChange >= 0 ? '+' : ''}${Math.round(c.percentChange)}%)\n`;
   });
   output += '\n';
@@ -350,8 +368,8 @@ function calculateTotalVictims(crimes) {
   let totalVictims = 0;
 
   crimes.forEach(crime => {
-    const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'];
-    const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || '';
+    const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'] || crime['primaryType'];
+    const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || crime['relatedTypes'] || '';
     const victimCount = parseInt(crime['victimCount'] || crime['Victim Count'] || '1', 10) || 1;
 
     if (primaryType && primaryType.trim() !== '') {
@@ -364,9 +382,11 @@ function calculateTotalVictims(crimes) {
         totalVictims += 1;
       }
 
-      // Count related crimes (always +1 each)
+      // Count related crimes (each entry = +1 victim)
+      // Duplicates are intentional (e.g., Murder|Murder = 2 deaths)
+      // Only exclude entries matching primaryType (prevents double-counting same type)
       if (relatedTypes && relatedTypes.trim() !== '') {
-        const related = relatedTypes.split('|').filter(t => t.trim() !== '');
+        const related = relatedTypes.split('|').map(t => t.trim()).filter(t => t !== '' && t !== primaryType);
         totalVictims += related.length;
       }
 
@@ -386,8 +406,8 @@ function calculateVictimsForCrimeType(crimes, targetType) {
   let victims = 0;
 
   crimes.forEach(crime => {
-    const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'];
-    const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || '';
+    const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'] || crime['primaryType'];
+    const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || crime['relatedTypes'] || '';
     const victimCount = parseInt(crime['victimCount'] || crime['Victim Count'] || '1', 10) || 1;
 
     if (primaryType && primaryType.trim() !== '') {
@@ -402,12 +422,11 @@ function calculateVictimsForCrimeType(crimes, targetType) {
         }
       }
 
-      // Check if any related crime matches (always +1)
-      if (relatedTypes && relatedTypes.trim() !== '') {
+      // Count related matches — each entry is +1 (Murder|Murder = 2)
+      // Only skip if same as primary (prevents double-counting same type)
+      if (relatedTypes && relatedTypes.trim() !== '' && primaryType !== targetType) {
         const related = relatedTypes.split('|').map(t => t.trim()).filter(t => t !== '');
-        if (related.includes(targetType)) {
-          victims += 1;
-        }
+        victims += related.filter(t => t === targetType).length;
       }
 
     } else {

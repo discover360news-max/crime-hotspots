@@ -10,6 +10,7 @@ export const prerender = true;
 import Layout from '../../layouts/Layout.astro';
 import { getTrinidadCrimes } from '../../lib/crimeData';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
+import { getTotalCrimeCount } from '../../lib/statisticsHelpers';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import StatCard from '../../components/StatCard.astro';
 import QuickInsightsCard from '../../components/QuickInsightsCard.astro';
@@ -149,7 +150,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
       <!-- Actual Stats (hidden initially) -->
       <div class="stats-scroll-container absolute inset-0 opacity-0 transition-opacity duration-300">
-        <StatCard value={crimes.length} label="Total Incidents" id="totalIncidents" crimeType="All" />
+        <StatCard value={getTotalCrimeCount(crimes)} label="All Crimes" id="totalIncidents" crimeType="All" />
         <StatCard value={countCrimeType(crimes, 'Murder')} label="Murders" crimeType="Murder" />
         <StatCard value={countCrimeType(crimes, 'Robbery')} label="Robberies" crimeType="Robbery" />
         <StatCard value={countCrimeType(crimes, 'Home Invasion')} label="Home Invasions" crimeType="Home Invasion" />

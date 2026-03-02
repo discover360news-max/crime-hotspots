@@ -158,13 +158,14 @@ function validateBlogDataReadiness() {
   }
 
   // Calculate the same lagged window as generateBlogStatistics()
+  // End-of-day / start-of-day + 8-day window to capture boundary dates without timestamps
   const now = new Date();
   const weekEnd = new Date(now);
   weekEnd.setDate(weekEnd.getDate() - SOCIAL_CONFIG.lagDays);
-  weekEnd.setHours(12, 0, 0, 0); // Noon — matches filterCrimesByDateRange()
+  weekEnd.setHours(23, 59, 59, 999);
   const weekStart = new Date(weekEnd);
-  weekStart.setDate(weekStart.getDate() - 6);
-  weekStart.setHours(12, 0, 0, 0); // Noon
+  weekStart.setDate(weekStart.getDate() - 7);
+  weekStart.setHours(0, 0, 0, 0);
 
   Logger.log(`Validation window: ${weekStart.toDateString()} to ${weekEnd.toDateString()}`);
 
@@ -184,7 +185,7 @@ function validateBlogDataReadiness() {
   // CHECK 2: Data freshness — ensure the most recent days of the window have data
   const freshnessStart = new Date(weekEnd);
   freshnessStart.setDate(freshnessStart.getDate() - 2);
-  freshnessStart.setHours(12, 0, 0, 0);
+  freshnessStart.setHours(0, 0, 0, 0);
 
   const recentCrimes = filterCrimesByDateRange(crimes, freshnessStart, weekEnd);
 
@@ -268,16 +269,22 @@ function generateBlogStatistics() {
   const crimes = fetchCrimeData();
 
   // Calculate date ranges with 3-day lag (from socialMediaStats.gs)
+  // End = noon on last day, Start = 8-day window (extra day buffers boundary dates
+  // since sheet entries have no timestamps and parse as midnight)
   const now = new Date();
   const currentWeekEnd = new Date(now);
   currentWeekEnd.setDate(currentWeekEnd.getDate() - SOCIAL_CONFIG.lagDays);
+  currentWeekEnd.setHours(23, 59, 59, 999);
   const currentWeekStart = new Date(currentWeekEnd);
-  currentWeekStart.setDate(currentWeekStart.getDate() - 6);
+  currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+  currentWeekStart.setHours(0, 0, 0, 0);
 
   const previousWeekEnd = new Date(currentWeekStart);
   previousWeekEnd.setDate(previousWeekEnd.getDate() - 1);
+  previousWeekEnd.setHours(23, 59, 59, 999);
   const previousWeekStart = new Date(previousWeekEnd);
-  previousWeekStart.setDate(previousWeekStart.getDate() - 6);
+  previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+  previousWeekStart.setHours(0, 0, 0, 0);
 
   // Filter crimes by date range (from socialMediaStats.gs)
   const currentWeekCrimes = filterCrimesByDateRange(crimes, currentWeekStart, currentWeekEnd);

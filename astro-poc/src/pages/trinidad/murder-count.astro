@@ -61,8 +61,15 @@ const projectedAnnualMurders = daysPassed > 0 ? Math.round((murderCount / daysPa
 const projectedMurderRate = ((projectedAnnualMurders / POPULATION) * 100000).toFixed(1);
 
 // Latest 10 murders for the incidents section
+// Check primaryCrimeType (current field), crimeType (legacy fallback), and relatedCrimeTypes.
+// When Murder appears in relatedCrimeTypes the victimCount does NOT apply — the incident may
+// have had multiple injuries but the death(s) is the related element, not the primary.
 const latestMurders = crimes2026
-  .filter(c => c.crimeType === 'Murder')
+  .filter(c =>
+    c.primaryCrimeType === 'Murder' ||
+    c.crimeType === 'Murder' ||
+    c.relatedCrimeTypes?.split(',').map(t => t.trim()).includes('Murder')
+  )
   .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
   .slice(0, 10);
 

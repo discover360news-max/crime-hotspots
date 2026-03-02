@@ -590,8 +590,8 @@ function countByCrimeType(crimes) {
   const counts = {};
   crimes.forEach(crime => {
     // Try new format first (2026+ data with primary + related crime types)
-    const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'];
-    const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || '';
+    const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'] || crime['primaryType'];
+    const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || crime['relatedTypes'] || '';
     const victimCount = parseInt(crime['victimCount'] || crime['Victim Count'] || '1', 10) || 1;
 
     if (primaryType && primaryType.trim() !== '') {
@@ -604,11 +604,13 @@ function countByCrimeType(crimes) {
         counts[primaryType] += 1; // Count as 1 incident
       }
 
-      // New format: count related types (pipe-separated, always +1 each)
+      // New format: count related types (pipe-separated, each entry = +1 victim)
+      // Each duplicate entry is intentional (e.g., Murder|Murder = 2 deaths in one shooting)
+      // Only exclude entries that match primaryType (prevents double-counting same type)
       if (relatedTypes && relatedTypes.trim() !== '') {
-        const related = relatedTypes.split('|').map(t => t.trim()).filter(t => t !== '');
+        const related = relatedTypes.split('|').map(t => t.trim()).filter(t => t !== '' && t !== primaryType);
         related.forEach(type => {
-          counts[type] = (counts[type] || 0) + 1; // Related crimes always +1
+          counts[type] = (counts[type] || 0) + 1; // Each related entry = 1 victim
         });
       }
     } else {
@@ -1102,6 +1104,77 @@ function debugDates() {
   if (crimes.length > 0) {
     Object.keys(crimes[0]).forEach(col => Logger.log(`  - "${col}"`));
   }
+}
+
+/**
+ * DIAGNOSTIC: Break down murder count in detail for any date range
+ * Run this to verify murder counting is correct
+ * Example: debugMurderCount('2026-02-21', '2026-02-27')
+ */
+function debugMurderCount(startDateStr, endDateStr) {
+  const crimes = fetchCrimeData();
+
+  // Default to current week window if no dates provided
+  if (!startDateStr || !endDateStr) {
+    const now = new Date();
+    const end = new Date(now);
+    end.setDate(end.getDate() - SOCIAL_CONFIG.lagDays);
+    end.setHours(12, 0, 0, 0);
+    const start = new Date(end);
+    start.setDate(start.getDate() - 6);
+    start.setHours(12, 0, 0, 0);
+    startDateStr = Utilities.formatDate(start, SOCIAL_CONFIG.timezone, 'yyyy-MM-dd');
+    endDateStr = Utilities.formatDate(end, SOCIAL_CONFIG.timezone, 'yyyy-MM-dd');
+  }
+
+  const start = new Date(startDateStr + 'T12:00:00');
+  const end = new Date(endDateStr + 'T12:00:00');
+  const weekCrimes = filterCrimesByDateRange(crimes, start, end);
+
+  Logger.log('=== MURDER COUNT DIAGNOSTIC ===');
+  Logger.log(`Date range: ${startDateStr} to ${endDateStr}`);
+  Logger.log(`Total rows in range: ${weekCrimes.length}`);
+
+  if (weekCrimes.length > 0) {
+    Logger.log(`\nCSV column names: ${Object.keys(weekCrimes[0]).join(', ')}`);
+  }
+
+  let primaryMurders = 0;
+  let relatedMurders = 0;
+  const details = [];
+
+  weekCrimes.forEach((crime, i) => {
+    const primaryType = crime['primaryCrimeType'] || crime['Primary Crime Type'] || crime['primaryType'];
+    const relatedTypes = crime['relatedCrimeTypes'] || crime['Related Crime Types'] || crime['relatedTypes'] || '';
+    const victimCount = parseInt(crime['victimCount'] || crime['Victim Count'] || '1', 10) || 1;
+    const date = crime['Date'] || '';
+    const area = crime['Area'] || '';
+    const headline = (crime['Headline'] || '').substring(0, 60);
+
+    const isPrimaryMurder = primaryType === 'Murder';
+    // Each related entry counts separately (Murder|Murder = 2 deaths), exclude if same as primary
+    const related = relatedTypes.split('|').map(t => t.trim()).filter(t => t !== '' && t !== primaryType);
+    const relatedMurderCount = related.filter(t => t === 'Murder').length;
+
+    if (isPrimaryMurder) {
+      primaryMurders += victimCount;
+      details.push(`ROW ${i+1}: PRIMARY Murder, victimCount=${victimCount}, area=${area}, date=${date}`);
+      details.push(`  headline: ${headline}`);
+      if (victimCount > 1) details.push(`  *** MULTI-VICTIM: counts as ${victimCount}`);
+    } else if (relatedMurderCount > 0) {
+      relatedMurders += relatedMurderCount;
+      details.push(`ROW ${i+1}: RELATED Murder x${relatedMurderCount} (primary=${primaryType}, victimCount=${victimCount}), area=${area}, date=${date}`);
+      details.push(`  headline: ${headline}`);
+      details.push(`  relatedTypes: ${relatedTypes}`);
+    }
+  });
+
+  Logger.log('\n--- Murder breakdown ---');
+  details.forEach(d => Logger.log(d));
+  Logger.log(`\nPrimary Murder victims (with victimCount): ${primaryMurders}`);
+  Logger.log(`Related Murder appearances (+1 each):     ${relatedMurders}`);
+  Logger.log(`TOTAL Murder count sent to Claude:        ${primaryMurders + relatedMurders}`);
+  Logger.log('================================');
 }
 
 /**

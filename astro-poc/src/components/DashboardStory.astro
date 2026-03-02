@@ -5,7 +5,6 @@
  * Server-rendered, compact, zero interactivity
  */
 import type { Crime } from '../lib/crimeData';
-import { getHotAreas } from '../lib/trendingHelpers';
 import { countCrimeType } from '../lib/dashboardHelpers';
 
 interface Props {
@@ -14,19 +13,32 @@ interface Props {
 
 const { allCrimes } = Astro.props;
 
-// This week's crimes
+// This week's crimes — offset by 3-day lag (crimes are logged by incident date,
+// not entry date, so the most recent 3 days are always incomplete)
 const now = new Date();
+const lagDays = 3;
+const weekEnd = new Date();
+weekEnd.setDate(now.getDate() - lagDays);
+weekEnd.setHours(0, 0, 0, 0);
 const weekAgo = new Date();
-weekAgo.setDate(now.getDate() - 7);
+weekAgo.setDate(now.getDate() - (7 + lagDays));
+weekAgo.setHours(0, 0, 0, 0);
 const twoWeeksAgo = new Date();
-twoWeeksAgo.setDate(now.getDate() - 14);
+twoWeeksAgo.setDate(now.getDate() - (14 + lagDays));
+twoWeeksAgo.setHours(0, 0, 0, 0);
 
-const thisWeekCrimes = allCrimes.filter(c => c.dateObj >= weekAgo);
+const thisWeekCrimes = allCrimes.filter(c => c.dateObj >= weekAgo && c.dateObj < weekEnd);
 const lastWeekCrimes = allCrimes.filter(c => c.dateObj >= twoWeeksAgo && c.dateObj < weekAgo);
 
-// Top area this week
-const hotAreas = getHotAreas(allCrimes, 1);
-const topArea = hotAreas[0];
+// Top area this week — derived from the same lag-adjusted thisWeekCrimes window
+// so the "leads with X" count matches the incident count shown in the banner
+const areaCountThisWeek = new Map<string, number>();
+thisWeekCrimes.forEach(c => {
+  const area = c.area || 'Unknown';
+  if (area !== 'Unknown') areaCountThisWeek.set(area, (areaCountThisWeek.get(area) || 0) + 1);
+});
+const topAreaEntry = Array.from(areaCountThisWeek.entries()).sort((a, b) => b[1] - a[1])[0];
+const topArea = topAreaEntry ? { area: topAreaEntry[0], count: topAreaEntry[1] } : null;
 
 // Murders comparison — uses countCrimeType which correctly:
 // - Applies victimCount for primary Murder (double murder = 2)

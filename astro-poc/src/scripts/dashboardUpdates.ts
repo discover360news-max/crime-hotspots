@@ -6,6 +6,7 @@
 
 import type { Crime } from '../lib/crimeData';
 import { countCrimeType } from '../lib/dashboardHelpers';
+import { getTotalCrimeCount } from '../lib/statisticsHelpers';
 import { generateNameSlug } from '../lib/csvParser';
 import { getRiskWeight } from '../config/riskWeights';
 import { usesVictimCount } from '../config/crimeTypeConfig';
@@ -140,7 +141,7 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
 
   // Calculate display counts (from filtered crimes parameter)
   // Uses countCrimeType to count across both primaryCrimeType and relatedCrimeTypes
-  const displayTotal = crimes.length;
+  const displayTotal = getTotalCrimeCount(crimes);
   const displayMurders = countCrimeType(crimes, 'Murder');
   const displayRobberies = countCrimeType(crimes, 'Robbery');
   const displayHomeInvasions = countCrimeType(crimes, 'Home Invasion');
@@ -152,7 +153,7 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
   const displayKidnappings = countCrimeType(crimes, 'Kidnapping');
 
   // Calculate trend counts (last 30 days from ALL crimes)
-  const last30Total = last30DaysCrimes.length;
+  const last30Total = getTotalCrimeCount(last30DaysCrimes);
   const last30Murders = countCrimeType(last30DaysCrimes, 'Murder');
   const last30Robberies = countCrimeType(last30DaysCrimes, 'Robbery');
   const last30HomeInvasions = countCrimeType(last30DaysCrimes, 'Home Invasion');
@@ -164,7 +165,7 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
   const last30Kidnappings = countCrimeType(last30DaysCrimes, 'Kidnapping');
 
   // Calculate previous 30-day counts
-  const prev30Total = prev30DaysCrimes.length;
+  const prev30Total = getTotalCrimeCount(prev30DaysCrimes);
   const prev30Murders = countCrimeType(prev30DaysCrimes, 'Murder');
   const prev30Robberies = countCrimeType(prev30DaysCrimes, 'Robbery');
   const prev30HomeInvasions = countCrimeType(prev30DaysCrimes, 'Home Invasion');

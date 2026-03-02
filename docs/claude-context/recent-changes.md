@@ -8,6 +8,48 @@
 
 ## March 2026
 
+### Calculation Audit + Fixes (Mar 2)
+
+**Root issues identified and fixed across dashboard, statistics, and murder count pages.**
+
+**Dashboard — "All Crimes" card (was "Total Incidents"):**
+- `dashboard.astro` + `dashboardUpdates.ts` — changed from raw `crimes.length` (incident rows) to `getTotalCrimeCount()` (primary + related crime type occurrences). Renamed label "Total Incidents" → "All Crimes"
+- Trend arrows (↑↓ vs prev 30 days) now use same count method
+
+**Statistics page:**
+- `statistics.astro` — "Total Incidents" stat card renamed "All Crimes"
+- Fixed double-counting in total YoY row: was summing 9 individual crime type counts (incidents with both a primary + related tracked type were counted twice). Now uses `filterToSamePeriod` + `getTotalCrimeCount` on each year's data
+
+**Murder Count page:**
+- `murder-count.astro` — "Latest Murders" list was filtering on old `crimeType` field only, missing 2026 incidents. Now checks `primaryCrimeType`, `crimeType` (legacy fallback), and `relatedCrimeTypes`. Incidents where Murder is in relatedCrimes are included but victimCount is not applied (multiple injuries ≠ multiple deaths)
+
+**DashboardStory banner ("This week: X incidents"):**
+- `DashboardStory.astro` — applied the same 3-day lag used by stat card trends. "This week" now covers day 3→10 ago (complete data) vs last week day 10→17 ago, instead of comparing incomplete recent data against complete historical data (was causing inflated "down 45%" figures)
+- Fixed boundary day mismatch: "leads with X" top area now derived from the same lag-adjusted `thisWeekCrimes` array instead of `getHotAreas()` which used its own unlagged window
+- Removed unused `getHotAreas` import
+
+---
+
+### Console Error Cleanup + UI Polish (Mar 1)
+
+**Console errors fixed:**
+- `Layout.astro` — corrupted Ko-fi SVG path (`masterpageWidth` artifact in `d` attr) replaced with clean heart icon
+- `Layout.astro` — removed `integrity` attr from Leaflet CSS `<link>` — was causing SRI mismatch preload warnings due to Astro ClientRouter generating integrity-free preload tags
+- `statsScroll.ts` — removed `console.warn` when scroll elements not found (expected on non-dashboard pages)
+- `yearFilter.ts` — removed `console.error` + debug logs when `#yearFilter` not in DOM (same pattern)
+- `leafletMap.ts` — removed `console.error` when map container not found (same pattern)
+- `headlines.astro` — added `astro:before-swap` listener to clear `window.__hlData`; without it, stale data caused the page-load guard to not bail out on other pages, throwing TypeErrors on missing DOM elements
+
+**UI polish (homepage):**
+- `QuickAnswers.astro` — CTA links inside FAQ cards centred (`self-center` in `flex-col` parent)
+- `index.astro` (InfoPopup) — methodology link centred + restyled as muted pill; text updated to "Read the full methodology"
+
+**Ignored (not our code):**
+- Leaflet source map CSP block — DevTools-only, `.map` file fetch, no user impact
+- `astro:before-swap` extension error — Chrome extension message channel lifecycle, unrelated to site
+
+---
+
 ### Muted UI Pass + SPA Script Fixes (Mar 1–2)
 
 **Muted UI — resting-state rose removed across components:**

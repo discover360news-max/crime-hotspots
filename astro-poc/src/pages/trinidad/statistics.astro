@@ -29,6 +29,7 @@ import {
   compareYearToDate,
   getTopRegions,
   getTotalCrimeCount,
+  filterToSamePeriod,
   formatPercentChange,
   getCurrentPeriodDescription,
   TRACKED_CRIME_TYPES
@@ -62,9 +63,12 @@ const shootingCount = countCrimeType(crimesCurrent, 'Shooting');
 const murderCountPrevious = countCrimeType(crimesPrevious, 'Murder');
 const robberyCountPrevious = countCrimeType(crimesPrevious, 'Robbery');
 
-// Get total YoY change
-const total2025SamePeriod = yoyComparisons.reduce((sum, c) => sum + c.count2025, 0);
-const total2026YTD = yoyComparisons.reduce((sum, c) => sum + c.count2026, 0);
+// Get total YoY change — use same-period filtered incident counts to avoid
+// double-counting incidents that appear in multiple tracked crime types
+const crimes2026YTD = filterToSamePeriod(crimesCurrent, currentYear);
+const crimes2025SamePeriod = filterToSamePeriod(crimesPrevious, previousYear);
+const total2026YTD = getTotalCrimeCount(crimes2026YTD);
+const total2025SamePeriod = getTotalCrimeCount(crimes2025SamePeriod);
 const totalYoYChange = total2025SamePeriod > 0
   ? ((total2026YTD - total2025SamePeriod) / total2025SamePeriod) * 100
   : 0;
@@ -93,7 +97,7 @@ const statCardsData = [
     direction: yoyComparisons.find(c => c.type === 'Shooting')?.direction || 'flat'
   },
   {
-    label: 'Total Incidents',
+    label: 'All Crimes',
     current: total2026YTD,
     previous: total2025SamePeriod,
     yoyChange: totalYoYChange,
