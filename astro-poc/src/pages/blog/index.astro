@@ -37,6 +37,21 @@ function formatDate(date: Date) {
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
 
+    <!-- Latest Brief Pin -->
+    {sortedPosts.length > 0 && (
+      <div class="mb-5 rounded-lg border border-rose-200 dark:border-rose-900/50 bg-rose-50/60 dark:bg-rose-950/20 p-4">
+        <p class="text-xs font-bold uppercase tracking-wide text-rose-600 dark:text-rose-400 mb-1.5">Latest Brief</p>
+        <a href={`/blog/${sortedPosts[0].slug}`} class="group block">
+          <h3 class="text-sm font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug mb-1 line-clamp-2">
+            {sortedPosts[0].data.title}
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">
+            {formatDate(sortedPosts[0].data.date)} · {sortedPosts[0].data.readTime}
+          </p>
+        </a>
+      </div>
+    )}
+
     <!-- Country Filter + RSS -->
     <div class="flex items-center justify-between mb-6">
       <div class="flex flex-wrap gap-2">
