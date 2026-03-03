@@ -8,6 +8,39 @@
 
 ## March 2026
 
+### Header + Search Overhaul (Mar 3)
+
+**Header — mobile logo:**
+- Mobile (`< md`) now shows `logo-icon.png` (36px square) instead of the full logo
+- Desktop continues to use `logo.png` / `logo-dark-mode.png` unchanged
+
+**Header — Subscribe button:**
+- Both mobile and desktop Subscribe buttons updated to ghost style (matches design tokens: `border-2 border-slate-300`, rose hover)
+
+**Header — ♥ Support link:**
+- Desktop: ghost button `♥ Support` added after Subscribe, links to `https://ko-fi.com/crimehotspots` (new tab)
+- Mobile hamburger: "Support this Project" menu item with filled heart icon in rose, at bottom of menu
+- Contact item gained a bottom border to visually separate it from Support
+
+**Search — Pagefind fix:**
+- `astro-pagefind` was installed but missing from `astro.config.mjs` integrations → pagefind never ran → `/pagefind/` dir absent on live → search broken
+- Fix: added `import pagefind from 'astro-pagefind'` + `pagefind()` to integrations array
+
+**Search — dark mode:**
+- Full dark mode CSS for all Pagefind UI selectors (input, results, excerpts, mark highlights, buttons, clear button)
+- Modal shell uses `dark:bg-[hsl(0_0%_8%)]` and all borders/text updated
+
+**Search — suggestions panel (shown when input is empty):**
+- **Recent searches:** localStorage key `ch_search_history` (max 5). Clock icon chips. Rendered on each modal open.
+- **Latest crimes:** fetched once per session from `/api/latest-crimes.json`. 2 cards with headline, area, crime type, date. Links directly to crime pages.
+- **Static chips:** 10 prompt chips (Murder, Shooting, Robbery, Burglary, Assault, Kidnapping, Seizures, Port of Spain, Laventille, San Fernando)
+- Clicking any chip or crime card populates Pagefind input and fires search
+- Terms auto-save to history on Enter, after 1.5s idle typing, or on result click
+
+**New file:** `src/pages/api/latest-crimes.json.ts` — pre-rendered endpoint, returns 2 latest crimes (headline, date, area, crimeType, slug). `Cache-Control: public, max-age=3600`.
+
+---
+
 ### Crime Counting Methodology Alignment + QuickInsights Redesign (Mar 3)
 
 **Core decision:** "All Crimes" counts primary + related crime type occurrences per row (not raw row count, not victim count). This is now consistent across every counter, label, and table on the site.

@@ -68,7 +68,7 @@
 ### Navigation & Layout
 | Component | Purpose |
 |-----------|---------|
-| Header.astro | Top nav, direct links on Trinidad pages, active section indicator |
+| Header.astro | Top nav, direct links on Trinidad pages, active section indicator. Mobile: `logo-icon.png` (36px square). Ghost Subscribe buttons. ♥ Support → Ko-fi (desktop + hamburger). |
 | BottomNav.astro | Mobile bottom tab bar (Dashboard, Headlines, Areas, Report, More). Config-driven from `countries.ts` |
 | Breadcrumbs.astro | Breadcrumb navigation for SEO |
 | SectionPickerModal.astro | Homepage island click → section chooser. Sections driven from `countries.ts` |
@@ -108,7 +108,7 @@
 | Component | Purpose |
 |-----------|---------|
 | IslandSelectorModal.astro | Unified island picker (dashboard/headlines/archives/areas). Exposes `window.openIslandModal(section)`. Backward-compat aliases: `openDashboardModal()`, `openHeadlinesModal()`, etc. Replaced 4 separate modal files. |
-| SearchModal.astro | Site-wide Pagefind search (Ctrl+K) |
+| SearchModal.astro | Site-wide Pagefind search (Ctrl+K). Dark mode. Suggestions panel (empty state): recent searches (localStorage `ch_search_history`, max 5), 2 latest crimes (fetched from `/api/latest-crimes.json`), static crime-type chips. |
 | ReportIssueModal.astro | Report crime data issues |
 
 ### Safety Tips
@@ -254,7 +254,7 @@
 - **Structured Data:** JSON-LD (WebPage, BreadcrumbList, Dataset, BlogPosting)
 - **Sitemap:** Auto-generated, submitted to Google Search Console
 - **OG Images:** Dynamic murder count OG image (satori + sharp, regenerates daily)
-- **Search:** Pagefind static search (auto-indexed at build time)
+- **Search:** Pagefind static search (auto-indexed at build time via `astro-pagefind` integration). Dark mode. Suggestions on empty state.
 
 ### Analytics
 - **Google Analytics 4:** With cookie consent gate

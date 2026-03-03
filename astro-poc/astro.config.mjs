@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
+import pagefind from 'astro-pagefind';
 import redirectGenerator from './src/integrations/redirectGenerator.ts';
 import csvBuildPlugin from './src/integrations/csvBuildPlugin.ts';
 
@@ -16,6 +17,7 @@ export default defineConfig({
   }),
   integrations: [
     csvBuildPlugin(),
+    pagefind(),
     sitemap(),
     redirectGenerator()
   ],

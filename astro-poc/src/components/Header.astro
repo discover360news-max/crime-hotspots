@@ -43,15 +43,19 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
     <div class="flex items-center justify-between h-16">
       <!-- Logo (light / dark mode variants) -->
       <a href="/" class="flex items-center">
-        <img src="/assets/images/logo.png" alt="Crime Hotspots logo" class="h-12 md:h-14 w-auto block dark:hidden" />
-        <img src="/assets/images/logo-dark-mode.png" alt="Crime Hotspots logo" class="h-12 md:h-14 w-auto hidden dark:block" />
+        <!-- Mobile: square icon -->
+        <img src="/assets/images/logo-icon.png" alt="Crime Hotspots" class="h-9 w-9 block md:hidden" />
+        <!-- Desktop: full logo, light mode -->
+        <img src="/assets/images/logo.png" alt="Crime Hotspots logo" class="h-14 w-auto hidden md:block dark:hidden" />
+        <!-- Desktop: full logo, dark mode -->
+        <img src="/assets/images/logo-dark-mode.png" alt="Crime Hotspots logo" class="h-14 w-auto hidden md:dark:block" />
       </a>
 
       <!-- Mobile subscribe + search + theme toggle + hamburger menu -->
       <div class="flex md:hidden items-center gap-2 ml-auto">
         <button
           id="subscribeToggleMobile"
-          class="px-3 py-1.5 rounded-lg bg-[hsl(0_0%_45%)] dark:bg-[hsl(0_0%_30%)] text-white hover:bg-[hsl(0_0%_35%)] dark:hover:bg-[hsl(0_0%_25%)] active:bg-[hsl(0_0%_30%)] transition text-caption font-bold"
+          class="px-4 py-1.5 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 transition text-caption font-bold"
           aria-label="Subscribe to our channels"
         >
           Subscribe
@@ -167,11 +171,21 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
 
         <button
           id="subscribeToggle"
-          class="px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:border-slate-400 dark:hover:border-[hsl(0_0%_45%)] hover:text-slate-800 dark:hover:text-[hsl(0_0%_90%)] transition text-caption font-bold"
+          class="px-4 py-1.5 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 transition text-caption font-bold"
           aria-label="Subscribe to our channels"
         >
           Subscribe
         </button>
+
+        <a
+          href="https://ko-fi.com/crimehotspots"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-1 px-4 py-1.5 min-h-[22px] rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 transition text-caption font-bold"
+          aria-label="Support this project on Ko-fi"
+        >
+          <span aria-hidden="true">♥</span> Support
+        </a>
       </nav>
     </div>
 
@@ -394,11 +408,18 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
         FAQ
       </a>
 
-      <a href={routes.contact} class="flex items-center gap-2 text-body text-slate-700 dark:text-[hsl(0_0%_85%)] hover:text-rose-600 dark:hover:text-rose-400 font-bold py-3">
+      <a href={routes.contact} class="flex items-center gap-2 text-body text-slate-700 dark:text-[hsl(0_0%_85%)] hover:text-rose-600 dark:hover:text-rose-400 font-bold py-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)]">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
         Contact
+      </a>
+
+      <a href="https://ko-fi.com/crimehotspots" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-body text-rose-600 dark:text-rose-400 font-bold py-3">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        Support this Project
       </a>
     </div>
   </div>
