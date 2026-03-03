@@ -17,7 +17,7 @@ import { getTrinidadCrimes, generateNameSlug } from '../../lib/crimeData';
 import { loadFullAreaData } from '../../lib/areaAliases';
 import { getSafetyContext } from '../../lib/safetyHelpers';
 import { countCrimeType } from '../../lib/dashboardHelpers';
-import { TRACKED_CRIME_TYPES, calculatePercentChange, filterToSamePeriod } from '../../lib/statisticsHelpers';
+import { TRACKED_CRIME_TYPES, calculatePercentChange, filterToSamePeriod, getTotalCrimeCount } from '../../lib/statisticsHelpers';
 
 const allCrimes = await getTrinidadCrimes();
 const areaData = await loadFullAreaData();
@@ -61,8 +61,8 @@ for (const area of availableAreas) {
   const murdersPrevious = countCrimeType(crimesPrevious, 'Murder');
 
   areaStatsMap[area.slug] = {
-    total90d: recent90d.length,
-    totalAll: crimes.length,
+    total90d: getTotalCrimeCount(recent90d),
+    totalAll: getTotalCrimeCount(crimes),
     murders: murdersCurrent,
     murderChange: calculatePercentChange(murdersPrevious, murdersCurrent),
     safety: { score: safety.score, level: safety.level, primaryCrimeType: safety.primaryCrimeType },
@@ -348,7 +348,7 @@ const breadcrumbs = [
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr class="hover:bg-slate-50">
-                <td class="px-4 py-3 font-bold text-slate-700">Total Incidents (90d)</td>
+                <td class="px-4 py-3 font-bold text-slate-700">Total Crimes (90d)</td>
                 <td class="px-4 py-3 text-right font-bold ${winnerClass(total90dWinner, 'a')}">${statsA.total90d}</td>
                 <td class="px-4 py-3 text-right font-bold ${winnerClass(total90dWinner, 'b')}">${statsB.total90d}</td>
               </tr>
@@ -358,7 +358,7 @@ const breadcrumbs = [
                 <td class="px-4 py-3 text-right font-bold ${winnerClass(murdersWinner, 'b')}">${statsB.murders}</td>
               </tr>
               <tr class="hover:bg-slate-50">
-                <td class="px-4 py-3 font-bold text-slate-700">All-Time Incidents</td>
+                <td class="px-4 py-3 font-bold text-slate-700">All-Time Crimes</td>
                 <td class="px-4 py-3 text-right text-slate-600">${statsA.totalAll}</td>
                 <td class="px-4 py-3 text-right text-slate-600">${statsB.totalAll}</td>
               </tr>
