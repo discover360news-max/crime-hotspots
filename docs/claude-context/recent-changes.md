@@ -8,6 +8,49 @@
 
 ## March 2026
 
+### Crime Counting Methodology Alignment + QuickInsights Redesign (Mar 3)
+
+**Core decision:** "All Crimes" counts primary + related crime type occurrences per row (not raw row count, not victim count). This is now consistent across every counter, label, and table on the site.
+
+**QuickInsightsCard.astro — redesigned layout:**
+- Daily Avg now full-width row — crimes/day + victims/day shown inline
+- Peak Day + Busiest Month moved to 2-column row below it
+- Concentration of Crimes removed entirely
+- "Highest Crimes" / "Lowest Crimes" → "Highest Crime Area" / "Lowest Crime Area"
+
+**Methodology fix — area counts now use `getTotalCrimeCount` logic (primary + related):**
+- `dashboardHelpers.ts` — `calculateInsights()` area map: was `+1 per row`, now `+primary + related count`
+- `dashboardUpdates.ts` — `updateQuickInsights()` client-side area map: same fix
+- `statisticsHelpers.ts` — `getTopRegions()`: same fix; total denominator now uses summed crime count
+- `compare.astro` — `total90d` and `totalAll` switched from `crimes.length` to `getTotalCrimeCount()`
+
+**"incidents" → "crimes" full sweep (all visible UI labels):**
+- `DashboardStory.astro` — weekly summary count
+- `HomepagePulse.astro` — stats label (both card variants)
+- `headlines.astro` — accordion date label (server + client-rendered)
+- `archive/[year]/[month].astro` — accordion date label
+- `areas.astro` — sort button + region count label
+- `area/[slug].astro` — Hero subtitle
+- `region/[slug].astro` — Hero subtitle + badge
+- `statistics.astro` — column header + 3× crime rate section labels
+- `compare.astro` — table row labels
+- `QuickInsightsCard.astro` — area crime sub-labels
+
+**Left as "incidents" (contextually correct prose):** faq.astro, methodology.astro, about.astro, safetyHelpers.ts tip copy, reportValidation.ts
+
+**Safety Tip TIP-00026 added:**
+- `src/content/tips/tip-00026-nighttime-venue-perimeter-awareness.md`
+- Category: Shooting, Severity: high, Context: At an Event
+- Related stories: 738, 1024, 343, 1267 (recreation club + late-night shooting incidents)
+- `src/content/config.ts` — `Shooting` added to tip category enum
+
+**socialMediaStats.gs date range fix:**
+- Removed off-by-one (`lagDays - 1` → `lagDays`)
+- Changed to 8-day window (full-day midnight–23:59 boundaries)
+- Insert-then-trim sheet order fix
+
+---
+
 ### Calculation Audit + Fixes (Mar 2)
 
 **Root issues identified and fixed across dashboard, statistics, and murder count pages.**

@@ -100,7 +100,7 @@
 | StatCard.astro | Individual stat card |
 | StatCards.astro | Grid of stat cards with YoY comparisons |
 | TopRegionsCard.astro | Top regions visualization + shimmer loading |
-| QuickInsightsCard.astro | Highest/lowest crime area insights |
+| QuickInsightsCard.astro | Daily avg (crimes/day + victims/day, full-width row), Peak Day + Busiest Month (2-col), Highest/Lowest Crime Area |
 | FiltersTray.astro | Year/date filter controls |
 | DataTable.astro | Responsive table wrapper |
 
@@ -168,7 +168,7 @@
 | safetyHelpers.ts | Area crime scoring + safety tip engine | `calculateAreaCrimeScore()` (1-10 scale, 90-day window), `getSafetyContext()` (returns tip + risk level), `getPrimaryCrimeType()`, `toDate()` (shared date normalizer) |
 | safetyTipsHelpers.ts | Curated safety tips utilities | `normalizedCrimeType()` (CSV type → tip category), `sortTipsByAreaRelevance()` (area-specific first), `slugifyCategory()` (category → URL slug) |
 | dashboardHelpers.ts | Dashboard stat calculations | `countCrimeType()`, `calculateInsights()` (highest/lowest crime areas) |
-| statisticsHelpers.ts | Statistics page calculations | `calculatePercentChange()`, `compareYearToDate()`, `getCrimeTypeBreakdown()`, `getTopRegions()`, `filterToSamePeriod()`, `formatPercentChange()` |
+| statisticsHelpers.ts | Statistics page calculations | `calculatePercentChange()`, `compareYearToDate()`, `getCrimeTypeBreakdown()`, `getTopRegions()` (crime-count based, not row count), `filterToSamePeriod()`, `formatPercentChange()`, `getTotalCrimeCount()` |
 | trendingHelpers.ts | Trending areas + recent views (localStorage) | `getHotAreas()` (top 5 areas, last 7 days), `trackRecentView()`, `getRecentViews()` |
 | escapeHtml.ts | XSS protection utilities | `escapeHtml()` (innerHTML), `sanitizeUrl()` (anchor hrefs), `validateUrl()` (DOM hrefs) |
 | crimeColors.ts | Crime type → color hex mapping | Default export: color map object |
@@ -292,7 +292,7 @@
 | Recent views tracking | `src/lib/trendingHelpers.ts` → `trackRecentView()` / `getRecentViews()` | localStorage, 20-entry rolling buffer |
 | Dashboard insights | `src/lib/dashboardHelpers.ts` → `calculateInsights()` | Highest/lowest crime areas |
 | YoY % comparison | `src/lib/statisticsHelpers.ts` → `compareYearToDate()` | Same-period prior year |
-| Top regions | `src/lib/statisticsHelpers.ts` → `getTopRegions()` | Used by dashboard + stats page |
+| Top regions | `src/lib/statisticsHelpers.ts` → `getTopRegions()` | Used by dashboard + stats page. Counts primary + related crime types (not raw rows) |
 | Crime type breakdown | `src/lib/statisticsHelpers.ts` → `getCrimeTypeBreakdown()` | Returns Map<type, count> |
 | Victim count rules | `src/config/crimeTypeConfig.ts` | PRIMARY crime only gets victim count; related always +1 |
 | Date normalization | `src/lib/safetyHelpers.ts` → `toDate()` | Exported, used by trendingHelpers too |
