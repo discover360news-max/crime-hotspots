@@ -138,14 +138,20 @@ export function getCrimeTypeBreakdown(crimes: Crime[]): Map<string, number> {
 export function getTopRegions(crimes: Crime[], limit: number = 5): RegionStats[] {
   const regionCount = new Map<string, number>();
 
+  // Count primary + related crime types per row (matches "All Crimes" methodology)
   crimes.forEach(crime => {
     const region = crime.region || 'Unknown';
     if (region && region !== 'Unknown' && region.trim() !== '') {
-      regionCount.set(region, (regionCount.get(region) || 0) + 1);
+      let crimeCount = crime.primaryCrimeType || crime.crimeType ? 1 : 0;
+      if (crime.relatedCrimeTypes) {
+        const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim()).filter(t => t);
+        crimeCount += relatedTypes.length;
+      }
+      regionCount.set(region, (regionCount.get(region) || 0) + crimeCount);
     }
   });
 
-  const total = crimes.filter(c => c.region && c.region !== 'Unknown').length;
+  const total = Array.from(regionCount.values()).reduce((sum, count) => sum + count, 0);
 
   return Array.from(regionCount.entries())
     .sort((a, b) => b[1] - a[1])
