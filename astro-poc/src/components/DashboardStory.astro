@@ -64,7 +64,7 @@ const weekChange = lastWeekCrimes.length > 0
         <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
       </span>
       <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_80%)] leading-relaxed">
-        This week: <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{thisWeekCrimes.length} incidents</span> reported
+        This week: <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{thisWeekCrimes.length} crimes</span> reported
         across Trinidad{weekChange !== 0 && (
           <span class={weekChange > 0 ? 'text-rose-600' : 'text-emerald-600'}>
             {' '}({weekChange > 0 ? '+' : ''}{weekChange}% vs last week)
