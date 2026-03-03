@@ -22,7 +22,7 @@ const tips = defineCollection({
     title: z.string(),
     category: z.enum([
       'Robbery', 'Carjacking', 'Home Invasion', 'ATM Crime', 'Online Scam',
-      'Kidnapping', 'Sexual Violence', 'Fraud', 'Assault', 'Other'
+      'Kidnapping', 'Sexual Violence', 'Fraud', 'Assault', 'Shooting', 'Other'
     ]),
     context: z.enum([
       'At Home', 'In Your Car', 'At the ATM', 'In a Mall', 'Walking Alone',

@@ -121,11 +121,16 @@ export const calculateInsights = (crimeData: Crime[]) => {
   const busiestMonth = Array.from(monthCount.entries())
     .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
 
-  // Area stats
+  // Area stats — count primary + related crime types per row (matches "All Crimes" methodology)
   const areaCount = new Map<string, number>();
   crimeData.forEach(crime => {
     const area = crime.area || 'Unknown';
-    areaCount.set(area, (areaCount.get(area) || 0) + 1);
+    let crimeCount = crime.primaryCrimeType || crime.crimeType ? 1 : 0;
+    if (crime.relatedCrimeTypes) {
+      const relatedTypes = crime.relatedCrimeTypes.split(',').map((t: string) => t.trim()).filter((t: string) => t);
+      crimeCount += relatedTypes.length;
+    }
+    areaCount.set(area, (areaCount.get(area) || 0) + crimeCount);
   });
   const areaArray = Array.from(areaCount.entries()).sort((a, b) => b[1] - a[1]);
 
@@ -137,10 +142,6 @@ export const calculateInsights = (crimeData: Crime[]) => {
   const mostDangerousRegion = areaArray[0]?.[0] || 'N/A';
   const mostDangerousRegionCount = areaArray[0]?.[1] || 0;
 
-  // Top 3 areas concentration
-  const top3Count = areaArray.slice(0, 3).reduce((sum, [_, count]) => sum + count, 0);
-  const top3Percentage = ((top3Count / crimeData.length) * 100).toFixed(0);
-
   return {
     avgPerDay,
     victimsPerDay,
@@ -150,7 +151,6 @@ export const calculateInsights = (crimeData: Crime[]) => {
     safestRegionCount,
     mostDangerousRegion,
     mostDangerousRegionCount,
-    top3Percentage,
     dayCount: daysDiff
   };
 };

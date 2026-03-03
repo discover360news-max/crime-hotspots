@@ -200,7 +200,6 @@ export function updateQuickInsights(crimes: Crime[]) {
     const victimsPerDayEl = document.getElementById('victimsPerDay');
     const mostDangerousDayEl = document.getElementById('mostDangerousDay');
     const busiestMonthEl = document.getElementById('busiestMonth');
-    const top3PercentageEl = document.getElementById('top3Percentage');
     const mostDangerousRegionEl = document.getElementById('mostDangerousRegion');
     const mostDangerousRegionCountEl = document.getElementById('mostDangerousRegionCount');
     const safestRegionEl = document.getElementById('safestRegion');
@@ -210,11 +209,10 @@ export function updateQuickInsights(crimes: Crime[]) {
     if (victimsPerDayEl) victimsPerDayEl.textContent = '0 victims/day';
     if (mostDangerousDayEl) mostDangerousDayEl.textContent = 'N/A';
     if (busiestMonthEl) busiestMonthEl.textContent = 'N/A';
-    if (top3PercentageEl) top3PercentageEl.textContent = 'N/A';
     if (mostDangerousRegionEl) mostDangerousRegionEl.textContent = 'N/A';
-    if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = '0 incidents';
+    if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = '0 crimes';
     if (safestRegionEl) safestRegionEl.textContent = 'N/A';
-    if (safestRegionCountEl) safestRegionCountEl.textContent = '0 incidents';
+    if (safestRegionCountEl) safestRegionCountEl.textContent = '0 crimes';
     return;
   }
 
@@ -273,15 +271,18 @@ export function updateQuickInsights(crimes: Crime[]) {
   });
   const busiestMonth = Array.from(monthCount.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
 
-  // Area stats
+  // Area stats — count primary + related crime types per row (matches "All Crimes" methodology)
   const areaCount = new Map<string, number>();
   crimes.forEach(crime => {
     const area = crime.area || 'Unknown';
-    areaCount.set(area, (areaCount.get(area) || 0) + 1);
+    let crimeCount = crime.primaryCrimeType || crime.crimeType ? 1 : 0;
+    if (crime.relatedCrimeTypes) {
+      const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim()).filter(t => t);
+      crimeCount += relatedTypes.length;
+    }
+    areaCount.set(area, (areaCount.get(area) || 0) + crimeCount);
   });
   const areaArray = Array.from(areaCount.entries()).sort((a, b) => b[1] - a[1]);
-  const top3Count = areaArray.slice(0, 3).reduce((sum, [_, count]) => sum + count, 0);
-  const top3Percentage = ((top3Count / crimes.length) * 100).toFixed(0);
 
   // Find safest area (exclude "Unknown" and empty values)
   const validAreas = areaArray.filter(([area]) => area && area !== 'Unknown' && area.trim() !== '');
@@ -296,7 +297,6 @@ export function updateQuickInsights(crimes: Crime[]) {
   const victimsPerDayEl = document.getElementById('victimsPerDay');
   const mostDangerousDayEl = document.getElementById('mostDangerousDay');
   const busiestMonthEl = document.getElementById('busiestMonth');
-  const top3PercentageEl = document.getElementById('top3Percentage');
   const mostDangerousRegionEl = document.getElementById('mostDangerousRegion');
   const mostDangerousRegionCountEl = document.getElementById('mostDangerousRegionCount');
   const safestRegionEl = document.getElementById('safestRegion');
@@ -306,20 +306,19 @@ export function updateQuickInsights(crimes: Crime[]) {
   if (victimsPerDayEl) victimsPerDayEl.textContent = `${victimsPerDay} victims/day`;
   if (mostDangerousDayEl) mostDangerousDayEl.textContent = mostDangerousDay;
   if (busiestMonthEl) busiestMonthEl.textContent = busiestMonth;
-  if (top3PercentageEl) top3PercentageEl.textContent = `Top 3 areas: ${top3Percentage}%`;
   // Update area names and wrap parent <a> with correct href
   if (mostDangerousRegionEl) {
     mostDangerousRegionEl.textContent = mostDangerousRegion;
     const dangerousLink = mostDangerousRegionEl.closest('a');
     if (dangerousLink) dangerousLink.href = buildRoute.area(generateNameSlug(mostDangerousRegion));
   }
-  if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = `${mostDangerousRegionCount} incidents`;
+  if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = `${mostDangerousRegionCount} crimes`;
   if (safestRegionEl) {
     safestRegionEl.textContent = safestRegion;
     const safestLink = safestRegionEl.closest('a');
     if (safestLink) safestLink.href = buildRoute.area(generateNameSlug(safestRegion));
   }
-  if (safestRegionCountEl) safestRegionCountEl.textContent = `${safestRegionCount} incidents`;
+  if (safestRegionCountEl) safestRegionCountEl.textContent = `${safestRegionCount} crimes`;
 }
 
 /**
