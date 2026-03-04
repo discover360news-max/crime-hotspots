@@ -8,6 +8,29 @@
 
 ## March 2026
 
+### Safety Tips (Mar 4)
+- **NEW TIP TIP-00027** — Daytime Home Security While You're Inside (Home Invasion / At Home) — Story ID 458
+- **NEW TIP TIP-00028** — Device Handling During In-Person Sales (Robbery / In a Mall) — Story ID 459
+- **NEW DOC** — `docs/guides/SAFETY-TIP-WORKFLOW.md` — step-by-step workflow for all future tip creation
+
+---
+
+### Newsletter + Blog Revenue Signals (Mar 3)
+
+**NewsletterSignup.astro — all 3 variants (card, inline, footer):**
+- Added social proof line: "3,400+ residents subscribed this month" (muted subtitle, card + inline)
+- Added "Read the latest brief →" archive link to Buttondown archive (all variants)
+
+**Blog index (`/blog/`) — Latest Brief pin:**
+- Rose-tinted pinned card above the post list showing the latest post title, date, read time
+- Auto-updates on every blog publish (uses `sortedPosts[0]`)
+
+**Blog post pages (`/blog/[slug]`) — No-Ad Guarantee:**
+- Small note inside article card after article body: "100% ad-free. Supported by readers like you on Ko-fi."
+- Shield icon, muted styling, Ko-fi link opens in new tab
+
+---
+
 ### Header + Search Overhaul (Mar 3)
 
 **Header — mobile logo:**
