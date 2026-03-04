@@ -184,11 +184,11 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
           </svg>
         </a>
       </div>
-      <div class="relative min-h-[280px]">
-        <div id="insightsShimmer" class="absolute inset-0 transition-opacity duration-300">
-          <LoadingShimmer height="280px" />
+      <div class="relative">
+        <div id="insightsShimmer" class="absolute inset-0 z-10 transition-opacity duration-300">
+          <LoadingShimmer height="100%" />
         </div>
-        <div id="insightsCards" class="absolute inset-0 opacity-0 transition-opacity duration-300">
+        <div id="insightsCards" class="opacity-0 transition-opacity duration-300">
           <QuickInsightsCard insights={insights} />
         </div>
       </div>
