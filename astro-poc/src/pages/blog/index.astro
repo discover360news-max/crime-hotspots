@@ -78,7 +78,7 @@ function formatDate(date: Date) {
           data-country={post.data.country}
         >
           <a href={`/blog/${post.slug}`} class="flex gap-4 items-start group">
-            <img src={post.data.image} alt={post.data.countryName} class="w-24 h-24 object-cover rounded-lg shrink-0">
+            <img src={post.data.image} alt={post.data.countryName} class="w-24 h-24 object-cover rounded-lg shrink-0" loading="lazy">
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-1 flex-wrap">
                 <span class="text-caption font-medium px-1.5 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)]">
