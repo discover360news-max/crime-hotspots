@@ -9,7 +9,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { routes } from '../config/routes';
 
 const title = "Our Methodology — How We Collect and Verify Caribbean Crime Data | Crime Hotspots";
-const description = "Learn how Crime Hotspots Caribbean collects, verifies, and publishes crime statistics. Our data comes from Trinidad Express, Guardian TT, Newsday, Stabroek News, and Kaieteur News, processed with Google Gemini AI and human oversight.";
+const description = "Learn how Crime Hotspots Caribbean collects, verifies, and publishes crime statistics. Our data comes from Trinidad Express, Guardian TT, Newsday, Stabroek News, and Kaieteur News, processed with Claude AI and human oversight.";
 ---
 
 <Layout title={title} description={description} includeLeaflet={false} includePagefind={false}>
@@ -65,12 +65,12 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
           The foundation of our system is an automated script built on Google Apps Script. This script executes at regular intervals, querying the RSS feeds of all our specified media partners. When a new article is detected, the script pulls the URL and headline and initiates the next stage of processing.
         </p>
 
-        <h3 class="text-body font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-3">Google Gemini AI Extraction Methodology</h3>
+        <h3 class="text-body font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-3">AI Extraction Methodology</h3>
         <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
-          This is the core of our Expertise. The text from each collected news article or social media post is fed into the Google Gemini AI model. The AI is trained to perform a critical extraction task: reading the unstructured narrative of a crime report and converting it into a structured data format.
+          This is the core of our Expertise. The text from each collected news article or social media post is fed into Claude AI (Claude Haiku). The model performs a critical extraction task: reading the unstructured narrative of a crime report and converting it into a structured data format.
         </p>
 
-        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-2">The Gemini model extracts the following structured data fields:</p>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-2">The model extracts the following structured data fields:</p>
         <ul class="list-disc list-inside text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4 ml-4">
           <li><strong>Crime Type:</strong> (e.g., Murder, Robbery, Burglary, Kidnapping)</li>
           <li><strong>Location:</strong> (Specific street address or junction, if available)</li>
@@ -82,6 +82,29 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
         <h3 class="text-body font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-3">Human Oversight and Validation</h3>
         <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
           While automation is efficient, human expertise is essential. All data entries classified as 'High Severity' or those flagged with ambiguous location data by the AI undergo a mandatory human validation step. Our team reviews the original source article to confirm the crime type, verify the location against a map, and ensure the classification is accurate before the data is published to the live dashboard.
+        </p>
+      </section>
+
+      <!-- How We Count Crimes -->
+      <section class="mb-10">
+        <h2 class="text-heading font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-4">How We Count Crimes</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          Our crime counts reflect the number of distinct crime types recorded per incident, not the number of raw data rows. Each incident can involve a primary crime type and one or more related crime types — and all of these count toward totals.
+        </p>
+
+        <h3 class="text-body font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-3">Primary and Related Crime Types</h3>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          When an incident involves multiple crime types — for example, a murder that also involved a shooting — we record a primary crime type (Murder) and a related crime type (Shooting). Both count toward total crime figures. A single data row with one primary and two related crime types contributes 3 to the total crime count.
+        </p>
+
+        <h3 class="text-body font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-3">Victim Count Rule</h3>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          Victim count is applied only to the primary crime type. If a single incident resulted in 2 murder victims, it contributes 2 to the murder count. Related crime types always count as 1 regardless of victim count. This prevents double-counting across crime type totals.
+        </p>
+
+        <h3 class="text-body font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-3">Regional Risk Ranking</h3>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          The Top Regions card on our dashboard ranks regions by weighted crime severity, not raw incident volume. More serious crimes (such as murder and kidnapping) contribute more to a region's score than lower-severity crimes (such as theft or burglary). The system is self-calibrating — each region's share is calculated relative to the national total for the selected time period, so rankings update automatically as new data is added without requiring manual threshold adjustments.
         </p>
       </section>
 
