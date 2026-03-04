@@ -1,24 +1,26 @@
 /**
  * Risk Weight Configuration
  *
- * Defines risk severity weights for each crime type used in risk level calculations.
- * Higher weights = higher risk/severity.
+ * Defines crime severity weights used to calculate weighted risk scores per region.
+ * Higher weights = higher severity contribution to the score.
  *
- * These weights are used to calculate area risk scores, which are then normalized
- * relative to the highest-risk area to generate risk level bars.
+ * How it works (Top Regions card):
+ * 1. Each crime's weighted score = weight × victimCount (murder only; all others × 1)
+ * 2. Region's total weighted score = sum of all crime weighted scores in that region
+ * 3. Region's share = (regionWeightedScore / nationalTotalWeightedScore) × 100
+ * 4. Risk label is based on that share — self-calibrating, no hardcoded absolute thresholds:
+ *    < 3%  = Low
+ *    < 8%  = Medium
+ *    < 15% = Concerning
+ *    < 25% = High
+ *    < 40% = Dangerous
+ *    ≥ 40% = Extremely Dangerous
  *
- * How it works:
- * 1. Each crime's risk contribution = weight × victimCount (for victim-based crimes)
- * 2. Area's total risk score = sum of all crime risk contributions in that area
- * 3. Risk percentage = (area risk score / TOTAL risk across ALL areas) × 100
- *    — each area's label reflects its share of the overall crime burden
- * 4. Label thresholds: ≤3% Low, ≤8% Medium, ≤15% Concerning, ≤25% High, ≤40% Dangerous, >40% Extremely Dangerous
+ * Example (10 active regions, ~equal crime):
+ * Each region ≈ 10% share → all "Concerning"
+ * If one region dominates at 35% → "Dangerous"; the rest score proportionally lower.
  *
- * Example:
- * Area A: 2 murders (weight 10 each) + 3 robberies (weight 4 each) = 32 points
- * Area B: 10 thefts (weight 2 each) = 20 points
- * Total risk = 52 points, so Area A = 62% (Dangerous), Area B = 38% (Dangerous)
- * If total across all areas = 320 points: Area A = 10% (Concerning), Area B = 6% (Medium)
+ * Full methodology: docs/guides/RISK-SCORING-METHODOLOGY.md
  *
  * Adjust weights to reflect your assessment of crime severity.
  */

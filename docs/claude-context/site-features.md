@@ -186,7 +186,7 @@
 | routes.ts | All internal routes + builders | `routes.*` for static, `buildRoute.*` for dynamic |
 | crimeTypeConfig.ts | Crime type definitions + victim count rules | Victim count applies to PRIMARY crime only |
 | siteNotifications.ts | Site notification banner content | Toggle-based enable/disable |
-| riskWeights.ts | Risk weighting for safety scoring | Used by `safetyHelpers.ts` |
+| riskWeights.ts | Crime severity weights | Used by `TopRegionsCard.astro`, `dashboardUpdates.ts` (Top Regions card), and `safetyHelpers.ts` (SafetyContext). Full methodology: `docs/guides/RISK-SCORING-METHODOLOGY.md` |
 | countries.ts | Country config (sections, icons, nav settings) | Imports from `routes.ts` and `csvUrls.ts` |
 
 ---
@@ -284,7 +284,8 @@
 |-------------------|----------|-------|
 | Area crime scoring (1-10) | `src/lib/safetyHelpers.ts` → `calculateAreaCrimeScore()` | 90-day rolling window |
 | Safety tip selection | `src/lib/safetyHelpers.ts` → `getSafetyContext()` | Returns tip + risk level (high/neutral/low) |
-| Risk weights per crime type | `src/config/riskWeights.ts` | Imported by `safetyHelpers.ts` |
+| Top Regions risk scoring | `src/components/TopRegionsCard.astro` + `dashboardUpdates.ts` | Weighted score per region → share of national total → label. Self-calibrating. See `docs/guides/RISK-SCORING-METHODOLOGY.md` |
+| Risk weights per crime type | `src/config/riskWeights.ts` | Used by Top Regions card AND `safetyHelpers.ts` |
 | Slug generation (legacy) | `src/lib/csvParser.ts` → `generateSlug()` | headline + date format |
 | Slug generation (current) | `src/lib/csvParser.ts` → `generateSlugWithId()` | StoryID + 6 words |
 | Area name → route slug | `src/lib/crimeData.ts` → `generateNameSlug()` | Used for area pages |

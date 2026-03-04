@@ -8,6 +8,17 @@
 
 ## March 2026
 
+### Top Regions — Weighted National Share Risk Scoring (Mar 4)
+- **TopRegionsCard.astro** + **dashboardUpdates.ts** — replaced old relative-to-max area system with region-based weighted national share scoring
+- Sort: absolute weighted score (crime severity × victim count per region)
+- Risk label: each region's % share of the national weighted total — self-calibrating, zero config
+- Removed dead `calculateAreaRiskLevels()` function (old relative-to-max, was unused)
+- Fixed misleading comments in `riskWeights.ts` and `TopRegionsCard.astro`
+- **NEW DOC** — `docs/guides/RISK-SCORING-METHODOLOGY.md` — canonical reference for the scoring system
+- `REGION_POPULATION_CSV_URL` added to `csvUrls.ts` (available for future per-capita use)
+
+---
+
 ### Safety Tips (Mar 4)
 - **NEW TIP TIP-00027** — Daytime Home Security While You're Inside (Home Invasion / At Home) — Story ID 458
 - **NEW TIP TIP-00028** — Device Handling During In-Person Sales (Robbery / In a Mall) — Story ID 459

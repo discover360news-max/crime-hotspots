@@ -12,7 +12,7 @@
  */
 
 import { parseCSVLine, stripQuotes } from './csvParser';
-import { REGION_DATA_CSV_URL } from '../config/csvUrls';
+import { REGION_DATA_CSV_URL, REGION_POPULATION_CSV_URL } from '../config/csvUrls';
 
 export interface AreaInfo {
   area: string;
@@ -92,6 +92,65 @@ export function getLocalName(
   area: string
 ): string | undefined {
   return aliasMap.get(area);
+}
+
+// ============================================================================
+// REGION POPULATIONS (for per-capita risk calculations)
+// ============================================================================
+
+/**
+ * Fetches region populations CSV and returns a Map of region name -> population.
+ * Strips commas from numbers. Skips the totals summary row.
+ */
+export async function loadRegionPopulations(): Promise<Map<string, number>> {
+  try {
+    const response = await fetch(REGION_POPULATION_CSV_URL);
+    if (!response.ok) {
+      console.error('Failed to fetch region populations CSV:', response.statusText);
+      return new Map();
+    }
+    const csvText = await response.text();
+    return parseRegionPopulations(csvText);
+  } catch (error) {
+    console.error('Error loading region populations:', error);
+    return new Map();
+  }
+}
+
+export function parseRegionPopulations(csvText: string): Map<string, number> {
+  const lines = csvText.trim().split('\n');
+  if (lines.length < 2) return new Map();
+
+  const headers = parseCSVLine(lines[0]).map(h => stripQuotes(h).trim());
+  const regionIndex = headers.indexOf('Region');
+  const populationIndex = headers.indexOf('population');
+
+  if (regionIndex === -1 || populationIndex === -1) {
+    console.error('Missing Region or population column in region populations CSV');
+    return new Map();
+  }
+
+  const map = new Map<string, number>();
+
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    const cols = parseCSVLine(line).map(c => stripQuotes(c).trim());
+    const region = cols[regionIndex];
+    const popStr = cols[populationIndex];
+
+    // Skip totals/summary rows
+    if (!region || region.toLowerCase().startsWith('total')) continue;
+
+    // Strip commas from numbers e.g. "115,936" -> 115936
+    const pop = parseInt(popStr.replace(/,/g, ''), 10);
+    if (!isNaN(pop) && pop > 0) {
+      map.set(region, pop);
+    }
+  }
+
+  return map;
 }
 
 // ============================================================================

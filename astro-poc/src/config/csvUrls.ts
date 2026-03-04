@@ -39,6 +39,14 @@ export const REGION_DATA_CSV_URL =
   'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=910363151&single=true&output=csv';
 
 /**
+ * Region population CSV URL
+ * Contains: Region, population
+ * Used for per-capita crime rate calculations in Top Regions card
+ */
+export const REGION_POPULATION_CSV_URL =
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=533682063&single=true&output=csv';
+
+/**
  * Type for year keys in TRINIDAD_CSV_URLS
  */
 export type TrinidadYear = keyof typeof TRINIDAD_CSV_URLS;

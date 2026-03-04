@@ -1,18 +1,23 @@
 ---
 /**
  * TopRegionsCard Component
- * Displays top 10 areas ranked by crime count with risk level bars
- * Data updates dynamically via JavaScript when filters change
+ * Displays top regions ranked by absolute weighted crime score.
+ * Data updates dynamically via JavaScript when filters change.
+ *
+ * Weighted score = sum of (crimeWeight × victimCount) per region.
+ * Sort order: absolute weighted score (most severe crime volume first).
+ * Bar width:  relative to #1 region's weighted score (visual comparison).
+ * Risk label: each region's % share of the national weighted total — self-calibrating,
+ *             no hardcoded absolute thresholds. See docs/guides/RISK-SCORING-METHODOLOGY.md.
  */
 
-import AreaNameTooltip from './AreaNameTooltip.astro';
-import { loadAreaAliases, getLocalName } from '../lib/areaAliases';
 import { generateNameSlug } from '../lib/crimeData';
+import { buildRoute } from '../config/routes';
 import { getRiskWeight } from '../config/riskWeights';
 import { usesVictimCount } from '../config/crimeTypeConfig';
 
 interface Crime {
-  area: string;
+  region?: string;
   primaryCrimeType?: string;
   crimeType?: string;
   relatedCrimeTypes?: string;
@@ -26,124 +31,108 @@ interface Props {
 
 const { crimes } = Astro.props;
 
-// Load area aliases for tooltips
-const areaAliases = await loadAreaAliases();
-
-// Calculate risk score for a single crime
+// Calculate weighted risk score for a single crime
 function calculateCrimeRisk(crime: Crime): number {
-  let riskScore = 0;
-
-  // Calculate primary crime risk
+  let score = 0;
   const primaryType = crime.primaryCrimeType || crime.crimeType;
   if (primaryType) {
     const weight = getRiskWeight(primaryType);
-    const victimCount = usesVictimCount(primaryType) && crime.victimCount ? crime.victimCount : 1;
-    riskScore += weight * victimCount;
+    const victims = usesVictimCount(primaryType) && crime.victimCount ? crime.victimCount : 1;
+    score += weight * victims;
   }
-
-  // Calculate related crimes risk (always × 1, no victim multiplier)
   if (crime.relatedCrimeTypes) {
-    const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim()).filter(t => t);
-    relatedTypes.forEach(relatedType => {
-      const weight = getRiskWeight(relatedType);
-      riskScore += weight * 1; // Always count as 1 for related crimes
+    crime.relatedCrimeTypes.split(',').map(t => t.trim()).filter(Boolean).forEach(t => {
+      score += getRiskWeight(t);
     });
   }
-
-  return riskScore;
+  return score;
 }
 
-// Calculate risk scores for all areas
-const areaRiskScores = new Map<string, number>();
+// Accumulate weighted scores and raw crime counts per region
+const regionWeightedScores = new Map<string, number>();
+const regionCrimeCounts = new Map<string, number>();
+
 crimes.forEach(crime => {
-  const area = crime.area || 'Unknown';
-  const riskScore = calculateCrimeRisk(crime);
-  areaRiskScores.set(area, (areaRiskScores.get(area) || 0) + riskScore);
+  const region = crime.region?.trim();
+  if (!region || region === 'Unknown') return;
+  regionWeightedScores.set(region, (regionWeightedScores.get(region) || 0) + calculateCrimeRisk(crime));
+  let count = crime.primaryCrimeType || crime.crimeType ? 1 : 0;
+  if (crime.relatedCrimeTypes) count += crime.relatedCrimeTypes.split(',').map(t => t.trim()).filter(Boolean).length;
+  regionCrimeCounts.set(region, (regionCrimeCounts.get(region) || 0) + count);
 });
 
-// Normalise relative to max — #1 area = 100%, everyone else proportional to it
-const maxRiskScore = Math.max(...Array.from(areaRiskScores.values()), 0);
-
-// Calculate top areas — single percentage drives both bar width and label
-const areaCounts = Array.from(
-  crimes.reduce((acc, crime) => {
-    const area = crime.area || 'Unknown';
-    acc.set(area, (acc.get(area) || 0) + 1);
-    return acc;
-  }, new Map<string, number>())
-)
-  .sort((a, b) => b[1] - a[1])
-  .slice(0, 10)
-  .map(([area, count]) => {
-    const riskScore = areaRiskScores.get(area) || 0;
-    const riskPercentage = maxRiskScore > 0 ? Math.round((riskScore / maxRiskScore) * 100) : 0;
-    return { area, count, riskPercentage };
-  });
-
-// Risk label based on relative-to-max (0–100%, #1 area = 100%).
-// Tighter thresholds so areas 2–10 spread across the full label range.
-function getRiskLevelText(percentage: number): string {
-  if (percentage <= 10) {
-    return 'Low';
-  } else if (percentage <= 25) {
-    return 'Medium';
-  } else if (percentage <= 45) {
-    return 'Concerning';
-  } else if (percentage <= 65) {
-    return 'High';
-  } else if (percentage <= 85) {
-    return 'Dangerous';
-  } else {
-    return 'Extremely Dangerous';
-  }
+interface RegionEntry {
+  region: string;
+  crimeCount: number;    // raw count — displayed to user
+  weightedScore: number; // absolute weighted score — sort order, bar width, and risk label
 }
 
-// Text color for risk label (relative-to-max thresholds)
-function getRiskTextColor(percentage: number): string {
-  if (percentage <= 25) {
-    return 'text-green-600';
-  } else if (percentage <= 65) {
-    return 'text-yellow-600';
-  } else {
-    return 'text-rose-600';
-  }
+const regionEntries: RegionEntry[] = Array.from(regionWeightedScores.entries())
+  .map(([region, weightedScore]) => ({
+    region,
+    crimeCount: regionCrimeCounts.get(region) ?? 0,
+    weightedScore,
+  }))
+  .sort((a, b) => b.weightedScore - a.weightedScore)
+  .slice(0, 10);
+
+const maxWeightedScore = regionEntries[0]?.weightedScore ?? 1;
+
+/**
+ * Risk label derived from bar width (0–100% relative to #1 region).
+ * Label and bar always tell the same story — #1 region = Extremely Dangerous,
+ * every other region is labelled proportionally to how close it is to the top.
+ * Must match getRiskLevelText in dashboardUpdates.ts.
+ */
+function getRiskLevelText(barWidth: number): string {
+  if (barWidth <= 10) return 'Low';
+  if (barWidth <= 25) return 'Medium';
+  if (barWidth <= 45) return 'Concerning';
+  if (barWidth <= 65) return 'High';
+  if (barWidth <= 85) return 'Dangerous';
+  return 'Extremely Dangerous';
 }
 
+function getRiskTextColor(barWidth: number): string {
+  if (barWidth <= 25) return 'text-green-600';
+  if (barWidth <= 65) return 'text-yellow-600';
+  return 'text-rose-600';
+}
 ---
 
 <div class="bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md rounded-lg p-4 shadow-md border border-slate-100 dark:border-[hsl(0_0%_15%)]">
-  <div id="topRegionsContainer" class="grid grid-cols-2 gap-x-8 gap-y-3">
-    {areaCounts.map(({ area, count, riskPercentage }) => {
-      const localName = getLocalName(areaAliases, area);
-      const riskLevelText = getRiskLevelText(riskPercentage);
-      const riskTextColor = getRiskTextColor(riskPercentage);
-      const areaSlug = generateNameSlug(area);
+  <div id="topRegionsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+    {regionEntries.map(({ region, crimeCount, weightedScore }, index) => {
+      const barWidth = maxWeightedScore > 0 ? Math.round((weightedScore / maxWeightedScore) * 100) : 0;
+      const riskLevelText = getRiskLevelText(barWidth);
+      const riskTextColor = getRiskTextColor(barWidth);
+      const regionSlug = generateNameSlug(region);
+      const mobileHidden = index >= 5 ? 'hidden sm:block' : '';
       return (
-        <a href={`/trinidad/area/${areaSlug}/`} class="flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
+        <a href={buildRoute.region(regionSlug)} class={`${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition`}>
           <div class="flex justify-between items-center gap-2">
-            <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] truncate flex-1">
-              <AreaNameTooltip area={area} localName={localName} />
-            </span>
+            <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] truncate flex-1">{region}</span>
             <div class="flex items-center gap-1.5 flex-shrink-0">
               <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_55%)] text-xs font-medium">
-                {count}
+                {crimeCount}
               </span>
-              <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{count === 1 ? 'crime' : 'crimes'}</span>
+              <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{crimeCount === 1 ? 'crime' : 'crimes'}</span>
               <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[hsl(0_0%_50%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </div>
           </div>
-          <!-- Bar width + gradient both relative to max — #1 area fills full red end -->
+          <!-- Bar width relative to #1 region's absolute weighted score -->
           <div class="relative w-full h-2 bg-slate-200 dark:bg-[hsl(0_0%_18%)] rounded-full overflow-hidden">
-            <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style={`width: ${riskPercentage}%`}>
-              <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style={`width: ${riskPercentage > 0 ? (100 / riskPercentage) * 100 : 100}%`}></div>
+            <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style={`width: ${barWidth}%`}>
+              <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style={`width: ${barWidth > 0 ? Math.round((100 / barWidth) * 100) : 100}%`}></div>
             </div>
           </div>
-          <!-- Risk level text -->
+          <!-- Risk label based on absolute per-capita thresholds -->
           <span class={`text-xs font-medium ${riskTextColor}`}>Risk: {riskLevelText}</span>
         </a>
       );
     })}
   </div>
 </div>
+
