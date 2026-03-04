@@ -88,10 +88,10 @@ function addExpandControl(map: any, containerId: string) {
     onAdd: function () {
       const div = L.DomUtil.create('div', 'leaflet-control-expand leaflet-bar');
       const link = L.DomUtil.create('a', '', div);
-      link.href = '#';
       link.title = 'Expand map';
       link.innerHTML = EXPAND_ICON;
       link.setAttribute('role', 'button');
+      link.setAttribute('tabindex', '0');
       link.setAttribute('aria-label', 'Expand map');
 
       L.DomEvent.disableClickPropagation(div);

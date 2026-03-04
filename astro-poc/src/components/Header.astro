@@ -6,6 +6,7 @@
  *
  * Phase 2 UX: Direct links when on Trinidad pages (reduces modal friction)
  */
+import { Image } from 'astro:assets';
 import { routes } from '../config/routes';
 import NewsletterSignup from './NewsletterSignup.astro';
 
@@ -44,11 +45,11 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
       <!-- Logo (light / dark mode variants) -->
       <a href="/" class="flex items-center">
         <!-- Mobile: square icon -->
-        <img src="/assets/images/logo-icon.png" alt="Crime Hotspots" class="h-9 w-9 block md:hidden" />
+        <Image src="/assets/images/logo-icon.png" alt="Crime Hotspots" width={159} height={159} class="h-9 w-9 block md:hidden" loading="eager" />
         <!-- Desktop: full logo, light mode -->
-        <img src="/assets/images/logo.png" alt="Crime Hotspots logo" class="h-14 w-auto hidden md:block dark:hidden" />
+        <Image src="/assets/images/logo.png" alt="Crime Hotspots logo" width={411} height={160} class="h-14 w-auto hidden md:block dark:hidden" loading="eager" />
         <!-- Desktop: full logo, dark mode -->
-        <img src="/assets/images/logo-dark-mode.png" alt="Crime Hotspots logo" class="h-14 w-auto hidden md:dark:block" />
+        <Image src="/assets/images/logo-dark-mode.png" alt="Crime Hotspots logo" width={1713} height={690} class="h-14 w-auto hidden md:dark:block" loading="eager" />
       </a>
 
       <!-- Mobile subscribe + search + theme toggle + hamburger menu -->
