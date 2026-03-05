@@ -12,8 +12,10 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Hero from '../../components/Hero.astro';
 import { getTrinidadCrimes, generateNameSlug } from '../../lib/crimeData';
 import { loadFullAreaData } from '../../lib/areaAliases';
-import { calculateAreaCrimeScore } from '../../lib/safetyHelpers';
+import { getRiskWeight } from '../../config/riskWeights';
+import { usesVictimCount } from '../../config/crimeTypeConfig';
 import { routes, buildRoute } from '../../config/routes';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
 
 const allCrimes = await getTrinidadCrimes();
 const areaData = await loadFullAreaData();
@@ -23,7 +25,34 @@ const cutoffDate = new Date();
 cutoffDate.setDate(cutoffDate.getDate() - 90);
 const recentCrimes = allCrimes.filter(c => c.dateObj >= cutoffDate);
 
-// Build area stats
+// Weighted risk score per crime — mirrors TopRegionsCard logic
+function calculateCrimeRisk(crime: any): number {
+  let score = 0;
+  const primaryType = crime.primaryCrimeType || crime.crimeType;
+  if (primaryType) {
+    const weight = getRiskWeight(primaryType);
+    const victims = usesVictimCount(primaryType) && crime.victimCount ? crime.victimCount : 1;
+    score += weight * victims;
+  }
+  if (crime.relatedCrimeTypes) {
+    crime.relatedCrimeTypes.split(',').map((t: string) => t.trim()).filter(Boolean).forEach((t: string) => {
+      score += getRiskWeight(t);
+    });
+  }
+  return score;
+}
+
+// Risk label from relative bar width — must match TopRegionsCard / dashboardUpdates.ts
+function getRiskLevelText(barWidth: number): string {
+  if (barWidth <= 10) return 'Low';
+  if (barWidth <= 25) return 'Medium';
+  if (barWidth <= 45) return 'Concerning';
+  if (barWidth <= 65) return 'High';
+  if (barWidth <= 85) return 'Dangerous';
+  return 'Extremely Dangerous';
+}
+
+// Build area stats — two-pass: first compute raw scores, then derive relative labels
 interface AreaStat {
   name: string;
   slug: string;
@@ -32,15 +61,30 @@ interface AreaStat {
   knownAs: string;
   crimeCount90d: number;
   totalCrimes: number;
-  safetyScore: number;
-  level: 'high' | 'neutral' | 'low';
+  weightedScore: number;
+  riskLabel: string;
+  badgeClass: string;
 }
 
-const areaStats: AreaStat[] = areaData.map(a => {
-  const crimeCount90d = recentCrimes.filter(c => c.area === a.area).length;
+const rawAreaStats = areaData.map(a => {
+  const areaCrimes = recentCrimes.filter(c => c.area === a.area);
+  const crimeCount90d = areaCrimes.length;
   const totalCrimes = allCrimes.filter(c => c.area === a.area).length;
-  const safetyScore = calculateAreaCrimeScore(a.area, allCrimes);
-  const level = safetyScore > 7 ? 'high' : safetyScore >= 4 ? 'neutral' : 'low';
+  const weightedScore = areaCrimes.reduce((sum, c) => sum + calculateCrimeRisk(c), 0);
+  return { area: a, crimeCount90d, totalCrimes, weightedScore };
+});
+
+// Max weighted score across all areas — relative baseline
+const maxWeightedScore = Math.max(...rawAreaStats.map(a => a.weightedScore), 1);
+
+const areaStats: AreaStat[] = rawAreaStats.map(({ area: a, crimeCount90d, totalCrimes, weightedScore }) => {
+  const barWidth = Math.round((weightedScore / maxWeightedScore) * 100);
+  const riskLabel = getRiskLevelText(barWidth);
+  const badgeClass = barWidth <= 25
+    ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400'
+    : barWidth <= 65
+    ? 'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
+    : 'bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400';
 
   return {
     name: a.area,
@@ -50,8 +94,9 @@ const areaStats: AreaStat[] = areaData.map(a => {
     knownAs: a.knownAs,
     crimeCount90d,
     totalCrimes,
-    safetyScore,
-    level,
+    weightedScore,
+    riskLabel,
+    badgeClass,
   };
 });
 
@@ -128,6 +173,11 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
       </div>
     </div>
 
+    <!-- Newsletter CTA -->
+    <div class="mb-6">
+      <NewsletterSignup variant="inline" source="areas-page" />
+    </div>
+
     <!-- Region Groups -->
     <div id="regionContainer" class="space-y-4">
       {sortedRegions.map(({ region, areas, totalCrimes }) => (
@@ -151,7 +201,7 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
             {areas.map(area => (
               <a
                 href={buildRoute.area(area.slug)}
-                class="area-card block bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
+                class="area-card flex flex-col bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
                 data-area={area.name.toLowerCase()}
                 data-known-as={area.knownAs?.toLowerCase() || ''}
                 data-crime-count={area.crimeCount90d}
@@ -167,17 +217,13 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
                       </p>
                     )}
                   </div>
-                  <!-- Safety Score Badge -->
-                  <span class={`flex-shrink-0 ml-2 px-2 py-0.5 rounded-full text-caption font-bold ${
-                    area.level === 'low' ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400' :
-                    area.level === 'neutral' ? 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_65%)]' :
-                    'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
-                  }`}>
-                    Risk Level: {area.safetyScore.toFixed(1)}
+                  <!-- Risk Badge (weighted score, relative to highest area — matches dashboard) -->
+                  <span class={`flex-shrink-0 ml-2 px-2 py-0.5 rounded-full text-caption font-bold ${area.badgeClass}`}>
+                    {area.riskLabel}
                   </span>
                 </div>
 
-                <div class="flex items-center justify-between text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">
+                <div class="mt-auto flex items-center justify-between text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">
                   <span>{area.crimeCount90d} incident{area.crimeCount90d !== 1 ? 's' : ''} (90d)</span>
                   <span class="text-slate-400 dark:text-[hsl(0_0%_45%)]">{area.division}</span>
                 </div>

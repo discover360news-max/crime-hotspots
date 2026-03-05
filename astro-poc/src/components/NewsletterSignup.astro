@@ -21,11 +21,11 @@ const { areaName, variant = 'card', source = 'website' } = Astro.props;
 
 const heading = areaName
   ? `Stay informed about ${areaName}`
-  : 'Get the weekly Caribbean crime digest';
+  : 'Get the weekly murder count + top crimes';
 
 const sub = areaName
-  ? 'Clean data, no ads — straight to your inbox. Unsubscribe anytime.'
-  : 'Clean data, no ads, straight to your inbox.';
+  ? `Weekly crime digest for ${areaName} and nearby areas — every Monday morning.`
+  : 'Every Monday: murder count, top incidents, hotspot areas. No ads.';
 ---
 
 {variant === 'card' && (
@@ -36,7 +36,7 @@ const sub = areaName
       </svg>
       <div class="flex-1">
         <h3 class="text-sm font-semibold text-slate-800 dark:text-[hsl(0_0%_90%)] mb-0.5">{heading}</h3>
-        <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mb-1">3,400+ residents subscribed this month</p>
+        <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mb-1">Read in 30+ countries — free, no spam</p>
         <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mb-3">{sub}</p>
 
         <form class="newsletter-signup-form flex gap-2" data-source={source}>
@@ -73,7 +73,7 @@ const sub = areaName
     <div class="flex flex-col sm:flex-row sm:items-center gap-4">
       <div class="flex-1 min-w-0">
         <p class="text-sm font-semibold text-slate-800 dark:text-[hsl(0_0%_90%)]">{heading}</p>
-        <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mt-0.5">3,400+ residents subscribed this month</p>
+        <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mt-0.5">Read in 30+ countries — free, no spam</p>
         <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-0.5">{sub}</p>
       </div>
       <form class="newsletter-signup-form flex gap-2 shrink-0" data-source={source}>

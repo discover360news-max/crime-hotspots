@@ -35,6 +35,7 @@ import {
   TRACKED_CRIME_TYPES
 } from '../../lib/statisticsHelpers';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import { generateStatisticsOgImage } from '../../lib/generateOgImage';
 
 // Fetch all crimes at build time
 const allCrimes = await getTrinidadCrimes();
@@ -151,9 +152,20 @@ const murderRateProjected = ((murderProjected / POPULATION) * 100000).toFixed(1)
 const robberyRateProjected = ((robberyProjected / POPULATION) * 100000).toFixed(1);
 const totalCrimeRateProjected = ((totalCrimesProjected / POPULATION) * 100000).toFixed(1);
 
+// Generate dynamic OG image with live stats
+const ogImagePath = await generateStatisticsOgImage({
+  totalCrimes: total2026YTD,
+  murderCount,
+  robberyCount,
+  shootingCount,
+  currentYear,
+  murderRate: murderRateCurrent,
+  yoyChange: totalYoYChange,
+});
+
 // SEO
 const title = `Trinidad Crime Statistics & Crime Rate ${currentYear} - Live Data | Crime Hotspots`;
-const description = `Trinidad & Tobago crime statistics and crime rate for ${currentYear}. ${murderCount} murders so far (projected ${murderProjected} annually). ${previousYear} final rate: ${murderRatePrevious} per 100k. Updated daily with year-over-year comparisons and regional analysis.`;
+const description = `Trinidad & Tobago ${currentYear} crime statistics: ${total2026YTD} total crimes — ${murderCount} murders, ${robberyCount} robberies, ${shootingCount} shootings (murder rate ${murderRateCurrent} per 100k, projected ${murderProjected} annually). ${previousYear} final: ${murderRatePrevious} per 100k. Updated daily.`;
 const canonicalUrl = "https://crimehotspots.com/trinidad/statistics/";
 
 // Structured Data - Dataset
@@ -161,7 +173,7 @@ const structuredData = {
   "@context": "https://schema.org",
   "@type": "Dataset",
   "name": `Trinidad & Tobago Crime Statistics ${currentYear}`,
-  "description": `Comprehensive crime statistics for Trinidad & Tobago including murders, robberies, shootings, and other offenses. Data collected from verified news sources and updated daily. Includes ${currentYear} current data and ${previousYear} final statistics.`,
+  "description": `Trinidad & Tobago crime statistics ${currentYear}: ${total2026YTD} total crimes, ${murderCount} murders, ${robberyCount} robberies, ${shootingCount} shootings. ${previousYear} final murder rate: ${murderRatePrevious} per 100k. Updated daily from verified news sources.`,
   "url": canonicalUrl,
   "license": "https://creativecommons.org/licenses/by/4.0/",
   "creator": {
@@ -194,6 +206,56 @@ const structuredData = {
   "dateModified": new Date().toISOString()
 };
 
+// FAQ structured data — targets "People Also Ask" boxes for zero-CTR position-3 queries
+const topCrimeType = ['Murder', 'Robbery', 'Shooting', 'Home Invasion', 'Theft']
+  .map(t => ({ type: t, count: countCrimeType(crimesCurrent, t) }))
+  .sort((a, b) => b.count - a.count)[0]?.type ?? 'Robbery';
+const yoyDirection = totalYoYChange > 5 ? 'up' : totalYoYChange < -5 ? 'down' : 'similar';
+const yoyFaqText = yoyDirection === 'up'
+  ? `${currentYear} is tracking higher — ${total2026YTD} crimes YTD vs ${total2025SamePeriod} over the same period in ${previousYear} (up ${Math.round(totalYoYChange)}%).`
+  : yoyDirection === 'down'
+    ? `${currentYear} is tracking lower — ${total2026YTD} crimes YTD vs ${total2025SamePeriod} over the same period in ${previousYear} (down ${Math.round(Math.abs(totalYoYChange))}%).`
+    : `${currentYear} is tracking similar to ${previousYear} — ${total2026YTD} crimes YTD vs ${total2025SamePeriod} over the same period last year.`;
+
+const faqData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `How many murders in Trinidad and Tobago in ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Trinidad and Tobago has recorded ${murderCount} murders so far in ${currentYear} (as of ${lastUpdated}). The murder rate is ${murderRateCurrent} per 100,000 population. At the current pace, ${murderProjected} murders are projected by year end.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `What is the crime rate in Trinidad and Tobago in ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Trinidad and Tobago's murder rate in ${currentYear} is ${murderRateCurrent} per 100,000 population (${murderCount} murders year-to-date as of ${lastUpdated}). The ${previousYear} final murder rate was ${murderRatePrevious} per 100,000. Total crimes tracked in ${currentYear}: ${total2026YTD}, including ${robberyCount} robberies and ${shootingCount} shootings.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `What is the most common crime in Trinidad and Tobago in ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `${topCrimeType} is the most frequently recorded crime type in Trinidad and Tobago in ${currentYear}, based on verified news reports tracked by Crime Hotspots. Other major crime types include murder (${murderCount}), robbery (${robberyCount}), and shootings (${shootingCount}).`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `How does Trinidad's ${currentYear} crime rate compare to ${previousYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `${yoyFaqText} The ${previousYear} final murder rate was ${murderRatePrevious} per 100,000 — one of the highest in the Caribbean. Data is updated daily from verified news sources.`
+      }
+    }
+  ]
+};
+
 // Breadcrumb structured data
 const breadcrumbData = {
   "@context": "https://schema.org",
@@ -206,7 +268,7 @@ const breadcrumbData = {
 };
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} ogImage={`https://crimehotspots.com${ogImagePath}`}>
   <!-- Hero Section -->
   <Hero
     compact
@@ -236,6 +298,22 @@ const breadcrumbData = {
 
   <!-- Main Content -->
   <main class="max-w-3xl mx-auto px-4 py-8">
+
+    <!-- Quick Answer box — structured for Google featured snippet capture -->
+    <!-- Targets: "trinidad crime rate 2026", "trinidad and tobago crime statistics 2026" -->
+    <section class="mb-8 p-4 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-slate-50 dark:bg-[hsl(0_0%_9%)]">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-[hsl(0_0%_45%)] mb-3">Quick Answer — {currentYear} Crime Statistics</p>
+      <p class="text-sm text-slate-700 dark:text-[hsl(0_0%_85%)] leading-relaxed">
+        Trinidad and Tobago has recorded <strong class="text-slate-900 dark:text-white">{total2026YTD} crimes</strong> in {currentYear} as of {lastUpdated}, including <strong class="text-rose-600 dark:text-rose-400">{murderCount} murders</strong> (rate: {murderRateCurrent}/100k), {robberyCount} robberies, and {shootingCount} shootings.
+        {previousYear} ended with a murder rate of <strong class="text-slate-900 dark:text-white">{murderRatePrevious} per 100,000</strong> — one of the highest in the Caribbean.
+        {yoyDirection === 'up'
+          ? `Crime in ${currentYear} is tracking ${Math.round(totalYoYChange)}% higher than the same period in ${previousYear}.`
+          : yoyDirection === 'down'
+            ? `Crime in ${currentYear} is tracking ${Math.round(Math.abs(totalYoYChange))}% lower than the same period in ${previousYear}.`
+            : `Crime in ${currentYear} is tracking similar to the same period in ${previousYear}.`
+        }
+      </p>
+    </section>
 
     <!-- Current Year Summary -->
     <section class="mb-10">
@@ -600,6 +678,7 @@ const breadcrumbData = {
     <!-- Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
   </main>
 </Layout>
 

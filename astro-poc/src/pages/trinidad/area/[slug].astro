@@ -26,6 +26,7 @@ import {
   TRACKED_CRIME_TYPES,
   calculatePercentChange,
   filterToSamePeriod,
+  getTotalCrimeCount,
 } from '../../../lib/statisticsHelpers';
 import { escapeHtml } from '../../../lib/escapeHtml';
 import { routes, buildRoute } from '../../../config/routes';
@@ -185,13 +186,31 @@ const otherRegionAreas = areaData
     region: a.region,
   }));
 
+// SEO vars
+const totalCrimesCurrentYTD = getTotalCrimeCount(crimesCurrentYTD);
+const totalCrimesPreviousYTD = getTotalCrimeCount(crimesPreviousYTD);
+const murderYTD = countCrimeType(crimesCurrentYTD, 'Murder');
+const topCrimeType = [...crimeTypeBreakdown].sort((a, b) => b.currentCount - a.currentCount)[0]?.type;
+const areaYoYChange = totalCrimesPreviousYTD > 0
+  ? ((totalCrimesCurrentYTD - totalCrimesPreviousYTD) / totalCrimesPreviousYTD) * 100
+  : 0;
+const areaYoYText = areaYoYChange > 5
+  ? `Up ${Math.round(areaYoYChange)}% vs ${previousYear}`
+  : areaYoYChange < -5
+    ? `Down ${Math.round(Math.abs(areaYoYChange))}% vs ${previousYear}`
+    : `Similar to ${previousYear}`;
+
 // SEO
 const subtitle = knownAs && knownAs !== areaName
   ? `${areaName} (${knownAs})`
   : areaName;
 
 const pageTitle = `${areaName} Crime Statistics ${currentYear} - Risk Level ${safety.score.toFixed(1)}/10 | Crime Hotspots`;
-const pageDescription = `Crime statistics for ${areaName}, ${region}. Risk Level: ${safety.score.toFixed(1)}/10. ${recentCrimes90d.length} incidents in the last 90 days. Updated daily.`;
+const pl = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+const topCount = topCrimeType && topCrimeType !== 'Murder' ? countCrimeType(crimesCurrentYTD, topCrimeType) : 0;
+const pageDescription = totalCrimesCurrentYTD > 0
+  ? `${areaName} ${currentYear}: ${totalCrimesCurrentYTD} crimes YTD — ${pl(murderYTD, 'murder')}${topCrimeType && topCrimeType !== 'Murder' && topCount > 0 ? `, ${pl(topCount, topCrimeType.toLowerCase())}` : ''}. Risk level ${safety.score.toFixed(1)}/10. ${areaYoYText}. Updated daily.`
+  : `Crime statistics for ${areaName}, ${region}. Risk Level: ${safety.score.toFixed(1)}/10. ${recentCrimes90d.length} incidents in the last 90 days. Updated daily.`;
 
 // Schema.org
 const schemaData = {

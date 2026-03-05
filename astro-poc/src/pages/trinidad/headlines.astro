@@ -12,6 +12,7 @@ import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Hero from '../../components/Hero.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
 import BlogRotatingBanner from '../../components/BlogRotatingBanner.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import { getTrinidadCrimes, type Crime } from '../../lib/crimeData';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { getCountryName } from '../../data/countries';
@@ -137,6 +138,11 @@ const breadcrumbs = [
 
       <!-- Blog Rotating Banner -->
       <BlogRotatingBanner country="tt" limit={3} />
+
+      <!-- Newsletter CTA — above crime list (scroll rate is low, bottom is invisible) -->
+      <div class="mb-6">
+        <NewsletterSignup variant="inline" source="headlines-page" />
+      </div>
 
       <!-- Crime Accordions by Date -->
       <div id="crimeAccordions">

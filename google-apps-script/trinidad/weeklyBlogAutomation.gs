@@ -479,7 +479,8 @@ RULES:
 7. Keep each section concise (3-5 sentences max)
 8. Total length: 600-800 words
 9. Use markdown formatting (##, ###, **, -, etc.)
-10. Do NOT include YAML frontmatter — only the title line and content`;
+10. Do NOT include YAML frontmatter — only the title line and content
+11. CRITICAL — Executive Summary first sentence: Must lead with the total crime count and top finding. This sentence is used as the Google search description. Example: "Trinidad recorded 47 crimes last week including 8 murders — the highest weekly murder count since November 2025." Make it specific, urgent, and compelling enough that someone searching would want to click.`;
 }
 
 // ============================================================================

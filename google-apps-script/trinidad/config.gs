@@ -289,6 +289,16 @@ const NEWS_SOURCES = [
     enabled: false, // DISABLED: Guardian has no RSS feed; use Facebook Post Submitter instead
     priority: 2,
     crimeKeywords: ["murder", "shoot", "rob", "assault", "kill", "crime", "police", "victim", "attack", "gang", "arrest", "home invasion"]
+  },
+  {
+    name: "Google News TT",
+    country: "TT",
+    rssUrl: "https://news.google.com/rss/search?q=trinidad+crime&hl=en-TT&gl=TT&ceid=TT:en",
+    enabled: false, // DISABLED: Too much noise — aggregated redirect URLs not useful
+    priority: 2, // Secondary — aggregates multiple sources incl. Guardian
+    // NOTE: <link> values are Google redirect URLs (news.google.com/rss/articles/...), not direct source URLs.
+    // Headline similarity dedup (80%) handles cross-source duplicates. linkChecker.gs skips this source by design.
+    crimeKeywords: ["murder", "shoot", "rob", "assault", "kill", "crime", "police", "victim", "attack", "gang", "arrest", "home invasion"]
   }
 ];
 

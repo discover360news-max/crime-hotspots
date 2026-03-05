@@ -16,6 +16,7 @@ import StatCard from '../../components/StatCard.astro';
 import QuickInsightsCard from '../../components/QuickInsightsCard.astro';
 import TopRegionsCard from '../../components/TopRegionsCard.astro';
 import DashboardInfoCards from '../../components/DashboardInfoCards.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import FiltersTray from '../../components/FiltersTray.astro';
 import InfoPopup from '../../components/InfoPopup.astro';
 import LoadingShimmer from '../../components/LoadingShimmer.astro';
@@ -369,6 +370,11 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
           <TopRegionsCard crimes={crimes} />
         </div>
       </div>
+    </div>
+
+    <!-- Newsletter CTA — after Top Regions, before info cards -->
+    <div class="mb-6">
+      <NewsletterSignup variant="inline" source="dashboard-page" />
     </div>
 
     <!-- Info Cards -->

@@ -273,9 +273,10 @@ function getAllSourceUrls_() {
       var crime = crimes[i];
       var url = (crime['URL'] || '').trim();
 
-      // Skip empty, invalid, or social media URLs
+      // Skip empty, invalid, social media, or Google News redirect URLs
       if (!url || !isValidHttpUrl_(url)) continue;
       if (isSocialMediaUrl_(url)) continue;
+      if (url.indexOf('news.google.com') !== -1) continue; // Google News redirects always return 200
 
       if (!urlMap[url]) {
         urlMap[url] = { count: 0, years: [], source: crime['Source'] || 'Unknown' };

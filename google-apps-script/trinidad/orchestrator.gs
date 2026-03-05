@@ -527,6 +527,148 @@ function sendErrorNotification(error) {
   */
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// SPLIT STAGE WRAPPERS (Added Mar 2026)
+// Separates runProcessingPipeline() into two triggers to avoid 6-min limit.
+//
+// TRIGGER SCHEDULE (set up via setupAllTriggers()):
+//   runRSSCollection()       6am / 2pm / 10pm TT  → Stage 1: collect feeds
+//   runTextFetchAndFilter()  7am / 3pm / 11pm TT  → Stages 2+3: fetch + pre-filter
+//   runAIProcessing()        8am / 4pm / 12am TT  → Stage 4: Claude extraction
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * STAGES 2+3 ONLY: Text fetching + pre-filtering
+ * Runs 1 hour after runRSSCollection().
+ * Fast (<2 min) — safe to combine.
+ */
+function runTextFetchAndFilter() {
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log('   STAGES 2+3: Text Fetch + Pre-Filter         ');
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log(`Started: ${new Date().toLocaleString()}`);
+
+  const startTime = Date.now();
+
+  try {
+    // Stage 2: Text fetching
+    const pendingCount = countArticlesByStatus('pending');
+    Logger.log(`Stage 2 — pending: ${pendingCount}`);
+    if (pendingCount > 0) {
+      const fetchResult = fetchPendingArticlesImproved();
+      Logger.log(`✅ Stage 2 done: ${fetchResult.success} articles fetched`);
+    } else {
+      Logger.log('ℹ️ Stage 2 — nothing to fetch');
+    }
+
+    // Stage 3: Pre-filtering
+    const textFetchedCount = countArticlesByStatus('text_fetched');
+    Logger.log(`Stage 3 — text_fetched: ${textFetchedCount}`);
+    if (textFetchedCount > 0) {
+      preFilterArticles();
+      const stats = getPreFilterStats();
+      Logger.log(`✅ Stage 3 done: ${stats.readyForProcessing} passed, ${stats.filteredOut} filtered`);
+    } else {
+      Logger.log('ℹ️ Stage 3 — nothing to filter');
+    }
+
+  } catch (error) {
+    Logger.log(`❌ Error: ${error.message}`);
+    sendErrorNotification(error);
+  }
+
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  Logger.log(`Completed in ${elapsed}s`);
+  Logger.log('═══════════════════════════════════════════════');
+}
+
+/**
+ * STAGE 4 ONLY: Claude AI extraction
+ * Runs 1 hour after runTextFetchAndFilter().
+ * Isolated so 30s-per-article delays don't risk timeout.
+ */
+function runAIProcessing() {
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log('   STAGE 4: Claude AI Processing               ');
+  Logger.log('═══════════════════════════════════════════════');
+  Logger.log(`Started: ${new Date().toLocaleString()}`);
+
+  const startTime = Date.now();
+
+  try {
+    const readyCount = countArticlesByStatus('ready_for_processing');
+    Logger.log(`ready_for_processing: ${readyCount}`);
+
+    if (readyCount > 0) {
+      const beforeProd = getSheetRowCount(SHEET_NAMES.PRODUCTION);
+      const beforeReview = getSheetRowCount(SHEET_NAMES.REVIEW_QUEUE);
+
+      processReadyArticles();
+
+      const toProduction = getSheetRowCount(SHEET_NAMES.PRODUCTION) - beforeProd;
+      const toReview = getSheetRowCount(SHEET_NAMES.REVIEW_QUEUE) - beforeReview;
+
+      Logger.log(`✅ Stage 4 done: → Production: ${toProduction}, Review Queue: ${toReview}`);
+    } else {
+      Logger.log('ℹ️ Nothing ready for processing');
+    }
+
+  } catch (error) {
+    Logger.log(`❌ Error: ${error.message}`);
+    sendErrorNotification(error);
+  }
+
+  const elapsed = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
+  Logger.log(`Completed in ${elapsed} min`);
+  Logger.log('═══════════════════════════════════════════════');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TRIGGER SETUP (Run once manually — do NOT set as a trigger itself)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Creates all pipeline triggers. Run this ONCE manually in Apps Script editor.
+ * Deletes any existing triggers first to avoid duplicates.
+ *
+ * Schedule (UTC — Trinidad = UTC-4):
+ *   runRSSCollection       → 10:00, 18:00, 02:00 UTC  (6am, 2pm, 10pm TT)
+ *   runTextFetchAndFilter  → 11:00, 19:00, 03:00 UTC  (7am, 3pm, 11pm TT)
+ *   runAIProcessing        → 12:00, 20:00, 04:00 UTC  (8am, 4pm, 12am TT)
+ */
+function setupAllTriggers() {
+  // Delete all existing triggers first
+  ScriptApp.getProjectTriggers().forEach(t => ScriptApp.deleteTrigger(t));
+  Logger.log('✅ Deleted all existing triggers');
+
+  const triggerDefs = [
+    // RSS Collection — 3x daily (6am / 2pm / 10pm TT = 10:00 / 18:00 / 02:00 UTC)
+    { fn: 'runRSSCollection', hours: [10, 18, 2] },
+    // Text Fetch + Pre-filter — 3x daily, 1hr after RSS
+    { fn: 'runTextFetchAndFilter', hours: [11, 19, 3] },
+    // AI Processing — 3x daily, 1hr after fetch
+    { fn: 'runAIProcessing', hours: [12, 20, 4] }
+  ];
+
+  let created = 0;
+
+  triggerDefs.forEach(({ fn, hours }) => {
+    hours.forEach(hour => {
+      ScriptApp.newTrigger(fn)
+        .timeBased()
+        .atHour(hour)
+        .everyDays(1)
+        .create();
+      created++;
+    });
+    Logger.log(`✅ ${fn}: scheduled at UTC hours ${hours.join(', ')}`);
+  });
+
+  Logger.log('');
+  Logger.log(`Total triggers created: ${created}`);
+  Logger.log('Run ScriptApp.getProjectTriggers() to verify.');
+}
+
 /**
  * Test the full pipeline manually
  */

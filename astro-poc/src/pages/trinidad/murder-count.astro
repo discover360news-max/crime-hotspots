@@ -17,6 +17,7 @@ import { getCollection } from 'astro:content';
 import { generateMurderCountOgImage } from '../../lib/generateOgImage';
 import { routes, buildRoute } from '../../config/routes';
 import InfoPopup from '../../components/InfoPopup.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
 // import CrimeDetailModal from '../../components/CrimeDetailModal.astro';
 
 // Fetch current year's crime data
@@ -96,8 +97,8 @@ const ogImagePath = await generateMurderCountOgImage({
   currentRate: currentMurderRate,
 });
 
-const title = "Trinidad Murder Rate & Count 2026 - Live Statistics | Crime Hotspots";
-const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k (${murderCount} murders so far). Track the Trinidad & Tobago murder toll and murder rate with live statistics. Projected annual rate: ${projectedMurderRate} per 100k. Updated daily.`;
+const title = `Trinidad Murder Count 2026: ${murderCount} Murders So Far — Updated Daily | Crime Hotspots`;
+const description = `Trinidad murder count 2026: ${murderCount} murders (death toll updated daily). Murder rate: ${currentMurderRate} per 100k. Murder toll projected at ${projectedMurderRate} per 100k for full year. Track the Trinidad & Tobago murder toll and murder rate live.`;
 ---
 
 <Layout title={title} description={description} includePagefind={false} ogImage={`https://crimehotspots.com${ogImagePath}`}>
@@ -260,6 +261,11 @@ const description = `Trinidad murder rate 2026: ${currentMurderRate} per 100k ($
           </div>
         </div>
       )}
+
+      <!-- Newsletter CTA — primary retention hook for search landing users -->
+      <div class="mt-8 w-full max-w-md mx-auto">
+        <NewsletterSignup variant="card" source="murder-count-page" />
+      </div>
 
       <!-- Share Section -->
       <div class="pt-6 border-t border-slate-200 dark:border-[hsl(0_0%_18%)] mt-6">
