@@ -58,6 +58,7 @@ export const GET: APIRoute = async () => {
     { url: 'faq/', priority: 0.7, changefreq: 'monthly' },
     { url: 'methodology/', priority: 0.7, changefreq: 'monthly' },
     { url: 'privacy/', priority: 0.5, changefreq: 'yearly' },
+    { url: 'terms/', priority: 0.5, changefreq: 'yearly' },
     { url: 'tools/social-image-generator/', priority: 0.4, changefreq: 'monthly' },
   ];
 

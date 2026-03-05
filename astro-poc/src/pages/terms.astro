@@ -1,0 +1,167 @@
+---
+/**
+ * Terms of Service Page
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+const title = "Terms of Service — Crime Hotspots Caribbean";
+const description = "Terms of Service for Crime Hotspots Caribbean. Read our terms governing your use of the platform, content policies, and liability disclaimers.";
+
+const lastUpdated = "March 5, 2026";
+---
+
+<Layout title={title} description={description}>
+  <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-12 text-slate-700 dark:text-[hsl(0_0%_82%)]">
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: 'Terms of Service' }
+    ]} />
+    <h1 class="text-display font-semibold mb-3 text-center pt-4 dark:text-[hsl(0_0%_95%)]">Terms of Service</h1>
+    <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-8 text-center">Last Updated: {lastUpdated}</p>
+
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)] leading-relaxed space-y-8">
+
+      <!-- Introduction -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">Agreement to Terms</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          By accessing or using <strong>Crime Hotspots</strong> at <a href="https://crimehotspots.com" class="text-rose-600 dark:text-rose-400 hover:text-rose-700 underline">crimehotspots.com</a>, you agree to be bound by these Terms of Service. If you do not agree, please do not use the platform.
+        </p>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
+          Crime Hotspots is operated as an independent public information service. We reserve the right to update these terms at any time. Continued use of the site after changes constitutes acceptance.
+        </p>
+      </section>
+
+      <!-- Use of the Platform -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">1. Permitted Use</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          You may use Crime Hotspots for personal, non-commercial research and informational purposes. Permitted uses include:
+        </p>
+        <ul class="list-disc list-inside text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4 space-y-1 ml-4">
+          <li>Browsing crime statistics, dashboards, and news summaries</li>
+          <li>Sharing individual pages via social media or messaging</li>
+          <li>Citing our data in research or journalism (with attribution to Crime Hotspots)</li>
+          <li>Submitting anonymous crime tips through the reporting form</li>
+        </ul>
+      </section>
+
+      <!-- Prohibited Use -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">2. Prohibited Use</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">You may not:</p>
+        <ul class="list-disc list-inside text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4 space-y-1 ml-4">
+          <li>Scrape, crawl, or bulk-download content from the platform without written permission</li>
+          <li>Reproduce or republish our content commercially without attribution</li>
+          <li>Submit false, misleading, or malicious crime reports</li>
+          <li>Attempt to disrupt, overload, or compromise the security of the platform</li>
+          <li>Use the platform to harass, defame, or target individuals</li>
+          <li>Misrepresent our data or use it out of context to spread misinformation</li>
+        </ul>
+      </section>
+
+      <!-- Content & Data Accuracy -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">3. Data Accuracy Disclaimer</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          Crime Hotspots aggregates crime data from publicly available news sources including the Trinidad Guardian, Trinidad Express, and Newsday. We strive for accuracy but:
+        </p>
+        <ul class="list-disc list-inside text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4 space-y-1 ml-4">
+          <li>Data may contain errors, delays, or omissions from source publications</li>
+          <li>Crime classifications are our own editorial interpretation and may differ from official police statistics</li>
+          <li>Historical data may be revised as sources update their records</li>
+          <li>This platform is <strong>not</strong> an official government or law enforcement source</li>
+        </ul>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
+          Do not rely on this data for legal, law enforcement, insurance, or emergency decision-making. For official statistics, refer to the Trinidad and Tobago Police Service (TTPS) or relevant government agencies.
+        </p>
+      </section>
+
+      <!-- Intellectual Property -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">4. Intellectual Property</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          The Crime Hotspots platform — including its design, code, original written content, dashboards, and visualizations — is owned by Crime Hotspots and protected under applicable copyright law.
+        </p>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          <strong>Crime data</strong> aggregated from news sources is published under the <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" class="text-rose-600 dark:text-rose-400 hover:text-rose-700 underline">Creative Commons Attribution 4.0 (CC BY 4.0)</a> license. You may share and adapt this data for any purpose, provided you give appropriate credit to Crime Hotspots and link back to the source page.
+        </p>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
+          Original news headlines and article excerpts remain the intellectual property of their respective publishers. We do not claim ownership over third-party content.
+        </p>
+      </section>
+
+      <!-- User Submissions -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">5. User Submissions</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          When you submit content through Crime Hotspots (crime tips, safety tips), you:
+        </p>
+        <ul class="list-disc list-inside text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4 space-y-1 ml-4">
+          <li>Grant Crime Hotspots a non-exclusive, royalty-free licence to use, publish, and display your submission</li>
+          <li>Confirm that your submission is truthful to the best of your knowledge</li>
+          <li>Understand that submissions may be reviewed, edited, or rejected at our discretion</li>
+          <li>Accept that anonymous submissions cannot be retracted once processed</li>
+        </ul>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
+          We reserve the right to remove any submission that violates these terms or is deemed harmful, false, or inappropriate.
+        </p>
+      </section>
+
+      <!-- No Warranties -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">6. No Warranties</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
+          Crime Hotspots is provided <strong>"as is"</strong> without warranties of any kind, express or implied. We do not warrant that the platform will be uninterrupted, error-free, or completely accurate. Use of this platform is at your own risk.
+        </p>
+      </section>
+
+      <!-- Limitation of Liability -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">7. Limitation of Liability</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
+          To the fullest extent permitted by law, Crime Hotspots and its operators shall not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from your use of — or inability to use — this platform, including reliance on any data or content displayed herein.
+        </p>
+      </section>
+
+      <!-- Third-Party Links -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">8. Third-Party Links</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
+          Crime Hotspots links to external news sources and third-party services. We are not responsible for the content, accuracy, or privacy practices of any third-party websites. Links to external sources do not constitute endorsement.
+        </p>
+      </section>
+
+      <!-- Governing Law -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">9. Governing Law</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
+          These terms are governed by the laws of Trinidad and Tobago. Any disputes arising from use of this platform shall be subject to the jurisdiction of the courts of Trinidad and Tobago.
+        </p>
+      </section>
+
+      <!-- Changes -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">10. Changes to These Terms</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
+          We may update these Terms of Service at any time. The "Last Updated" date above reflects the most recent revision. Continued use of the platform after changes constitutes your acceptance of the updated terms.
+        </p>
+      </section>
+
+      <!-- Contact -->
+      <section>
+        <h2 class="text-heading font-semibold mb-3 text-slate-700 dark:text-[hsl(0_0%_88%)]">11. Contact</h2>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
+          For questions about these terms, contact us at:
+        </p>
+        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+          <p><strong>Email:</strong> <a href="mailto:discover360news@gmail.com" class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 underline font-medium">discover360news@gmail.com</a></p>
+          <p class="mt-1"><strong>Website:</strong> <a href="https://crimehotspots.com" class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 underline font-medium">crimehotspots.com</a></p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</Layout>

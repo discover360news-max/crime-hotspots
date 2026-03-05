@@ -1,176 +1,160 @@
 # Crime Hotspots SEO Implementation Status
 
-**Last Updated:** December 25, 2025
-**Status:** Phase 1 Complete ✅
+**Last Updated:** March 5, 2026
+**Status:** Phase 1 + Phase 2 (Social) Complete ✅
 
 ---
 
 ## ✅ COMPLETED
 
 ### Technical SEO Foundation
-- ✅ Sitemap.xml (auto-generated, includes all 1,300+ pages)
+- ✅ Sitemap.xml (auto-generated, includes 2,100+ pages — crimes, blog, areas, tips, archive)
 - ✅ Robots.txt (allows all crawlers, 1-second delay)
-- ✅ Breadcrumbs on ALL pages (About, FAQ, Methodology, Dashboard, Headlines, Blog, Crime Pages)
+- ✅ Breadcrumbs on ALL pages
 - ✅ Google Analytics 4 (GA4: G-JMQ8B4DYEG)
-- ✅ Cookie consent system
+- ✅ Cookie consent system (Secure; SameSite=Lax cookie)
 - ✅ Meta descriptions on all pages
-- ✅ Open Graph tags (WhatsApp optimized)
+- ✅ Open Graph tags (WhatsApp/Facebook/X optimized)
 - ✅ Twitter Cards
 - ✅ Canonical URLs
 - ✅ Geo tags (location targeting)
-- ✅ Content Security Policy (CSP)
+- ✅ Content Security Policy (CSP) — Grade A
+- ✅ Self-hosted Inter font (eliminated Google Fonts external request chain)
+- ✅ RSS feed at /rss.xml (blog posts + latest 20 crime headlines)
+- ✅ Daily rebuild at 6 AM UTC via GitHub Actions
 
 ### Structured Data (Schema.org)
+- ✅ NewsArticle Schema on ALL crime detail pages (`/trinidad/crime/[slug]/`)
+- ✅ NewsArticle Schema on ALL blog post pages (`/blog/[slug]/`) ← upgraded from BlogPosting Mar 2026
 - ✅ Dataset Schema (headlines pages)
-- ✅ BreadcrumbList Schema (headlines pages)
-- ✅ FAQPage Schema (FAQ page with 13 Q&As)
+- ✅ BreadcrumbList Schema (all pages)
+- ✅ FAQPage Schema (FAQ page — 13 Q&As)
 - ✅ Organization Schema with social links
+- ✅ BlogPosting/Article schema — replaced by NewsArticle
+- ✅ Dataset license field (CC BY 4.0) on murder count page
+
+### News Sitemap
+- ✅ `/news-sitemap.xml` — Google News sitemap with `<news:news>` elements (Mar 2026)
+  - Includes blog posts from last 2 days (Google News window)
+  - Rebuilt daily via Cloudflare Pages deployment
 
 ### Content & Trust (E-E-A-T)
 - ✅ FAQ page (13 questions)
-- ✅ Methodology page (data verification process)
+- ✅ Methodology page (data verification process, crime counting methodology)
 - ✅ About page (mission statement)
-- ✅ Weekly automated blog posts (Mondays)
+- ✅ Weekly automated blog posts (every Monday — Claude Haiku 4.5)
 - ✅ Interactive Leaflet dashboards
+- ✅ Safety Tips section (28 tips, community-submitted, moderated)
+- ✅ Source attribution (crime pages link to original Guardian/Express/Newsday articles)
 
-### Performance
-- ✅ Astro static site (excellent Core Web Vitals)
-- ✅ Daily auto-rebuild (6 AM UTC)
-- ✅ 1,300+ auto-generated crime detail pages
+### Social Media Distribution
+- ✅ Social sharing buttons on crime detail pages, blog posts, area pages
+- ✅ Facebook, X (Twitter), WhatsApp share on all content pages
+- ✅ Social media accounts active (Facebook, X, Instagram)
+- ✅ Facebook post submitter web app (daily data entry tool)
+- ✅ Weekly blog auto-posts via GAS automation
 
----
+### Performance (Core Web Vitals)
+- ✅ Astro 5 static/SSR hybrid (Crime pages: full SSR + 24h CDN cache)
+- ✅ LCP optimized — self-hosted fonts, Astro Image component
+- ✅ CLS fixed on dashboard (shimmer overlay pattern)
+- ✅ Hybrid rendering for crime pages (first visit SSR → CDN cached)
+- ✅ Dynamic OG image for murder count page (build-time satori + sharp)
+- ✅ Pagefind site-wide search with suggestions (recent searches + latest crimes)
 
-## 📋 PHASE 2: Social Media Dominance (3-5 days)
-
-**Priority:** HIGH — Direct traffic driver
-
-1. **Open Graph Preview Images** (branded templates)
-   - Create OG image template: "Trinidad Murders: [Number] in [Month]" with map graphic
-   - Auto-generate for each blog post and crime page
-   - WhatsApp/Facebook share previews
-
-2. **Auto-Post to Social Media**
-   - Facebook API integration (post new crimes)
-   - X (Twitter) API (breaking news alerts)
-   - WhatsApp Business API (future consideration)
-
-3. **Social Sharing Buttons**
-   - Add to crime detail pages
-   - Add to blog posts
-   - Track share counts
-
-**Owner Tasks:**
-- Provide branding assets (logo, color palette)
-- Create Facebook Page + X account (if not exists)
-- Set up Meta Developer account for API keys
+### Security
+- ✅ Security grade: A (Jan 2026 audit)
+- ✅ XSS protection via escapeHtml() on all user/crime data
+- ✅ CSP complete — tight domain allowlist
+- ✅ Turnstile CAPTCHA on all report forms
 
 ---
 
-## 📋 PHASE 3: Authority & E-E-A-T (1-2 weeks)
+## 📋 GOOGLE NEWS — SUBMITTED, AWAITING REVIEW (Mar 5, 2026)
 
-**Priority:** MEDIUM — Trust building for Google
+**Status:** Application submitted. Google says approval takes ~2 weeks.
+**Revisit date:** ~March 19, 2026
+
+### What Was Done (Mar 5, 2026)
+- ✅ Upgraded blog post schema: `BlogPosting` → `NewsArticle` (`blog/[slug].astro`)
+- ✅ Created `/news-sitemap.xml` — Google News sitemap with `<news:news>` elements, last-2-days window, rebuilt daily
+- ✅ Added `news.google.com` to CSP `script-src` in `public/_headers`
+- ✅ Added SwG (Subscribe with Google) sync script to `Layout.astro` — CMS content sync
+  - **Note:** Removed `clientOptions: { theme: "light" }` — it was injecting light CSS sitewide, breaking dark mode and making rose colours appear pink. Fixed same session.
+- ✅ Created `/terms/` page (required by Publisher Center alongside `/privacy/`)
+- ✅ Added `NewsletterSignup` (inline variant) to blog post pages — Publisher Center reader funnel CTA
+- ✅ Added `/terms/` to sitemap
+
+### Known Gaps (Accepted Trade-offs)
+- ⚠️ **Posting frequency** — Google News prefers daily publication. Our blog posts are weekly.
+  - Decision: Submit anyway. Niche publishers with consistent weekly cadence have been approved.
+  - If rejected, next step is building **daily digest pages** at `/trinidad/daily/YYYY-MM-DD/`
+- ⚠️ **Newsletter CTA points to `/blog/`** — Publisher Center reader funnel currently routes to the weekly blog.
+  - Daily summary pages don't exist yet. Blog is the correct placeholder.
+  - If daily digests are built, move the CTA there.
+- ⚠️ **Author is an org, not a person** — "Crime Hotspots Analytics" is used sitewide.
+  - Google News accepts org bylines. No change needed unless rejected for this reason.
+
+### If Rejected
+1. Read the rejection reason carefully — Google usually specifies
+2. If **frequency**: Build daily digest pages (`/trinidad/daily/YYYY-MM-DD/`) — planned feature
+3. If **content policy**: Review what Google flags specifically
+4. If **technical**: Check `/news-sitemap.xml` is crawlable and SwG script is loading
+
+---
+
+## 📋 PHASE 3: Authority & E-E-A-T (Next Priority)
 
 1. **Expand About Page**
-   - Add team bios (who runs Crime Hotspots?)
+   - Add mission statement depth + contact information
    - Data accuracy guarantees
-   - Contact information
 
-2. **Source Attribution**
-   - Link to original Guardian/Express/Newsday articles from crime pages
-   - Display "Source: Trinidad Express" with clickable link
-   - Show article timestamps
+2. **Team/Author page**
+   - Even a minimal "About the Author" page for "Crime Hotspots Analytics" helps E-E-A-T
+   - Add to `/about/` or create `/about/editorial/`
 
-3. **"Last Updated" Timestamps**
-   - Add to all dashboard cards
-   - Show data freshness ("Updated 2 hours ago")
-   - Build trust in real-time claims
-
-4. **Google Business Profile**
-   - List as "Data & Analytics Service - Trinidad"
+3. **Google Business Profile**
+   - List as "Data & Analytics Service — Trinidad & Tobago"
    - Appear in Google Maps for "crime statistics Trinidad"
-
-**Owner Tasks:**
-- Write team bios (if applicable)
-- Provide contact email for About page
-- Create Google Business Profile listing
 
 ---
 
 ## 📋 PHASE 4: Content Expansion (Ongoing)
 
-**Priority:** MEDIUM — Long-term organic growth
-
 1. **City-Specific Landing Pages**
-   - `/trinidad/port-of-spain` - Dashboard for capital
-   - `/trinidad/san-fernando` - Second city
-   - `/guyana/georgetown` - Guyana capital
+   - `/trinidad/port-of-spain/` — Dashboard for capital
+   - `/trinidad/san-fernando/` — Second city
+   - `/guyana/georgetown/` — Guyana capital (when Guyana launches)
 
 2. **Comparison Content** (high search volume)
-   - "Trinidad vs Guyana crime rate 2025"
+   - "Trinidad vs Guyana crime rate 2026"
    - "Safest Caribbean island"
    - "Port of Spain vs Georgetown crime"
 
-3. **Neighborhood Safety Guides**
-   - "Is Westmoorings safe?" (SEO gold)
+3. **Neighborhood Safety Guides** (SEO gold)
+   - "Is Westmoorings safe?"
    - "St. James crime statistics"
    - "Maraval safety guide"
 
-4. **Monthly Trend Reports** (automated)
-   - "Murder rate down 12% in December"
-   - "Robbery hotspots shifted to X"
-   - "Crime clock: A murder every X hours"
-
-5. **Submit to Google News**
-   - Apply as verified news source
-   - Appear in Google News results
-
-**Owner Tasks:**
-- None - all automated once templates created
-
----
-
-## 📋 PHASE 5: Advanced Optimization (Future)
-
-**Priority:** LOW — Nice to have
-
-1. **NewsArticle Schema** on blog posts
-2. **Preconnect tags** for external resources
-3. **Lazy loading** for images below fold
-4. **Service Worker** for offline access
-5. **AMP pages** for mobile speed
-6. **Video content** (crime trend explainers)
-7. **Podcast** (weekly crime wrap-up)
-
----
-
-## 🎯 Quick Win Checklist (Owner Actions Needed)
-
-**Do This Week:**
-1. ✅ Verify Google Search Console (claim crimehotspots.com)
-2. ✅ Submit sitemap to Google Search Console
-3. ✅ Create Facebook Page + X account (if missing)
-4. ✅ Get Meta Developer API keys for auto-posting
-5. ✅ Provide logo/branding for OG images
-
-**Can Wait:**
-- Google Business Profile setup
-- Team bios for About page
-- Partner outreach to news sites
+4. **Daily Crime Digest Pages** (Google News frequency boost)
+   - `/trinidad/daily/YYYY-MM-DD/` — auto-generated from CSV data
+   - Crimes that day + crime type breakdown + auto-written paragraph
+   - Needs design + GAS/build pipeline decision
 
 ---
 
 ## 📊 SEO Metrics to Track
 
-**Set Up Now:**
-1. Google Search Console - Track impressions, clicks, position
-2. GA4 Events - Track "Share to WhatsApp", "View Crime Map"
-3. Backlink Monitor - Who's linking to Crime Hotspots?
-
 **Monthly Review:**
-- Organic traffic growth
-- Top performing keywords ("Trinidad crime statistics 2025")
-- Social media referrals (WhatsApp, Facebook, X)
-- Bounce rate on crime detail pages
+- GSC: impressions, clicks, avg position, CTR
+- GA4: organic traffic, pages/session, bounce rate
+- Top keywords ("Trinidad crime statistics 2026")
+- Social referrals (WhatsApp, Facebook, X)
+- Google News inclusion (check Search Console > News tab)
+
+**Current Baseline (Feb 2026, last 28 days):**
+- GSC: 494 clicks (~18/day), 8,410 impressions, CTR 5.9%, avg position 7.5
+- GA4: ~119 unique users/day, ~2,307 page views
 
 ---
 
@@ -179,10 +163,9 @@
 ✅ Real-time data (daily updates, not monthly)
 ✅ Interactive maps (better than static government PDFs)
 ✅ Multi-country (only Caribbean-wide aggregator)
-✅ Verified sources (Guardian, Express, Newsday - not rumors)
+✅ Verified sources (Guardian, Express, Newsday — not rumors)
 ✅ Free & accessible (no paywalls)
-✅ Mobile optimized (responsive design)
-
-**Next Move:** Push Phase 2 (social media) to drive immediate traffic while Google crawls new sitemap.
-
-
+✅ Mobile optimized (responsive design, bottom nav, iOS UX)
+✅ NewsArticle schema on 2,100+ pages
+✅ Safety tips community section
+✅ Weekly automated journalism (Claude Haiku)

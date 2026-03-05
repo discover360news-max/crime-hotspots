@@ -9,6 +9,7 @@ export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { routes, buildRoute } from '../../config/routes';
 
@@ -54,29 +55,36 @@ const relatedPosts = allPosts
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 
-// BlogPosting Schema for SEO
-const blogPostingSchema = {
+// NewsArticle Schema — required for Google News eligibility
+const newsArticleSchema = {
   "@context": "https://schema.org",
-  "@type": "BlogPosting",
+  "@type": "NewsArticle",
   "headline": post.data.title,
   "description": post.data.excerpt,
-  "image": post.data.image,
+  "image": [`https://crimehotspots.com${post.data.image}`],
   "datePublished": post.data.date.toISOString(),
+  "dateModified": post.data.date.toISOString(),
   "author": {
-    "@type": "Person",
-    "name": post.data.author
+    "@type": "Organization",
+    "name": post.data.author,
+    "url": "https://crimehotspots.com"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Crime Hotspots",
-    "url": "https://crimehotspots.com"
+    "url": "https://crimehotspots.com",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://crimehotspots.com/assets/images/logo.png"
+    }
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": `https://crimehotspots.com/blog/${post.slug}`
+    "@id": `https://crimehotspots.com/blog/${post.slug}/`
   },
-  "articleSection": post.data.countryName,
-  "keywords": ["crime statistics", post.data.countryName, "Caribbean crime data"]
+  "articleSection": "Crime Statistics",
+  "keywords": post.data.tags.join(", "),
+  "inLanguage": "en"
 };
 ---
 
@@ -284,8 +292,8 @@ const blogPostingSchema = {
 </style>
 
 <Layout title={title} description={description} ogImage={post.data.image}>
-  <!-- BlogPosting Schema for SEO -->
-  <script type="application/ld+json" set:html={JSON.stringify(blogPostingSchema)} />
+  <!-- NewsArticle Schema — required for Google News eligibility -->
+  <script type="application/ld+json" set:html={JSON.stringify(newsArticleSchema)} />
 
   <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-12 text-slate-700 dark:text-[hsl(0_0%_82%)]">
     <!-- Breadcrumbs -->
@@ -322,6 +330,11 @@ const blogPostingSchema = {
         <!-- Article Body -->
         <div class="blog-content">
           <Content />
+        </div>
+
+        <!-- Newsletter CTA -->
+        <div class="mt-8 sm:mt-10">
+          <NewsletterSignup variant="inline" source="blog-post" />
         </div>
 
         <!-- Social Share Buttons -->

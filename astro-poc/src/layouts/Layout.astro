@@ -147,6 +147,19 @@ const detectedCountryId = Object.entries(countryPathMap).find(
     @media (min-width: 768px) { #mainNav { display: flex } }
   </style>
 
+  <!-- Google News / Subscribe with Google (SwG) — CMS sync for Google News Publisher Center -->
+  <script async type="application/javascript" src="https://news.google.com/swg/js/v1/swg-basic.js"></script>
+  <script is:inline>
+    (self.SWG_BASIC = self.SWG_BASIC || []).push(basicSubscriptions => {
+      basicSubscriptions.init({
+        type: "NewsArticle",
+        isPartOfType: ["Product"],
+        isPartOfProductId: "CAow8K_fCw:openaccess",
+        clientOptions: { lang: "en" },
+      });
+    });
+  </script>
+
   <!-- Cloudflare Web Analytics (cookieless, no consent needed, tracks all real visitors) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "9edc1888af84466fa5b067943e7c6f99"}'></script>
 
