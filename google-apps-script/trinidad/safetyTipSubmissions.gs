@@ -108,9 +108,11 @@ function appendVote(tipId, vote) {
 }
 
 /**
- * doGet — health check endpoint
+ * Health check — called internally, not as a web app entry point.
+ * Renamed from doGet() to avoid conflicting with facebookSubmitter.gs doGet()
+ * which is the sole web app entry point for this GAS project.
  */
-function doGet() {
+function safetyTipsHealthCheck() {
   return ContentService
     .createTextOutput(JSON.stringify({ status: 'ok', service: 'safety-tip-submissions' }))
     .setMimeType(ContentService.MimeType.JSON);
