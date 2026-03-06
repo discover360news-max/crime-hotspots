@@ -551,14 +551,15 @@ function isDuplicateCrime(sheet, crime, geocoded, cachedData, cachedColMap) {
                        : null;
 
     for (let row of data) {
-      const existingHeadline  = row[colMap['headline']];
-      const existingCrimeType = row[colMap['crimetype']];
-      const existingDate      = row[colMap['date']];
-      const existingStreet    = row[colMap['street address']];
-      const existingLat       = row[colMap['latitude']];
-      const existingLng       = row[colMap['longitude']];
-      const existingArea      = row[colMap['area']];
-      const existingUrl       = row[colMap['url']];
+      // Coerce to the correct primitive type — Sheets can return Date/Number for any cell
+      const existingHeadline  = String(row[colMap['headline']]  || '');
+      const existingCrimeType = String(row[colMap['crimetype']] || '');
+      const existingDate      = row[colMap['date']]; // keep raw for new Date() parsing
+      const existingStreet    = String(row[colMap['street address']] || '');
+      const existingLat       = Number(row[colMap['latitude']])  || 0;
+      const existingLng       = Number(row[colMap['longitude']]) || 0;
+      const existingArea      = String(row[colMap['area']]  || '');
+      const existingUrl       = String(row[colMap['url']]   || '');
 
       // ═══════════════════════════════════════════════════════════
       // PRE-CHECK: Same exact coordinates + same date + same crime type + some headline similarity
@@ -946,10 +947,11 @@ function findPotentialDuplicate(sheet, crime, geocoded, cachedData, cachedColMap
     const row = data[i];
     const rowNumber = i + 2;
 
-    const existingHeadline  = row[colMap['headline']];
-    const existingCrimeType = row[colMap['crimetype']];
-    const existingDate      = row[colMap['date']];
-    const existingArea      = row[colMap['area']];
+    // Coerce to the correct primitive type — Sheets can return Date/Number for any cell
+    const existingHeadline  = String(row[colMap['headline']]  || '');
+    const existingCrimeType = String(row[colMap['crimetype']] || '');
+    const existingDate      = row[colMap['date']]; // keep raw for new Date() parsing
+    const existingArea      = String(row[colMap['area']]  || '');
 
     if (!existingDate || !crime.crime_date) continue;
 
