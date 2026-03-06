@@ -205,7 +205,7 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {regionAreas.map((area, index) => (
           <a
-            href={area.hasCrimes ? `/trinidad/area/${area.slug}` : '#'}
+            href={area.hasCrimes ? `/trinidad/area/${area.slug}/` : '#'}
             class={`block rounded-lg border p-4 transition ${
               area.hasCrimes
                 ? 'bg-white dark:bg-[hsl(0_0%_10%)] border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md group'
