@@ -19,6 +19,10 @@
 
 ---
 
+### Safety Tips (Mar 6)
+- **NEW TIP TIP-00029** — Dual-Flank Vehicle Approach Awareness (Carjacking / In Your Car) — Story ID 474
+- **NEW TIP TIP-00030** — Payment-Before-Release for Online Sales (Online Scam / Online) — Story ID 473
+
 ### Safety Tips (Mar 4)
 - **NEW TIP TIP-00027** — Daytime Home Security While You're Inside (Home Invasion / At Home) — Story ID 458
 - **NEW TIP TIP-00028** — Device Handling During In-Person Sales (Robbery / In a Mall) — Story ID 459
