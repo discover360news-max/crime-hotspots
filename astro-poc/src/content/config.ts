@@ -26,7 +26,7 @@ const tips = defineCollection({
     ]),
     context: z.enum([
       'At Home', 'In Your Car', 'At the ATM', 'In a Mall', 'Walking Alone',
-      'Online', 'At Work', 'Using Public Transport', 'At an Event', 'Other'
+      'Online', 'At Work', 'Using Public Transport', 'At an Event', 'At a Hotel', 'Other'
     ]),
     area: z.string().default(''),
     severity: z.enum(['low', 'medium', 'high']),

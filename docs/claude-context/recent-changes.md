@@ -8,6 +8,34 @@
 
 ## March 2026
 
+### Safety Tips — TIP-00031 to TIP-00033 (Mar 6)
+
+- **NEW TIP TIP-00031** — Securing Your Hotel Room Door at Night (Home Invasion / At a Hotel)
+- **NEW TIP TIP-00032** — Recognising and Responding to Road-Block Robberies (Robbery / In Your Car)
+- **NEW TIP TIP-00033** — Preventing False-Customer Entry Robberies at Retail Premises (Robbery / At Work)
+- **Schema:** Added `'At a Hotel'` to the `context` enum in `src/content/config.ts`
+
+### GSC Indexing Fixes + Google News Sitemap (Mar 6)
+
+**GSC audit across 6 validation emails (~700 URLs total):**
+- **5xx errors (43 pages):** Already resolved by `9cc78ca` — stale GSC data. Request re-validation, no code change needed.
+- **Page with redirect — area pages (120):** Root cause found: `region/[slug].astro:208` generated `/trinidad/area/${slug}` without trailing slash. Googlebot followed all area links from region pages into 308 redirects. Fixed by adding trailing slash. Deployed `6b49ba9`.
+- **Page with redirect — old crime slugs (~308):** Intentional 301s from Story_ID migration. Will age out as Google re-crawls new sitemap over 4–8 weeks. Do not re-validate.
+- **Duplicate canonical (104):** Story_ID migration aftermath — Google chose old URLs as canonical. Resolves naturally over time.
+- **Crawled not indexed (77):** Thin content / quality signal issue. No immediate fix.
+
+**Google News sitemap fix (`5ceb8b2`):**
+- Was: blog posts only → empty 6/7 days (weekly Monday automation)
+- Now: blog posts + crime pages from last 2 days (daily fresh content, capped at 100)
+- Crime pages already have `NewsArticle` schema — valid Google News candidates
+
+**Google Reader Revenue Manager (RRM):**
+- Approved Mar 5, 2026. Publisher Center primary URL: `crimehotspots.com`
+- **Do not use monetization features** — Ko-fi + Buttondown already handle support/newsletter
+- **Keep the approval** — it's a publisher legitimacy signal enabling Top Stories / Google News eligibility
+- SwG script already in codebase (commit `a0a8776`) — keep it, costs nothing
+- News sitemap registered in Publisher Center under Content settings → Sitemaps: `https://crimehotspots.com/news-sitemap.xml`
+
 ### Google Freshness Signals — datePublished / dateUpdated pipeline (Mar 6)
 
 **Goal:** Let Google know when a story was published into the pipeline and when it was last corrected, so every signal shows accurate freshness rather than the incident date.
