@@ -560,6 +560,16 @@ function parseClaudeResponse(responseText, articleUrl) {
     extracted.crimes.forEach(crime => {
       crime.source_url = articleUrl;
 
+      // Normalize safety tip fields — default to 'No' if Claude omitted them.
+      // This ensures every crime object has an explicit value in the sheet,
+      // making it clear the field was evaluated (not just skipped by the pipeline).
+      if (!crime.safety_tip_flag || (crime.safety_tip_flag !== 'Yes' && crime.safety_tip_flag !== 'No')) {
+        crime.safety_tip_flag = 'No';
+        crime.safety_tip_category = crime.safety_tip_category || '';
+        crime.safety_tip_context = crime.safety_tip_context || '';
+        crime.tactic_noted = crime.tactic_noted || '';
+      }
+
       // Post-process: auto-insert || paragraph breaks if Claude omitted them
       if (crime.details && !crime.details.includes('||')) {
         // Find sentence boundary positions: ". A", "! T", "? W" etc.

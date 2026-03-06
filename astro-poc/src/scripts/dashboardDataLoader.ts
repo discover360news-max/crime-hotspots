@@ -69,6 +69,12 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
       const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
       const validVictimCount = !isNaN(victimCount) && victimCount >= 0 ? victimCount : 1;
 
+      // Parse optional entry/correction timestamps
+      const datePublishedStr = getColumn('Date_Published');
+      const dateUpdatedStr = getColumn('Date_Updated');
+      const datePublishedObj = datePublishedStr ? parseDate(datePublishedStr) : undefined;
+      const dateUpdatedObj = dateUpdatedStr ? parseDate(dateUpdatedStr) : undefined;
+
       crimes.push({
         date,
         headline,
@@ -84,6 +90,8 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
         latitude: Number(latitude),
         longitude: Number(longitude),
         summary,
+        datePublished: datePublishedObj && !isNaN(datePublishedObj.getTime()) ? datePublishedObj : undefined,
+        dateUpdated: dateUpdatedObj && !isNaN(dateUpdatedObj.getTime()) ? dateUpdatedObj : undefined,
         slug,
         storyId,
         oldSlug,

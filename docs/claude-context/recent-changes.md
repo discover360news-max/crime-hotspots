@@ -8,6 +8,43 @@
 
 ## March 2026
 
+### Google Freshness Signals — datePublished / dateUpdated pipeline (Mar 6)
+
+**Goal:** Let Google know when a story was published into the pipeline and when it was last corrected, so every signal shows accurate freshness rather than the incident date.
+
+**CSV columns** (`Date_Published`, `Date_Updated`) confirmed present in both 2025 and 2026 sheets.
+
+**`crimeData.ts` + `dashboardDataLoader.ts`:**
+- Added `datePublished?: Date` and `dateUpdated?: Date` to `Crime` interface
+- Both parsed via the same `parseDate()` function (MM/DD/YYYY, same protection as `Date` column)
+- Invalid/missing values silently become `undefined` — fallback to `dateObj`
+
+**`[slug].astro` — NewsArticle structured data:**
+- `datePublished`: `crime.datePublished ?? crime.dateObj`
+- `dateModified`: `crime.dateUpdated ?? crime.datePublished ?? crime.dateObj`
+
+**`rss.xml.ts`:**
+- `<pubDate>`: `crime.datePublished ?? crime.dateObj`
+- `<atom:updated>` added per item: `crime.dateUpdated ?? crime.datePublished ?? crime.dateObj`
+
+**`sitemap-0.xml.ts`:**
+- Crime page `<lastmod>`: `crime.dateUpdated ?? crime.datePublished ?? crime.dateObj`
+
+**GAS — `processor.gs`:**
+- Refactored all positional column indices → `buildColMap()` + `appendRowByHeaders()` helpers (safe against sheet column reordering)
+- Auto-fills `Date_Published` = today (Trinidad time) on every new Production/Review Queue row
+- `Date_Updated` left blank on insert (filled manually when a story is corrected)
+- Safety tip fields normalized: default to `'No'` if Claude omits them (`claudeClient.gs`)
+
+**GAS — `syncToLive.gs`:**
+- Replaced hardcoded `COLUMN_MAPPING` with `NAME_BASED_FIELD_MAP` (name → name, resolved at runtime)
+- Propagates `Date_Published` and `Date_Updated` from Production → LIVE sheet on sync
+
+**GAS — `facebookSubmitter.gs`:**
+- 2025-sheet append switched to `appendRowByHeaders()` (column-reorder safe)
+
+---
+
 ### Top Regions — Weighted National Share Risk Scoring (Mar 4)
 - **TopRegionsCard.astro** + **dashboardUpdates.ts** — replaced old relative-to-max area system with region-based weighted national share scoring
 - Sort: absolute weighted score (crime severity × victim count per region)

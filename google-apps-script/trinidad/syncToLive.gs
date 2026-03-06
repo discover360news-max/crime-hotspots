@@ -19,21 +19,32 @@ const LIVE_SHEET_NAME = 'Form Responses 1';      // Name of the tab in LIVE shee
 
 const DAYS_TO_SYNC = 7; // Only sync crimes from last 7 days (adjust as needed)
 
-// Column mapping: Production → LIVE
-// Production columns: Date, Headline, Crime Type, Street, Plus Code, Area, Island, URL, Lat, Long, Status
-// LIVE columns: Timestamp, Date, Headline, Crime Type, Street Address, Location, Area, Island, URL, ...
-const COLUMN_MAPPING = {
-  // LIVE column index: Production column index (0-based)
-  0: 'timestamp',        // Timestamp (auto-generated)
-  1: 0,                  // Date → Date
-  2: 1,                  // Headline → Headline
-  3: 2,                  // Crime Type → Crime Type
-  4: 3,                  // Street Address → Street
-  5: 4,                  // Location → Plus Code
-  6: 5,                  // Area → Area
-  7: 6,                  // Island → Island
-  8: 7,                  // URL → URL
-  // Columns 9-27 are extra form fields - leave empty
+// Name-based field mapping: Production header (lowercase) → LIVE header (lowercase)
+// Resolved at runtime — safe against Production or LIVE column reordering.
+// Timestamp is special-cased (auto-generated, not copied from Production).
+const NAME_BASED_FIELD_MAP = {
+  'date':                 'date',
+  'headline':             'headline',
+  'summary':              'summary',
+  'primarycrimetype':     'primarycrimetype',
+  'relatedcrimetypes':    'relatedcrimetypes',
+  'victimcount':          'victimcount',
+  'crimetype':            'crime type',
+  'street address':       'street address',
+  'latitude':             'latitude',
+  'longitude':            'longitude',
+  'location (plus code)': 'location',
+  'area':                 'area',
+  'region':               'region',
+  'island':               'island',
+  'url':                  'url',
+  'source':               'source',
+  'safety_tip_flag':      'safety_tip_flag',
+  'safety_tip_category':  'safety_tip_category',
+  'safety_tip_context':   'safety_tip_context',
+  'tactic_noted':         'tactic_noted',
+  'date_published':       'date_published',
+  'date_updated':         'date_updated',
 };
 
 // ============================================================================
@@ -68,6 +79,14 @@ function syncProductionToLive() {
     // Get Production data
     const prodData = prodSheet.getDataRange().getValues();
 
+    // Build Production column map from header row (name → 0-based index)
+    const prodHeaders = prodData[0];
+    const prodColMap = {};
+    prodHeaders.forEach((h, i) => {
+      if (h) prodColMap[h.toString().toLowerCase().trim()] = i;
+    });
+    Logger.log('Production headers mapped: ' + JSON.stringify(Object.keys(prodColMap)));
+
     // Get LIVE data for duplicate detection
     const liveData = liveSheet.getDataRange().getValues();
 
@@ -86,11 +105,10 @@ function syncProductionToLive() {
     // Process each Production row (skip header)
     for (let i = 1; i < prodData.length; i++) {
       const row = prodData[i];
-      const crimeDate = new Date(row[0]); // Column A: Date
-      const headline = row[1];            // Column B: Headline
-      const crimeType = row[2];           // Column C: Crime Type
-      const area = row[5];                // Column F: Area
-      const url = row[7];                 // Column H: URL
+
+      // Access by name — safe against column reordering
+      const crimeDate = new Date(row[prodColMap['date']]);
+      const headline = row[prodColMap['headline']];
 
       // Skip old crimes
       if (crimeDate < cutoffDate) {
@@ -99,10 +117,10 @@ function syncProductionToLive() {
       }
 
       // Check for duplicate in LIVE sheet
-      const isDuplicate = checkDuplicateInLive(liveData, row);
+      const isDuplicate = checkDuplicateInLive(liveData, row, prodColMap);
 
       if (isDuplicate) {
-        Logger.log(`⏭️  Skip (duplicate): ${headline.substring(0, 50)}...`);
+        Logger.log(`⏭️  Skip (duplicate): ${String(headline).substring(0, 50)}...`);
         duplicates++;
 
         // Mark for archiving (already in LIVE)
@@ -111,9 +129,9 @@ function syncProductionToLive() {
       }
 
       // Not a duplicate - map Production row to LIVE format and append
-      const mappedRow = mapProductionToLive(row);
+      const mappedRow = mapProductionToLive(row, prodColMap, liveSheet);
       liveSheet.appendRow(mappedRow);
-      Logger.log(`✅ Added: ${headline.substring(0, 50)}...`);
+      Logger.log(`✅ Added: ${String(headline).substring(0, 50)}...`);
       newCrimes++;
 
       // Mark for archiving (successfully copied)
@@ -154,30 +172,34 @@ function syncProductionToLive() {
 // ============================================================================
 
 /**
- * Map Production row to LIVE sheet format
+ * Map Production row to LIVE sheet format using name-based column lookup.
+ * Safe against Production or LIVE column reordering.
  *
  * @param {Array} prodRow - Row from Production sheet
+ * @param {Object} prodColMap - Production header → index map (from syncProductionToLive)
+ * @param {Sheet} liveSheet - LIVE sheet object (passed in to avoid reopening)
  * @returns {Array} Mapped row for LIVE sheet
  */
-function mapProductionToLive(prodRow) {
-  // Get LIVE sheet to determine column count
-  const liveSpreadsheet = SpreadsheetApp.openById(LIVE_SHEET_ID);
-  const liveSheet = liveSpreadsheet.getSheetByName(LIVE_SHEET_NAME);
-  const liveColumnCount = liveSheet.getLastColumn();
+function mapProductionToLive(prodRow, prodColMap, liveSheet) {
+  // Build LIVE column map from header row
+  const liveHeaders = liveSheet.getRange(1, 1, 1, liveSheet.getLastColumn()).getValues()[0];
+  const liveColMap = {};
+  liveHeaders.forEach((h, i) => {
+    if (h) liveColMap[h.toString().toLowerCase().trim()] = i;
+  });
 
-  // Create array with correct length for LIVE sheet
+  const liveColumnCount = liveSheet.getLastColumn();
   const mappedRow = new Array(liveColumnCount).fill('');
 
-  // Map each column according to COLUMN_MAPPING
-  for (const [liveIdx, prodIdx] of Object.entries(COLUMN_MAPPING)) {
-    const liveIndex = parseInt(liveIdx);
+  // Timestamp: always in first LIVE column (auto-generated)
+  mappedRow[0] = new Date();
 
-    if (prodIdx === 'timestamp') {
-      // Auto-generate timestamp
-      mappedRow[liveIndex] = new Date();
-    } else if (typeof prodIdx === 'number') {
-      // Copy from Production column
-      mappedRow[liveIndex] = prodRow[prodIdx] || '';
+  // Copy each field by name where both Production and LIVE headers match
+  for (const [prodKey, liveKey] of Object.entries(NAME_BASED_FIELD_MAP)) {
+    const prodIdx = prodColMap[prodKey];
+    const liveIdx = liveColMap[liveKey];
+    if (prodIdx !== undefined && liveIdx !== undefined) {
+      mappedRow[liveIdx] = prodRow[prodIdx] !== undefined ? prodRow[prodIdx] : '';
     }
   }
 
@@ -193,28 +215,39 @@ function mapProductionToLive(prodRow) {
  *
  * @param {Array} liveData - All rows from LIVE sheet
  * @param {Array} prodRow - Single row from Production sheet
+ * @param {Object} prodColMap - Production header → index map
  * @returns {boolean} True if duplicate found
  */
-function checkDuplicateInLive(liveData, prodRow) {
-  // Production columns: Date(0), Headline(1), Crime Type(2), Street(3), Plus Code(4), Area(5), Island(6), URL(7), Lat(8), Long(9)
-  const prodDate = new Date(prodRow[0]);
-  const prodHeadline = prodRow[1];
-  const prodCrimeType = prodRow[2];
-  const prodArea = prodRow[5];
-  const prodUrl = prodRow[7];
-  const prodLat = prodRow[8];
-  const prodLng = prodRow[9];
+function checkDuplicateInLive(liveData, prodRow, prodColMap) {
+  const prodDate     = new Date(prodRow[prodColMap['date']]);
+  const prodHeadline = prodRow[prodColMap['headline']];
+  const prodCrimeType = prodRow[prodColMap['crimetype']];
+  const prodArea     = prodRow[prodColMap['area']];
+  const prodUrl      = prodRow[prodColMap['url']];
 
-  // Skip header row
+  // Build LIVE column map once from header row
+  const liveHeaderRow = liveData[0];
+  const liveColMap = {};
+  liveHeaderRow.forEach((h, i) => {
+    if (h) liveColMap[h.toString().toLowerCase().trim()] = i;
+  });
+
+  // LIVE column positions (name-based, with fallback to legacy positions)
+  const liveDateIdx     = liveColMap['date']         !== undefined ? liveColMap['date']         : 1;
+  const liveHeadlineIdx = liveColMap['headline']      !== undefined ? liveColMap['headline']      : 2;
+  const liveCrimeTypeIdx = liveColMap['crime type']   !== undefined ? liveColMap['crime type']    :
+                           liveColMap['crimetype']    !== undefined ? liveColMap['crimetype']     : 3;
+  const liveAreaIdx     = liveColMap['area']          !== undefined ? liveColMap['area']          : 6;
+  const liveUrlIdx      = liveColMap['url']           !== undefined ? liveColMap['url']           : 8;
+
+  // Skip header row (index 0)
   for (let i = 1; i < liveData.length; i++) {
     const liveRow = liveData[i];
-    // LIVE columns: Timestamp(0), Date(1), Headline(2), Crime Type(3), Street Address(4), Location(5), Area(6), Island(7), URL(8), ...
-    const liveDate = new Date(liveRow[1]);  // Column 1 (not 0, because 0 is Timestamp)
-    const liveHeadline = liveRow[2];
-    const liveCrimeType = liveRow[3];
-    const liveArea = liveRow[6];
-    const liveUrl = liveRow[8];
-    // Note: Lat/Lng not in LIVE sheet - skip coordinate check
+    const liveDate      = new Date(liveRow[liveDateIdx]);
+    const liveHeadline  = liveRow[liveHeadlineIdx];
+    const liveCrimeType = liveRow[liveCrimeTypeIdx];
+    const liveArea      = liveRow[liveAreaIdx];
+    const liveUrl       = liveRow[liveUrlIdx];
 
     // Check 1: Exact URL match
     if (prodUrl && liveUrl && prodUrl === liveUrl) {
@@ -223,7 +256,7 @@ function checkDuplicateInLive(liveData, prodRow) {
 
     // Check 2: Same date + same headline (80%+ similarity)
     if (isSameDate(prodDate, liveDate)) {
-      const similarity = calculateSimilarity(prodHeadline, liveHeadline);
+      const similarity = calculateSimilarity(String(prodHeadline), String(liveHeadline));
       if (similarity > 0.80) {
         return true;
       }
@@ -231,7 +264,7 @@ function checkDuplicateInLive(liveData, prodRow) {
 
     // Check 3: Same date + same area + same crime type (high similarity)
     if (isSameDate(prodDate, liveDate) && prodArea === liveArea && prodCrimeType === liveCrimeType) {
-      const similarity = calculateSimilarity(prodHeadline, liveHeadline);
+      const similarity = calculateSimilarity(String(prodHeadline), String(liveHeadline));
       if (similarity > 0.70) {
         return true;
       }
@@ -371,6 +404,15 @@ function testSyncDryRun() {
   }
 
   const prodData = prodSheet.getDataRange().getValues();
+
+  // Build column map from header row
+  const prodHeaders = prodData[0];
+  const prodColMap = {};
+  prodHeaders.forEach((h, i) => {
+    if (h) prodColMap[h.toString().toLowerCase().trim()] = i;
+  });
+  Logger.log('Production headers: ' + JSON.stringify(Object.keys(prodColMap)) + '\n');
+
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - DAYS_TO_SYNC);
 
@@ -381,11 +423,12 @@ function testSyncDryRun() {
 
   for (let i = 1; i < prodData.length; i++) {
     const row = prodData[i];
-    const crimeDate = new Date(row[0]);
-    const headline = row[1];
+    const crimeDate = new Date(row[prodColMap['date']]);
+    const headline = row[prodColMap['headline']];
+    const datePublished = row[prodColMap['date_published']] || '(no Date_Published yet)';
 
     if (crimeDate >= cutoffDate) {
-      Logger.log(`✅ ${Utilities.formatDate(crimeDate, Session.getScriptTimeZone(), 'yyyy-MM-dd')} - ${headline.substring(0, 60)}...`);
+      Logger.log(`✅ ${Utilities.formatDate(crimeDate, Session.getScriptTimeZone(), 'yyyy-MM-dd')} - ${String(headline).substring(0, 60)} | Published: ${datePublished}`);
       wouldSync++;
     } else {
       wouldSkip++;

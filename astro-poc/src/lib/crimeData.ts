@@ -76,6 +76,9 @@ export interface Crime {
   latitude: number;
   longitude: any;
   summary: string;
+  // Optional entry/correction timestamps (from Date_Published / Date_Updated columns)
+  datePublished?: Date;   // When the row was entered into the pipeline
+  dateUpdated?: Date;     // When the story was corrected (filled manually in LIVE sheet)
   // Computed fields
   slug: string;
   storyId: string | null; // Story_ID from CSV; null if blank
@@ -144,6 +147,12 @@ function parseCrimeDataFromText(csvText: string): Crime[] {
     const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
     const validVictimCount = !isNaN(victimCount) && victimCount >= 0 ? victimCount : 1;
 
+    // Parse optional entry/correction timestamps
+    const datePublishedStr = getColumn('Date_Published');
+    const dateUpdatedStr = getColumn('Date_Updated');
+    const datePublishedObj = datePublishedStr ? parseDate(datePublishedStr) : undefined;
+    const dateUpdatedObj = dateUpdatedStr ? parseDate(dateUpdatedStr) : undefined;
+
     crimes.push({
       date,
       headline,
@@ -159,6 +168,8 @@ function parseCrimeDataFromText(csvText: string): Crime[] {
       latitude: Number(latitude),
       longitude: Number(longitude),
       summary,
+      datePublished: datePublishedObj && !isNaN(datePublishedObj.getTime()) ? datePublishedObj : undefined,
+      dateUpdated: dateUpdatedObj && !isNaN(dateUpdatedObj.getTime()) ? dateUpdatedObj : undefined,
       slug,
       storyId,
       oldSlug,

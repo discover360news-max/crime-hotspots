@@ -199,25 +199,24 @@ function appendTo2025Sheet(crime, publishedDate, crimeTypes) {
   // Format date as MM/DD/YYYY (matching existing sheet format)
   const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
-  // 2025 column order (14 columns):
-  // Date, Headline, Crime Type, Street Address, Location, Area, Region, Island, URL, Source, Latitude, Longitude, Summary, Secondary Crime Types
-  sheet.appendRow([
-    new Date(),                              // 1. Timestamp (Column A - hidden)
-    validatedDate,                           // 1. Date
-    crime.headline || 'No headline',         // 2. Headline
-    crimeTypes.primary,                      // 3. Crime Type
-    crime.street || '',                      // 4. Street Address
-    geocoded.plus_code || '',                // 5. Location (Plus Code)
-    crime.area || '',                        // 6. Area
-    '',                                      // 7. Region (formula fills this)
-    'Trinidad',                              // 8. Island
-    crime.source_url || '',                  // 9. URL
-    '',                                      // 10. Source (formula fills this)
-    geocoded.lat || '',                      // 11. Latitude
-    geocoded.lng || '',                      // 12. Longitude
-    crime.details || '',                     // 13. Summary
-    crimeTypes.related || ''                 // 14. Secondary Crime Types
-  ]);
+  // Name-based append — safe against 2025 sheet column reordering
+  appendRowByHeaders(sheet, {
+    'Timestamp':              new Date(),
+    'Date':                   validatedDate,
+    'Headline':               crime.headline || 'No headline',
+    'Crime Type':             crimeTypes.primary,
+    'Street Address':         crime.street || '',
+    'Location':               geocoded.plus_code || '',
+    'Area':                   crime.area || '',
+    'Region':                 '',
+    'Island':                 'Trinidad',
+    'URL':                    crime.source_url || '',
+    'Source':                 '',
+    'Latitude':               geocoded.lat || '',
+    'Longitude':              geocoded.lng || '',
+    'Summary':                crime.details || '',
+    'Secondary Crime Types':  crimeTypes.related || ''
+  });
 
   Logger.log(`✅ Added to 2025 FR1: ${crime.headline}`);
 }

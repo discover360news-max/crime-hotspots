@@ -14,7 +14,7 @@ export const GET: APIRoute = async () => {
   const site = 'https://crimehotspots.com';
 
   // Blog posts
-  let blogItems: { title: string; link: string; description: string; pubDate: Date; author: string; category?: string }[] = [];
+  let blogItems: { title: string; link: string; description: string; pubDate: Date; updated: Date; author: string; category?: string }[] = [];
   try {
     const blogPosts = await getCollection('blog');
     blogItems = blogPosts.map(post => ({
@@ -22,6 +22,7 @@ export const GET: APIRoute = async () => {
       link: `${site}${buildRoute.blogPost(post.slug)}`,
       description: post.data.excerpt,
       pubDate: new Date(post.data.date),
+      updated: new Date(post.data.date),
       author: post.data.author,
       category: 'Weekly Report',
     }));
@@ -30,14 +31,15 @@ export const GET: APIRoute = async () => {
   }
 
   // Crime headlines (latest 20)
-  let crimeItems: typeof blogItems = [];
+  let crimeItems: { title: string; link: string; description: string; pubDate: Date; updated: Date; author: string; category?: string }[] = [];
   try {
     const crimes = await getTrinidadCrimes();
     crimeItems = crimes.slice(0, 20).map(crime => ({
       title: crime.headline,
       link: `${site}${buildRoute.crime(crime.slug)}`,
       description: `${crime.crimeType} in ${crime.area}, ${crime.region}. ${crime.summary ? crime.summary.slice(0, 200) : ''}`,
-      pubDate: crime.dateObj,
+      pubDate: crime.datePublished ?? crime.dateObj,
+      updated: crime.dateUpdated ?? crime.datePublished ?? crime.dateObj,
       author: 'Crime Hotspots',
       category: crime.crimeType,
     }));
@@ -56,6 +58,7 @@ export const GET: APIRoute = async () => {
       <guid>${item.link}</guid>
       <description>${escapeXml(item.description)}</description>
       <pubDate>${item.pubDate.toUTCString()}</pubDate>
+      <atom:updated>${item.updated.toISOString()}</atom:updated>
       <author>${escapeXml(item.author)}</author>${item.category ? `\n      <category>${escapeXml(item.category)}</category>` : ''}
     </item>`).join('\n');
 

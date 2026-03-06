@@ -4,6 +4,45 @@
  */
 
 // ============================================================================
+// SHARED HELPERS — header-name mapping, safe against column reordering
+// ============================================================================
+
+/**
+ * Build a header → 0-based column index map from a sheet's first row.
+ * All reads/writes go through this — never use positional indices directly.
+ * @param {Sheet} sheet
+ * @returns {Object} e.g. { 'headline': 0, 'date': 6, ... }
+ */
+function buildColMap(sheet) {
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const map = {};
+  headers.forEach((h, i) => {
+    if (h) map[h.toString().toLowerCase().trim()] = i;
+  });
+  return map;
+}
+
+/**
+ * Append a row to a sheet by matching field names to column headers.
+ * Unknown keys are silently ignored — safe against column additions.
+ * @param {Sheet} sheet
+ * @param {Object} fieldValues - { 'Exact Header Name': value, ... }
+ */
+function appendRowByHeaders(sheet, fieldValues) {
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const row = new Array(headers.length).fill('');
+  headers.forEach((h, i) => {
+    if (!h) return;
+    const key = h.toString().trim();
+    if (key in fieldValues) {
+      const val = fieldValues[key];
+      row[i] = (val !== undefined && val !== null) ? val : '';
+    }
+  });
+  sheet.appendRow(row);
+}
+
+// ============================================================================
 // MAIN PROCESSING FUNCTION
 // ============================================================================
 
@@ -24,7 +63,9 @@ function processReadyArticles() {
       return;
     }
 
-    const dataRange = sheet.getRange(2, 1, lastRow - 1, 8);
+    // Build column map from headers — safe against Raw Articles column reordering
+    const rawColMap = buildColMap(sheet);
+    const dataRange = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn());
     const data = dataRange.getValues();
 
     let articlesProcessed = 0;
@@ -38,16 +79,19 @@ function processReadyArticles() {
     // in appendToProduction(). Cuts per-crime write time from ~80s → <5s.
     const prodSheetForCache = getActiveSheet(SHEET_NAMES.PRODUCTION);
     const prodCacheLastRow = prodSheetForCache.getLastRow();
+    const prodColMap = buildColMap(prodSheetForCache);
     let cachedProdData = prodCacheLastRow >= 2
-      ? prodSheetForCache.getRange(2, 1, prodCacheLastRow - 1, 15).getValues()
+      ? prodSheetForCache.getRange(2, 1, prodCacheLastRow - 1, prodSheetForCache.getLastColumn()).getValues()
       : [];
 
     let cachedArchiveData = [];
+    let archiveColMap = {};
     try {
       const archiveSheetForCache = getActiveSheet(SHEET_NAMES.PRODUCTION_ARCHIVE);
       const archiveCacheLastRow = archiveSheetForCache.getLastRow();
+      archiveColMap = buildColMap(archiveSheetForCache);
       if (archiveCacheLastRow >= 2) {
-        cachedArchiveData = archiveSheetForCache.getRange(2, 1, archiveCacheLastRow - 1, 15).getValues();
+        cachedArchiveData = archiveSheetForCache.getRange(2, 1, archiveCacheLastRow - 1, archiveSheetForCache.getLastColumn()).getValues();
       }
     } catch (e) {
       Logger.log('ℹ️ Production Archive not found for caching (may not exist yet)');
@@ -66,7 +110,7 @@ function processReadyArticles() {
         break;
       }
       const row = data[i];
-      const status = row[6]; // Column G
+      const status = row[rawColMap['status']];
 
       if (status === 'ready_for_processing') {
         // ═══════════════════════════════════════════════════════════
@@ -84,13 +128,13 @@ function processReadyArticles() {
         const rowNumber = i + 2;
 
         try {
-          sheet.getRange(rowNumber, 7).setValue('processing');
+          sheet.getRange(rowNumber, rawColMap['status'] + 1).setValue('processing');
           SpreadsheetApp.flush();
 
-          const articleTitle = row[2];
-          const articleUrl = row[3];
-          const articleText = row[4];
-          const publishedDate = row[5]; // ← IMPORTANT: Get publication date
+          const articleTitle = row[rawColMap['title']];
+          const articleUrl = row[rawColMap['url']];
+          const articleText = row[rawColMap['full text']];
+          const publishedDate = row[rawColMap['published date']]; // ← IMPORTANT: Get publication date
 
           Logger.log(`Processing row ${rowNumber}: ${articleTitle.substring(0, 50)}...`);
 
@@ -152,7 +196,7 @@ function processReadyArticles() {
               const crimeAmbiguities = Array.isArray(crime.ambiguities) ? crime.ambiguities : [];
 
               if (crimeConfidence >= PROCESSING_CONFIG.CONFIDENCE_THRESHOLD) {
-                appendToProduction(crime, publishedDate, crimeTypes, cachedProdData, cachedArchiveData);
+                appendToProduction(crime, publishedDate, crimeTypes, cachedProdData, cachedArchiveData, prodColMap, archiveColMap);
                 highConfCrimes++;
                 Logger.log(`    ✅ Added to Production (confidence: ${crimeConfidence})`);
               } else if (crimeConfidence > 0) {
@@ -167,20 +211,20 @@ function processReadyArticles() {
             // Update article status
             if (highConfCrimes > 0) {
               const confScores = extracted.crimes.map(c => c.confidence || '?').join(', ');
-              sheet.getRange(rowNumber, 7).setValue('completed');
-              sheet.getRange(rowNumber, 8).setValue(`✅ Extracted ${extracted.crimes.length} crime(s), confidence: [${confScores}]`);
+              sheet.getRange(rowNumber, rawColMap['status'] + 1).setValue('completed');
+              sheet.getRange(rowNumber, rawColMap['notes'] + 1).setValue(`✅ Extracted ${extracted.crimes.length} crime(s), confidence: [${confScores}]`);
               successCount += highConfCrimes;
             } else if (lowConfCrimes > 0) {
               const confScores = extracted.crimes.map(c => c.confidence || '?').join(', ');
-              sheet.getRange(rowNumber, 7).setValue('needs_review');
-              sheet.getRange(rowNumber, 8).setValue(`⚠️ ${extracted.crimes.length} crime(s) need review, confidence: [${confScores}]`);
+              sheet.getRange(rowNumber, rawColMap['status'] + 1).setValue('needs_review');
+              sheet.getRange(rowNumber, rawColMap['notes'] + 1).setValue(`⚠️ ${extracted.crimes.length} crime(s) need review, confidence: [${confScores}]`);
               reviewCount += lowConfCrimes;
             }
 
           } else {
             // No crimes found
-            sheet.getRange(rowNumber, 7).setValue('skipped');
-            sheet.getRange(rowNumber, 8).setValue(`Not a crime article: ${(extracted.ambiguities || []).join(', ')}`);
+            sheet.getRange(rowNumber, rawColMap['status'] + 1).setValue('skipped');
+            sheet.getRange(rowNumber, rawColMap['notes'] + 1).setValue(`Not a crime article: ${(extracted.ambiguities || []).join(', ')}`);
             Logger.log(`⏭️ Skipped (no crimes detected)`);
           }
 
@@ -189,8 +233,8 @@ function processReadyArticles() {
 
         } catch (error) {
           Logger.log(`❌ Error processing row ${rowNumber}: ${error.message}`);
-          sheet.getRange(rowNumber, 7).setValue('failed');
-          sheet.getRange(rowNumber, 8).setValue(`Error: ${error.message.substring(0, 100)}`);
+          sheet.getRange(rowNumber, rawColMap['status'] + 1).setValue('failed');
+          sheet.getRange(rowNumber, rawColMap['notes'] + 1).setValue(`Error: ${error.message.substring(0, 100)}`);
           failedCount++;
         }
       }
@@ -267,7 +311,7 @@ function processReadyArticles() {
    * @param {Date} publishedDate - Article publication date (fallback)
    * @param {Object} crimeTypes - Pre-calculated crime types (primary/related)
    */
-  function appendToProduction(crime, publishedDate, crimeTypes, cachedProdData, cachedArchiveData) {
+  function appendToProduction(crime, publishedDate, crimeTypes, cachedProdData, cachedArchiveData, prodColMap, archiveColMap) {
     // Acquire lock to prevent race conditions when multiple processes run simultaneously
     const lock = LockService.getScriptLock();
 
@@ -282,7 +326,7 @@ function processReadyArticles() {
       const geocoded = geocodeAddress(fullAddress);
 
       // Check for duplicate in Production sheet (uses pre-loaded cache if available)
-      if (isDuplicateCrime(prodSheet, crime, geocoded, cachedProdData)) {
+      if (isDuplicateCrime(prodSheet, crime, geocoded, cachedProdData, prodColMap)) {
         Logger.log(`⚠️ Duplicate detected in Production, skipping: ${crime.headline}`);
         return;
       }
@@ -290,7 +334,7 @@ function processReadyArticles() {
       // Check for duplicate in Production Archive (may be archived already)
       try {
         const archiveSheet = getActiveSheet(SHEET_NAMES.PRODUCTION_ARCHIVE);
-        if (archiveSheet && isDuplicateCrime(archiveSheet, crime, geocoded, cachedArchiveData)) {
+        if (archiveSheet && isDuplicateCrime(archiveSheet, crime, geocoded, cachedArchiveData, archiveColMap)) {
           Logger.log(`⚠️ Duplicate detected in Production Archive, skipping: ${crime.headline}`);
           return;
         }
@@ -303,7 +347,7 @@ function processReadyArticles() {
       // NEW: Check for POTENTIAL duplicates - redirect to Review Queue
       // These are near-misses that a human should verify
       // ═══════════════════════════════════════════════════════════
-      const potentialDupe = findPotentialDuplicate(prodSheet, crime, geocoded, cachedProdData);
+      const potentialDupe = findPotentialDuplicate(prodSheet, crime, geocoded, cachedProdData, prodColMap);
       if (potentialDupe.isPotential) {
         Logger.log(`⚠️ Potential duplicate detected, routing to Review Queue: ${crime.headline}`);
         Logger.log(`   Reason: ${potentialDupe.reason}`);
@@ -317,28 +361,30 @@ function processReadyArticles() {
         // Get crimeTypes if not already processed
         const crimeTypesForReview = crimeTypes || processLegacyCrimeType(crime);
 
-        reviewSheet.appendRow([
-          crime.headline || 'Needs headline',
-          crime.details || '',
-          crimeTypesForReview.primary,
-          crimeTypesForReview.related,
-          victimCount,
-          crimeTypesForReview.primary,
-          validatedDate,
-          crime.street || '',
-          geocoded.lat || '',
-          geocoded.lng || '',
-          geocoded.plus_code || '',
-          crime.area || '',
-          '',
-          'Trinidad',
-          crime.source_url || '',
-          '',
-          6, // Confidence lowered due to potential duplicate
-          `POTENTIAL DUPLICATE: ${potentialDupe.reason}`,
-          'pending',
-          ''
-        ]);
+        appendRowByHeaders(reviewSheet, {
+          'Headline':            crime.headline || 'Needs headline',
+          'Summary':             crime.details || '',
+          'primaryCrimeType':    crimeTypesForReview.primary,
+          'relatedCrimeTypes':   crimeTypesForReview.related,
+          'victimCount':         victimCount,
+          'crimeType':           crimeTypesForReview.primary,
+          'Date':                validatedDate,
+          'Street Address':      crime.street || '',
+          'Latitude':            geocoded.lat || '',
+          'Longitude':           geocoded.lng || '',
+          'Location (Plus Code)': geocoded.plus_code || '',
+          'Area':                crime.area || '',
+          'Region':              '',
+          'Island':              'Trinidad',
+          'URL':                 crime.source_url || '',
+          'Source':              '',
+          'Confidence':          6,  // Lowered due to potential duplicate
+          'Ambiguities':         `POTENTIAL DUPLICATE: ${potentialDupe.reason}`,
+          'Status':              'pending',
+          'Notes':               '',
+          'Date_Published':      Utilities.formatDate(new Date(), 'America/Port_of_Spain', 'M/d/yyyy'),
+          'Date_Updated':        ''
+        });
 
         // Release lock before returning
         lock.releaseLock();
@@ -352,28 +398,30 @@ function processReadyArticles() {
       const victimCount = crime.victimCount ||
                           (crime.victims && Array.isArray(crime.victims) ? crime.victims.length : 1);
 
-      prodSheet.appendRow([
-        crime.headline || 'No headline',        // 1. Headline
-        crime.details || '',                     // 2. Summary
-        crimeTypes.primary,                      // 3. primaryCrimeType
-        crimeTypes.related,                      // 4. relatedCrimeTypes
-        victimCount,                             // 5. victimCount ← ADDED
-        crimeTypes.primary,                      // 6. crimeType (backward compat)
-        validatedDate,                           // 7. Date
-        crime.street || '',                      // 8. Street Address
-        geocoded.lat || '',                      // 9. Latitude
-        geocoded.lng || '',                      // 10. Longitude
-        geocoded.plus_code || '',                // 11. Location (Plus Code)
-        crime.area || '',                        // 12. Area
-        '',                                      // 13. Region (formula fills this)
-        'Trinidad',                              // 14. Island
-        crime.source_url || '',                  // 15. URL
-        '',                                      // 16. Source (formula fills this)
-        crime.safety_tip_flag || '',             // 17. Safety_Tip_Flag
-        crime.safety_tip_category || '',         // 18. Safety_Tip_Category
-        crime.safety_tip_context || '',          // 19. Safety_Tip_Context
-        crime.tactic_noted || ''                 // 20. Tactic_Noted
-      ]);
+      appendRowByHeaders(prodSheet, {
+        'Headline':             crime.headline || 'No headline',
+        'Summary':              crime.details || '',
+        'primaryCrimeType':     crimeTypes.primary,
+        'relatedCrimeTypes':    crimeTypes.related,
+        'victimCount':          victimCount,
+        'crimeType':            crimeTypes.primary,
+        'Date':                 validatedDate,
+        'Street Address':       crime.street || '',
+        'Latitude':             geocoded.lat || '',
+        'Longitude':            geocoded.lng || '',
+        'Location (Plus Code)': geocoded.plus_code || '',
+        'Area':                 crime.area || '',
+        'Region':               '',
+        'Island':               'Trinidad',
+        'URL':                  crime.source_url || '',
+        'Source':               '',
+        'Safety_Tip_Flag':      crime.safety_tip_flag || '',
+        'Safety_Tip_Category':  crime.safety_tip_category || '',
+        'Safety_Tip_Context':   crime.safety_tip_context || '',
+        'Tactic_Noted':         crime.tactic_noted || '',
+        'Date_Published':       Utilities.formatDate(new Date(), 'America/Port_of_Spain', 'M/d/yyyy'),
+        'Date_Updated':         ''
+      });
 
       Logger.log(`✅ Added to production: ${crime.headline}
   [${geocoded.plus_code || 'No Plus Code'}]`);
@@ -422,28 +470,30 @@ function processReadyArticles() {
     const victimCount = crime.victimCount ||
                         (crime.victims && Array.isArray(crime.victims) ? crime.victims.length : 1);
 
-    reviewSheet.appendRow([
-      crime.headline || 'Needs headline',      // 1. Headline
-      crime.details || '',                     // 2. Summary
-      crimeTypes.primary,                      // 3. primaryCrimeType
-      crimeTypes.related,                      // 4. relatedCrimeTypes
-      victimCount,                             // 5. victimCount ← ADDED
-      crimeTypes.primary,                      // 6. crimeType (backward compat)
-      validatedDate,                           // 7. Date
-      crime.street || '',                      // 8. Street Address
-      geocoded.lat || '',                      // 9. Latitude
-      geocoded.lng || '',                      // 10. Longitude
-      geocoded.plus_code || '',                // 11. Location (Plus Code)
-      crime.area || '',                        // 12. Area
-      '',                                      // 13. Region (formula fills this)
-      'Trinidad',                              // 14. Island
-      crime.source_url || '',                  // 15. URL
-      '',                                      // 16. Source (formula fills this)
-      confidence,                              // 17. Confidence
-      (ambiguities || []).join('; '),          // 18. Ambiguities
-      'pending',                               // 19. Status
-      ''                                       // 19. Notes
-    ]);
+    appendRowByHeaders(reviewSheet, {
+      'Headline':             crime.headline || 'Needs headline',
+      'Summary':              crime.details || '',
+      'primaryCrimeType':     crimeTypes.primary,
+      'relatedCrimeTypes':    crimeTypes.related,
+      'victimCount':          victimCount,
+      'crimeType':            crimeTypes.primary,
+      'Date':                 validatedDate,
+      'Street Address':       crime.street || '',
+      'Latitude':             geocoded.lat || '',
+      'Longitude':            geocoded.lng || '',
+      'Location (Plus Code)': geocoded.plus_code || '',
+      'Area':                 crime.area || '',
+      'Region':               '',
+      'Island':               'Trinidad',
+      'URL':                  crime.source_url || '',
+      'Source':               '',
+      'Confidence':           confidence,
+      'Ambiguities':          (ambiguities || []).join('; '),
+      'Status':               'pending',
+      'Notes':                '',
+      'Date_Published':       Utilities.formatDate(new Date(), 'America/Port_of_Spain', 'M/d/yyyy'),
+      'Date_Updated':         ''
+    });
 
     Logger.log(`⚠️ Added to review queue: ${crime.headline}`);
   }
@@ -481,14 +531,17 @@ function normalizeUrl(url) {
  * @param {Object} geocoded - Geocoded coordinates {lat, lng, plus_code, formatted_address}
  * @returns {boolean} True if duplicate found
  */
-function isDuplicateCrime(sheet, crime, geocoded, cachedData) {
+function isDuplicateCrime(sheet, crime, geocoded, cachedData, cachedColMap) {
     let data;
-    if (cachedData) {
+    let colMap;
+    if (cachedData && cachedColMap) {
       data = cachedData;
+      colMap = cachedColMap;
     } else {
       const lastRow = sheet.getLastRow();
       if (lastRow < 2) return false;
-      data = sheet.getRange(2, 1, lastRow - 1, 15).getValues();
+      colMap = buildColMap(sheet);
+      data = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
     }
     if (!data || data.length === 0) return false;
 
@@ -498,17 +551,14 @@ function isDuplicateCrime(sheet, crime, geocoded, cachedData) {
                        : null;
 
     for (let row of data) {
-      // Column layout (0-indexed): 0=Headline, 1=Summary, 2=primaryType, 3=relatedTypes,
-      // 4=victimCount, 5=crimeType, 6=Date, 7=Street, 8=Lat, 9=Lng, 10=PlusCode,
-      // 11=Area, 12=Region, 13=Island, 14=URL
-      const existingHeadline = row[0];   // Column A: Headline
-      const existingCrimeType = row[5];  // Column F: crimeType (backward compat)
-      const existingDate = row[6];       // Column G: Date
-      const existingStreet = row[7];     // Column H: Street Address
-      const existingLat = row[8];        // Column I: Latitude
-      const existingLng = row[9];        // Column J: Longitude
-      const existingArea = row[11];      // Column L: Area
-      const existingUrl = row[14];       // Column O: URL
+      const existingHeadline  = row[colMap['headline']];
+      const existingCrimeType = row[colMap['crimetype']];
+      const existingDate      = row[colMap['date']];
+      const existingStreet    = row[colMap['street address']];
+      const existingLat       = row[colMap['latitude']];
+      const existingLng       = row[colMap['longitude']];
+      const existingArea      = row[colMap['area']];
+      const existingUrl       = row[colMap['url']];
 
       // ═══════════════════════════════════════════════════════════
       // PRE-CHECK: Same exact coordinates + same date + same crime type + some headline similarity
@@ -878,14 +928,17 @@ function checkSemanticDuplicate(headline1, headline2, area1, area2) {
  * @param {Object} geocoded - Geocoded coordinates
  * @returns {Object} {isPotential: boolean, reason: string, matchRow: number}
  */
-function findPotentialDuplicate(sheet, crime, geocoded, cachedData) {
+function findPotentialDuplicate(sheet, crime, geocoded, cachedData, cachedColMap) {
   let data;
-  if (cachedData) {
+  let colMap;
+  if (cachedData && cachedColMap) {
     data = cachedData;
+    colMap = cachedColMap;
   } else {
     const lastRow = sheet.getLastRow();
     if (lastRow < 2) return { isPotential: false, reason: '', matchRow: -1 };
-    data = sheet.getRange(2, 1, lastRow - 1, 15).getValues();
+    colMap = buildColMap(sheet);
+    data = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
   }
   if (!data || data.length === 0) return { isPotential: false, reason: '', matchRow: -1 };
 
@@ -893,10 +946,10 @@ function findPotentialDuplicate(sheet, crime, geocoded, cachedData) {
     const row = data[i];
     const rowNumber = i + 2;
 
-    const existingHeadline = row[0];
-    const existingCrimeType = row[5];  // col 5: crimeType (victimCount shifted indices)
-    const existingDate = row[6];       // col 6: Date
-    const existingArea = row[11];      // col 11: Area
+    const existingHeadline  = row[colMap['headline']];
+    const existingCrimeType = row[colMap['crimetype']];
+    const existingDate      = row[colMap['date']];
+    const existingArea      = row[colMap['area']];
 
     if (!existingDate || !crime.crime_date) continue;
 

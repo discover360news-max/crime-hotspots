@@ -69,7 +69,7 @@ export const GET: APIRoute = async () => {
 
     return {
       url: buildRoute.crime(crime.slug).slice(1),
-      lastmod: crime.dateObj.toISOString(),
+      lastmod: (crime.dateUpdated ?? crime.datePublished ?? crime.dateObj).toISOString(),
       priority,
       changefreq: 'monthly' as const
     };
