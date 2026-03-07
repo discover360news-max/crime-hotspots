@@ -8,6 +8,12 @@
 
 ## March 2026
 
+### Safety Tips — TIP-00034 to TIP-00036 (Mar 7)
+
+- **NEW TIP TIP-00034** — Hardening Your Home Against Forced Pre-Dawn Entry (Home Invasion / At Home)
+- **NEW TIP TIP-00035** — Recognising Hostile Intent from Known Contacts (Assault / Walking Alone)
+- **NEW TIP TIP-00036** — Protecting Against Window Bar Cutting and Armed Robbery (Home Invasion / At Home)
+
 ### Safety Tips — TIP-00031 to TIP-00033 (Mar 6)
 
 - **NEW TIP TIP-00031** — Securing Your Hotel Room Door at Night (Home Invasion / At a Hotel)
