@@ -8,6 +8,16 @@
 
 ## March 2026
 
+### Safety Tips — TIP-00037 to TIP-00043 (Mar 7)
+
+- **NEW TIP TIP-00037** — Avoiding Being Targeted While Parked Alone in a Vehicle (Robbery / In Your Car) — Story IDs 489, 495
+- **NEW TIP TIP-00038** — Staying Safe When Travelling Through Remote Areas (Robbery / Other)
+- **NEW TIP TIP-00039** — Recognising Dispute-Based Attacks at Your Business (Assault / At Work)
+- **NEW TIP TIP-00040** — Never Exit Your Home Based on an Unverified Claim (Assault / At Home)
+- **NEW TIP TIP-00041** — Bystander Safety During Road Confrontations and Gunfire (Assault / In Your Car)
+- **NEW TIP TIP-00042** — Staying Vigilant in Mall and Shopping Centre Carparks (Robbery / In a Mall)
+- **NEW TIP TIP-00043** — Counter-Surveillance and Window Security for Retail Businesses (Robbery / At Work)
+
 ### Safety Tips — TIP-00034 to TIP-00036 (Mar 7)
 
 - **NEW TIP TIP-00034** — Hardening Your Home Against Forced Pre-Dawn Entry (Home Invasion / At Home)
