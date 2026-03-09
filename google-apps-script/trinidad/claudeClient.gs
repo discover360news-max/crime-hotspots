@@ -202,15 +202,15 @@ JSON SCHEMA:
       "area": "Neighborhood (e.g., Maraval, Port of Spain)",
       "street": "Street address INCLUDING business names/landmarks",
       "headline": "Brief headline with victim name/age in parentheses if known",
-      "details": "4-5 complete sentences using ONLY facts stated in the article — do NOT infer or add details not present. Separate logical paragraphs with || delimiter. Group: (1) what happened + when/where, (2) victim details + circumstances/motive, (3) police response/investigation. If the article is thin, use fewer sentences rather than padding. Example: 'First paragraph about the incident.||Second paragraph about the victim.||Third paragraph about police response.'",
+      "details": "3-5 complete sentences using ONLY facts stated in the article — do NOT infer or add details not present. Maximum 5 sentences total; if article provides more, prioritise: (1) what happened + when/where, (2) victim details + circumstances, (3) police response. Separate logical paragraphs with || delimiter — you MUST include || breaks between paragraphs, omitting them is an error. If the article is thin, use fewer sentences rather than padding. Example: 'First paragraph about the incident.||Second paragraph about the victim.||Third paragraph about police response.'",
       "victims": [{"name": "Name or null", "age": number, "aliases": []}],
       "victimCount": number,
       "location_country": "Trinidad|Tobago|Trinidad and Tobago|Venezuela|Guyana|Other",
       "confidence": 1-10,
       "ambiguities": ["reason if confidence < 7"],
       "safety_tip_flag": "Yes or No — Yes ONLY if this incident reveals a specific criminal tactic that residents could protect themselves against by changing their behaviour.",
-      "safety_tip_category": "If flagged: Robbery|Carjacking|Home Invasion|ATM Crime|Online Scam|Kidnapping|Sexual Violence|Fraud|Assault|Other. Leave blank if not flagged.",
-      "safety_tip_context": "If flagged: At Home|In Your Car|At the ATM|In a Mall|Walking Alone|Online|At Work|Using Public Transport|At an Event|Other. Leave blank if not flagged.",
+      "safety_tip_category": ["If flagged: array of applicable categories — ${SAFETY_TIP_CATEGORIES.join('|')}. Empty array [] if not flagged."],
+      "safety_tip_context": ["If flagged: array of applicable contexts — ${SAFETY_TIP_CONTEXTS.join('|')}. Empty array [] if not flagged."],
       "tactic_noted": "If flagged: one plain English sentence describing the SPECIFIC tactic used. Be precise — not 'robbery occurred' but 'criminal posed as stranded motorist to get victim to stop'. Leave blank if not flagged."
     }
   ]
@@ -267,7 +267,7 @@ CRIME TYPE SEVERITY HIERARCHY (For Determining Primary Crime)
 ═══════════════════════════════════════════════════════════════════════════════
 
 When listing all_crime_types, order by severity (highest first):
-Murder > Kidnapping > Sexual Assault > Shooting > Assault > Home Invasion > Robbery > Burglary > Theft > Seizures
+${buildCrimeHierarchyString()}
 
 The FIRST crime type in the array is considered the PRIMARY crime.
 
@@ -297,6 +297,11 @@ Example: "Father beaten, children held at gunpoint during home invasion"
 
 Example: "Couple and their two teens tied up during robbery"
 → victimCount: 4 (couple=2 + teens=2)
+
+CRITICAL — victimCount MUST equal victims array length:
+- If the article states a count that exceeds the named victims, add unnamed objects to fill the gap
+- Example: "Four people were shot, including John Smith" → victimCount: 4, victims: [{"name": "John Smith", ...}, {"name": null, "age": null}, {"name": null, "age": null}, {"name": null, "age": null}]
+- NEVER have victimCount: 4 with only 1 object in the victims array — they must always match
 
 ═══════════════════════════════════════════════════════════════════════════════
 POLICE DIRECTIONALITY CHECK (READ BEFORE EXCLUSIONS)
@@ -340,6 +345,7 @@ CRITICAL EXCLUSIONS - Return {"crimes": [], "confidence": 0}
 ❌ STATISTICAL/COMMENTARY: Crime trends, commissioner statements, "decline in murders", statistics
 
 ❌ FOLLOW-UP ARTICLES: "Family calls for", "relatives demand", funerals, memorials, reactions to previous crimes
+   EXCEPTION — Arrest reports ARE valid: If an article primarily reports an arrest or charge for a crime, extract the underlying crime (use the original victim and original crime date if stated, not the arrest date). These add investigative detail and often confirm victim identity.
 
 ❌ PHOTO CAPTIONS: Short text with "—Photo:", "Photo:", or image credit lines (e.g., "Confiscated: Vehicles seized —Photo: Richard Charan")
 
@@ -402,12 +408,22 @@ Murder: ONLY when civilian INTENTIONALLY killed another civilian
 - Keywords: "murder", "slain", "executed", "assassination", "killed by gunman"
 - NEVER use for: accidents, medical deaths, traffic deaths, police killings
 
+Attempted Murder: Intentional targeted attack where victim survived
+- Use when: targeted shooting/stabbing where victim survived AND intent to kill is clear
+- Examples: "gunman opened fire at man who escaped with injuries", "stabbed multiple times, rushed to hospital in critical condition"
+- Do NOT use for: stray bullets, fights where intent is unclear, use Assault or Shooting instead
+- Always paired: Attempted Murder ALWAYS appears with Shooting or Assault in all_crime_types
+
+Arson: Deliberate setting of fire to property or person
+- Use when article explicitly states fire was deliberately set, describes arson, or treats it as criminal
+- Do NOT use for accidental fires, electrical fires, or fires of undetermined cause
+
 Seizures vs Theft:
 - "Seizures" = police recovering items (guns/drugs)
 - "Theft" = criminals taking property from victims
 
 Crime Type Schema (USE ONLY THESE):
-Murder, Shooting, Kidnapping, Robbery, Assault, Sexual Assault, Home Invasion, Burglary, Theft, Seizures
+${buildCrimeTypesList()}
 
 ═══════════════════════════════════════════════════════════════════════════════
 DATE CALCULATION RULES (CRITICAL - YOU MUST CALCULATE)
@@ -423,6 +439,7 @@ STEP 3: Calculate the ACTUAL crime date using these rules:
 | "on [day]"     | Most recent occurrence       | Find [day] on or before published     |
 | "last [day]"   | PREVIOUS WEEK's [day]        | Go back to week BEFORE, find that day |
 | "this [day]"   | Same week as published       | Find [day] in current week            |
+| "this morning" / "this afternoon" / "this evening" / "today" | Same day as published | Use published date |
 | No date        | Use published date           | Default fallback                      |
 | "Sat night into Sun morning" | Overnight, spans midnight | Use SATURDAY (the earlier/start date) |
 | "between Sat night and Sun morning" | Overnight, spans midnight | Use SATURDAY (the earlier/start date) |
@@ -565,31 +582,21 @@ function parseClaudeResponse(responseText, articleUrl) {
       // making it clear the field was evaluated (not just skipped by the pipeline).
       if (!crime.safety_tip_flag || (crime.safety_tip_flag !== 'Yes' && crime.safety_tip_flag !== 'No')) {
         crime.safety_tip_flag = 'No';
-        crime.safety_tip_category = crime.safety_tip_category || '';
-        crime.safety_tip_context = crime.safety_tip_context || '';
+        crime.safety_tip_category = [];
+        crime.safety_tip_context = [];
         crime.tactic_noted = crime.tactic_noted || '';
+      } else {
+        // Normalise arrays — Claude may return a string if only one value
+        if (!Array.isArray(crime.safety_tip_category)) {
+          crime.safety_tip_category = crime.safety_tip_category ? [crime.safety_tip_category] : [];
+        }
+        if (!Array.isArray(crime.safety_tip_context)) {
+          crime.safety_tip_context = crime.safety_tip_context ? [crime.safety_tip_context] : [];
+        }
       }
 
-      // Post-process: auto-insert || paragraph breaks if Claude omitted them
-      if (crime.details && !crime.details.includes('||')) {
-        // Find sentence boundary positions: ". A", "! T", "? W" etc.
-        var boundaries = [];
-        var re = /[.!?]\s+[A-Z]/g;
-        var m;
-        while ((m = re.exec(crime.details)) !== null) {
-          // Position right after the punctuation + space (before the uppercase letter)
-          boundaries.push(m.index + m[0].length - 1);
-        }
-        if (boundaries.length >= 3) {
-          // Insert || after sentence 2 and after ~middle sentence
-          var cut1 = boundaries[1];  // after 2nd sentence
-          var midIdx = Math.ceil(boundaries.length / 2);
-          var cut2 = boundaries[midIdx];
-          crime.details = crime.details.substring(0, cut1) + '||' +
-                          crime.details.substring(cut1, cut2) + '||' +
-                          crime.details.substring(cut2);
-        }
-      }
+      // Note: || paragraph breaks are enforced in the system prompt.
+      // Auto-insertion was removed — it broke on abbreviations like "Cpl.", "St.", "approx."
     });
 
     extracted.source_url = articleUrl;
@@ -654,10 +661,12 @@ function testClaudeExtraction() {
     Logger.log(JSON.stringify(result, null, 2));
     Logger.log('=========================');
 
-    // Validate result
-    if (result.confidence >= 7) {
+    // Validate result — confidence is per-crime (not article-level) in new format
+    const checkConf = result.crimes && result.crimes.length > 0
+      ? (result.crimes[0].confidence || 0) : 0;
+    if (checkConf >= 7) {
       Logger.log('✅ HIGH CONFIDENCE - Would go to Production');
-    } else if (result.confidence > 0) {
+    } else if (checkConf > 0) {
       Logger.log('⚠️ LOW CONFIDENCE - Would go to Review Queue');
     } else {
       Logger.log('❌ ZERO CONFIDENCE - Processing failed');
@@ -741,15 +750,17 @@ function testClaudeWithSheetData() {
     Logger.log('═══════════════════════════════');
     Logger.log('');
 
-    // Validate result
-    if (result.confidence >= 7) {
+    // Validate result — confidence is per-crime (not article-level) in new format
+    const firstCrime = result.crimes && result.crimes[0];
+    const checkConf2 = firstCrime ? (firstCrime.confidence || 0) : 0;
+    if (checkConf2 >= 7) {
       Logger.log('✅ HIGH CONFIDENCE - Would go to Production');
-    } else if (result.confidence > 0) {
+    } else if (checkConf2 > 0) {
       Logger.log('⚠️ LOW CONFIDENCE - Would go to Review Queue');
-      Logger.log(`Ambiguities: ${result.ambiguities.join(', ')}`);
+      Logger.log(`Ambiguities: ${(firstCrime.ambiguities || []).join(', ')}`);
     } else {
       Logger.log('❌ ZERO CONFIDENCE - Not a crime article');
-      Logger.log(`Reason: ${result.ambiguities.join(', ')}`);
+      Logger.log(`Reason: ${(result.ambiguities || []).join(', ')}`);
     }
 
     Logger.log('');

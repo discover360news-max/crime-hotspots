@@ -187,7 +187,24 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       </div>
       <div class="relative">
         <div id="insightsShimmer" class="absolute inset-0 z-10 transition-opacity duration-300">
-          <LoadingShimmer height="100%" />
+          <!-- Structured skeleton matching QuickInsightsCard: 50/50 split, right side 2x2 grid -->
+          <div class="bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 rounded-lg p-4 border border-slate-100 dark:border-[hsl(0_0%_15%)] h-full flex gap-4">
+            <!-- Left 50%: Daily Average skeleton -->
+            <div class="w-1/2 pr-4 border-r border-slate-200 dark:border-[hsl(0_0%_18%)] flex flex-col items-center justify-center gap-2">
+              <LoadingShimmer height="12px" width="40%" rounded="full" />
+              <LoadingShimmer height="22px" width="70%" rounded="md" />
+              <LoadingShimmer height="12px" width="45%" rounded="full" />
+            </div>
+            <!-- Right 50%: 2x2 grid skeleton -->
+            <div class="flex-1 grid grid-cols-2 gap-x-3 gap-y-3 content-center">
+              {[...Array(4)].map(() => (
+                <div class="flex flex-col gap-1.5">
+                  <LoadingShimmer height="10px" width="55%" rounded="full" />
+                  <LoadingShimmer height="14px" width="80%" rounded="md" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <div id="insightsCards" class="opacity-0 transition-opacity duration-300">
           <QuickInsightsCard insights={insights} />

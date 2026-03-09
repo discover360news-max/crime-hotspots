@@ -207,7 +207,7 @@ const CLAUDE_API_ENDPOINT = 'https://api.anthropic.com/v1/messages';
  */
 const CLAUDE_CONFIG = {
   model: 'claude-haiku-4-5-20251001',  // Haiku 4.5: Current model ($1/$5 per million tokens)
-  max_tokens: 2048,                     // Enough for multi-crime JSON
+  max_tokens: 4096,                     // MUST stay at 4096 — multi-crime articles with full schema can exceed 2048
   temperature: 0.1                      // Low temperature = more deterministic (top_p removed for Claude 4.5)
 };
 
@@ -368,7 +368,7 @@ function getOrCreateArchiveSheet() {
     // Add headers matching Raw Articles structure
     sheet.appendRow([
       'Timestamp', 'Source', 'Title', 'URL', 'Full Text',
-      'Published Date', 'Status', 'Notes'
+      'Publish Date', 'Status', 'Notes'
     ]);
     Logger.log('✅ Created Archive sheet');
   }
@@ -382,17 +382,20 @@ function getOrCreateArchiveSheet() {
  */
 function logConfigStatus() {
   Logger.log('=== CONFIGURATION STATUS ===');
-  Logger.log(`Groq API Endpoint: ${GROQ_API_ENDPOINT}`);
-  Logger.log(`Groq Model: ${GROQ_CONFIG.model}`);
-  Logger.log(`Groq API Key Set: ${getGroqApiKey() ? 'YES' : 'NO'}`);
-  Logger.log(`Groq Max Tokens: ${GROQ_CONFIG.max_tokens}`);
+  Logger.log(`Claude API Endpoint: ${CLAUDE_API_ENDPOINT}`);
+  Logger.log(`Claude Model:        ${CLAUDE_CONFIG.model}`);
+  Logger.log(`Claude Max Tokens:   ${CLAUDE_CONFIG.max_tokens}`);
+  Logger.log(`Claude Temperature:  ${CLAUDE_CONFIG.temperature}`);
+  Logger.log(`Claude API Key Set:  ${getClaudeApiKey() ? 'YES' : 'NO'}`);
   Logger.log('---');
+  Logger.log(`Groq API Key Set (legacy): ${getGroqApiKey() ? 'YES' : 'NO'}`);
   Logger.log(`Gemini API Key Set (legacy): ${getGeminiApiKey() ? 'YES' : 'NO'}`);
   Logger.log('---');
   Logger.log(`Notification Email: ${NOTIFICATION_EMAIL}`);
   Logger.log(`Active News Sources: ${NEWS_SOURCES.filter(s => s.enabled).length}`);
   Logger.log(`Confidence Threshold: ${PROCESSING_CONFIG.CONFIDENCE_THRESHOLD}`);
   Logger.log(`Max Articles Per Run: ${PROCESSING_CONFIG.MAX_ARTICLES_PER_RUN}`);
+  Logger.log(`Rate Limit Delay: ${PROCESSING_CONFIG.RATE_LIMIT_DELAY / 1000}s between Claude calls`);
   Logger.log(`Max Fetch Per Run: ${PROCESSING_CONFIG.MAX_FETCH_PER_RUN}`);
   Logger.log('===========================');
 }

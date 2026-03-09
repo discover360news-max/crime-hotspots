@@ -3,6 +3,7 @@
  *
  * Defines crime severity weights used to calculate weighted risk scores per region.
  * Higher weights = higher severity contribution to the score.
+ * Derived from CRIME_SEVERITY_MAP in crimeSchema.ts — do not edit values here directly.
  *
  * How it works (Top Regions card):
  * 1. Each crime's weighted score = weight × victimCount (murder only; all others × 1)
@@ -21,38 +22,15 @@
  * If one region dominates at 35% → "Dangerous"; the rest score proportionally lower.
  *
  * Full methodology: docs/guides/RISK-SCORING-METHODOLOGY.md
- *
- * Adjust weights to reflect your assessment of crime severity.
  */
 
-export const RISK_WEIGHTS = {
-  // High severity crimes
-  Murder: 10,
-  Kidnapping: 9,
-  'Sexual Assault': 8,
+import { CRIME_SEVERITY_MAP } from './crimeSchema';
 
-  // Medium-high severity crimes
-  Shooting: 7,
-  Assault: 6,
-  'Home Invasion': 5,
-
-  // Medium severity crimes
-  Robbery: 4,
-  Burglary: 3,
-
-  // Lower severity crimes
-  Theft: 2,
-  Seizures: 1,
-} as const;
-
-/**
- * Type-safe access to risk weights
- */
-export type RiskCrimeType = keyof typeof RISK_WEIGHTS;
+export const RISK_WEIGHTS: Record<string, number> = CRIME_SEVERITY_MAP;
 
 /**
  * Get risk weight for a crime type (defaults to 1 if not found)
  */
 export function getRiskWeight(crimeType: string): number {
-  return RISK_WEIGHTS[crimeType as RiskCrimeType] ?? 1;
+  return RISK_WEIGHTS[crimeType] ?? 1;
 }

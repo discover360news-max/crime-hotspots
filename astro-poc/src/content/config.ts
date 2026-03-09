@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content';
+import { SAFETY_TIP_CATEGORIES, SAFETY_TIP_CONTEXTS } from '../config/crimeSchema';
 
 const blog = defineCollection({
   type: 'content',
@@ -20,14 +21,8 @@ const tips = defineCollection({
   schema: z.object({
     tip_id: z.string(),
     title: z.string(),
-    category: z.enum([
-      'Robbery', 'Carjacking', 'Home Invasion', 'ATM Crime', 'Online Scam',
-      'Kidnapping', 'Sexual Violence', 'Fraud', 'Assault', 'Shooting', 'Other'
-    ]),
-    context: z.enum([
-      'At Home', 'In Your Car', 'At the ATM', 'In a Mall', 'Walking Alone',
-      'Online', 'At Work', 'Using Public Transport', 'At an Event', 'At a Hotel', 'Other'
-    ]),
+    category: z.enum(SAFETY_TIP_CATEGORIES),
+    context: z.enum(SAFETY_TIP_CONTEXTS),
     area: z.string().default(''),
     severity: z.enum(['low', 'medium', 'high']),
     source: z.enum(['manual', 'community']),

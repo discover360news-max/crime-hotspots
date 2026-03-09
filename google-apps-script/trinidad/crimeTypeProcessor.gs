@@ -5,21 +5,8 @@
  * from Gemini's all_crime_types array
  */
 
-// Crime severity ranking (higher = more severe)
-// Updated Dec 30, 2025: Home Invasion > Robbery, added Burglary, deprioritized Police-Involved Shooting
-const CRIME_SEVERITY = {
-  'Murder': 10,
-  'Kidnapping': 9,
-  'Home Invasion': 8,        // ← UPDATED: Moved up from 3 to 8 (more severe than Robbery)
-  'Shooting': 7,
-  'Sexual Assault': 6,
-  'Assault': 5,
-  'Robbery': 4,
-  'Burglary': 3,             // ← NEW: Added Burglary (between Robbery and Theft)
-  'Theft': 2,
-  'Seizures': 1,
-  'Police-Involved Shooting': 0  // ← UPDATED: Not a crime, set to 0 (backward compat only)
-};
+// Crime severity is now sourced from schema.gs via getCrimeSeverityMap().
+// Do NOT redefine CRIME_SEVERITY here — schema.gs is the single source of truth.
 
 /**
  * Process crime types to determine primary and related
@@ -36,12 +23,20 @@ function determineCrimeTypes(allCrimeTypes) {
     };
   }
 
-  // Remove duplicates and sort by severity (descending)
+  // Remove duplicates and sort by severity descending.
+  // Tiebreaker: schema insertion order (earlier in CRIME_TYPES = higher priority).
+  // Unknown types (e.g. legacy 'Police-Involved Shooting') fall to the end.
+  const severityMap = getCrimeSeverityMap();
+  const schemaOrderMap = getCrimeSchemaOrderMap();
   const uniqueTypes = [...new Set(allCrimeTypes)];
   const sortedTypes = uniqueTypes.sort((a, b) => {
-    const severityA = CRIME_SEVERITY[a] || 0;
-    const severityB = CRIME_SEVERITY[b] || 0;
-    return severityB - severityA; // Descending
+    const severityA = severityMap[a] || 0;
+    const severityB = severityMap[b] || 0;
+    if (severityB !== severityA) return severityB - severityA;
+    // Tie: lower schema index wins (earlier in schema = higher priority)
+    const orderA = schemaOrderMap[a] !== undefined ? schemaOrderMap[a] : 999;
+    const orderB = schemaOrderMap[b] !== undefined ? schemaOrderMap[b] : 999;
+    return orderA - orderB;
   });
 
   // Primary = most severe (first after sorting)

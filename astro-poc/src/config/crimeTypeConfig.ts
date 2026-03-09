@@ -21,6 +21,7 @@
 export const CRIME_TYPE_CONFIG = {
   // Victim-count crimes (count each victim for PRIMARY crime only)
   Murder: { useVictimCount: true },
+  'Attempted Murder': { useVictimCount: true },
   Assault: { useVictimCount: true },
   'Sexual Assault': { useVictimCount: true },
   Kidnapping: { useVictimCount: true },

@@ -5,6 +5,8 @@
  * Includes year filter and crime type filter
  */
 
+import { CRIME_TYPE_LABELS } from '../config/crimeSchema';
+
 interface Props {
   showYearFilter?: boolean;
   showCrimeTypeFilter?: boolean;
@@ -12,18 +14,8 @@ interface Props {
 
 const { showYearFilter = true, showCrimeTypeFilter = false } = Astro.props;
 
-// Crime types for filter checkboxes
-const crimeTypes = [
-  'Murder',
-  'Robbery',
-  'Home Invasion',
-  'Theft',
-  'Shooting',
-  'Assault',
-  'Burglary',
-  'Seizures',
-  'Kidnapping'
-];
+// Crime types for filter checkboxes (all types, sorted by severity descending)
+const crimeTypes = CRIME_TYPE_LABELS;
 ---
 
 <!-- Filters Tray -->

@@ -41,3 +41,4 @@ local-fb-extractor-files/*.json
 **/*secret*.md
 **/*credentials*.md
 **/*.key
+.playwright-mcp/

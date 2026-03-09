@@ -134,7 +134,7 @@ function processReadyArticles() {
           const articleTitle = row[rawColMap['title']];
           const articleUrl = row[rawColMap['url']];
           const articleText = row[rawColMap['full text']];
-          const publishedDate = row[rawColMap['published date']]; // ← IMPORTANT: Get publication date
+          const publishedDate = row[rawColMap['publish date']]; // ← IMPORTANT: Get publication date
 
           Logger.log(`Processing row ${rowNumber}: ${articleTitle.substring(0, 50)}...`);
 
@@ -276,7 +276,10 @@ function processReadyArticles() {
       dateToFormat = fallbackDate;
     } else {
       try {
-        const parsed = new Date(dateStr);
+        // ISO date-only strings (YYYY-MM-DD) parse as UTC midnight in V8/GAS,
+        // which shifts to the previous day when formatted in TT (UTC-4).
+        // Appending T12:00:00 forces noon local time and avoids the off-by-one.
+        const parsed = new Date(dateStr.includes('T') ? dateStr : dateStr + 'T12:00:00');
         if (isNaN(parsed.getTime())) {
           Logger.log(`⚠️ Invalid date format: "${dateStr}", using fallback`);
           dateToFormat = fallbackDate;
@@ -416,8 +419,8 @@ function processReadyArticles() {
         'URL':                  crime.source_url || '',
         'Source':               '',
         'Safety_Tip_Flag':      crime.safety_tip_flag || '',
-        'Safety_Tip_Category':  crime.safety_tip_category || '',
-        'Safety_Tip_Context':   crime.safety_tip_context || '',
+        'Safety_Tip_Category':  Array.isArray(crime.safety_tip_category) ? crime.safety_tip_category.join(', ') : (crime.safety_tip_category || ''),
+        'Safety_Tip_Context':   Array.isArray(crime.safety_tip_context) ? crime.safety_tip_context.join(', ') : (crime.safety_tip_context || ''),
         'Tactic_Noted':         crime.tactic_noted || '',
         'Date_Published':       Utilities.formatDate(new Date(), 'America/Port_of_Spain', 'M/d/yyyy'),
         'Date_Updated':         ''

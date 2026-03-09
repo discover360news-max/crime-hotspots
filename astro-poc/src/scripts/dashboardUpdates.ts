@@ -341,7 +341,7 @@ export function updateTopRegions(crimes: Crime[]) {
     const riskLevelText = getRiskLevelText(barWidth);
     const riskTextColor = getRiskTextColor(barWidth);
     const regionSlug = generateNameSlug(region);
-    const mobileHidden = index >= 5 ? 'hidden sm:block' : '';
+    const mobileHidden = index >= 5 ? 'hidden sm:flex' : '';
     return `
     <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">

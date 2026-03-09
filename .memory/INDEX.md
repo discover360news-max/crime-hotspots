@@ -16,6 +16,7 @@ B009 | BUG | active | Tailwind v4 HSL opacity: use `hsl(0 0% 8% / 0.7)` not `hsl
 B010 | BUG | active | Blog automation: column mismatch + noon boundary caused wrong murder count → B010-blog-automation-bugs.md
 B011 | BUG | active | astro-pagefind MUST be in integrations[] in astro.config.mjs — package.json not enough → B011-pagefind-integration.md
 B012 | BUG | active | NEVER `await import()` inside Astro integration hooks — crashes Vite runner → B012-await-import-hooks.md
+B013 | BUG | fixed | Raw Articles sheet column is "Publish Date" not "Published Date" — caused all crime dates to use run date → B013-gas-publish-date-column-mismatch.md
 
 ## Learnings & Patterns (L)
 L001 | LEARN | active | astro:page-load is the ONLY correct pattern for interactive scripts on SPA → L001-astro-page-load-pattern.md
@@ -27,6 +28,7 @@ L006 | LEARN | active | Dark mode CSS: .dark is on <html> — use :global(.dark)
 L007 | LEARN | active | Risk scoring: self-calibrating weighted share of national total (not absolute count) → L007-risk-scoring-algorithm.md
 L008 | LEARN | active | window.__crimesData: set on 5 pages; area pages use area-scoped crimes only → L008-crimes-data-flow.md
 L009 | LEARN | active | Crime counting: primary+related types per row — NOT raw row count, NOT victim count → L009-crime-counting-methodology.md
+L010 | LEARN | active | Schema centralization COMPLETE (all follow-ups resolved). crimeSchema.ts ↔ schema.gs fully in sync. crimeTypeConfig.ts has Attempted Murder. → L010-gas-schema-centralization.md
 
 ## Decisions (D)
 D001 | DEC | active | Crime pages: full SSR + Cloudflare CDN 24h cache (migrated from hybrid prerender) → D001-crime-page-ssr.md
