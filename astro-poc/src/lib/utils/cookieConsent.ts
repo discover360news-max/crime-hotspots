@@ -27,8 +27,9 @@ export class CookieConsent {
 
     this.consentGiven = this.checkConsent();
 
-    // If consent already given, initialize analytics immediately
+    // Returning user: restore granted consent so Consent Mode v2 fires correctly
     if (this.consentGiven) {
+      this._updateGtagConsent('granted');
       this.config.onAccept();
     }
   }
@@ -162,6 +163,7 @@ export class CookieConsent {
   acceptConsent() {
     this.setCookie(CONSENT_COOKIE_NAME, 'accepted', CONSENT_DURATION_DAYS);
     this.consentGiven = true;
+    this._updateGtagConsent('granted');
     this.config.onAccept();
   }
 
@@ -171,7 +173,22 @@ export class CookieConsent {
   declineConsent() {
     this.setCookie(CONSENT_COOKIE_NAME, 'declined', CONSENT_DURATION_DAYS);
     this.consentGiven = false;
+    this._updateGtagConsent('denied');
     this.config.onDecline();
+  }
+
+  /**
+   * Update GA4 Consent Mode v2 signals
+   */
+  _updateGtagConsent(analyticsState) {
+    if (typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', {
+        analytics_storage: analyticsState,
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied'
+      });
+    }
   }
 
   /**

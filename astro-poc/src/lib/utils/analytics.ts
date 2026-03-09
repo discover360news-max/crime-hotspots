@@ -53,13 +53,20 @@ export class Analytics {
       return;
     }
 
-    // Load gtag.js script
+    // Consent Mode v2: gtag.js is already loaded in <head> with consent denied by default.
+    // cookieConsent.ts has already called gtag('consent', 'update', {granted}) at this point.
+    // Nothing left to do here — just mark as ready.
+    if (window.gtag) {
+      this.log('GA4 ready (Consent Mode v2)');
+      return;
+    }
+
+    // Fallback: load gtag.js manually (should not occur when Layout.astro is correctly set up)
     const script = document.createElement('script');
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${this.config.ga4MeasurementId}`;
     document.head.appendChild(script);
 
-    // Initialize gtag
     window.dataLayer = window.dataLayer || [];
     function gtag() {
       window.dataLayer.push(arguments);
@@ -67,23 +74,12 @@ export class Analytics {
     window.gtag = gtag;
 
     gtag('js', new Date());
-
-    // Privacy-focused configuration
-    const gaConfig = {
+    gtag('config', this.config.ga4MeasurementId, {
       anonymize_ip: this.config.anonymizeIp,
-      cookie_flags: 'SameSite=None;Secure',
       send_page_view: true
-    };
+    });
 
-    // Cookieless mode (less accurate but more privacy-friendly)
-    if (this.config.cookieless) {
-      gaConfig.client_storage = 'none';
-      gaConfig.anonymize_ip = true;
-    }
-
-    gtag('config', this.config.ga4MeasurementId, gaConfig);
-
-    this.log('GA4 initialized');
+    this.log('GA4 initialized (fallback)');
   }
 
   /**

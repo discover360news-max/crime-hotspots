@@ -163,12 +163,29 @@ const detectedCountryId = Object.entries(countryPathMap).find(
   <!-- Cloudflare Web Analytics (cookieless, no consent needed, tracks all real visitors) -->
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "9edc1888af84466fa5b067943e7c6f99"}'></script>
 
+  <!-- GA4 Consent Mode v2: must run before gtag.js loads. Denies all by default. -->
+  <script is:inline>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      analytics_storage: 'denied',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      wait_for_update: 500
+    });
+    gtag('js', new Date());
+    gtag('config', 'G-JMQ8B4DYEG', { anonymize_ip: true });
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-JMQ8B4DYEG"></script>
+
   <!-- PRIMARY ANALYTICS — do not add additional tracking scripts without checking with site owner -->
   <script>
     import { initCookieConsent } from '../lib/utils/cookieConsent';
     import { initAnalytics } from '../lib/utils/analytics';
 
-    // Initialize GA4 only after user consent (detailed behavior tracking)
+    // Consent update is handled inside cookieConsent.ts (Consent Mode v2).
+    // initAnalytics is still called on accept to enable trackEvent() globally.
     initCookieConsent({
       onAccept: () => {
         initAnalytics({
