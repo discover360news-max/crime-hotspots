@@ -107,7 +107,7 @@ Glob pattern="*.md" path="astro-poc/src/content/tips/"
 
 Find the highest-numbered file. Next tip = last ID + 1. Zero-pad to 5 digits (`TIP-00031`, `TIP-00032`, etc.).
 
-> **Current last tip:** TIP-00043 (as of March 7, 2026)
+> **Current last tip:** TIP-00046 (as of March 9, 2026)
 
 ---
 

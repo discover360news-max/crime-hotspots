@@ -8,6 +8,12 @@
 
 ## March 2026
 
+### Safety Tips — TIP-00044 to TIP-00046 (Mar 9)
+
+- **NEW TIP TIP-00044** — Vary Your Morning Departure to Avoid Ambush (Carjacking / At Home) — Story ID 506
+- **NEW TIP TIP-00045** — Recognising Fake Weapons and False Police Authority (Home Invasion / At Home) — Story ID 507
+- **NEW TIP TIP-00046** — Protecting Yourself When Carrying Cash on Foot (Robbery / Walking Alone) — Story ID 503
+
 ### Safety Tips — TIP-00037 to TIP-00043 (Mar 7)
 
 - **NEW TIP TIP-00037** — Avoiding Being Targeted While Parked Alone in a Vehicle (Robbery / In Your Car) — Story IDs 489, 495
