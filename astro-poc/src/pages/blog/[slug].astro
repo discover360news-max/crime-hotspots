@@ -45,7 +45,7 @@ const dashboardLink = post.data.country === 'tt'
 const breadcrumbItems = [
   { label: 'Home', href: routes.home },
   { label: 'Blog', href: routes.blog },
-  { label: post.data.title }
+  { label: post.slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) }
 ];
 
 // Get related posts (same country, most recent, excluding current)
