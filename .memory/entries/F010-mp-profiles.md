@@ -52,6 +52,9 @@ SEO: meta description enriched with live crime stats (incidents 90d, murders YTD
 - Standalone "Dr" → `honorific: "Dr"`, name without title in `fullName`
 - SC stripped from surnames (Stuart Young, Kamla Persad-Bissessar)
 
+**Optional contact fields:** `contact.emailAlt` (personal email) and `contact.whatsapp` (rendered as wa.me link, number stored as-is e.g. `"+1(868)332-3531"`). Both render conditionally — only add where data exists.
+**Phone convention:** multiple numbers go in the single `phone` field separated by ` / `. Only use `whatsapp` when explicitly stated as WhatsApp.
+
 **Ambiguous MPs (7):** regionConfidence = "ambiguous", regionSlugs has 2 entries. They appear on both region pages. Profile page shows boundary note + two crime sections.
 
 **Party badge colours:** PNM = red-50/red-700, UNC = orange-50/orange-700, TPP = slate-100/slate-600. Defined inline in each page (3 lines, not worth abstracting).
@@ -79,7 +82,7 @@ Contact rows render conditionally — empty fields are skipped entirely.
 
 ## Outstanding / deferred
 
-- **Photos:** Kavell to add real photos to `public/images/mps/`. Filename must match `photo` field in mps.json. All photo fields currently empty → all show placeholder. Known filenames when ready: `roger-alexander.webp`, `khadija-ameen.webp` (one 'h'), `pennelope-beckles.webp`.
+- **Photos:** All 41 MPs now have real photos. Store in `public/images/mps/`, filename must match `photo` field in mps.json. Non-standard filenames to note: `khadijah-ameen.webp` (two h's), `mrs-camille-robinson-regis.webp`, `neil-gosine.webp` (Colin Neil Gosine).
 - **Socials/website:** All empty — populate when available, no code change needed
 - **Area page → MP link:** Phase 2, deferred (only where area→constituency mapping is unambiguous)
 - **Next election:** Update mps.json after any by-election or general election. Next general election by April 2030.

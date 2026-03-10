@@ -559,12 +559,12 @@
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/jearleanjohntt/",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "jearlean-john.webp"
   },
   {
     "nameSlug": "barry-padarath",
@@ -586,12 +586,12 @@
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/barrypadarathcouvasouth/",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "barry-padarath.webp"
   },
   {
     "nameSlug": "sean-sobers",
@@ -618,7 +618,7 @@
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "sean-sobers.webp"
   },
   {
     "nameSlug": "phillip-watts",
@@ -640,12 +640,12 @@
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/profile.php?id=61576084441206",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "phillip-watts.webp"
   },
   {
     "nameSlug": "hansen-narinesingh",
@@ -667,12 +667,12 @@
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/PAPisUNC",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "hansen-narinesingh.webp"
   },
   {
     "nameSlug": "wayne-sturge",
@@ -699,7 +699,7 @@
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "wayne-sturge.webp"
   },
   {
     "nameSlug": "shivanna-sam",
@@ -726,7 +726,7 @@
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "shivanna-sam.webp"
   },
   {
     "nameSlug": "wilfred-nicholas-morris",
@@ -753,7 +753,7 @@
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "wilfred-nicholas-morris.webp"
   },
   {
     "nameSlug": "brian-manning",
@@ -775,12 +775,12 @@
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/brianmanningsfe/",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "brian-manning.webp"
   },
   {
     "nameSlug": "michael-dowlath",
@@ -802,12 +802,12 @@
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/uncsfw2025",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "dr-michael-dowlath.webp"
   },
   {
     "nameSlug": "narindra-roopnarine",
@@ -823,18 +823,20 @@
     "regionConfidence": "clear",
     "contact": {
       "email": "naparima@ttparliament.org",
+      "emailAlt": "naparimamp@gmail.com",
       "phone": "(868) 655-2363",
+      "whatsapp": "+1(868)332-3531",
       "office": "#29 Manahambre Road, Cedar Hill, Princes Town",
       "parliamentProfile": "https://www.ttparliament.org/members/member/dr-narindra-roopnarine/"
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/p/MP-for-Naparima-Dr-Narindra-Roopnarine-61574927785986/",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "dr-narindra-roopnarine.webp"
   },
   {
     "nameSlug": "aiyna-ali",
@@ -861,7 +863,7 @@
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "dr-aiyna-ali.webp"
   },
   {
     "nameSlug": "michelle-benjamin",
@@ -877,18 +879,19 @@
     "regionConfidence": "ambiguous",
     "contact": {
       "email": "morugatableland@ttparliament.org",
-      "phone": "(868) 655-1958",
+      "emailAlt": "mpmorugatableland@gmail.com",
+      "phone": "(868) 655-1958 / +1 868-321-6115",
       "office": "#4 Petit Cafe, Indian Walk, Princes Town",
       "parliamentProfile": "https://www.ttparliament.org/members/member/michelle-benjamin/"
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/CouncillorMichelleBenjamin/",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "michelle-benjamin.webp"
   },
   {
     "nameSlug": "roodal-moonilal",
@@ -915,7 +918,7 @@
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "dr-roodal-moonilal.webp"
   },
   {
     "nameSlug": "lackram-bodoe",
@@ -931,18 +934,18 @@
     "regionConfidence": "clear",
     "contact": {
       "email": "oropouchew@ttparliament.org",
-      "phone": "(868) 398-7130",
+      "phone": "(868) 398-7130 / +1 868-319-6172",
       "office": "1280-1282 S.S. Erin Road, Batchiya Village, Penal",
       "parliamentProfile": "https://www.ttparliament.org/members/member/dr-lackram-bodoe/"
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/p/MP-for-Oropouche-West-Dr-Lackram-Bodoe-100063789996739/",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "dr-lackram-bodoe.webp"
   },
   {
     "nameSlug": "kamla-persad-bissessar",
@@ -969,7 +972,7 @@
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "kamla-persad-bissessar.webp"
   },
   {
     "nameSlug": "davendranath-tancoo",
@@ -985,18 +988,19 @@
     "regionConfidence": "ambiguous",
     "contact": {
       "email": "fyzabad@ttparliament.org",
-      "phone": "(868) 677-5807",
+      "emailAlt": "tancooforfyzabad@gmail.com",
+      "phone": "(868) 677-5807 / 868-486-0807",
       "office": "Government Quarters, Unity Court, Fyzabad",
       "parliamentProfile": "https://www.ttparliament.org/members/member/davendranath-tancoo/"
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/mpDaveTancoo/",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "davendranath-tancoo.webp"
   },
   {
     "nameSlug": "ernesto-kesar",
@@ -1023,7 +1027,7 @@
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "ernesto-kesar.webp"
   },
   {
     "nameSlug": "clyde-elder",
@@ -1045,12 +1049,12 @@
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/profile.php?id=61576098614607",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "clyde-elder.webp"
   },
   {
     "nameSlug": "david-thomas",
@@ -1077,7 +1081,7 @@
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "david-thomas.webp"
   },
   {
     "nameSlug": "joel-sampson",
@@ -1093,17 +1097,18 @@
     "regionConfidence": "clear",
     "contact": {
       "email": "tobagow@ttparliament.org",
-      "phone": "(868) 639-5099",
+      "emailAlt": "bonaccordcrownpoint@gov.tt",
+      "phone": "(868) 639-5099 / 868-610-6322",
       "office": "#5 Milford Plaza, Milford Road, Milford Bay, Tobago",
       "parliamentProfile": "https://www.ttparliament.org/members/member/joel-sampson/"
     },
     "website": "",
     "socials": {
-      "facebook": "",
+      "facebook": "https://www.facebook.com/JoelNuttsySampsonTPP",
       "instagram": "",
       "x": "",
       "youtube": ""
     },
-    "photo": ""
+    "photo": "joel-sampson.webp"
   }
 ]
