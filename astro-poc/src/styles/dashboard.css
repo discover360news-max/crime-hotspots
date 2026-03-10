@@ -36,7 +36,7 @@
 #mapContainer {
   transition: height 400ms ease-in-out;
   overflow: hidden;
-  scroll-margin-top: 7rem; /* Clear sticky header on scrollIntoView */
+  scroll-margin-top: 8rem; /* Clear sticky header + sticky filter bar on scrollIntoView */
 }
 
 #mapContainer.map-expanded {

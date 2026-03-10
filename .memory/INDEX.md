@@ -29,6 +29,7 @@ L007 | LEARN | active | Risk scoring: self-calibrating weighted share of nationa
 L008 | LEARN | active | window.__crimesData: set on 5 pages; area pages use area-scoped crimes only → L008-crimes-data-flow.md
 L009 | LEARN | active | Crime counting: primary+related types per row — NOT raw row count, NOT victim count → L009-crime-counting-methodology.md
 L010 | LEARN | active | Schema centralization COMPLETE (all follow-ups resolved). crimeSchema.ts ↔ schema.gs fully in sync. crimeTypeConfig.ts has Attempted Murder. → L010-gas-schema-centralization.md
+L011 | LEARN | candidate | Utility control pattern: filled bg button + sticky bar, separate from nav CTA ghost buttons. Dashboard confirmed Mar 10 2026, global rollout TBD → L011-utility-control-pattern.md
 
 ## Decisions (D)
 D001 | DEC | active | Crime pages: full SSR + Cloudflare CDN 24h cache (migrated from hybrid prerender) → D001-crime-page-ssr.md
@@ -46,6 +47,7 @@ F005 | FEAT | active | Safety context: area crime score 1–10, 90-day window, 3
 F006 | FEAT | active | Slug redirects: SSR handles legacy→new; redirect-map.json is reference only → F006-slug-redirect-system.md
 F007 | FEAT | active | Newsletter: Buttondown embed endpoint — Workers cannot reach API subdomain → F007-newsletter-support.md
 F008 | FEAT | active | Trending hotspots: 7-day hot areas (server) + recent views via localStorage → F008-trending-hotspots.md
+F009 | FEAT | active | Analytics: GA4 Consent Mode v2 — gtag denied by default, updates on accept/decline/return → F009-analytics-consent.md
 
 ## Components (C)
 C001 | COMP | active | CrimeDetailModal: 261-line orchestrator + 5 modal*.ts modules in src/scripts/ → C001-crime-detail-modal.md

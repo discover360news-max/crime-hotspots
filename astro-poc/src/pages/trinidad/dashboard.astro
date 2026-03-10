@@ -67,7 +67,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 <Layout title={title} description={description} includeLeaflet={true} includeTurnstile={true}>
 
   <!-- Hero section — cohesive with Headlines page (Hero.astro compact pattern) -->
-  <section class="w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-rose-950/30 dark:via-[hsl(0_0%_5%)] dark:to-[hsl(0_0%_5%)] py-6 sm:py-8" data-pagefind-ignore>
+  <section class="w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-rose-950/30 dark:via-[hsl(0_0%_5%)] dark:to-[hsl(0_0%_5%)] py-5 sm:py-6" data-pagefind-ignore>
     <div class="mx-auto max-w-3xl px-4 sm:px-6">
       <Breadcrumbs items={[
         { label: 'Home', href: '/' },
@@ -83,7 +83,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
         <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         Data as of {freshnessText}
       </p>
-      <!-- CTAs row: Headlines (primary) → Murder Count (secondary) → Filters | Clear -->
+      <!-- CTAs row: Headlines (primary) → Murder Count (secondary) -->
       <div class="flex gap-4 items-center flex-row flex-wrap">
           <a href={routes.trinidad.headlines}
             class="px-4 py-1.5 min-h-[22px] inline-flex items-center gap-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 transition font-medium text-xs shadow-sm hover:shadow-md whitespace-nowrap">
@@ -94,26 +94,48 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
             class="px-4 py-1.5 min-h-[22px] inline-flex items-center gap-2 rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 transition font-medium text-xs whitespace-nowrap">
             Murder Count
           </a>
-          <div class="flex items-center gap-2">
-            <button
-              id="filtersBtn"
-              class="px-4 py-1.5 min-h-[22px] inline-flex items-center justify-center border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 rounded-lg transition font-medium text-xs whitespace-nowrap cursor-pointer"
-            >
-              <span id="filtersBtnText">Filters ›</span>
-            </button>
-            <button
-              id="clearFiltersInline"
-              class="hidden text-xs text-rose-600 hover:text-rose-700 font-medium whitespace-nowrap transition"
-            >
-              Clear
-            </button>
-          </div>
         </div>
     </div>
   </section>
 
+  <!-- Sticky Filter Bar — year inline, drawer for Region / Area / Crime Type -->
+  <div id="filterBar" class="sticky top-16 z-30 bg-white/95 dark:bg-[hsl(0_0%_5%)]/95 backdrop-blur-sm border-b border-slate-200 dark:border-[hsl(0_0%_15%)]">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-3 flex-wrap">
+      <!-- Year label + inline select -->
+      <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_48%)] font-medium shrink-0">Year</span>
+      <select
+        id="yearFilter"
+        class="filter-select py-1 pl-2.5 pr-6 text-xs border border-slate-200 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-md bg-white dark:bg-[hsl(0_0%_8%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium cursor-pointer"
+      >
+        <!-- Options populated dynamically by yearFilter.ts -->
+      </select>
 
-  <div class="container mx-auto px-4 sm:px-6 py-4 max-w-3xl" data-pagefind-ignore>
+      <!-- Divider -->
+      <span class="h-4 w-px bg-slate-200 dark:bg-[hsl(0_0%_20%)] shrink-0"></span>
+
+      <!-- Filters drawer button — funnel icon + label -->
+      <button
+        id="filtersBtn"
+        class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-[hsl(0_0%_65%)] hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-[hsl(0_0%_12%)] hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md px-2.5 py-1 transition cursor-pointer whitespace-nowrap"
+      >
+        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+        </svg>
+        <span id="filtersBtnText">Filters</span>
+      </button>
+
+      <!-- Clear — shown only when drawer filters are active -->
+      <button
+        id="clearFiltersInline"
+        class="hidden text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium whitespace-nowrap transition"
+      >
+        Clear
+      </button>
+    </div>
+  </div>
+
+
+  <div class="container mx-auto px-4 sm:px-6 py-6 max-w-3xl" data-pagefind-ignore>
 
     <!-- Site Notification Banner -->
     <SiteNotificationBanner notification={dataUpdateNotice} />
@@ -122,7 +144,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     <DashboardStory allCrimes={allCrimes} />
 
     <!-- Statistics Cards - Horizontal Scroll -->
-    <div class="flex items-center gap-1 pt-4 px-4 mb-2">
+    <div class="flex items-center gap-1 px-4 mb-2">
       <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)]">Crime Statistics</h2>
       <InfoPopup id="crime-types-info">
         <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Crime Type Definitions</p>
@@ -371,12 +393,21 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
             <li><span class="text-rose-600 font-medium">Red</span>: High risk (67-100%)</li>
           </ul>
         </InfoPopup>
-        <a href={routes.trinidad.areas} class="ml-auto text-xs text-rose-600 hover:text-rose-700 active:text-rose-800 font-medium transition">
-          View all
-          <svg class="w-3 h-3 inline-block ml-0.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </a>
+        <div class="ml-auto flex items-center gap-3">
+          <a href={routes.trinidad.compare} class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] hover:text-rose-600 dark:hover:text-rose-400 font-medium transition">
+            Compare areas
+            <svg class="w-3 h-3 inline-block ml-0.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+          <span class="text-slate-200 dark:text-[hsl(0_0%_20%)]">|</span>
+          <a href={routes.trinidad.areas} class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] hover:text-rose-600 dark:hover:text-rose-400 font-medium transition">
+            View all
+            <svg class="w-3 h-3 inline-block ml-0.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
       </div>
 
       <div class="relative">
@@ -604,7 +635,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
   </script>
 
   <!-- Filters Tray Component -->
-  <FiltersTray showYearFilter={true} showCrimeTypeFilter={true}>
+  <FiltersTray showYearFilter={false} showCrimeTypeFilter={true}>
     <!-- Region Filter (injected via slot) -->
     <div>
       <label for="regionFilter" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Region</label>
@@ -735,34 +766,27 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     // ── Filter Active State ────────────────────────────────────────────────
     function showDashboardFilterActive() {
       const btn = document.getElementById('filtersBtn') as HTMLElement | null;
-      const text = document.getElementById('filtersBtnText');
       const clearBtn = document.getElementById('clearFiltersInline');
-      if (text) text.textContent = 'Filters Active ›';
       if (btn) {
-        btn.style.borderColor = '#e11d48';
         btn.style.color = '#e11d48';
-        btn.style.backgroundColor = 'color-mix(in srgb, #e11d48 10%, transparent)';
+        btn.style.backgroundColor = 'color-mix(in srgb, #e11d48 12%, transparent)';
       }
       if (clearBtn) clearBtn.classList.remove('hidden');
     }
 
     function hideDashboardFilterActive() {
       const btn = document.getElementById('filtersBtn') as HTMLElement | null;
-      const text = document.getElementById('filtersBtnText');
       const clearBtn = document.getElementById('clearFiltersInline');
-      if (text) text.textContent = 'Filters ›';
-      if (btn) { btn.style.borderColor = ''; btn.style.color = ''; btn.style.backgroundColor = ''; }
+      if (btn) { btn.style.color = ''; btn.style.backgroundColor = ''; }
       if (clearBtn) clearBtn.classList.add('hidden');
     }
 
     function checkDashboardFilterState() {
-      const yearEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
+      // Year is visible inline — only drawer filters (Crime Type, Region, Area) light up the button
       const crimeTypeEl = document.getElementById('crimeTypeFilter') as HTMLSelectElement | null;
       const regionEl = document.getElementById('regionFilter') as HTMLSelectElement | null;
       const areaEl = document.getElementById('areaFilter') as HTMLSelectElement | null;
-      const defaultYear = (window as any).__dashboardDefaultYear || '';
       const active =
-        (yearEl ? (yearEl.value !== defaultYear && yearEl.value !== '') : false) ||
         (crimeTypeEl ? crimeTypeEl.value !== '' : false) ||
         (regionEl ? regionEl.value !== '' : false) ||
         (areaEl ? areaEl.value !== '' : false);

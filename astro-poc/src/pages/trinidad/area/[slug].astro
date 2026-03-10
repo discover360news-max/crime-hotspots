@@ -132,6 +132,8 @@ const statCards = [
     label: 'Risk Level',
     current: parseFloat(safety.score.toFixed(1)),
     subtitle: 'out of 10',
+    size: 'large' as const,
+    riskColor: safety.level,
   },
 ];
 
@@ -154,16 +156,18 @@ recentCrimes30d.forEach(crime => {
   headlinesByDate.get(dateKey)!.push(crime);
 });
 
-// Related areas (same region)
+// Related areas (same region, sorted by total crime count descending)
 const relatedAreas = areaData
   .filter(a => a.region === region && a.area !== areaName)
-  .slice(0, 6)
   .map(a => ({
     name: a.area,
     slug: generateNameSlug(a.area),
     knownAs: a.knownAs,
     hasCrimes: allCrimes.some(c => c.area === a.area),
-  }));
+    crimeCount: allCrimes.filter(c => c.area === a.area).length,
+  }))
+  .sort((a, b) => b.crimeCount - a.crimeCount)
+  .slice(0, 6);
 
 // Suggested compare area: related area with most recent crime (for contextual compare CTA)
 const suggestedCompare = relatedAreas
@@ -174,17 +178,18 @@ const suggestedCompare = relatedAreas
   }))
   .sort((a, b) => b.recentCount - a.recentCount)[0];
 
-// Random areas from other regions (for cross-linking / internal SEO)
+// Top areas from other regions by total crime count (for cross-linking / internal SEO)
 const otherRegionAreas = areaData
   .filter(a => a.region !== region && a.area !== areaName && allCrimes.some(c => c.area === a.area))
-  .sort(() => Math.random() - 0.5)
-  .slice(0, 3)
   .map(a => ({
     name: a.area,
     slug: generateNameSlug(a.area),
     knownAs: a.knownAs,
     region: a.region,
-  }));
+    crimeCount: allCrimes.filter(c => c.area === a.area).length,
+  }))
+  .sort((a, b) => b.crimeCount - a.crimeCount)
+  .slice(0, 3);
 
 // SEO vars
 const totalCrimesCurrentYTD = getTotalCrimeCount(crimesCurrentYTD);

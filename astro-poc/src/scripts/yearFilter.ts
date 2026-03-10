@@ -73,7 +73,7 @@ export function initializeYearFilter(
     // Add current year option (selected by default)
     const currentOption = document.createElement('option');
     currentOption.value = currentYear.toString();
-    currentOption.textContent = `${currentYear} Data`;
+    currentOption.textContent = `${currentYear}`;
     currentOption.selected = true;
     yearFilterElement.appendChild(currentOption);
 
@@ -82,7 +82,7 @@ export function initializeYearFilter(
       if (year !== currentYear) {
         const option = document.createElement('option');
         option.value = year.toString();
-        option.textContent = `${year} Data`;
+        option.textContent = `${year}`;
         yearFilterElement.appendChild(option);
       }
     });

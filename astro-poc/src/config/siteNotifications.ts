@@ -20,7 +20,7 @@ export interface SiteNotification {
  * Set enabled to false when updates are complete
  */
 export const dataUpdateNotice: SiteNotification = {
-  enabled: true, // ← Change to false when 2025 updates complete
+  enabled: false, // ← Change to true if update notice is needed again
   id: 'data-update-2025',
   message: '2025 crime data is currently being updated.',
   subMessage: 'Historical data remains available. Feel free to browse, contribute reports, and check back soon for complete 2025 statistics.',
