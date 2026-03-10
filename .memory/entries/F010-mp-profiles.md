@@ -72,7 +72,7 @@ Contact rows render conditionally — empty fields are skipped entirely.
 
 - Store in `public/images/mps/`
 - Filename must match `photo` field in mps.json (e.g. `roger-alexander.webp`)
-- Note: Khadijah Ameen's filename is `khadija-ameen.webp` (one 'h') — matches existing file
+- Note: Khadijah Ameen's filename is `khadijah-ameen.webp` (two h's — matches the actual file)
 - If `photo` field is empty, placeholder.svg is used automatically
 
 ---

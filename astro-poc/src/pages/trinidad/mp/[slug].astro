@@ -153,16 +153,14 @@ const personSchema: Record<string, unknown> = {
     <div class="mt-2 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] overflow-hidden">
       <div class="grid grid-cols-1 sm:grid-cols-2">
 
-        <!-- Left: image only -->
-        <div class="sm:border-r border-slate-100 dark:border-[hsl(0_0%_15%)]">
-          <div class="w-full aspect-square overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
-            <img
-              src={photoSrc}
-              alt={mp.photo ? `${mp.fullName}, MP for ${mp.constituency}` : ''}
-              class="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
+        <!-- Left: image only — fills full height of right column -->
+        <div class="relative sm:border-r border-slate-100 dark:border-[hsl(0_0%_15%)] min-h-48 bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
+          <img
+            src={photoSrc}
+            alt={mp.photo ? `${mp.fullName}, MP for ${mp.constituency}` : ''}
+            class="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
         </div>
 
         <!-- Right: identity + contact -->
