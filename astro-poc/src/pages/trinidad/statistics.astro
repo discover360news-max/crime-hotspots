@@ -74,35 +74,53 @@ const totalYoYChange = total2025SamePeriod > 0
   ? ((total2026YTD - total2025SamePeriod) / total2025SamePeriod) * 100
   : 0;
 
+// Extract YoY comparisons (avoids repeated .find() calls)
+const murderComp = yoyComparisons.find(c => c.type === 'Murder') ?? { count2025: 0, percentChange: 0, direction: 'flat' as const };
+const robberyComp = yoyComparisons.find(c => c.type === 'Robbery') ?? { count2025: 0, percentChange: 0, direction: 'flat' as const };
+const shootingComp = yoyComparisons.find(c => c.type === 'Shooting') ?? { count2025: 0, percentChange: 0, direction: 'flat' as const };
+
+// Build WhatsApp share text for a stat card
+const statsPageUrl = 'https://crimehotspots.com/trinidad/statistics/';
+function buildShareText(count: number, noun: string, direction: string, change: number): string {
+  const trend = direction === 'up'
+    ? `up ${Math.round(Math.abs(change))}% vs ${previousYear}`
+    : direction === 'down'
+      ? `down ${Math.round(Math.abs(change))}% vs ${previousYear}`
+      : `similar to ${previousYear}`;
+  return `Trinidad and Tobago: ${count} ${noun} in ${currentYear} — ${trend}. Track it live: ${statsPageUrl}`;
+}
+
 // Prepare stat cards data
 const statCardsData = [
   {
     label: 'Murders',
     current: murderCount,
-    previous: yoyComparisons.find(c => c.type === 'Murder')?.count2025 || 0,
-    yoyChange: yoyComparisons.find(c => c.type === 'Murder')?.percentChange || 0,
-    direction: yoyComparisons.find(c => c.type === 'Murder')?.direction || 'flat'
+    previous: murderComp.count2025,
+    yoyChange: murderComp.percentChange,
+    direction: murderComp.direction,
+    shareText: buildShareText(murderCount, 'murders', murderComp.direction, murderComp.percentChange),
   },
   {
     label: 'Robberies',
     current: robberyCount,
-    previous: yoyComparisons.find(c => c.type === 'Robbery')?.count2025 || 0,
-    yoyChange: yoyComparisons.find(c => c.type === 'Robbery')?.percentChange || 0,
-    direction: yoyComparisons.find(c => c.type === 'Robbery')?.direction || 'flat'
+    previous: robberyComp.count2025,
+    yoyChange: robberyComp.percentChange,
+    direction: robberyComp.direction,
+    shareText: buildShareText(robberyCount, 'robberies', robberyComp.direction, robberyComp.percentChange),
   },
   {
     label: 'Shootings',
     current: shootingCount,
-    previous: yoyComparisons.find(c => c.type === 'Shooting')?.count2025 || 0,
-    yoyChange: yoyComparisons.find(c => c.type === 'Shooting')?.percentChange || 0,
-    direction: yoyComparisons.find(c => c.type === 'Shooting')?.direction || 'flat'
+    previous: shootingComp.count2025,
+    yoyChange: shootingComp.percentChange,
+    direction: shootingComp.direction,
   },
   {
     label: 'All Crimes',
     current: total2026YTD,
     previous: total2025SamePeriod,
     yoyChange: totalYoYChange,
-    direction: totalYoYChange < -0.5 ? 'down' : totalYoYChange > 0.5 ? 'up' : 'flat'
+    direction: totalYoYChange < -0.5 ? 'down' : totalYoYChange > 0.5 ? 'up' : 'flat',
   }
 ];
 

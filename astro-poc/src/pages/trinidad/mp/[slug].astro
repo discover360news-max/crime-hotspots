@@ -1,0 +1,273 @@
+---
+/**
+ * MP Profile Page
+ * Static profile for each Member of Parliament with crime data for their region(s).
+ * Generates 41 pages at /trinidad/mp/[nameSlug]/
+ * Target keywords: "[MP name] Trinidad", "[constituency] MP", "[constituency] crime data"
+ */
+
+export const prerender = true;
+
+import Layout from '../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import Hero from '../../../components/Hero.astro';
+import StatCards from '../../../components/StatCards.astro';
+import mpsData from '../../../data/mps.json';
+import { getTrinidadCrimes, generateNameSlug } from '../../../lib/crimeData';
+import { loadFullAreaData } from '../../../lib/areaAliases';
+import { countCrimeType } from '../../../lib/dashboardHelpers';
+import { calculatePercentChange, filterToSamePeriod } from '../../../lib/statisticsHelpers';
+import { sanitizeUrl } from '../../../lib/escapeHtml';
+import { routes } from '../../../config/routes';
+
+export async function getStaticPaths() {
+  return mpsData.map((mp) => ({
+    params: { slug: mp.nameSlug },
+    props: { mp },
+  }));
+}
+
+const { mp } = Astro.props;
+
+const allCrimes = await getTrinidadCrimes();
+const areaData = await loadFullAreaData();
+
+// Build regionSlug → regionName lookup from area data
+const regionSlugToName = new Map<string, string>();
+for (const area of areaData) {
+  if (area.region) {
+    regionSlugToName.set(generateNameSlug(area.region), area.region);
+  }
+}
+
+const currentYear = new Date().getFullYear();
+const previousYear = currentYear - 1;
+const cutoff90d = new Date();
+cutoff90d.setDate(cutoff90d.getDate() - 90);
+const cutoff90dPrevStart = new Date(cutoff90d);
+cutoff90dPrevStart.setFullYear(cutoff90dPrevStart.getFullYear() - 1);
+const cutoff90dPrevEnd = new Date();
+cutoff90dPrevEnd.setFullYear(cutoff90dPrevEnd.getFullYear() - 1);
+
+function makeYoYCard(label: string, curr: number, prev: number) {
+  const yoyChange = calculatePercentChange(prev, curr);
+  return {
+    label,
+    current: curr,
+    previous: prev,
+    yoyChange,
+    direction: (curr > prev ? 'up' : curr < prev ? 'down' : 'flat') as 'up' | 'down' | 'flat',
+  };
+}
+
+const regionStats = mp.regionSlugs.map((regionSlug: string) => {
+  const regionName = regionSlugToName.get(regionSlug) ?? regionSlug;
+  const regionCrimes = allCrimes.filter(c => c.region === regionName);
+  const currentYTD = filterToSamePeriod(regionCrimes.filter(c => c.year === currentYear), currentYear);
+  const previousYTD = filterToSamePeriod(regionCrimes.filter(c => c.year === previousYear), previousYear);
+  const crimes90d = regionCrimes.filter(c => c.dateObj >= cutoff90d);
+  const crimes90dPrev = regionCrimes.filter(c => c.dateObj >= cutoff90dPrevStart && c.dateObj <= cutoff90dPrevEnd);
+  return {
+    regionSlug,
+    regionName,
+    statCards: [
+      makeYoYCard('Incidents (90d)', crimes90d.length, crimes90dPrev.length),
+      { ...makeYoYCard('Murders (YTD)', countCrimeType(currentYTD, 'Murder'), countCrimeType(previousYTD, 'Murder')), highlight: true },
+      makeYoYCard('Robberies (YTD)', countCrimeType(currentYTD, 'Robbery'), countCrimeType(previousYTD, 'Robbery')),
+    ],
+  };
+});
+
+const displayName = mp.honorific ? `${mp.honorific} ${mp.fullName}` : mp.fullName;
+const photoSrc = mp.photo ? `/images/mps/${mp.photo}` : '/images/mps/placeholder.svg';
+
+const partyBadgeClass: Record<string, string> = {
+  PNM: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400',
+  UNC: 'bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400',
+  TPP: 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_65%)]',
+};
+const partyBadge = partyBadgeClass[mp.party] ?? partyBadgeClass['TPP'];
+
+const hasSocials = mp.socials.facebook || mp.socials.instagram || mp.socials.x || mp.socials.youtube;
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
+  { label: 'MPs', href: routes.trinidad.mps },
+  { label: mp.fullName },
+];
+
+const regionNames = regionStats.map((r: { regionName: string }) => r.regionName).join(' and ');
+
+// Pull primary region stats for meta description
+const primaryRegion = regionStats[0] as { regionSlug: string; regionName: string; statCards: Array<{ label: string; current: number }> } | undefined;
+const incidents90d = primaryRegion?.statCards.find(s => s.label === 'Incidents (90d)')?.current ?? 0;
+const murdersYTD = primaryRegion?.statCards.find(s => s.label === 'Murders (YTD)')?.current ?? 0;
+
+const pageTitle = `${mp.fullName} MP — ${mp.constituency} | Crime Hotspots`;
+const pageDescription = `${mp.fullName} is the MP for ${mp.constituency} (${mp.party}). ${incidents90d} incidents in the last 90 days in ${primaryRegion?.regionName ?? regionNames}${murdersYTD > 0 ? `, including ${murdersYTD} murder${murdersYTD !== 1 ? 's' : ''} YTD` : ''}. Contact details and live crime data.`;
+
+const personSchema: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  'name': displayName,
+  'jobTitle': 'Member of Parliament',
+  'worksFor': {
+    '@type': 'Organization',
+    'name': 'Parliament of Trinidad and Tobago',
+    'url': 'https://www.ttparliament.org',
+  },
+  'url': `https://crimehotspots.com/trinidad/mp/${mp.nameSlug}/`,
+  ...(mp.contact.parliamentProfile ? { 'sameAs': [sanitizeUrl(mp.contact.parliamentProfile)] } : {}),
+  ...(mp.contact.email ? { 'email': `mailto:${mp.contact.email}` } : {}),
+  ...(mp.contact.phone ? { 'telephone': mp.contact.phone } : {}),
+  ...(mp.contact.office ? {
+    'address': {
+      '@type': 'PostalAddress',
+      'streetAddress': mp.contact.office,
+      'addressCountry': 'TT',
+    }
+  } : {}),
+};
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+  </Fragment>
+
+  <Hero
+    compact
+    narrowContainer={true}
+    title={mp.fullName}
+    subtitle={`MP for ${mp.constituency}`}
+    badge={`${mp.partyFull} · Elected ${mp.electionYear}`}
+    primaryCTA={{ text: 'All Regions', href: routes.trinidad.regions, icon: 'arrow' }}
+  >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
+
+    <!-- 2-column profile + contact card -->
+    <div class="mt-2 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] overflow-hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-2">
+
+        <!-- Left: image only -->
+        <div class="sm:border-r border-slate-100 dark:border-[hsl(0_0%_15%)]">
+          <div class="w-full aspect-square overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
+            <img
+              src={photoSrc}
+              alt={mp.photo ? `${mp.fullName}, MP for ${mp.constituency}` : ''}
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        </div>
+
+        <!-- Right: identity + contact -->
+        <section class="border-t sm:border-t-0 border-slate-100 dark:border-[hsl(0_0%_15%)] divide-y divide-slate-100 dark:divide-[hsl(0_0%_15%)]" aria-label="Contact information">
+
+          <!-- Identity row -->
+          <div class="px-4 py-3">
+            <h2 class="text-base font-bold text-slate-800 dark:text-[hsl(0_0%_95%)] leading-tight">{displayName}</h2>
+            <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-0.5">{mp.constituency}</p>
+            <div class="flex flex-wrap items-center gap-2 mt-2">
+              <span class={`px-2 py-0.5 rounded-full text-xs font-medium ${partyBadge}`}>{mp.party}</span>
+              <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">MP since {mp.electionYear}</span>
+            </div>
+          </div>
+
+          {mp.contact.email && (
+            <div class="flex items-start gap-3 px-4 py-3">
+              <svg class="w-4 h-4 mt-0.5 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <div class="min-w-0">
+                <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mb-0.5">Email</div>
+                <a href={`mailto:${mp.contact.email}`} class="text-sm text-slate-700 dark:text-[hsl(0_0%_80%)] hover:text-rose-600 dark:hover:text-rose-400 transition break-all">{mp.contact.email}</a>
+              </div>
+            </div>
+          )}
+
+          {mp.contact.phone && (
+            <div class="flex items-start gap-3 px-4 py-3">
+              <svg class="w-4 h-4 mt-0.5 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+              <div class="min-w-0">
+                <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mb-0.5">Phone</div>
+                <span class="text-sm text-slate-700 dark:text-[hsl(0_0%_80%)]">{mp.contact.phone}</span>
+              </div>
+            </div>
+          )}
+
+          {mp.contact.office && (
+            <div class="flex items-start gap-3 px-4 py-3">
+              <svg class="w-4 h-4 mt-0.5 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <div class="min-w-0">
+                <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mb-0.5">Office</div>
+                <span class="text-sm text-slate-700 dark:text-[hsl(0_0%_80%)]">{mp.contact.office}</span>
+              </div>
+            </div>
+          )}
+
+          {mp.contact.parliamentProfile && (
+            <div class="flex items-start gap-3 px-4 py-3">
+              <svg class="w-4 h-4 mt-0.5 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+              <div class="min-w-0">
+                <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mb-0.5">Parliament Profile</div>
+                <a href={sanitizeUrl(mp.contact.parliamentProfile)} target="_blank" rel="noopener noreferrer" class="text-sm text-slate-700 dark:text-[hsl(0_0%_80%)] hover:text-rose-600 dark:hover:text-rose-400 transition">View on ttparliament.org ↗</a>
+              </div>
+            </div>
+          )}
+
+          {mp.website && (
+            <div class="flex items-start gap-3 px-4 py-3">
+              <svg class="w-4 h-4 mt-0.5 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+              <div class="min-w-0">
+                <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mb-0.5">Website</div>
+                <a href={sanitizeUrl(mp.website)} target="_blank" rel="noopener noreferrer" class="text-sm text-slate-700 dark:text-[hsl(0_0%_80%)] hover:text-rose-600 dark:hover:text-rose-400 transition break-all">{mp.website}</a>
+              </div>
+            </div>
+          )}
+
+          {hasSocials && (
+            <div class="flex items-center gap-3 px-4 py-3">
+              <svg class="w-4 h-4 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <div class="flex items-center gap-4">
+                {mp.socials.facebook && <a href={sanitizeUrl(mp.socials.facebook)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">Facebook</a>}
+                {mp.socials.instagram && <a href={sanitizeUrl(mp.socials.instagram)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">Instagram</a>}
+                {mp.socials.x && <a href={sanitizeUrl(mp.socials.x)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">X</a>}
+                {mp.socials.youtube && <a href={sanitizeUrl(mp.socials.youtube)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">YouTube</a>}
+              </div>
+            </div>
+          )}
+
+        </section>
+      </div>
+    </div>
+
+    <!-- Ambiguous boundary note -->
+    {mp.regionConfidence === 'ambiguous' && (
+      <div class="mt-5 flex items-start gap-2.5 p-3.5 rounded-lg bg-slate-50 dark:bg-[hsl(0_0%_8%)] border border-slate-200 dark:border-[hsl(0_0%_18%)]">
+        <svg class="w-4 h-4 mt-0.5 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">This constituency spans two administrative regions. Crime data is shown for both below.</p>
+      </div>
+    )}
+
+    <!-- Crime data per region -->
+    {regionStats.map((region: { regionSlug: string; regionName: string; statCards: any[] }) => (
+      <section class="mt-8">
+        <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-4">
+          Crime data for {region.regionName}
+        </h2>
+        <StatCards stats={region.statCards} />
+        <a
+          href={`/trinidad/region/${region.regionSlug}/`}
+          class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition"
+        >
+          View full crime data for {region.regionName}
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+      </section>
+    ))}
+
+  </main>
+</Layout>

@@ -1,6 +1,6 @@
 # L011 — Utility Control Pattern (Filter Bar)
 
-**Status:** candidate (confirmed on dashboard, not yet rolled out globally)
+**Status:** active (confirmed on dashboard + compare page, Mar 10 2026)
 
 ## Pattern
 
@@ -19,11 +19,18 @@ Utility controls (filters, toggles, view options) are visually separated from na
 - Year select options: plain year numbers only ("2026", "2025") — no "Data" suffix
 - `scroll-margin-top` on `#mapContainer`: `8rem` (clears header 64px + filter bar ~45px)
 
+### Compare page implementation (P2-02, Mar 10 2026)
+- `#selectorBar`: `sticky top-16 z-30` (same offset)
+- Contains: "Area A" label → `#selectA` → vs divider → "Area B" label → `#selectB`
+- Both selects use `filter-select max-w-[180px]` — same class as dashboard year select
+- Redundant subtitle removed; `data-pagefind-body` moved to `<main>`
+
 ## Intent
-Kavell flagged this as a candidate global pattern for any page with utility controls. Before applying elsewhere, confirm the pattern is working well on the dashboard across a few sessions.
+Established as the standard pattern for any page with inline utility controls. Apply to new pages that need filters/selects above content (not navigation CTAs).
 
 ## Files touched
-- `astro-poc/src/pages/trinidad/dashboard.astro` — filter bar HTML, active state logic
+- `astro-poc/src/pages/trinidad/dashboard.astro` — filter bar HTML, active state logic (refactored Mar 10 2026 — see L012)
 - `astro-poc/src/scripts/yearFilter.ts` — option labels trimmed
 - `astro-poc/src/styles/dashboard.css` — scroll-margin-top bump
 - `astro-poc/src/components/FiltersTray.astro` — called with `showYearFilter={false}` from dashboard
+- `astro-poc/src/scripts/dashboardLocationFilter.ts` — active state logic now lives here (extracted Mar 10 2026)

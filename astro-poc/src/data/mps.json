@@ -1,0 +1,1109 @@
+[
+  {
+    "nameSlug": "stuart-young",
+    "fullName": "Stuart Young",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Port of Spain North/St. Ann's West",
+    "constituencySlug": "port-of-spain-north-st-anns-west",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["port-of-spain"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "posnorth@ttparliament.org",
+      "phone": "(868) 624-6855",
+      "office": "#29 Observatory Street, Port of Spain",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/stuart-young/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": "stuart-young.webp"
+  },
+  {
+    "nameSlug": "keith-scotland",
+    "fullName": "Keith Scotland",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Port of Spain South",
+    "constituencySlug": "port-of-spain-south",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["port-of-spain"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "possouth@ttparliament.org",
+      "phone": "(868) 715-5475",
+      "office": "#70 Piccadilly Street, East Dry River, Port of Spain",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/keith-scotland/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": "keith-scotland.webp"
+  },
+  {
+    "nameSlug": "saddam-hosein",
+    "fullName": "Saddam Hosein",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Barataria/San Juan",
+    "constituencySlug": "barataria-san-juan",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["san-juan-laventille"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "barsanjuan@ttparliament.org",
+      "phone": "(868) 674-4788",
+      "office": "Corner El Socorro Road and Salamat Street, San Juan",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/saddam-hosein/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": "saddam-hosein.webp"
+  },
+  {
+    "nameSlug": "christian-birchwood",
+    "fullName": "Christian Birchwood",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Laventille East/Morvant",
+    "constituencySlug": "laventille-east-morvant",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["san-juan-laventille"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "laventilleeast@ttparliament.org",
+      "phone": "(868) 626-0911",
+      "office": "#10 Cajuca Street, Morvant",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/christian-birchwood/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": "christian-birchwood.webp"
+  },
+  {
+    "nameSlug": "kareem-marcelle",
+    "fullName": "Kareem Marcelle",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Laventille West",
+    "constituencySlug": "laventille-west",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["san-juan-laventille"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "laventillew@ttparliament.org",
+      "phone": "(868) 627-2087",
+      "office": "240 Laventille Road, Laventille",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/kareem-marcelle/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": "kareem-marcelle.webp"
+  },
+  {
+    "nameSlug": "nyan-gadsby-dolly",
+    "fullName": "Nyan Gadsby-Dolly",
+    "title": "MP",
+    "honorific": "Dr",
+    "constituency": "St. Ann's East",
+    "constituencySlug": "st-anns-east",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["san-juan-laventille", "port-of-spain"],
+    "regionConfidence": "ambiguous",
+    "contact": {
+      "email": "stannseast@ttparliament.org",
+      "phone": "(868) 674-9077",
+      "office": "Cor. Bagatelle & Saddle Roads, San Juan",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/dr-nyan-gadsby-dolly/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": "dr-nyan-gadsby-dolly.webp"
+  },
+  {
+    "nameSlug": "roger-alexander",
+    "fullName": "Roger Alexander",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Tunapuna",
+    "constituencySlug": "tunapuna",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["tunapuna-piarco"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "tunapuna@ttparliament.org",
+      "phone": "(868) 227-3414",
+      "office": "Corner Green Street and El Dorado Road",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/roger-alexander/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "khadijah-ameen",
+    "fullName": "Khadijah Ameen",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "St. Augustine",
+    "constituencySlug": "st-augustine",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["tunapuna-piarco"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "staugustine@ttparliament.org",
+      "phone": "(868) 739-5287",
+      "office": "No. 43 Pasea Main Road, Tunapuna",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/khadijah-ameen/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "devesh-maharaj",
+    "fullName": "Devesh Maharaj",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Aranguez/St. Joseph",
+    "constituencySlug": "aranguez-st-joseph",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["tunapuna-piarco"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "aranguezstjoseph@ttparliament.org",
+      "phone": "(868) 227-6839",
+      "office": "Corner Aranguez Main Road and Kanhai Street, Aranguez",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/devesh-maharaj/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "marvin-gonzales",
+    "fullName": "Marvin Gonzales",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Arouca/Lopinot",
+    "constituencySlug": "arouca-lopinot",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["tunapuna-piarco"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "aroucalopinot@ttparliament.org",
+      "phone": "(868) 640-4347",
+      "office": "#62 Eastern Main Road, Garden Village, Arouca",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/marvin-gonzales/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "dominic-romain",
+    "fullName": "Dominic Romain",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Malabar/Mausica",
+    "constituencySlug": "malabar-mausica",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["tunapuna-piarco"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "malabarmausica@ttparliament.org",
+      "phone": "(868) 643-4366",
+      "office": "Corner Second Street and Tumpuna Road, Arima",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/dominic-romain/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "camille-robinson-regis",
+    "fullName": "Camille Robinson-Regis",
+    "title": "MP",
+    "honorific": "Mrs",
+    "constituency": "Trincity/Maloney",
+    "constituencySlug": "trincity-maloney",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["tunapuna-piarco"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "trincitymaloney@ttparliament.org",
+      "phone": "(868) 692-7380",
+      "office": "Tanager Block, HDC Village Plaza, Bon Air",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/camille-robinson-regis/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "pennelope-beckles",
+    "fullName": "Pennelope Beckles",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Arima",
+    "constituencySlug": "arima",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["arima"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "arima@ttparliament.org",
+      "phone": "(868) 667-3289",
+      "office": "#31 Guanapo Street",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/pennelope-beckles-robinson/biography/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "hans-des-vignes",
+    "fullName": "Hans Des Vignes",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Diego Martin West",
+    "constituencySlug": "diego-martin-west",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["diego-martin"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "diegomartinw@ttparliament.org",
+      "phone": "(868) 612-3694",
+      "office": "Corner Western Main Road and La Horquetta Valley Road, Glencoe",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/hans-des-vignes/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "symon-de-nobriga",
+    "fullName": "Symon De Nobriga",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Diego Martin Central",
+    "constituencySlug": "diego-martin-central",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["diego-martin"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "diegomartinc@ttparliament.org",
+      "phone": "(868) 637-6056",
+      "office": "#1 Orchid Drive, Morne Coco Road, Petit Valley",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/symon-de-nobriga/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "colm-imbert",
+    "fullName": "Colm Imbert",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Diego Martin North/East",
+    "constituencySlug": "diego-martin-north-east",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["diego-martin"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "diegomartine@ttparliament.org",
+      "phone": "(868) 629-3830",
+      "office": "#1B Morne Coco Road, Maraval",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/colm-imbert/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "vandana-mohit",
+    "fullName": "Vandana Mohit",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Chaguanas East",
+    "constituencySlug": "chaguanas-east",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["chaguanas"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "chaguanase@ttparliament.org",
+      "phone": "(868) 226-1330",
+      "office": "#7 Dynette Street Extension, Cunupia",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/vandana-mohit/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "colin-neil-gosine",
+    "fullName": "Colin Neil Gosine",
+    "title": "MP",
+    "honorific": "Dr",
+    "constituency": "Chaguanas West",
+    "constituencySlug": "chaguanas-west",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["chaguanas"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "chaguanasw@ttparliament.org",
+      "phone": "(868) 688-1041",
+      "office": "LP#111 Munroe Road, Cunupia",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/colin-neil-gosine/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "david-lee",
+    "fullName": "David Lee",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Caroni Central",
+    "constituencySlug": "caroni-central",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["chaguanas", "couva-tabaquite-talparo"],
+    "regionConfidence": "ambiguous",
+    "contact": {
+      "email": "caronic@ttparliament.org",
+      "phone": "(868) 223-7186",
+      "office": "Lot B, Corner Nelson and Mission Road, Freeport",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/david-lee/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "rishad-seecheran",
+    "fullName": "Dr Rishad Seecheran",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Caroni East",
+    "constituencySlug": "caroni-east",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["chaguanas", "tunapuna-piarco"],
+    "regionConfidence": "ambiguous",
+    "contact": {
+      "email": "caronie@ttparliament.org",
+      "phone": "(868) 678-1515",
+      "office": "Lot 1B, Malibu Park, Southern Main Road, Cunupia",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/dr-rishad-seecheran/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "jearlean-john",
+    "fullName": "Jearlean John",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Couva North",
+    "constituencySlug": "couva-north",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["couva-tabaquite-talparo"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "couvan@ttparliament.org",
+      "phone": "(868) 672-2206",
+      "office": "LP #436 Southern Main Road, Chase Village, Carapichaima",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/jearlean-john/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "barry-padarath",
+    "fullName": "Barry Padarath",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Couva South",
+    "constituencySlug": "couva-south",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["couva-tabaquite-talparo"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "couvas@ttparliament.org",
+      "phone": "(868) 636-4143",
+      "office": "No. 27A Camden Road, Couva",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/barry-padarath/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "sean-sobers",
+    "fullName": "Sean Sobers",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Tabaquite",
+    "constituencySlug": "tabaquite",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["couva-tabaquite-talparo"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "tabaquite@ttparliament.org",
+      "phone": "(868) 218-8222",
+      "office": "LP #91 Bonne Aventure Main Road, Happy Hill, Gasparillo",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/sean-sobers/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "phillip-watts",
+    "fullName": "Phillip Watts",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "La Horquetta/Talparo",
+    "constituencySlug": "la-horquetta-talparo",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["couva-tabaquite-talparo"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "lahorquettatalparo@ttparliament.org",
+      "phone": "(868) 227-4310",
+      "office": "#19 Talparo Main Road, Brazil",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/phillip-watts/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "hansen-narinesingh",
+    "fullName": "Hansen Narinesingh",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Claxton Bay",
+    "constituencySlug": "claxton-bay",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["couva-tabaquite-talparo"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "claxtonbay@ttparliament.org",
+      "phone": "(868) 393-7685",
+      "office": "#270 Union Village, Hermitage Road, Claxton Bay",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/hansen-narinesingh/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "wayne-sturge",
+    "fullName": "Wayne Sturge",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Toco/Sangre Grande",
+    "constituencySlug": "toco-sangre-grande",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["sangre-grande"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "tocosangregrande@ttparliament.org",
+      "phone": "(868) 610-5552",
+      "office": "#44 Foster Road, Sangre Grande",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/wayne-sturge/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "shivanna-sam",
+    "fullName": "Shivanna Sam",
+    "title": "MP",
+    "honorific": "Mrs",
+    "constituency": "Cumuto/Manzanilla",
+    "constituencySlug": "cumuto-manzanilla",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["sangre-grande", "mayaro-rio-claro"],
+    "regionConfidence": "ambiguous",
+    "contact": {
+      "email": "cumutomanzanilla@ttparliament.org",
+      "phone": "(868) 491-2064",
+      "office": "Corner Easter Main and Guaico Tamana Roads, Sangre Grande",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/shivanna-sam/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "wilfred-nicholas-morris",
+    "fullName": "Wilfred Nicholas Morris",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Mayaro",
+    "constituencySlug": "mayaro",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["mayaro-rio-claro"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "mayaro@ttparliament.org",
+      "phone": "(868) 223-9218",
+      "office": "#1285 Tabaquite Road, Rio Claro",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/wilfred-nicholas-morris/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "brian-manning",
+    "fullName": "Brian Manning",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "San Fernando East",
+    "constituencySlug": "san-fernando-east",
+    "party": "PNM",
+    "partyFull": "People's National Movement",
+    "electionYear": 2025,
+    "regionSlugs": ["san-fernando"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "sanfernandoe@ttparliament.org",
+      "phone": "(868) 653-9436",
+      "office": "#10 Navet Road, San Fernando",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/brian-manning/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "michael-dowlath",
+    "fullName": "Dr Michael Dowlath",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "San Fernando West",
+    "constituencySlug": "san-fernando-west",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["san-fernando"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "sanfernandow@ttparliament.org",
+      "phone": "(868) 652-3386",
+      "office": "#50 Independence Avenue, San Fernando",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/dr-michael-dowlath/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "narindra-roopnarine",
+    "fullName": "Narindra Roopnarine",
+    "title": "MP",
+    "honorific": "Dr",
+    "constituency": "Naparima",
+    "constituencySlug": "naparima",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["san-fernando"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "naparima@ttparliament.org",
+      "phone": "(868) 655-2363",
+      "office": "#29 Manahambre Road, Cedar Hill, Princes Town",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/dr-narindra-roopnarine/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "aiyna-ali",
+    "fullName": "Aiyna Ali",
+    "title": "MP",
+    "honorific": "Dr",
+    "constituency": "Princes Town",
+    "constituencySlug": "princes-town",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["princes-town"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "princestown@ttparliament.org",
+      "phone": "(868) 655-5952",
+      "office": "#162 Craignish Village",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/aiyna-ali/biography/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "michelle-benjamin",
+    "fullName": "Michelle Benjamin",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Moruga/Tableland",
+    "constituencySlug": "moruga-tableland",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["princes-town"],
+    "regionConfidence": "ambiguous",
+    "contact": {
+      "email": "morugatableland@ttparliament.org",
+      "phone": "(868) 655-1958",
+      "office": "#4 Petit Cafe, Indian Walk, Princes Town",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/michelle-benjamin/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "roodal-moonilal",
+    "fullName": "Dr Roodal Moonilal",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Oropouche East",
+    "constituencySlug": "oropouche-east",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["penal-debe"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "oropouche@ttparliament.org",
+      "phone": "(868) 647-8104",
+      "office": "Debe Junction, S.S. Erin Road, Debe",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/roodal-moonilal/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "lackram-bodoe",
+    "fullName": "Dr Lackram Bodoe",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Oropouche West",
+    "constituencySlug": "oropouche-west",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["penal-debe"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "oropouchew@ttparliament.org",
+      "phone": "(868) 398-7130",
+      "office": "1280-1282 S.S. Erin Road, Batchiya Village, Penal",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/dr-lackram-bodoe/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "kamla-persad-bissessar",
+    "fullName": "Kamla Persad-Bissessar",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Siparia",
+    "constituencySlug": "siparia",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["siparia"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "siparia@ttparliament.org",
+      "phone": "(868) 647-4128",
+      "office": "Penal Junction, Penal",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/kamla-persad-bissessar/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "davendranath-tancoo",
+    "fullName": "Davendranath Tancoo",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Fyzabad",
+    "constituencySlug": "fyzabad",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["siparia", "penal-debe"],
+    "regionConfidence": "ambiguous",
+    "contact": {
+      "email": "fyzabad@ttparliament.org",
+      "phone": "(868) 677-5807",
+      "office": "Government Quarters, Unity Court, Fyzabad",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/davendranath-tancoo/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "ernesto-kesar",
+    "fullName": "Ernesto Kesar",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "Point Fortin",
+    "constituencySlug": "point-fortin",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["point-fortin"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "pointfortin@ttparliament.org",
+      "phone": "(868) 648-1086",
+      "office": "#8-10 Techier Main Road, Point Fortin",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/ernesto-kesar/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "clyde-elder",
+    "fullName": "Clyde Elder",
+    "title": "MP",
+    "honorific": "The Honourable",
+    "constituency": "La Brea",
+    "constituencySlug": "la-brea",
+    "party": "UNC",
+    "partyFull": "United National Congress",
+    "electionYear": 2025,
+    "regionSlugs": ["point-fortin", "siparia"],
+    "regionConfidence": "ambiguous",
+    "contact": {
+      "email": "labrea@ttparliament.org",
+      "phone": "(868) 648-7328",
+      "office": "#944 Three Hands Main Road, La Brea",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/clyde-elder/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "david-thomas",
+    "fullName": "David Thomas",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Tobago East",
+    "constituencySlug": "tobago-east",
+    "party": "TPP",
+    "partyFull": "Tobago People's Party",
+    "electionYear": 2025,
+    "regionSlugs": ["tobago"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "tobagoe@ttparliament.org",
+      "phone": "(868) 635-0826",
+      "office": "Corner North Side and Mason-Les Couteaux Roads, Mason Hall, Tobago",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/david-thomas/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  },
+  {
+    "nameSlug": "joel-sampson",
+    "fullName": "Joel Sampson",
+    "title": "MP",
+    "honorific": "Mr",
+    "constituency": "Tobago West",
+    "constituencySlug": "tobago-west",
+    "party": "TPP",
+    "partyFull": "Tobago People's Party",
+    "electionYear": 2025,
+    "regionSlugs": ["tobago"],
+    "regionConfidence": "clear",
+    "contact": {
+      "email": "tobagow@ttparliament.org",
+      "phone": "(868) 639-5099",
+      "office": "#5 Milford Plaza, Milford Road, Milford Bay, Tobago",
+      "parliamentProfile": "https://www.ttparliament.org/members/member/joel-sampson/"
+    },
+    "website": "",
+    "socials": {
+      "facebook": "",
+      "instagram": "",
+      "x": "",
+      "youtube": ""
+    },
+    "photo": ""
+  }
+]

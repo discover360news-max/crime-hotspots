@@ -163,11 +163,11 @@ These don't require new data — just better surfacing and packaging of what alr
 **Problem:** Everything reads at similar visual weight. Risk scores, key stats, and weekly summaries don't visually dominate. Users must read everything to find what matters.
 **Fix:** Not a full redesign — targeted emphasis. The risk score on area pages should be the biggest number. The weekly summary text should be styled as a callout, not body text. The Quick Insights section on the dashboard should take more vertical space.
 
-- [ ] Identify 3-5 specific elements that need weight increases
-- [ ] Apply font size / colour / spacing changes (within existing design tokens)
-- [ ] Re-review area page and dashboard — key numbers dominate at a glance
+- [x] Identify 3-5 specific elements that need weight increases
+- [x] Apply font size / colour / spacing changes (within existing design tokens)
+- [x] Re-review area page and dashboard — key numbers dominate at a glance
 
-**Status:** `[ ]`
+**Status:** `[x]`
 **Result:**
 **Challenges:**
 **Solution:**
@@ -189,16 +189,16 @@ The single highest-leverage growth mechanism. Data that can't be shared stays in
 
 Option B is faster to build and still highly effective. Option A is more impactful longer term.
 
-- [ ] Decide: pre-formatted text share (quick) or generated image card (impactful)
-- [ ] Implement for top-level stats on Statistics page first
-- [ ] Extend to area pages (area-specific stat share)
-- [ ] Extend to dashboard stat cards
+- [x] Decide: pre-formatted text share (quick) or generated image card (impactful)
+- [x] Implement for top-level stats on Statistics page first
+- [x] Extend to area pages (area-specific stat share)
+- [ ] Extend to dashboard stat cards (deferred — needs client-side JS for filter-aware share)
 - [ ] Re-review — test sharing flow end-to-end on mobile
 
-**Status:** `[ ]`
-**Result:**
-**Challenges:**
-**Solution:**
+**Status:** `[~]`
+**Result:** WA share icon added inline-right on each stat card's YoY/subtitle row. Statistics page: Murders + Robberies cards. Area pages: Murders YTD + Risk Level cards. Dashboard deferred (StatCard.astro is JS-driven; share text must reflect active filter state — needs client-side approach). Option A (image cards) noted as upgrade path for later.
+**Challenges:** `canonicalUrl` in statistics.astro is defined after the statCardsData block — `buildShareText` referenced it via closure causing TDZ error at build time. Fixed by defining `statsPageUrl` const before the function.
+**Solution:** `shareText?: string` added to `StatCards.astro` interface. WA link (`<a href="wa.me/?text=...">`) renders inline-right of YoY badge or subtitle in each card. `buildShareText()` helper in statistics.astro. Share text messages always name "Trinidad and Tobago" explicitly.
 
 ---
 
@@ -207,15 +207,15 @@ Option B is faster to build and still highly effective. Option A is more impactf
 **Problem:** The weekly area summary ("Incidents in Port of Spain dropped 29% this week") is the most shareable sentence on the site but has no dedicated share button next to it.
 **Fix:** Add a WhatsApp share button directly on the weekly summary text, pre-populating: "[Area] this week: [summary sentence]. Full data: [URL]". One tap, ready to forward.
 
-- [ ] Identify the weekly summary element on area pages
-- [ ] Add WhatsApp share button alongside existing X/FB/WA share row
-- [ ] Pre-populate with summary text + URL
-- [ ] Re-review area page — share button is immediately visible alongside summary
+- [x] Identify the weekly summary element on area pages
+- [x] Add WhatsApp share button alongside existing X/FB/WA share row
+- [x] Pre-populate with summary text + URL
+- [x] Re-review area page — share button is immediately visible alongside summary
 
-**Status:** `[ ]`
-**Result:**
-**Challenges:**
-**Solution:**
+**Status:** `[x]`
+**Result:** WA icon added to the right end of the AreaNarrative CTAs row (`ml-auto` separator from text links). All 4 narrative branches covered: up / down / flat / zero incidents. Icon-only style, muted slate + rose hover — consistent with stat cards. Share text mirrors the summary sentence with "Full crime data for Trinidad and Tobago: [url]" appended.
+**Challenges:** None.
+**Solution:** `shareText` computed in `AreaNarrative.astro` frontmatter from `areaSlug` (URL constructed internally — no new prop needed). WA `<a>` link added at end of `.flex` CTAs row with `ml-auto`.
 
 ---
 
@@ -369,6 +369,8 @@ Pitch headline: *"A civic accountability platform tracking parliamentary bills, 
 | March 10, 2026 | Phase 2 | P2-01 deferred | "Compare areas →" contextual link added to Top Areas card header on dashboard, left of existing "View all →". Both links now muted slate (`text-slate-400`) with rose hover — consistent secondary action treatment. Pipe separator between them. |
 | March 10, 2026 | Phase 2 | P2-03 | Latest weekly blog post surfaced in DashboardStory card as right column. Two-column layout: left = live weekly summary (existing), right = blog title (line-clamp-1) + date + "Read →". Date/Read locked to card bottom via mt-auto. Hero py reduced (py-8→py-6), wrapper py-6, Crime Statistics pt-4 removed for balanced spacing. Link colour corrected to text-rose-600 (not dark:rose-400). Single file change: `DashboardStory.astro`. |
 | March 10, 2026 | Phase 2 | P2-04 | Explore section added to homepage. 3 tiles (Areas, Murder Count, Blog) in `grid-cols-1 sm:grid-cols-3`, placed between country cards and QuickAnswers. Matches QuickAnswers header pattern (rose pill + h2). Tile hierarchy: bold title → muted xs description → rose arrow link. `text-left` on grid overrides parent `text-center`. Single file change: `index.astro`. |
+| March 10, 2026 | Phase 3 | P3-01 | WA share icon added inline-right of YoY badge on stat cards. Statistics page: Murders + Robberies. Area pages: Murders YTD + Risk Level. `shareText?` added to `StatCards.astro` interface. `buildShareText()` helper in `statistics.astro`. Dashboard deferred (filter-aware values need client-side approach). Build fix: `statsPageUrl` const defined before helper to avoid TDZ. |
+| March 10, 2026 | Phase 3 | P3-02 | WA icon added to AreaNarrative CTAs row (far-right via `ml-auto`). All 4 narrative branches covered. Share text: "[Area] this week: [summary]. Full crime data for Trinidad and Tobago: [url]". URL constructed from existing `areaSlug` prop — no new prop needed. Single component change: `AreaNarrative.astro`. |
 
 ---
 

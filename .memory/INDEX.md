@@ -29,7 +29,8 @@ L007 | LEARN | active | Risk scoring: self-calibrating weighted share of nationa
 L008 | LEARN | active | window.__crimesData: set on 5 pages; area pages use area-scoped crimes only → L008-crimes-data-flow.md
 L009 | LEARN | active | Crime counting: primary+related types per row — NOT raw row count, NOT victim count → L009-crime-counting-methodology.md
 L010 | LEARN | active | Schema centralization COMPLETE (all follow-ups resolved). crimeSchema.ts ↔ schema.gs fully in sync. crimeTypeConfig.ts has Attempted Murder. → L010-gas-schema-centralization.md
-L011 | LEARN | candidate | Utility control pattern: filled bg button + sticky bar, separate from nav CTA ghost buttons. Dashboard confirmed Mar 10 2026, global rollout TBD → L011-utility-control-pattern.md
+L011 | LEARN | active | Utility control pattern: filled bg button + sticky bar, separate from nav CTA ghost buttons. Confirmed on dashboard + compare page (Mar 10 2026) → L011-utility-control-pattern.md
+L012 | LEARN | active | Dashboard script extraction (Mar 10 2026): 869→554 lines. MapLegend.astro + dashboardMapInit.ts + dashboardLocationFilter.ts. Extraction signal: >50-line named-function script → move to src/scripts/ → L012-dashboard-script-extraction.md
 
 ## Decisions (D)
 D001 | DEC | active | Crime pages: full SSR + Cloudflare CDN 24h cache (migrated from hybrid prerender) → D001-crime-page-ssr.md
@@ -39,6 +40,7 @@ D004 | DEC | active | Slug migration: Story_ID+6words new format; legacy headlin
 D005 | DEC | active | Migrated to Astro (Dec 2025) from Vite for SSR, content collections, scalability → D005-astro-migration.md
 
 ## Features (F)
+F010 | FEAT | active | MP profiles: 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg → F010-mp-profiles.md
 F001 | FEAT | active | Security: escapeHtml, sanitizeUrl, CSP headers, Turnstile, Secure cookies → F001-security-system.md
 F002 | FEAT | active | GAS pipeline: RSS → preFilter → Claude Haiku → Sheets → CSV → site → F002-gas-automation-pipeline.md
 F003 | FEAT | active | Safety tips: 43 tips, category/context/area pages, submit form, voting → F003-safety-tips-system.md

@@ -36,6 +36,7 @@ export const routes = {
     murderCount: '/trinidad/murder-count/',
     safetyTips: '/trinidad/safety-tips/',
     safetyTipsSubmit: '/trinidad/safety-tips/submit/',
+    mps: '/trinidad/mp/',
   },
 } as const;
 
@@ -52,6 +53,7 @@ export const buildRoute = {
   safetyTipsCategory: (category: string) => `/trinidad/safety-tips/category/${slugifyParam(category)}/`,
   safetyTipsContext: (context: string) => `/trinidad/safety-tips/context/${slugifyParam(context)}/`,
   safetyTipsArea: (area: string) => `/trinidad/safety-tips/area/${area}/`,
+  mp: (nameSlug: string) => `/trinidad/mp/${nameSlug}/`,
 } as const;
 
 /** Slugify a category/context string for use in URL path segments */

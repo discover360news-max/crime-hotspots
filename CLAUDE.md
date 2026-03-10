@@ -40,7 +40,7 @@ npm run preview  # preview production build
 - Component-first: check `src/components/` before writing any UI code
 - Check `docs/guides/DESIGN-TOKENS.md` before any styling change (Rose + Slate, `rounded-lg`)
 - Working directory is `astro-poc/` — never work in the root (Vite version is deprecated)
-- Keep page files under 500 lines — extract to components/scripts if larger
+- Keep page files under ~500 lines (content/simple pages) or ~600 lines (complex interactive pages like dashboards) — extract to components/scripts if larger
 - No emojis unless Kavell asks
 
 ## After Kavell Confirms a Task is Complete

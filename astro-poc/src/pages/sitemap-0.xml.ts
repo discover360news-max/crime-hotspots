@@ -3,6 +3,7 @@ import { getTrinidadCrimes, generateNameSlug } from '../lib/crimeData';
 import { getCollection } from 'astro:content';
 import { buildRoute } from '../config/routes';
 import { slugifyCategory } from '../lib/safetyTipsHelpers';
+import mpsData from '../data/mps.json';
 
 /**
  * Main Sitemap
@@ -51,6 +52,7 @@ export const GET: APIRoute = async () => {
     { url: 'trinidad/archive/', priority: 0.7, changefreq: 'weekly' },
     { url: 'trinidad/regions/', priority: 0.6, changefreq: 'weekly' },
     { url: 'trinidad/compare/', priority: 0.5, changefreq: 'monthly' },
+    { url: 'trinidad/mp/', priority: 0.7, changefreq: 'yearly' },
     { url: 'trinidad/safety-tips/', priority: 0.8, changefreq: 'weekly' },
     { url: 'trinidad/safety-tips/submit/', priority: 0.5, changefreq: 'monthly' },
     { url: 'report/', priority: 0.6, changefreq: 'monthly' },
@@ -134,6 +136,14 @@ export const GET: APIRoute = async () => {
     changefreq: 'weekly' as const
   }));
 
+  // MP profile pages — 41 individual pages
+  const mpPages = mpsData.map(mp => ({
+    url: buildRoute.mp(mp.nameSlug).slice(1),
+    lastmod: new Date().toISOString(),
+    priority: 0.7,
+    changefreq: 'yearly' as const,
+  }));
+
   // Tip area pages (only areas with ≥3 tips)
   const areaCountMap: Record<string, number> = {};
   publishedTips.forEach((t: any) => {
@@ -161,6 +171,7 @@ export const GET: APIRoute = async () => {
     ...tipCategoryPages,
     ...tipContextPages,
     ...tipAreaPages,
+    ...mpPages,
     ...crimePages
   ];
 

@@ -22,6 +22,7 @@ import InfoPopup from '../../components/InfoPopup.astro';
 import LoadingShimmer from '../../components/LoadingShimmer.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
 import DashboardStory from '../../components/DashboardStory.astro';
+import MapLegend from '../../components/MapLegend.astro';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { getCountryName } from '../../data/countries';
 import { routes } from '../../config/routes';
@@ -269,107 +270,8 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       </div>
 
       <!-- Collapsible Legend -->
-      <details id="legendDetails" class="mt-3 group bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md border border-slate-200 dark:border-[hsl(0_0%_15%)] rounded-lg">
-        <summary class="px-4 py-2.5 cursor-pointer list-none flex items-center justify-between select-none">
-          <h3 class="text-xs font-semibold text-slate-700 dark:text-[hsl(0_0%_90%)]">
-            <span id="legendLabelClosed">View Legend</span>
-            <span id="legendLabelOpen" class="hidden">Legend</span>
-          </h3>
-          <svg id="legendChevron" class="w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_50%)] transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7 7" />
-          </svg>
-        </summary>
-        <!-- Animation wrapper: grid trick for smooth slide-down -->
-        <div id="legendBody" style="display:grid;grid-template-rows:0fr;transition:grid-template-rows 300ms ease">
-          <div style="overflow:hidden">
-        <div class="px-4 pb-3 pt-2 grid grid-cols-2 sm:grid-cols-5 gap-x-4 gap-y-2 border-t border-slate-100 dark:border-[hsl(0_0%_18%)]">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full border border-white dark:border-[hsl(0_0%_15%)] shadow-sm shrink-0" style="background:#e11d48"></span>
-            <span class="text-xs text-slate-600 dark:text-[hsl(0_0%_55%)]">Murder</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full border border-white dark:border-[hsl(0_0%_15%)] shadow-sm shrink-0" style="background:#dc2626"></span>
-            <span class="text-xs text-slate-600 dark:text-[hsl(0_0%_55%)]">Shooting</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full border border-white dark:border-[hsl(0_0%_15%)] shadow-sm shrink-0" style="background:#f97316"></span>
-            <span class="text-xs text-slate-600 dark:text-[hsl(0_0%_55%)]">Robbery</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full border border-white dark:border-[hsl(0_0%_15%)] shadow-sm shrink-0" style="background:#9333ea"></span>
-            <span class="text-xs text-slate-600 dark:text-[hsl(0_0%_55%)]">Home Invasion</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full border border-white dark:border-[hsl(0_0%_15%)] shadow-sm shrink-0" style="background:#06b6d4"></span>
-            <span class="text-xs text-slate-600 dark:text-[hsl(0_0%_55%)]">Theft</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full border border-white dark:border-[hsl(0_0%_15%)] shadow-sm shrink-0" style="background:#ec4899"></span>
-            <span class="text-xs text-slate-600 dark:text-[hsl(0_0%_55%)]">Kidnapping</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full border border-white dark:border-[hsl(0_0%_15%)] shadow-sm shrink-0" style="background:#c026d3"></span>
-            <span class="text-xs text-slate-600 dark:text-[hsl(0_0%_55%)]">Sexual Assault</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full border border-white dark:border-[hsl(0_0%_15%)] shadow-sm shrink-0" style="background:#8b5cf6"></span>
-            <span class="text-xs text-slate-600 dark:text-[hsl(0_0%_55%)]">Assault</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full border border-white dark:border-[hsl(0_0%_15%)] shadow-sm shrink-0" style="background:#3b82f6"></span>
-            <span class="text-xs text-slate-600 dark:text-[hsl(0_0%_55%)]">Seizures</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full border border-white dark:border-[hsl(0_0%_15%)] shadow-sm shrink-0" style="background:#eab308"></span>
-            <span class="text-xs text-slate-600 dark:text-[hsl(0_0%_55%)]">Burglary</span>
-          </div>
-        </div>
-          </div><!-- /overflow:hidden -->
-        </div><!-- /legendBody grid wrapper -->
-      </details>
+      <MapLegend />
     </div>
-
-  <!-- Legend slide animation -->
-  <script is:inline>
-    (function () {
-      var details = document.getElementById('legendDetails');
-      var body = document.getElementById('legendBody');
-      var chevron = document.getElementById('legendChevron');
-      var labelClosed = document.getElementById('legendLabelClosed');
-      var labelOpen = document.getElementById('legendLabelOpen');
-      if (!details || !body) return;
-
-      var isAnimating = false;
-
-      details.querySelector('summary').addEventListener('click', function (e) {
-        e.preventDefault();
-        if (isAnimating) return;
-        isAnimating = true;
-
-        if (details.open) {
-          // Close
-          body.style.gridTemplateRows = '0fr';
-          chevron.style.transform = 'rotate(0deg)';
-          labelClosed.classList.remove('hidden');
-          labelOpen.classList.add('hidden');
-          setTimeout(function () {
-            details.removeAttribute('open');
-            isAnimating = false;
-          }, 300);
-        } else {
-          // Open
-          details.setAttribute('open', '');
-          requestAnimationFrame(function () {
-            body.style.gridTemplateRows = '1fr';
-            chevron.style.transform = 'rotate(180deg)';
-            labelClosed.classList.add('hidden');
-            labelOpen.classList.remove('hidden');
-            setTimeout(function () { isAnimating = false; }, 300);
-          });
-        }
-      });
-    })();
-  </script>
 
     <!-- Top Areas -->
     <div class="mb-6">
@@ -457,52 +359,8 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
   <!-- Leaflet Map Initialization -->
   <script>
-    import { initializeLeafletMap } from '../../scripts/leafletMap';
-
-    function initMap() {
-      // Record shimmer start time per navigation (reset on each astro:page-load)
-      const mapShimmerStartTime = Date.now();
-
-      function poll() {
-        if (!window.__crimesData) {
-          setTimeout(poll, 100);
-          return;
-        }
-
-        // Get current year
-        const availableYears = [...new Set(window.__crimesData.map((c: any) => c.year))].sort((a: number, b: number) => b - a);
-        const currentYear = availableYears[0];
-        const currentYearCrimes = window.__crimesData.filter((c: any) => c.year === currentYear);
-
-        initializeLeafletMap('leafletMap', currentYearCrimes, {
-          center: [10.634963, -61.197207],
-          zoom: 8,
-          country: 'Trinidad',
-          crimeDetailPath: '/trinidad/crime/',
-          onMapReady: async () => {
-            // Hide map shimmer with minimum display time (500ms)
-            const elapsed = Date.now() - mapShimmerStartTime;
-            const remaining = Math.max(0, 500 - elapsed);
-
-            if (remaining > 0) {
-              await new Promise(resolve => setTimeout(resolve, remaining));
-            }
-
-            const mapShimmer = document.getElementById('mapShimmer');
-            const leafletMap = document.getElementById('leafletMap');
-
-            if (mapShimmer) mapShimmer.style.display = 'none';
-            if (leafletMap) leafletMap.style.opacity = '1';
-
-            console.log('✅ Map shimmer hidden, map visible');
-          }
-        });
-      }
-
-      poll();
-    }
-
-    document.addEventListener('astro:page-load', initMap);
+    import { initializeDashboardMap } from '../../scripts/dashboardMapInit';
+    document.addEventListener('astro:page-load', initializeDashboardMap);
   </script>
 
   <!-- Year Filtering Script -->
@@ -672,182 +530,10 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     window.__dashboardDefaultYear = dashboardDefaultYear;
   </script>
 
-  <!-- Region / Area filter for dashboard (module script — can use imports) -->
+  <!-- Region / Area filter for dashboard -->
   <script>
-    import { updateStatsCards, updateQuickInsights, updateTopRegions } from '../../scripts/dashboardUpdates';
-    import { updateLeafletMap } from '../../scripts/leafletMap';
-
-    // Cascade: repopulate area dropdown when region changes
-    function updateDashboardAreaOptions(selectedRegion: string) {
-      const areaSelect = document.getElementById('areaFilter') as HTMLSelectElement | null;
-      if (!areaSelect) return;
-      const currentArea = areaSelect.value;
-      areaSelect.innerHTML = '<option value="">All Areas</option>';
-      const regionToAreas = (window as any).__dashboardRegionToAreas || {};
-      const allAreas: string[] = (window as any).__dashboardAllAreas || [];
-      const areasToShow: string[] = selectedRegion ? (regionToAreas[selectedRegion] || []) : allAreas;
-      areasToShow.forEach(area => {
-        const opt = document.createElement('option');
-        opt.value = area;
-        opt.textContent = area;
-        if (area === currentArea && (!selectedRegion || (regionToAreas[selectedRegion] || []).includes(currentArea))) {
-          opt.selected = true;
-        }
-        areaSelect.appendChild(opt);
-      });
-    }
-
-    // Apply region + area filters on top of current year selection and fire all callbacks
-    function applyDashboardLocationFilter() {
-      if (!(window as any).__crimesData) return;
-
-      const yearEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
-      const regionEl = document.getElementById('regionFilter') as HTMLSelectElement | null;
-      const areaEl = document.getElementById('areaFilter') as HTMLSelectElement | null;
-      if (!yearEl || !regionEl || !areaEl) return;
-
-      const selectedYear = yearEl.value;
-      const selectedRegion = regionEl.value;
-      const selectedArea = areaEl.value;
-
-      // Start from year-filtered base (same logic as yearFilter.ts)
-      let crimes = selectedYear === 'all' || !selectedYear
-        ? (window as any).__crimesData
-        : (window as any).__crimesData.filter((c: any) => String(c.year) === selectedYear);
-
-      // Apply region filter
-      if (selectedRegion) crimes = crimes.filter((c: any) => c.region === selectedRegion);
-
-      // Apply area filter
-      if (selectedArea) crimes = crimes.filter((c: any) => c.area === selectedArea);
-
-      // Fire all dashboard callbacks with shimmer transitions
-      const statsShimmer = document.getElementById('statsShimmer');
-      const statsContainer = document.querySelector('.stats-scroll-container') as HTMLElement | null;
-      if (statsShimmer) { (statsShimmer as HTMLElement).style.opacity = '1'; (statsShimmer as HTMLElement).style.pointerEvents = ''; }
-      if (statsContainer) statsContainer.style.opacity = '0';
-      setTimeout(async () => {
-        const t = Date.now();
-        updateStatsCards(crimes, (window as any).__crimesData);
-        await (window as any).hideShimmerWithMinTime(statsShimmer, statsContainer, t);
-      }, 100);
-
-      const insightsShimmer = document.getElementById('insightsShimmer');
-      const insightsCards = document.getElementById('insightsCards') as HTMLElement | null;
-      if (insightsShimmer) { (insightsShimmer as HTMLElement).style.opacity = '1'; (insightsShimmer as HTMLElement).style.pointerEvents = ''; }
-      if (insightsCards) insightsCards.style.opacity = '0';
-      setTimeout(async () => {
-        const t = Date.now();
-        updateQuickInsights(crimes);
-        await (window as any).hideShimmerWithMinTime(insightsShimmer, insightsCards, t);
-      }, 100);
-
-      const topRegionsShimmer = document.getElementById('topRegionsShimmer');
-      const topRegionsCard = document.getElementById('topRegionsCard') as HTMLElement | null;
-      if (topRegionsShimmer) { (topRegionsShimmer as HTMLElement).style.opacity = '1'; (topRegionsShimmer as HTMLElement).style.pointerEvents = ''; }
-      if (topRegionsCard) topRegionsCard.style.opacity = '0';
-      setTimeout(async () => {
-        const t = Date.now();
-        updateTopRegions(crimes);
-        await (window as any).hideShimmerWithMinTime(topRegionsShimmer, topRegionsCard, t);
-      }, 100);
-
-      const mapShimmer = document.getElementById('mapShimmer');
-      const leafletMap = document.getElementById('leafletMap') as HTMLElement | null;
-      if (mapShimmer) { (mapShimmer as HTMLElement).style.opacity = '1'; (mapShimmer as HTMLElement).style.pointerEvents = ''; }
-      if (leafletMap) leafletMap.style.opacity = '0';
-      setTimeout(async () => {
-        const t = Date.now();
-        updateLeafletMap(crimes, '/trinidad/crime/');
-        await (window as any).hideShimmerWithMinTime(mapShimmer, leafletMap, t);
-      }, 100);
-    }
-
-    // ── Filter Active State ────────────────────────────────────────────────
-    function showDashboardFilterActive() {
-      const btn = document.getElementById('filtersBtn') as HTMLElement | null;
-      const clearBtn = document.getElementById('clearFiltersInline');
-      if (btn) {
-        btn.style.color = '#e11d48';
-        btn.style.backgroundColor = 'color-mix(in srgb, #e11d48 12%, transparent)';
-      }
-      if (clearBtn) clearBtn.classList.remove('hidden');
-    }
-
-    function hideDashboardFilterActive() {
-      const btn = document.getElementById('filtersBtn') as HTMLElement | null;
-      const clearBtn = document.getElementById('clearFiltersInline');
-      if (btn) { btn.style.color = ''; btn.style.backgroundColor = ''; }
-      if (clearBtn) clearBtn.classList.add('hidden');
-    }
-
-    function checkDashboardFilterState() {
-      // Year is visible inline — only drawer filters (Crime Type, Region, Area) light up the button
-      const crimeTypeEl = document.getElementById('crimeTypeFilter') as HTMLSelectElement | null;
-      const regionEl = document.getElementById('regionFilter') as HTMLSelectElement | null;
-      const areaEl = document.getElementById('areaFilter') as HTMLSelectElement | null;
-      const active =
-        (crimeTypeEl ? crimeTypeEl.value !== '' : false) ||
-        (regionEl ? regionEl.value !== '' : false) ||
-        (areaEl ? areaEl.value !== '' : false);
-      if (active) showDashboardFilterActive(); else hideDashboardFilterActive();
-    }
-
-    function clearDashboardFilters() {
-      const yearEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
-      const crimeTypeEl = document.getElementById('crimeTypeFilter') as HTMLSelectElement | null;
-      const regionEl = document.getElementById('regionFilter') as HTMLSelectElement | null;
-      const areaEl = document.getElementById('areaFilter') as HTMLSelectElement | null;
-      const defaultYear = (window as any).__dashboardDefaultYear || '';
-      if (yearEl && yearEl.value !== defaultYear) {
-        yearEl.value = defaultYear;
-        yearEl.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-      if (crimeTypeEl && crimeTypeEl.value !== '') {
-        crimeTypeEl.value = '';
-        crimeTypeEl.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-      if (regionEl) regionEl.value = '';
-      if (areaEl) areaEl.value = '';
-      updateDashboardAreaOptions('');
-      applyDashboardLocationFilter();
-      hideDashboardFilterActive();
-    }
-    // ─────────────────────────────────────────────────────────────────────────
-
-    function waitForLocationFilterElements() {
-      const regionEl = document.getElementById('regionFilter') as HTMLSelectElement | null;
-      const areaEl = document.getElementById('areaFilter') as HTMLSelectElement | null;
-      if (!regionEl || !areaEl) { setTimeout(waitForLocationFilterElements, 100); return; }
-
-      regionEl.addEventListener('change', () => {
-        updateDashboardAreaOptions(regionEl!.value);
-        applyDashboardLocationFilter();
-        checkDashboardFilterState();
-      });
-      areaEl.addEventListener('change', () => {
-        applyDashboardLocationFilter();
-        checkDashboardFilterState();
-      });
-
-      // Also track year and crime type filter changes for the active indicator
-      const yearEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
-      const crimeTypeEl = document.getElementById('crimeTypeFilter') as HTMLSelectElement | null;
-      if (yearEl) yearEl.addEventListener('change', checkDashboardFilterState);
-      if (crimeTypeEl) crimeTypeEl.addEventListener('change', checkDashboardFilterState);
-
-      // Wire the Clear button
-      const clearBtn = document.getElementById('clearFiltersInline');
-      if (clearBtn) clearBtn.addEventListener('click', clearDashboardFilters);
-
-      // Check initial state (in case filters are pre-set)
-      checkDashboardFilterState();
-    }
-
-    // astro:page-load fires on initial load (with ClientRouter) and after each navigation
-    document.addEventListener('astro:page-load', () => {
-      waitForLocationFilterElements();
-    });
+    import { initializeDashboardLocationFilter } from '../../scripts/dashboardLocationFilter';
+    document.addEventListener('astro:page-load', initializeDashboardLocationFilter);
   </script>
 
   <!-- Sync Stat Cards with Tray Checkboxes -->

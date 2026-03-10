@@ -2,16 +2,16 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** February 26, 2026
+**Last Updated:** March 10, 2026
 
 ---
 
-## Pages & Routes (25 pages)
+## Pages & Routes (28 pages)
 
 ### Marketing & Static
 | Page | Route | Purpose |
 |------|-------|---------|
-| Homepage | `/` | Country cards (direct link to dashboard), HomepagePulse live stats, InfoPopup |
+| Homepage | `/` | Country cards (direct link to dashboard), HomepagePulse live stats, Explore 3-tile section (Areas / Murder Count / Blog), QuickAnswers FAQ section |
 | About | `/about/` | Project background |
 | Contact | `/contact/` | Contact information |
 | Methodology | `/methodology/` | Data collection process |
@@ -25,15 +25,17 @@
 ### Trinidad Crime Data
 | Page | Route | Rendering | Purpose |
 |------|-------|-----------|---------|
-| Dashboard | `/trinidad/` | Pre-rendered | DashboardStory narrative, stats, Leaflet map, filters, trend indicators, data freshness, crime type tooltips |
+| Dashboard | `/trinidad/` | Pre-rendered | DashboardStory (two-column: live weekly narrative + latest blog post), sticky year filter bar, stat cards, Leaflet map, Filters drawer (crime type/region/area), Quick Insights card, Top Regions, trend indicators |
 | Headlines | `/trinidad/headlines/` | Pre-rendered | Latest crimes, date accordion, victim counts, empty state for filters |
 | Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | Individual crime page, safety context, related crimes, trending hotspots |
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
-| Area Detail | `/trinidad/area/[slug]` | Pre-rendered | AreaNarrative summary, "New Since" badge, compare prompt, stats, share buttons |
+| Area Detail | `/trinidad/area/[slug]` | Pre-rendered | AreaNarrative summary (text-body weight), "New Since" badge, compare prompt, stat cards (Risk Level card: larger number + level color — amber=high, emerald=low), share buttons, crime type breakdown table, related areas (sorted by crime count) |
 | Statistics | `/trinidad/statistics/` | Pre-rendered | Three-tier crime rates (previous year / YTD / projected) |
 | Regions | `/trinidad/regions/` | Pre-rendered | Browse by region |
-| Region Detail | `/trinidad/region/[slug]` | Pre-rendered | Region-specific crimes |
-| Compare | `/trinidad/compare/` | Pre-rendered | Side-by-side area comparison |
+| Region Detail | `/trinidad/region/[slug]` | Pre-rendered | Region-specific crimes. Includes "Members of Parliament" card (filters mps.json by regionSlugs, shows photo/name/party/constituency, links to MP profile). |
+| MP Index | `/trinidad/mp/` | Pre-rendered | Directory of all 41 MPs grouped by region. Each card: photo, honorific name, party badge, constituency. |
+| MP Profile | `/trinidad/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left, identity+contact right. Crime stat cards per region (reuses region page pattern). JSON-LD Person schema. Ambiguous MPs show boundary note + two region sections. Data: `src/data/mps.json`. |
+| Compare | `/trinidad/compare/` | Pre-rendered | Side-by-side area comparison. Pre-loads Port of Spain vs San Juan by default. Rose gradient hero + sticky selector bar (matches dashboard pattern). |
 | Murder Count | `/trinidad/murder-count/` | Pre-rendered | Live counter with flip animation, YoY comparison, share buttons |
 | Archive Index | `/trinidad/archive/` | Pre-rendered | Browse by year |
 | Archive Month | `/trinidad/archive/[year]/[month]` | Pre-rendered | Crimes for specific month |
@@ -98,9 +100,9 @@
 |-----------|---------|
 | DashboardInfoCards.astro | Crime summary cards |
 | StatCard.astro | Individual stat card |
-| StatCards.astro | Grid of stat cards with YoY comparisons |
+| StatCards.astro | Grid of stat cards with YoY comparisons. Optional `size: 'large'` (bumps number to text-3xl/4xl) and `riskColor: 'high'|'neutral'|'low'` (amber/slate/emerald) props — used on Risk Level card on area pages. |
 | TopRegionsCard.astro | Top regions visualization + shimmer loading |
-| QuickInsightsCard.astro | Daily avg (crimes/day + victims/day, full-width row), Peak Day + Busiest Month (2-col), Highest/Lowest Crime Area |
+| QuickInsightsCard.astro | Daily avg (crimes/day + victims/day, left column), Peak Day + Busiest Month + Highest/Lowest Crime Area (2×2 right grid). Padding p-5, gap-y-4, daily avg text-base/xl. |
 | FiltersTray.astro | Year/date filter controls |
 | DataTable.astro | Responsive table wrapper |
 
@@ -183,7 +185,8 @@
 | File | Purpose | Notes |
 |------|---------|-------|
 | csvUrls.ts | CSV data source URLs | **Single source of truth** for all CSV URLs |
-| routes.ts | All internal routes + builders | `routes.*` for static, `buildRoute.*` for dynamic |
+| routes.ts | All internal routes + builders | `routes.*` for static, `buildRoute.*` for dynamic. Includes `routes.trinidad.mps` + `buildRoute.mp(nameSlug)`. |
+| mps.json | 41 MP records | Schema: nameSlug, fullName, honorific, constituency, constituencySlug, party, partyFull, electionYear, regionSlugs, regionConfidence, contact, socials, photo. Photos in `public/images/mps/` (placeholder.svg always present). |
 | crimeTypeConfig.ts | Crime type definitions + victim count rules | Victim count applies to PRIMARY crime only |
 | siteNotifications.ts | Site notification banner content | Toggle-based enable/disable |
 | riskWeights.ts | Crime severity weights | Used by `TopRegionsCard.astro`, `dashboardUpdates.ts` (Top Regions card), and `safetyHelpers.ts` (SafetyContext). Full methodology: `docs/guides/RISK-SCORING-METHODOLOGY.md` |

@@ -1,0 +1,105 @@
+---
+/**
+ * MPs Index Page
+ * Directory of all 41 Members of Parliament, grouped by region.
+ * Route: /trinidad/mp/
+ */
+
+export const prerender = true;
+
+import Layout from '../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import Hero from '../../../components/Hero.astro';
+import mpsData from '../../../data/mps.json';
+import { generateNameSlug } from '../../../lib/crimeData';
+import { loadFullAreaData } from '../../../lib/areaAliases';
+import { routes } from '../../../config/routes';
+
+const areaData = await loadFullAreaData();
+const regionSlugToName = new Map<string, string>();
+for (const area of areaData) {
+  if (area.region) {
+    regionSlugToName.set(generateNameSlug(area.region), area.region);
+  }
+}
+
+const regionOrder = [
+  'port-of-spain', 'san-juan-laventille', 'tunapuna-piarco', 'arima',
+  'diego-martin', 'chaguanas', 'couva-tabaquite-talparo', 'sangre-grande',
+  'mayaro-rio-claro', 'san-fernando', 'princes-town', 'penal-debe',
+  'siparia', 'point-fortin', 'tobago',
+];
+
+const grouped = regionOrder.map(slug => ({
+  slug,
+  regionName: regionSlugToName.get(slug) ?? slug,
+  mps: mpsData.filter(mp => mp.regionSlugs[0] === slug),
+})).filter(g => g.mps.length > 0);
+
+const partyBadgeClass: Record<string, string> = {
+  PNM: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400',
+  UNC: 'bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400',
+  TPP: 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_65%)]',
+};
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
+  { label: 'Members of Parliament' },
+];
+
+const pageTitle = 'Members of Parliament — Trinidad & Tobago | Crime Hotspots';
+const pageDescription = 'Directory of all 41 Members of Parliament in Trinidad and Tobago, organised by region, with contact details and crime statistics for their constituencies.';
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <Hero
+    compact
+    narrowContainer={true}
+    title="Members of Parliament"
+    subtitle={`${mpsData.length} MPs across ${grouped.length} regions`}
+    primaryCTA={{ text: 'All Regions', href: routes.trinidad.regions, icon: 'arrow' }}
+  >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
+    {grouped.map(group => (
+      <section class="mt-8 first:mt-4">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)]">{group.regionName}</h2>
+          <a
+            href={`/trinidad/region/${group.slug}/`}
+            class="text-xs font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition"
+          >
+            Crime data ↗
+          </a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {group.mps.map(mp => {
+            const displayName = mp.honorific ? `${mp.honorific} ${mp.fullName}` : mp.fullName;
+            const photoSrc = mp.photo ? `/images/mps/${mp.photo}` : '/images/mps/placeholder.svg';
+            const badge = partyBadgeClass[mp.party] ?? partyBadgeClass['TPP'];
+            return (
+              <a
+                href={`/trinidad/mp/${mp.nameSlug}/`}
+                class="flex items-center gap-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-3 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm transition group"
+              >
+                <div class="shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
+                  <img src={photoSrc} alt="" class="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div class="min-w-0">
+                  <div class="text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug">{displayName}</div>
+                  <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                    <span class={`px-1.5 py-0 rounded-full text-xs font-medium ${badge}`}>{mp.party}</span>
+                    <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] truncate">{mp.constituency}</span>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    ))}
+  </main>
+</Layout>

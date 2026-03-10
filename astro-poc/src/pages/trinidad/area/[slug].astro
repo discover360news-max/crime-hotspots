@@ -123,10 +123,27 @@ function makeYoYCard(label: string, currentCount: number, previousCount: number)
   };
 }
 
+// Precompute murder stats for share text (reused in statCards and shareText)
+const areaPageUrl = `https://crimehotspots.com/trinidad/area/${slug}/`;
+const murderYTDCount = countCrimeType(crimesCurrentYTD, 'Murder');
+const murderPrevCount = countCrimeType(crimesPreviousYTD, 'Murder');
+const murderYTDChange = calculatePercentChange(murderPrevCount, murderYTDCount);
+const murderYTDDir: 'up' | 'down' | 'flat' = murderYTDCount > murderPrevCount ? 'up' : murderYTDCount < murderPrevCount ? 'down' : 'flat';
+const murderTrend = murderYTDDir === 'up'
+  ? `up ${Math.round(Math.abs(murderYTDChange))}% vs ${previousYear}`
+  : murderYTDDir === 'down'
+    ? `down ${Math.round(Math.abs(murderYTDChange))}% vs ${previousYear}`
+    : `similar to ${previousYear}`;
+const riskLevelLabel = safety.level === 'high' ? 'High Risk' : safety.level === 'low' ? 'Low Risk' : 'Stable';
+
 // Primary stat cards (visible)
 const statCards = [
   makeYoYCard('Incidents (90d)', recentCrimes90d.length, recentCrimes90dPrev.length),
-  { ...makeYoYCard('Murders (YTD)', countCrimeType(crimesCurrentYTD, 'Murder'), countCrimeType(crimesPreviousYTD, 'Murder')), highlight: true },
+  {
+    ...makeYoYCard('Murders (YTD)', murderYTDCount, murderPrevCount),
+    highlight: true,
+    shareText: `${areaName}: ${murderYTDCount} murders in ${currentYear} — ${murderTrend}. Crime data for Trinidad and Tobago: ${areaPageUrl}`,
+  },
   makeYoYCard('Robberies (YTD)', countCrimeType(crimesCurrentYTD, 'Robbery'), countCrimeType(crimesPreviousYTD, 'Robbery')),
   {
     label: 'Risk Level',
@@ -134,6 +151,7 @@ const statCards = [
     subtitle: 'out of 10',
     size: 'large' as const,
     riskColor: safety.level,
+    shareText: `${areaName} risk level: ${safety.score.toFixed(1)}/10 — ${riskLevelLabel}. Crime data for Trinidad and Tobago: ${areaPageUrl}`,
   },
 ];
 
