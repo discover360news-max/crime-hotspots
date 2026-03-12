@@ -3,7 +3,7 @@ id: C002
 type: component
 status: active
 created: 2026-03-03
-updated: 2026-03-07
+updated: 2026-03-12
 related: [B011, CFG004]
 ---
 
@@ -22,11 +22,15 @@ related: [B011, CFG004]
 **Behaviour:**
 - Suggestions hide when user types; re-show when input is cleared
 - Pagefind indexes at build time — `astro-pagefind` must be in `integrations[]` (see B011)
+- `pagefind-ui.js` is **lazy-loaded** — injected into `<head>` on first `openSearchModal()` call via `loadPagefindScript()`. Only the CSS is loaded upfront (non-blocking). Do NOT add the script back to Layout.
 
 ## Known Issues / Gotchas
 - Murder count page opts out: `includePagefind={false}` on `<Layout>` — intentional (reduces JS payload)
 - `/api/latest-crimes.json` is pre-rendered static — content only updates on site rebuild
 - See B011 — `astro-pagefind` in package.json alone is not enough; must be in astro.config.mjs
+- Pagefind clear button (`.pagefind-ui__search-clear`) does NOT fire a native `input` event — handled separately via click delegation in `watchSearchInput()`
 
 ## Change Log
 - 2026-03-03: Suggestions panel added (recent searches, latest crimes, chips)
+- 2026-03-12: Fix — result link clicks now call `closeModal()` so navigation is visible; clear button click re-shows suggestions panel
+- 2026-03-12: Perf — `pagefind-ui.js` (83KB) moved from eager Layout load to lazy injection on first modal open (INP improvement)

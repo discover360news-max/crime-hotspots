@@ -8,6 +8,25 @@
 
 ## March 2026
 
+### Search + Performance Fixes (Mar 12)
+
+**SearchModal — two bug fixes:**
+- Clicking a Pagefind result now calls `closeModal()` before navigation — modal was staying open (SPA nav happened in background, looked like nothing happened)
+- Pagefind clear button click re-shows the suggestions panel — Pagefind's clear button does not fire a native `input` event, so the empty-state handler wasn't running
+
+**LCP + INP improvements (all crime detail pages):**
+- `font-display: swap` → `font-display: optional` on both Inter `@font-face` rules in `Layout.astro` — eliminates the re-paint LCP bump (font is preloaded so it's available within the block period on first render)
+- `pagefind-ui.js` (83KB) removed from eager Layout load; now lazy-injected by `loadPagefindScript()` inside `openSearchModal()` on first call — pagefind-ui.css still loads upfront (non-blocking). Defers 83KB of JS parse/execute until user actually opens search.
+
+---
+
+### Safety Tips — Stories 520–521 (Mar 12)
+
+- **UPDATED TIP-00033** — Added Story 520 to `related_story_ids` (armed retail robbery, employees tied up — same actionable advice as false-customer entry)
+- **NEW TIP TIP-00049** — Preventing Push-In Robbery at Your Home (Home Invasion / At Home)
+
+---
+
 ### CSS Modernisation — Groups 1–5 complete (Mar 12)
 
 **~781 JS lines removed across 10 components. Full plan doc: `docs/CSS-MODERNISATION.md`.**

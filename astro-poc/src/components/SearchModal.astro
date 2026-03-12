@@ -388,9 +388,22 @@
     });
 
     document.querySelector('#search')?.addEventListener('click', (e) => {
-      if ((e.target as Element).closest('a')) {
+      const target = e.target as Element;
+
+      // Result link clicked — save history and close modal so navigation is visible
+      if (target.closest('a')) {
         const val = searchInput.value.trim();
         if (val) saveToHistory(val);
+        closeModal();
+        return;
+      }
+
+      // Clear button clicked — Pagefind doesn't fire a native input event, handle manually
+      if (target.closest('.pagefind-ui__search-clear')) {
+        setTimeout(() => {
+          renderRecentChips();
+          showSuggestions();
+        }, 50);
       }
     });
   }
@@ -407,13 +420,37 @@
     }, { once: true });
   }
 
+  // ── Lazy-load pagefind-ui.js on first open ───────────────────────────────
+  function loadPagefindScript(): Promise<void> {
+    if ((window as any).PagefindUI) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = '/pagefind/pagefind-ui.js';
+      script.onload = () => resolve();
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
   // ── Open ─────────────────────────────────────────────────────────────────
-  (window as any).openSearchModal = function() {
+  (window as any).openSearchModal = async function() {
     const dialog = document.getElementById('searchModal') as HTMLDialogElement | null;
     if (!dialog) return;
 
     document.body.style.overflow = 'hidden';
     dialog.showModal();
+
+    // Load pagefind-ui.js lazily on first open, then initialize
+    if (!pagefindUI) {
+      try {
+        await loadPagefindScript();
+      } catch {
+        const searchDiv = document.getElementById('search');
+        if (searchDiv) searchDiv.innerHTML = '<p class="text-center text-slate-500 dark:text-[hsl(0_0%_50%)] p-4">Search is currently unavailable. Please try again later.</p>';
+        hideSuggestions();
+        return;
+      }
+    }
 
     // Initialize Pagefind UI on first open (pagefindUI is reset to null on each SPA nav)
     if (!pagefindUI && (window as any).PagefindUI) {
