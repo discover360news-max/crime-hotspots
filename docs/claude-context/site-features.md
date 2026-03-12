@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 12, 2026
+**Last Updated:** March 12, 2026 (Phase 3 D1 migration complete)
 
 ---
 
@@ -57,6 +57,14 @@
 | Blog Post | `/blog/[slug]` | Individual post, "More Weekly Reports" section |
 | RSS Feed | `/rss.xml` | Blog posts + latest 20 crime headlines (pre-rendered) |
 | Social Image Generator | `/tools/social-image-generator/` | Create shareable crime stat images |
+
+### API Endpoints (SSR, D1-backed, CDN-cached)
+| Endpoint | Route | Purpose |
+|----------|-------|---------|
+| Dashboard API | `/api/dashboard/?year=2026\|2025\|all` | Pre-computed stats, trends, insights, topRegions from D1. Cache: 1h browser / ~23h CDN edge. |
+| Crimes API | `/api/crimes/?year=2026\|2025\|all` | Full Crime objects from D1 (Date fields stripped; client reconstructs `dateObj` from year/month/day). Same cache headers. |
+| Health | `/api/health.json` | Build health status (pre-rendered static) |
+| Latest Crimes | `/api/latest-crimes.json` | Latest 20 crimes for SearchModal suggestions (pre-rendered static) |
 
 ---
 
@@ -138,8 +146,8 @@
 
 | Script | Purpose |
 |--------|---------|
-| dashboardDataLoader.ts | Loads crime CSV data on client |
-| dashboardUpdates.ts | Updates dashboard on filter change |
+| dashboardDataLoader.ts | Primary path: fetches `/api/dashboard/` + `/api/crimes/` in parallel; sets `window.__crimesData`; dispatches `crimesDataReady` event; applies pre-computed stats via `applyPrecomputed*`. CSV fallback via `initializeDashboardDataFromCSV()` if API fails. |
+| dashboardUpdates.ts | Updates dashboard on filter change. Also exports `applyPrecomputedStats`, `applyPrecomputedInsights`, `applyPrecomputedTopRegions` (used by API path) + `updateCardWithTrend` (shared helper). |
 | statCardFiltering.ts | Stat card click-to-filter |
 | statsScroll.ts | Smooth scroll to stats section |
 | leafletMap.ts | Interactive Leaflet map with crime markers |
@@ -157,7 +165,7 @@
 
 | File | Purpose |
 |------|---------|
-| csvBuildPlugin.ts | Vite plugin — fetches CSV at build:start with retry (2s/4s/8s), validates rows, writes `csv-cache.json` + `health-data.json`. **NEVER use `await import()` inside hook — causes Vite runner error.** |
+| csvBuildPlugin.ts | Vite plugin — fetches CSV at build:start with retry (2s/4s/8s), validates rows, writes `csv-cache.json` + `health-data.json` + `area-aliases.json` (116 area→known_as mappings from RegionData CSV). **NEVER use `await import()` inside hook — causes Vite runner error (B012).** |
 | redirectGenerator.ts | Build-time redirect map generator — writes `src/data/redirect-map.json` (~1,984 old→new slug mappings). Static top-level imports only. |
 
 ---
@@ -166,7 +174,7 @@
 
 | Utility | Purpose | Key Exports |
 |---------|---------|-------------|
-| crimeData.ts | Fetches/parses crime CSV (server-side). Runtime fallback via bundled `csv-cache.json`. | `getTrinidadCrimes()`, `getCrimesByArea()`, `getCrimesByMonth()`, `getCrimesByRegion()`, `getAvailableYears()`, `generateNameSlug()` |
+| crimeData.ts | Fetches/parses crime CSV (server-side). Runtime fallback via bundled `csv-cache.json`. D1 query functions for SSR routes. | `getTrinidadCrimes()`, `getCrimesByArea()`, `getCrimesByMonth()`, `getCrimesByRegion()`, `getAvailableYears()`, `generateNameSlug()`, `getAllCrimesFromD1()`, `getCrimesByAreaFromD1()`, `getCrimesByRegionFromD1()`, `getCrimesByYearFromD1()`, `getCrimesByDateRangeFromD1()` |
 | csvParser.ts | Raw CSV parsing utilities. Slug generation lives here. | `parseCSVLine()`, `parseDate()`, `generateSlug()` (legacy, headline+date), `generateSlugWithId()` (current, StoryID+6 words), `createColumnMap()`, `stripQuotes()` |
 | safetyHelpers.ts | Area crime scoring + safety tip engine | `calculateAreaCrimeScore()` (1-10 scale, 90-day window), `getSafetyContext()` (returns tip + risk level), `getPrimaryCrimeType()`, `toDate()` (shared date normalizer) |
 | safetyTipsHelpers.ts | Curated safety tips utilities | `normalizedCrimeType()` (CSV type → tip category), `sortTipsByAreaRelevance()` (area-specific first), `slugifyCategory()` (category → URL slug) |
