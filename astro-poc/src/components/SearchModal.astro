@@ -143,6 +143,14 @@
     margin-bottom: 0.75rem;
     background: white;
     transition: all 0.2s;
+    position: relative;
+  }
+
+  /* Expand the link's click area to cover the entire result card */
+  #search .pagefind-ui__result-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
   }
 
   #search .pagefind-ui__result:hover {
