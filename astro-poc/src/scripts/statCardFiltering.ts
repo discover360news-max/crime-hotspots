@@ -202,10 +202,7 @@ export function initializeStatCardFiltering(callbacks: {
 export function initializeTraySync() {
   const crimeTypeDropdown = document.getElementById('crimeTypeFilter') as HTMLSelectElement;
 
-  if (!crimeTypeDropdown) {
-    console.log('⚠️ Crime type filter dropdown not found');
-    return;
-  }
+  if (!crimeTypeDropdown) return;
 
   // Global function to sync dropdown with stat card selection
   (window as any).syncCrimeTypeDropdown = function(crimeType: string, isActive: boolean) {

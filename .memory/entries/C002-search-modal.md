@@ -35,3 +35,4 @@ related: [B011, CFG004]
 - 2026-03-12: Fix — result link clicks now call `closeModal()` so navigation is visible; clear button click re-shows suggestions panel
 - 2026-03-12: Perf — `pagefind-ui.js` (83KB) moved from eager Layout load to lazy injection on first modal open (INP improvement)
 - 2026-03-12: Fix — crime pages (SSR) now indexed via `pagefindCrimeIndexer` integration (2,591 records). Root cause: Pagefind only crawls static HTML; SSR pages produce no `.html` files.
+- 2026-03-12: Fix — crime records were indexed but outranked by area pages. Area pages embed full crime headline lists (30d) in static HTML → `data-pagefind-ignore` added to that section. Indexer also updated to use `parseFullCSV` (handles embedded newlines in summaries). See B014.

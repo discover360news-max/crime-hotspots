@@ -17,10 +17,11 @@ B010 | BUG | active | Blog automation: column mismatch + noon boundary caused wr
 B011 | BUG | active | astro-pagefind MUST be in integrations[] in astro.config.mjs — package.json not enough → B011-pagefind-integration.md
 B012 | BUG | active | NEVER `await import()` inside Astro integration hooks — crashes Vite runner → B012-await-import-hooks.md
 B013 | BUG | fixed | Raw Articles sheet column is "Publish Date" not "Published Date" — caused all crime dates to use run date → B013-gas-publish-date-column-mismatch.md
-B014 | BUG | fixed | Pagefind only indexes static HTML — SSR crime pages invisible to search. Fix: `pagefindCrimeIndexer` integration (Node API custom records). Must be LAST in integrations[]. → (see recent-changes.md Mar 12)
+B014 | BUG | fixed | Pagefind: SSR crime pages invisible to search + area pages outranked custom records. Fix: `pagefindCrimeIndexer` (custom records) + `data-pagefind-ignore` on area crime list + `parseFullCSV` → B014-pagefind-crime-indexer.md
 B015 | BUG | active | Astro trailingSlash:'always' — fetch to SSR endpoints MUST use trailing slash (/api/dashboard/?year=) or 200 HTML is returned → B015-astro-trailing-slash-api-fetch.md
 B016 | BUG | active | SSR handlers: wrap ENTIRE body in try/catch, not just DB queries — uncaught throws return 200 HTML from Astro error handler → B016-ssr-handler-try-catch.md
 B017 | BUG | active | Local D1 is empty — apply schema manually before using wrangler pages dev locally → B017-local-d1-empty.md
+B018 | BUG | fixed | D1 date column stored as MM/DD/YYYY (raw CSV) — range queries with YYYY-MM-DD always returned 0 rows → trend indicators hidden. Fix: normalize in sync worker + re-sync → B018-d1-date-format-mismatch.md
 
 ## Learnings & Patterns (L)
 L001 | LEARN | active | astro:page-load is the ONLY correct pattern for interactive scripts on SPA → L001-astro-page-load-pattern.md

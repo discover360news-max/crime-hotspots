@@ -15,8 +15,8 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { createIndex } from 'pagefind';
 import {
-  parseCSVLine,
-  createColumnMap,
+  parseFullCSV,
+  createColumnMapFromArray,
   parseDate,
   generateSlug,
   generateSlugWithId,
@@ -44,17 +44,14 @@ interface CrimeRecord {
 
 /** Parse one CSV text block into minimal crime records needed for indexing */
 function parseCrimesFromCsvText(csvText: string): CrimeRecord[] {
-  const lines = csvText.split('\n');
-  if (lines.length < 2) return [];
+  const rows = parseFullCSV(csvText);
+  if (rows.length < 2) return [];
 
-  const columnMap = createColumnMap(lines[0]);
+  const columnMap = createColumnMapFromArray(rows[0]);
   const records: CrimeRecord[] = [];
 
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line.trim()) continue;
-
-    const values = parseCSVLine(line);
+  for (let i = 1; i < rows.length; i++) {
+    const values = rows[i];
     const get = (name: string): string => {
       const idx = columnMap.get(name.toLowerCase());
       return idx !== undefined ? (values[idx] ?? '').trim() : '';

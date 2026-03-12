@@ -147,6 +147,9 @@ async function syncCsvToD1(db: D1Database, csvUrl: string, year: string): Promis
         continue;
       }
 
+      // Normalize date to YYYY-MM-DD for correct string-comparison in SQL range queries
+      const normalizedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+
       // Year-prefix the PK to prevent ID collisions across years (each year's CSV restarts from 1)
       const storyId = `${year}-${rawStoryId}`;
       const oldSlug = generateSlug(headline, dateObj);
@@ -172,7 +175,7 @@ async function syncCsvToD1(db: D1Database, csvUrl: string, year: string): Promis
       stmts.push(
         db.prepare(INSERT_SQL).bind(
           storyId,
-          dateStr,
+          normalizedDate,
           headline,
           summary,
           crimeType,

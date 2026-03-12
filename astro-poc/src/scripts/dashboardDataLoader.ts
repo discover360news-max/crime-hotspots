@@ -183,15 +183,12 @@ async function initializeDashboardDataFromCSV(): Promise<void> {
 
   console.log('🔍 Loading crimes data and area aliases from CSV (fallback)...');
 
-  const [areaAliases, historicalTrendsData, crimesCurrentData] = await Promise.all([
+  const [areaAliases, crimes] = await Promise.all([
     fetchAreaAliases(REGION_DATA_CSV_URL),
-    fetchCrimesFromURL(TRINIDAD_CSV_URLS.historicalTrends),
     fetchCrimesFromURL(TRINIDAD_CSV_URLS.current)
   ]);
 
   (window as any).__areaAliases = areaAliases;
-
-  const crimes = [...historicalTrendsData, ...crimesCurrentData];
   crimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
 
   (window as any).__crimesData = crimes;

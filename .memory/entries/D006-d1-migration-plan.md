@@ -77,6 +77,7 @@ Cache headers: `public, max-age=3600, s-maxage=82800` (1h browser / ~23h CDN edg
 - 2026-03-12: Phase 3 approved — ready to start next session.
 - 2026-03-12: Phase 3 COMPLETE. Build passes (2596 rows, 116 area aliases). See files above.
 - 2026-03-12: Phase 3 bugs fixed + committed (f5884fb). Two issues found in local testing: (1) fetch URLs missing trailing slash — Astro trailingSlash:'always' requires /api/dashboard/?year= (see B015); (2) response-building code outside try/catch caused Astro to return 200 HTML on error (see B016). Both fixed. Pushed to main.
+- 2026-03-12: Post-migration cleanup: (1) removed `historicalTrends` key from csvUrls.ts + simplified CSV fallback in dashboardDataLoader.ts (60+ days of 2026 data makes historical snippet obsolete); (2) fixed D1 date format — sync worker was storing raw MM/DD/YYYY, breaking date-range trend queries. Normalized to YYYY-MM-DD, re-synced 2,591 rows, purged CDN cache (see B018).
 
 ## Deferred Cleanup
-- Remove `historicalTrends` key from `TRINIDAD_CSV_URLS` in `src/config/csvUrls.ts` once production is confirmed healthy (no docs.google.com requests in Network tab)
+- ~~Remove `historicalTrends` key from `TRINIDAD_CSV_URLS`~~ — DONE Mar 12, 2026. Key removed from `csvUrls.ts`; fallback in `dashboardDataLoader.ts` simplified to fetch only `current`. 60+ days of 2026 data makes cross-year historical snippet unnecessary.

@@ -26,9 +26,6 @@ export const TRINIDAD_CSV_URLS = {
   // This is the "live" sheet that the website fetches
   current: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
 
-  // Historical snippet for client-side trend calculations (Nov-Dec 2025, ~60 days)
-  // Used only by dashboard for comparing current stats to historical baseline
-  historicalTrends: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1728695070&single=true&output=csv'
 } as const;
 
 /**
