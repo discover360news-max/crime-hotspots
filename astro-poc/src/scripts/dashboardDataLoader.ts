@@ -4,7 +4,7 @@
  */
 
 // Import shared utilities - SINGLE SOURCE OF TRUTH
-import { parseCSVLine, parseDate, generateSlug, generateSlugWithId, createColumnMap, getColumnValue } from '../lib/csvParser';
+import { parseCSVLine, parseDate, generateSlug, generateSlugWithId, getColumnValue, parseFullCSV, createColumnMapFromArray } from '../lib/csvParser';
 import { TRINIDAD_CSV_URLS, REGION_DATA_CSV_URL } from '../config/csvUrls';
 
 // Re-export for backwards compatibility with any code that imports from here
@@ -19,21 +19,19 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
   try {
     const response = await fetch(url);
     const csvText = await response.text();
-    const lines = csvText.split('\n');
+    const rows = parseFullCSV(csvText);
 
-    // Parse headers and create column mapping using shared utility
-    const columnMap = createColumnMap(lines[0]);
+    if (rows.length < 2) return [];
+
+    const columnMap = createColumnMapFromArray(rows[0]);
 
     // Debug: Log all column headers found
     console.log('📋 CSV Column Headers:', Array.from(columnMap.keys()));
 
     const crimes: any[] = [];
 
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
-      if (!line.trim()) continue;
-
-      const values = parseCSVLine(line);
+    for (let i = 1; i < rows.length; i++) {
+      const values = rows[i];
 
       // Helper function using shared getColumnValue
       const getColumn = (columnName: string): string => getColumnValue(values, columnMap, columnName);
@@ -116,10 +114,11 @@ export async function fetchAreaAliases(url: string): Promise<Record<string, stri
   try {
     const response = await fetch(url);
     const csvText = await response.text();
-    const lines = csvText.split('\n');
+    const rows = parseFullCSV(csvText);
 
-    // Parse headers using shared utility
-    const columnMap = createColumnMap(lines[0]);
+    if (rows.length < 2) return {};
+
+    const columnMap = createColumnMapFromArray(rows[0]);
 
     const areaIndex = columnMap.get('area');
     const knownAsIndex = columnMap.get('known_as');
@@ -131,13 +130,10 @@ export async function fetchAreaAliases(url: string): Promise<Record<string, stri
 
     const aliases: Record<string, string> = {};
 
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i];
-      if (!line.trim()) continue;
-
-      const values = parseCSVLine(line);
-      const area = values[areaIndex]?.trim();
-      const knownAs = values[knownAsIndex]?.trim();
+    for (let i = 1; i < rows.length; i++) {
+      const values = rows[i];
+      const area = values[areaIndex];
+      const knownAs = values[knownAsIndex];
 
       if (area && knownAs && knownAs !== area) {
         aliases[area] = knownAs;

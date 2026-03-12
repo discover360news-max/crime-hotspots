@@ -9,7 +9,7 @@
  * - This reduces build time significantly (from ~30 min to ~5-10 min)
  */
 
-import { parseCSVLine, parseDate, generateSlug, generateSlugWithId, createColumnMap, getColumnValue, generateNameSlug } from './csvParser';
+import { parseDate, generateSlug, generateSlugWithId, getColumnValue, generateNameSlug, parseFullCSV, createColumnMapFromArray } from './csvParser';
 export { generateNameSlug }; // Re-exported for backward compatibility — canonical definition is in csvParser.ts
 import { TRINIDAD_CSV_URLS } from '../config/csvUrls';
 import csvCacheRaw from '../data/csv-cache.json';
@@ -94,22 +94,18 @@ export interface Crime {
  * Uses column header mapping so column order doesn't matter.
  */
 function parseCrimeDataFromText(csvText: string): Crime[] {
-  const lines = csvText.split('\n');
-  if (lines.length < 2) return [];
+  const rows = parseFullCSV(csvText);
+  if (rows.length < 2) return [];
 
-  // Parse headers and create column mapping using shared utility
-  const columnMap = createColumnMap(lines[0]);
+  const columnMap = createColumnMapFromArray(rows[0]);
 
   // Debug: Log all column headers found (only once per session)
   console.log('📋 CSV Column Headers:', Array.from(columnMap.keys()));
 
   const crimes: Crime[] = [];
 
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line.trim()) continue;
-
-    const values = parseCSVLine(line);
+  for (let i = 1; i < rows.length; i++) {
+    const values = rows[i];
 
     // Helper function using shared getColumnValue — never accesses by index directly
     const getColumn = (columnName: string): string => getColumnValue(values, columnMap, columnName);
@@ -329,3 +325,101 @@ export async function getAvailableAreas(): Promise<string[]> {
   return Array.from(areas).sort();
 }
 
+// ============================================================================
+// D1 DATABASE QUERIES (SSR runtime only — pre-rendered pages use getTrinidadCrimes())
+// ============================================================================
+
+interface D1CrimeRow {
+  story_id: string;
+  date: string;
+  headline: string;
+  summary: string | null;
+  crime_type: string | null;
+  primary_crime_type: string | null;
+  related_crime_types: string | null;
+  victim_count: number | null;
+  street: string | null;
+  area: string | null;
+  region: string | null;
+  url: string | null;
+  source: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  date_published: string | null;
+  date_updated: string | null;
+  slug: string;
+  old_slug: string;
+  year: number;
+  month: number;
+  day: number;
+}
+
+function mapD1RowToCrime(row: D1CrimeRow): Crime {
+  // Reconstruct dateObj from stored year/month/day (avoids re-parsing the date string)
+  const dateObj = new Date(row.year, row.month - 1, row.day);
+
+  const datePublishedObj = row.date_published ? parseDate(row.date_published) : undefined;
+  const dateUpdatedObj = row.date_updated ? parseDate(row.date_updated) : undefined;
+
+  return {
+    date: row.date,
+    headline: row.headline,
+    crimeType: row.crime_type ?? '',
+    primaryCrimeType: row.primary_crime_type ?? undefined,
+    relatedCrimeTypes: row.related_crime_types ?? undefined,
+    // victim_count NULL means 2025 row (not yet collected) — app layer defaults to 1
+    victimCount: row.victim_count ?? undefined,
+    street: row.street ?? '',
+    area: row.area ?? '',
+    region: row.region ?? '',
+    url: row.url ?? '',
+    source: row.source ?? '',
+    latitude: row.latitude ?? 0,
+    longitude: row.longitude ?? 0,
+    summary: row.summary ?? '',
+    datePublished: datePublishedObj && !isNaN(datePublishedObj.getTime()) ? datePublishedObj : undefined,
+    dateUpdated: dateUpdatedObj && !isNaN(dateUpdatedObj.getTime()) ? dateUpdatedObj : undefined,
+    slug: row.slug,
+    // Strip year-prefix added by sync worker (e.g. "2025-1" → "1") to keep storyId consistent with CSV-parsed crimes
+    storyId: row.story_id.replace(/^\d{4}-/, ''),
+    oldSlug: row.old_slug,
+    dateObj,
+    year: row.year,
+    month: row.month,
+    day: row.day,
+  };
+}
+
+/**
+ * Fetch ALL crimes from D1, sorted newest-first.
+ * Use this in SSR pages (pass Astro.locals.runtime.env.DB).
+ * Pre-rendered pages continue using getTrinidadCrimes() at build time.
+ */
+export async function getAllCrimesFromD1(db: D1Database): Promise<Crime[]> {
+  const { results } = await db
+    .prepare('SELECT * FROM crimes ORDER BY year DESC, month DESC, day DESC')
+    .all<D1CrimeRow>();
+  return results.map(mapD1RowToCrime);
+}
+
+/**
+ * Get crimes for a specific area from D1.
+ */
+export async function getCrimesByAreaFromD1(db: D1Database, area: string): Promise<Crime[]> {
+  const { results } = await db
+    .prepare('SELECT * FROM crimes WHERE LOWER(area) = LOWER(?) ORDER BY year DESC, month DESC, day DESC')
+    .bind(area)
+    .all<D1CrimeRow>();
+  return results.map(mapD1RowToCrime);
+}
+
+/**
+ * Get crimes for a specific region from D1.
+ */
+export async function getCrimesByRegionFromD1(db: D1Database, region: string): Promise<Crime[]> {
+  const { results } = await db
+    .prepare('SELECT * FROM crimes WHERE LOWER(region) = LOWER(?) ORDER BY year DESC, month DESC, day DESC')
+    .bind(region)
+    .all<D1CrimeRow>();
+  return results.map(mapD1RowToCrime);
+}

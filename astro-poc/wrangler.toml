@@ -1,0 +1,11 @@
+name = "crime-hotspots"
+compatibility_date = "2025-01-01"
+
+# D1 binding for local development (wrangler pages dev)
+# Also add this binding in the Cloudflare Dashboard:
+#   Pages → crime-hotspots → Settings → Functions → D1 database bindings
+#   Variable name: DB | D1 database: crime-hotspots-db
+[[d1_databases]]
+binding = "DB"
+database_name = "crime-hotspots-db"
+database_id = "23311480-68d6-45ec-b351-e6185a5af80a"

@@ -7,7 +7,7 @@
  */
 
 import Layout from '../../../layouts/Layout.astro';
-import { getTrinidadCrimes, type Crime } from '../../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1, type Crime } from '../../../lib/crimeData';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import ReportIssueModal from '../../../components/ReportIssueModal.astro';
 import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
@@ -27,8 +27,11 @@ import CompactTipCard from '../../../components/CompactTipCard.astro';
 import { normalizedCrimeType, sortTipsByAreaRelevance } from '../../../lib/safetyTipsHelpers';
 
 // Fetch all crimes once per request (used for slug lookup, navigation, and safety context)
+// At runtime on Cloudflare: use D1 (low-latency, always fresh, no Google Sheets dependency).
+// Fallback to CSV fetch when DB binding is absent (local astro dev, not wrangler pages dev).
 const { slug } = Astro.params;
-const allCrimes = await getTrinidadCrimes();
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 const crime = allCrimes.find(c => c.slug === slug);
 
 // Fallback: check if this is a legacy slug → 301 to new URL

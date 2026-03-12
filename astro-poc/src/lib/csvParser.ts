@@ -7,35 +7,59 @@
  * - src/lib/areaAliases.ts (client-side)
  *
  * Created: Jan 17, 2026
+ * Updated: Mar 2026 — replaced hand-rolled parser with Papaparse (Phase 1 D1 migration)
  */
+
+import Papa from 'papaparse';
 
 /**
- * Parse CSV line handling quoted commas
- * Properly handles fields that contain commas within quotes
+ * Parse a single CSV line into an array of field values.
+ * Backed by Papaparse — handles "" escaped quotes correctly.
+ * For full-file parsing (including embedded newlines), use parseFullCSV().
  *
  * @param line - Single line from CSV
- * @returns Array of field values
+ * @returns Array of trimmed field values
  */
 export function parseCSVLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
+  const result = Papa.parse<string[]>(line, {
+    header: false,
+    skipEmptyLines: false,
+    transform: (value: string) => value.trim(),
+  });
+  return (result.data[0] as string[]) ?? [];
+}
 
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
+/**
+ * Parse a full CSV text into a 2D array of rows × fields.
+ * Handles quoted commas, "" escaped quotes, and embedded newlines.
+ * Row 0 is the header row; rows 1+ are data rows.
+ * Empty lines are skipped automatically.
+ *
+ * @param csvText - Full CSV text string
+ * @returns string[][] where [0] is headers, [1..] are data rows
+ */
+export function parseFullCSV(csvText: string): string[][] {
+  const result = Papa.parse<string[]>(csvText, {
+    header: false,
+    skipEmptyLines: true,
+    transform: (value: string) => value.trim(),
+  });
+  return result.data as string[][];
+}
 
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-
-  result.push(current.trim());
-  return result;
+/**
+ * Build a column-name → index map from an already-parsed header row.
+ * Column names are normalised to lowercase for case-insensitive lookup.
+ *
+ * @param headers - Parsed header row (string[])
+ * @returns Map of lowercase column name to zero-based column index
+ */
+export function createColumnMapFromArray(headers: string[]): Map<string, number> {
+  const columnMap = new Map<string, number>();
+  headers.forEach((header, index) => {
+    columnMap.set(header.trim().toLowerCase(), index);
+  });
+  return columnMap;
 }
 
 /**

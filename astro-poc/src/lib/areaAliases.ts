@@ -11,7 +11,7 @@
  * const localName = aliases.get('Warrenville'); // Returns local name or undefined
  */
 
-import { parseCSVLine, stripQuotes } from './csvParser';
+import { parseFullCSV, stripQuotes } from './csvParser';
 import { REGION_DATA_CSV_URL, REGION_POPULATION_CSV_URL } from '../config/csvUrls';
 
 export interface AreaInfo {
@@ -45,11 +45,10 @@ export async function loadAreaAliases(): Promise<Map<string, string>> {
  * Parses CSV text and creates area -> local name map
  */
 export function parseAreaAliases(csvText: string): Map<string, string> {
-  const lines = csvText.trim().split('\n');
-  if (lines.length < 2) return new Map();
+  const rows = parseFullCSV(csvText);
+  if (rows.length < 2) return new Map();
 
-  const headerLine = lines[0];
-  const headers = parseCSVLine(headerLine).map((h) => stripQuotes(h));
+  const headers = rows[0].map((h) => stripQuotes(h));
 
   // Find column indices
   const areaIndex = headers.indexOf('Area');
@@ -62,13 +61,8 @@ export function parseAreaAliases(csvText: string): Map<string, string> {
 
   const aliasMap = new Map<string, string>();
 
-  // Parse data rows
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-
-    const columns = parseCSVLine(line).map((col) => stripQuotes(col));
-
+  for (let i = 1; i < rows.length; i++) {
+    const columns = rows[i].map((col) => stripQuotes(col));
     const area = columns[areaIndex];
     const knownAs = columns[knownAsIndex];
 
@@ -118,10 +112,10 @@ export async function loadRegionPopulations(): Promise<Map<string, number>> {
 }
 
 export function parseRegionPopulations(csvText: string): Map<string, number> {
-  const lines = csvText.trim().split('\n');
-  if (lines.length < 2) return new Map();
+  const rows = parseFullCSV(csvText);
+  if (rows.length < 2) return new Map();
 
-  const headers = parseCSVLine(lines[0]).map(h => stripQuotes(h).trim());
+  const headers = rows[0].map(h => stripQuotes(h));
   const regionIndex = headers.indexOf('Region');
   const populationIndex = headers.indexOf('population');
 
@@ -132,11 +126,8 @@ export function parseRegionPopulations(csvText: string): Map<string, number> {
 
   const map = new Map<string, number>();
 
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-
-    const cols = parseCSVLine(line).map(c => stripQuotes(c).trim());
+  for (let i = 1; i < rows.length; i++) {
+    const cols = rows[i].map(c => stripQuotes(c));
     const region = cols[regionIndex];
     const popStr = cols[populationIndex];
 
@@ -186,11 +177,10 @@ export async function loadFullAreaData(): Promise<AreaInfo[]> {
  * Parses CSV text and returns full AreaInfo array
  */
 export function parseFullAreaData(csvText: string): AreaInfo[] {
-  const lines = csvText.trim().split('\n');
-  if (lines.length < 2) return [];
+  const rows = parseFullCSV(csvText);
+  if (rows.length < 2) return [];
 
-  const headerLine = lines[0];
-  const headers = parseCSVLine(headerLine).map((h) => stripQuotes(h));
+  const headers = rows[0].map((h) => stripQuotes(h));
 
   const areaIndex = headers.indexOf('Area');
   const regionIndex = headers.indexOf('Region');
@@ -205,12 +195,8 @@ export function parseFullAreaData(csvText: string): AreaInfo[] {
   const areas: AreaInfo[] = [];
   const seenAreas = new Set<string>();
 
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-
-    const columns = parseCSVLine(line).map((col) => stripQuotes(col));
-
+  for (let i = 1; i < rows.length; i++) {
+    const columns = rows[i].map((col) => stripQuotes(col));
     const area = columns[areaIndex];
     if (!area) continue;
 
