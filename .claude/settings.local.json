@@ -125,7 +125,8 @@
       "WebFetch(domain:github.com)",
       "Bash(npm update:*)",
       "Bash(node -e:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(npm show:*)"
     ],
     "deny": [],
     "ask": []

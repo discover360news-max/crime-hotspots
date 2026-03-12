@@ -55,7 +55,7 @@ const styles = styleVariants[notification.type];
   data-notification-id={notification.id}
   class={`${styles.bg} ${styles.border} border rounded-lg p-4 mb-6 relative`}
   data-pagefind-ignore
-  style="display: none;"
+  hidden
 >
   <div class="flex items-start gap-3">
     <!-- Info Icon -->
@@ -122,7 +122,7 @@ const styles = styleVariants[notification.type];
     const dismissed = localStorage.getItem(`notification-dismissed-${notificationId}`);
     if (dismissed !== 'true') {
       // Show banner if not dismissed
-      banner.style.display = 'block';
+      (banner as HTMLElement).hidden = false;
     }
   }
 
@@ -142,7 +142,7 @@ const styles = styleVariants[notification.type];
       localStorage.setItem(`notification-dismissed-${notificationId}`, 'true');
 
       // Hide banner immediately (no flash on subsequent page loads)
-      banner.style.display = 'none';
+      (banner as HTMLElement).hidden = true;
     });
   }
 

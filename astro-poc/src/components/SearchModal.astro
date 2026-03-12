@@ -6,89 +6,282 @@
  */
 ---
 
-<!-- Modal Overlay -->
-<div
+<dialog
   id="searchModal"
-  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4"
+  class="m-auto p-0 bg-white dark:bg-[hsl(0_0%_8%)] backdrop-blur-xl rounded-2xl shadow-2xl border-0 outline-none"
+  aria-labelledby="searchModalTitle"
   data-pagefind-ignore
 >
-  <!-- Modal Content -->
-  <div
-    id="searchModalContent"
-    class="bg-white dark:bg-[hsl(0_0%_8%)] backdrop-blur-xl rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] opacity-0 scale-95 transition-all duration-300 flex flex-col"
-  >
-    <!-- Header -->
-    <div class="sticky top-0 bg-white/90 dark:bg-[hsl(0_0%_8%)]/95 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
-      <h2 class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Search Crime Hotspots</h2>
-      <button
-        id="closeSearchModal"
-        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-200 transition text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
-        aria-label="Close"
-      >
-        <span class="text-2xl leading-none">×</span>
-      </button>
-    </div>
+  <!-- Header -->
+  <div class="sticky top-0 bg-white/90 dark:bg-[hsl(0_0%_8%)]/95 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
+    <h2 id="searchModalTitle" class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Search Crime Hotspots</h2>
+    <button
+      id="closeSearchModal"
+      class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-200 transition text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
+      aria-label="Close"
+    >
+      <span class="text-2xl leading-none">×</span>
+    </button>
+  </div>
 
-    <!-- Search Container -->
-    <div class="flex-1 overflow-y-auto p-6">
-      <div id="search"></div>
+  <!-- Search Container -->
+  <div class="flex-1 overflow-y-auto p-6">
+    <div id="search"></div>
 
-      <!-- Suggestions panel — shown when search input is empty -->
-      <div id="searchSuggestions" class="mt-2 space-y-5">
+    <!-- Suggestions panel — shown when search input is empty -->
+    <div id="searchSuggestions" class="mt-2 space-y-5">
 
-        <!-- Recent searches (rendered by JS if localStorage has entries) -->
-        <div id="recentSearchesSection" class="hidden">
-          <p class="text-xs font-semibold text-slate-400 dark:text-[hsl(0_0%_45%)] uppercase tracking-wide mb-2">Recent</p>
-          <div id="recentChips" class="flex flex-wrap gap-2"></div>
-        </div>
+      <!-- Recent searches (rendered by JS if localStorage has entries) -->
+      <div id="recentSearchesSection" class="hidden">
+        <p class="text-xs font-semibold text-slate-400 dark:text-[hsl(0_0%_45%)] uppercase tracking-wide mb-2">Recent</p>
+        <div id="recentChips" class="flex flex-wrap gap-2"></div>
+      </div>
 
-        <!-- Latest crimes (rendered by JS after fetch) -->
-        <div id="latestCrimesSection" class="hidden">
-          <p class="text-xs font-semibold text-slate-400 dark:text-[hsl(0_0%_45%)] uppercase tracking-wide mb-2">Latest Crimes</p>
-          <div id="latestCrimeCards" class="space-y-2"></div>
-        </div>
+      <!-- Latest crimes (rendered by JS after fetch) -->
+      <div id="latestCrimesSection" class="hidden">
+        <p class="text-xs font-semibold text-slate-400 dark:text-[hsl(0_0%_45%)] uppercase tracking-wide mb-2">Latest Crimes</p>
+        <div id="latestCrimeCards" class="space-y-2"></div>
+      </div>
 
-        <!-- Static prompt chips -->
-        <div>
-          <p class="text-xs font-semibold text-slate-400 dark:text-[hsl(0_0%_45%)] uppercase tracking-wide mb-2">Try searching for</p>
-          <div class="flex flex-wrap gap-2">
-            {["Murder", "Shooting", "Robbery", "Burglary", "Assault", "Kidnapping", "Seizures", "Port of Spain", "Laventille", "San Fernando"].map(term => (
-              <button
-                class="search-chip px-3 py-1.5 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_70%)] text-xs font-medium hover:border-rose-500 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 active:bg-rose-100 transition"
-                data-term={term}
-              >
-                {term}
-              </button>
-            ))}
-          </div>
+      <!-- Static prompt chips -->
+      <div>
+        <p class="text-xs font-semibold text-slate-400 dark:text-[hsl(0_0%_45%)] uppercase tracking-wide mb-2">Try searching for</p>
+        <div class="flex flex-wrap gap-2">
+          {["Murder", "Shooting", "Robbery", "Burglary", "Assault", "Kidnapping", "Seizures", "Port of Spain", "Laventille", "San Fernando"].map(term => (
+            <button
+              class="search-chip px-3 py-1.5 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_70%)] text-xs font-medium hover:border-rose-500 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 active:bg-rose-100 transition"
+              data-term={term}
+            >
+              {term}
+            </button>
+          ))}
         </div>
       </div>
     </div>
-
-    <!-- Footer Help Text -->
-    <div class="px-6 pb-6 pt-2 border-t border-slate-200 dark:border-[hsl(0_0%_18%)]">
-      <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] text-center">
-        Search through all crime incidents · Search by location, crime type, or keywords
-      </p>
-    </div>
   </div>
-</div>
 
-<script is:inline>
+  <!-- Footer Help Text -->
+  <div class="px-6 pb-6 pt-2 border-t border-slate-200 dark:border-[hsl(0_0%_18%)]">
+    <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] text-center">
+      Search through all crime incidents · Search by location, crime type, or keywords
+    </p>
+  </div>
+</dialog>
+
+<style is:global>
+  /* ── Dialog sizing & flex layout ─────────────────────────────────────────── */
+  #searchModal {
+    width: calc(100% - 2rem);
+    max-width: 48rem; /* same as max-w-3xl */
+    max-height: 85vh;
+  }
+
+  #searchModal[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Open animation — browser picks up @starting-style as the FROM state */
+  #searchModal[open] {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  @starting-style {
+    #searchModal[open] {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+
+  /* Close animation — JS adds this class, removes it after transitionend */
+  #searchModal.is-closing {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  /* Backdrop */
+  #searchModal::backdrop {
+    background: rgb(0 0 0 / 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  @starting-style {
+    #searchModal[open]::backdrop {
+      opacity: 0;
+    }
+  }
+  #searchModal.is-closing::backdrop {
+    opacity: 0;
+  }
+
+  /* ── Pagefind UI — Light mode ───────────────────────────────────────────── */
+  #search .pagefind-ui__search-input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    color: #334155;
+    background: white;
+    transition: all 0.2s;
+  }
+
+  #search .pagefind-ui__search-input:focus {
+    outline: none;
+    border-color: #e11d48;
+    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1);
+  }
+
+  #search .pagefind-ui__result {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background: white;
+    transition: all 0.2s;
+  }
+
+  #search .pagefind-ui__result:hover {
+    border-color: #e11d48;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  #search .pagefind-ui__result-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.5rem;
+  }
+
+  #search .pagefind-ui__result-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  #search .pagefind-ui__result-link:hover .pagefind-ui__result-title {
+    color: #e11d48;
+  }
+
+  #search .pagefind-ui__result-excerpt {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  #search .pagefind-ui__message {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+    font-size: 0.875rem;
+  }
+
+  #search mark {
+    background-color: #fef3c7;
+    color: #92400e;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+  }
+
+  #search .pagefind-ui__button {
+    background: #e11d48;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  #search .pagefind-ui__button:hover {
+    background: #be123c;
+  }
+
+  /* ── Pagefind UI — Dark mode ────────────────────────────────────────────── */
+  .dark #search .pagefind-ui__search-input {
+    background: hsl(0 0% 12%);
+    border-color: hsl(0 0% 22%);
+    color: hsl(0 0% 90%);
+  }
+
+  .dark #search .pagefind-ui__search-input::placeholder {
+    color: hsl(0 0% 45%);
+  }
+
+  .dark #search .pagefind-ui__search-input:focus {
+    border-color: #e11d48;
+    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.15);
+  }
+
+  .dark #search .pagefind-ui__result {
+    background: hsl(0 0% 11%);
+    border-color: hsl(0 0% 20%);
+  }
+
+  .dark #search .pagefind-ui__result:hover {
+    border-color: #e11d48;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  }
+
+  .dark #search .pagefind-ui__result-title {
+    color: hsl(0 0% 90%);
+  }
+
+  .dark #search .pagefind-ui__result-link:hover .pagefind-ui__result-title {
+    color: #fb7185;
+  }
+
+  .dark #search .pagefind-ui__result-excerpt {
+    color: hsl(0 0% 60%);
+  }
+
+  .dark #search .pagefind-ui__message {
+    color: hsl(0 0% 55%);
+  }
+
+  .dark #search mark {
+    background-color: hsl(38 80% 20%);
+    color: hsl(38 80% 75%);
+  }
+
+  .dark #search .pagefind-ui__search-clear {
+    color: hsl(0 0% 50%);
+  }
+
+  .dark #search .pagefind-ui__search-clear:hover {
+    color: hsl(0 0% 80%);
+  }
+
+  .dark #search .pagefind-ui__button {
+    background: #e11d48;
+  }
+
+  .dark #search .pagefind-ui__button:hover {
+    background: #be123c;
+  }
+</style>
+
+<script>
+  // NOTE: Module script — runs ONCE per session.
+  // pagefindUI and latestCrimesFetched are reset in astro:page-load so
+  // Pagefind re-mounts cleanly into the fresh DOM after each SPA nav.
+
   const HISTORY_KEY = 'ch_search_history';
   const MAX_HISTORY = 5;
+  let pagefindUI: any = null;
+  let latestCrimesFetched = false;
 
-  const modal = document.getElementById('searchModal');
-  const modalContent = document.getElementById('searchModalContent');
-  const closeBtn = document.getElementById('closeSearchModal');
-  let pagefindUI = null;
-
-  // ── History helpers ────────────────────────────────────────────────────────
-  function getHistory() {
+  // ── History helpers ──────────────────────────────────────────────────────
+  function getHistory(): string[] {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
   }
 
-  function saveToHistory(term) {
+  function saveToHistory(term: string) {
     if (!term || term.trim().length < 2) return;
     const clean = term.trim();
     let history = getHistory().filter(t => t.toLowerCase() !== clean.toLowerCase());
@@ -113,9 +306,7 @@
     bindChips(container);
   }
 
-  // ── Latest crimes ─────────────────────────────────────────────────────────
-  let latestCrimesFetched = false;
-
+  // ── Latest crimes ────────────────────────────────────────────────────────
   async function fetchAndRenderLatestCrimes() {
     if (latestCrimesFetched) return;
     latestCrimesFetched = true;
@@ -127,7 +318,7 @@
       if (!res.ok) return;
       const { crimes } = await res.json();
       if (!crimes || crimes.length === 0) return;
-      container.innerHTML = crimes.map(c => `
+      container.innerHTML = crimes.map((c: any) => `
         <a href="/trinidad/crime/${c.slug}/"
            class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_20%)] hover:border-rose-500 dark:hover:border-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition group"
         >
@@ -144,9 +335,9 @@
     }
   }
 
-  // ── Chip interaction ───────────────────────────────────────────────────────
-  function triggerSearch(term) {
-    const searchInput = document.querySelector('#search input');
+  // ── Chip interaction ─────────────────────────────────────────────────────
+  function triggerSearch(term: string) {
+    const searchInput = document.querySelector<HTMLInputElement>('#search input');
     if (!searchInput) return;
     searchInput.value = term;
     searchInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -154,35 +345,33 @@
     hideSuggestions();
   }
 
-  function bindChips(container) {
-    container.querySelectorAll('.search-chip').forEach(btn => {
-      btn.addEventListener('click', () => triggerSearch(btn.dataset.term));
+  function bindChips(container: Element | null) {
+    if (!container) return;
+    container.querySelectorAll<HTMLElement>('.search-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (btn.dataset.term) triggerSearch(btn.dataset.term);
+      });
     });
   }
 
-  // Bind static chips (already in DOM)
-  const suggestionsPanel = document.getElementById('searchSuggestions');
-  bindChips(suggestionsPanel);
-
-  // ── Show / hide suggestions based on input state ──────────────────────────
+  // ── Show / hide suggestions ──────────────────────────────────────────────
   function showSuggestions() {
-    if (suggestionsPanel) suggestionsPanel.classList.remove('hidden');
+    document.getElementById('searchSuggestions')?.classList.remove('hidden');
   }
 
   function hideSuggestions() {
-    if (suggestionsPanel) suggestionsPanel.classList.add('hidden');
+    document.getElementById('searchSuggestions')?.classList.add('hidden');
   }
 
   function watchSearchInput() {
-    const searchInput = document.querySelector('#search input');
+    const searchInput = document.querySelector<HTMLInputElement>('#search input');
     if (!searchInput) return;
 
-    let saveTimer;
+    let saveTimer: ReturnType<typeof setTimeout>;
     searchInput.addEventListener('input', () => {
       const val = searchInput.value.trim();
       if (val.length > 0) {
         hideSuggestions();
-        // Debounce saving — only save after user stops typing for 1.5s
         clearTimeout(saveTimer);
         saveTimer = setTimeout(() => saveToHistory(val), 1500);
       } else {
@@ -191,7 +380,6 @@
       }
     });
 
-    // Also save on Enter key
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         const val = searchInput.value.trim();
@@ -199,29 +387,38 @@
       }
     });
 
-    // Save when user clicks a result link
     document.querySelector('#search')?.addEventListener('click', (e) => {
-      if (e.target.closest('a')) {
+      if ((e.target as Element).closest('a')) {
         const val = searchInput.value.trim();
         if (val) saveToHistory(val);
       }
     });
   }
 
-  // ── Modal open / close ─────────────────────────────────────────────────────
-  window.openSearchModal = function() {
-    if (!modal || !modalContent) return;
-    modal.classList.remove('invisible', 'opacity-0');
-    modal.classList.add('visible', 'opacity-100');
-    setTimeout(() => {
-      modalContent.classList.remove('opacity-0', 'scale-95');
-      modalContent.classList.add('opacity-100', 'scale-100');
-    }, 50);
+  // ── Close animation ──────────────────────────────────────────────────────
+  function closeModal() {
+    const dialog = document.getElementById('searchModal') as HTMLDialogElement | null;
+    if (!dialog || !dialog.open || dialog.classList.contains('is-closing')) return;
+    dialog.classList.add('is-closing');
+    dialog.addEventListener('transitionend', () => {
+      dialog.classList.remove('is-closing');
+      dialog.close();
+      document.body.style.overflow = '';
+    }, { once: true });
+  }
 
-    // Initialize Pagefind UI on first open
-    if (!pagefindUI && window.PagefindUI) {
+  // ── Open ─────────────────────────────────────────────────────────────────
+  (window as any).openSearchModal = function() {
+    const dialog = document.getElementById('searchModal') as HTMLDialogElement | null;
+    if (!dialog) return;
+
+    document.body.style.overflow = 'hidden';
+    dialog.showModal();
+
+    // Initialize Pagefind UI on first open (pagefindUI is reset to null on each SPA nav)
+    if (!pagefindUI && (window as any).PagefindUI) {
       try {
-        pagefindUI = new window.PagefindUI({
+        pagefindUI = new (window as any).PagefindUI({
           element: "#search",
           showSubResults: true,
           showImages: false,
@@ -234,7 +431,7 @@
           fetchAndRenderLatestCrimes();
           showSuggestions();
           watchSearchInput();
-          document.querySelector('#search input')?.focus();
+          document.querySelector<HTMLInputElement>('#search input')?.focus();
         }, 200);
       } catch (error) {
         console.error('Failed to initialize Pagefind UI:', error);
@@ -245,176 +442,46 @@
     } else if (pagefindUI) {
       renderRecentChips();
       fetchAndRenderLatestCrimes();
-      const val = document.querySelector('#search input')?.value?.trim() || '';
+      const val = document.querySelector<HTMLInputElement>('#search input')?.value?.trim() || '';
       if (val.length === 0) showSuggestions();
-      setTimeout(() => document.querySelector('#search input')?.focus(), 100);
+      setTimeout(() => document.querySelector<HTMLInputElement>('#search input')?.focus(), 100);
     }
   };
 
-  function closeModal() {
-    if (!modal || !modalContent) return;
-    modalContent.classList.remove('opacity-100', 'scale-100');
-    modalContent.classList.add('opacity-0', 'scale-95');
-    setTimeout(() => {
-      modal.classList.remove('visible', 'opacity-100');
-      modal.classList.add('invisible', 'opacity-0');
-    }, 300);
-  }
+  // ── Re-attach listeners after each SPA nav ────────────────────────────────
+  document.addEventListener('astro:page-load', () => {
+    // Reset so Pagefind re-mounts into the fresh DOM
+    pagefindUI = null;
+    latestCrimesFetched = false;
 
-  closeBtn?.addEventListener('click', closeModal);
-  modal?.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    const dialog = document.getElementById('searchModal') as HTMLDialogElement | null;
+    const closeBtn = document.getElementById('closeSearchModal');
 
+    // Bind static suggestion chips
+    bindChips(document.getElementById('searchSuggestions'));
+
+    closeBtn?.addEventListener('click', closeModal);
+
+    dialog?.addEventListener('click', (e) => {
+      if (e.target === dialog) closeModal();
+    });
+
+    dialog?.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      closeModal();
+    });
+  });
+
+  // ── Keyboard shortcuts (added once — document persists across SPA nav) ────
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal?.classList.contains('visible')) closeModal();
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); window.openSearchModal(); }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      (window as any).openSearchModal();
+    }
+  });
+
+  // Restore scroll lock if SPA nav happens while modal is open
+  document.addEventListener('astro:before-preparation', () => {
+    document.body.style.overflow = '';
   });
 </script>
-
-<style>
-  /* ── Pagefind UI — Light mode ───────────────────────────────────────────── */
-  :global(#search .pagefind-ui__search-input) {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-    color: #334155;
-    background: white;
-    transition: all 0.2s;
-  }
-
-  :global(#search .pagefind-ui__search-input:focus) {
-    outline: none;
-    border-color: #e11d48;
-    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1);
-  }
-
-  :global(#search .pagefind-ui__result) {
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    margin-bottom: 0.75rem;
-    background: white;
-    transition: all 0.2s;
-  }
-
-  :global(#search .pagefind-ui__result:hover) {
-    border-color: #e11d48;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-
-  :global(#search .pagefind-ui__result-title) {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #334155;
-    margin-bottom: 0.5rem;
-  }
-
-  :global(#search .pagefind-ui__result-link) {
-    text-decoration: none;
-    color: inherit;
-  }
-
-  :global(#search .pagefind-ui__result-link:hover .pagefind-ui__result-title) {
-    color: #e11d48;
-  }
-
-  :global(#search .pagefind-ui__result-excerpt) {
-    font-size: 0.875rem;
-    color: #64748b;
-    line-height: 1.5;
-  }
-
-  :global(#search .pagefind-ui__message) {
-    text-align: center;
-    padding: 2rem;
-    color: #64748b;
-    font-size: 0.875rem;
-  }
-
-  :global(#search mark) {
-    background-color: #fef3c7;
-    color: #92400e;
-    padding: 0.125rem 0.25rem;
-    border-radius: 0.25rem;
-    font-weight: 600;
-  }
-
-  :global(#search .pagefind-ui__button) {
-    background: #e11d48;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    border: none;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  :global(#search .pagefind-ui__button:hover) {
-    background: #be123c;
-  }
-
-  /* ── Pagefind UI — Dark mode ────────────────────────────────────────────── */
-  :global(.dark #search .pagefind-ui__search-input) {
-    background: hsl(0 0% 12%);
-    border-color: hsl(0 0% 22%);
-    color: hsl(0 0% 90%);
-  }
-
-  :global(.dark #search .pagefind-ui__search-input::placeholder) {
-    color: hsl(0 0% 45%);
-  }
-
-  :global(.dark #search .pagefind-ui__search-input:focus) {
-    border-color: #e11d48;
-    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.15);
-  }
-
-  :global(.dark #search .pagefind-ui__result) {
-    background: hsl(0 0% 11%);
-    border-color: hsl(0 0% 20%);
-  }
-
-  :global(.dark #search .pagefind-ui__result:hover) {
-    border-color: #e11d48;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  }
-
-  :global(.dark #search .pagefind-ui__result-title) {
-    color: hsl(0 0% 90%);
-  }
-
-  :global(.dark #search .pagefind-ui__result-link:hover .pagefind-ui__result-title) {
-    color: #fb7185;
-  }
-
-  :global(.dark #search .pagefind-ui__result-excerpt) {
-    color: hsl(0 0% 60%);
-  }
-
-  :global(.dark #search .pagefind-ui__message) {
-    color: hsl(0 0% 55%);
-  }
-
-  :global(.dark #search mark) {
-    background-color: hsl(38 80% 20%);
-    color: hsl(38 80% 75%);
-  }
-
-  :global(.dark #search .pagefind-ui__search-clear) {
-    color: hsl(0 0% 50%);
-  }
-
-  :global(.dark #search .pagefind-ui__search-clear:hover) {
-    color: hsl(0 0% 80%);
-  }
-
-  :global(.dark #search .pagefind-ui__button) {
-    background: #e11d48;
-  }
-
-  :global(.dark #search .pagefind-ui__button:hover) {
-    background: #be123c;
-  }
-</style>

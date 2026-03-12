@@ -23,6 +23,13 @@ const latestPosts = allPosts
 
 // If no posts, don't render
 if (latestPosts.length === 0) return null;
+
+// Animation timing — each item is shown for 5s; 0.5s slide-in/out transitions
+// Item 0 uses a negative delay so it appears already-visible on page load (no slide-in flash)
+const slideInDuration = 0.5; // seconds
+const itemDelays = latestPosts.map((_, i) =>
+  i === 0 ? `-${slideInDuration}s` : `${i * 5 - slideInDuration}s`
+);
 ---
 
 <div
@@ -52,9 +59,8 @@ if (latestPosts.length === 0) return null;
     <div class="flex-1 min-w-0 relative h-5 md:h-6 overflow-hidden">
       {latestPosts.map((post, index) => (
         <div
-          class="blog-title absolute inset-0 flex items-center transition-all duration-500"
-          data-index={index}
-          style={index === 0 ? 'opacity: 1; transform: translateY(0);' : 'opacity: 0; transform: translateY(100%);'}
+          class="blog-title absolute inset-0 flex items-center"
+          style={`animation-delay: ${itemDelays[index]};`}
         >
           <span class="text-xs md:text-sm font-medium text-slate-600 dark:text-[hsl(0_0%_72%)] group-hover:underline truncate">
             {post.data.title}
@@ -82,40 +88,6 @@ if (latestPosts.length === 0) return null;
   </a>
 </div>
 
-<script>
-  function initBlogRotator() {
-    const banner = document.querySelector('.blog-rotating-banner');
-    if (!banner) return;
-
-    const titles = banner.querySelectorAll('.blog-title');
-    const postCount = parseInt(banner.getAttribute('data-post-count') || '0');
-
-    // Only rotate if there are multiple posts
-    if (postCount <= 1) return;
-
-    let currentIndex = 0;
-
-    function rotateTitles() {
-      // Hide current title (slide up and fade out)
-      titles[currentIndex].style.opacity = '0';
-      titles[currentIndex].style.transform = 'translateY(-100%)';
-
-      // Move to next title
-      currentIndex = (currentIndex + 1) % postCount;
-
-      // Show next title (slide up from bottom and fade in)
-      titles[currentIndex].style.opacity = '1';
-      titles[currentIndex].style.transform = 'translateY(0)';
-    }
-
-    // Rotate every 5 seconds
-    setInterval(rotateTitles, 5000);
-  }
-
-  // Initialize on each page load — astro:page-load fires on initial load AND after navigations
-  document.addEventListener('astro:page-load', initBlogRotator);
-</script>
-
 <style>
   .blog-rotating-banner {
     background: linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9));
@@ -128,5 +100,57 @@ if (latestPosts.length === 0) return null;
 
   .blog-title {
     will-change: transform, opacity;
+  }
+
+  /* Single post — always visible, no animation */
+  [data-post-count="1"] .blog-title {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Two posts — 10s cycle (5s per item) */
+  [data-post-count="2"] .blog-title {
+    animation: blog-rotate-2 10s infinite;
+    animation-fill-mode: backwards; /* holds 0% state (hidden) during positive delays */
+  }
+
+  /* Three posts — 15s cycle (5s per item) */
+  [data-post-count="3"] .blog-title {
+    animation: blog-rotate-3 15s infinite;
+    animation-fill-mode: backwards;
+  }
+
+  /* Pause rotation on hover (desktop) */
+  .blog-rotating-banner:hover .blog-title {
+    animation-play-state: paused;
+  }
+
+  /*
+   * Keyframes — each item occupies one "slot" in the cycle.
+   * 0%:       hidden below (translateY 100%) — held during animation-delay
+   * slide in: 0.5s to enter from below
+   * hold:     visible for ~4s
+   * slide out: 0.5s to exit upward (translateY -100%)
+   * rest:     hidden above until next cycle
+   *
+   * Percentages are relative to the full cycle duration (N × 5s).
+   */
+
+  /* 2 posts — 10s cycle. Slot = 50% = 5s. Slide = 5% = 0.5s. */
+  @keyframes blog-rotate-2 {
+    0%   { opacity: 0; transform: translateY(100%); }
+    5%   { opacity: 1; transform: translateY(0); }     /* slide in complete */
+    45%  { opacity: 1; transform: translateY(0); }     /* hold */
+    50%  { opacity: 0; transform: translateY(-100%); } /* slide out complete */
+    100% { opacity: 0; transform: translateY(100%); }  /* ready for next cycle */
+  }
+
+  /* 3 posts — 15s cycle. Slot = 33.3% = 5s. Slide = 3.33% = 0.5s. */
+  @keyframes blog-rotate-3 {
+    0%     { opacity: 0; transform: translateY(100%); }
+    3.33%  { opacity: 1; transform: translateY(0); }     /* slide in complete */
+    30%    { opacity: 1; transform: translateY(0); }     /* hold */
+    33.33% { opacity: 0; transform: translateY(-100%); } /* slide out complete */
+    100%   { opacity: 0; transform: translateY(100%); }  /* ready for next cycle */
   }
 </style>

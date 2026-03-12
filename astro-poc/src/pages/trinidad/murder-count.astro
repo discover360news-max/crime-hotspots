@@ -18,7 +18,6 @@ import { generateMurderCountOgImage } from '../../lib/generateOgImage';
 import { routes, buildRoute } from '../../config/routes';
 import InfoPopup from '../../components/InfoPopup.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
-// import CrimeDetailModal from '../../components/CrimeDetailModal.astro';
 
 // Fetch current year's crime data
 const allCrimes = await getTrinidadCrimes();
@@ -62,9 +61,6 @@ const projectedAnnualMurders = daysPassed > 0 ? Math.round((murderCount / daysPa
 const projectedMurderRate = ((projectedAnnualMurders / POPULATION) * 100000).toFixed(1);
 
 // Latest 10 murders for the incidents section
-// Check primaryCrimeType (current field), crimeType (legacy fallback), and relatedCrimeTypes.
-// When Murder appears in relatedCrimeTypes the victimCount does NOT apply — the incident may
-// have had multiple injuries but the death(s) is the related element, not the primary.
 const latestMurders = crimes2026
   .filter(c =>
     c.primaryCrimeType === 'Murder' ||
@@ -81,7 +77,6 @@ const latestPost = blogPosts.sort((a, b) =>
 )[0];
 
 // Last updated = build time (when data was fetched from Google Sheets)
-// Daily GitHub Action rebuilds at 6 AM UTC, so this reflects actual data freshness
 const lastUpdated = new Date().toLocaleDateString('en-US', {
   month: 'long',
   day: 'numeric'
@@ -97,12 +92,15 @@ const ogImagePath = await generateMurderCountOgImage({
   currentRate: currentMurderRate,
 });
 
+const pageUrl = 'https://crimehotspots.com/trinidad/murder-count/';
+const shareText = `Trinidad Murder Count ${currentYear}: ${murderCount} murders so far. Track live statistics at Crime Hotspots.`;
+
 const title = `Trinidad Murder Count 2026: ${murderCount} Murders So Far — Updated Daily | Crime Hotspots`;
 const description = `Trinidad murder count 2026: ${murderCount} murders (death toll updated daily). Murder rate: ${currentMurderRate} per 100k. Murder toll projected at ${projectedMurderRate} per 100k for full year. Track the Trinidad & Tobago murder toll and murder rate live.`;
 ---
 
 <Layout title={title} description={description} includePagefind={false} ogImage={`https://crimehotspots.com${ogImagePath}`}>
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-pagefind-ignore>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8" data-pagefind-ignore>
     <!-- Breadcrumbs -->
     <div class="mb-6">
       <Breadcrumbs items={[
@@ -112,212 +110,220 @@ const description = `Trinidad murder count 2026: ${murderCount} murders (death t
       ]} />
     </div>
 
-    <!-- Main Content - Centered -->
-    <div class="flex flex-col items-center">
-      <div class="text-center space-y-4 max-w-lg mx-auto">
-      <!-- Header -->
-      <div class="space-y-1">
-        <h1 class="text-2xl sm:text-3xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">
-          Trinidad & Tobago
-        </h1>
-        <p class="text-lg sm:text-xl text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium">
-          Murder Count
-        </p>
-        <p class="text-4xl sm:text-5xl font-bold text-rose-600">
-          {currentYear}
-        </p>
-      </div>
-
-      <!-- Flip Counter -->
-      <div class="pt-8 pb-12">
-        <FlipCounter value={murderCount} animateOnLoad={true} />
-      </div>
-
-      <!-- Last Updated -->
-      <p class="text-sm text-slate-400 dark:text-[hsl(0_0%_50%)]">
-        Updated: {lastUpdated}
+    <!-- Page header — above grid so sidebar aligns with counter, not title -->
+    <div class="text-center mb-8">
+      <h1 class="text-2xl sm:text-3xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">
+        Trinidad & Tobago
+      </h1>
+      <p class="text-lg sm:text-xl text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium">
+        Murder Count
       </p>
+      <p class="text-4xl sm:text-5xl font-bold text-rose-600">
+        {currentYear}
+      </p>
+    </div>
 
-      <!-- 2025 Comparison -->
-      <div class="bg-slate-50 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 max-w-md mx-auto">
-        <div class="flex items-center justify-center gap-1">
-          <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_70%)] text-center">
-            Same period in 2025: <span class="font-bold text-slate-800 dark:text-[hsl(0_0%_90%)]">{murderCount2025SamePeriod}</span> murders
-          </p>
-          <InfoPopup id="murder-comparison-info">
-            <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">How We Compare Years</p>
-            <p class="mb-3">To make a fair comparison, we only look at the same time window in both years. For example, if today is February 10, we compare January 1 to February 10 of 2026 against January 1 to February 10 of 2025.</p>
-            <p>The percentage below shows whether murders are trending higher or lower than the same point last year. A green arrow means fewer murders so far this year.</p>
-          </InfoPopup>
-        </div>
-        {yoyDirection !== 'same' && (
-          <p class={`text-xs text-center mt-2 ${yoyDirection === 'down' ? 'text-emerald-600' : 'text-rose-600'}`}>
-            {yoyDirection === 'down' ? '↓' : '↑'} {Math.abs(yoyChange).toFixed(0)}% vs 2025
-          </p>
-        )}
-      </div>
+    <!-- Two-column grid — starts at counter level -->
+    <div class="lg:grid lg:grid-cols-[1fr_256px] lg:gap-8 lg:items-start">
 
-      <!-- Murder Rate Section (SEO: "trinidad murder rate") -->
-      <div class="mt-8 w-full max-w-md mx-auto">
-        <div class="flex items-center justify-center gap-1 mb-4">
-          <h2 class="text-xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] text-center">
-            Trinidad & Tobago Murder Rate 2026
-          </h2>
-          <InfoPopup id="murder-rate-info">
-            <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Understanding Murder Rates</p>
-            <p class="mb-3">A murder rate shows how many murders happen for every 100,000 people in a country. This makes it easier to compare safety between places of different sizes.</p>
+      <!-- Left column: counter + stats -->
+      <main class="min-w-0 space-y-10">
 
-            <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">What Each Card Means</p>
-            <ul class="list-disc list-inside space-y-1">
-              <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Current Rate (YTD)</span> — The murder rate so far this year, based on the first {daysPassed} days of data.</li>
-              <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Projected Rate</span> — If murders continue at the current pace for the full year, this is the estimated annual rate. The ~{projectedAnnualMurders} shown is the projected total murders.</li>
-              <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">2025 Final Rate</span> — Last year's actual rate, based on {murderCount2025Full} total murders recorded.</li>
-            </ul>
-
-            <p class="font-bold mb-2 mt-3 text-slate-700 dark:text-[hsl(0_0%_90%)]">About the Population</p>
-            <p>All rates use an estimated population of 1.5 million for Trinidad & Tobago. This is a commonly used approximation; the actual population may vary slightly.</p>
-          </InfoPopup>
+        <!-- Flip Counter -->
+        <div class="flex justify-center pt-4 pb-10">
+          <FlipCounter value={murderCount} animateOnLoad={true} />
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <!-- Current Year-to-Date Rate -->
-          <div class="bg-rose-50 dark:bg-rose-950/30 rounded-lg border border-rose-200 dark:border-rose-900/50 p-4 text-center">
-            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium mb-1">Current Rate (YTD)</div>
-            <div class="text-2xl font-bold text-rose-600">{currentMurderRate}</div>
-            <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">per 100k</div>
-            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2 pt-2 border-t border-rose-100 dark:border-rose-900/40">{murderCount} murders</div>
-          </div>
-
-          <!-- Projected Annual Rate -->
-          <div class="bg-slate-100 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 text-center">
-            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium mb-1">Projected Rate</div>
-            <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{projectedMurderRate}</div>
-            <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">per 100k (2026)</div>
-            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2 pt-2 border-t border-slate-200 dark:border-[hsl(0_0%_18%)]">~{projectedAnnualMurders} murders</div>
-          </div>
-
-          <!-- 2025 Final Rate -->
-          <div class="bg-slate-50 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 text-center col-span-2 sm:col-span-1">
-            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium mb-1">2025 Final Rate</div>
-            <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{murderRate2025}</div>
-            <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">per 100k</div>
-            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2 pt-2 border-t border-slate-100 dark:border-[hsl(0_0%_18%)]">{murderCount2025Full} murders</div>
-          </div>
-        </div>
-
-        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] text-center mt-3">
-          Based on population estimate of {(POPULATION / 1000000).toFixed(1)}M
+        <!-- Last Updated -->
+        <p class="text-sm text-slate-400 dark:text-[hsl(0_0%_50%)]">
+          Updated: {lastUpdated}
         </p>
-      </div>
 
-      <!-- Action Buttons -->
-      <div class="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-        <a
-          href={routes.trinidad.dashboard}
-          class="px-6 py-3 min-h-[44px] flex items-center justify-center bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:bg-rose-800 transition font-medium text-sm shadow-md"
-        >
-          View Dashboard
-        </a>
-        <a
-          href={routes.trinidad.statistics}
-          class="px-6 py-3 min-h-[44px] flex items-center justify-center border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition font-medium text-sm"
-        >
-          All Crime Statistics
-        </a>
-      </div>
-
-      <!-- Latest Analysis -->
-      {latestPost && (
-        <div class="mt-8 max-w-md mx-auto">
-          <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_55%)] mb-3">Latest Analysis</p>
-          <a href={`/blog/${latestPost.slug}/`} class="block bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
-            <h3 class="font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] text-sm mb-2">{latestPost.data.title}</h3>
-            <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{latestPost.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} &bull; {latestPost.data.readTime}</p>
-          </a>
-        </div>
-      )}
-
-      <!-- Latest Murder Incidents -->
-      {latestMurders.length > 0 && (
-        <div class="mt-8 w-full max-w-md mx-auto">
-          <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_55%)] mb-3">Latest Incidents</p>
-          <div class="space-y-2">
-            {latestMurders.map(crime => (
-              <a
-                href={buildRoute.crime(crime.slug)}
-                class="block bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] px-4 py-3 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition group"
-              >
-                <div class="flex items-start justify-between gap-3">
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] leading-snug group-hover:text-rose-600 transition line-clamp-2">{crime.headline}</p>
-                    <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{crime.area}</p>
-                  </div>
-                  <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] shrink-0 mt-0.5">
-                    {crime.dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </span>
-                </div>
-              </a>
-            ))}
+        <!-- 2025 Comparison -->
+        <div class="bg-slate-50 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4">
+          <div class="flex items-center gap-1">
+            <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_70%)]">
+              Same period in 2025: <span class="font-bold text-slate-800 dark:text-[hsl(0_0%_90%)]">{murderCount2025SamePeriod}</span> murders
+            </p>
+            <InfoPopup id="murder-comparison-info">
+              <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">How We Compare Years</p>
+              <p class="mb-3">To make a fair comparison, we only look at the same time window in both years. For example, if today is February 10, we compare January 1 to February 10 of 2026 against January 1 to February 10 of 2025.</p>
+              <p>The percentage below shows whether murders are trending higher or lower than the same point last year. A green arrow means fewer murders so far this year.</p>
+            </InfoPopup>
           </div>
+          {yoyDirection !== 'same' && (
+            <p class={`text-xs mt-2 ${yoyDirection === 'down' ? 'text-emerald-600' : 'text-rose-600'}`}>
+              {yoyDirection === 'down' ? '↓' : '↑'} {Math.abs(yoyChange).toFixed(0)}% vs 2025
+            </p>
+          )}
         </div>
-      )}
 
-      <!-- Newsletter CTA — primary retention hook for search landing users -->
-      <div class="mt-8 w-full max-w-md mx-auto">
-        <NewsletterSignup variant="card" source="murder-count-page" />
-      </div>
+        <!-- Murder Rate Section (SEO: "trinidad murder rate") -->
+        <div>
+          <div class="flex items-center gap-1 mb-4">
+            <h2 class="text-xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">
+              Trinidad & Tobago Murder Rate 2026
+            </h2>
+            <InfoPopup id="murder-rate-info">
+              <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">Understanding Murder Rates</p>
+              <p class="mb-3">A murder rate shows how many murders happen for every 100,000 people in a country. This makes it easier to compare safety between places of different sizes.</p>
 
-      <!-- Share Section -->
-      <div class="pt-6 border-t border-slate-200 dark:border-[hsl(0_0%_18%)] mt-6">
-        <p class="text-sm text-slate-400 dark:text-[hsl(0_0%_50%)] mb-3">Share this page</p>
-        <div class="flex gap-3 justify-center">
-          <!-- WhatsApp -->
+              <p class="font-bold mb-2 text-slate-700 dark:text-[hsl(0_0%_90%)]">What Each Card Means</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Current Rate (YTD)</span> — The murder rate so far this year, based on the first {daysPassed} days of data.</li>
+                <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">Projected Rate</span> — If murders continue at the current pace for the full year, this is the estimated annual rate. The ~{projectedAnnualMurders} shown is the projected total murders.</li>
+                <li><span class="font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">2025 Final Rate</span> — Last year's actual rate, based on {murderCount2025Full} total murders recorded.</li>
+              </ul>
+
+              <p class="font-bold mb-2 mt-3 text-slate-700 dark:text-[hsl(0_0%_90%)]">About the Population</p>
+              <p>All rates use an estimated population of 1.5 million for Trinidad & Tobago. This is a commonly used approximation; the actual population may vary slightly.</p>
+            </InfoPopup>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3">
+            <!-- Current Year-to-Date Rate -->
+            <div class="bg-rose-50 dark:bg-rose-950/30 rounded-lg border border-rose-200 dark:border-rose-900/50 p-4 text-center">
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium mb-1">Current Rate (YTD)</div>
+              <div class="text-2xl font-bold text-rose-600">{currentMurderRate}</div>
+              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">per 100k</div>
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2 pt-2 border-t border-rose-100 dark:border-rose-900/40">{murderCount} murders</div>
+            </div>
+
+            <!-- Projected Annual Rate -->
+            <div class="bg-slate-100 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 text-center">
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium mb-1">Projected Rate</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{projectedMurderRate}</div>
+              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">per 100k (2026)</div>
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2 pt-2 border-t border-slate-200 dark:border-[hsl(0_0%_18%)]">~{projectedAnnualMurders} murders</div>
+            </div>
+
+            <!-- 2025 Final Rate -->
+            <div class="bg-slate-50 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 text-center">
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] font-medium mb-1">2025 Final Rate</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{murderRate2025}</div>
+              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">per 100k</div>
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-2 pt-2 border-t border-slate-100 dark:border-[hsl(0_0%_18%)]">{murderCount2025Full} murders</div>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-3">
+            Based on population estimate of {(POPULATION / 1000000).toFixed(1)}M
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3">
           <a
-            id="share-whatsapp"
-            href="#"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/50 hover:text-rose-600 active:bg-rose-200 dark:active:bg-rose-950/70 transition shadow-sm"
-            aria-label="Share on WhatsApp"
+            href={routes.trinidad.dashboard}
+            class="px-6 py-3 min-h-[44px] flex items-center justify-center bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:bg-rose-800 transition font-medium text-sm shadow-md"
           >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-            </svg>
+            View Dashboard
           </a>
-          <!-- Facebook -->
           <a
-            id="share-facebook"
-            href="#"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/50 hover:text-rose-600 active:bg-rose-200 dark:active:bg-rose-950/70 transition shadow-sm"
-            aria-label="Share on Facebook"
+            href={routes.trinidad.statistics}
+            class="px-6 py-3 min-h-[44px] flex items-center justify-center border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition font-medium text-sm"
           >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-            </svg>
+            All Crime Statistics
           </a>
-          <!-- X/Twitter -->
-          <a
-            id="share-twitter"
-            href="#"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/50 hover:text-rose-600 active:bg-rose-200 dark:active:bg-rose-950/70 transition shadow-sm"
-            aria-label="Share on X"
+        </div>
+
+        <!-- Latest Analysis -->
+        {latestPost && (
+          <div>
+            <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_55%)] mb-3">Latest Analysis</p>
+            <a href={`/blog/${latestPost.slug}/`} class="block bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
+              <h3 class="font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] text-sm mb-2">{latestPost.data.title}</h3>
+              <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{latestPost.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} &bull; {latestPost.data.readTime}</p>
+            </a>
+          </div>
+        )}
+
+      </main>
+
+      <!-- Right column: sidebar -->
+      <aside class="mt-10 lg:mt-0 lg:sticky lg:top-20 space-y-5 min-w-0 [&_.newsletter-signup-form]:flex-col [&_.newsletter-signup-form_input]:w-full">
+
+        <!-- Share buttons -->
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_50%)]">Share:</span>
+          <button
+            class="sb-share-btn p-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_55%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition"
+            data-platform="twitter"
+            data-share-url={pageUrl}
+            data-share-text={shareText}
+            title="Share on X (Twitter)"
+            aria-label="Share on X (Twitter)"
           >
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
-          </a>
-          <!-- Copy Link -->
+          </button>
+          <button
+            class="sb-share-btn p-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_55%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition"
+            data-platform="facebook"
+            data-share-url={pageUrl}
+            data-share-text={shareText}
+            title="Share on Facebook"
+            aria-label="Share on Facebook"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </button>
+          <button
+            class="sb-share-btn p-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_55%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition"
+            data-platform="whatsapp"
+            data-share-url={pageUrl}
+            data-share-text={shareText}
+            title="Share on WhatsApp"
+            aria-label="Share on WhatsApp"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+          </button>
           <button
             id="share-copy"
-            class="w-11 h-11 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/50 hover:text-rose-600 active:bg-rose-200 dark:active:bg-rose-950/70 transition shadow-sm"
+            class="p-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_55%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition"
+            title="Copy link"
             aria-label="Copy link"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
           </button>
         </div>
-        <p id="copy-feedback" class="text-xs text-emerald-600 mt-2 opacity-0 transition-opacity">Link copied!</p>
-      </div>
-    </div>
+        <p id="copy-feedback" class="text-xs text-emerald-600 opacity-0 transition-opacity">Link copied!</p>
+
+        <!-- Latest Incidents -->
+        {latestMurders.length > 0 && (
+          <div class="rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] bg-slate-50 dark:bg-[hsl(0_0%_7%)] overflow-hidden">
+            <div class="px-3 pt-3 pb-2 border-b border-slate-200 dark:border-[hsl(0_0%_15%)]">
+              <p class="text-xs font-semibold text-slate-500 dark:text-[hsl(0_0%_50%)] uppercase tracking-wide">Latest Incidents</p>
+            </div>
+            <div class="p-2 space-y-1.5">
+              {latestMurders.map(crime => (
+                <a
+                  href={buildRoute.crime(crime.slug)}
+                  class="flex items-start justify-between gap-2 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] px-2.5 py-2 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm transition group"
+                >
+                  <div class="min-w-0 flex-1">
+                    <p class="text-xs font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug line-clamp-2">{crime.headline}</p>
+                    <p class="text-[10px] text-slate-400 dark:text-[hsl(0_0%_45%)] mt-0.5 truncate">{crime.area}</p>
+                  </div>
+                  <span class="text-[10px] text-slate-400 dark:text-[hsl(0_0%_45%)] shrink-0 mt-0.5">
+                    {crime.dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <!-- Newsletter -->
+        <NewsletterSignup variant="card" source="murder-count-page" />
+
+      </aside>
     </div>
 
     <!-- Structured Data for SEO -->
@@ -326,7 +332,7 @@ const description = `Trinidad murder count 2026: ${murderCount} murders (death t
       "@type": "WebPage",
       "name": "Trinidad & Tobago Murder Rate & Count 2026",
       "description": description,
-      "url": "https://crimehotspots.com/trinidad/murder-count/",
+      "url": pageUrl,
       "breadcrumb": {
         "@type": "BreadcrumbList",
         "itemListElement": [
@@ -398,44 +404,48 @@ const description = `Trinidad murder count 2026: ${murderCount} murders (death t
         "license": "https://creativecommons.org/licenses/by/4.0/"
       }
     })} />
-  </main>
+  </div>
 </Layout>
 
-<script define:vars={{ murderCount, currentYear }}>
-  // Share functionality
-  const pageUrl = 'https://crimehotspots.com/trinidad/murder-count/';
-  const shareText = `Trinidad Murder Count ${currentYear}: ${murderCount} murders so far. Track live statistics at Crime Hotspots.`;
+<script>
+  document.addEventListener('astro:page-load', () => {
+    // Share buttons (X, Facebook, WhatsApp)
+    document.querySelectorAll<HTMLElement>('.sb-share-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const platform = btn.dataset.platform;
+        const rawUrl = btn.dataset.shareUrl || '';
+        const rawText = btn.dataset.shareText || '';
+        const url = encodeURIComponent(rawUrl);
+        const text = encodeURIComponent(rawText);
 
-  // WhatsApp
-  document.getElementById('share-whatsapp').href =
-    `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`;
+        if (platform === 'twitter') {
+          window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=550,height=420');
+        } else if (platform === 'facebook') {
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=550,height=420');
+        } else if (platform === 'whatsapp') {
+          window.open(`https://wa.me/?text=${encodeURIComponent(rawText + ' ' + rawUrl)}`, '_blank');
+        }
+      });
+    });
 
-  // Facebook
-  document.getElementById('share-facebook').href =
-    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
-
-  // X/Twitter
-  document.getElementById('share-twitter').href =
-    `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`;
-
-  // Copy link
-  document.getElementById('share-copy').addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(pageUrl);
+    // Copy link
+    document.getElementById('share-copy')?.addEventListener('click', async () => {
+      const pageUrl = 'https://crimehotspots.com/trinidad/murder-count/';
+      try {
+        await navigator.clipboard.writeText(pageUrl);
+      } catch {
+        const input = document.createElement('input');
+        input.value = pageUrl;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+      }
       const feedback = document.getElementById('copy-feedback');
-      feedback.style.opacity = '1';
-      setTimeout(() => { feedback.style.opacity = '0'; }, 2000);
-    } catch (err) {
-      // Fallback for older browsers
-      const input = document.createElement('input');
-      input.value = pageUrl;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand('copy');
-      document.body.removeChild(input);
-      const feedback = document.getElementById('copy-feedback');
-      feedback.style.opacity = '1';
-      setTimeout(() => { feedback.style.opacity = '0'; }, 2000);
-    }
+      if (feedback) {
+        feedback.style.opacity = '1';
+        setTimeout(() => { feedback.style.opacity = '0'; }, 2000);
+      }
+    });
   });
 </script>

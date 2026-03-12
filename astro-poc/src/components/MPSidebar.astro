@@ -1,0 +1,300 @@
+---
+/**
+ * MPSidebar
+ * Sticky right-column sidebar for area and region pages.
+ * Contains: share buttons, MPs for the region, and Ko-fi support card.
+ *
+ * Area pages (showAll=false): shows 2 MPs, rest behind a "N more" chevron toggle.
+ * Region pages (showAll=true): shows all MPs on desktop; mobile-only chevron collapses the list.
+ */
+
+interface MP {
+  nameSlug: string;
+  fullName: string;
+  honorific?: string;
+  constituency: string;
+  party: string;
+  photo?: string;
+}
+
+interface Props {
+  mps: MP[];
+  regionName: string;
+  pageUrl: string;
+  /** Custom share text. If omitted, built from areaDisplayName + safetyScore. */
+  shareText?: string;
+  /** Area-page-only props (unused when shareText is provided) */
+  areaDisplayName?: string;
+  safetyScore?: string;
+  /** When true: all MPs shown on desktop, mobile gets a collapse toggle */
+  showAll?: boolean;
+}
+
+const { mps, regionName, pageUrl, shareText, areaDisplayName, safetyScore, showAll = false } = Astro.props;
+
+const computedShareText = shareText
+  ?? `Crime stats for ${areaDisplayName}, Trinidad \u2014 Risk Level: ${safetyScore}/10. View details at Crime Hotspots.`;
+
+const visibleMPs = showAll ? mps : mps.slice(0, 2);
+const hiddenMPs  = showAll ? []  : mps.slice(2);
+
+const partyBadgeClass: Record<string, string> = {
+  PNM: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400',
+  UNC: 'bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400',
+  TPP: 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_65%)]',
+};
+
+function mpCard(mp: MP) {
+  const displayName = mp.honorific ? `${mp.honorific} ${mp.fullName}` : mp.fullName;
+  const photoSrc = mp.photo ? `/images/mps/${mp.photo}` : '/images/mps/placeholder.svg';
+  const badge = partyBadgeClass[mp.party] ?? partyBadgeClass['TPP'];
+  return { displayName, photoSrc, badge };
+}
+---
+
+<aside class="mt-4 lg:mt-0 lg:sticky lg:top-20 space-y-3">
+
+  <!-- Share buttons -->
+  <div class="flex items-center gap-2">
+    <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_50%)]">Share:</span>
+    <button
+      class="sb-share-btn p-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_55%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition"
+      data-platform="twitter"
+      data-share-url={pageUrl}
+      data-share-text={computedShareText}
+      title="Share on X (Twitter)"
+      aria-label="Share on X (Twitter)"
+    >
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+    </button>
+    <button
+      class="sb-share-btn p-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_55%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition"
+      data-platform="facebook"
+      data-share-url={pageUrl}
+      data-share-text={computedShareText}
+      title="Share on Facebook"
+      aria-label="Share on Facebook"
+    >
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+      </svg>
+    </button>
+    <button
+      class="sb-share-btn p-2 rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_55%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition"
+      data-platform="whatsapp"
+      data-share-url={pageUrl}
+      data-share-text={computedShareText}
+      title="Share on WhatsApp"
+      aria-label="Share on WhatsApp"
+    >
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- MPs card -->
+  {mps.length > 0 && (
+    <div class="rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] bg-slate-50 dark:bg-[hsl(0_0%_7%)] overflow-hidden">
+      <div class="px-3 pt-3 pb-2 border-b border-slate-200 dark:border-[hsl(0_0%_15%)]">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold text-slate-500 dark:text-[hsl(0_0%_50%)] uppercase tracking-wide">
+              Member{mps.length !== 1 ? 's' : ''} of Parliament
+            </p>
+            <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_40%)] mt-0.5">{regionName} Region</p>
+          </div>
+          {showAll && (
+            <button
+              id="mpMobileToggle"
+              class="lg:hidden p-1 text-slate-400 dark:text-[hsl(0_0%_45%)] hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer"
+              aria-label="Toggle MPs list"
+              aria-expanded="false"
+            >
+              <svg id="mpMobileChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* showAll=true: all MPs in one list; mobile-hidden, always visible on lg+ */}
+      {showAll ? (
+        <div id="mpMobileList" class="p-2 space-y-1.5 hidden lg:block">
+          {mps.map(mp => {
+            const { displayName, photoSrc, badge } = mpCard(mp);
+            return (
+              <a
+                href={`/trinidad/mp/${mp.nameSlug}/`}
+                class="flex items-center gap-2.5 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-2.5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm transition group"
+              >
+                <div class="shrink-0 w-9 h-9 rounded-md overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
+                  <img src={photoSrc} alt="" class="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug truncate">
+                    {displayName}
+                  </div>
+                  <div class="flex items-center gap-1 mt-0.5 flex-wrap">
+                    <span class={`px-1 py-0 rounded-full text-[10px] font-medium leading-4 ${badge}`}>{mp.party}</span>
+                    <span class="text-[10px] text-slate-400 dark:text-[hsl(0_0%_45%)] truncate">{mp.constituency}</span>
+                  </div>
+                </div>
+                <svg class="shrink-0 w-3.5 h-3.5 text-slate-300 dark:text-[hsl(0_0%_35%)] group-hover:text-rose-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            );
+          })}
+        </div>
+      ) : (
+        /* showAll=false (area pages): first 2 visible, rest behind chevron */
+        <div class="p-2 space-y-1.5">
+          {visibleMPs.map(mp => {
+            const { displayName, photoSrc, badge } = mpCard(mp);
+            return (
+              <a
+                href={`/trinidad/mp/${mp.nameSlug}/`}
+                class="flex items-center gap-2.5 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-2.5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm transition group"
+              >
+                <div class="shrink-0 w-9 h-9 rounded-md overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
+                  <img src={photoSrc} alt="" class="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="text-xs font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug truncate">
+                    {displayName}
+                  </div>
+                  <div class="flex items-center gap-1 mt-0.5 flex-wrap">
+                    <span class={`px-1 py-0 rounded-full text-[10px] font-medium leading-4 ${badge}`}>{mp.party}</span>
+                    <span class="text-[10px] text-slate-400 dark:text-[hsl(0_0%_45%)] truncate">{mp.constituency}</span>
+                  </div>
+                </div>
+                <svg class="shrink-0 w-3.5 h-3.5 text-slate-300 dark:text-[hsl(0_0%_35%)] group-hover:text-rose-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            );
+          })}
+
+          {hiddenMPs.length > 0 && (
+            <>
+              <div id="mpSidebarHidden" class="space-y-1.5 hidden">
+                {hiddenMPs.map(mp => {
+                  const { displayName, photoSrc, badge } = mpCard(mp);
+                  return (
+                    <a
+                      href={`/trinidad/mp/${mp.nameSlug}/`}
+                      class="flex items-center gap-2.5 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-2.5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm transition group"
+                    >
+                      <div class="shrink-0 w-9 h-9 rounded-md overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
+                        <img src={photoSrc} alt="" class="w-full h-full object-cover" loading="lazy" />
+                      </div>
+                      <div class="min-w-0 flex-1">
+                        <div class="text-xs font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug truncate">
+                          {displayName}
+                        </div>
+                        <div class="flex items-center gap-1 mt-0.5 flex-wrap">
+                          <span class={`px-1 py-0 rounded-full text-[10px] font-medium leading-4 ${badge}`}>{mp.party}</span>
+                          <span class="text-[10px] text-slate-400 dark:text-[hsl(0_0%_45%)] truncate">{mp.constituency}</span>
+                        </div>
+                      </div>
+                      <svg class="shrink-0 w-3.5 h-3.5 text-slate-300 dark:text-[hsl(0_0%_35%)] group-hover:text-rose-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  );
+                })}
+              </div>
+
+              <button
+                id="mpSidebarToggle"
+                class="w-full flex items-center justify-center gap-1 py-1.5 text-[11px] font-medium text-slate-400 dark:text-[hsl(0_0%_45%)] hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer"
+              >
+                <span id="mpSidebarLabel">{hiddenMPs.length} more MP{hiddenMPs.length !== 1 ? 's' : ''}</span>
+                <svg id="mpSidebarChevron" class="w-3.5 h-3.5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )}
+
+  <!-- Support card -->
+  <div class="p-4 bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)]">
+    <p class="text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_90%)] mb-1">Support this project</p>
+    <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mb-3">Free, ad-free, and independent. Help keep it that way.</p>
+    <a
+      href="https://ko-fi.com/crimehotspots"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="px-4 py-1.5 min-h-[22px] inline-flex items-center gap-2 border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] hover:border-amber-400 dark:hover:border-amber-600 hover:text-amber-700 dark:hover:text-amber-400 active:bg-amber-50 dark:active:bg-amber-950/40 rounded-lg transition font-medium text-xs whitespace-nowrap"
+    >
+      <svg class="w-4 h-4 text-amber-500" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+      </svg>
+      Support the Project
+    </a>
+  </div>
+
+</aside>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    // Share buttons
+    document.querySelectorAll<HTMLElement>('.sb-share-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const platform = btn.dataset.platform;
+        const rawUrl = btn.dataset.shareUrl || '';
+        const rawText = btn.dataset.shareText || '';
+        const url = encodeURIComponent(rawUrl);
+        const text = encodeURIComponent(rawText);
+
+        if (platform === 'twitter') {
+          window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=550,height=420');
+        } else if (platform === 'facebook') {
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=550,height=420');
+        } else if (platform === 'whatsapp') {
+          window.open(`https://wa.me/?text=${encodeURIComponent(rawText + ' ' + rawUrl)}`, '_blank');
+        }
+      });
+    });
+
+    // Area pages: "N more" chevron toggle
+    const sidebarToggle = document.getElementById('mpSidebarToggle');
+    const sidebarHidden = document.getElementById('mpSidebarHidden');
+    const sidebarLabel  = document.getElementById('mpSidebarLabel');
+    const sidebarChevron = document.getElementById('mpSidebarChevron');
+    if (sidebarToggle && sidebarHidden && sidebarLabel && sidebarChevron) {
+      const count = sidebarHidden.children.length;
+      sidebarToggle.addEventListener('click', () => {
+        const isOpen = !sidebarHidden.classList.contains('hidden');
+        sidebarHidden.classList.toggle('hidden');
+        (sidebarChevron as HTMLElement).style.transform = isOpen ? '' : 'rotate(180deg)';
+        sidebarLabel.textContent = isOpen
+          ? `${count} more MP${count !== 1 ? 's' : ''}`
+          : 'Show less';
+      });
+    }
+
+    // Region pages: mobile-only collapse toggle (lg+ always visible via lg:block)
+    const mobileToggle  = document.getElementById('mpMobileToggle');
+    const mobileList    = document.getElementById('mpMobileList');
+    const mobileChevron = document.getElementById('mpMobileChevron');
+    if (mobileToggle && mobileList) {
+      mobileToggle.addEventListener('click', () => {
+        const isOpen = !mobileList.classList.contains('hidden');
+        mobileList.classList.toggle('hidden');
+        mobileToggle.setAttribute('aria-expanded', String(!isOpen));
+        if (mobileChevron) {
+          (mobileChevron as HTMLElement).style.transform = isOpen ? '' : 'rotate(180deg)';
+        }
+      });
+    }
+  });
+</script>

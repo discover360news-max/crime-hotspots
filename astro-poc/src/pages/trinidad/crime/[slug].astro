@@ -88,7 +88,7 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
 ---
 
 {crime ? (
-<Layout title={title} description={description} ogImage={ogImage} ogType="article" includeTurnstile={true}>
+<Layout title={title} description={description} ogImage={ogImage} ogType="article">
   <!-- SEO CRITICAL: NewsArticle structured data — injected into <head> via slot="head".
        Google uses this for news carousels, rich snippets, and article indexing signals.
        DO NOT remove fields or the slot="head" attribute. See docs/claude-context/SEO-CONFIG.md. -->
@@ -146,7 +146,7 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
       { label: truncatedHeadline }
     ]} />
 
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+    <div class="bg-white dark:bg-[hsl(0_0%_8%)] rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
 
     <!-- Navigation Buttons with Share -->
     <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">

@@ -12,6 +12,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import Hero from '../../../components/Hero.astro';
 import StatCards from '../../../components/StatCards.astro';
 import DataTable from '../../../components/DataTable.astro';
+import MPSidebar from '../../../components/MPSidebar.astro';
 import { getTrinidadCrimes, generateNameSlug } from '../../../lib/crimeData';
 import { loadFullAreaData } from '../../../lib/areaAliases';
 import { calculateAreaCrimeScore } from '../../../lib/safetyHelpers';
@@ -154,12 +155,6 @@ recentCrimes30d.slice(0, 20).forEach(crime => {
 
 const regionMPs = mpsData.filter(mp => mp.regionSlugs.includes(slug));
 
-const mpPartyBadgeClass: Record<string, string> = {
-  PNM: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400',
-  UNC: 'bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400',
-  TPP: 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_65%)]',
-};
-
 const breadcrumbs = [
   { label: 'Home', href: '/' },
   { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
@@ -184,7 +179,10 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
     <Breadcrumbs items={breadcrumbs} slot="before" />
   </Hero>
 
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-5">
+    <div class="lg:grid lg:grid-cols-[1fr_256px] lg:gap-8 lg:items-start">
+
+  <main class="min-w-0" data-pagefind-body>
 
     <!-- Stat Cards -->
     <div class="mt-6">
@@ -207,39 +205,6 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
         </div>
       )}
     </div>
-
-    <!-- MPs for this region -->
-    {regionMPs.length > 0 && (
-      <section class="mt-8">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-4">
-          Member{regionMPs.length !== 1 ? 's' : ''} of Parliament
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {regionMPs.map(mp => {
-            const displayName = mp.honorific ? `${mp.honorific} ${mp.fullName}` : mp.fullName;
-            const photoSrc = mp.photo ? `/images/mps/${mp.photo}` : '/images/mps/placeholder.svg';
-            const badge = mpPartyBadgeClass[mp.party] ?? mpPartyBadgeClass['TPP'];
-            return (
-              <a
-                href={`/trinidad/mp/${mp.nameSlug}/`}
-                class="flex items-center gap-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-3 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm transition group"
-              >
-                <div class="shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
-                  <img src={photoSrc} alt="" class="w-full h-full object-cover" loading="lazy" />
-                </div>
-                <div class="min-w-0">
-                  <div class="text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug">{displayName}</div>
-                  <div class="flex items-center gap-1.5 mt-1 flex-wrap">
-                    <span class={`px-1.5 py-0 rounded-full text-xs font-medium ${badge}`}>{mp.party}</span>
-                    <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] truncate">{mp.constituency}</span>
-                  </div>
-                </div>
-              </a>
-            );
-          })}
-        </div>
-      </section>
-    )}
 
     <!-- Area Ranking -->
     <section class="mt-8">
@@ -356,6 +321,17 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
       </section>
     )}
   </main>
+
+      <MPSidebar
+        mps={regionMPs}
+        regionName={regionName}
+        pageUrl={`https://crimehotspots.com/trinidad/region/${slug}/`}
+        shareText={`Crime statistics for ${regionName} Region, Trinidad. View details at Crime Hotspots.`}
+        showAll={true}
+      />
+
+    </div>
+  </div>
 </Layout>
 
 <style>

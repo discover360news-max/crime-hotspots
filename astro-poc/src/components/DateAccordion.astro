@@ -22,17 +22,13 @@ const formattedDate = new Date(date).toLocaleDateString('en-US', {
 });
 ---
 
-<div class="date-accordion mb-4" data-date={date}>
+<details class="date-accordion mb-4" data-date={date} open={isExpanded || undefined}>
   <!-- Accordion Header -->
-  <button
-    class="accordion-header w-full px-4 py-3 bg-white/70 dark:bg-[hsl(0_0%_10%)]/70 backdrop-blur-md rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-white/90 dark:hover:bg-[hsl(0_0%_14%)] transition flex items-center justify-between group"
-    aria-expanded={isExpanded ? 'true' : 'false'}
-  >
+  <summary class="accordion-header w-full px-4 py-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-white dark:hover:bg-[hsl(0_0%_14%)] transition flex items-center justify-between group list-none cursor-pointer">
     <div class="flex items-center gap-3">
       <!-- Chevron Icon -->
       <svg
         class="chevron w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_55%)] transition-transform duration-200"
-        class:list={[isExpanded && 'rotate-90']}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -51,18 +47,15 @@ const formattedDate = new Date(date).toLocaleDateString('en-US', {
     <span class="px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 text-xs font-medium">
       {victimCount}
     </span>
-  </button>
+  </summary>
 
   <!-- Accordion Content -->
-  <div
-    class="accordion-content overflow-hidden"
-    class:list={[isExpanded && 'is-open']}
-  >
+  <div class="accordion-content overflow-hidden">
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pb-4">
       <slot />
     </div>
   </div>
-</div>
+</details>
 
 <style>
   /* height: auto is animatable because Layout.astro sets html { interpolate-size: allow-keywords } */
@@ -74,27 +67,30 @@ const formattedDate = new Date(date).toLocaleDateString('en-US', {
     height: auto;
     margin-top: 0.75rem;
   }
+  details[open] .chevron {
+    transform: rotate(90deg);
+  }
+  /* Remove default <summary> marker in all browsers */
+  summary::-webkit-details-marker { display: none; }
 </style>
 
 <script>
+  // <details> sets content to display:none on close, which kills CSS height transitions.
+  // Intercept toggle: manage is-open class for animation, open attribute for ARIA semantics.
   document.addEventListener('astro:page-load', () => {
-    document.querySelectorAll('.accordion-header').forEach(header => {
-      header.addEventListener('click', () => {
-        const accordion = header.closest('.date-accordion');
-        const content = accordion && accordion.querySelector('.accordion-content');
-        const chevron = header.querySelector('.chevron');
-        const expanded = header.getAttribute('aria-expanded') === 'true';
-
-        if (content && chevron) {
-          if (expanded) {
-            header.setAttribute('aria-expanded', 'false');
-            content.classList.remove('is-open');
-            chevron.classList.remove('rotate-90');
-          } else {
-            header.setAttribute('aria-expanded', 'true');
-            content.classList.add('is-open');
-            chevron.classList.add('rotate-90');
-          }
+    document.querySelectorAll('.date-accordion').forEach((details) => {
+      const content = details.querySelector('.accordion-content');
+      if (!content) return;
+      if (details.open) content.classList.add('is-open');
+      details.querySelector('.accordion-header').addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent native <details> toggle — we manage open attribute ourselves
+        if (details.open) {
+          content.classList.remove('is-open');
+          setTimeout(() => details.removeAttribute('open'), 300);
+        } else {
+          details.setAttribute('open', '');
+          content.getBoundingClientRect(); // Force reflow so browser sees height:0 before transition
+          content.classList.add('is-open');
         }
       });
     });

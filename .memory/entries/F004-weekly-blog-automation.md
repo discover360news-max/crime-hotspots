@@ -3,7 +3,7 @@ id: F004
 type: feature
 status: active
 created: 2026-02-06
-updated: 2026-03-07
+updated: 2026-03-11
 related: [B007, B008, B010, F002]
 ---
 
@@ -44,6 +44,13 @@ Fully automated weekly blog pipeline: Monday 10AM Trinidad time → GAS validate
 - To delete a GAS-committed blog file (not in local repo): use GitHub API via `gh api --method DELETE` (see B010)
 - `SOCIAL_CONFIG.lagDays = 3` — do not change without understanding impact on stats accuracy
 
+## Title Format
+`buildBlogSystemPrompt()` generates titles as:
+`Trinidad [Year]: [Y] Murders This Week — [X] Total Crimes ([Month Abbreviation Day])`
+e.g. `Trinidad 2026: 7 Murders This Week — 55 Total Crimes (Mar 6)`
+Targets "trinidad murders 2026" and "trinidad crime this week" queries.
+
 ## Change Log
 - 2026-02-06: Weekly blog automation launched
 - 2026-03-02: Fixed murder count bugs (B007, B008, B010)
+- 2026-03-11: Updated title template in system prompt for SEO keyword targeting

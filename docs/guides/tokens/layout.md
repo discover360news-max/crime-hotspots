@@ -106,6 +106,60 @@ Crime detail, blog posts, About, Methodology.
 
 ---
 
+## Sidebar Page Layout (max-w-5xl + 256px column)
+
+Established Mar 11 2026. Used by area pages, region pages, and murder-count page.
+
+```astro
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+  <Breadcrumbs ... />
+
+  <!-- If main content was previously centred on a single-column page,
+       put the page title/header HERE (above the grid, text-center).
+       The grid then starts at the first meaningful content block (e.g. counter),
+       so the sidebar naturally aligns with it rather than the title. -->
+  <div class="text-center mb-8">
+    <h1>...</h1>
+  </div>
+
+  <div class="lg:grid lg:grid-cols-[1fr_256px] lg:gap-8 lg:items-start">
+
+    <!-- Left column — min-w-0 is REQUIRED to prevent overflow -->
+    <main class="min-w-0 space-y-10">
+      ...
+    </main>
+
+    <!-- Right sidebar — min-w-0 is REQUIRED; space-y-5 between cards -->
+    <aside class="mt-10 lg:mt-0 lg:sticky lg:top-20 space-y-5 min-w-0">
+      ...
+    </aside>
+
+  </div>
+</div>
+```
+
+### Sidebar Spacing Standards
+| Zone | Token | Value |
+|------|-------|-------|
+| Left column section gaps | `space-y-10` | 40px |
+| Sidebar card gaps | `space-y-5` | 20px |
+| Page header → grid | `mb-8` | 32px |
+| Mobile sidebar top margin | `mt-10` | 40px |
+| Sticky offset | `lg:top-20` | 80px (clears 64px header + 16px gap) |
+
+### Fitting NewsletterSignup in the 256px sidebar
+
+The `card` variant's form is `flex gap-2` (email + button side-by-side), which overflows at 256px.
+Fix with Tailwind arbitrary selectors on the `<aside>` — no component changes needed:
+
+```html
+<aside class="... min-w-0 [&_.newsletter-signup-form]:flex-col [&_.newsletter-signup-form_input]:w-full">
+  <NewsletterSignup variant="card" source="..." />
+</aside>
+```
+
+---
+
 ## Spacing & Layout
 
 ### Container Padding

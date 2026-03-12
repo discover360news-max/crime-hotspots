@@ -15,183 +15,217 @@ import { routes } from '../config/routes';
 const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.length);
 ---
 
-<!-- Modal Overlay -->
-<div
+<dialog
   id="sectionPickerModal"
-  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4"
+  class="m-auto p-0 bg-white/90 dark:bg-[hsl(0_0%_8%)]/95 backdrop-blur-xl rounded-2xl shadow-2xl border-0 outline-none"
+  aria-labelledby="sectionPickerTitle"
   data-pagefind-ignore
 >
-  <!-- Modal Content -->
-  <div
-    id="sectionPickerModalContent"
-    class="bg-white/90 dark:bg-[hsl(0_0%_8%)]/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full opacity-0 scale-95 transition-all duration-300"
-  >
-    <!-- Header -->
-    <div class="sticky top-0 bg-white/80 dark:bg-[hsl(0_0%_8%)]/90 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
-      <h2 id="sectionPickerTitle" class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Select Section</h2>
-      <button
-        id="closeSectionPickerModal"
-        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 dark:active:bg-[hsl(0_0%_15%)] transition text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
-        aria-label="Close"
-      >
-        <span class="text-2xl leading-none">&times;</span>
-      </button>
-    </div>
-
-    <!-- Section Buttons (one container per country, toggled by JS) -->
-    {availableCountries.map((country) => {
-      const primarySections = country.sections!.filter(s => s.showInBottomNav);
-      const secondarySections = country.sections!.filter(s => !s.showInBottomNav);
-
-      return (
-        <div
-          class="section-picker-list hidden p-6 max-h-[70vh] overflow-y-auto"
-          data-country-id={country.id}
-        >
-          <!-- Primary Sections (Start Here) -->
-          <div class="space-y-3 mb-4">
-            {primarySections.map((section) => {
-              const isRecommended = section.id === 'dashboard';
-              return (
-                <a
-                  href={section.url}
-                  class:list={[
-                    "group relative bg-white/80 dark:bg-[hsl(0_0%_10%)] backdrop-blur-md rounded-lg p-4 hover:shadow-lg transition-all duration-300 flex items-center justify-between",
-                    isRecommended
-                      ? "border-2 border-rose-500 shadow-md"
-                      : "border-2 border-slate-200 dark:border-[hsl(0_0%_20%)] hover:border-rose-600 dark:hover:border-rose-700"
-                  ]}
-                >
-                  <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-1">
-                      <h3 class:list={[
-                        "text-small font-bold transition",
-                        isRecommended ? "text-rose-600" : "text-slate-700 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600"
-                      ]}>
-                        {section.label}
-                      </h3>
-                      {isRecommended && (
-                        <span class="text-[10px] font-semibold uppercase tracking-wide bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-full">
-                          Start Here
-                        </span>
-                      )}
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{section.description}</p>
-                  </div>
-                  <svg class:list={[
-                    "w-5 h-5 shrink-0 ml-3 transition",
-                    isRecommended
-                      ? "text-rose-500 group-hover:translate-x-1"
-                      : "text-slate-400 dark:text-[hsl(0_0%_40%)] group-hover:text-rose-600 group-hover:translate-x-1"
-                  ]} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </a>
-              );
-            })}
-
-          </div>
-
-          <!-- Divider -->
-          {secondarySections.length > 0 && (
-            <div class="flex items-center gap-3 my-4">
-              <div class="flex-1 h-px bg-slate-200 dark:bg-[hsl(0_0%_22%)]"></div>
-              <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_40%)] font-medium">Explore More</span>
-              <div class="flex-1 h-px bg-slate-200 dark:bg-[hsl(0_0%_22%)]"></div>
-            </div>
-          )}
-
-          <!-- Secondary Sections (Compact) -->
-          {secondarySections.length > 0 && (
-            <div class="flex flex-wrap gap-2">
-              {secondarySections.map((section) => (
-                <a
-                  href={section.url}
-                  class="group inline-flex items-center gap-1.5 bg-slate-100 dark:bg-[hsl(0_0%_12%)] hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-slate-200 dark:border-[hsl(0_0%_20%)] hover:border-rose-300 dark:hover:border-rose-800 rounded-full px-3 py-1.5 transition-all duration-200"
-                  title={section.description}
-                >
-                  <span class="text-xs font-medium text-slate-600 dark:text-[hsl(0_0%_75%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">
-                    {section.label}
-                  </span>
-                  <svg class="w-3 h-3 text-slate-400 dark:text-[hsl(0_0%_40%)] group-hover:text-rose-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
-      );
-    })}
-
-    <!-- Footer Help Text -->
-    <div class="px-6 pb-6 pt-4">
-      <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] text-center">
-        Don't see your island? <a href={routes.contact} class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 underline">Contact us</a> to request coverage.
-      </p>
-    </div>
+  <!-- Header -->
+  <div class="sticky top-0 bg-white/80 dark:bg-[hsl(0_0%_8%)]/90 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
+    <h2 id="sectionPickerTitle" class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Select Section</h2>
+    <button
+      id="closeSectionPickerModal"
+      class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 dark:active:bg-[hsl(0_0%_15%)] transition text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
+      aria-label="Close"
+    >
+      <span class="text-2xl leading-none">&times;</span>
+    </button>
   </div>
-</div>
 
-<script>
-  const modal = document.getElementById('sectionPickerModal');
-  const modalContent = document.getElementById('sectionPickerModalContent');
-  const closeBtn = document.getElementById('closeSectionPickerModal');
-  const titleEl = document.getElementById('sectionPickerTitle');
-  const sectionLists = document.querySelectorAll('.section-picker-list');
+  <!-- Section Buttons (one container per country, toggled by JS) -->
+  {availableCountries.map((country) => {
+    const primarySections = country.sections!.filter(s => s.showInBottomNav);
+    const secondarySections = country.sections!.filter(s => !s.showInBottomNav);
 
-  // Country names lookup (built from data attributes)
-  const countryNames: Record<string, string> = {};
-  document.querySelectorAll<HTMLElement>('[data-section-country-name]').forEach(el => {
-    const id = el.dataset.sectionCountryId;
-    const name = el.dataset.sectionCountryName;
-    if (id && name) countryNames[id] = name;
-  });
+    return (
+      <div
+        class="section-picker-list hidden p-6 max-h-[70vh] overflow-y-auto"
+        data-country-id={country.id}
+      >
+        <!-- Primary Sections (Start Here) -->
+        <div class="space-y-3 mb-4">
+          {primarySections.map((section) => {
+            const isRecommended = section.id === 'dashboard';
+            return (
+              <a
+                href={section.url}
+                class:list={[
+                  "group relative bg-white/80 dark:bg-[hsl(0_0%_10%)] backdrop-blur-md rounded-lg p-4 hover:shadow-lg transition-all duration-300 flex items-center justify-between",
+                  isRecommended
+                    ? "border-2 border-rose-500 shadow-md"
+                    : "border-2 border-slate-200 dark:border-[hsl(0_0%_20%)] hover:border-rose-600 dark:hover:border-rose-700"
+                ]}
+              >
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <h3 class:list={[
+                      "text-small font-bold transition",
+                      isRecommended ? "text-rose-600" : "text-slate-700 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600"
+                    ]}>
+                      {section.label}
+                    </h3>
+                    {isRecommended && (
+                      <span class="text-[10px] font-semibold uppercase tracking-wide bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-full">
+                        Start Here
+                      </span>
+                    )}
+                  </div>
+                  <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{section.description}</p>
+                </div>
+                <svg class:list={[
+                  "w-5 h-5 shrink-0 ml-3 transition",
+                  isRecommended
+                    ? "text-rose-500 group-hover:translate-x-1"
+                    : "text-slate-400 dark:text-[hsl(0_0%_40%)] group-hover:text-rose-600 group-hover:translate-x-1"
+                ]} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            );
+          })}
 
-  // Global function to open modal for a specific country
-  (window as any).openSectionPickerModal = function(countryId: string, countryName: string) {
-    if (!modal || !modalContent) return;
+        </div>
 
-    // Update title
-    if (titleEl) titleEl.textContent = countryName;
+        <!-- Divider -->
+        {secondarySections.length > 0 && (
+          <div class="flex items-center gap-3 my-4">
+            <div class="flex-1 h-px bg-slate-200 dark:bg-[hsl(0_0%_22%)]"></div>
+            <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_40%)] font-medium">Explore More</span>
+            <div class="flex-1 h-px bg-slate-200 dark:bg-[hsl(0_0%_22%)]"></div>
+          </div>
+        )}
 
-    // Show the correct section list
-    sectionLists.forEach(list => {
-      if ((list as HTMLElement).dataset.countryId === countryId) {
-        list.classList.remove('hidden');
-      } else {
-        list.classList.add('hidden');
-      }
-    });
+        <!-- Secondary Sections (Compact) -->
+        {secondarySections.length > 0 && (
+          <div class="flex flex-wrap gap-2">
+            {secondarySections.map((section) => (
+              <a
+                href={section.url}
+                class="group inline-flex items-center gap-1.5 bg-slate-100 dark:bg-[hsl(0_0%_12%)] hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-slate-200 dark:border-[hsl(0_0%_20%)] hover:border-rose-300 dark:hover:border-rose-800 rounded-full px-3 py-1.5 transition-all duration-200"
+                title={section.description}
+              >
+                <span class="text-xs font-medium text-slate-600 dark:text-[hsl(0_0%_75%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">
+                  {section.label}
+                </span>
+                <svg class="w-3 h-3 text-slate-400 dark:text-[hsl(0_0%_40%)] group-hover:text-rose-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  })}
 
-    // Animate in
-    modal.classList.remove('invisible', 'opacity-0');
-    modal.classList.add('visible', 'opacity-100');
-    setTimeout(() => {
-      modalContent.classList.remove('opacity-0', 'scale-95');
-      modalContent.classList.add('opacity-100', 'scale-100');
-    }, 50);
-  };
+  <!-- Footer Help Text -->
+  <div class="px-6 pb-6 pt-4">
+    <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] text-center">
+      Don't see your island? <a href={routes.contact} class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 underline">Contact us</a> to request coverage.
+    </p>
+  </div>
+</dialog>
 
-  function closeModal() {
-    if (!modal || !modalContent) return;
-    modalContent.classList.remove('opacity-100', 'scale-100');
-    modalContent.classList.add('opacity-0', 'scale-95');
-    setTimeout(() => {
-      modal.classList.remove('visible', 'opacity-100');
-      modal.classList.add('invisible', 'opacity-0');
-    }, 300);
+<style is:global>
+  /* Sizing — width constrained to max-w-md with 1rem safe margin each side on small screens */
+  #sectionPickerModal {
+    width: calc(100% - 2rem);
+    max-width: 28rem; /* same as max-w-md */
   }
 
-  closeBtn?.addEventListener('click', closeModal);
+  /* Open animation — browser picks up @starting-style as the FROM state */
+  #sectionPickerModal[open] {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  @starting-style {
+    #sectionPickerModal[open] {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
 
-  modal?.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
+  /* Close animation — JS adds this class, removes it after transitionend */
+  #sectionPickerModal.is-closing {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  /* Backdrop */
+  #sectionPickerModal::backdrop {
+    background: rgb(0 0 0 / 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  @starting-style {
+    #sectionPickerModal[open]::backdrop {
+      opacity: 0;
+    }
+  }
+  #sectionPickerModal.is-closing::backdrop {
+    opacity: 0;
+  }
+</style>
+
+<script>
+  // NOTE: This is a module script — it runs ONCE per session (not re-run on SPA nav).
+  // All DOM queries happen inside each function call (fresh query every time);
+  // never captured at module scope. After SPA nav the body is replaced with fresh
+  // HTML, so any module-level element references become stale detached nodes.
+
+  function closeModal() {
+    const dialog = document.getElementById('sectionPickerModal') as HTMLDialogElement | null;
+    if (!dialog || !dialog.open || dialog.classList.contains('is-closing')) return;
+    dialog.classList.add('is-closing');
+    dialog.addEventListener('transitionend', () => {
+      dialog.classList.remove('is-closing');
+      dialog.close();
+      document.body.style.overflow = '';
+    }, { once: true });
+  }
+
+  // Primary API — queries DOM fresh on every call so SPA nav never breaks it
+  (window as any).openSectionPickerModal = function(countryId: string, countryName: string) {
+    const dialog = document.getElementById('sectionPickerModal') as HTMLDialogElement | null;
+    const titleEl = document.getElementById('sectionPickerTitle');
+    const lists = document.querySelectorAll<HTMLElement>('.section-picker-list');
+    if (!dialog) return;
+
+    if (titleEl) titleEl.textContent = countryName;
+    lists.forEach(list => {
+      list.classList.toggle('hidden', list.dataset.countryId !== countryId);
+    });
+
+    document.body.style.overflow = 'hidden';
+    dialog.showModal();
+  };
+
+  // Re-attach click listeners after every SPA navigation (body is replaced each time)
+  document.addEventListener('astro:page-load', () => {
+    const dialog = document.getElementById('sectionPickerModal') as HTMLDialogElement | null;
+    const closeBtn = document.getElementById('closeSectionPickerModal');
+
+    closeBtn?.addEventListener('click', closeModal);
+
+    // Backdrop click — fires on the <dialog> element itself when ::backdrop is clicked
+    dialog?.addEventListener('click', (e) => {
+      if (e.target === dialog) closeModal();
+    });
+
+    // Intercept native Escape to run our animated close instead of instant close
+    dialog?.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      closeModal();
+    });
   });
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal?.classList.contains('visible')) {
-      closeModal();
-    }
+  // Restore scroll lock if SPA nav happens while modal is open
+  document.addEventListener('astro:before-preparation', () => {
+    document.body.style.overflow = '';
   });
 </script>

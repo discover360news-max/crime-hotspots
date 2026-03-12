@@ -8,6 +8,84 @@
 
 ## March 2026
 
+### CSS Modernisation — Groups 1–5 complete (Mar 12)
+
+**~781 JS lines removed across 10 components. Full plan doc: `docs/CSS-MODERNISATION.md`.**
+
+**Group 1 — `<details>/<summary>` accordions (done earlier):**
+- `CategoryAccordion.astro`, `DateAccordion.astro` — JS class toggles → `<details>/<summary>` + CSS `:open` chevron
+- `MapLegend.astro` — JS `grid-template-rows` animation retained; click + open logic simplified
+- `area/[slug].astro` — inline "Recent Headlines" accordion: same pattern applied
+
+**Group 2 — `<dialog>` modals & menus:**
+- `IslandSelectorModal.astro`, `SectionPickerModal.astro`, `SearchModal.astro`, `Header.astro`, `BottomNav.astro` — all converted from JS-managed divs to native `<dialog>` + `showModal()` + `::backdrop`
+- Established patterns: `@starting-style` open animation, `.is-closing` + `transitionend` close, `cancel` intercept for Esc, `astro:before-preparation` SPA guard, `animation-fill-mode: backwards` backdrop concurrent fade
+- `BottomNav` country indicator: IntersectionObserver removed; strip always visible
+- All `is:inline` scripts converted to module scripts with `astro:page-load`
+
+**Group 3 — CSS `@keyframes` rotating banner:**
+- `BlogRotatingBanner.astro` — `setInterval` removed; 2 `@keyframes` variants (`blog-rotate-2/3`) + `[data-post-count]` selectors; item 0 gets `animation-delay: -0.5s` (no slide-in flash on load); `:hover` pauses rotation
+
+**Group 5 — Minor cleanup:**
+- `FeedbackToggle.astro` — `setTimeout(700)` → `animationend` + `{ once: true }`
+- `SiteNotificationBanner.astro` — `style.display='block/none'` → `hidden` attribute
+
+**Group 4 deferred** — CSS Anchor Positioning (Firefox not yet baseline; revisit late 2026)
+
+---
+
+### MPSidebar.astro + Murder Count Sidebar Layout (Mar 11)
+
+**New component: `src/components/MPSidebar.astro`**
+- Sticky right-column sidebar for area and region detail pages
+- Sections: share buttons (X/Facebook/WhatsApp using `.sb-share-btn` pattern), MPs card, Ko-fi support card
+- `showAll=false` (area pages): shows 2 MPs + "N more" chevron toggle
+- `showAll=true` (region pages): all MPs visible on desktop, mobile toggle
+- Added to `area/[slug].astro` + `region/[slug].astro` (replaces inline share button + MP grid)
+- Full design rules: `.memory/entries/C004-mpsidebar-design-rules.md`
+
+**Site width standard established (Mar 11):**
+- Global content width: `max-w-5xl` — header, footer, hero `narrowContainer`, sidebar pages
+- Sidebar grid: `lg:grid-cols-[1fr_256px]` with `lg:gap-8`; `min-w-0` required on both columns
+- Template: `docs/guides/tokens/layout.md` → "Sidebar Page Layout"
+
+**murder-count.astro sidebar:**
+- Converted to `max-w-5xl` + `lg:grid-cols-[1fr_256px]` layout (same pattern as MPSidebar pages)
+- Does NOT use MPSidebar component — sidebar content is inline (share buttons + incidents + newsletter)
+
+---
+
+### UX Audit Phase 1 & 2 (Mar 10)
+
+**P2-01 — Dashboard filter bar:**
+- Extracted year select + filters button into `sticky top-16 z-30` filter bar above content
+- Utility button style: `bg-slate-100` filled pill (vs ghost border for nav CTAs) — see L011
+- `#clearFiltersInline` hidden until filters active; `scroll-margin-top: 8rem` on map container
+- Year select options: plain years only ("2026" not "2026 Data")
+
+**P2-02 — Compare page selector bar:**
+- Same `sticky top-16 z-30` bar pattern; `#selectA` + `#selectB` dropdowns; redundant subtitle removed
+
+**Dashboard script extraction (L012):**
+- `dashboard.astro` 869 → 554 lines — extracted `MapLegend.astro`, `dashboardMapInit.ts`, `dashboardLocationFilter.ts`
+- Line limit updated: content pages ~500, complex interactive pages ~600
+
+---
+
+### MP Profiles — Phase 1 complete (Mar 10–11)
+
+- All 41 MPs now have real photos (`public/images/mps/`)
+- `socials` (Facebook, X, Instagram, YouTube), `website`, `contact.emailAlt`, `contact.whatsapp` populated where available
+- Non-standard filenames: `khadijah-ameen.webp`, `mrs-camille-robinson-regis.webp`, `neil-gosine.webp`
+- Phase 2 deferred: area page → MP link (only where area↔constituency mapping is unambiguous)
+
+---
+
+### Safety Tips — TIP-00047 to TIP-00048 (Mar 11)
+
+- **NEW TIP TIP-00047** — Concealing Valuables Before Exiting Your Vehicle (Robbery / In Your Car) — Story ID 514
+- **NEW TIP TIP-00048** — Staying Safe During Roadside Enforcement Duties (Assault / At Work) — Story ID 515
+
 ### Safety Tips — TIP-00044 to TIP-00046 (Mar 9)
 
 - **NEW TIP TIP-00044** — Vary Your Morning Departure to Avoid Ambush (Carjacking / At Home) — Story ID 506

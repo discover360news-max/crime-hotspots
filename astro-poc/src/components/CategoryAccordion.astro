@@ -15,15 +15,11 @@ interface Props {
 const { category, count, categoryHref, isExpanded = false } = Astro.props;
 ---
 
-<div class="cat-accordion mb-3">
-  <button
-    class="cat-header w-full px-4 py-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group"
-    aria-expanded={isExpanded ? 'true' : 'false'}
-  >
+<details class="cat-accordion mb-3" open={isExpanded || undefined}>
+  <summary class="cat-header w-full px-4 py-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group list-none cursor-pointer">
     <div class="flex items-center gap-3">
       <svg
         class="cat-chevron w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_55%)] transition-transform duration-200 flex-shrink-0"
-        class:list={[isExpanded && 'rotate-90']}
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -45,12 +41,9 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
         See all →
       </a>
     </div>
-  </button>
+  </summary>
 
-  <div
-    class="cat-content overflow-hidden"
-    class:list={[isExpanded && 'is-open']}
-  >
+  <div class="cat-content overflow-hidden">
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-2">
       <slot />
     </div>
@@ -61,7 +54,7 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
       See all {category} tips →
     </a>
   </div>
-</div>
+</details>
 
 <style>
   /* height: auto is animatable because Layout.astro sets html { interpolate-size: allow-keywords } */
@@ -73,25 +66,30 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
     height: auto;
     margin-top: 0.75rem;
   }
+  details[open] .cat-chevron {
+    transform: rotate(90deg);
+  }
+  /* Remove default <summary> marker in all browsers */
+  summary::-webkit-details-marker { display: none; }
 </style>
 
 <script>
+  // <details> sets content to display:none on close, which kills CSS height transitions.
+  // Intercept toggle: manage is-open class for animation, open attribute for ARIA semantics.
   document.addEventListener('astro:page-load', () => {
-    document.querySelectorAll('.cat-accordion').forEach((accordion) => {
-      const header = accordion.querySelector('.cat-header');
-      const content = accordion.querySelector('.cat-content');
-      const chevron = accordion.querySelector('.cat-chevron');
-      if (!header || !content || !chevron) return;
-      header.addEventListener('click', () => {
-        const expanded = header.getAttribute('aria-expanded') === 'true';
-        if (expanded) {
-          header.setAttribute('aria-expanded', 'false');
+    document.querySelectorAll('.cat-accordion').forEach((details) => {
+      const content = details.querySelector('.cat-content');
+      if (!content) return;
+      if (details.open) content.classList.add('is-open');
+      details.querySelector('.cat-header').addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent native <details> toggle — we manage open attribute ourselves
+        if (details.open) {
           content.classList.remove('is-open');
-          chevron.classList.remove('rotate-90');
+          setTimeout(() => details.removeAttribute('open'), 300);
         } else {
-          header.setAttribute('aria-expanded', 'true');
+          details.setAttribute('open', '');
+          content.getBoundingClientRect(); // Force reflow so browser sees height:0 before transition
           content.classList.add('is-open');
-          chevron.classList.add('rotate-90');
         }
       });
     });

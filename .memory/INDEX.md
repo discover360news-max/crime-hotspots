@@ -55,6 +55,7 @@ F009 | FEAT | active | Analytics: GA4 Consent Mode v2 — gtag denied by default
 C001 | COMP | active | CrimeDetailModal: 261-line orchestrator + 5 modal*.ts modules in src/scripts/ → C001-crime-detail-modal.md
 C002 | COMP | active | SearchModal: Pagefind + suggestions panel (recent searches, latest crimes, chips) → C002-search-modal.md
 C003 | COMP | active | IslandSelectorModal: unified picker; backward-compat window.open*Modal() aliases → C003-island-selector-modal.md
+C004 | COMP | active | MPSidebar: area pages (showAll=false: 2+chevron) + region pages (showAll=true: all on desktop, mobile toggle). Share + MPs + Ko-fi. Global width standard: max-w-5xl across header/footer/hero → C004-mpsidebar-design-rules.md
 
 ## Config (CFG)
 CFG001 | CFG | active | Project overview: Astro 5, Cloudflare Pages, GA4, GAS, Claude Haiku → CFG001-project-overview.md

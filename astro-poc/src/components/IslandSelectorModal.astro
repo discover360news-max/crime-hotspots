@@ -37,79 +37,118 @@ function getCountryUrl(country: typeof COUNTRIES[0], type: ModalType): string | 
 const modalTypes: ModalType[] = ['dashboard', 'headlines', 'areas', 'archives'];
 ---
 
-<!-- Modal Overlay -->
-<div
+<dialog
   id="islandSelectorModal"
-  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4"
+  class="m-auto p-0 bg-white/90 dark:bg-[hsl(0_0%_8%)]/95 backdrop-blur-xl rounded-2xl shadow-2xl border-0 outline-none"
+  aria-labelledby="islandSelectorTitle"
   data-pagefind-ignore
 >
-  <!-- Modal Content -->
-  <div
-    id="islandSelectorModalContent"
-    class="bg-white/90 dark:bg-[hsl(0_0%_8%)]/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full opacity-0 scale-95 transition-all duration-300"
-  >
-    <!-- Header -->
-    <div class="sticky top-0 bg-white/80 dark:bg-[hsl(0_0%_8%)]/90 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
-      <h2 id="islandSelectorTitle" class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Select Island</h2>
-      <button
-        id="closeIslandSelectorModal"
-        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 dark:active:bg-[hsl(0_0%_15%)] transition text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
-        aria-label="Close"
-      >
-        <span class="text-2xl leading-none">&times;</span>
-      </button>
-    </div>
-
-    <!-- Island Lists (one per modal type, toggled by JS) -->
-    {modalTypes.map((type) => (
-      <div
-        class="island-selector-list hidden p-6 space-y-3 max-h-[60vh] overflow-y-auto"
-        data-modal-type={type}
-      >
-        {COUNTRIES.map((country) => {
-          const url = getCountryUrl(country, type);
-          return country.available && url ? (
-            <a
-              href={url}
-              class="group relative bg-white/85 dark:bg-[hsl(0_0%_10%)] backdrop-blur-md border-2 border-slate-200 dark:border-[hsl(0_0%_20%)] rounded-lg p-4 hover:border-rose-600 dark:hover:border-rose-700 hover:shadow-lg transition-all duration-300 flex items-center justify-between"
-            >
-              <div>
-                <h3 class="text-body font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600 transition mb-1">
-                  {country.name}
-                </h3>
-                <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">{country.short}</p>
-              </div>
-              <svg class="w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_40%)] group-hover:text-rose-600 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </a>
-          ) : !country.available ? (
-            <div class="relative bg-white/50 dark:bg-[hsl(0_0%_8%)]/50 backdrop-blur-md border-2 border-slate-200 dark:border-[hsl(0_0%_18%)] rounded-lg p-4 opacity-60 cursor-not-allowed flex items-center justify-between">
-              <div>
-                <h3 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_45%)] mb-1">{country.name}</h3>
-                <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_40%)]">{country.short}</p>
-              </div>
-              <svg class="w-5 h-5 text-slate-300 dark:text-[hsl(0_0%_30%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-          ) : null;
-        })}
-      </div>
-    ))}
-
-    <!-- Footer Help Text -->
-    <div class="px-6 pb-6 pt-2">
-      <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)] text-center">
-        Don't see your island? <a href={routes.report} class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 underline">Submit a report</a> to help us expand.
-      </p>
-    </div>
+  <!-- Header -->
+  <div class="sticky top-0 bg-white/80 dark:bg-[hsl(0_0%_8%)]/90 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
+    <h2 id="islandSelectorTitle" class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Select Island</h2>
+    <button
+      id="closeIslandSelectorModal"
+      class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 dark:active:bg-[hsl(0_0%_15%)] transition text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
+      aria-label="Close"
+    >
+      <span class="text-2xl leading-none">&times;</span>
+    </button>
   </div>
-</div>
+
+  <!-- Island Lists (one per modal type, toggled by JS) -->
+  {modalTypes.map((type) => (
+    <div
+      class="island-selector-list hidden p-6 space-y-3 max-h-[60vh] overflow-y-auto"
+      data-modal-type={type}
+    >
+      {COUNTRIES.map((country) => {
+        const url = getCountryUrl(country, type);
+        return country.available && url ? (
+          <a
+            href={url}
+            class="group relative bg-white/85 dark:bg-[hsl(0_0%_10%)] backdrop-blur-md border-2 border-slate-200 dark:border-[hsl(0_0%_20%)] rounded-lg p-4 hover:border-rose-600 dark:hover:border-rose-700 hover:shadow-lg transition-all duration-300 flex items-center justify-between"
+          >
+            <div>
+              <h3 class="text-body font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600 transition mb-1">
+                {country.name}
+              </h3>
+              <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">{country.short}</p>
+            </div>
+            <svg class="w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_40%)] group-hover:text-rose-600 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        ) : !country.available ? (
+          <div class="relative bg-white/50 dark:bg-[hsl(0_0%_8%)]/50 backdrop-blur-md border-2 border-slate-200 dark:border-[hsl(0_0%_18%)] rounded-lg p-4 opacity-60 cursor-not-allowed flex items-center justify-between">
+            <div>
+              <h3 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_45%)] mb-1">{country.name}</h3>
+              <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_40%)]">{country.short}</p>
+            </div>
+            <svg class="w-5 h-5 text-slate-300 dark:text-[hsl(0_0%_30%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+        ) : null;
+      })}
+    </div>
+  ))}
+
+  <!-- Footer Help Text -->
+  <div class="px-6 pb-6 pt-2">
+    <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)] text-center">
+      Don't see your island? <a href={routes.report} class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 underline">Submit a report</a> to help us expand.
+    </p>
+  </div>
+</dialog>
+
+<style is:global>
+  /* Sizing — width constrained to max-w-md with 1rem safe margin each side on small screens */
+  #islandSelectorModal {
+    width: calc(100% - 2rem);
+    max-width: 28rem; /* same as max-w-md */
+  }
+
+  /* Open animation — browser picks up @starting-style as the FROM state */
+  #islandSelectorModal[open] {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  @starting-style {
+    #islandSelectorModal[open] {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+
+  /* Close animation — JS adds this class, removes it after transitionend */
+  #islandSelectorModal.is-closing {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  /* Backdrop */
+  #islandSelectorModal::backdrop {
+    background: rgb(0 0 0 / 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  @starting-style {
+    #islandSelectorModal[open]::backdrop {
+      opacity: 0;
+    }
+  }
+  #islandSelectorModal.is-closing::backdrop {
+    opacity: 0;
+  }
+</style>
 
 <script>
   // NOTE: This is a module script — it runs ONCE per session (not re-run on SPA nav).
-  // All DOM queries MUST happen inside each function call (fresh query every time),
+  // All DOM queries happen inside each function call (fresh query every time);
   // never captured at module scope. After SPA nav the body is replaced with fresh
   // HTML, so any module-level element references become stale detached nodes.
 
@@ -120,44 +159,31 @@ const modalTypes: ModalType[] = ['dashboard', 'headlines', 'areas', 'archives'];
     archives: 'Select Island',
   };
 
-  function openModal() {
-    const modal = document.getElementById('islandSelectorModal');
-    const modalContent = document.getElementById('islandSelectorModalContent');
-    if (!modal || !modalContent) return;
-    modal.classList.remove('invisible', 'opacity-0');
-    modal.classList.add('visible', 'opacity-100');
-    setTimeout(() => {
-      modalContent.classList.remove('opacity-0', 'scale-95');
-      modalContent.classList.add('opacity-100', 'scale-100');
-    }, 50);
-  }
-
   function closeModal() {
-    const modal = document.getElementById('islandSelectorModal');
-    const modalContent = document.getElementById('islandSelectorModalContent');
-    if (!modal || !modalContent) return;
-    modalContent.classList.remove('opacity-100', 'scale-100');
-    modalContent.classList.add('opacity-0', 'scale-95');
-    setTimeout(() => {
-      modal.classList.remove('visible', 'opacity-100');
-      modal.classList.add('invisible', 'opacity-0');
-    }, 300);
+    const dialog = document.getElementById('islandSelectorModal') as HTMLDialogElement | null;
+    if (!dialog || !dialog.open || dialog.classList.contains('is-closing')) return;
+    dialog.classList.add('is-closing');
+    dialog.addEventListener('transitionend', () => {
+      dialog.classList.remove('is-closing');
+      dialog.close();
+      document.body.style.overflow = '';
+    }, { once: true });
   }
 
   // Primary API — queries DOM fresh on every call so SPA nav never breaks it
   (window as any).openIslandModal = function(type: string) {
-    const modal = document.getElementById('islandSelectorModal');
-    const modalContent = document.getElementById('islandSelectorModalContent');
+    const dialog = document.getElementById('islandSelectorModal') as HTMLDialogElement | null;
     const titleEl = document.getElementById('islandSelectorTitle');
     const lists = document.querySelectorAll<HTMLElement>('.island-selector-list');
-    if (!modal || !modalContent) return;
+    if (!dialog) return;
 
     if (titleEl) titleEl.textContent = TITLES[type] ?? 'Select Island';
     lists.forEach(list => {
       list.classList.toggle('hidden', list.dataset.modalType !== type);
     });
 
-    openModal();
+    document.body.style.overflow = 'hidden';
+    dialog.showModal();
   };
 
   // Backward-compat aliases
@@ -168,20 +194,25 @@ const modalTypes: ModalType[] = ['dashboard', 'headlines', 'areas', 'archives'];
 
   // Re-attach click listeners after every SPA navigation (body is replaced each time)
   document.addEventListener('astro:page-load', () => {
+    const dialog = document.getElementById('islandSelectorModal') as HTMLDialogElement | null;
     const closeBtn = document.getElementById('closeIslandSelectorModal');
-    const modal = document.getElementById('islandSelectorModal');
 
     closeBtn?.addEventListener('click', closeModal);
-    modal?.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
+
+    // Backdrop click — fires on the <dialog> element itself when ::backdrop is clicked
+    dialog?.addEventListener('click', (e) => {
+      if (e.target === dialog) closeModal();
+    });
+
+    // Intercept native Escape to run our animated close instead of instant close
+    dialog?.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      closeModal();
     });
   });
 
-  // Escape — registered once at module level; queries DOM fresh on each keypress
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      const modal = document.getElementById('islandSelectorModal');
-      if (modal?.classList.contains('visible')) closeModal();
-    }
+  // Restore scroll lock if SPA nav happens while modal is open
+  document.addEventListener('astro:before-preparation', () => {
+    document.body.style.overflow = '';
   });
 </script>

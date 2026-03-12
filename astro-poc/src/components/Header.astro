@@ -40,7 +40,7 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
 ---
 
 <header class="bg-white dark:bg-[hsl(0_0%_5%)] shadow-sm dark:shadow-[0_1px_0_0_hsl(0_0%_18%)] sticky top-0 z-40" data-pagefind-ignore>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <!-- Logo (light / dark mode variants) -->
       <a href="/" class="flex items-center">
@@ -88,7 +88,7 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
         <button
           id="menuToggle"
           class="inline-flex items-center justify-center p-2 rounded-md text-slate-700 dark:text-[hsl(0_0%_70%)] hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-rose-300 transition-all"
-          aria-controls="mainNav"
+          aria-controls="mobileMenuDialog"
           aria-expanded="false"
         >
           <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -193,11 +193,8 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
   </div>
 </header>
 
-<!-- Subscribe tray backdrop -->
-<div id="subscribeBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300" data-pagefind-ignore></div>
-
-<!-- Subscribe tray -->
-<div id="subscribeTray" class="fixed top-0 right-0 bottom-0 w-80 bg-white/80 dark:bg-[hsl(0_0%_7%)]/95 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full invisible transition-transform duration-300 ease-out overflow-y-auto" data-pagefind-ignore>
+<!-- Subscribe tray dialog -->
+<dialog id="subscribeDialog" aria-label="Subscribe and follow" class="bg-white/80 dark:bg-[hsl(0_0%_7%)]/95 backdrop-blur-lg shadow-2xl rounded-l-2xl" data-pagefind-ignore>
   <div class="p-6">
     <div class="flex items-center justify-between mb-8">
       <h2 class="text-body font-bold text-slate-800 dark:text-[hsl(0_0%_92%)]">Follow Us</h2>
@@ -286,13 +283,10 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
       </a>
     </div>
   </div>
-</div>
+</dialog>
 
-<!-- Mobile menu backdrop -->
-<div id="mobileMenuBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 md:hidden" data-pagefind-ignore></div>
-
-<!-- Mobile menu overlay -->
-<nav id="mobileNav" class="fixed top-0 right-0 bottom-0 w-72 bg-white/80 dark:bg-[hsl(0_0%_7%)]/95 backdrop-blur-lg shadow-2xl rounded-l-2xl z-50 transform translate-x-full invisible transition-transform duration-300 ease-out md:hidden overflow-y-auto" role="navigation" aria-label="Mobile menu" data-pagefind-ignore>
+<!-- Mobile menu dialog -->
+<dialog id="mobileMenuDialog" aria-label="Mobile menu" class="bg-white/80 dark:bg-[hsl(0_0%_7%)]/95 backdrop-blur-lg shadow-2xl rounded-l-2xl" data-pagefind-ignore>
   <div class="p-6">
     <div class="flex items-center justify-end mb-8">
       <button id="mobileMenuClose" class="p-2 rounded-full text-slate-600 dark:text-[hsl(0_0%_60%)] hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 transition-all" aria-label="Close menu">
@@ -424,8 +418,99 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
       </a>
     </div>
   </div>
-</nav>
+</dialog>
 
+<style is:global>
+  /* Subscribe tray — right-side panel dialog */
+  #subscribeDialog {
+    position: fixed;
+    inset: 0 0 0 auto;
+    margin: 0;
+    width: 20rem;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: none;
+    padding: 0;
+    overflow-y: auto;
+    transform: translateX(0);
+    opacity: 1;
+    transition: transform 0.3s ease-out, opacity 0.3s;
+  }
+
+  @starting-style {
+    #subscribeDialog[open] {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  #subscribeDialog.is-closing {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  #subscribeDialog::backdrop {
+    background: rgb(0 0 0 / 0.5);
+    backdrop-filter: blur(4px);
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
+
+  @starting-style {
+    #subscribeDialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  #subscribeDialog.is-closing::backdrop {
+    opacity: 0;
+  }
+
+  /* Mobile menu — right-side panel dialog */
+  #mobileMenuDialog {
+    position: fixed;
+    inset: 0 0 0 auto;
+    margin: 0;
+    width: 18rem;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: none;
+    padding: 0;
+    overflow-y: auto;
+    transform: translateX(0);
+    opacity: 1;
+    transition: transform 0.3s ease-out, opacity 0.3s;
+  }
+
+  @starting-style {
+    #mobileMenuDialog[open] {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  #mobileMenuDialog.is-closing {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  #mobileMenuDialog::backdrop {
+    background: rgb(0 0 0 / 0.5);
+    backdrop-filter: blur(4px);
+    opacity: 1;
+    transition: opacity 0.3s;
+  }
+
+  @starting-style {
+    #mobileMenuDialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  #mobileMenuDialog.is-closing::backdrop {
+    opacity: 0;
+  }
+</style>
 
 <script>
   // NOTE: Module script — runs ONCE per session. All interactive setup MUST be
@@ -444,33 +529,13 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
     document.body.style.paddingRight = '';
   }
 
-  // Escape key — registered once at module level, queries DOM fresh on each press
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'Escape') return;
-    const menuToggle = document.getElementById('menuToggle');
-    const subscribeTray = document.getElementById('subscribeTray');
-    if (menuToggle?.getAttribute('aria-expanded') === 'true') {
-      (window as any).closeMobileMenu?.();
-    }
-    if (subscribeTray?.classList.contains('translate-x-0')) {
-      closeSubscribeTray();
-    }
-  });
-
-  // Subscribe tray helpers (used inside and outside page-load callback)
-  function closeSubscribeTray() {
-    const subscribeTray = document.getElementById('subscribeTray');
-    const subscribeBackdrop = document.getElementById('subscribeBackdrop');
-    if (!subscribeBackdrop || !subscribeTray) return;
-    subscribeTray.classList.remove('translate-x-0');
-    subscribeTray.classList.add('translate-x-full');
-    subscribeBackdrop.classList.remove('opacity-100');
-    subscribeBackdrop.classList.add('opacity-0');
-    unlockScroll();
-    setTimeout(() => {
-      subscribeBackdrop.classList.add('hidden');
-      subscribeTray.classList.add('invisible');
-    }, 300);
+  function closeDialogAnimated(dialog: HTMLDialogElement, callback?: () => void) {
+    dialog.classList.add('is-closing');
+    dialog.addEventListener('transitionend', () => {
+      dialog.classList.remove('is-closing');
+      dialog.close();
+      callback?.();
+    }, { once: true });
   }
 
   // Areas navigation — context-aware, no DOM refs needed
@@ -498,81 +563,96 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
   // Expose for inline onclick attributes in the template
   (window as any).navigateAreas = navigateAreas;
 
+  // SPA navigation guard — close any open dialogs immediately, unlock scroll
+  document.addEventListener('astro:before-preparation', () => {
+    const mobileMenuDialog = document.getElementById('mobileMenuDialog') as HTMLDialogElement | null;
+    const subscribeDialog = document.getElementById('subscribeDialog') as HTMLDialogElement | null;
+    if (mobileMenuDialog?.open) mobileMenuDialog.close();
+    if (subscribeDialog?.open) subscribeDialog.close();
+    unlockScroll();
+  });
+
   // Re-attach all element-specific listeners on every navigation
   document.addEventListener('astro:page-load', () => {
     // ── Mobile menu ──────────────────────────────────────────────────────────
-    const menuToggle = document.getElementById('menuToggle');
-    const mobileNav = document.getElementById('mobileNav');
-    const mobileBackdrop = document.getElementById('mobileMenuBackdrop');
-    const mobileMenuClose = document.getElementById('mobileMenuClose');
-
-    function openMobileMenu() {
-      if (!mobileBackdrop || !mobileNav || !menuToggle) return;
-      mobileBackdrop.classList.remove('hidden');
-      mobileNav.classList.remove('translate-x-full', 'invisible');
-      mobileNav.classList.add('translate-x-0');
-      lockScroll();
-      requestAnimationFrame(() => {
-        mobileBackdrop.classList.remove('opacity-0');
-        mobileBackdrop.classList.add('opacity-100');
-      });
-      menuToggle.setAttribute('aria-expanded', 'true');
-    }
+    const menuToggle = document.getElementById('menuToggle') as HTMLButtonElement | null;
+    const mobileMenuDialog = document.getElementById('mobileMenuDialog') as HTMLDialogElement | null;
+    const mobileMenuClose = document.getElementById('mobileMenuClose') as HTMLButtonElement | null;
 
     function closeMobileMenu() {
-      if (!mobileBackdrop || !mobileNav || !menuToggle) return;
-      mobileNav.classList.remove('translate-x-0');
-      mobileNav.classList.add('translate-x-full');
-      mobileBackdrop.classList.remove('opacity-100');
-      mobileBackdrop.classList.add('opacity-0');
-      unlockScroll();
-      setTimeout(() => {
-        mobileBackdrop.classList.add('hidden');
-        mobileNav.classList.add('invisible');
-      }, 300);
-      menuToggle.setAttribute('aria-expanded', 'false');
+      if (!mobileMenuDialog?.open) return;
+      closeDialogAnimated(mobileMenuDialog, () => {
+        unlockScroll();
+        menuToggle?.setAttribute('aria-expanded', 'false');
+      });
     }
 
     // Expose for inline onclick (e.g. the homepage Browse button)
     (window as any).closeMobileMenu = closeMobileMenu;
 
-    if (menuToggle && mobileNav) {
+    if (mobileMenuDialog && menuToggle) {
       menuToggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (menuToggle.getAttribute('aria-expanded') === 'true') closeMobileMenu();
-        else openMobileMenu();
+        if (mobileMenuDialog.open) {
+          closeMobileMenu();
+        } else {
+          mobileMenuDialog.showModal();
+          lockScroll();
+          menuToggle.setAttribute('aria-expanded', 'true');
+        }
       });
 
       mobileMenuClose?.addEventListener('click', closeMobileMenu);
-      mobileBackdrop?.addEventListener('click', closeMobileMenu);
 
-      mobileNav.querySelectorAll('a').forEach(link => {
+      // Backdrop click (fires on <dialog> element itself)
+      mobileMenuDialog.addEventListener('click', (e) => {
+        if (e.target === mobileMenuDialog) closeMobileMenu();
+      });
+
+      // Escape key — intercept cancel to run animated close
+      mobileMenuDialog.addEventListener('cancel', (e) => {
+        e.preventDefault();
+        closeMobileMenu();
+      });
+
+      // Close when a nav link is clicked
+      mobileMenuDialog.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', closeMobileMenu);
       });
     }
 
     // ── Subscribe tray ───────────────────────────────────────────────────────
-    const subscribeToggle = document.getElementById('subscribeToggle');
-    const subscribeToggleMobile = document.getElementById('subscribeToggleMobile');
-    const subscribeTray = document.getElementById('subscribeTray');
-    const subscribeBackdrop = document.getElementById('subscribeBackdrop');
-    const subscribeClose = document.getElementById('subscribeClose');
+    const subscribeToggle = document.getElementById('subscribeToggle') as HTMLButtonElement | null;
+    const subscribeToggleMobile = document.getElementById('subscribeToggleMobile') as HTMLButtonElement | null;
+    const subscribeDialog = document.getElementById('subscribeDialog') as HTMLDialogElement | null;
+    const subscribeClose = document.getElementById('subscribeClose') as HTMLButtonElement | null;
 
     function openSubscribeTray() {
-      if (!subscribeBackdrop || !subscribeTray) return;
-      subscribeBackdrop.classList.remove('hidden');
-      subscribeTray.classList.remove('translate-x-full', 'invisible');
-      subscribeTray.classList.add('translate-x-0');
+      if (!subscribeDialog) return;
+      subscribeDialog.showModal();
       lockScroll();
-      requestAnimationFrame(() => {
-        subscribeBackdrop.classList.remove('opacity-0');
-        subscribeBackdrop.classList.add('opacity-100');
-      });
     }
 
-    subscribeToggle?.addEventListener('click', (e) => { e.stopPropagation(); openSubscribeTray(); });
-    subscribeToggleMobile?.addEventListener('click', (e) => { e.stopPropagation(); openSubscribeTray(); });
-    subscribeClose?.addEventListener('click', closeSubscribeTray);
-    subscribeBackdrop?.addEventListener('click', closeSubscribeTray);
+    function closeSubscribeTray() {
+      if (!subscribeDialog?.open) return;
+      closeDialogAnimated(subscribeDialog, unlockScroll);
+    }
+
+    if (subscribeDialog) {
+      subscribeToggle?.addEventListener('click', (e) => { e.stopPropagation(); openSubscribeTray(); });
+      subscribeToggleMobile?.addEventListener('click', (e) => { e.stopPropagation(); openSubscribeTray(); });
+      subscribeClose?.addEventListener('click', closeSubscribeTray);
+
+      // Backdrop click
+      subscribeDialog.addEventListener('click', (e) => {
+        if (e.target === subscribeDialog) closeSubscribeTray();
+      });
+
+      // Escape key — intercept cancel to run animated close
+      subscribeDialog.addEventListener('cancel', (e) => {
+        e.preventDefault();
+        closeSubscribeTray();
+      });
+    }
   });
 </script>

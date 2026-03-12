@@ -416,14 +416,13 @@ TONE & STYLE:
 OUTPUT FORMAT:
 Your response must start with a TITLE line, then the markdown content.
 
-**TITLE:** Trinidad Crime Report: Week of [Month Day, Year] - [X] Incidents, [Y] Murders, [Z] [Next Highest Crime Type]
+**TITLE:** Trinidad [Year]: [Y] Murders This Week — [X] Total Crimes ([Month Abbreviation Day])
 
 Title rules:
-- Include total incidents
-- Include murder count (always)
-- Include the next highest crime type
-- Keep to 2-3 key statistics maximum
-- Use full date format (Month Day, Year)
+- Lead with the year (e.g., 2026) and murder count — these are the highest-value search terms
+- Include total incident count
+- Use abbreviated month and day for the date (e.g., Mar 6) — NOT full date format
+- Keep under 65 characters total
 
 Then output the blog content using this exact markdown structure:
 

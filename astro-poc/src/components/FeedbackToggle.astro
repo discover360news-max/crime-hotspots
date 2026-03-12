@@ -133,11 +133,11 @@ const { areaName, pageUrl, pageTitle } = Astro.props;
         voteEl.classList.add('hidden');
         thanksEl.classList.remove('hidden');
 
-        // Trigger spark animation
+        // Trigger spark animation — remove class once animation completes
         const spark = thanksEl.querySelector('.feedback-spark');
         if (spark) {
           spark.classList.add('animate');
-          setTimeout(() => spark.classList.remove('animate'), 700);
+          spark.addEventListener('animationend', () => spark.classList.remove('animate'), { once: true });
         }
       });
     });

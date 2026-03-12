@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 10, 2026
+**Last Updated:** March 12, 2026
 
 ---
 
@@ -36,7 +36,7 @@
 | MP Index | `/trinidad/mp/` | Pre-rendered | Directory of all 41 MPs grouped by region. Each card: photo, honorific name, party badge, constituency. |
 | MP Profile | `/trinidad/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left, identity+contact right. Crime stat cards per region (reuses region page pattern). JSON-LD Person schema. Ambiguous MPs show boundary note + two region sections. Data: `src/data/mps.json`. |
 | Compare | `/trinidad/compare/` | Pre-rendered | Side-by-side area comparison. Pre-loads Port of Spain vs San Juan by default. Rose gradient hero + sticky selector bar (matches dashboard pattern). |
-| Murder Count | `/trinidad/murder-count/` | Pre-rendered | Live counter with flip animation, YoY comparison, share buttons |
+| Murder Count | `/trinidad/murder-count/` | Pre-rendered | `max-w-5xl` sidebar layout. Left: flip counter, YoY comparison, rate cards, blog post. Right sidebar: share buttons (`.sb-share-btn` pattern), latest 10 murder incidents, newsletter. Header (h1/year) above grid. |
 | Archive Index | `/trinidad/archive/` | Pre-rendered | Browse by year |
 | Archive Month | `/trinidad/archive/[year]/[month]` | Pre-rendered | Crimes for specific month |
 
@@ -70,8 +70,9 @@
 ### Navigation & Layout
 | Component | Purpose |
 |-----------|---------|
-| Header.astro | Top nav, direct links on Trinidad pages, active section indicator. Mobile: `logo-icon.png` (36px square). Ghost Subscribe buttons. ♥ Support → Ko-fi (desktop + hamburger). |
-| BottomNav.astro | Mobile bottom tab bar (Dashboard, Headlines, Areas, Report, More). Config-driven from `countries.ts` |
+| Header.astro | Top nav, direct links on Trinidad pages, active section indicator. Mobile: `logo-icon.png` (36px square). Ghost Subscribe buttons. ♥ Support → Ko-fi (desktop + hamburger). Mobile menu + subscribe tray are native `<dialog>` elements. |
+| BottomNav.astro | Mobile bottom tab bar (Dashboard, Headlines, Areas, Report, More). Config-driven from `countries.ts`. More menu is a native `<dialog>` bottom sheet. Country indicator strip always visible. |
+| MPSidebar.astro | Sticky right-column sidebar for area + region pages. Sections: share buttons (`.sb-share-btn` pattern), MPs card, Ko-fi card. `showAll=false` (area): 2 MPs + chevron toggle. `showAll=true` (region): all on desktop, mobile toggle. Design rules: `.memory/entries/C004-mpsidebar-design-rules.md`. |
 | Breadcrumbs.astro | Breadcrumb navigation for SEO |
 | SectionPickerModal.astro | Homepage island click → section chooser. Sections driven from `countries.ts` |
 | Hero.astro | Full-width gradient hero with CTAs, compact variant, `<slot>` support |

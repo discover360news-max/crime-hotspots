@@ -67,54 +67,78 @@ const initialDigits = animateOnLoad
 
       const digits = container.querySelectorAll('.flip-digit');
       const targetString = targetValue.toString();
-      const staggerDelay = 80;
-      const flipDuration = 250;
 
-      digits.forEach((digit, index) => {
-        const targetDigit = parseInt(digit.dataset.targetDigit || '0', 10);
+      // Skip animation for users who prefer reduced motion — show final values immediately
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        digits.forEach(digit => {
+          const target = parseInt(digit.dataset.targetDigit || '0', 10);
+          const top = digit.querySelector('.flip-digit-top');
+          const bottom = digit.querySelector('.flip-digit-bottom');
+          if (top) top.textContent = target.toString();
+          if (bottom) bottom.textContent = target.toString();
+          digit.classList.remove('hidden');
+        });
+        return;
+      }
+
+      const FLIP_INTERVAL = 250; // ms between digit increments
+      const STAGGER_MS = 80;     // ms delay between each digit starting
+      const START_DELAY = 300;   // ms before animation begins
+
+      const startTime = performance.now() + START_DELAY;
+
+      // Per-digit state — track progress without nested timers
+      const state = Array.from(digits).map((digit, index) => {
+        const target = parseInt(digit.dataset.targetDigit || '0', 10);
         const isLeadingZero = index < digits.length - targetString.length;
+        return {
+          digit,
+          target,
+          current: 0,
+          isLeadingZero,
+          startAt: startTime + index * STAGGER_MS,
+          lastFlipAt: 0,
+          done: isLeadingZero && target === 0,
+        };
+      });
 
-        // Skip permanently hidden leading zeros
-        if (isLeadingZero && targetDigit === 0) {
-          return;
+      function frame(now) {
+        let anyActive = false;
+
+        for (const s of state) {
+          if (s.done) continue;
+          if (now < s.startAt) { anyActive = true; continue; }
+
+          if (now - s.lastFlipAt >= FLIP_INTERVAL && s.current < s.target) {
+            s.lastFlipAt = now;
+            s.current++;
+
+            if (s.isLeadingZero && s.current > 0) {
+              s.digit.classList.remove('hidden');
+            }
+
+            const top = s.digit.querySelector('.flip-digit-top');
+            const bottom = s.digit.querySelector('.flip-digit-bottom');
+            if (top) top.textContent = s.current.toString();
+            if (bottom) bottom.textContent = s.current.toString();
+
+            // shadowPulse via CSS — clean up class when animation ends
+            s.digit.classList.add('flipping');
+            s.digit.addEventListener('animationend', () => {
+              s.digit.classList.remove('flipping');
+            }, { once: true });
+
+            if (s.current >= s.target) s.done = true;
+            else anyActive = true;
+          } else if (s.current < s.target) {
+            anyActive = true;
+          }
         }
 
-        // Animate to target digit
-        let currentDigit = 0;
+        if (anyActive) requestAnimationFrame(frame);
+      }
 
-        setTimeout(() => {
-          const flipInterval = setInterval(() => {
-            if (currentDigit >= targetDigit) {
-              clearInterval(flipInterval);
-              return;
-            }
-
-            currentDigit++;
-
-            // Show digit if it was hidden and now non-zero
-            if (isLeadingZero && currentDigit > 0) {
-              digit.classList.remove('hidden');
-            }
-
-            // Update digit display
-            const topHalf = digit.querySelector('.flip-digit-top');
-            const bottomHalf = digit.querySelector('.flip-digit-bottom');
-
-            if (topHalf && bottomHalf) {
-              // Add flip effect class
-              digit.classList.add('flipping');
-
-              // Update values
-              topHalf.textContent = currentDigit.toString();
-
-              setTimeout(() => {
-                bottomHalf.textContent = currentDigit.toString();
-                digit.classList.remove('flipping');
-              }, 150);
-            }
-          }, flipDuration);
-        }, index * staggerDelay);
-      });
+      requestAnimationFrame(frame);
     }
 
     // Run animation after page load (astro:page-load works with ClientRouter)
