@@ -39,7 +39,7 @@ D002 | DEC | active | CSV URLs: single source of truth in csvUrls.ts — all oth
 D003 | DEC | active | Victim count: PRIMARY crime only; related always +1; Murder|Murder = 2 victims → D003-victim-count-rules.md
 D004 | DEC | active | Slug migration: Story_ID+6words new format; legacy headline-date → 301 via SSR → D004-slug-migration.md
 D005 | DEC | active | Migrated to Astro (Dec 2025) from Vite for SSR, content collections, scalability → D005-astro-migration.md
-D006 | DEC | active | CSV → D1 migration. Phase 1+2 COMPLETE. Infra live (DB ID: 23311480, Worker: crime-sync.discover360news.workers.dev). Pending: one-time curl sync + Pages binding + redeploy. Phase 3 next. → D006-d1-migration-plan.md
+D006 | DEC | active | CSV → D1 migration. ALL 3 PHASES COMPLETE. Infra live (DB ID: 23311480). Dashboard uses /api/dashboard + /api/crimes (D1-backed, CDN-cached). area-aliases.json baked at build. → D006-d1-migration-plan.md
 
 ## Features (F)
 F010 | FEAT | active | MP profiles: 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg → F010-mp-profiles.md

@@ -1,11 +1,18 @@
 /**
  * Dashboard Data Loader
- * Handles CSV loading, parsing, and data initialization for the dashboard
+ * Handles data loading and initialization for the dashboard.
+ *
+ * PRIMARY PATH (Phase 3): Fetches pre-computed JSON from /api/dashboard + /api/crimes (D1-backed).
+ * FALLBACK PATH: Falls back to CSV fetches if the API is unavailable.
+ * AREA ALIASES: Loaded from static area-aliases.json (baked at build time by csvBuildPlugin).
  */
 
 // Import shared utilities - SINGLE SOURCE OF TRUTH
 import { parseCSVLine, parseDate, generateSlug, generateSlugWithId, getColumnValue, parseFullCSV, createColumnMapFromArray } from '../lib/csvParser';
 import { TRINIDAD_CSV_URLS, REGION_DATA_CSV_URL } from '../config/csvUrls';
+
+// Static area aliases — baked at build time, zero network cost
+import areaAliasesJson from '../data/area-aliases.json';
 
 // Re-export for backwards compatibility with any code that imports from here
 export { parseCSVLine, parseDate, generateSlug, generateSlugWithId };
@@ -25,18 +32,13 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
 
     const columnMap = createColumnMapFromArray(rows[0]);
 
-    // Debug: Log all column headers found
-    console.log('📋 CSV Column Headers:', Array.from(columnMap.keys()));
-
     const crimes: any[] = [];
 
     for (let i = 1; i < rows.length; i++) {
       const values = rows[i];
 
-      // Helper function using shared getColumnValue
       const getColumn = (columnName: string): string => getColumnValue(values, columnMap, columnName);
 
-      // Extract values using column mapping
       const headline = getColumn('Headline');
       const summary = getColumn('Summary');
       const primaryCrimeType = getColumn('primaryCrimeType');
@@ -63,11 +65,9 @@ export async function fetchCrimesFromURL(url: string): Promise<any[]> {
       const oldSlug = generateSlug(headline, dateObj);
       const slug = storyId ? generateSlugWithId(storyId, headline) : oldSlug;
 
-      // Parse victim count (default to 1 if not provided, allow 0 for victimless crimes)
       const victimCount = victimCountStr ? parseInt(victimCountStr, 10) : 1;
       const validVictimCount = !isNaN(victimCount) && victimCount >= 0 ? victimCount : 1;
 
-      // Parse optional entry/correction timestamps
       const datePublishedStr = getColumn('Date_Published');
       const dateUpdatedStr = getColumn('Date_Updated');
       const datePublishedObj = datePublishedStr ? parseDate(datePublishedStr) : undefined;
@@ -161,12 +161,10 @@ export async function hideShimmerWithMinTime(
   const elapsed = Date.now() - shimmerStartTime;
   const remaining = Math.max(0, MINIMUM_SHIMMER_TIME - elapsed);
 
-  // Wait for minimum time if needed
   if (remaining > 0) {
     await new Promise(resolve => setTimeout(resolve, remaining));
   }
 
-  // Hide shimmer, show content (opacity only - no layout shift)
   if (shimmerEl) {
     shimmerEl.style.opacity = '0';
     shimmerEl.style.pointerEvents = 'none';
@@ -177,71 +175,40 @@ export async function hideShimmerWithMinTime(
 }
 
 /**
- * Initialize dashboard data loading
- * Fetches crime data and area aliases, then updates the dashboard
+ * CSV fallback: fetch crimes + area aliases from Google Sheets CSVs.
+ * Called if the primary API path fails.
  */
-export async function initializeDashboardData(): Promise<void> {
-  // Track when shimmers started
+async function initializeDashboardDataFromCSV(): Promise<void> {
   const shimmerStartTime = Date.now();
 
-  console.log('🔍 Loading crimes data and area aliases from CSV...');
+  console.log('🔍 Loading crimes data and area aliases from CSV (fallback)...');
 
-  // Fetch area aliases, historical trends, and current crimes in parallel
   const [areaAliases, historicalTrendsData, crimesCurrentData] = await Promise.all([
     fetchAreaAliases(REGION_DATA_CSV_URL),
-    // Fetch historical snippet (Nov-Dec 2025) for trend calculations only
     fetchCrimesFromURL(TRINIDAD_CSV_URLS.historicalTrends),
     fetchCrimesFromURL(TRINIDAD_CSV_URLS.current)
   ]);
 
-  // Store area aliases globally for map popups
   (window as any).__areaAliases = areaAliases;
 
-  // Log loaded data
-  if (historicalTrendsData.length > 0) {
-    console.log(`✅ Loaded ${historicalTrendsData.length} historical crimes (Nov-Dec 2025) for trend calculations`);
-  }
-  console.log(`✅ Loaded ${crimesCurrentData.length} crimes from current sheet (2026)`);
-
-  // Combine all crimes (historical + current)
-  // Historical data is used ONLY for trend calculations, not display
   const crimes = [...historicalTrendsData, ...crimesCurrentData];
   crimes.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
 
-  console.log(`✅ Total crimes loaded: ${crimes.length}`);
-
-  // Store ALL crimes globally for year filter script
   (window as any).__crimesData = crimes;
 
-  // Calculate current year (highest year)
-  const availableYears = [...new Set(crimes.map(c => c.year))].sort((a, b) => b - a);
+  const availableYears = [...new Set(crimes.map((c: any) => c.year))].sort((a: any, b: any) => b - a);
   const currentYear = availableYears[0];
-  console.log(`🎯 Current year detected: ${currentYear}`);
+  const currentYearCrimes = crimes.filter((c: any) => c.year === currentYear);
 
-  // Filter to show only current year by default
-  const currentYearCrimes = crimes.filter(c => c.year === currentYear);
-  console.log(`📊 Showing ${currentYearCrimes.length} crimes from ${currentYear} (filtered from ${crimes.length} total)`);
-  console.log(`📊 Current year crimes sample:`, currentYearCrimes.slice(0, 3).map(c => ({
-    year: c.year,
-    headline: c.headline,
-    primaryCrimeType: c.primaryCrimeType,
-    relatedCrimeTypes: c.relatedCrimeTypes
-  })));
-
-  // Update stats with trends (need to import the function)
   const { updateStatsCards } = await import('./dashboardUpdates');
-  console.log(`📊 About to call updateStatsCards with ${currentYearCrimes.length} current year crimes`);
   updateStatsCards(currentYearCrimes, crimes);
-  console.log(`📊 updateStatsCards completed`);
 
-  // Hide stats and insights shimmers with minimum display time
   await hideShimmerWithMinTime(
     document.getElementById('statsShimmer'),
     document.querySelector('.stats-scroll-container'),
     shimmerStartTime
   );
 
-  // Show stats scroll hint after shimmer is hidden
   const statsScrollHint = document.getElementById('statsScrollHint');
   if (statsScrollHint) statsScrollHint.style.opacity = '1';
 
@@ -251,12 +218,88 @@ export async function initializeDashboardData(): Promise<void> {
     shimmerStartTime
   );
 
-  // Hide Top Regions shimmer (absolute overlay pattern - opacity transition)
   await hideShimmerWithMinTime(
     document.getElementById('topRegionsShimmer'),
     document.getElementById('topRegionsCard'),
     shimmerStartTime
   );
+
+  // Signal that crimes data is ready
+  window.dispatchEvent(new CustomEvent('crimesDataReady'));
+}
+
+/**
+ * Initialize dashboard data loading.
+ * PRIMARY: Fetches pre-computed stats from /api/dashboard + crimes from /api/crimes (D1-backed).
+ * FALLBACK: Falls back to CSV fetches if the API is unavailable.
+ */
+export async function initializeDashboardData(): Promise<void> {
+  const shimmerStartTime = Date.now();
+
+  // Area aliases — static, zero network cost
+  (window as any).__areaAliases = areaAliasesJson;
+
+  // Default year set via define:vars in dashboard.astro
+  const year = (window as any).__dashboardDefaultYear || String(new Date().getFullYear());
+
+  try {
+    const [dashData, crimesData] = await Promise.all([
+      fetch(`/api/dashboard/?year=${year}`).then(r => {
+        if (!r.ok) throw new Error(`/api/dashboard responded ${r.status}`);
+        return r.json();
+      }),
+      fetch(`/api/crimes/?year=${year}`).then(r => {
+        if (!r.ok) throw new Error(`/api/crimes responded ${r.status}`);
+        return r.json();
+      }),
+    ]);
+
+    // Reconstruct dateObj (omitted from JSON serialization)
+    const crimes = (crimesData.crimes as any[]).map(c => ({
+      ...c,
+      dateObj: new Date(c.year, c.month - 1, c.day),
+    }));
+
+    (window as any).__crimesData = crimes;
+
+    const {
+      applyPrecomputedStats,
+      applyPrecomputedInsights,
+      applyPrecomputedTopRegions,
+    } = await import('./dashboardUpdates');
+
+    applyPrecomputedStats(dashData.stats, dashData.trends);
+    applyPrecomputedInsights(dashData.insights);
+    applyPrecomputedTopRegions(dashData.topRegions);
+
+    await hideShimmerWithMinTime(
+      document.getElementById('statsShimmer'),
+      document.querySelector('.stats-scroll-container'),
+      shimmerStartTime
+    );
+
+    const statsScrollHint = document.getElementById('statsScrollHint');
+    if (statsScrollHint) statsScrollHint.style.opacity = '1';
+
+    await hideShimmerWithMinTime(
+      document.getElementById('insightsShimmer'),
+      document.getElementById('insightsCards'),
+      shimmerStartTime
+    );
+
+    await hideShimmerWithMinTime(
+      document.getElementById('topRegionsShimmer'),
+      document.getElementById('topRegionsCard'),
+      shimmerStartTime
+    );
+
+    // Signal that crimes data is ready for the year filter script
+    window.dispatchEvent(new CustomEvent('crimesDataReady'));
+
+  } catch (err) {
+    console.warn('API fetch failed, falling back to CSV:', err);
+    await initializeDashboardDataFromCSV();
+  }
 }
 
 // Make hideShimmerWithMinTime available globally for use by other scripts

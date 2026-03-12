@@ -365,125 +365,124 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
   <!-- Year Filtering Script -->
   <script>
-    import { initializeYearFilter } from '../../scripts/yearFilter';
     import { updateLeafletMap } from '../../scripts/leafletMap';
-    import { updateStatsCards, updateQuickInsights, updateTopRegions } from '../../scripts/dashboardUpdates';
-    import { initializeStatCardFiltering, initializeTraySync } from '../../scripts/statCardFiltering';
+    import {
+      updateQuickInsights,
+      updateTopRegions,
+      applyPrecomputedStats,
+      applyPrecomputedInsights,
+      applyPrecomputedTopRegions,
+    } from '../../scripts/dashboardUpdates';
+    import { initializeStatCardFiltering } from '../../scripts/statCardFiltering';
 
-    console.log('🚀 Year filter script starting...');
-
-    // Wait for crimes data to be available
-    function waitForCrimesData() {
-      if (!window.__crimesData) {
-        setTimeout(waitForCrimesData, 100);
-        return;
+    function updateSubtitleYear(selectedValue: string) {
+      const dashboardYear = document.getElementById('dashboardYear');
+      if (dashboardYear) {
+        dashboardYear.textContent = selectedValue === 'all' ? '(All Years)' : `for ${selectedValue}`;
       }
 
-      // Initialize year filter with callbacks
-      initializeYearFilter(window.__crimesData, {
-        updateStatsCards: (crimes) => {
-          // Show shimmer before update
-          const statsShimmer = document.getElementById('statsShimmer');
-          const statsContainer = document.querySelector('.stats-scroll-container');
-
-          if (statsShimmer) { statsShimmer.style.opacity = '1'; statsShimmer.style.pointerEvents = ''; }
-          if (statsContainer) statsContainer.style.opacity = '0';
-
-          // Update after short delay
-          setTimeout(async () => {
-            const updateStart = Date.now();
-            updateStatsCards(crimes, window.__crimesData);
-
-            // Hide shimmer with minimum time
-            await window.hideShimmerWithMinTime(statsShimmer, statsContainer, updateStart);
-          }, 100);
-        },
-        updateQuickInsights: (crimes) => {
-          // Show shimmer before update
-          const insightsShimmer = document.getElementById('insightsShimmer');
-          const insightsCards = document.getElementById('insightsCards');
-
-          if (insightsShimmer) { insightsShimmer.style.opacity = '1'; insightsShimmer.style.pointerEvents = ''; }
-          if (insightsCards) insightsCards.style.opacity = '0';
-
-          // Update after short delay
-          setTimeout(async () => {
-            const updateStart = Date.now();
-            updateQuickInsights(crimes);
-
-            // Hide shimmer with minimum time
-            await window.hideShimmerWithMinTime(insightsShimmer, insightsCards, updateStart);
-          }, 100);
-        },
-        updateTopRegions: (crimes) => {
-          // Show shimmer before update (absolute overlay - opacity transition)
-          const topRegionsShimmer = document.getElementById('topRegionsShimmer');
-          const topRegionsCard = document.getElementById('topRegionsCard');
-
-          if (topRegionsShimmer) { topRegionsShimmer.style.opacity = '1'; topRegionsShimmer.style.pointerEvents = ''; }
-          if (topRegionsCard) topRegionsCard.style.opacity = '0';
-
-          // Update after short delay
-          setTimeout(async () => {
-            const updateStart = Date.now();
-            updateTopRegions(crimes);
-
-            // Hide shimmer with minimum time
-            await window.hideShimmerWithMinTime(topRegionsShimmer, topRegionsCard, updateStart);
-          }, 100);
-        },
-        updateLeafletMap: (crimes) => {
-          // Show shimmer before update
-          const mapShimmer = document.getElementById('mapShimmer');
-          const leafletMap = document.getElementById('leafletMap');
-
-          if (mapShimmer) { mapShimmer.style.opacity = '1'; mapShimmer.style.pointerEvents = ''; }
-          if (leafletMap) leafletMap.style.opacity = '0';
-
-          // Update after short delay
-          setTimeout(async () => {
-            const updateStart = Date.now();
-            updateLeafletMap(crimes, '/trinidad/crime/');
-
-            // Hide shimmer with minimum time
-            await window.hideShimmerWithMinTime(mapShimmer, leafletMap, updateStart);
-          }, 100);
-        },
-        updateSubtitleYear: (selectedValue) => {
-          const dashboardYear = document.getElementById('dashboardYear');
-          if (!dashboardYear) return;
-
-          // Update year display based on selection
-          if (selectedValue === 'all') {
-            dashboardYear.textContent = '(All Years)';
-          } else {
-            dashboardYear.textContent = `for ${selectedValue}`;
-          }
-
-          // Update data freshness indicator
-          const freshness = document.getElementById('dataFreshness');
-          if (freshness && window.__crimesData) {
-            const filtered = selectedValue === 'all'
-              ? window.__crimesData
-              : window.__crimesData.filter((c: any) => {
-                  const y = new Date(c.date).getFullYear();
-                  return selectedValue.split(',').map(Number).includes(y);
-                });
-            if (filtered.length > 0) {
-              const newest = filtered.reduce((a: any, b: any) => new Date(a.date) > new Date(b.date) ? a : b);
-              const d = new Date(newest.date);
-              freshness.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Data as of ${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
-            }
-          }
+      const freshness = document.getElementById('dataFreshness');
+      if (freshness && window.__crimesData) {
+        const filtered: any[] = selectedValue === 'all'
+          ? window.__crimesData
+          : window.__crimesData.filter((c: any) => String(c.year) === selectedValue);
+        if (filtered.length > 0) {
+          const newest = filtered.reduce((a: any, b: any) => a.dateObj > b.dateObj ? a : b);
+          const d = newest.dateObj as Date;
+          freshness.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Data as of ${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`;
         }
+      }
+    }
+
+    function populateYearDropdown(crimes: any[]) {
+      const yearFilterEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
+      if (!yearFilterEl) return;
+
+      const defaultYear = (window as any).__dashboardDefaultYear;
+      const availableYears = [...new Set(crimes.map((c: any) => c.year as number))]
+        .sort((a, b) => b - a);
+
+      yearFilterEl.innerHTML = '';
+      availableYears.forEach(year => {
+        const opt = document.createElement('option');
+        opt.value = String(year);
+        opt.textContent = String(year);
+        opt.selected = String(year) === defaultYear;
+        yearFilterEl.appendChild(opt);
       });
+      const allOpt = document.createElement('option');
+      allOpt.value = 'all';
+      allOpt.textContent = 'All Years';
+      yearFilterEl.appendChild(allOpt);
+    }
+
+    async function onYearChange(selectedValue: string) {
+      const updateStart = Date.now();
+
+      // Show all shimmers
+      const statsShimmer = document.getElementById('statsShimmer');
+      const statsContainer = document.querySelector('.stats-scroll-container') as HTMLElement | null;
+      const insightsShimmer = document.getElementById('insightsShimmer');
+      const insightsCards = document.getElementById('insightsCards');
+      const topRegionsShimmer = document.getElementById('topRegionsShimmer');
+      const topRegionsCard = document.getElementById('topRegionsCard');
+      const mapShimmer = document.getElementById('mapShimmer');
+      const leafletMapEl = document.getElementById('leafletMap');
+
+      if (statsShimmer) { statsShimmer.style.opacity = '1'; statsShimmer.style.pointerEvents = ''; }
+      if (statsContainer) statsContainer.style.opacity = '0';
+      if (insightsShimmer) { insightsShimmer.style.opacity = '1'; insightsShimmer.style.pointerEvents = ''; }
+      if (insightsCards) insightsCards.style.opacity = '0';
+      if (topRegionsShimmer) { topRegionsShimmer.style.opacity = '1'; topRegionsShimmer.style.pointerEvents = ''; }
+      if (topRegionsCard) topRegionsCard.style.opacity = '0';
+      if (mapShimmer) { mapShimmer.style.opacity = '1'; mapShimmer.style.pointerEvents = ''; }
+      if (leafletMapEl) leafletMapEl.style.opacity = '0';
+
+      const [dashData, crimesData] = await Promise.all([
+        fetch(`/api/dashboard/?year=${selectedValue}`).then(r => r.json()),
+        fetch(`/api/crimes/?year=${selectedValue}`).then(r => r.json()),
+      ]);
+
+      const crimes = (crimesData.crimes as any[]).map((c: any) => ({
+        ...c,
+        dateObj: new Date(c.year, c.month - 1, c.day),
+      }));
+      window.__crimesData = crimes;
+
+      applyPrecomputedStats(dashData.stats, dashData.trends);
+      applyPrecomputedInsights(dashData.insights);
+      applyPrecomputedTopRegions(dashData.topRegions);
+      updateLeafletMap(crimes, '/trinidad/crime/');
+      updateSubtitleYear(selectedValue);
+
+      // Hide all shimmers
+      await Promise.all([
+        window.hideShimmerWithMinTime(statsShimmer, statsContainer, updateStart),
+        window.hideShimmerWithMinTime(insightsShimmer, insightsCards, updateStart),
+        window.hideShimmerWithMinTime(topRegionsShimmer, topRegionsCard, updateStart),
+        window.hideShimmerWithMinTime(mapShimmer, leafletMapEl, updateStart),
+      ]);
+    }
+
+    function setupYearFilter() {
+      const crimes = window.__crimesData;
+      if (!crimes) return;
+
+      populateYearDropdown(crimes);
+
+      const yearFilterEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
+      if (yearFilterEl) {
+        yearFilterEl.addEventListener('change', (e) => {
+          onYearChange((e.target as HTMLSelectElement).value);
+        });
+      }
     }
 
     // astro:page-load fires on initial load (with ClientRouter) and after each navigation
     document.addEventListener('astro:page-load', () => {
-      waitForCrimesData();
+      // crimesDataReady is dispatched by initializeDashboardData() once API response is processed
+      window.addEventListener('crimesDataReady', setupYearFilter, { once: true });
 
-      // DOM is ready at astro:page-load time
       initializeStatCardFiltering({
         updateQuickInsights,
         updateTopRegions,

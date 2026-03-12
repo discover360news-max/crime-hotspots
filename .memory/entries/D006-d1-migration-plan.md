@@ -46,14 +46,22 @@ Pending (Kavell — manual steps in dashboard/terminal):
 4. Redeploy Pages (push a commit or retry from dashboard)
 5. Smoke test: visit any /trinidad/crime/[slug]/ page and confirm it loads correctly
 
-Next session — after Kavell confirms steps 1–5 are done:
-- Verify D1 queries are being used (check Workers logs for DB query activity)
-- Run `wrangler d1 execute crime-hotspots-db --remote --command="SELECT COUNT(*) FROM crimes;"` to confirm row count
-- Consider Phase 3: replace dashboardDataLoader.ts's 3 browser CSV fetches with one /api/dashboard Pages Function
+**Phase 3 — Slim dashboard client (COMPLETE Mar 12, 2026)**
+Replaced 3 browser CSV fetches with 2 CDN-cached API endpoints + 1 static JSON file.
 
-**Phase 3 — Slim dashboard client (not started, after Phase 2 stable)**
-Replace 3 browser CSV fetches in `dashboardDataLoader.ts` with one `/api/dashboard?year=X`
-Pages Function that returns pre-computed JSON from D1.
+Files created:
+- `src/pages/api/dashboard.ts` — SSR endpoint, returns pre-computed stats/trends/insights/topRegions from D1
+- `src/pages/api/crimes.ts` — SSR endpoint, returns full Crime objects (Date fields stripped, reconstructed client-side)
+- `src/data/area-aliases.json` — 116 aliases baked at build time by csvBuildPlugin
+
+Files modified:
+- `src/lib/crimeData.ts` — added `getCrimesByYearFromD1()` + `getCrimesByDateRangeFromD1()`
+- `src/integrations/csvBuildPlugin.ts` — added area-aliases.json generation step
+- `src/scripts/dashboardUpdates.ts` — extracted `updateCardWithTrend` to module level; added `applyPrecomputedStats`, `applyPrecomputedInsights`, `applyPrecomputedTopRegions`
+- `src/scripts/dashboardDataLoader.ts` — primary path: /api/dashboard + /api/crimes; CSV fallback in `initializeDashboardDataFromCSV()`; dispatches `crimesDataReady` custom event when done
+- `src/pages/trinidad/dashboard.astro` — year filter script replaces `waitForCrimesData()` polling with `crimesDataReady` event listener; API-based `onYearChange()` replaces `initializeYearFilter` callbacks
+
+Cache headers: `public, max-age=3600, s-maxage=82800` (1h browser / ~23h CDN edge)
 
 ## Key Confirmed Facts
 - `story_id` always populated on 2025+ rows — safe as PRIMARY KEY
@@ -65,3 +73,6 @@ Pages Function that returns pre-computed JSON from D1.
 - 2026-03-12: Plan created after architecture review session
 - 2026-03-12: Phase 1 complete
 - 2026-03-12: Phase 2 spec locked (victim_count nullable, daily cron syncs all years)
+- 2026-03-12: Phase 2 COMPLETE + bug fixed. story_id restarts from 1 each year — 527 2025 rows were overwritten on first sync. Fix: year-prefix PK (e.g. "2025-1"), strip in mapD1RowToCrime. D1 wiped + re-synced: 2025=2064, 2026=527, total=2591. Committed 0467d0e + pushed live.
+- 2026-03-12: Phase 3 approved — ready to start next session.
+- 2026-03-12: Phase 3 COMPLETE. Build passes (2596 rows, 116 area aliases). See files above.

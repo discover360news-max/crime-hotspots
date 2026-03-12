@@ -49,6 +49,31 @@ function calculateCrimeRisk(crime: Crime): number {
 
 
 /**
+ * Update a stat card's value and trend indicator.
+ * Shared by updateStatsCards (computed from Crime[]) and applyPrecomputedStats (from API).
+ */
+function updateCardWithTrend(card: Element | null, displayValue: number, last30Count: number, prev30Count: number) {
+  if (!card) return;
+
+  const valueEl = card.querySelector('.text-3xl');
+  const trendEl = card.querySelector('.trend-indicator');
+
+  if (valueEl) valueEl.textContent = displayValue.toString();
+
+  if (trendEl && prev30Count > 0) {
+    const change = last30Count - prev30Count;
+    const percent = Math.round((change / prev30Count) * 100);
+    const arrow = change >= 0 ? '↑' : '↓';
+    const color = change >= 0 ? 'text-red-600' : 'text-emerald-600';
+
+    trendEl.innerHTML = `<span class="${color}">${arrow} ${Math.abs(change)} (${Math.abs(percent)}%)</span> vs prev 30 days`;
+    trendEl.classList.remove('hidden');
+  } else if (trendEl) {
+    trendEl.classList.add('hidden');
+  }
+}
+
+/**
  * Update stats cards with filtered crime data and trends
  */
 export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
@@ -68,7 +93,6 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
   // - If viewing "All Years" OR filtered data matches allCrimes: use allCrimes (includes historical)
   // - If viewing specific year filter: use filtered data only (respects year filter)
   const isViewingAllData = !allCrimes || crimes.length === allCrimes.length;
-  const crimesForTrends = isViewingAllData ? crimes : crimes;
 
   // Special case: If user is viewing current year (2026), use allCrimes to include historical data
   // This ensures trends work even in early 2026 when we don't have 63 days yet
@@ -89,31 +113,6 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
     const crimeDate = new Date(c.date);
     return crimeDate >= sixtyThreeDaysAgo && crimeDate < thirtyThreeDaysAgo;
   });
-
-  // Helper function to update card with trend
-  function updateCardWithTrend(card: Element | null, displayValue: number, last30Count: number, prev30Count: number) {
-    if (!card) return;
-
-    const valueEl = card.querySelector('.text-3xl');
-    const trendEl = card.querySelector('.trend-indicator');
-
-    // Update the main display value (full dataset)
-    if (valueEl) valueEl.textContent = displayValue.toString();
-
-    // Update trend indicator (30-day comparison)
-    if (trendEl && prev30Count > 0) {
-      const change = last30Count - prev30Count;
-      const percent = Math.round((change / prev30Count) * 100);
-      const arrow = change >= 0 ? '↑' : '↓';
-      const color = change >= 0 ? 'text-red-600' : 'text-emerald-600';
-
-      trendEl.innerHTML = `<span class="${color}">${arrow} ${Math.abs(change)} (${Math.abs(percent)}%)</span> vs prev 30 days`;
-      trendEl.classList.remove('hidden');
-    } else if (trendEl) {
-      // Hide trend if no previous data
-      trendEl.classList.add('hidden');
-    }
-  }
 
   // Calculate display counts (from filtered crimes parameter)
   // Uses countCrimeType to count across both primaryCrimeType and relatedCrimeTypes
@@ -391,3 +390,137 @@ function getRiskTextColor(barWidth: number): string {
   return 'text-rose-600';
 }
 
+// ============================================================================
+// PRE-COMPUTED API PATH — apply server-computed data directly to DOM
+// Used by dashboardDataLoader when fetching from /api/dashboard
+// ============================================================================
+
+export interface DashboardStats {
+  total: number;
+  murders: number;
+  robberies: number;
+  homeInvasions: number;
+  thefts: number;
+  shootings: number;
+  assaults: number;
+  burglaries: number;
+  seizures: number;
+  kidnappings: number;
+}
+
+export interface DashboardTrends {
+  last30: DashboardStats;
+  prev30: DashboardStats;
+}
+
+export interface DashboardInsights {
+  avgPerDay: string;
+  victimsPerDay: number;
+  mostDangerousDay: string;
+  busiestMonth: string;
+  mostDangerousArea: string;
+  mostDangerousAreaCount: number;
+  safestArea: string;
+  safestAreaCount: number;
+}
+
+export interface TopRegionEntry {
+  region: string;
+  crimeCount: number;
+  weightedScore: number;
+  barWidth: number;
+}
+
+/**
+ * Apply pre-computed stat card values + trend indicators from API response.
+ * No client-side computation — values come from /api/dashboard.
+ */
+export function applyPrecomputedStats(stats: DashboardStats, trends: DashboardTrends): void {
+  const statCards = document.querySelectorAll('.stat-card');
+  updateCardWithTrend(document.getElementById('totalIncidents'), stats.total, trends.last30.total, trends.prev30.total);
+  updateCardWithTrend(statCards[1], stats.murders, trends.last30.murders, trends.prev30.murders);
+  updateCardWithTrend(statCards[2], stats.robberies, trends.last30.robberies, trends.prev30.robberies);
+  updateCardWithTrend(statCards[3], stats.homeInvasions, trends.last30.homeInvasions, trends.prev30.homeInvasions);
+  updateCardWithTrend(statCards[4], stats.thefts, trends.last30.thefts, trends.prev30.thefts);
+  updateCardWithTrend(statCards[5], stats.shootings, trends.last30.shootings, trends.prev30.shootings);
+  updateCardWithTrend(statCards[6], stats.assaults, trends.last30.assaults, trends.prev30.assaults);
+  updateCardWithTrend(statCards[7], stats.burglaries, trends.last30.burglaries, trends.prev30.burglaries);
+  updateCardWithTrend(statCards[8], stats.seizures, trends.last30.seizures, trends.prev30.seizures);
+  updateCardWithTrend(statCards[9], stats.kidnappings, trends.last30.kidnappings, trends.prev30.kidnappings);
+}
+
+/**
+ * Apply pre-computed quick insights values from API response.
+ */
+export function applyPrecomputedInsights(insights: DashboardInsights): void {
+  const avgPerDayEl = document.getElementById('avgPerDay');
+  const victimsPerDayEl = document.getElementById('victimsPerDay');
+  const mostDangerousDayEl = document.getElementById('mostDangerousDay');
+  const busiestMonthEl = document.getElementById('busiestMonth');
+  const mostDangerousRegionEl = document.getElementById('mostDangerousRegion');
+  const mostDangerousRegionCountEl = document.getElementById('mostDangerousRegionCount');
+  const safestRegionEl = document.getElementById('safestRegion');
+  const safestRegionCountEl = document.getElementById('safestRegionCount');
+
+  if (avgPerDayEl) avgPerDayEl.textContent = `${insights.avgPerDay} crimes/day`;
+  if (victimsPerDayEl) victimsPerDayEl.textContent = `${insights.victimsPerDay} victims/day`;
+  if (mostDangerousDayEl) mostDangerousDayEl.textContent = insights.mostDangerousDay;
+  if (busiestMonthEl) busiestMonthEl.textContent = insights.busiestMonth;
+  if (mostDangerousRegionEl) {
+    mostDangerousRegionEl.textContent = insights.mostDangerousArea;
+    const dangerousLink = mostDangerousRegionEl.closest('a');
+    if (dangerousLink) dangerousLink.href = buildRoute.area(generateNameSlug(insights.mostDangerousArea));
+  }
+  if (mostDangerousRegionCountEl) mostDangerousRegionCountEl.textContent = `${insights.mostDangerousAreaCount} crimes`;
+  if (safestRegionEl) {
+    safestRegionEl.textContent = insights.safestArea;
+    const safestLink = safestRegionEl.closest('a');
+    if (safestLink) safestLink.href = buildRoute.area(generateNameSlug(insights.safestArea));
+  }
+  if (safestRegionCountEl) safestRegionCountEl.textContent = `${insights.safestAreaCount} crimes`;
+}
+
+/**
+ * Apply pre-computed top regions from API response.
+ * Uses same HTML template as updateTopRegions but reads barWidth from pre-computed data.
+ */
+export function applyPrecomputedTopRegions(regions: TopRegionEntry[]): void {
+  const container = document.getElementById('topRegionsContainer');
+  if (!container) return;
+
+  if (regions.length === 0) {
+    container.innerHTML = '<div class="text-xs text-slate-400 text-center py-4">No data available</div>';
+    return;
+  }
+
+  container.innerHTML = regions.map(({ region, crimeCount, barWidth }, index) => {
+    const riskLevelText = getRiskLevelText(barWidth);
+    const riskTextColor = getRiskTextColor(barWidth);
+    const regionSlug = generateNameSlug(region);
+    const mobileHidden = index >= 5 ? 'hidden sm:flex' : '';
+    return `
+    <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
+      <div class="flex justify-between items-center gap-2">
+        <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] truncate flex-1">${region}</span>
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+          <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_55%)] text-xs font-medium">
+            ${crimeCount}
+          </span>
+          <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">${crimeCount === 1 ? 'crime' : 'crimes'}</span>
+          <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[hsl(0_0%_50%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+      <div class="relative w-full h-2 bg-slate-200 dark:bg-[hsl(0_0%_18%)] rounded-full overflow-hidden">
+        <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style="width: ${barWidth}%">
+          <div class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-rose-600" style="width: ${barWidth > 0 ? Math.round((100 / barWidth) * 100) : 100}%"></div>
+        </div>
+      </div>
+      <span class="text-xs font-medium ${riskTextColor}">Risk: ${riskLevelText}</span>
+    </a>
+  `;
+  }).join('');
+
+  window.dispatchEvent(new CustomEvent('topAreasRendered'));
+}

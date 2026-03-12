@@ -423,3 +423,32 @@ export async function getCrimesByRegionFromD1(db: D1Database, region: string): P
     .all<D1CrimeRow>();
   return results.map(mapD1RowToCrime);
 }
+
+/**
+ * Get crimes for a specific year from D1.
+ * Used by /api/dashboard and /api/crimes endpoints.
+ */
+export async function getCrimesByYearFromD1(db: D1Database, year: number): Promise<Crime[]> {
+  const { results } = await db
+    .prepare('SELECT * FROM crimes WHERE year = ? ORDER BY month DESC, day DESC')
+    .bind(year)
+    .all<D1CrimeRow>();
+  return results.map(mapD1RowToCrime);
+}
+
+/**
+ * Get crimes within a date range from D1 (for trend windows).
+ * Dates are YYYY-MM-DD strings matching the stored TEXT date column.
+ * Naturally crosses year boundaries, eliminating the historicalTrends CSV.
+ */
+export async function getCrimesByDateRangeFromD1(
+  db: D1Database,
+  fromDate: string,
+  toDate: string
+): Promise<Crime[]> {
+  const { results } = await db
+    .prepare('SELECT * FROM crimes WHERE date >= ? AND date <= ? ORDER BY date DESC')
+    .bind(fromDate, toDate)
+    .all<D1CrimeRow>();
+  return results.map(mapD1RowToCrime);
+}

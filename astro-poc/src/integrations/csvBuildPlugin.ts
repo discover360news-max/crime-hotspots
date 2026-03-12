@@ -16,7 +16,7 @@ import type { AstroIntegration } from 'astro';
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
-import { TRINIDAD_CSV_URLS } from '../config/csvUrls.ts';
+import { TRINIDAD_CSV_URLS, REGION_DATA_CSV_URL } from '../config/csvUrls.ts';
 
 // ---------------------------------------------------------------------------
 // Inline CSV utilities (avoids ESM/CJS import issues inside integration hooks)
@@ -209,12 +209,40 @@ function validateCsvRows(csvText: string, sheetLabel: string, logger: Logger): V
 }
 
 // ---------------------------------------------------------------------------
+// Area alias parser (inline — avoids ESM/CJS issues inside integration hooks)
+// Parses RegionData CSV rows to produce { area → known_as } mapping
+// ---------------------------------------------------------------------------
+
+function parseAreaAliases(csvText: string): Record<string, string> {
+  const lines = csvText.split('\n').filter(l => l.trim());
+  if (lines.length < 2) return {};
+
+  const columnMap = createColumnMap(lines[0]);
+  const areaIdx = columnMap.get('area');
+  const knownAsIdx = columnMap.get('known_as');
+
+  if (areaIdx === undefined || knownAsIdx === undefined) return {};
+
+  const aliases: Record<string, string> = {};
+  for (let i = 1; i < lines.length; i++) {
+    const values = parseCSVLine(lines[i]);
+    const area = values[areaIdx]?.trim();
+    const knownAs = values[knownAsIdx]?.trim();
+    if (area && knownAs && knownAs !== area) {
+      aliases[area] = knownAs;
+    }
+  }
+  return aliases;
+}
+
+// ---------------------------------------------------------------------------
 // Path helpers
 // ---------------------------------------------------------------------------
 
 const DIR = fileURLToPath(new URL('.', import.meta.url));
 // src/integrations/ → src/data/
 const CACHE_PATH = join(DIR, '../data/csv-cache.json');
+const AREA_ALIASES_PATH = join(DIR, '../data/area-aliases.json');
 
 function readExistingCache(): CsvCache | null {
   try {
@@ -333,6 +361,18 @@ export default function csvBuildPlugin(): AstroIntegration {
           `[csvBuildPlugin] csv-cache.json written — ${totalRows} rows, ` +
           `${totalWarnings} warning(s)${cacheStatus}`
         );
+
+        // --- Generate area-aliases.json from RegionData CSV ---
+        try {
+          logger.info('[csvBuildPlugin] Fetching RegionData CSV for area aliases...');
+          const regionCsvText = await fetchWithRetry(REGION_DATA_CSV_URL, logger);
+          const aliases = parseAreaAliases(regionCsvText);
+          writeFileSync(AREA_ALIASES_PATH, JSON.stringify(aliases, null, 2), 'utf-8');
+          logger.info(`[csvBuildPlugin] area-aliases.json written — ${Object.keys(aliases).length} aliases`);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          logger.warn(`[csvBuildPlugin] ⚠️ RegionData fetch failed (${msg}) — area-aliases.json unchanged`);
+        }
 
         // Store stats for build:done hook
         buildStats = {
