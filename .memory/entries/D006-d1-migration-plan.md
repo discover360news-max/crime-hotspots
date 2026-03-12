@@ -76,3 +76,7 @@ Cache headers: `public, max-age=3600, s-maxage=82800` (1h browser / ~23h CDN edg
 - 2026-03-12: Phase 2 COMPLETE + bug fixed. story_id restarts from 1 each year — 527 2025 rows were overwritten on first sync. Fix: year-prefix PK (e.g. "2025-1"), strip in mapD1RowToCrime. D1 wiped + re-synced: 2025=2064, 2026=527, total=2591. Committed 0467d0e + pushed live.
 - 2026-03-12: Phase 3 approved — ready to start next session.
 - 2026-03-12: Phase 3 COMPLETE. Build passes (2596 rows, 116 area aliases). See files above.
+- 2026-03-12: Phase 3 bugs fixed + committed (f5884fb). Two issues found in local testing: (1) fetch URLs missing trailing slash — Astro trailingSlash:'always' requires /api/dashboard/?year= (see B015); (2) response-building code outside try/catch caused Astro to return 200 HTML on error (see B016). Both fixed. Pushed to main.
+
+## Deferred Cleanup
+- Remove `historicalTrends` key from `TRINIDAD_CSV_URLS` in `src/config/csvUrls.ts` once production is confirmed healthy (no docs.google.com requests in Network tab)
