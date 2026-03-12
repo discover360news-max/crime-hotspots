@@ -14,6 +14,12 @@
 - Clicking a Pagefind result now calls `closeModal()` before navigation — modal was staying open (SPA nav happened in background, looked like nothing happened)
 - Pagefind clear button click re-shows the suggestions panel — Pagefind's clear button does not fire a native `input` event, so the empty-state handler wasn't running
 
+**Search — crime pages now indexed (2,591 records):**
+- Root cause: crime pages are SSR so Pagefind's build-time HTML crawler never sees them — only static pages (areas, regions, blog, etc.) were appearing in results
+- Fix: new `src/integrations/pagefindCrimeIndexer.ts` — runs in `astro:build:done` AFTER `pagefind()`, re-builds the complete index using `pagefind` Node API: `addDirectory` (static pages) + `addCustomRecord` per crime (slug, headline, area, region, crimeType, summary). Overwrites astro-pagefind's index with the combined one.
+- Build time impact: ~6s extra per build
+- Config: must stay LAST in `integrations[]` in `astro.config.mjs` (runs after astro-pagefind)
+
 **LCP + INP improvements (all crime detail pages):**
 - `font-display: swap` → `font-display: optional` on both Inter `@font-face` rules in `Layout.astro` — eliminates the re-paint LCP bump (font is preloaded so it's available within the block period on first render)
 - `pagefind-ui.js` (83KB) removed from eager Layout load; now lazy-injected by `loadPagefindScript()` inside `openSearchModal()` on first call — pagefind-ui.css still loads upfront (non-blocking). Defers 83KB of JS parse/execute until user actually opens search.

@@ -17,6 +17,7 @@ B010 | BUG | active | Blog automation: column mismatch + noon boundary caused wr
 B011 | BUG | active | astro-pagefind MUST be in integrations[] in astro.config.mjs — package.json not enough → B011-pagefind-integration.md
 B012 | BUG | active | NEVER `await import()` inside Astro integration hooks — crashes Vite runner → B012-await-import-hooks.md
 B013 | BUG | fixed | Raw Articles sheet column is "Publish Date" not "Published Date" — caused all crime dates to use run date → B013-gas-publish-date-column-mismatch.md
+B014 | BUG | fixed | Pagefind only indexes static HTML — SSR crime pages invisible to search. Fix: `pagefindCrimeIndexer` integration (Node API custom records). Must be LAST in integrations[]. → (see recent-changes.md Mar 12)
 
 ## Learnings & Patterns (L)
 L001 | LEARN | active | astro:page-load is the ONLY correct pattern for interactive scripts on SPA → L001-astro-page-load-pattern.md
