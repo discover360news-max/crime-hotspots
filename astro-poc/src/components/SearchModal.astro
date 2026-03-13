@@ -1,8 +1,8 @@
 ---
 /**
  * Search Modal
- * Site-wide search powered by Pagefind
- * Searches crime headlines, locations, and crime types
+ * Site-wide search powered by /api/search (D1 FTS5 for crimes, static for MPs + areas).
+ * Replaces Pagefind — no build-time indexing required.
  */
 ---
 
@@ -10,7 +10,6 @@
   id="searchModal"
   class="m-auto p-0 bg-white dark:bg-[hsl(0_0%_8%)] backdrop-blur-xl rounded-2xl shadow-2xl border-0 outline-none"
   aria-labelledby="searchModalTitle"
-  data-pagefind-ignore
 >
   <!-- Header -->
   <div class="sticky top-0 bg-white/90 dark:bg-[hsl(0_0%_8%)]/95 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
@@ -26,7 +25,31 @@
 
   <!-- Search Container -->
   <div class="flex-1 overflow-y-auto p-6">
-    <div id="search"></div>
+
+    <!-- Search Input -->
+    <div class="relative mb-4">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_45%)] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="Search crimes, MPs, areas..."
+        class="w-full pl-9 pr-10 py-3 border-2 border-slate-200 dark:border-[hsl(0_0%_22%)] rounded-lg text-base text-slate-700 dark:text-[hsl(0_0%_90%)] bg-white dark:bg-[hsl(0_0%_12%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_45%)] focus:outline-none focus:border-rose-500 dark:focus:border-rose-500 focus:shadow-[0_0_0_3px_rgba(225,29,72,0.1)] dark:focus:shadow-[0_0_0_3px_rgba(225,29,72,0.15)] transition"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <!-- Loading spinner -->
+      <div id="searchSpinner" class="hidden absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+        <svg class="w-4 h-4 animate-spin text-rose-500" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Search results (shown when a query is active) -->
+    <div id="searchResults" class="hidden mt-2 space-y-2"></div>
 
     <!-- Suggestions panel — shown when search input is empty -->
     <div id="searchSuggestions" class="mt-2 space-y-5">
@@ -63,7 +86,7 @@
   <!-- Footer Help Text -->
   <div class="px-6 pb-6 pt-2 border-t border-slate-200 dark:border-[hsl(0_0%_18%)]">
     <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] text-center">
-      Search through all crime incidents · Search by location, crime type, or keywords
+      Search through all crime incidents, MPs, and areas
     </p>
   </div>
 </dialog>
@@ -72,7 +95,7 @@
   /* ── Dialog sizing & flex layout ─────────────────────────────────────────── */
   #searchModal {
     width: calc(100% - 2rem);
-    max-width: 48rem; /* same as max-w-3xl */
+    max-width: 48rem;
     max-height: 85vh;
   }
 
@@ -81,7 +104,7 @@
     flex-direction: column;
   }
 
-  /* Open animation — browser picks up @starting-style as the FROM state */
+  /* Open animation */
   #searchModal[open] {
     opacity: 1;
     transform: scale(1);
@@ -94,7 +117,7 @@
     }
   }
 
-  /* Close animation — JS adds this class, removes it after transitionend */
+  /* Close animation */
   #searchModal.is-closing {
     opacity: 0;
     transform: scale(0.95);
@@ -118,171 +141,107 @@
     opacity: 0;
   }
 
-  /* ── Pagefind UI — Light mode ───────────────────────────────────────────── */
-  #search .pagefind-ui__search-input {
-    width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    border: 2px solid #e2e8f0;
+  /* ── Result cards ────────────────────────────────────────────────────────── */
+  .search-result-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
     border-radius: 0.5rem;
-    font-size: 1rem;
-    color: #334155;
-    background: white;
-    transition: all 0.2s;
-  }
-
-  #search .pagefind-ui__search-input:focus {
-    outline: none;
-    border-color: #e11d48;
-    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1);
-  }
-
-  #search .pagefind-ui__result {
     border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    margin-bottom: 0.75rem;
     background: white;
-    transition: all 0.2s;
-    position: relative;
-  }
-
-  /* Expand the link's click area to cover the entire result card */
-  #search .pagefind-ui__result-link::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-
-  #search .pagefind-ui__result:hover {
-    border-color: #e11d48;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-
-  #search .pagefind-ui__result-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #334155;
-    margin-bottom: 0.5rem;
-  }
-
-  #search .pagefind-ui__result-link {
+    transition: all 0.15s;
     text-decoration: none;
     color: inherit;
   }
-
-  #search .pagefind-ui__result-link:hover .pagefind-ui__result-title {
-    color: #e11d48;
-  }
-
-  #search .pagefind-ui__result-excerpt {
-    font-size: 0.875rem;
-    color: #64748b;
-    line-height: 1.5;
-  }
-
-  #search .pagefind-ui__message {
-    text-align: center;
-    padding: 2rem;
-    color: #64748b;
-    font-size: 0.875rem;
-  }
-
-  #search mark {
-    background-color: #fef3c7;
-    color: #92400e;
-    padding: 0.125rem 0.25rem;
-    border-radius: 0.25rem;
-    font-weight: 600;
-  }
-
-  #search .pagefind-ui__button {
-    background: #e11d48;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    border: none;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  #search .pagefind-ui__button:hover {
-    background: #be123c;
-  }
-
-  /* ── Pagefind UI — Dark mode ────────────────────────────────────────────── */
-  .dark #search .pagefind-ui__search-input {
-    background: hsl(0 0% 12%);
-    border-color: hsl(0 0% 22%);
-    color: hsl(0 0% 90%);
-  }
-
-  .dark #search .pagefind-ui__search-input::placeholder {
-    color: hsl(0 0% 45%);
-  }
-
-  .dark #search .pagefind-ui__search-input:focus {
+  .search-result-card:hover {
     border-color: #e11d48;
-    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.15);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   }
-
-  .dark #search .pagefind-ui__result {
+  .dark .search-result-card {
     background: hsl(0 0% 11%);
     border-color: hsl(0 0% 20%);
   }
-
-  .dark #search .pagefind-ui__result:hover {
+  .dark .search-result-card:hover {
     border-color: #e11d48;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
   }
 
-  .dark #search .pagefind-ui__result-title {
-    color: hsl(0 0% 90%);
+  /* Type badge */
+  .search-type-badge {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.125rem;
   }
-
-  .dark #search .pagefind-ui__result-link:hover .pagefind-ui__result-title {
+  .search-type-badge--crime {
+    background: #ffe4e6;
+    color: #be123c;
+  }
+  .dark .search-type-badge--crime {
+    background: rgba(159, 18, 57, 0.2);
     color: #fb7185;
   }
-
-  .dark #search .pagefind-ui__result-excerpt {
-    color: hsl(0 0% 60%);
+  .search-type-badge--mp {
+    background: #e2e8f0;
+    color: #475569;
+  }
+  .dark .search-type-badge--mp {
+    background: hsl(0 0% 18%);
+    color: hsl(0 0% 65%);
+  }
+  .search-type-badge--area {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  .dark .search-type-badge--area {
+    background: rgba(6, 78, 59, 0.25);
+    color: #34d399;
   }
 
-  .dark #search .pagefind-ui__message {
-    color: hsl(0 0% 55%);
+  .search-result-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #334155;
+    transition: color 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+  .search-result-card:hover .search-result-title { color: #e11d48; }
+  .dark .search-result-title { color: hsl(0 0% 88%); }
+  .dark .search-result-card:hover .search-result-title { color: #fb7185; }
 
-  .dark #search mark {
-    background-color: hsl(38 80% 20%);
-    color: hsl(38 80% 75%);
+  .search-result-meta {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 0.125rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-
-  .dark #search .pagefind-ui__search-clear {
-    color: hsl(0 0% 50%);
-  }
-
-  .dark #search .pagefind-ui__search-clear:hover {
-    color: hsl(0 0% 80%);
-  }
-
-  .dark #search .pagefind-ui__button {
-    background: #e11d48;
-  }
-
-  .dark #search .pagefind-ui__button:hover {
-    background: #be123c;
-  }
+  .dark .search-result-meta { color: hsl(0 0% 50%); }
 </style>
 
 <script>
   // NOTE: Module script — runs ONCE per session.
-  // pagefindUI and latestCrimesFetched are reset in astro:page-load so
-  // Pagefind re-mounts cleanly into the fresh DOM after each SPA nav.
+  // State is reset in astro:page-load so the modal re-initialises after each SPA nav.
+
+  import { escapeHtml } from '../lib/escapeHtml';
 
   const HISTORY_KEY = 'ch_search_history';
   const MAX_HISTORY = 5;
-  let pagefindUI: any = null;
+  const SEARCH_DEBOUNCE_MS = 300;
+
   let latestCrimesFetched = false;
+  let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  let lastQuery = '';
 
   // ── History helpers ──────────────────────────────────────────────────────
   function getHistory(): string[] {
@@ -308,7 +267,7 @@
     container.innerHTML = history.map(term => `
       <button class="search-chip recent-chip px-3 py-1.5 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_70%)] text-xs font-medium hover:border-rose-500 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 active:bg-rose-100 transition flex items-center gap-1.5" data-term="${term.replace(/"/g, '&quot;')}">
         <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        ${term}
+        ${escapeHtml(term)}
       </button>
     `).join('');
     bindChips(container);
@@ -343,14 +302,94 @@
     }
   }
 
+  // ── Suggestions show/hide ────────────────────────────────────────────────
+  function showSuggestions() {
+    document.getElementById('searchSuggestions')?.classList.remove('hidden');
+    document.getElementById('searchResults')?.classList.add('hidden');
+  }
+
+  function hideSuggestions() {
+    document.getElementById('searchSuggestions')?.classList.add('hidden');
+  }
+
+  // ── Search results rendering ─────────────────────────────────────────────
+  function typeBadgeClass(type: string): string {
+    if (type === 'crime') return 'search-type-badge--crime';
+    if (type === 'mp')    return 'search-type-badge--mp';
+    return 'search-type-badge--area';
+  }
+
+  function typeLabel(type: string): string {
+    if (type === 'crime') return 'Crime';
+    if (type === 'mp')    return 'MP';
+    return 'Area';
+  }
+
+  function renderResults(results: any[], q: string) {
+    const container = document.getElementById('searchResults');
+    if (!container) return;
+
+    if (results.length === 0) {
+      container.innerHTML = `<p class="text-center text-slate-400 dark:text-[hsl(0_0%_50%)] py-6 text-sm">No results for &ldquo;${escapeHtml(q)}&rdquo;</p>`;
+      container.classList.remove('hidden');
+      return;
+    }
+
+    container.innerHTML = results.map(r => `
+      <a href="${escapeHtml(r.url)}"
+         class="search-result-card"
+      >
+        <span class="search-type-badge ${typeBadgeClass(r.type)}">${typeLabel(r.type)}</span>
+        <div class="min-w-0 flex-1">
+          <p class="search-result-title">${escapeHtml(r.title)}</p>
+          ${r.excerpt ? `<p class="search-result-meta">${escapeHtml(r.excerpt)}</p>` : ''}
+          ${r.meta && r.meta !== r.excerpt ? `<p class="search-result-meta" style="opacity:0.75">${escapeHtml(r.meta)}</p>` : ''}
+        </div>
+      </a>
+    `).join('');
+    container.classList.remove('hidden');
+  }
+
+  // ── Search execution ─────────────────────────────────────────────────────
+  async function performSearch(q: string) {
+    const spinner = document.getElementById('searchSpinner');
+    const results = document.getElementById('searchResults');
+    if (!q || q.trim().length < 2) {
+      results?.classList.add('hidden');
+      return;
+    }
+
+    lastQuery = q;
+    spinner?.classList.remove('hidden');
+    hideSuggestions();
+
+    try {
+      const res = await fetch(`/api/search/?q=${encodeURIComponent(q.trim())}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { results: data } = await res.json();
+      // Only render if query hasn't changed while we were fetching
+      if (q === lastQuery) {
+        renderResults(data ?? [], q);
+      }
+    } catch {
+      if (q === lastQuery && results) {
+        results.innerHTML = '<p class="text-center text-slate-400 dark:text-[hsl(0_0%_50%)] py-6 text-sm">Search is unavailable. Please try again.</p>';
+        results.classList.remove('hidden');
+      }
+    } finally {
+      spinner?.classList.add('hidden');
+    }
+  }
+
   // ── Chip interaction ─────────────────────────────────────────────────────
   function triggerSearch(term: string) {
-    const searchInput = document.querySelector<HTMLInputElement>('#search input');
+    const searchInput = document.querySelector<HTMLInputElement>('#searchInput');
     if (!searchInput) return;
     searchInput.value = term;
-    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-    searchInput.focus();
     hideSuggestions();
+    saveToHistory(term);
+    performSearch(term);
+    searchInput.focus();
   }
 
   function bindChips(container: Element | null) {
@@ -362,56 +401,46 @@
     });
   }
 
-  // ── Show / hide suggestions ──────────────────────────────────────────────
-  function showSuggestions() {
-    document.getElementById('searchSuggestions')?.classList.remove('hidden');
-  }
-
-  function hideSuggestions() {
-    document.getElementById('searchSuggestions')?.classList.add('hidden');
-  }
-
+  // ── Input watcher ────────────────────────────────────────────────────────
   function watchSearchInput() {
-    const searchInput = document.querySelector<HTMLInputElement>('#search input');
+    const searchInput = document.querySelector<HTMLInputElement>('#searchInput');
     if (!searchInput) return;
 
-    let saveTimer: ReturnType<typeof setTimeout>;
     searchInput.addEventListener('input', () => {
       const val = searchInput.value.trim();
-      if (val.length > 0) {
-        hideSuggestions();
-        clearTimeout(saveTimer);
-        saveTimer = setTimeout(() => saveToHistory(val), 1500);
-      } else {
+      if (val.length === 0) {
         renderRecentChips();
         showSuggestions();
+        document.getElementById('searchResults')?.classList.add('hidden');
+        lastQuery = '';
+        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+        return;
       }
+      if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        saveToHistory(val);
+        performSearch(val);
+      }, SEARCH_DEBOUNCE_MS);
     });
 
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         const val = searchInput.value.trim();
-        if (val) { clearTimeout(saveTimer); saveToHistory(val); }
+        if (val) {
+          if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+          saveToHistory(val);
+          performSearch(val);
+        }
       }
     });
 
-    document.querySelector('#search')?.addEventListener('click', (e) => {
+    // Result link clicks — save history and close modal
+    document.getElementById('searchResults')?.addEventListener('click', (e) => {
       const target = e.target as Element;
-
-      // Result link clicked — save history and close modal so navigation is visible
       if (target.closest('a')) {
         const val = searchInput.value.trim();
         if (val) saveToHistory(val);
         closeModal();
-        return;
-      }
-
-      // Clear button clicked — Pagefind doesn't fire a native input event, handle manually
-      if (target.closest('.pagefind-ui__search-clear')) {
-        setTimeout(() => {
-          renderRecentChips();
-          showSuggestions();
-        }, 50);
       }
     });
   }
@@ -428,81 +457,32 @@
     }, { once: true });
   }
 
-  // ── Lazy-load pagefind-ui.js on first open ───────────────────────────────
-  function loadPagefindScript(): Promise<void> {
-    if ((window as any).PagefindUI) return Promise.resolve();
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = '/pagefind/pagefind-ui.js';
-      script.onload = () => resolve();
-      script.onerror = reject;
-      document.head.appendChild(script);
-    });
-  }
-
   // ── Open ─────────────────────────────────────────────────────────────────
-  (window as any).openSearchModal = async function() {
+  (window as any).openSearchModal = function() {
     const dialog = document.getElementById('searchModal') as HTMLDialogElement | null;
     if (!dialog) return;
 
     document.body.style.overflow = 'hidden';
     dialog.showModal();
 
-    // Load pagefind-ui.js lazily on first open, then initialize
-    if (!pagefindUI) {
-      try {
-        await loadPagefindScript();
-      } catch {
-        const searchDiv = document.getElementById('search');
-        if (searchDiv) searchDiv.innerHTML = '<p class="text-center text-slate-500 dark:text-[hsl(0_0%_50%)] p-4">Search is currently unavailable. Please try again later.</p>';
-        hideSuggestions();
-        return;
-      }
-    }
+    renderRecentChips();
+    fetchAndRenderLatestCrimes();
+    showSuggestions();
+    watchSearchInput();
 
-    // Initialize Pagefind UI on first open (pagefindUI is reset to null on each SPA nav)
-    if (!pagefindUI && (window as any).PagefindUI) {
-      try {
-        pagefindUI = new (window as any).PagefindUI({
-          element: "#search",
-          showSubResults: true,
-          showImages: false,
-          excerptLength: 30,
-          resetStyles: false,
-          bundlePath: "/pagefind/"
-        });
-        setTimeout(() => {
-          renderRecentChips();
-          fetchAndRenderLatestCrimes();
-          showSuggestions();
-          watchSearchInput();
-          document.querySelector<HTMLInputElement>('#search input')?.focus();
-        }, 200);
-      } catch (error) {
-        console.error('Failed to initialize Pagefind UI:', error);
-        const searchDiv = document.getElementById('search');
-        if (searchDiv) searchDiv.innerHTML = '<p class="text-center text-slate-500 dark:text-[hsl(0_0%_50%)] p-4">Search is currently unavailable. Please try again later.</p>';
-        hideSuggestions();
-      }
-    } else if (pagefindUI) {
-      renderRecentChips();
-      fetchAndRenderLatestCrimes();
-      const val = document.querySelector<HTMLInputElement>('#search input')?.value?.trim() || '';
-      if (val.length === 0) showSuggestions();
-      setTimeout(() => document.querySelector<HTMLInputElement>('#search input')?.focus(), 100);
-    }
+    setTimeout(() => {
+      document.querySelector<HTMLInputElement>('#searchInput')?.focus();
+    }, 50);
   };
 
   // ── Re-attach listeners after each SPA nav ────────────────────────────────
   document.addEventListener('astro:page-load', () => {
-    // Reset so Pagefind re-mounts into the fresh DOM
-    pagefindUI = null;
     latestCrimesFetched = false;
+    lastQuery = '';
 
     const dialog = document.getElementById('searchModal') as HTMLDialogElement | null;
     const closeBtn = document.getElementById('closeSearchModal');
 
-    // Bind static suggestion chips
     bindChips(document.getElementById('searchSuggestions'));
 
     closeBtn?.addEventListener('click', closeModal);
@@ -517,7 +497,7 @@
     });
   });
 
-  // ── Keyboard shortcuts (added once — document persists across SPA nav) ────
+  // ── Keyboard shortcuts ────────────────────────────────────────────────────
   document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();

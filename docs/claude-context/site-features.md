@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 12, 2026 (Phase 3 D1 migration complete)
+**Last Updated:** March 13, 2026 (D1 FTS5 search replaces Pagefind)
 
 ---
 
@@ -63,6 +63,7 @@
 |----------|-------|---------|
 | Dashboard API | `/api/dashboard/?year=2026\|2025\|all` | Pre-computed stats, trends, insights, topRegions from D1. Cache: 1h browser / ~23h CDN edge. |
 | Crimes API | `/api/crimes/?year=2026\|2025\|all` | Full Crime objects from D1 (Date fields stripped; client reconstructs `dateObj` from year/month/day). Same cache headers. |
+| Search API | `/api/search/?q=...` | D1 FTS5 search for crimes + LIKE for areas + static filter for MPs. Returns typed `SearchResult[]`. No CDN cache. Min 2 chars. |
 | Health | `/api/health.json` | Build health status (pre-rendered static) |
 | Latest Crimes | `/api/latest-crimes.json` | Latest 20 crimes for SearchModal suggestions (pre-rendered static) |
 
@@ -119,7 +120,7 @@
 | Component | Purpose |
 |-----------|---------|
 | IslandSelectorModal.astro | Unified island picker (dashboard/headlines/archives/areas). Exposes `window.openIslandModal(section)`. Backward-compat aliases: `openDashboardModal()`, `openHeadlinesModal()`, etc. Replaced 4 separate modal files. |
-| SearchModal.astro | Site-wide Pagefind search (Ctrl+K). Dark mode. Suggestions panel (empty state): recent searches (localStorage `ch_search_history`, max 5), 2 latest crimes (fetched from `/api/latest-crimes.json`), static crime-type chips. |
+| SearchModal.astro | Site-wide search (Ctrl+K). Powered by `/api/search` (D1 FTS5 crimes, mps.json MPs, D1 LIKE areas). Dark mode. Custom debounced input (300ms). Typed result cards (Crime/MP/Area badges). Suggestions panel (empty state): recent searches (localStorage `ch_search_history`, max 5), 2 latest crimes (fetched from `/api/latest-crimes.json`), static crime-type chips. |
 | ReportIssueModal.astro | Report crime data issues |
 
 ### Safety Tips
@@ -165,7 +166,7 @@
 
 | File | Purpose |
 |------|---------|
-| csvBuildPlugin.ts | Vite plugin — fetches CSV at build:start with retry (2s/4s/8s), validates rows, writes `csv-cache.json` + `health-data.json` + `area-aliases.json` (116 area→known_as mappings from RegionData CSV). **NEVER use `await import()` inside hook — causes Vite runner error (B012).** |
+| csvBuildPlugin.ts | Vite plugin — fetches CSV at build:start with retry (2s/4s/8s), validates rows, writes `csv-cache.json` + `health-data.json` + `area-aliases.json` (116 area→known_as mappings from RegionData CSV). **NEVER use `await import()` inside hook — causes Vite runner error (B012). Pagefind indexer removed (Mar 2026) — no longer writes pagefind index.** |
 | redirectGenerator.ts | Build-time redirect map generator — writes `src/data/redirect-map.json` (~1,984 old→new slug mappings). Static top-level imports only. |
 
 ---
@@ -266,7 +267,7 @@
 - **Structured Data:** JSON-LD (WebPage, BreadcrumbList, Dataset, BlogPosting)
 - **Sitemap:** Auto-generated, submitted to Google Search Console
 - **OG Images:** Dynamic murder count OG image (satori + sharp, regenerates daily)
-- **Search:** Pagefind static search (auto-indexed at build time via `astro-pagefind` integration). Dark mode. Suggestions on empty state.
+- **Search:** D1 FTS5 via `/api/search` (crimes, MPs, areas). Dark mode. Suggestions on empty state. No build-time indexing.
 
 ### Analytics
 - **Google Analytics 4:** With cookie consent gate

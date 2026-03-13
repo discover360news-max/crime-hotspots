@@ -8,31 +8,34 @@ related: [B011, CFG004]
 ---
 
 ## Summary
-`SearchModal.astro` — site-wide Pagefind search triggered by Ctrl+K. Dark mode. Shows suggestions panel when input is empty: recent searches (localStorage), 2 latest crimes (API), and static crime-type chips.
+`SearchModal.astro` — site-wide search triggered by Ctrl+K. Powered by `/api/search` (D1 FTS5 for crimes, mps.json filter for MPs, D1 LIKE for areas). Dark mode. Shows suggestions panel when input is empty: recent searches (localStorage), 2 latest crimes (API), and static crime-type chips.
 
 ## Implementation Details
 
 **File:** `src/components/SearchModal.astro`
 
+**Search input:** custom `<input id="searchInput">` with 300ms debounce → fetch to `/api/search/?q=...`
+
 **Suggestions panel (empty state):**
-- **Recent searches:** `ch_search_history` localStorage key (max 5 entries). Saved on Enter / 1.5s idle / result click
+- **Recent searches:** `ch_search_history` localStorage key (max 5 entries). Saved on Enter / debounce / result click
 - **Latest crimes:** fetched from `/api/latest-crimes.json` once per session. Source: `src/pages/api/latest-crimes.json.ts` (pre-rendered, `Cache-Control: 1h`)
 - **Static chips:** 10 crime-type/area prompt chips
 
 **Behaviour:**
 - Suggestions hide when user types; re-show when input is cleared
-- Pagefind indexes at build time — `astro-pagefind` must be in `integrations[]` (see B011)
-- `pagefind-ui.js` is **lazy-loaded** — injected into `<head>` on first `openSearchModal()` call via `loadPagefindScript()`. Only the CSS is loaded upfront (non-blocking). Do NOT add the script back to Layout.
+- Loading spinner shown during fetch
+- Results rendered with type badges (Crime/MP/Area), title, excerpt, meta
+- `escapeHtml()` used on all innerHTML rendering
 
 ## Known Issues / Gotchas
-- Murder count page opts out: `includePagefind={false}` on `<Layout>` — intentional (reduces JS payload)
 - `/api/latest-crimes.json` is pre-rendered static — content only updates on site rebuild
-- See B011 — `astro-pagefind` in package.json alone is not enough; must be in astro.config.mjs
-- Pagefind clear button (`.pagefind-ui__search-clear`) does NOT fire a native `input` event — handled separately via click delegation in `watchSearchInput()`
+- `includePagefind` prop on `<Layout>` is now a no-op (4 pages pass it — kept for compat, not removed)
+- Search requires D1 runtime for crimes + areas; MPs work without D1 (static JSON)
+- See D007 for full architecture, FTS5 schema, and one-time migration command
 
 ## Change Log
 - 2026-03-03: Suggestions panel added (recent searches, latest crimes, chips)
-- 2026-03-12: Fix — result link clicks now call `closeModal()` so navigation is visible; clear button click re-shows suggestions panel
-- 2026-03-12: Perf — `pagefind-ui.js` (83KB) moved from eager Layout load to lazy injection on first modal open (INP improvement)
-- 2026-03-12: Fix — crime pages (SSR) now indexed via `pagefindCrimeIndexer` integration (2,591 records). Root cause: Pagefind only crawls static HTML; SSR pages produce no `.html` files.
-- 2026-03-12: Fix — crime records were indexed but outranked by area pages. Area pages embed full crime headline lists (30d) in static HTML → `data-pagefind-ignore` added to that section. Indexer also updated to use `parseFullCSV` (handles embedded newlines in summaries). See B014.
+- 2026-03-12: Fix — result link clicks now call `closeModal()`; clear button re-shows suggestions panel
+- 2026-03-12: Perf — pagefind-ui.js moved to lazy load
+- 2026-03-12: Fix — crime pages indexed via pagefindCrimeIndexer (now removed)
+- 2026-03-13: Full rewrite — replaced Pagefind with D1 FTS5 via /api/search. Custom input + debounced fetch + typed result cards. Pagefind entirely removed. See D007.

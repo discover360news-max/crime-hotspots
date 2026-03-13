@@ -114,11 +114,8 @@ const detectedCountryId = Object.entries(countryPathMap).find(
     </>
   )}
 
-  <!-- Pagefind CSS: only the stylesheet is loaded upfront (non-blocking).
-       pagefind-ui.js (83 KB) is injected lazily by SearchModal when the modal first opens. -->
-  {includePagefind && (
-    <link rel="stylesheet" href="/pagefind/pagefind-ui.css" media="print" onload="this.media='all'"/>
-  )}
+  <!-- includePagefind prop retained for backward compatibility but is now a no-op.
+       Search is powered by /api/search (D1 FTS5) — no Pagefind assets needed. -->
 
   <!-- Self-hosted Inter font (eliminates external request chain for faster LCP) -->
   <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>

@@ -106,6 +106,10 @@ const INSERT_SQL = `
   ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
 
+const INSERT_FTS_SQL = `
+  INSERT INTO crimes_fts(story_id, title, body, url) VALUES (?, ?, ?, ?)
+`;
+
 async function syncCsvToD1(db: D1Database, csvUrl: string, year: string): Promise<number> {
   console.log(`[sync] Fetching ${year} CSV...`);
   const response = await fetch(csvUrl);
@@ -198,6 +202,12 @@ async function syncCsvToD1(db: D1Database, csvUrl: string, year: string): Promis
           dateObj.getDate(),
         ),
       );
+
+      // FTS entry — title=headline, body=searchable metadata fields
+      const ftsBody = [area, region, crimeType, street, summary].filter(Boolean).join(' ');
+      const ftsUrl = `/trinidad/crime/${slug}/`;
+      stmts.push(db.prepare(INSERT_FTS_SQL).bind(storyId, headline, ftsBody, ftsUrl));
+
       upsertCount++;
     }
 
@@ -213,6 +223,10 @@ async function syncCsvToD1(db: D1Database, csvUrl: string, year: string): Promis
 async function runFullSync(db: D1Database): Promise<void> {
   const start = Date.now();
   let total = 0;
+
+  // Clear FTS before re-syncing so stale entries don't accumulate
+  await db.prepare('DELETE FROM crimes_fts').run();
+  console.log('[sync] crimes_fts cleared — will re-populate from CSV');
 
   for (const [year, url] of Object.entries(YEAR_CSV_URLS)) {
     const count = await syncCsvToD1(db, url, year);

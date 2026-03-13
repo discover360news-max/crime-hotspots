@@ -14,10 +14,10 @@ B007 | BUG | active | filterCrimesByDateRange() normalises to noon — use setHo
 B008 | BUG | active | GAS CSV columns: always try 3 name variants (camelCase, Title Case, short) → B008-gas-csv-column-fallbacks.md
 B009 | BUG | active | Tailwind v4 HSL opacity: use `hsl(0 0% 8% / 0.7)` not `hsl(...)/70` → B009-tailwind-hsl-opacity.md
 B010 | BUG | active | Blog automation: column mismatch + noon boundary caused wrong murder count → B010-blog-automation-bugs.md
-B011 | BUG | active | astro-pagefind MUST be in integrations[] in astro.config.mjs — package.json not enough → B011-pagefind-integration.md
+B011 | BUG | archived | astro-pagefind removed (Mar 13 2026) — search now uses D1 FTS5 via /api/search → B011-pagefind-integration.md
 B012 | BUG | active | NEVER `await import()` inside Astro integration hooks — crashes Vite runner → B012-await-import-hooks.md
 B013 | BUG | fixed | Raw Articles sheet column is "Publish Date" not "Published Date" — caused all crime dates to use run date → B013-gas-publish-date-column-mismatch.md
-B014 | BUG | fixed | Pagefind: SSR crime pages invisible to search + area pages outranked custom records. Fix: `pagefindCrimeIndexer` (custom records) + `data-pagefind-ignore` on area crime list + `parseFullCSV` → B014-pagefind-crime-indexer.md
+B014 | BUG | archived | Pagefind ranking issues → fully resolved by removing Pagefind (Mar 13 2026). Search now uses D1 FTS5 (see D007) → B014-pagefind-crime-indexer.md
 B015 | BUG | active | Astro trailingSlash:'always' — fetch to SSR endpoints MUST use trailing slash (/api/dashboard/?year=) or 200 HTML is returned → B015-astro-trailing-slash-api-fetch.md
 B016 | BUG | active | SSR handlers: wrap ENTIRE body in try/catch, not just DB queries — uncaught throws return 200 HTML from Astro error handler → B016-ssr-handler-try-catch.md
 B017 | BUG | active | Local D1 is empty — apply schema manually before using wrangler pages dev locally → B017-local-d1-empty.md
@@ -44,6 +44,7 @@ D003 | DEC | active | Victim count: PRIMARY crime only; related always +1; Murde
 D004 | DEC | active | Slug migration: Story_ID+6words new format; legacy headline-date → 301 via SSR → D004-slug-migration.md
 D005 | DEC | active | Migrated to Astro (Dec 2025) from Vite for SSR, content collections, scalability → D005-astro-migration.md
 D006 | DEC | active | CSV → D1 migration. ALL 3 PHASES COMPLETE. Infra live (DB ID: 23311480). Dashboard uses /api/dashboard + /api/crimes (D1-backed, CDN-cached). area-aliases.json baked at build. → D006-d1-migration-plan.md
+D007 | DEC | active | Search: replaced Pagefind with D1 FTS5. crimes_fts virtual table (FTS5). /api/search endpoint (crimes via FTS5, MPs via mps.json, areas via D1 LIKE). Sync worker clears+repopulates FTS on every sync. → D007-search-d1-fts.md
 
 ## Features (F)
 F010 | FEAT | active | MP profiles: 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg → F010-mp-profiles.md
@@ -59,7 +60,7 @@ F009 | FEAT | active | Analytics: GA4 Consent Mode v2 — gtag denied by default
 
 ## Components (C)
 C001 | COMP | active | CrimeDetailModal: 261-line orchestrator + 5 modal*.ts modules in src/scripts/ → C001-crime-detail-modal.md
-C002 | COMP | active | SearchModal: Pagefind + suggestions panel (recent searches, latest crimes, chips) → C002-search-modal.md
+C002 | COMP | active | SearchModal: D1 FTS5 via /api/search (crimes+MPs+areas) + suggestions panel (recent searches, latest crimes, chips) → C002-search-modal.md
 C003 | COMP | active | IslandSelectorModal: unified picker; backward-compat window.open*Modal() aliases → C003-island-selector-modal.md
 C004 | COMP | active | MPSidebar: area pages (showAll=false: 2+chevron) + region pages (showAll=true: all on desktop, mobile toggle). Share + MPs + Ko-fi. Global width standard: max-w-5xl across header/footer/hero → C004-mpsidebar-design-rules.md
 
