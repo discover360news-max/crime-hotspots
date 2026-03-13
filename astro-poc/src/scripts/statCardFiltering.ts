@@ -94,8 +94,8 @@ function applyAllFilters(callbacks: {
   if (yearFilter && yearFilter.value !== 'all') {
     const selectedYears = yearFilter.value.split(',').map(y => parseInt(y.trim()));
     filteredCrimes = filteredCrimes.filter((crime: Crime) => {
-      const crimeYear = new Date(crime.date).getFullYear();
-      return selectedYears.includes(crimeYear);
+      // Use pre-parsed crime.year (already available) instead of re-parsing the date string
+      return selectedYears.includes(crime.year);
     });
   }
 

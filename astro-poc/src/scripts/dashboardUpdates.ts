@@ -191,7 +191,9 @@ export function updateQuickInsights(crimes: Crime[]) {
     return;
   }
 
-  const dates = crimes.map(c => new Date(c.date)).filter(d => !isNaN(d.getTime()));
+  // Use dateObj (local-time Date) when available; fall back to parsing c.date string.
+  // Avoids UTC-midnight parse shifting Peak Day/Busiest Month in non-UTC timezones.
+  const dates = crimes.map(c => (c as any).dateObj instanceof Date ? (c as any).dateObj : new Date(c.date)).filter((d: Date) => !isNaN(d.getTime()));
   const minDate = new Date(Math.min(...dates.map(d => d.getTime())));
   const maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
   const daysDiff = Math.ceil((maxDate.getTime() - minDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
@@ -259,13 +261,14 @@ export function updateQuickInsights(crimes: Crime[]) {
   });
   const areaArray = Array.from(areaCount.entries()).sort((a, b) => b[1] - a[1]);
 
-  // Find safest area (exclude "Unknown" and empty values)
+  // Filter out "Unknown" and empty area values for both highest and lowest lookups
   const validAreas = areaArray.filter(([area]) => area && area !== 'Unknown' && area.trim() !== '');
   const safestRegion = validAreas[validAreas.length - 1]?.[0] || 'N/A';
   const safestRegionCount = validAreas[validAreas.length - 1]?.[1] || 0;
 
-  const mostDangerousRegion = areaArray[0]?.[0] || 'N/A';
-  const mostDangerousRegionCount = areaArray[0]?.[1] || 0;
+  // Use validAreas (not areaArray) so "Unknown" is never returned as the highest-crime area
+  const mostDangerousRegion = validAreas[0]?.[0] || 'N/A';
+  const mostDangerousRegionCount = validAreas[0]?.[1] || 0;
 
   // Update DOM using IDs
   const avgPerDayEl = document.getElementById('avgPerDay');
