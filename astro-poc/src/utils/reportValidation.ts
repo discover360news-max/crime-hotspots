@@ -4,6 +4,7 @@
  */
 
 import { COUNTRIES } from '../data/countries';
+import { CRIME_TYPE_LABELS } from '../config/crimeSchema';
 
 /**
  * Validate entire report form
@@ -132,18 +133,7 @@ export function validateCountry(countryId: string): string[] {
 export function validateCrimeType(crimeType: string): string[] {
   const errors: string[] = [];
 
-  const validCrimes = [
-    'Assault',
-    'Burglary',
-    'Home Invasion',
-    'Kidnapping',
-    'Murder',
-    'Robbery',
-    'Shooting',
-    'Seizures',
-    'Theft',
-    'Other'
-  ];
+  const validCrimes = [...CRIME_TYPE_LABELS, 'Other'];
 
   if (!crimeType || !validCrimes.includes(crimeType)) {
     errors.push('Invalid crime type');

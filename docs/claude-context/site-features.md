@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 13, 2026 (D1 FTS5 search replaces Pagefind)
+**Last Updated:** March 13, 2026 (crime schema overhaul — 3 new types + isContextType)
 
 ---
 
@@ -183,7 +183,7 @@
 | statisticsHelpers.ts | Statistics page calculations | `calculatePercentChange()`, `compareYearToDate()`, `getCrimeTypeBreakdown()`, `getTopRegions()` (crime-count based, not row count), `filterToSamePeriod()`, `formatPercentChange()`, `getTotalCrimeCount()` |
 | trendingHelpers.ts | Trending areas + recent views (localStorage) | `getHotAreas()` (top 5 areas, last 7 days), `trackRecentView()`, `getRecentViews()` |
 | escapeHtml.ts | XSS protection utilities | `escapeHtml()` (innerHTML), `sanitizeUrl()` (anchor hrefs), `validateUrl()` (DOM hrefs) |
-| crimeColors.ts | Crime type → color hex mapping | Default export: color map object |
+| crimeColors.ts | Crime type → color hex mapping | 15 types (no Vehicle Theft). Exports `getCrimeTailwindColor()`, `getCrimeHexColor()`. Must stay in sync with crimeSchema.ts. |
 | areaAliases.ts | Area name aliases (handles quoted CSV fields) | Used by tooltip + area pages |
 | generateOgImage.ts | Dynamic OG image generation (satori + sharp) | Used by murder-count page (1200×630 PNG) |
 | generateCrimeTypeThumbnails.ts | Build-time crime type thumbnail images | Used during build |
@@ -197,7 +197,7 @@
 | csvUrls.ts | CSV data source URLs | **Single source of truth** for all CSV URLs |
 | routes.ts | All internal routes + builders | `routes.*` for static, `buildRoute.*` for dynamic. Includes `routes.trinidad.mps` + `buildRoute.mp(nameSlug)`. |
 | mps.json | 41 MP records | Schema: nameSlug, fullName, honorific, constituency, constituencySlug, party, partyFull, electionYear, regionSlugs, regionConfidence, contact, socials, photo. Photos in `public/images/mps/` (placeholder.svg always present). |
-| crimeTypeConfig.ts | Crime type definitions + victim count rules | Victim count applies to PRIMARY crime only |
+| crimeTypeConfig.ts | Crime type definitions + victim count rules | Victim count applies to PRIMARY crime only. 15 types: Murder/Attempted Murder/Kidnapping/Sexual Assault/Shooting/Assault/Home Invasion/Carjacking/Arson/Robbery/Domestic Violence/Extortion/Burglary/Theft/Seizures. |
 | siteNotifications.ts | Site notification banner content | Toggle-based enable/disable |
 | riskWeights.ts | Crime severity weights | Used by `TopRegionsCard.astro`, `dashboardUpdates.ts` (Top Regions card), and `safetyHelpers.ts` (SafetyContext). Full methodology: `docs/guides/RISK-SCORING-METHODOLOGY.md` |
 | countries.ts | Country config (sections, icons, nav settings) | Imports from `routes.ts` and `csvUrls.ts` |
@@ -214,10 +214,10 @@
 | preFilter.gs | Pre-filters articles before AI processing |
 | orchestrator.gs | Main automation flow controller |
 | processor.gs | Processes articles, routes to Production/Archive sheets |
-| claudeClient.gs | Claude Haiku 4.5 for crime extraction (primary) |
+| claudeClient.gs | Claude Haiku 4.5 for crime extraction. System prompt includes: Assault+Robbery combination rule (add Assault when victim physically struck), context type ordering rule (Home Invasion/Domestic Violence always after harm types), Carjacking/Domestic Violence/Extortion classification rules. |
 | geminiClient.gs | Gemini API client (legacy backup) |
 | groqClient.gs | Groq API client (legacy backup) |
-| crimeTypeProcessor.gs | Validates and processes crime types |
+| crimeTypeProcessor.gs | Determines primary + related crime types. After severity sort, partitions harm types first, context types (Home Invasion, Domestic Violence) last — context types can never be primary when a harm type is present. Calls `getContextTypeLabels()` from schema.gs. |
 
 ### Data Management
 | Script | Purpose |
@@ -237,7 +237,7 @@
 | Script | Purpose |
 |--------|---------|
 | weeklyBlogAutomation.gs | Auto weekly blog (Claude Haiku → GitHub → Cloudflare) |
-| blogDataGenerator.gs | Prepares crime stats for blog generation |
+| blogDataGenerator.gs | Prepares crime stats for blog generation. `BLOG_CRIME_TYPE_CONFIG` mirrors `crimeTypeConfig.ts` — keep in sync when adding crime types. |
 | socialMediaStats.gs | Daily/monthly/custom social media stats |
 | facebookSubmitter.gs | Web app for manual Facebook post entry (Guardian source) |
 | linkChecker.gs | Bi-weekly dead link detection + email reports |
@@ -245,6 +245,7 @@
 ### Infrastructure
 | Script | Purpose |
 |--------|---------|
+| schema.gs | **Single source of truth** for crime types (15 types, severity, isContextType, promptDescription), safety tip enums, confidence tiers. Exports: `getCrimeSeverityMap()`, `getCrimeSchemaOrderMap()`, `getContextTypeLabels()`, `buildCrimeHierarchyString()`, `buildCrimeTypesList()`, `buildClassificationRulesBlock()`. Mirror: `src/config/crimeSchema.ts`. |
 | config.gs | API keys, model config, sheet/source config |
 | setupApiKey.gs | Initial API key setup |
 | throttlingManager.gs | API rate limiting |
@@ -308,7 +309,8 @@
 | YoY % comparison | `src/lib/statisticsHelpers.ts` → `compareYearToDate()` | Same-period prior year |
 | Top regions | `src/lib/statisticsHelpers.ts` → `getTopRegions()` | Used by dashboard + stats page. Counts primary + related crime types (not raw rows) |
 | Crime type breakdown | `src/lib/statisticsHelpers.ts` → `getCrimeTypeBreakdown()` | Returns Map<type, count> |
-| Victim count rules | `src/config/crimeTypeConfig.ts` | PRIMARY crime only gets victim count; related always +1 |
+| Victim count rules | `src/config/crimeTypeConfig.ts` | PRIMARY crime only gets victim count; related always +1. Mirror also exists in `blogDataGenerator.gs` → `BLOG_CRIME_TYPE_CONFIG`. |
+| Crime type schema | `src/config/crimeSchema.ts` ↔ `schema.gs` | 15 types with severity + isContextType. `CONTEXT_TYPE_LABELS` export lists context types (Home Invasion, Domestic Violence). `reportValidation.ts` + `report.astro` dropdown are schema-driven. |
 | Date normalization | `src/lib/safetyHelpers.ts` → `toDate()` | Exported, used by trendingHelpers too |
 | OG image generation | `src/lib/generateOgImage.ts` | satori + sharp, 1200×630 |
 | XSS escaping | `src/lib/escapeHtml.ts` → `escapeHtml()` | Use on ALL innerHTML/set:html |

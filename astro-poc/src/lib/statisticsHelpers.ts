@@ -16,8 +16,11 @@ export const TRACKED_CRIME_TYPES = [
   'Shooting',
   'Home Invasion',
   'Assault',
+  'Carjacking',
+  'Domestic Violence',
   'Burglary',
   'Kidnapping',
+  'Extortion',
   'Theft',
   'Seizures'
 ] as const;

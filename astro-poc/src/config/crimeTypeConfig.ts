@@ -28,8 +28,11 @@ export const CRIME_TYPE_CONFIG = {
   Robbery: { useVictimCount: true },
   Shooting: { useVictimCount: true },
 
+  Carjacking: { useVictimCount: true },
+  'Domestic Violence': { useVictimCount: true },
+
   // Incident-count crimes (always count as 1 incident)
-  
+  Extortion: { useVictimCount: false },
   Burglary: { useVictimCount: false },
   'Home Invasion': { useVictimCount: false },
   Seizures: { useVictimCount: false },

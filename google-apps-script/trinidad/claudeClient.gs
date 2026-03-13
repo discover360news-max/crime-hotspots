@@ -219,6 +219,29 @@ JSON SCHEMA:
 Safety tip guidance: Routine incidents with no notable new tactic = No. Only flag when the tactic is genuinely preventable by residents changing their behaviour. Example worth flagging: victim withdrew cash from ATM and was followed home. Example NOT worth flagging: man shot in front of home (no actionable tactic revealed).
 
 ═══════════════════════════════════════════════════════════════════════════════
+ASSAULT + ROBBERY COMBINATIONS
+═══════════════════════════════════════════════════════════════════════════════
+Add "Assault" to all_crime_types whenever the victim is physically struck or beaten,
+even when Robbery is also present.
+✅ "Man beaten and robbed" → ["Robbery", "Assault"]
+✅ "Woman punched, phone snatched" → ["Robbery", "Assault"]
+✅ "Victim pistol-whipped during robbery" → ["Robbery", "Assault"]
+❌ "Robbed at gunpoint" → ["Robbery"] only — threat, no physical strike
+❌ "Armed men held family at gunpoint" → ["Home Invasion", "Robbery"] — no Assault (threat only)
+
+═══════════════════════════════════════════════════════════════════════════════
+CONTEXT TYPES — ORDERING RULE (CRITICAL)
+═══════════════════════════════════════════════════════════════════════════════
+Some crime types describe the SETTING or RELATIONSHIP, not the primary harm.
+These are: Home Invasion, Domestic Violence.
+Context types ALWAYS appear AFTER harm types in all_crime_types, regardless of severity.
+
+✅ "Family robbed during home invasion" → ["Robbery", "Home Invasion"]
+✅ "Man assaulted wife" → ["Assault", "Domestic Violence"]
+✅ "Man shot wife" → ["Murder", "Shooting", "Domestic Violence"]
+❌ WRONG: "Man assaulted wife" → ["Domestic Violence", "Assault"]
+
+═══════════════════════════════════════════════════════════════════════════════
 MULTI-CRIME LOGIC (CRITICAL)
 ═══════════════════════════════════════════════════════════════════════════════
 ✅ SEPARATE objects when: Different victims OR different dates OR different locations
@@ -417,6 +440,18 @@ Attempted Murder: Intentional targeted attack where victim survived
 Arson: Deliberate setting of fire to property or person
 - Use when article explicitly states fire was deliberately set, describes arson, or treats it as criminal
 - Do NOT use for accidental fires, electrical fires, or fires of undetermined cause
+
+Carjacking: Vehicle taken from driver/occupant by force or threat. Carjacking implies the
+vehicle robbery — only add Robbery separately if other property (phone, wallet) was also taken.
+Always paired with Shooting if shots fired, Assault if victim was physically harmed.
+
+Domestic Violence: Use when violence occurs between current/former intimate partners or
+family members in a domestic setting. CONTEXT TYPE — always appears after Assault/Murder/Shooting.
+Never use Domestic Violence alone.
+
+Extortion: Threatening harm to a person or their property unless they pay money or comply
+with demands. Use for: protection racket threats, ransom demands (distinct from Kidnapping),
+blackmail involving threats of violence/arson.
 
 Seizures vs Theft:
 - "Seizures" = police recovering items (guns/drugs)

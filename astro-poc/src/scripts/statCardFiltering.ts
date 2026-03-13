@@ -48,7 +48,10 @@ function updateQuickInsightsTitle(crimeType: string | null) {
       'Assault': 'Assaults',
       'Burglary': 'Burglaries',
       'Seizures': 'Seizures',
-      'Kidnapping': 'Kidnappings'
+      'Kidnapping': 'Kidnappings',
+      'Carjacking': 'Carjackings',
+      'Domestic Violence': 'Domestic Violence',
+      'Extortion': 'Extortion',
     };
 
     const plural = pluralMap[crimeType] || crimeType;

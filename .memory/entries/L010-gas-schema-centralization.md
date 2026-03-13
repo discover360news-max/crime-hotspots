@@ -3,7 +3,7 @@ id: L010
 type: learning
 status: active
 created: 2026-03-09
-updated: 2026-03-09 (session 3)
+updated: 2026-03-13 (crime schema overhaul — new types + isContextType)
 related: [F002, B013]
 ---
 
@@ -36,8 +36,18 @@ Full plan at `docs/guides/SCHEMA-CENTRALIZATION-PLAN.md`
 - `src/config/crimeTypeConfig.ts` — behavioral config (useVictimCount per type), intentional per-type decisions
 - `src/pages/trinidad/statistics.astro:210` — 5-type priority list for FAQ SEO structured data
 
+## Crime Schema Overhaul (2026-03-13)
+New types: Carjacking (sev 5, isContextType false), Domestic Violence (sev 4, isContextType true), Extortion (sev 3, isContextType false).
+New field: `isContextType` on every entry — context types (Home Invasion, Domestic Violence) always yield to harm types in primary position.
+Files changed: schema.gs, claudeClient.gs, crimeTypeProcessor.gs, crimeSchema.ts, crimeTypeConfig.ts, crimeColors.ts, leafletMap.ts, generateCrimeTypeThumbnails.ts, statisticsHelpers.ts, statCardFiltering.ts, reportValidation.ts (now imports from crimeSchema — arch fix), report.astro (now schema-driven — arch fix).
+Removed stale `Vehicle Theft` from crimeColors.ts and generateCrimeTypeThumbnails.ts.
+crimeTypeProcessor.gs: context types partitioned to end of reordered array — Home Invasion can never be primary when any harm type is present.
+Assault promptDescription updated: clarifies ADD alongside Robbery when victim physically struck.
+claudeClient.gs: added ASSAULT+ROBBERY COMBINATIONS section + CONTEXT TYPES ORDERING RULE section + Carjacking/DV/Extortion classification rules.
+getContextTypeLabels() helper added to schema.gs.
+
 ## Schema Drift — crimeSchema.ts vs schema.gs
-✅ RESOLVED (2026-03-09 session 3) — both files fully in sync:
+✅ RESOLVED (2026-03-13) — both files fully in sync after overhaul:
 - `'Shooting'` added to `SAFETY_TIP_CATEGORIES` in schema.gs
 - `'At a Hotel'` added to `SAFETY_TIP_CONTEXTS` in schema.gs
 

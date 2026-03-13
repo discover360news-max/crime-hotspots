@@ -1,21 +1,24 @@
 // astro-poc/src/config/crimeSchema.ts
 // Mirror of google-apps-script/trinidad/schema.gs — kept in sync manually.
 // Source of truth for frontend: filters, display labels, route slugs, validation.
-// SYNC NOTE: Keep in sync with schema.gs — last synced: 2026-03-09 (session 3)
+// SYNC NOTE: Keep in sync with schema.gs — last synced: 2026-03-13 (crime schema overhaul — new types + isContextType)
 
 export const CRIME_TYPES = {
-  MURDER:           { label: 'Murder',           severity: 10 },
-  ATTEMPTED_MURDER: { label: 'Attempted Murder', severity: 9  },
-  KIDNAPPING:       { label: 'Kidnapping',       severity: 8  },
-  SEXUAL_ASSAULT:   { label: 'Sexual Assault',   severity: 7  },
-  SHOOTING:         { label: 'Shooting',         severity: 6  },
-  ASSAULT:          { label: 'Assault',          severity: 5  },
-  HOME_INVASION:    { label: 'Home Invasion',    severity: 5  },
-  ARSON:            { label: 'Arson',            severity: 4  },
-  ROBBERY:          { label: 'Robbery',          severity: 4  },
-  BURGLARY:         { label: 'Burglary',         severity: 3  },
-  THEFT:            { label: 'Theft',            severity: 2  },
-  SEIZURES:         { label: 'Seizures',         severity: 1  },
+  MURDER:           { label: 'Murder',           severity: 10, isContextType: false },
+  ATTEMPTED_MURDER: { label: 'Attempted Murder', severity: 9,  isContextType: false },
+  KIDNAPPING:       { label: 'Kidnapping',       severity: 8,  isContextType: false },
+  SEXUAL_ASSAULT:   { label: 'Sexual Assault',   severity: 7,  isContextType: false },
+  SHOOTING:         { label: 'Shooting',         severity: 6,  isContextType: false },
+  ASSAULT:          { label: 'Assault',          severity: 5,  isContextType: false },
+  HOME_INVASION:    { label: 'Home Invasion',    severity: 5,  isContextType: true  },
+  CARJACKING:       { label: 'Carjacking',       severity: 5,  isContextType: false },
+  ARSON:            { label: 'Arson',            severity: 4,  isContextType: false },
+  ROBBERY:          { label: 'Robbery',          severity: 4,  isContextType: false },
+  DOMESTIC_VIOLENCE:{ label: 'Domestic Violence',severity: 4,  isContextType: true  },
+  EXTORTION:        { label: 'Extortion',        severity: 3,  isContextType: false },
+  BURGLARY:         { label: 'Burglary',         severity: 3,  isContextType: false },
+  THEFT:            { label: 'Theft',            severity: 2,  isContextType: false },
+  SEIZURES:         { label: 'Seizures',         severity: 1,  isContextType: false },
 } as const;
 
 export type CrimeTypeKey = keyof typeof CRIME_TYPES;
@@ -24,6 +27,11 @@ export type CrimeTypeLabel = (typeof CRIME_TYPES)[CrimeTypeKey]['label'];
 /** All crime type labels ordered by severity descending (ties: schema insertion order). */
 export const CRIME_TYPE_LABELS = Object.values(CRIME_TYPES)
   .sort((a, b) => b.severity - a.severity)
+  .map(t => t.label) as CrimeTypeLabel[];
+
+/** Labels of context types (setting/relationship — yield to harm types in primary position). */
+export const CONTEXT_TYPE_LABELS = Object.values(CRIME_TYPES)
+  .filter(t => t.isContextType)
   .map(t => t.label) as CrimeTypeLabel[];
 
 /** Map of label → severity. Mirrors getCrimeSeverityMap() in schema.gs. */

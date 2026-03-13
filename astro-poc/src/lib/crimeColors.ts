@@ -40,14 +40,22 @@ export const CRIME_COLORS = {
     tailwind: 'bg-violet-500',
     hex: '#8b5cf6'
   },
+  'Carjacking': {
+    tailwind: 'bg-amber-500',
+    hex: '#f59e0b'
+  },
+  'Domestic Violence': {
+    tailwind: 'bg-rose-400',
+    hex: '#fb7185'
+  },
+  'Extortion': {
+    tailwind: 'bg-emerald-600',
+    hex: '#059669'
+  },
   'Seizures': {
     tailwind: 'bg-blue-500',
     hex: '#3b82f6'
   },
-  'Vehicle Theft': {
-    tailwind: 'bg-sky-500',
-    hex: '#0ea5e9'
-  }
 } as const;
 
 export const DEFAULT_CRIME_COLOR = {

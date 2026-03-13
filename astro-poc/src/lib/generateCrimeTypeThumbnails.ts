@@ -14,17 +14,19 @@ const SIZE = 200;
 
 /** Crime type → short label + hex color */
 const CRIME_THUMBNAILS: Record<string, { label: string; color: string }> = {
-  'Murder':          { label: 'M',   color: '#e11d48' },
-  'Shooting':        { label: 'SH',  color: '#dc2626' },
-  'Robbery':         { label: 'R',   color: '#f97316' },
-  'Burglary':        { label: 'B',   color: '#eab308' },
-  'Theft':           { label: 'T',   color: '#06b6d4' },
-  'Home Invasion':   { label: 'HI',  color: '#9333ea' },
-  'Kidnapping':      { label: 'K',   color: '#ec4899' },
-  'Sexual Assault':  { label: 'SA',  color: '#c026d3' },
-  'Assault':         { label: 'A',   color: '#8b5cf6' },
-  'Seizures':        { label: 'SZ',  color: '#3b82f6' },
-  'Vehicle Theft':   { label: 'VT',  color: '#0ea5e9' },
+  'Murder':           { label: 'M',   color: '#e11d48' },
+  'Shooting':         { label: 'SH',  color: '#dc2626' },
+  'Robbery':          { label: 'R',   color: '#f97316' },
+  'Burglary':         { label: 'B',   color: '#eab308' },
+  'Theft':            { label: 'T',   color: '#06b6d4' },
+  'Home Invasion':    { label: 'HI',  color: '#9333ea' },
+  'Kidnapping':       { label: 'K',   color: '#ec4899' },
+  'Sexual Assault':   { label: 'SA',  color: '#c026d3' },
+  'Assault':          { label: 'A',   color: '#8b5cf6' },
+  'Carjacking':       { label: 'CJ',  color: '#f59e0b' },
+  'Domestic Violence':{ label: 'DV',  color: '#fb7185' },
+  'Extortion':        { label: 'EX',  color: '#059669' },
+  'Seizures':         { label: 'SZ',  color: '#3b82f6' },
 };
 
 const FALLBACK = { label: '!', color: '#64748b' };

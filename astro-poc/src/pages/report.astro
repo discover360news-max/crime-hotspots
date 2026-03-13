@@ -7,6 +7,7 @@
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import { routes } from '../config/routes';
+import { CRIME_TYPE_LABELS } from '../config/crimeSchema';
 
 const title = "Report a Crime Anonymously — Crime Hotspots Caribbean";
 const description = "Help build safer communities: report crime anonymously via our secure platform. Use our reliable crime tip line for the Caribbean. Submit a report now.";
@@ -48,15 +49,7 @@ const description = "Help build safer communities: report crime anonymously via 
           </label>
           <select id="reportCrimeType" name="reportCrimeType" class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_25%)] dark:bg-[hsl(0_0%_12%)] rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-700 dark:text-[hsl(0_0%_85%)]" required>
             <option value="">Select a crime</option>
-            <option>Assault</option>
-            <option>Burglary</option>
-            <option>Home Invasion</option>
-            <option>Kidnapping</option>
-            <option>Murder</option>
-            <option>Robbery</option>
-            <option>Shooting</option>
-            <option>Seizures</option>
-            <option>Theft</option>
+            {CRIME_TYPE_LABELS.map(label => <option>{label}</option>)}
             <option>Other</option>
           </select>
         </div>

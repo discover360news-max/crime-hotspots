@@ -46,6 +46,9 @@ const CRIME_COLORS: Record<string, string> = {
   'Kidnapping': '#ec4899',
   'Sexual Assault': '#c026d3',
   'Assault': '#8b5cf6',
+  'Carjacking': '#f59e0b',
+  'Domestic Violence': '#fb7185',
+  'Extortion': '#059669',
   'Seizures': '#3b82f6',
   'Burglary': '#eab308'
 };

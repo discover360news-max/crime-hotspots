@@ -39,11 +39,19 @@ function determineCrimeTypes(allCrimeTypes) {
     return orderA - orderB;
   });
 
-  // Primary = most severe (first after sorting)
-  const primary = sortedTypes[0];
+  // Partition: harm types first, context types last.
+  // Context types (Home Invasion, Domestic Violence) NEVER become primary
+  // when any harm type is present — regardless of severity score.
+  const contextTypeLabels = getContextTypeLabels();
+  const harmTypes = sortedTypes.filter(t => !contextTypeLabels.includes(t));
+  const ctxTypes  = sortedTypes.filter(t =>  contextTypeLabels.includes(t));
+  const reordered = harmTypes.length > 0 ? [...harmTypes, ...ctxTypes] : sortedTypes;
+
+  // Primary = first after reordering
+  const primary = reordered[0];
 
   // Related = all others (comma-separated)
-  const related = sortedTypes.slice(1).join(',');
+  const related = reordered.slice(1).join(',');
 
   Logger.log(`  Crime types: ${allCrimeTypes.join(', ')}`);
   Logger.log(`  → Primary: ${primary}, Related: ${related || 'none'}`);

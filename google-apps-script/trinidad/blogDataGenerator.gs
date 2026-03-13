@@ -23,16 +23,23 @@
  * IMPORTANT: Victim count ONLY applies to PRIMARY crime type.
  * Related crimes ALWAYS count as +1 (incident-based).
  */
+// SYNC NOTE: Mirror of astro-poc/src/config/crimeTypeConfig.ts
+// Last synced: 2026-03-13 (crime schema overhaul — new types + drift fix)
 const BLOG_CRIME_TYPE_CONFIG = {
   // Victim-count crimes (count each victim for PRIMARY crime only)
   'Murder': { useVictimCount: true },
+  'Attempted Murder': { useVictimCount: true },
   'Assault': { useVictimCount: true },
   'Sexual Assault': { useVictimCount: true },
   'Kidnapping': { useVictimCount: true },
   'Robbery': { useVictimCount: true },
   'Shooting': { useVictimCount: true },
+  'Carjacking': { useVictimCount: true },
+  'Domestic Violence': { useVictimCount: true },
 
   // Incident-count crimes (always count as 1 incident)
+  'Extortion': { useVictimCount: false },
+  'Arson': { useVictimCount: false },
   'Burglary': { useVictimCount: false },
   'Home Invasion': { useVictimCount: false },
   'Seizures': { useVictimCount: false },
@@ -281,7 +288,8 @@ function formatBlogData(startDate, endDate, stats, timeAnalysis, areaBreakdown, 
   const totalVictimsCurrent = calculateTotalVictims(crimes);
   output += `\nVictims:\n`;
   output += `- Total Victims This Week: ${totalVictimsCurrent}\n`;
-  output += `- Note: Victim count applies to configured crime types (Murder, Assault, Sexual Assault, Kidnapping, Robbery, Shooting)\n\n`;
+  const victimCountTypes = Object.entries(BLOG_CRIME_TYPE_CONFIG).filter(([, v]) => v.useVictimCount).map(([k]) => k).join(', ');
+  output += `- Note: Victim count applies to: ${victimCountTypes}\n\n`;
 
   // Crime Type Breakdown (with incidents + victims)
   output += `**CRIME TYPE BREAKDOWN (Top ${stats.changes.length})**\n`;

@@ -4,7 +4,7 @@
 // Everything else derives from this file — never duplicate these values.
 //
 // SYNC NOTE: Keep in sync with astro-poc/src/config/crimeSchema.ts (Phase 5).
-// Last synced: 2026-03-09 (session 3)
+// Last synced: 2026-03-13 (crime schema overhaul — new types + isContextType)
 // ============================================================================
 
 /**
@@ -12,24 +12,29 @@
  * severity: 1–10 (used by crimeTypeProcessor to determine primary crime)
  * label: display string (used in prompt, frontend filters, sheet values)
  * promptDescription: one-line rule for Claude's classification section
+ * isContextType: true = describes METHOD or SETTING (yields to harm types in
+ *   primary position); false = the primary harm itself
  *
  * TIE-BREAKING: When two types share the same severity, schema insertion order
  * is used as the tiebreaker (earlier = higher priority). This is guaranteed
  * stable in GAS V8 (Object.values preserves insertion order for string keys).
  */
 const CRIME_TYPES = {
-  MURDER:           { label: 'Murder',           severity: 10, promptDescription: 'Civilian intentionally killed by another civilian. Never for accidents, medical deaths, or police killings.' },
-  ATTEMPTED_MURDER: { label: 'Attempted Murder', severity: 9,  promptDescription: 'Targeted attack with clear intent to kill where victim survived. Always paired with Shooting or Assault.' },
-  KIDNAPPING:       { label: 'Kidnapping',       severity: 8,  promptDescription: 'Person abducted or held against their will.' },
-  SEXUAL_ASSAULT:   { label: 'Sexual Assault',   severity: 7,  promptDescription: 'Rape, sexual violence, or forced sexual contact.' },
-  SHOOTING:         { label: 'Shooting',         severity: 6,  promptDescription: 'Firearm was DISCHARGED at a person. Gun as threat only = NOT a Shooting.' },
-  ASSAULT:          { label: 'Assault',          severity: 5,  promptDescription: 'Physical attack causing injury. Not robbery with a threat.' },
-  HOME_INVASION:    { label: 'Home Invasion',    severity: 5,  promptDescription: 'Forced entry into a residence while occupied.' },
-  ARSON:            { label: 'Arson',            severity: 4,  promptDescription: 'Deliberate setting of fire to property or person.' },
-  ROBBERY:          { label: 'Robbery',          severity: 4,  promptDescription: 'Taking property using force or threat. Not pure theft.' },
-  BURGLARY:         { label: 'Burglary',         severity: 3,  promptDescription: 'Forced entry into unoccupied property to steal.' },
-  THEFT:            { label: 'Theft',            severity: 2,  promptDescription: 'Taking property without confrontation.' },
-  SEIZURES:         { label: 'Seizures',         severity: 1,  promptDescription: 'Police recovering contraband (guns/drugs/cash).' },
+  MURDER:           { label: 'Murder',           severity: 10, isContextType: false, promptDescription: 'Civilian intentionally killed by another civilian. Never for accidents, medical deaths, or police killings.' },
+  ATTEMPTED_MURDER: { label: 'Attempted Murder', severity: 9,  isContextType: false, promptDescription: 'Targeted attack with clear intent to kill where victim survived. Always paired with Shooting or Assault.' },
+  KIDNAPPING:       { label: 'Kidnapping',       severity: 8,  isContextType: false, promptDescription: 'Person abducted or held against their will.' },
+  SEXUAL_ASSAULT:   { label: 'Sexual Assault',   severity: 7,  isContextType: false, promptDescription: 'Rape, sexual violence, or forced sexual contact.' },
+  SHOOTING:         { label: 'Shooting',         severity: 6,  isContextType: false, promptDescription: 'Firearm was DISCHARGED at a person. Gun as threat only = NOT a Shooting.' },
+  ASSAULT:          { label: 'Assault',          severity: 5,  isContextType: false, promptDescription: 'Physical attack causing injury. ADD Assault alongside Robbery when victim is physically struck/beaten (not just threatened). Threat alone = no Assault.' },
+  HOME_INVASION:    { label: 'Home Invasion',    severity: 5,  isContextType: true,  promptDescription: 'Forced entry into a residence while occupied. Describes the SETTING — always yields to harm types in primary position.' },
+  CARJACKING:       { label: 'Carjacking',       severity: 5,  isContextType: false, promptDescription: 'Vehicle taken from driver/occupant using force or threat. Add Robbery as related ONLY if additional property (phone, wallet) was also stolen.' },
+  ARSON:            { label: 'Arson',            severity: 4,  isContextType: false, promptDescription: 'Deliberate setting of fire to property or person.' },
+  ROBBERY:          { label: 'Robbery',          severity: 4,  isContextType: false, promptDescription: 'Taking property using force or threat. Not pure theft.' },
+  DOMESTIC_VIOLENCE:{ label: 'Domestic Violence',severity: 4,  isContextType: true,  promptDescription: 'Violence between intimate partners or family members. ALWAYS appears alongside Assault/Murder/Shooting — never alone. Describes RELATIONSHIP context, not the harm type.' },
+  EXTORTION:        { label: 'Extortion',        severity: 3,  isContextType: false, promptDescription: 'Demanding money or compliance under threat of harm, property damage, or exposure. No immediate physical violence required.' },
+  BURGLARY:         { label: 'Burglary',         severity: 3,  isContextType: false, promptDescription: 'Forced entry into unoccupied property to steal.' },
+  THEFT:            { label: 'Theft',            severity: 2,  isContextType: false, promptDescription: 'Taking property without confrontation.' },
+  SEIZURES:         { label: 'Seizures',         severity: 1,  isContextType: false, promptDescription: 'Police recovering contraband (guns/drugs/cash).' },
 };
 
 /**
@@ -119,12 +124,26 @@ function getCrimeSchemaOrderMap() {
 }
 
 /**
+ * Returns array of labels where isContextType = true.
+ * Used by crimeTypeProcessor to partition harm types vs context types.
+ * @returns {string[]}
+ */
+function getContextTypeLabels() {
+  return Object.values(CRIME_TYPES).filter(t => t.isContextType).map(t => t.label);
+}
+
+/**
  * Build the hierarchy string for the Claude system prompt.
- * Output: "Murder > Attempted Murder > Kidnapping > ..."
+ * Context types are marked with [context] so Claude understands ordering.
+ * Output: "... > Assault > Home Invasion [context] > Carjacking > ..."
+ * Stable sort: ties preserve insertion order (GAS V8 guarantee).
  * @returns {string}
  */
 function buildCrimeHierarchyString() {
-  return getCrimeTypesSortedBySeverity().join(' > ');
+  return Object.values(CRIME_TYPES)
+    .sort((a, b) => b.severity - a.severity)
+    .map(t => t.isContextType ? `${t.label} [context]` : t.label)
+    .join(' > ');
 }
 
 /**
