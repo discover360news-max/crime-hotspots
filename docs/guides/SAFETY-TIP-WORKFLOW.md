@@ -79,7 +79,7 @@ Scan titles for same category + context. Ask: "Does any existing tip give the sa
 Both `category` and `context` must exist in `astro-poc/src/content/config.ts`.
 
 **Current valid categories:**
-`Robbery`, `Carjacking`, `Home Invasion`, `ATM Crime`, `Online Scam`, `Kidnapping`, `Sexual Violence`, `Fraud`, `Assault`, `Shooting`, `Other`
+`Robbery`, `Carjacking`, `Home Invasion`, `ATM Crime`, `Online Scam`, `Kidnapping`, `Sexual Violence`, `Fraud`, `Assault`, `Domestic Violence`, `Extortion`, `Shooting`, `Burglary`, `Other`
 
 **Current valid contexts:**
 `At Home`, `In Your Car`, `At the ATM`, `In a Mall`, `Walking Alone`, `Online`, `At Work`, `Using Public Transport`, `At an Event`, `At a Hotel`, `Other`
@@ -107,7 +107,7 @@ Glob pattern="*.md" path="astro-poc/src/content/tips/"
 
 Find the highest-numbered file. Next tip = last ID + 1. Zero-pad to 5 digits (`TIP-00031`, `TIP-00032`, etc.).
 
-> **Current last tip:** TIP-00046 (as of March 9, 2026)
+> **Current last tip:** TIP-00061 (as of March 14, 2026)
 
 ---
 

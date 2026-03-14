@@ -1,7 +1,7 @@
 // astro-poc/src/config/crimeSchema.ts
 // Mirror of google-apps-script/trinidad/schema.gs — kept in sync manually.
 // Source of truth for frontend: filters, display labels, route slugs, validation.
-// SYNC NOTE: Keep in sync with schema.gs — last synced: 2026-03-13 (crime schema overhaul — new types + isContextType)
+// SYNC NOTE: Keep in sync with schema.gs — last synced: 2026-03-14 (CRIME_HARD_IMPLICATIONS added; Carjacking rule fixed)
 
 export const CRIME_TYPES = {
   MURDER:           { label: 'Murder',           severity: 10, isContextType: false },
@@ -39,6 +39,17 @@ export const CRIME_SEVERITY_MAP: Record<string, number> = Object.fromEntries(
   Object.values(CRIME_TYPES).map(t => [t.label, t.severity])
 );
 
+/**
+ * Hard implication rules — certain crime types ALWAYS carry implied related types.
+ * No article confirmation needed; these are definitionally contained.
+ * Applied at data entry / GAS processing. Mirrors CRIME_HARD_IMPLICATIONS in schema.gs.
+ * Source of truth: docs/guides/CRIME-CLASSIFICATION-RULES.md §4
+ */
+export const CRIME_HARD_IMPLICATIONS: Partial<Record<CrimeTypeKey, CrimeTypeKey[]>> = {
+  CARJACKING:    ['ROBBERY'],    // Carjacking IS a robbery — vehicle taken by force
+  HOME_INVASION: ['BURGLARY'],   // Every home invasion involves unlawful entry
+} as const;
+
 export const SAFETY_TIP_CATEGORIES = [
   'Robbery',
   'Carjacking',
@@ -49,7 +60,10 @@ export const SAFETY_TIP_CATEGORIES = [
   'Sexual Violence',
   'Fraud',
   'Assault',
+  'Domestic Violence',
+  'Extortion',
   'Shooting',
+  'Burglary',
   'Other',
 ] as const;
 

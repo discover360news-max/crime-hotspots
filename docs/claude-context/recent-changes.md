@@ -8,6 +8,89 @@
 
 ## March 2026
 
+### Safety Tips TIP-00058 to TIP-00061 + Burglary schema (Mar 14)
+
+- **Schema:** Added `'Burglary'` to the `category` enum in `src/config/crimeSchema.ts`
+- **NEW TIP TIP-00058** — Securing Your Business Premises Overnight (Burglary / At Work)
+- **NEW TIP TIP-00059** — Recognising Escalation Inside a Shared Vehicle (Carjacking / In Your Car)
+- **NEW TIP TIP-00060** — Responding When Your Vehicle Is Shot At (Shooting / In Your Car)
+- **NEW TIP TIP-00061** — Protecting Your Hybrid Vehicle Overnight (Burglary / At Home)
+
+---
+
+### Safety Tips TIP-00056 + TIP-00057 (Mar 14)
+
+- **NEW TIP TIP-00056** — When a Dispute Follows You Home (Shooting / At Home)
+- **NEW TIP TIP-00057** — Ambush Risk Arriving at Your Business (Shooting / At Work)
+
+---
+
+### Claude Prompt Quality Overhaul (Mar 14)
+
+**Files changed:**
+- `google-apps-script/trinidad/schema.gs` — enriched `promptDescription` for Murder (added keywords), Attempted Murder (added "Do NOT use for stray bullets"), Arson (added "use when" / "never for" guidance). All 15 types now have substantive per-type rules.
+- `google-apps-script/trinidad/claudeClient.gs` — `buildSystemPrompt()` fully restructured and quality-fixed:
+
+**Gaps closed:**
+- `buildClassificationRulesBlock()` now wired into the prompt — all 15 crime types have explicit rules (was 7/15 before; Sexual Assault, Kidnapping, Burglary, Theft, Shooting, Assault, Home Invasion had no classification guidance)
+- `location_country` disambiguation rule added: Trinidad / Tobago / Trinidad and Tobago defined
+- Safety tip multi-category ordering rule added: "list ALL applicable, ordered most-specific first"
+- `role` field removed from VICTIM COUNT worked example (was not in the JSON schema — caused inconsistent output)
+- Mass-casualty example clarified: "3 shot, 1 dies" explicitly stated as one crime object
+
+**Overlaps eliminated:**
+- Carjacking rule: was in 3 sections → now in 1 (Classification only, auto-generated from schema)
+- Shooting sections merged into one SHOOTING CLASSIFICATION block
+- Date worked examples: 3 redundant examples → 1 example covering all key cases
+
+**Structural improvements:**
+- Section order: Hierarchy + Hard Implications + Classification moved immediately after JSON schema (foundational rules now precede sections that reference them)
+- `CRITICAL` keyword reduced from 14+ uses to 1 reserved case (date distinction)
+- Output examples: "Bad (no || separators)" is now a one-liner instead of full repeated text
+
+---
+
+### Crime Classification Rules — Hard Implications + Reference Doc (Mar 14)
+
+**New doc:** `docs/guides/CRIME-CLASSIFICATION-RULES.md`
+- Full schematic: severity hierarchy, context type rules, hard rules (§4), soft flags per crime type (§5), disambiguation rules (§6), quick reference card
+- Recording standard reference: FBI NIBRS + UK Home Office (harm hierarchy)
+
+**Hard implication rules established (2 rules):**
+- Carjacking → Robbery (always, definitionally — vehicle IS the stolen property)
+- Home Invasion → Burglary (always — every home invasion involves unlawful entry)
+
+**Key disambiguation decisions locked in:**
+- Robbery ≠ Theft: mutually exclusive; Robbery always supersedes (no double-counting)
+- Shooting (primary) vs Attempted Murder (primary): intent-based. Intent confirmed (execution-style, stated intent, multiple shots at close range) → Attempted Murder. In doubt → default to Shooting.
+- Shooting and Assault are not stackable as peers — choose the more specific
+
+**Files changed:**
+- `schema.gs` — CARJACKING promptDescription fixed (was "add Robbery only if extra property taken" — wrong). `CRIME_HARD_IMPLICATIONS` constant + `getHardImplications()` + `buildHardImplicationsBlock()` added.
+- `claudeClient.gs` — new HARD IMPLICATION RULES section in system prompt; Carjacking rule fixed with ✅/❌ examples; SHOOTING AS PRIMARY clarification block added with intent-based decision table.
+- `crimeTypeProcessor.gs` — `determineCrimeTypes()` now applies `getHardImplications()` as safety net after dedup, before sort. Auto-adds implied types if Claude misses them.
+- `crimeSchema.ts` — `CRIME_HARD_IMPLICATIONS` added (frontend mirror).
+
+---
+
+### Safety Tips — New categories + seed tips (Mar 13)
+
+- **Schema:** Added `'Domestic Violence'` and `'Extortion'` to `SAFETY_TIP_CATEGORIES` in `src/content/config.ts` (via `crimeSchema.ts`)
+- **NEW TIP TIP-00054** — Recognising Escalating Danger in a Domestic Situation (Domestic Violence / At Home)
+- **NEW TIP TIP-00055** — Responding to Extortion and Threatening Demands (Extortion / Other)
+- **Docs:** `docs/guides/SAFETY-TIP-WORKFLOW.md` — categories table + last tip ID updated
+
+---
+
+### Safety Tips — Stories 530–533 (Mar 13)
+
+- **NEW TIP TIP-00050** — Protecting a Lone Occupant Against Evening Home Invasion (Home Invasion / At Home)
+- **NEW TIP TIP-00051** — Armed Window-Smash Robbery on Vehicles Parked at Home (Robbery / In Your Car)
+- **NEW TIP TIP-00052** — Avoiding Jewellery Theft on Public Transport (Robbery / Using Public Transport)
+- **NEW TIP TIP-00053** — Protecting Business Vehicles From Targeted Arson (Other / At Work)
+
+---
+
 ### Search + Performance Fixes (Mar 12)
 
 **SearchModal — two bug fixes:**
