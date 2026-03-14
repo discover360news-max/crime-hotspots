@@ -39,6 +39,12 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 14, 2026 (continued)
+- Created HEADLINE-CLASSIFICATION-WORKFLOW.md in docs/guides/ — quick reference for manual headline classification (decision tree, disambiguation, T&T terminology, worked examples)
+- Updated Attempted Murder rule: intentional weapon use against a person who survived = Attempted Murder (not Assault). Fists/feet only = Assault. Aligns with TT "wounding with intent" law. Updated CRIME-CLASSIFICATION-RULES.md v1.0→v1.1 and Assault §5 note.
+- Corrected batch #2, #10, #11 above: those stabbings are now Attempted Murder under the new rule.
+- Added .wrangler/ to both .gitignore files (was causing ~181 phantom changes in VS Code).
+
 ## Session Notes — Mar 14, 2026
 - Statistics page: fixed misleading murder rate display. Raw YTD rate (e.g. 5.0/100k for 2.5 months) was shown as "current rate" — not comparable to annualized rates. Replaced with annualized rate throughout (stat tables, Quick Answer box, SEO description, FAQ schema, OG image). Collapsed Current Progress + Projected sections into one (they were mathematically identical — both = `count/daysElapsed*365`). Removed unused `murderRateCurrent`, `robberyRateCurrent`, `totalCrimeRateCurrent` vars. Build passes.
 

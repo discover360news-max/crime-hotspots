@@ -1,6 +1,6 @@
 # Crime Classification Rules
 
-**Version:** 1.0 — March 2026
+**Version:** 1.1 — March 2026
 **Applies to:** All crime records in the Crime Hotspots database (Trinidad & Tobago)
 **Implements:** The primary + related crime type system in `crimeSchema.ts` / `schema.gs`
 **Recording standard reference:** FBI NIBRS, UK Home Office Counting Rules (harm hierarchy)
@@ -138,7 +138,10 @@ This is the correct standard (per FBI NIBRS) when outcome doesn't qualify for At
 | Domestic Violence *(context)* | Perpetrator is partner/family |
 | Home Invasion *(context)* | Attacker entered the victim's home unlawfully |
 
-### Assault (primary)
+### Assault (primary — fists/feet only, no weapon)
+> If a weapon was used, see §6 Assault vs. Attempted Murder — The Weapon Rule.
+> Assault as primary applies only when physical violence involved no weapon.
+
 | Add as Related | When |
 |---|---|
 | Robbery | Force used to take property (when Assault is primary due to context) |
@@ -183,6 +186,25 @@ Typically standalone. No standard implied related types.
 - Vehicle taken from a person by force → **Carjacking** (primary) + **Robbery** (hard-added)
 - Vehicle stolen with no person present → **Theft** only (no Robbery, no Carjacking)
 - Phone/wallet also taken during carjacking → Covered by Robbery. No need to also add Theft.
+
+### Assault vs. Attempted Murder — The Weapon Rule
+
+Intentional weapon use against a person who survived = **Attempted Murder**, not Assault.
+Rationale: using a weapon implies intent to cause grievous bodily harm at minimum —
+consistent with "wounding with intent" charges under TT law (Offences Against the Person Act).
+
+| Scenario | Classification |
+|---|---|
+| Stabbed with knife/cutlass and survived | **Attempted Murder** |
+| Chopped with cutlass and survived | **Attempted Murder** |
+| Beaten with bat, bottle, or any wielded object and survived | **Attempted Murder** |
+| Punched, kicked, or shoved — fists/feet only | **Assault** |
+| Weapon brandished as threat only, not used to strike | Robbery or Assault (not Attempted Murder) |
+
+> Assault is reserved for fists/feet only — physical violence without a weapon.
+> If a weapon made contact with the victim and they survived, use Attempted Murder.
+
+---
 
 ### Shooting vs. Assault — not stackable as peers
 - Firearm was discharged at someone → **Shooting** (more specific type — use this)
