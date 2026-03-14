@@ -4,7 +4,7 @@
 // Everything else derives from this file — never duplicate these values.
 //
 // SYNC NOTE: Keep in sync with astro-poc/src/config/crimeSchema.ts (Phase 5).
-// Last synced: 2026-03-13 (crime schema overhaul — new types + isContextType)
+// Last synced: 2026-03-14 (CRIME_HARD_IMPLICATIONS + Carjacking promptDescription fix + hard implication helpers)
 // ============================================================================
 
 /**
@@ -20,15 +20,15 @@
  * stable in GAS V8 (Object.values preserves insertion order for string keys).
  */
 const CRIME_TYPES = {
-  MURDER:           { label: 'Murder',           severity: 10, isContextType: false, promptDescription: 'Civilian intentionally killed by another civilian. Never for accidents, medical deaths, or police killings.' },
-  ATTEMPTED_MURDER: { label: 'Attempted Murder', severity: 9,  isContextType: false, promptDescription: 'Targeted attack with clear intent to kill where victim survived. Always paired with Shooting or Assault.' },
+  MURDER:           { label: 'Murder',           severity: 10, isContextType: false, promptDescription: 'Civilian intentionally killed by another civilian. Keywords: murdered, slain, executed, gunned down, killed by gunman. Never for accidents, medical deaths, traffic deaths, or police killings.' },
+  ATTEMPTED_MURDER: { label: 'Attempted Murder', severity: 9,  isContextType: false, promptDescription: 'Targeted attack with clear intent to kill where victim survived. Always paired with Shooting or Assault in all_crime_types. Do NOT use for stray bullets or ambiguous fights — default to Shooting or Assault instead.' },
   KIDNAPPING:       { label: 'Kidnapping',       severity: 8,  isContextType: false, promptDescription: 'Person abducted or held against their will.' },
   SEXUAL_ASSAULT:   { label: 'Sexual Assault',   severity: 7,  isContextType: false, promptDescription: 'Rape, sexual violence, or forced sexual contact.' },
   SHOOTING:         { label: 'Shooting',         severity: 6,  isContextType: false, promptDescription: 'Firearm was DISCHARGED at a person. Gun as threat only = NOT a Shooting.' },
   ASSAULT:          { label: 'Assault',          severity: 5,  isContextType: false, promptDescription: 'Physical attack causing injury. ADD Assault alongside Robbery when victim is physically struck/beaten (not just threatened). Threat alone = no Assault.' },
   HOME_INVASION:    { label: 'Home Invasion',    severity: 5,  isContextType: true,  promptDescription: 'Forced entry into a residence while occupied. Describes the SETTING — always yields to harm types in primary position.' },
-  CARJACKING:       { label: 'Carjacking',       severity: 5,  isContextType: false, promptDescription: 'Vehicle taken from driver/occupant using force or threat. Add Robbery as related ONLY if additional property (phone, wallet) was also stolen.' },
-  ARSON:            { label: 'Arson',            severity: 4,  isContextType: false, promptDescription: 'Deliberate setting of fire to property or person.' },
+  CARJACKING:       { label: 'Carjacking',       severity: 5,  isContextType: false, promptDescription: 'Vehicle taken from driver/occupant using force or threat. HARD RULE: always include Robbery in all_crime_types — the vehicle IS the stolen property. Add Shooting if shots fired, Assault if victim was physically struck. Never add Theft — Robbery covers all property taken.' },
+  ARSON:            { label: 'Arson',            severity: 4,  isContextType: false, promptDescription: 'Deliberate setting of fire to property or person. Use when article explicitly states fire was deliberately set, describes arson, or treats it as criminal. Never for accidental fires, electrical fires, or fires of undetermined cause.' },
   ROBBERY:          { label: 'Robbery',          severity: 4,  isContextType: false, promptDescription: 'Taking property using force or threat. Not pure theft.' },
   DOMESTIC_VIOLENCE:{ label: 'Domestic Violence',severity: 4,  isContextType: true,  promptDescription: 'Violence between intimate partners or family members. ALWAYS appears alongside Assault/Murder/Shooting — never alone. Describes RELATIONSHIP context, not the harm type.' },
   EXTORTION:        { label: 'Extortion',        severity: 3,  isContextType: false, promptDescription: 'Demanding money or compliance under threat of harm, property damage, or exposure. No immediate physical violence required.' },
@@ -36,6 +36,36 @@ const CRIME_TYPES = {
   THEFT:            { label: 'Theft',            severity: 2,  isContextType: false, promptDescription: 'Taking property without confrontation.' },
   SEIZURES:         { label: 'Seizures',         severity: 1,  isContextType: false, promptDescription: 'Police recovering contraband (guns/drugs/cash).' },
 };
+
+/**
+ * Hard implication rules — certain crime types ALWAYS carry implied related types.
+ * No article confirmation needed; these are definitionally contained.
+ * Applied in determineCrimeTypes() in crimeTypeProcessor.gs as a safety net.
+ * Source of truth: docs/guides/CRIME-CLASSIFICATION-RULES.md §4
+ */
+const CRIME_HARD_IMPLICATIONS = {
+  'Carjacking':    ['Robbery'],   // Carjacking IS a robbery — vehicle taken by force
+  'Home Invasion': ['Burglary'],  // Every home invasion involves unlawful entry
+};
+
+/**
+ * Returns the hard implications map.
+ * Used by crimeTypeProcessor.gs to auto-add implied types.
+ * @returns {Object} Map of crime label → array of always-implied labels
+ */
+function getHardImplications() {
+  return CRIME_HARD_IMPLICATIONS;
+}
+
+/**
+ * Build the hard implications block for the Claude system prompt.
+ * @returns {string}
+ */
+function buildHardImplicationsBlock() {
+  return Object.entries(CRIME_HARD_IMPLICATIONS)
+    .map(([type, implied]) => `${type} → always include in all_crime_types: ${implied.join(', ')}`)
+    .join('\n');
+}
 
 /**
  * Safety tip categories (what type of crime it helps prevent).

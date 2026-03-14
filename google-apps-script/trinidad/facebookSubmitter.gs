@@ -178,7 +178,7 @@ function submitFacebookPost(postText, sourceUrl, targetYear) {
 
 /**
  * Append crime data to the 2025 Form Responses 1 sheet
- * Column order: Date, Headline, Crime Type, Street Address, Location, Area, Region, Island, URL, Source, Latitude, Longitude, Summary, Secondary Crime Types
+ * Column order: Date, Headline, primaryCrimeType, relatedCrimeTypes, victimCount, Street Address, Location, Area, Region, Island, URL, Source, Latitude, Longitude, Summary
  *
  * @param {Object} crime - Extracted crime data
  * @param {Date} publishedDate - Fallback date
@@ -199,23 +199,26 @@ function appendTo2025Sheet(crime, publishedDate, crimeTypes) {
   // Format date as MM/DD/YYYY (matching existing sheet format)
   const validatedDate = validateAndFormatDate(crime.crime_date, publishedDate || new Date());
 
-  // Name-based append — safe against 2025 sheet column reordering
+  const victimCount = crime.victimCount ||
+                      (crime.victims && Array.isArray(crime.victims) ? crime.victims.length : 1);
+
   appendRowByHeaders(sheet, {
-    'Timestamp':              new Date(),
-    'Date':                   validatedDate,
-    'Headline':               crime.headline || 'No headline',
-    'Crime Type':             crimeTypes.primary,
-    'Street Address':         crime.street || '',
-    'Location':               geocoded.plus_code || '',
-    'Area':                   crime.area || '',
-    'Region':                 '',
-    'Island':                 'Trinidad',
-    'URL':                    crime.source_url || '',
-    'Source':                 '',
-    'Latitude':               geocoded.lat || '',
-    'Longitude':              geocoded.lng || '',
-    'Summary':                crime.details || '',
-    'Secondary Crime Types':  crimeTypes.related || ''
+    'Timestamp':          new Date(),
+    'Date':               validatedDate,
+    'Headline':           crime.headline || 'No headline',
+    'primaryCrimeType':   crimeTypes.primary,
+    'relatedCrimeTypes':  crimeTypes.related || '',
+    'victimCount':        victimCount,
+    'Street Address':     crime.street || '',
+    'Location':           geocoded.plus_code || '',
+    'Area':               crime.area || '',
+    'Region':             '',
+    'Island':             'Trinidad',
+    'URL':                crime.source_url || '',
+    'Source':             '',
+    'Latitude':           geocoded.lat || '',
+    'Longitude':          geocoded.lng || '',
+    'Summary':            crime.details || '',
   });
 
   Logger.log(`✅ Added to 2025 FR1: ${crime.headline}`);

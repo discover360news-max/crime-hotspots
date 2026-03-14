@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2025 Dedup — B1 Analysis</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 32px; color: #1e293b; max-width: 680px; }
+    h1   { font-size: 20px; margin-bottom: 8px; }
+    p    { font-size: 14px; color: #64748b; margin-bottom: 20px; }
+    button {
+      padding: 9px 20px; border-radius: 6px; border: none;
+      background: #e11d48; color: white; cursor: pointer; font-size: 14px; font-weight: 500;
+    }
+    button:hover    { background: #be123c; }
+    button:disabled { background: #94a3b8; cursor: default; }
+    #status {
+      margin-top: 20px; padding: 14px 16px; border-radius: 6px;
+      font-size: 14px; font-weight: 600; color: #0f172a;
+      background: #f1f5f9; min-height: 48px;
+    }
+    #stats {
+      display: none; margin-top: 16px; padding: 18px 20px;
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; font-size: 14px;
+    }
+    .stat-row   { margin-bottom: 8px; }
+    .stat-label { color: #64748b; }
+    .stat-val   { font-weight: 700; color: #166534; }
+    .stat-sep   { margin: 12px 0; border: none; border-top: 1px solid #bbf7d0; }
+
+    /* ── Cards ── */
+    .card {
+      background: white; border-radius: 8px;
+      border: 1px solid #e2e8f0; margin-bottom: 10px; overflow: hidden;
+    }
+    .card-header {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding: 10px 14px; background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+    }
+    .card-meta { flex: 1; font-size: 13px; color: #475569; }
+    .card-meta strong { color: #1e293b; }
+    .badge {
+      font-size: 11px; font-weight: 700; padding: 3px 9px;
+      border-radius: 9999px; letter-spacing: 0.03em; white-space: nowrap;
+    }
+    .sim-url    { background: #dcfce7; color: #15803d; }
+    .sim-high   { background: #dcfce7; color: #15803d; }
+    .sim-mid    { background: #fef9c3; color: #854d0e; }
+    .sim-low    { background: #fee2e2; color: #b91c1c; }
+    .type-ct    { background: #dbeafe; color: #1e40af; }
+    .type-vc    { background: #fef3c7; color: #92400e; }
+
+    /* ── Row entries ── */
+    .card-body  { padding: 10px 14px; }
+    .row-entry  {
+      display: flex; align-items: flex-start; gap: 8px;
+      padding: 8px 10px; border-radius: 6px; margin-bottom: 6px;
+    }
+    .row-keep  { background: #f0fdf4; border: 1px solid #bbf7d0; }
+    .row-merge { background: #fff7ed; border: 1px solid #fed7aa; }
+    .row-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 3px 7px; border-radius: 4px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .lbl-keep  { background: #dcfce7; color: #15803d; }
+    .lbl-merge { background: #ffedd5; color: #c2410c; }
+    .crime-badge {
+      font-size: 11px; font-weight: 600; padding: 3px 9px;
+      border-radius: 9999px; white-space: nowrap; flex-shrink: 0;
+    }
+    .sev-10, .sev-9 { background: #fecdd3; color: #9f1239; }
+    .sev-8,  .sev-7 { background: #fed7aa; color: #9a3412; }
+    .sev-6,  .sev-5 { background: #fef9c3; color: #854d0e; }
+    .sev-4,  .sev-3,
+    .sev-2,  .sev-1 { background: #dbeafe; color: #1e40af; }
+    .row-text   { flex: 1; min-width: 0; }
+    .row-hl     { font-size: 13px; color: #374151; line-height: 1.4; }
+    .row-sub    { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .result-line {
+      margin-top: 8px; padding: 7px 10px; background: #f1f5f9;
+      border-radius: 5px; font-size: 12px; color: #475569;
+    }
+    .vc-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 8px; padding: 8px 10px;
+      background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px;
+      font-size: 13px; color: #78350f;
+    }
+    .vc-row label { font-weight: 500; white-space: nowrap; }
+    .vc-row input {
+      width: 64px; padding: 4px 8px; border: 1px solid #fbbf24;
+      border-radius: 4px; font-size: 13px; font-weight: 600;
+      color: #1e293b; text-align: center;
+    }
+    .vc-note { font-size: 12px; color: #92400e; }
+    .hl-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 8px; padding: 8px 10px;
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+      font-size: 13px; color: #374151;
+    }
+    .hl-row label { font-weight: 500; white-space: nowrap; color: #64748b; }
+    .hl-row input {
+      flex: 1; padding: 4px 8px; border: 1px solid #cbd5e1;
+      border-radius: 4px; font-size: 13px; color: #1e293b;
+    }
+    .hl-row input:focus { outline: none; border-color: #e11d48; }
+    .swap-btn {
+      padding: 3px 8px; font-size: 11px; font-weight: 500;
+      border: 1px solid #cbd5e1; border-radius: 4px;
+      background: white; color: #475569; cursor: pointer; flex-shrink: 0;
+    }
+    .swap-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+    .card.selected { border-color: #e11d48; border-width: 2px; }
+    .card.selected .card-header { background: #fff1f2; border-bottom-color: #fecdd3; }
+
+    /* ── Controls bar ── */
+    #controls {
+      display: none; margin-top: 20px; margin-bottom: 12px;
+      display: none; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    #sel-count { font-size: 13px; color: #64748b; flex: 1; }
+    .btn-ghost {
+      padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500;
+      background: transparent; color: #475569; border: 1px solid #cbd5e1; cursor: pointer;
+    }
+    .btn-ghost:hover { background: #f1f5f9; }
+    #apply-btn {
+      padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
+      background: #e11d48; color: white; border: none; cursor: pointer;
+    }
+    #apply-btn:hover:not(:disabled) { background: #be123c; }
+    #apply-btn:disabled { background: #94a3b8; cursor: default; }
+
+    /* ── Result log ── */
+    #result-log { margin-top: 28px; display: none; }
+    #result-log h2 { font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+    #log-pre {
+      background: #0f172a; color: #cbd5e1; border-radius: 8px;
+      padding: 16px 18px; font-family: monospace; font-size: 12px;
+      line-height: 1.7; white-space: pre-wrap; overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>2025 Dedup — B1 Analysis Engine</h1>
+  <p>Fetches all rows then runs duplicate detection in the browser (URL match + headline similarity).</p>
+
+  <button id="btn" onclick="runAnalysis()">Scan for duplicates</button>
+
+  <div id="status">Ready — press the button to start.</div>
+  <div id="stats"></div>
+  <div id="controls">
+    <span id="sel-count"></span>
+    <button class="btn-ghost" onclick="toggleAll(true)">Select All</button>
+    <button class="btn-ghost" onclick="toggleAll(false)">Deselect All</button>
+    <button id="apply-btn" disabled onclick="applySelected()">Apply Selected</button>
+  </div>
+
+  <div id="groups" style="margin-top:8px;"></div>
+
+  <div id="result-log">
+    <h2>Applied Changes</h2>
+    <pre id="log-pre"></pre>
+  </div>
+
+  <script>
+    // ── Global state ─────────────────────────────────────────────────────────
+    var allGroups = [];
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    function setStatus(msg) {
+      document.getElementById('status').textContent = msg;
+      console.log('[dedup] ' + msg);
+    }
+
+    function esc(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ── Entry point ──────────────────────────────────────────────────────────
+
+    function runAnalysis() {
+      document.getElementById('btn').disabled = true;
+      document.getElementById('stats').style.display = 'none';
+      setStatus('Step 1/3 — Fetching rows from sheet...');
+
+      google.script.run
+        .withSuccessHandler(onData)
+        .withFailureHandler(function(err) {
+          setStatus('Server error: ' + err.message);
+          document.getElementById('btn').disabled = false;
+        })
+        .getSheetData();
+    }
+
+    function onData(result) {
+      setStatus('Step 2/3 — Got ' + result.rows.length + ' rows. Analysing in browser...');
+      setTimeout(function() {
+        try {
+          var t0 = Date.now();
+          var analysis = buildGroups(result.rows, result.threshold);
+          var elapsed  = Date.now() - t0;
+          allGroups = analysis.groups;
+          setStatus('Step 3/3 — Done in ' + elapsed + 'ms.');
+          showStats(result.rows.length, allGroups, elapsed);
+          renderGroups(allGroups);
+          document.getElementById('controls').style.display = 'flex';
+          updateCount();
+        } catch(err) {
+          setStatus('Analysis error: ' + err.message);
+          console.error(err);
+        }
+        document.getElementById('btn').disabled = false;
+      }, 30);
+    }
+
+    function sevClass(sev) {
+      if (sev >= 9) return 'sev-10';
+      if (sev >= 7) return 'sev-8';
+      if (sev >= 5) return 'sev-6';
+      return 'sev-4';
+    }
+
+    function buildCardBody(g) {
+      var html = '<div class="card-body">';
+
+      // Keeper
+      html += '<div class="row-entry row-keep">'
+        + '<span class="row-label lbl-keep">KEEP</span>'
+        + '<span class="crime-badge ' + sevClass(g.keeper.severity) + '">'
+        + esc(g.keeper.crimeType) + '</span>'
+        + '<div class="row-text">'
+        + '<div class="row-hl">' + esc(g.keeper.headline) + '</div>'
+        + '<div class="row-sub">Row ' + g.keeper.sheetRow
+        + (g.keeper.storyId ? ' &middot; ID: ' + esc(g.keeper.storyId) : '')
+        + (g.keeper.dupCheck ? ' &middot; <span style="color:#f59e0b;font-weight:600">DUP: '
+            + esc(g.keeper.dupCheck) + '</span>' : '')
+        + '</div></div></div>';
+
+      // Mergers
+      for (var j = 0; j < g.mergers.length; j++) {
+        var m = g.mergers[j];
+        html += '<div class="row-entry row-merge">'
+          + '<span class="row-label lbl-merge">MERGE</span>'
+          + '<span class="crime-badge ' + sevClass(m.severity) + '">'
+          + esc(m.crimeType) + '</span>'
+          + '<div class="row-text">'
+          + '<div class="row-hl">' + esc(m.headline) + '</div>'
+          + '<div class="row-sub">Row ' + m.sheetRow
+          + (m.storyId ? ' &middot; ID: ' + esc(m.storyId) : '')
+          + (m.dupCheck ? ' &middot; <span style="color:#f59e0b;font-weight:600">DUP: '
+              + esc(m.dupCheck) + '</span>' : '')
+          + '</div></div>'
+          + '<button class="swap-btn" onclick="event.stopPropagation();swapKeeper(\''
+          + g.id + '\',' + m.sheetRow + ')">Make Primary</button>'
+          + '</div>';
+      }
+
+      // Result preview
+      var resultText = (g.mergeType === 'VICTIM_COUNT')
+        ? '<strong>' + esc(g.keeper.crimeType) + '</strong> kept &middot; '
+          + g.suggestedVictimCount + ' victims collapsed into 1 row'
+          + (g.resultSecondary ? ' &middot; secondary: <em>' + esc(g.resultSecondary) + '</em>' : '')
+        : g.resultSecondary
+          ? '<strong>' + esc(g.keeper.crimeType) + '</strong> kept &rarr; secondary: <em>'
+            + esc(g.resultSecondary) + '</em>'
+          : '<strong>' + esc(g.keeper.crimeType) + '</strong> kept &middot; no secondary added';
+
+      html += '<div class="result-line">' + resultText + '</div>';
+
+      // Victim count input
+      var vcNote = (g.mergeType === 'VICTIM_COUNT')
+        ? 'Pre-filled from number of matching rows — adjust if needed'
+        : 'Adjust if multiple people were victimised in this incident';
+      html += '<div class="vc-row" onclick="event.stopPropagation()">'
+        + '<label for="vc-' + g.id + '">Victim count</label>'
+        + '<input type="number" id="vc-' + g.id + '" min="1" value="' + g.suggestedVictimCount + '">'
+        + '<span class="vc-note">' + vcNote + '</span>'
+        + '</div>';
+
+      // Headline edit input
+      html += '<div class="hl-row" onclick="event.stopPropagation()">'
+        + '<label for="hl-' + g.id + '">Headline</label>'
+        + '<input type="text" id="hl-' + g.id + '" value="' + esc(g.keeper.headline) + '">'
+        + '</div>';
+
+      html += '</div>'; // close card-body
+      return html;
+    }
+
+    function renderGroups(groups) {
+      var html = '<h2 style="font-size:15px;font-weight:600;margin-bottom:12px;color:#0f172a;">'
+        + groups.length + ' duplicate groups &mdash; review before applying</h2>';
+
+      for (var i = 0; i < groups.length; i++) {
+        var g = groups[i];
+
+        var simClass = (g.detectedBy === 'URL') ? 'sim-url'
+                     : (g.similarity >= 90)     ? 'sim-high'
+                     : (g.similarity >= 75)     ? 'sim-mid'
+                     : 'sim-low';
+        var simLabel = (g.detectedBy === 'URL') ? 'URL match' : (g.similarity + '% match');
+        var typeClass = (g.mergeType === 'VICTIM_COUNT') ? 'type-vc' : 'type-ct';
+        var typeLabel = (g.mergeType === 'VICTIM_COUNT') ? 'Victim count' : 'Crime type';
+
+        html += '<div class="card selected" id="card-' + g.id + '">';
+
+        // Header — clicking anywhere on header toggles the checkbox
+        html += '<div class="card-header" onclick="toggleCard(\'' + g.id + '\')">'
+          + '<input type="checkbox" id="chk-' + g.id + '" checked'
+          + ' onclick="event.stopPropagation();onCheck(\'' + g.id + '\')"'
+          + ' style="width:17px;height:17px;cursor:pointer;flex-shrink:0;accent-color:#e11d48;">'
+          + '<div class="card-meta"><strong>' + esc(g.date) + '</strong>'
+          + ' &middot; ' + esc(g.area) + '</div>'
+          + '<span class="badge ' + typeClass + '">' + typeLabel + '</span>'
+          + '<span class="badge ' + simClass + '">' + simLabel + '</span>'
+          + '</div>';
+
+        html += buildCardBody(g);
+
+        html += '</div>'; // close card
+      }
+
+      document.getElementById('groups').innerHTML = html;
+    }
+
+    function swapKeeper(groupId, mergerSheetRow) {
+      // Find the group
+      var group = null;
+      for (var i = 0; i < allGroups.length; i++) {
+        if (allGroups[i].id === groupId) { group = allGroups[i]; break; }
+      }
+      if (!group) return;
+
+      // Find the merger to promote
+      var newKeeper = null, newKeeperIdx = -1;
+      for (var j = 0; j < group.mergers.length; j++) {
+        if (group.mergers[j].sheetRow === mergerSheetRow) {
+          newKeeper = group.mergers[j];
+          newKeeperIdx = j;
+          break;
+        }
+      }
+      if (!newKeeper) return;
+
+      // Old keeper becomes a merger
+      var oldKeeperAsMerger = {
+        sheetRow:  group.keeper.sheetRow,
+        headline:  group.keeper.headline,
+        crimeType: group.keeper.crimeType,
+        secondary: group.keeper.secondary,
+        storyId:   group.keeper.storyId,
+        dupCheck:  group.keeper.dupCheck,
+        severity:  group.keeper.severity
+      };
+
+      // Build new mergers list
+      var newMergers = [];
+      for (var k = 0; k < group.mergers.length; k++) {
+        if (k !== newKeeperIdx) newMergers.push(group.mergers[k]);
+      }
+      newMergers.push(oldKeeperAsMerger);
+
+      // Promote new keeper
+      group.keeper = {
+        sheetRow:  newKeeper.sheetRow,
+        headline:  newKeeper.headline,
+        crimeType: newKeeper.crimeType,
+        secondary: newKeeper.secondary,
+        storyId:   newKeeper.storyId,
+        dupCheck:  newKeeper.dupCheck,
+        severity:  newKeeper.severity
+      };
+      group.mergers = newMergers;
+
+      // Rebuild resultSecondary
+      var secArr = [];
+      if (group.keeper.secondary) {
+        var sp = group.keeper.secondary.split(',');
+        for (var si = 0; si < sp.length; si++) {
+          var st = sp[si].trim();
+          if (st && st !== group.keeper.crimeType && secArr.indexOf(st) === -1) secArr.push(st);
+        }
+      }
+      for (var mi = 0; mi < group.mergers.length; mi++) {
+        var mm = group.mergers[mi];
+        if (group.mergeType === 'CRIME_TYPE' && mm.crimeType !== group.keeper.crimeType && secArr.indexOf(mm.crimeType) === -1) {
+          secArr.push(mm.crimeType);
+        }
+        if (mm.secondary) {
+          var mp2 = mm.secondary.split(',');
+          for (var msi = 0; msi < mp2.length; msi++) {
+            var mst = mp2[msi].trim();
+            if (mst && mst !== group.keeper.crimeType && secArr.indexOf(mst) === -1) secArr.push(mst);
+          }
+        }
+      }
+      group.resultSecondary = secArr.join(', ');
+
+      // Re-render only this card's body (preserves checkbox state)
+      var card = document.getElementById('card-' + groupId);
+      if (!card) return;
+      var oldBody = card.querySelector('.card-body');
+      if (oldBody) oldBody.outerHTML = buildCardBody(group);
+    }
+
+    function showStats(rowCount, groups, elapsed) {
+      var urlCount  = 0, simCount = 0, ctCount = 0, vcCount = 0, mergeRows = 0;
+      for (var i = 0; i < groups.length; i++) {
+        var g = groups[i];
+        if (g.detectedBy === 'URL') urlCount++; else simCount++;
+        if (g.mergeType  === 'CRIME_TYPE') ctCount++; else vcCount++;
+        mergeRows += g.mergers.length;
+      }
+      var html =
+        '<div class="stat-row"><span class="stat-label">Rows scanned: </span>'
+          + '<span class="stat-val">' + rowCount + '</span></div>'
+        + '<div class="stat-row"><span class="stat-label">Duplicate groups: </span>'
+          + '<span class="stat-val">' + groups.length + '</span></div>'
+        + '<div class="stat-row"><span class="stat-label">Rows queued for merge: </span>'
+          + '<span class="stat-val">' + mergeRows + '</span></div>'
+        + '<hr class="stat-sep">'
+        + '<div class="stat-row"><span class="stat-label">Detected by URL match: </span>'
+          + '<span class="stat-val">' + urlCount + '</span></div>'
+        + '<div class="stat-row"><span class="stat-label">Detected by headline similarity: </span>'
+          + '<span class="stat-val">' + simCount + '</span></div>'
+        + '<hr class="stat-sep">'
+        + '<div class="stat-row"><span class="stat-label">Crime-type merges: </span>'
+          + '<span class="stat-val">' + ctCount + '</span></div>'
+        + '<div class="stat-row"><span class="stat-label">Victim-count merges: </span>'
+          + '<span class="stat-val">' + vcCount + '</span></div>'
+        + '<hr class="stat-sep">'
+        + '<div class="stat-row"><span class="stat-label">Analysis time: </span>'
+          + '<span class="stat-val">' + elapsed + 'ms</span></div>';
+      var el = document.getElementById('stats');
+      el.innerHTML = html;
+      el.style.display = 'block';
+    }
+
+    // ── Selection & Apply ────────────────────────────────────────────────────
+
+    function toggleCard(id) {
+      var chk = document.getElementById('chk-' + id);
+      chk.checked = !chk.checked;
+      onCheck(id);
+    }
+
+    function onCheck(id) {
+      var chk  = document.getElementById('chk-'  + id);
+      var card = document.getElementById('card-' + id);
+      if (chk.checked) {
+        card.classList.add('selected');
+      } else {
+        card.classList.remove('selected');
+      }
+      updateCount();
+    }
+
+    function toggleAll(checked) {
+      for (var i = 0; i < allGroups.length; i++) {
+        var id  = allGroups[i].id;
+        var chk = document.getElementById('chk-'  + id);
+        var card = document.getElementById('card-' + id);
+        if (!chk) continue;
+        chk.checked = checked;
+        if (checked) { card.classList.add('selected'); }
+        else          { card.classList.remove('selected'); }
+      }
+      updateCount();
+    }
+
+    function updateCount() {
+      var n = 0, deletes = 0;
+      for (var i = 0; i < allGroups.length; i++) {
+        var chk = document.getElementById('chk-' + allGroups[i].id);
+        if (chk && chk.checked) { n++; deletes += allGroups[i].mergers.length; }
+      }
+      document.getElementById('sel-count').textContent =
+        n + ' of ' + allGroups.length + ' selected'
+        + (n > 0 ? ' \u00b7 ' + deletes + ' row' + (deletes !== 1 ? 's' : '') + ' will be deleted' : '');
+      var btn = document.getElementById('apply-btn');
+      btn.disabled    = (n === 0);
+      btn.textContent = n > 0 ? 'Apply ' + n + ' Selected' : 'Apply Selected';
+      btn.setAttribute('data-n', n);
+      btn.setAttribute('data-del', deletes);
+    }
+
+    function getSelected() {
+      var sel = [];
+      for (var i = 0; i < allGroups.length; i++) {
+        var chk = document.getElementById('chk-' + allGroups[i].id);
+        if (chk && chk.checked) sel.push(allGroups[i]);
+      }
+      return sel;
+    }
+
+    function applySelected() {
+      var sel = getSelected();
+      if (sel.length === 0) return;
+      var btn = document.getElementById('apply-btn');
+      var n   = parseInt(btn.getAttribute('data-n'),   10);
+      var del = parseInt(btn.getAttribute('data-del'), 10);
+      var msg = 'Apply ' + n + ' merge' + (n !== 1 ? 's' : '') + '?\n\n'
+        + '\u2022 ' + n   + ' Secondary Crime Types cell' + (n   !== 1 ? 's' : '') + ' updated\n'
+        + '\u2022 ' + del + ' duplicate row' + (del !== 1 ? 's' : '') + ' deleted\n\n'
+        + 'Avoid editing the sheet while this runs.\nThis cannot be undone from this tool.';
+      if (!confirm(msg)) return;
+      btn.disabled    = true;
+      btn.textContent = 'Applying\u2026';
+
+      var ids = [], victimCounts = {}, headlines = {};
+      for (var i = 0; i < sel.length; i++) {
+        ids.push(sel[i].id);
+        var vcInput = document.getElementById('vc-' + sel[i].id);
+        victimCounts[sel[i].id] = vcInput
+          ? (parseInt(vcInput.value, 10) || sel[i].suggestedVictimCount)
+          : sel[i].suggestedVictimCount;
+        var hlInput = document.getElementById('hl-' + sel[i].id);
+        if (hlInput && hlInput.value !== sel[i].keeper.headline) {
+          headlines[sel[i].id] = hlInput.value;
+        }
+      }
+
+      google.script.run
+        .withSuccessHandler(onApplyDone)
+        .withFailureHandler(onApplyError)
+        .applyMerges(ids, allGroups, victimCounts, headlines);
+    }
+
+    function onApplyDone(result) {
+      var btn = document.getElementById('apply-btn');
+      btn.disabled    = true;
+      btn.textContent = 'Done';
+      var logEl = document.getElementById('log-pre');
+      logEl.textContent = result.log.join('\n');
+      document.getElementById('result-log').style.display = 'block';
+      document.getElementById('result-log').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function onApplyError(err) {
+      var btn = document.getElementById('apply-btn');
+      btn.disabled    = false;
+      btn.textContent = 'Apply Selected';
+      alert('Error applying merges:\n\n' + err.message);
+    }
+
+    // ── Analysis engine (pure ES5) ───────────────────────────────────────────
+
+    var SEVERITY = {
+      'Murder': 10, 'Attempted Murder': 9, 'Kidnapping': 8, 'Sexual Assault': 7,
+      'Shooting': 6, 'Assault': 5, 'Home Invasion': 5, 'Carjacking': 5,
+      'Arson': 4, 'Robbery': 4, 'Domestic Violence': 4, 'Extortion': 3,
+      'Burglary': 3, 'Theft': 2, 'Seizures': 1
+    };
+
+    function parseDate(str) {
+      if (!str) return null;
+      var s = String(str).trim();
+      var parts = s.split('/');
+      if (parts.length === 3) {
+        var mo = parseInt(parts[0], 10) - 1;
+        var dy = parseInt(parts[1], 10);
+        var yr = parseInt(parts[2], 10);
+        var dt = new Date(yr, mo, dy);
+        return isNaN(dt.getTime()) ? null : dt;
+      }
+      var dt2 = new Date(s);
+      return isNaN(dt2.getTime()) ? null : dt2;
+    }
+
+    function levenshtein(s, t) {
+      var m = s.length, n = t.length, i, j;
+      var dp = [];
+      for (i = 0; i <= m; i++) {
+        dp[i] = [i];
+        for (j = 1; j <= n; j++) dp[i][j] = 0;
+      }
+      for (j = 0; j <= n; j++) dp[0][j] = j;
+      for (i = 1; i <= m; i++) {
+        for (j = 1; j <= n; j++) {
+          dp[i][j] = (s[i-1] === t[j-1])
+            ? dp[i-1][j-1]
+            : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+        }
+      }
+      return dp[m][n];
+    }
+
+    function calcSimilarity(a, b) {
+      var sa = a.toLowerCase().trim();
+      var sb = b.toLowerCase().trim();
+      var longer  = (sa.length >= sb.length) ? sa : sb;
+      var shorter = (sa.length <  sb.length) ? sa : sb;
+      if (longer.length === 0) return 1.0;
+      return (longer.length - levenshtein(longer, shorter)) / longer.length;
+    }
+
+    function buildGroups(rows, threshold) {
+      var i, j, a, b, k, url, key;
+      var adj = {};
+
+      // Enrich: add areaLower
+      var enriched = [];
+      for (i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        enriched.push({
+          sheetRow:  r.sheetRow,
+          headline:  r.headline,
+          date:      r.date,
+          area:      r.area,
+          crimeType: r.crimeType,
+          secondary: r.secondary,
+          storyId:   r.storyId,
+          dupCheck:  r.dupCheck,
+          url:       r.url,
+          areaLower: String(r.area || '').toLowerCase().trim()
+        });
+      }
+
+      // Pass 1: URL edges
+      // Cap: if a URL appears in more than MAX_URL_GROUP rows it is almost
+      // certainly a generic link (Facebook page, news homepage) not a specific
+      // story — skip it to avoid one mega-component.
+      var MAX_URL_GROUP = 8;
+      var urlIndex = {};
+      for (i = 0; i < enriched.length; i++) {
+        url = enriched[i].url;
+        if (!url) continue;
+        if (!urlIndex[url]) urlIndex[url] = [];
+        urlIndex[url].push(i);
+      }
+      var urlKeys = Object.keys(urlIndex);
+      for (var ui = 0; ui < urlKeys.length; ui++) {
+        var idxs = urlIndex[urlKeys[ui]];
+        if (idxs.length < 2) continue;
+        if (idxs.length > MAX_URL_GROUP) {
+          console.log('[dedup] Skipping generic URL (' + idxs.length + ' rows): ' + urlKeys[ui]);
+          continue;
+        }
+        for (a = 0; a < idxs.length; a++) {
+          for (b = a + 1; b < idxs.length; b++) {
+            i = idxs[a]; j = idxs[b];
+            var mt1 = (enriched[i].crimeType === enriched[j].crimeType) ? 'VICTIM_COUNT' : 'CRIME_TYPE';
+            if (!adj[i]) adj[i] = [];
+            if (!adj[j]) adj[j] = [];
+            adj[i].push({ idx: j, sim: 1.0, mergeType: mt1, detectedBy: 'URL' });
+            adj[j].push({ idx: i, sim: 1.0, mergeType: mt1, detectedBy: 'URL' });
+          }
+        }
+      }
+      console.log('[dedup] URL pass done. Multi-URL groups: '
+        + urlKeys.filter(function(u) { return urlIndex[u].length > 1; }).length);
+
+      // Pass 2: Date+Area bucket similarity
+      var daIndex = {};
+      for (i = 0; i < enriched.length; i++) {
+        var d = parseDate(enriched[i].date);
+        if (!d) continue;
+        var mo2 = d.getMonth() + 1;
+        var dd2 = d.getDate();
+        key = d.getFullYear() + '-'
+          + (mo2 < 10 ? '0' + mo2 : '' + mo2) + '-'
+          + (dd2 < 10 ? '0' + dd2 : '' + dd2)
+          + '|' + enriched[i].areaLower;
+        if (!daIndex[key]) daIndex[key] = [];
+        daIndex[key].push(i);
+      }
+      var daKeys = Object.keys(daIndex);
+      for (var di = 0; di < daKeys.length; di++) {
+        var bucket = daIndex[daKeys[di]];
+        if (bucket.length < 2) continue;
+        for (a = 0; a < bucket.length; a++) {
+          for (b = a + 1; b < bucket.length; b++) {
+            i = bucket[a]; j = bucket[b];
+            var linked = false;
+            if (adj[i]) {
+              for (k = 0; k < adj[i].length; k++) {
+                if (adj[i][k].idx === j && adj[i][k].detectedBy === 'URL') { linked = true; break; }
+              }
+            }
+            if (linked) continue;
+            var sim = calcSimilarity(
+              enriched[i].headline.substring(0, 80),
+              enriched[j].headline.substring(0, 80)
+            );
+            if (sim < threshold) continue;
+            var mt2 = (enriched[i].crimeType === enriched[j].crimeType) ? 'VICTIM_COUNT' : 'CRIME_TYPE';
+            if (!adj[i]) adj[i] = [];
+            if (!adj[j]) adj[j] = [];
+            adj[i].push({ idx: j, sim: sim, mergeType: mt2, detectedBy: 'SIMILARITY' });
+            adj[j].push({ idx: i, sim: sim, mergeType: mt2, detectedBy: 'SIMILARITY' });
+          }
+        }
+      }
+      console.log('[dedup] Similarity pass done. Connected nodes: ' + Object.keys(adj).length);
+
+      // BFS connected components
+      var visited = {};
+      var components = [];
+      var adjKeys = Object.keys(adj);
+      for (var ai = 0; ai < adjKeys.length; ai++) {
+        var startIdx = Number(adjKeys[ai]);
+        if (visited[startIdx]) continue;
+        var component = [];
+        var queue = [startIdx];
+        visited[startIdx] = true;
+        while (queue.length > 0) {
+          var curr = queue.shift();
+          component.push(curr);
+          var edges = adj[curr] || [];
+          for (var ei = 0; ei < edges.length; ei++) {
+            var nbr = edges[ei].idx;
+            if (!visited[nbr]) { visited[nbr] = true; queue.push(nbr); }
+          }
+        }
+        components.push(component);
+      }
+      console.log('[dedup] BFS done. Components: ' + components.length);
+      for (var wi = 0; wi < components.length; wi++) {
+        if (components[wi].length > 8) {
+          var sampleRows = [];
+          for (var wj = 0; wj < Math.min(3, components[wi].length); wj++) {
+            sampleRows.push('Row ' + enriched[components[wi][wj]].sheetRow
+              + ' [' + enriched[components[wi][wj]].crimeType + ']');
+          }
+          console.warn('[dedup] Large component (' + components[wi].length + ' rows): '
+            + sampleRows.join(', ') + '...');
+        }
+      }
+
+      // Build groups
+      var groups = [];
+      for (var ci = 0; ci < components.length; ci++) {
+        var comp    = components[ci];
+        var cRows   = [];
+        for (var ri = 0; ri < comp.length; ri++) cRows.push(enriched[comp[ri]]);
+        cRows.sort(function(x, y) {
+          return (SEVERITY[y.crimeType] || 0) - (SEVERITY[x.crimeType] || 0);
+        });
+        var keeper  = cRows[0];
+        var mergers = cRows.slice(1);
+
+        var maxSim = 0, vcEdges = 0, ctEdges = 0, urlEdgesCount = 0;
+        for (var cri = 0; cri < comp.length; cri++) {
+          var cedges = adj[comp[cri]] || [];
+          for (var ce = 0; ce < cedges.length; ce++) {
+            var edge = cedges[ce];
+            var inComp = false;
+            for (var cx = 0; cx < comp.length; cx++) {
+              if (comp[cx] === edge.idx) { inComp = true; break; }
+            }
+            if (!inComp) continue;
+            if (edge.sim > maxSim) maxSim = edge.sim;
+            if (edge.mergeType  === 'VICTIM_COUNT') vcEdges++; else ctEdges++;
+            if (edge.detectedBy === 'URL') urlEdgesCount++;
+          }
+        }
+
+        var mergeType  = (ctEdges === 0) ? 'VICTIM_COUNT' : 'CRIME_TYPE';
+        var detectedBy = (urlEdgesCount > 0) ? 'URL' : 'SIMILARITY';
+        var displaySim = (detectedBy === 'URL') ? 100 : Math.round(maxSim * 100);
+
+        // Build resultSecondary
+        var secArr = [];
+        if (keeper.secondary) {
+          var sp = keeper.secondary.split(',');
+          for (var si = 0; si < sp.length; si++) {
+            var st = sp[si].trim();
+            if (st && st !== keeper.crimeType && secArr.indexOf(st) === -1) secArr.push(st);
+          }
+        }
+        for (var mi = 0; mi < mergers.length; mi++) {
+          var mm = mergers[mi];
+          if (mergeType === 'CRIME_TYPE' && mm.crimeType !== keeper.crimeType && secArr.indexOf(mm.crimeType) === -1) {
+            secArr.push(mm.crimeType);
+          }
+          if (mm.secondary) {
+            var mp = mm.secondary.split(',');
+            for (var msi = 0; msi < mp.length; msi++) {
+              var mst = mp[msi].trim();
+              if (mst && mst !== keeper.crimeType && secArr.indexOf(mst) === -1) secArr.push(mst);
+            }
+          }
+        }
+
+        var sugVC = (mergeType === 'VICTIM_COUNT') ? cRows.length : 1;
+        var hlArr = [];
+        for (var hi = 0; hi < cRows.length; hi++) {
+          if (hlArr.indexOf(cRows[hi].headline) === -1) hlArr.push(cRows[hi].headline);
+        }
+
+        var mArr = [];
+        for (var mj = 0; mj < mergers.length; mj++) {
+          mArr.push({
+            sheetRow:  mergers[mj].sheetRow,
+            headline:  mergers[mj].headline,
+            crimeType: mergers[mj].crimeType,
+            secondary: mergers[mj].secondary,
+            storyId:   mergers[mj].storyId,
+            dupCheck:  mergers[mj].dupCheck,
+            severity:  SEVERITY[mergers[mj].crimeType] || 0
+          });
+        }
+
+        groups.push({
+          id:                   'g' + keeper.sheetRow + '_' + mArr.map(function(m) { return m.sheetRow; }).join('_'),
+          date:                 keeper.date,
+          area:                 keeper.area,
+          similarity:           displaySim,
+          detectedBy:           detectedBy,
+          mergeType:            mergeType,
+          suggestedVictimCount: sugVC,
+          allHeadlines:         hlArr,
+          keeper: {
+            sheetRow:  keeper.sheetRow,
+            headline:  keeper.headline,
+            crimeType: keeper.crimeType,
+            secondary: keeper.secondary,
+            storyId:   keeper.storyId,
+            dupCheck:  keeper.dupCheck,
+            severity:  SEVERITY[keeper.crimeType] || 0
+          },
+          mergers:        mArr,
+          resultSecondary: secArr.join(', ')
+        });
+      }
+
+      groups.sort(function(x, y) { return y.similarity - x.similarity; });
+      return { groups: groups };
+    }
+
+  </script>
+</body>
+</html>

@@ -22,6 +22,8 @@ B015 | BUG | active | Astro trailingSlash:'always' — fetch to SSR endpoints MU
 B016 | BUG | active | SSR handlers: wrap ENTIRE body in try/catch, not just DB queries — uncaught throws return 200 HTML from Astro error handler → B016-ssr-handler-try-catch.md
 B017 | BUG | active | Local D1 is empty — apply schema manually before using wrangler pages dev locally → B017-local-d1-empty.md
 B018 | BUG | fixed | D1 date column stored as MM/DD/YYYY (raw CSV) — range queries with YYYY-MM-DD always returned 0 rows → trend indicators hidden. Fix: normalize in sync worker + re-sync → B018-d1-date-format-mismatch.md
+B019 | BUG | fixed | Quick Insights "Highest Crime Area" could show 'Unknown' — calculateInsights() + updateQuickInsights() used areaArray[0] instead of validAreas[0]. Fix: both server (dashboardHelpers.ts) + client (dashboardUpdates.ts) now use validAreas[0] → B019-quick-insights-unknown-area.md
+B020 | BUG | fixed | updateQuickInsights() used new Date(c.date) string parse (UTC midnight) for Peak Day/Busiest Month — shifts day for Trinidad (UTC-4). Fix: use c.dateObj when available → B019-quick-insights-unknown-area.md
 
 ## Learnings & Patterns (L)
 L001 | LEARN | active | astro:page-load is the ONLY correct pattern for interactive scripts on SPA → L001-astro-page-load-pattern.md
@@ -36,6 +38,7 @@ L009 | LEARN | active | Crime counting: primary+related types per row — NOT ra
 L010 | LEARN | active | Schema centralization COMPLETE (all follow-ups resolved). crimeSchema.ts ↔ schema.gs fully in sync. crimeTypeConfig.ts has Attempted Murder. → L010-gas-schema-centralization.md
 L011 | LEARN | active | Utility control pattern: filled bg button + sticky bar, separate from nav CTA ghost buttons. Confirmed on dashboard + compare page (Mar 10 2026) → L011-utility-control-pattern.md
 L012 | LEARN | active | Dashboard script extraction (Mar 10 2026): 869→554 lines. MapLegend.astro + dashboardMapInit.ts + dashboardLocationFilter.ts. Extraction signal: >50-line named-function script → move to src/scripts/ → L012-dashboard-script-extraction.md
+L013 | LEARN | active | Crime classification rules: 2 hard rules (Carjacking→Robbery, HomeInvasion→Burglary), Shooting vs AttemptedMurder intent standard, Robbery≠Theft. Encoded in schema.gs + crimeTypeProcessor.gs + claudeClient.gs. Doc: docs/guides/CRIME-CLASSIFICATION-RULES.md → L013-crime-classification-rules.md
 
 ## Decisions (D)
 D001 | DEC | active | Crime pages: full SSR + Cloudflare CDN 24h cache (migrated from hybrid prerender) → D001-crime-page-ssr.md
@@ -50,7 +53,7 @@ D007 | DEC | active | Search: replaced Pagefind with D1 FTS5. crimes_fts virtual
 F010 | FEAT | active | MP profiles: 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg → F010-mp-profiles.md
 F001 | FEAT | active | Security: escapeHtml, sanitizeUrl, CSP headers, Turnstile, Secure cookies → F001-security-system.md
 F002 | FEAT | active | GAS pipeline: RSS → preFilter → Claude Haiku → Sheets → CSV → site → F002-gas-automation-pipeline.md
-F003 | FEAT | active | Safety tips: 43 tips, category/context/area pages, submit form, voting → F003-safety-tips-system.md
+F003 | FEAT | active | Safety tips: 61 tips, category/context/area pages, submit form, voting. Categories: Robbery, Carjacking, Home Invasion, ATM Crime, Online Scam, Kidnapping, Sexual Violence, Fraud, Assault, Domestic Violence, Extortion, Shooting, Burglary (added Mar 2026), Other → F003-safety-tips-system.md
 F004 | FEAT | active | Weekly blog: Mon 10AM GAS → Claude Haiku → GitHub commit → Cloudflare deploy → F004-weekly-blog-automation.md
 F005 | FEAT | active | Safety context: area crime score 1–10, 90-day window, 3 risk levels → F005-safety-context-system.md
 F006 | FEAT | active | Slug redirects: SSR handles legacy→new; redirect-map.json is reference only → F006-slug-redirect-system.md
@@ -69,6 +72,9 @@ CFG001 | CFG | active | Project overview: Astro 5, Cloudflare Pages, GA4, GAS, C
 CFG002 | CFG | active | Build & deploy: npm commands, GitHub Actions, daily 6AM UTC rebuild → CFG002-build-deploy.md
 CFG003 | CFG | active | Cloudflare caching: crime pages CDN 24h + browser 1h; other pages static → CFG003-cloudflare-caching.md
 CFG004 | CFG | active | astro.config.mjs: output:server, Cloudflare adapter, key integrations → CFG004-astro-config.md
+
+## Tools (T)
+T001 | TOOL | archived | dedup-2025: one-time GAS script to de-duplicate Raw Articles sheet entries. `google-apps-script/tools/dedup-2025/dedup.gs` + `index.html`. Ran Mar 2026; kept for reference if de-dup needed again.
 
 ## Dependencies (DEP)
 DEP001 | DEP | active | Key deps: satori+sharp (OG images), astro-pagefind (search), @astrojs/rss → DEP001-key-dependencies.md

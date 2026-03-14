@@ -46,7 +46,16 @@ Assault promptDescription updated: clarifies ADD alongside Robbery when victim p
 claudeClient.gs: added ASSAULT+ROBBERY COMBINATIONS section + CONTEXT TYPES ORDERING RULE section + Carjacking/DV/Extortion classification rules.
 getContextTypeLabels() helper added to schema.gs.
 
+## Hard Implications Addition (2026-03-14)
+`CRIME_HARD_IMPLICATIONS` constant + `getHardImplications()` + `buildHardImplicationsBlock()` added to schema.gs.
+CARJACKING promptDescription fixed (was "add Robbery only if extra property taken" — wrong per hard rule).
+`CRIME_HARD_IMPLICATIONS` mirror added to crimeSchema.ts.
+`determineCrimeTypes()` in crimeTypeProcessor.gs now applies hard implications as safety net before sort.
+New HARD IMPLICATION RULES section + Carjacking fix + Shooting-as-primary clarification added to claudeClient.gs system prompt.
+See L013 for full classification rules reference.
+
 ## Schema Drift — crimeSchema.ts vs schema.gs
+✅ RESOLVED (2026-03-14) — both files synced after hard implications addition:
 ✅ RESOLVED (2026-03-13) — both files fully in sync after overhaul:
 - `'Shooting'` added to `SAFETY_TIP_CATEGORIES` in schema.gs
 - `'At a Hotel'` added to `SAFETY_TIP_CONTEXTS` in schema.gs

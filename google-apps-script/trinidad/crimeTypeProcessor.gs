@@ -23,13 +23,27 @@ function determineCrimeTypes(allCrimeTypes) {
     };
   }
 
-  // Remove duplicates and sort by severity descending.
+  // Remove duplicates and apply hard implication rules (safety net — Claude should
+  // already include implied types, but this catches any misses).
+  // Source of truth for rules: docs/guides/CRIME-CLASSIFICATION-RULES.md §4
+  const uniqueTypes = [...new Set(allCrimeTypes)];
+  const hardImplications = getHardImplications();
+  const withImplied = [...uniqueTypes];
+  uniqueTypes.forEach(type => {
+    (hardImplications[type] || []).forEach(impliedType => {
+      if (!withImplied.includes(impliedType)) {
+        withImplied.push(impliedType);
+        Logger.log(`  Hard implication: ${type} → ${impliedType} (auto-added)`);
+      }
+    });
+  });
+
+  // Sort by severity descending.
   // Tiebreaker: schema insertion order (earlier in CRIME_TYPES = higher priority).
   // Unknown types (e.g. legacy 'Police-Involved Shooting') fall to the end.
   const severityMap = getCrimeSeverityMap();
   const schemaOrderMap = getCrimeSchemaOrderMap();
-  const uniqueTypes = [...new Set(allCrimeTypes)];
-  const sortedTypes = uniqueTypes.sort((a, b) => {
+  const sortedTypes = withImplied.sort((a, b) => {
     const severityA = severityMap[a] || 0;
     const severityB = severityMap[b] || 0;
     if (severityB !== severityA) return severityB - severityA;
