@@ -161,10 +161,10 @@ async function syncCsvToD1(db: D1Database, csvUrl: string, year: string): Promis
       const slug = generateSlugWithId(rawStoryId, headline);
 
       const summary = col(row, 'Summary') || null;
-      const crimeType = col(row, 'Crime Type', 'crimeType') || null;
+      const crimeType = col(row, 'primaryCrimeType') || null;
       const primaryCrimeType = col(row, 'primaryCrimeType') || null;
-      const relatedCrimeTypes = col(row, 'relatedCrimeType', 'relatedCrimeTypes') || null;
-      const victimCountStr = col(row, 'victimCount', 'victimcount', 'Victim Count');
+      const relatedCrimeTypes = col(row, 'relatedCrimeTypes') || null;
+      const victimCountStr = col(row, 'victimCount');
       const victimCount = parseNullableInt(victimCountStr); // NULL for 2025 rows
       const street = col(row, 'Street Address', 'Street') || null;
       const area = col(row, 'Area') || null;
