@@ -42,3 +42,6 @@ local-fb-extractor-files/*.json
 **/*credentials*.md
 **/*.key
 .playwright-mcp/
+
+# Wrangler local dev state (D1, cache, KV)
+.wrangler/
