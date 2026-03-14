@@ -149,11 +149,6 @@ const murderRatePrevious = ((murderCountPrevious / POPULATION) * 100000).toFixed
 const robberyRatePrevious = ((robberyCountPrevious / POPULATION) * 100000).toFixed(1);
 const totalCrimeRatePrevious = ((totalCrimesPrevious / POPULATION) * 100000).toFixed(1);
 
-// Current year rates (year-to-date)
-const murderRateCurrent = ((murderCount / POPULATION) * 100000).toFixed(1);
-const robberyRateCurrent = ((robberyCount / POPULATION) * 100000).toFixed(1);
-const totalCrimeRateCurrent = ((totalCrimesCurrent / POPULATION) * 100000).toFixed(1);
-
 // Projection calculations (based on current pace)
 const startOfYear = new Date(`${currentYear}-01-01`);
 const now = new Date();
@@ -177,13 +172,13 @@ const ogImagePath = await generateStatisticsOgImage({
   robberyCount,
   shootingCount,
   currentYear,
-  murderRate: murderRateCurrent,
+  murderRate: murderRateProjected,
   yoyChange: totalYoYChange,
 });
 
 // SEO
 const title = `Trinidad Crime Statistics & Crime Rate ${currentYear} - Live Data | Crime Hotspots`;
-const description = `Trinidad & Tobago ${currentYear} crime statistics: ${total2026YTD} total crimes — ${murderCount} murders, ${robberyCount} robberies, ${shootingCount} shootings (murder rate ${murderRateCurrent} per 100k, projected ${murderProjected} annually). ${previousYear} final: ${murderRatePrevious} per 100k. Updated daily.`;
+const description = `Trinidad & Tobago ${currentYear} crime statistics: ${total2026YTD} total crimes — ${murderCount} murders, ${robberyCount} robberies, ${shootingCount} shootings (murder rate ${murderRateProjected} per 100k annualized, ${murderProjected} projected annually). ${previousYear} final: ${murderRatePrevious} per 100k. Updated daily.`;
 const canonicalUrl = "https://crimehotspots.com/trinidad/statistics/";
 
 // Structured Data - Dataset
@@ -244,7 +239,7 @@ const faqData = {
       "name": `How many murders in Trinidad and Tobago in ${currentYear}?`,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": `Trinidad and Tobago has recorded ${murderCount} murders so far in ${currentYear} (as of ${lastUpdated}). The murder rate is ${murderRateCurrent} per 100,000 population. At the current pace, ${murderProjected} murders are projected by year end.`
+        "text": `Trinidad and Tobago has recorded ${murderCount} murders so far in ${currentYear} (as of ${lastUpdated}). At the current pace, the annualized murder rate is ${murderRateProjected} per 100,000 population, with ${murderProjected} murders projected by year end.`
       }
     },
     {
@@ -252,7 +247,7 @@ const faqData = {
       "name": `What is the crime rate in Trinidad and Tobago in ${currentYear}?`,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": `Trinidad and Tobago's murder rate in ${currentYear} is ${murderRateCurrent} per 100,000 population (${murderCount} murders year-to-date as of ${lastUpdated}). The ${previousYear} final murder rate was ${murderRatePrevious} per 100,000. Total crimes tracked in ${currentYear}: ${total2026YTD}, including ${robberyCount} robberies and ${shootingCount} shootings.`
+        "text": `Trinidad and Tobago's annualized murder rate in ${currentYear} is ${murderRateProjected} per 100,000 population (${murderCount} murders in ${daysElapsed} days as of ${lastUpdated}). The ${previousYear} final murder rate was ${murderRatePrevious} per 100,000. Total crimes tracked in ${currentYear}: ${total2026YTD}, including ${robberyCount} robberies and ${shootingCount} shootings.`
       }
     },
     {
@@ -322,7 +317,7 @@ const breadcrumbData = {
     <section class="mb-8 p-4 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-slate-50 dark:bg-[hsl(0_0%_9%)]">
       <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-[hsl(0_0%_45%)] mb-3">Quick Answer — {currentYear} Crime Statistics</p>
       <p class="text-sm text-slate-700 dark:text-[hsl(0_0%_85%)] leading-relaxed">
-        Trinidad and Tobago has recorded <strong class="text-slate-900 dark:text-white">{total2026YTD} crimes</strong> in {currentYear} as of {lastUpdated}, including <strong class="text-rose-600 dark:text-rose-400">{murderCount} murders</strong> (rate: {murderRateCurrent}/100k), {robberyCount} robberies, and {shootingCount} shootings.
+        Trinidad and Tobago has recorded <strong class="text-slate-900 dark:text-white">{total2026YTD} crimes</strong> in {currentYear} as of {lastUpdated}, including <strong class="text-rose-600 dark:text-rose-400">{murderCount} murders</strong> (annualized rate: {murderRateProjected}/100k), {robberyCount} robberies, and {shootingCount} shootings.
         {previousYear} ended with a murder rate of <strong class="text-slate-900 dark:text-white">{murderRatePrevious} per 100,000</strong> — one of the highest in the Caribbean.
         {yoyDirection === 'up'
           ? `Crime in ${currentYear} is tracking ${Math.round(totalYoYChange)}% higher than the same period in ${previousYear}.`
@@ -380,57 +375,31 @@ const breadcrumbData = {
         </div>
       </div>
 
-      <!-- Current Year Progress -->
-      <div class="mb-6">
+      <!-- Current Year Annualized Rate -->
+      <div>
         <h3 class="text-base font-semibold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-3">
-          {currentYear} Current Progress ({lastUpdated})
+          {currentYear} Annualized Rate (at current pace)
         </h3>
         <div class="bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5 shadow-sm">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="text-center p-3 bg-rose-50 dark:bg-rose-950/30 rounded-lg">
-              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Murder Rate (YTD)</div>
-              <div class="text-2xl font-bold text-rose-600 dark:text-rose-400">{murderRateCurrent}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{murderCount} murders so far</div>
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Murder Rate</div>
+              <div class="text-2xl font-bold text-rose-600 dark:text-rose-400">{murderRateProjected}</div>
+              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{murderCount} murders in {daysElapsed} days</div>
             </div>
             <div class="text-center p-3 bg-slate-50 dark:bg-[hsl(0_0%_10%)] rounded-lg">
-              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Robbery Rate (YTD)</div>
-              <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">{robberyRateCurrent}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{robberyCount} robberies so far</div>
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Robbery Rate</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">{robberyRateProjected}</div>
+              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{robberyCount} robberies in {daysElapsed} days</div>
             </div>
             <div class="text-center p-3 bg-slate-50 dark:bg-[hsl(0_0%_10%)] rounded-lg">
-              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Overall Rate (YTD)</div>
-              <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">{totalCrimeRateCurrent}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{totalCrimesCurrent} crimes so far</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Projected (At Current Pace) -->
-      <div>
-        <h3 class="text-base font-semibold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-3">
-          {currentYear} Projected (If Current Pace Continues)
-        </h3>
-        <div class="bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5 shadow-sm">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="text-center p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
-              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Projected Murder Rate</div>
-              <div class="text-2xl font-bold text-amber-700 dark:text-amber-400">{murderRateProjected}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">~{murderProjected} murders projected</div>
-            </div>
-            <div class="text-center p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
-              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Projected Robbery Rate</div>
-              <div class="text-2xl font-bold text-amber-700 dark:text-amber-400">{robberyRateProjected}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">~{robberyProjected} robberies projected</div>
-            </div>
-            <div class="text-center p-3 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
-              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Projected Overall Rate</div>
-              <div class="text-2xl font-bold text-amber-700 dark:text-amber-400">{totalCrimeRateProjected}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">~{totalCrimesProjected} crimes projected</div>
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Overall Rate</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">{totalCrimeRateProjected}</div>
+              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{totalCrimesCurrent} crimes in {daysElapsed} days</div>
             </div>
           </div>
           <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] mt-3 text-center">
-            Based on {daysElapsed} days of data. Projection assumes current trends continue for full year.
+            Rates annualized from {daysElapsed} days of data ({lastUpdated}). Assumes current pace continues through year end.
           </p>
         </div>
       </div>

@@ -39,6 +39,9 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 14, 2026
+- Statistics page: fixed misleading murder rate display. Raw YTD rate (e.g. 5.0/100k for 2.5 months) was shown as "current rate" — not comparable to annualized rates. Replaced with annualized rate throughout (stat tables, Quick Answer box, SEO description, FAQ schema, OG image). Collapsed Current Progress + Projected sections into one (they were mathematically identical — both = `count/daysElapsed*365`). Removed unused `murderRateCurrent`, `robberyRateCurrent`, `totalCrimeRateCurrent` vars. Build passes.
+
 ## Priority Queue (Mar 13, 2026)
 
 1. Safety tips — active management (I am tip manager, 43 tips live)

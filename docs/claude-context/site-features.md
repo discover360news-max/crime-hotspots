@@ -30,7 +30,7 @@
 | Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | Individual crime page, safety context, related crimes, trending hotspots |
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
 | Area Detail | `/trinidad/area/[slug]` | Pre-rendered | AreaNarrative summary (text-body weight), "New Since" badge, compare prompt, stat cards (Risk Level card: larger number + level color — amber=high, emerald=low), share buttons, crime type breakdown table, related areas (sorted by crime count) |
-| Statistics | `/trinidad/statistics/` | Pre-rendered | Three-tier crime rates (previous year / YTD / projected) |
+| Statistics | `/trinidad/statistics/` | Pre-rendered | Two-tier crime rates: previous year final (official) + current year annualized at current pace. All displayed rates are annualized for apples-to-apples comparison. Raw YTD rates removed Mar 2026. |
 | Regions | `/trinidad/regions/` | Pre-rendered | Browse by region |
 | Region Detail | `/trinidad/region/[slug]` | Pre-rendered | Region-specific crimes. Includes "Members of Parliament" card (filters mps.json by regionSlugs, shows photo/name/party/constituency, links to MP profile). |
 | MP Index | `/trinidad/mp/` | Pre-rendered | Directory of all 41 MPs grouped by region. Each card: photo, honorific name, party badge, constituency. |
