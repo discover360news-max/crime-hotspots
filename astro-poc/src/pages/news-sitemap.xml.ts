@@ -1,18 +1,17 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { buildRoute } from '../config/routes';
-import { getTrinidadCrimes } from '../lib/crimeData';
+import { getTrinidadCrimes, getCrimesByDateRangeFromD1 } from '../lib/crimeData';
 
 /**
  * Google News Sitemap — /news-sitemap.xml
  *
  * Google News only indexes articles published in the last 2 days.
  * Includes both weekly blog posts AND recent crime pages (daily fresh content).
- * Rebuilt daily via Cloudflare Pages' daily GitHub Actions trigger.
  *
  * Spec: https://developers.google.com/search/docs/crawling-indexing/sitemaps/news-sitemap
  */
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ locals }) => {
   const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
   const escapeXml = (str: string) =>
@@ -32,7 +31,12 @@ export const GET: APIRoute = async () => {
   // Recent crime pages — primary daily content with NewsArticle schema
   let crimeEntries: { loc: string; date: string; title: string }[] = [];
   try {
-    const crimes = await getTrinidadCrimes();
+    const db = (locals as any).runtime?.env?.DB as D1Database | undefined;
+    const fromDate = twoDaysAgo.toISOString().slice(0, 10);
+    const toDate = new Date().toISOString().slice(0, 10);
+    const crimes = db
+      ? await getCrimesByDateRangeFromD1(db, fromDate, toDate)
+      : (await getTrinidadCrimes()).filter(c => c.dateObj >= twoDaysAgo);
     crimeEntries = crimes
       .filter(c => c.dateObj >= twoDaysAgo)
       .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())

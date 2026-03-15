@@ -39,6 +39,9 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 15, 2026
+- Phase 4 D1 migration complete. All crime-data pages now SSR + D1. csvBuildPlugin slimmed to area-aliases only. Build passes with zero CSV warnings. See D006 for full file list.
+
 ## Session Notes — Mar 14, 2026 (continued)
 - Created HEADLINE-CLASSIFICATION-WORKFLOW.md in docs/guides/ — quick reference for manual headline classification (decision tree, disambiguation, T&T terminology, worked examples)
 - Updated Attempted Murder rule: intentional weapon use against a person who survived = Attempted Murder (not Assault). Fists/feet only = Assault. Aligns with TT "wounding with intent" law. Updated CRIME-CLASSIFICATION-RULES.md v1.0→v1.1 and Assault §5 note.

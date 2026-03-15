@@ -4,22 +4,23 @@
  * Shows all crime headlines with filters (Area, Crime Type, Date)
  */
 
-// Keep headlines static (pre-rendered at build time)
-export const prerender = true;
-
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Hero from '../../components/Hero.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
 import BlogRotatingBanner from '../../components/BlogRotatingBanner.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
-import { getTrinidadCrimes, type Crime } from '../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1, type Crime } from '../../lib/crimeData';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { getCountryName } from '../../data/countries';
 import { routes } from '../../config/routes';
 
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
 // Fetch all crimes (server-side) - include all years for filtering
-const allCrimes = await getTrinidadCrimes();
+const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // Get available years for filters
 const availableYears = [...new Set(allCrimes.map(c => c.year))].sort((a, b) => b - a);

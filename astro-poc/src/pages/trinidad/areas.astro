@@ -5,19 +5,21 @@
  * Target keywords: "trinidad crime by area", "safest areas in trinidad"
  */
 
-export const prerender = true;
-
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Hero from '../../components/Hero.astro';
-import { getTrinidadCrimes, generateNameSlug } from '../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1, generateNameSlug } from '../../lib/crimeData';
 import { loadFullAreaData } from '../../lib/areaAliases';
 import { getRiskWeight } from '../../config/riskWeights';
 import { usesVictimCount } from '../../config/crimeTypeConfig';
 import { routes, buildRoute } from '../../config/routes';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 
-const allCrimes = await getTrinidadCrimes();
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 const areaData = await loadFullAreaData();
 
 // Calculate 90-day cutoff for recent crime counts

@@ -10,7 +10,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import Hero from '../../../components/Hero.astro';
 import TipCard from '../../../components/TipCard.astro';
 import TipVote from '../../../components/TipVote.astro';
-import { getTrinidadCrimes } from '../../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../../lib/crimeData';
 import { routes, buildRoute } from '../../../config/routes';
 
 const { slug } = Astro.params;
@@ -28,7 +28,8 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalida
 // Resolve related crime headlines from story IDs
 let relatedCrimes: Awaited<ReturnType<typeof getTrinidadCrimes>> = [];
 if (tip.data.related_story_ids.length > 0) {
-  const allCrimes = await getTrinidadCrimes();
+  const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+  const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
   relatedCrimes = allCrimes.filter(c => c.storyId && tip.data.related_story_ids.includes(c.storyId));
 }
 

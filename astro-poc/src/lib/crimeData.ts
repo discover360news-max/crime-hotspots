@@ -437,6 +437,18 @@ export async function getCrimesByYearFromD1(db: D1Database, year: number): Promi
 }
 
 /**
+ * Get crimes for a specific year/month from D1.
+ * Used by the /trinidad/archive/[year]/[month] SSR page.
+ */
+export async function getCrimesByMonthFromD1(db: D1Database, year: number, month: number): Promise<Crime[]> {
+  const { results } = await db
+    .prepare('SELECT * FROM crimes WHERE year = ? AND month = ? ORDER BY day DESC')
+    .bind(year, month)
+    .all<D1CrimeRow>();
+  return results.map(mapD1RowToCrime);
+}
+
+/**
  * Get crimes within a date range from D1 (for trend windows).
  * Dates are YYYY-MM-DD strings matching the stored TEXT date column.
  * Naturally crosses year boundaries, eliminating the historicalTrends CSV.

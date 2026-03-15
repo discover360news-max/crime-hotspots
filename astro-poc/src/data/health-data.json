@@ -1,9 +1,5 @@
 {
   "status": "ok",
-  "csv_last_fetched": "2026-03-14T06:27:16.538Z",
-  "csv_row_count": 2514,
-  "csv_cache_age_minutes": 0,
-  "oldest_story": "2025-01-01",
-  "newest_story": "2026-03-14",
-  "build_time": "2026-03-14T06:27:16.538Z"
+  "build_time": "2026-03-15T10:47:45.435Z",
+  "area_aliases_count": 116
 }

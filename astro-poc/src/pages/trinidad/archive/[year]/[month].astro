@@ -5,58 +5,40 @@
  * URL: /trinidad/archive/2025/12
  */
 
-// Keep archive pages static (pre-rendered at build time)
-export const prerender = true;
-
 import Layout from '../../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import Hero from '../../../../components/Hero.astro';
 import SiteNotificationBanner from '../../../../components/SiteNotificationBanner.astro';
 import QuickInsightsCard from '../../../../components/QuickInsightsCard.astro';
 // import CrimeDetailModal from '../../../../components/CrimeDetailModal.astro';
-import { getTrinidadCrimes, type Crime } from '../../../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1, getCrimesByMonthFromD1, type Crime } from '../../../../lib/crimeData';
 import { dataUpdateNotice } from '../../../../config/siteNotifications';
 import { getCountryName } from '../../../../data/countries';
 import { routes, buildRoute } from '../../../../config/routes';
 import { usesVictimCount } from '../../../../config/crimeTypeConfig';
 
-export async function getStaticPaths() {
-  const crimes = await getTrinidadCrimes();
+const { year: yearParam, month: monthParam } = Astro.params;
+const year = parseInt(yearParam ?? '', 10);
+const month = parseInt(monthParam ?? '', 10);
 
-  // Group crimes by year/month
-  const monthsMap = new Map<string, Crime[]>();
-
-  crimes.forEach(crime => {
-    const key = `${crime.year}-${String(crime.month).padStart(2, '0')}`;
-    if (!monthsMap.has(key)) {
-      monthsMap.set(key, []);
-    }
-    monthsMap.get(key)!.push(crime);
-  });
-
-  // Generate paths with all crimes for comparisons
-  return Array.from(monthsMap.entries()).map(([key, monthCrimes]) => {
-    const [year, month] = key.split('-');
-    return {
-      params: { year, month },
-      props: {
-        crimes: monthCrimes,
-        allCrimes: crimes, // Need all crimes for comparisons
-        year: parseInt(year),
-        month: parseInt(month)
-      },
-    };
-  });
+if (isNaN(year) || isNaN(month) || month < 1 || month > 12) {
+  return Astro.redirect('/404/', 301);
 }
 
-interface Props {
-  crimes: Crime[];
-  allCrimes: Crime[];
-  year: number;
-  month: number;
-}
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-const { crimes, allCrimes, year, month } = Astro.props;
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+const [crimes, allCrimes] = db
+  ? await Promise.all([getCrimesByMonthFromD1(db, year, month), getAllCrimesFromD1(db)])
+  : await (async () => {
+      const all = await getTrinidadCrimes();
+      return [all.filter(c => c.year === year && c.month === month), all] as [Crime[], Crime[]];
+    })();
+
+if (crimes.length === 0) {
+  return Astro.redirect('/404/', 301);
+}
 
 const monthName = new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long' });
 const title = `${monthName} ${year} Crime Archive | Trinidad & Tobago`;

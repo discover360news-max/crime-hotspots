@@ -2,12 +2,9 @@
 /**
  * Area Detail Page
  * Individual area crime statistics with risk level, headlines, and breakdown
- * Pre-renders only areas with crime data; SSR fallback for zero-crime areas
  *
  * Target keywords: "crime in {area}", "{area} crime statistics", "is {area} safe"
  */
-
-export const prerender = true;
 
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
@@ -18,7 +15,7 @@ import SafetyContext from '../../../components/SafetyContext.astro';
 import FeedbackToggle from '../../../components/FeedbackToggle.astro';
 import NewsletterSignup from '../../../components/NewsletterSignup.astro';
 import AreaNarrative from '../../../components/AreaNarrative.astro';
-import { getTrinidadCrimes, generateNameSlug } from '../../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1, getCrimesByAreaFromD1, generateNameSlug } from '../../../lib/crimeData';
 import { loadFullAreaData } from '../../../lib/areaAliases';
 import { getSafetyContext } from '../../../lib/safetyHelpers';
 import { countCrimeType } from '../../../lib/dashboardHelpers';
@@ -33,39 +30,32 @@ import { routes, buildRoute } from '../../../config/routes';
 import MPSidebar from '../../../components/MPSidebar.astro';
 import mpsData from '../../../data/mps.json';
 
-// Pre-render only areas that have crime data
-export async function getStaticPaths() {
-  const allCrimes = await getTrinidadCrimes();
-  const areaData = await loadFullAreaData();
+const { slug } = Astro.params;
 
-  // Get areas with at least 1 crime
-  const areasWithCrimes = new Set(allCrimes.map(c => c.area).filter(a => a));
+// Resolve slug → area metadata
+const areaData = await loadFullAreaData();
+const areaInfo = areaData.find(a => generateNameSlug(a.area) === slug);
 
-  return areaData
-    .filter(a => areasWithCrimes.has(a.area))
-    .map(a => ({
-      params: { slug: generateNameSlug(a.area) },
-      props: {
-        areaName: a.area,
-        region: a.region,
-        division: a.division,
-        knownAs: a.knownAs,
-      },
-    }));
+if (!areaInfo) {
+  return Astro.redirect('/404/', 301);
 }
 
-const { slug } = Astro.params;
-const { areaName, region, division, knownAs } = Astro.props;
+const { area: areaName, region, division, knownAs } = areaInfo;
+
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
 const regionSlug = generateNameSlug(region);
 const areaRegionMPs = mpsData.filter(mp => mp.regionSlugs.includes(regionSlug));
 
-// Fetch all crimes
-const allCrimes = await getTrinidadCrimes();
-const areaData = await loadFullAreaData();
+// Fetch crimes — D1 at runtime, CSV fallback for local dev
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // Area crimes
-const areaCrimes = allCrimes.filter(c => c.area === areaName);
+const areaCrimes = db
+  ? await getCrimesByAreaFromD1(db, areaName)
+  : allCrimes.filter(c => c.area === areaName);
 
 // Date ranges
 const currentYear = new Date().getFullYear();

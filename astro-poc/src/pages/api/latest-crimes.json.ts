@@ -1,19 +1,16 @@
 /**
  * GET /api/latest-crimes.json
  *
- * Pre-rendered at build time. Returns the 2 most recent crime entries
- * used by the SearchModal suggestions panel.
- *
- * Pre-rendered (static) — served from CDN, zero Worker invocations.
+ * SSR endpoint — returns the 2 most recent crime entries used by the SearchModal
+ * suggestions panel. CDN-cached at edge for ~23h.
  */
 
-export const prerender = true;
-
 import type { APIRoute } from 'astro';
-import { getTrinidadCrimes } from '../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../lib/crimeData';
 
-export const GET: APIRoute = async () => {
-  const crimes = await getTrinidadCrimes();
+export const GET: APIRoute = async ({ locals }) => {
+  const db = (locals as any).runtime?.env?.DB as D1Database | undefined;
+  const crimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
   const latest = crimes
     .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
@@ -30,7 +27,8 @@ export const GET: APIRoute = async () => {
     status: 200,
     headers: {
       'Content-Type': 'application/json',
-      'Cache-Control': 'public, max-age=3600',
+      'CDN-Cache-Control': 'max-age=82800',
+      'Cache-Control': 'public, max-age=3600, must-revalidate',
     },
   });
 };

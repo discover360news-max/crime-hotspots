@@ -1,10 +1,9 @@
 ---
 /**
  * HomepagePulse — "Right Now" data snapshot for a country
- * Server-rendered at build time, zero runtime cost
- * Reusable per country when Guyana/Barbados go live
+ * SSR — reads from D1 at request time; CDN cache keeps latency low
  */
-import { getTrinidadCrimes } from '../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1 } from '../lib/crimeData';
 import { getHotAreas } from '../lib/trendingHelpers';
 import { countCrimeType } from '../lib/dashboardHelpers';
 import { escapeHtml } from '../lib/escapeHtml';
@@ -18,7 +17,8 @@ interface Props {
 
 const { countryName, dashboardUrl, embedded = false } = Astro.props;
 
-const allCrimes = await getTrinidadCrimes();
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // This week's crimes
 const now = new Date();

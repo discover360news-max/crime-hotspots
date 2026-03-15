@@ -79,5 +79,28 @@ Cache headers: `public, max-age=3600, s-maxage=82800` (1h browser / ~23h CDN edg
 - 2026-03-12: Phase 3 bugs fixed + committed (f5884fb). Two issues found in local testing: (1) fetch URLs missing trailing slash — Astro trailingSlash:'always' requires /api/dashboard/?year= (see B015); (2) response-building code outside try/catch caused Astro to return 200 HTML on error (see B016). Both fixed. Pushed to main.
 - 2026-03-12: Post-migration cleanup: (1) removed `historicalTrends` key from csvUrls.ts + simplified CSV fallback in dashboardDataLoader.ts (60+ days of 2026 data makes historical snippet obsolete); (2) fixed D1 date format — sync worker was storing raw MM/DD/YYYY, breaking date-range trend queries. Normalized to YYYY-MM-DD, re-synced 2,591 rows, purged CDN cache (see B018).
 
+**Phase 4 — Complete D1 Migration: All Pages Off CSV (COMPLETE Mar 15, 2026)**
+
+Removed `prerender = true` and CSV dependency from all remaining crime-data pages. Every page now serves live D1 data, CDN-cached at the edge (~23h).
+
+New D1 function added:
+- `crimeData.ts` — `getCrimesByMonthFromD1(db, year, month)` for archive month pages
+
+Simple page swaps (removed `prerender`, added D1 pattern + CDN cache headers):
+- `headlines.astro`, `areas.astro`, `regions.astro`, `statistics.astro`, `murder-count.astro`, `archive/index.astro`, `api/latest-crimes.json.ts`, `HomepagePulse.astro`
+
+Dynamic routes (removed `prerender` + `getStaticPaths()`, slug resolved at request time, 404 on unknown):
+- `area/[slug].astro` — resolves via `loadFullAreaData()`, uses `getCrimesByAreaFromD1`
+- `region/[slug].astro` — resolves via area metadata, uses `getCrimesByRegionFromD1`
+- `archive/[year]/[month].astro` — uses `getCrimesByMonthFromD1` + `getAllCrimesFromD1`
+
+Tips / feeds / sitemaps (D1 pattern + CDN cache headers):
+- `safety-tips/[slug].astro`, `rss.xml.ts`, `news-sitemap.xml.ts`, `sitemap-0.xml.ts`
+
+`csvBuildPlugin.ts` slimmed: removed all CSV crime fetching (~200 lines), `validateCsvRows`, `csv-cache.json` write, row-count drop warning. Now a 2-step plugin: fetch RegionData → write `area-aliases.json` → write simplified `health-data.json` (status/build_time/area_aliases_count). Zero CSV warnings on build.
+
+Remaining `prerender = true` pages (intentional — no live crime data dependency):
+- `dashboard.astro` (SSR shell, loads via /api/dashboard), `compare.astro`, `mp/` pages, safety-tips static pages
+
 ## Deferred Cleanup
 - ~~Remove `historicalTrends` key from `TRINIDAD_CSV_URLS`~~ — DONE Mar 12, 2026. Key removed from `csvUrls.ts`; fallback in `dashboardDataLoader.ts` simplified to fetch only `current`. 60+ days of 2026 data makes cross-year historical snippet unnecessary.

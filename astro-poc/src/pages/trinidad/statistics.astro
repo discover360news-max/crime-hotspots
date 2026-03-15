@@ -12,15 +12,12 @@
  * - Public CSV download links
  */
 
-// Keep statistics page static (pre-rendered at build time)
-export const prerender = true;
-
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Hero from '../../components/Hero.astro';
 import StatCards from '../../components/StatCards.astro';
 import DataTable from '../../components/DataTable.astro';
-import { getTrinidadCrimes } from '../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../lib/crimeData';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
 import { getCollection } from 'astro:content';
 import { TRINIDAD_CSV_URLS } from '../../config/csvUrls';
@@ -37,8 +34,11 @@ import {
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import { generateStatisticsOgImage } from '../../lib/generateOgImage';
 
-// Fetch all crimes at build time
-const allCrimes = await getTrinidadCrimes();
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // Dynamic year handling (future-proof)
 const currentYear = new Date().getFullYear();

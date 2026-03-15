@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getTrinidadCrimes, generateNameSlug } from '../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1, generateNameSlug } from '../lib/crimeData';
 import { getCollection } from 'astro:content';
 import { buildRoute } from '../config/routes';
 import { slugifyCategory } from '../lib/safetyTipsHelpers';
@@ -13,9 +13,10 @@ import mpsData from '../data/mps.json';
  * - Archive pages (monthly archives)
  * - Blog posts
  */
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ locals }) => {
+  const db = (locals as any).runtime?.env?.DB as D1Database | undefined;
   // Get all crimes for crime pages
-  const crimes = await getTrinidadCrimes();
+  const crimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
   // Get blog posts
   let blogPosts: any[] = [];
@@ -189,6 +190,8 @@ ${allPages.map(page => `  <url>
   return new Response(sitemap, {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
+      'CDN-Cache-Control': 'max-age=82800',
+      'Cache-Control': 'public, max-age=3600, must-revalidate',
     },
   });
 };

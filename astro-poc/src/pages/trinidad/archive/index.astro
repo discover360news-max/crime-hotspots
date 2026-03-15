@@ -5,19 +5,20 @@
  * URL: /trinidad/archive
  */
 
-// Keep archive index static (pre-rendered at build time)
-export const prerender = true;
-
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import Hero from '../../../components/Hero.astro';
 import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
-import { getTrinidadCrimes } from '../../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../../lib/crimeData';
 import { dataUpdateNotice } from '../../../config/siteNotifications';
 import { getCountryName } from '../../../data/countries';
 import { routes, buildRoute } from '../../../config/routes';
 
-const crimes = await getTrinidadCrimes();
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+const crimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // Group by year and month
 const archiveMap = new Map<string, { year: number; month: number; count: number }>();

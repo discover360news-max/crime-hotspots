@@ -8,6 +8,45 @@
 
 ## March 2026
 
+### Complete D1 Migration — All Pages Off CSV (Mar 15)
+
+All crime-data pages now serve live D1 data at request time (CDN-cached ~23h). `prerender = true` and `getTrinidadCrimes()` as primary data source removed from all in-scope pages.
+
+**New D1 function:** `getCrimesByMonthFromD1(db, year, month)` in `crimeData.ts`
+
+**Simple page swaps** (8 files — D1 pattern + CDN headers added):
+`headlines.astro`, `areas.astro`, `regions.astro`, `statistics.astro`, `murder-count.astro`, `archive/index.astro`, `api/latest-crimes.json.ts`, `HomepagePulse.astro`
+
+**Dynamic routes** (3 files — `getStaticPaths()` removed, slug resolved at request time, 404 on unknown slug):
+`area/[slug].astro`, `region/[slug].astro`, `archive/[year]/[month].astro`
+
+**Feeds/sitemaps** (4 files): `safety-tips/[slug].astro`, `rss.xml.ts`, `news-sitemap.xml.ts`, `sitemap-0.xml.ts`
+
+**`csvBuildPlugin.ts` slimmed:** removed all CSV crime fetching (~200 lines), validation, and `csv-cache.json` write. Now only fetches RegionData → writes `area-aliases.json` + simplified `health-data.json`. Zero CSV warnings on build.
+
+---
+
+### Pipeline duplicate fixes + Assault classification rule (Mar 15)
+
+**processor.gs — Fix A:** After each Production write, the last-written row is read back and pushed onto `cachedProdData` in memory. Prevents same-incident articles processed in the same batch from bypassing all duplicate checks.
+
+**processor.gs — Fix B (POTENTIAL 4):** New check in `findPotentialDuplicate()` — same victim name + crime date 1 day apart → routes to Review Queue instead of passing through. Catches cross-outlet date discrepancies that exact-date checks miss.
+
+**schema.gs — Assault promptDescription:** Added explicit rule: a weapon pointed at a victim without physical contact does NOT qualify as Assault. Fixes incorrect Assault classification for knife-threat-only scenarios (e.g. grandma story).
+
+**Docs synced:** `CRIME-CLASSIFICATION-RULES.md` §6 + `HEADLINE-CLASSIFICATION-WORKFLOW.md` weapon-threat row updated to match.
+
+---
+
+### Safety Tips TIP-00062 to TIP-00064 + TIP-00049 update (Mar 15)
+
+- **UPDATED TIP-00049** — Added Story 549 to related_story_ids (return-from-shopping garage robbery)
+- **NEW TIP TIP-00062** — Securing Your Home During Morning Routines (Home Invasion / At Home)
+- **NEW TIP TIP-00063** — Securing High-Value Items in Hotel Rooms (Burglary / At a Hotel)
+- **NEW TIP TIP-00064** — Concealing Jewellery When Walking in Public (Robbery / Walking Alone)
+
+---
+
 ### Safety Tips TIP-00058 to TIP-00061 + Burglary schema (Mar 14)
 
 - **Schema:** Added `'Burglary'` to the `category` enum in `src/config/crimeSchema.ts`

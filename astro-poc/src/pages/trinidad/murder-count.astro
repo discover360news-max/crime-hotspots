@@ -5,13 +5,10 @@
  * Target keywords: "trinidad murder rate", "trinidad murder toll", "how many murders in trinidad 2026"
  */
 
-// Keep murder count page static (pre-rendered at build time)
-export const prerender = true;
-
 import Layout from '../../layouts/Layout.astro';
 import FlipCounter from '../../components/FlipCounter.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import { getTrinidadCrimes } from '../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../lib/crimeData';
 import { countCrimeType } from '../../lib/dashboardHelpers';
 import { getCollection } from 'astro:content';
 import { generateMurderCountOgImage } from '../../lib/generateOgImage';
@@ -19,8 +16,11 @@ import { routes, buildRoute } from '../../config/routes';
 import InfoPopup from '../../components/InfoPopup.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 
-// Fetch current year's crime data
-const allCrimes = await getTrinidadCrimes();
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 const currentYear = 2026;
 const crimes2026 = allCrimes.filter(crime => crime.year === currentYear);
 const crimes2025 = allCrimes.filter(crime => crime.year === 2025);

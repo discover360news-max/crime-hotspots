@@ -5,15 +5,13 @@
  * Target keywords: "crime in {region} trinidad", "{region} crime statistics"
  */
 
-export const prerender = true;
-
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import Hero from '../../../components/Hero.astro';
 import StatCards from '../../../components/StatCards.astro';
 import DataTable from '../../../components/DataTable.astro';
 import MPSidebar from '../../../components/MPSidebar.astro';
-import { getTrinidadCrimes, generateNameSlug } from '../../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1, getCrimesByRegionFromD1, generateNameSlug } from '../../../lib/crimeData';
 import { loadFullAreaData } from '../../../lib/areaAliases';
 import { calculateAreaCrimeScore } from '../../../lib/safetyHelpers';
 import { countCrimeType } from '../../../lib/dashboardHelpers';
@@ -25,26 +23,27 @@ import {
 import { escapeHtml } from '../../../lib/escapeHtml';
 import mpsData from '../../../data/mps.json';
 
-export async function getStaticPaths() {
-  const areaData = await loadFullAreaData();
+const { slug } = Astro.params;
 
-  // Get unique regions
-  const regions = new Set(areaData.map(a => a.region).filter(r => r));
+// Resolve slug → region name
+const areaData = await loadFullAreaData();
+const regions = new Set(areaData.map(a => a.region).filter(r => r));
+const regionName = Array.from(regions).find(r => generateNameSlug(r) === slug);
 
-  return Array.from(regions).map(region => ({
-    params: { slug: generateNameSlug(region) },
-    props: { regionName: region },
-  }));
+if (!regionName) {
+  return Astro.redirect('/404/', 301);
 }
 
-const { slug } = Astro.params;
-const { regionName } = Astro.props;
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-const allCrimes = await getTrinidadCrimes();
-const areaData = await loadFullAreaData();
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // Region crimes
-const regionCrimes = allCrimes.filter(c => c.region === regionName);
+const regionCrimes = db
+  ? await getCrimesByRegionFromD1(db, regionName)
+  : allCrimes.filter(c => c.region === regionName);
 
 // Date ranges
 const currentYear = new Date().getFullYear();

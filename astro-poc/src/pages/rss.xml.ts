@@ -1,16 +1,14 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
-import { getTrinidadCrimes } from '../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1 } from '../lib/crimeData';
 import { buildRoute } from '../config/routes';
-
-export const prerender = true;
 
 /**
  * RSS Feed
  * Blog posts (weekly reports) + latest crime headlines
  * Combined and sorted by date, limited to 30 items
  */
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ locals }) => {
   const site = 'https://crimehotspots.com';
 
   // Blog posts
@@ -33,7 +31,8 @@ export const GET: APIRoute = async () => {
   // Crime headlines (latest 20)
   let crimeItems: { title: string; link: string; description: string; pubDate: Date; updated: Date; author: string; category?: string }[] = [];
   try {
-    const crimes = await getTrinidadCrimes();
+    const db = (locals as any).runtime?.env?.DB as D1Database | undefined;
+    const crimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
     crimeItems = crimes.slice(0, 20).map(crime => ({
       title: crime.headline,
       link: `${site}${buildRoute.crime(crime.slug)}`,
@@ -78,6 +77,8 @@ ${items}
   return new Response(rss, {
     headers: {
       'Content-Type': 'application/rss+xml; charset=utf-8',
+      'CDN-Cache-Control': 'max-age=82800',
+      'Cache-Control': 'public, max-age=3600, must-revalidate',
     },
   });
 };
