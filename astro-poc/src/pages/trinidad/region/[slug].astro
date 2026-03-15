@@ -91,7 +91,7 @@ const avgRiskScore = regionAreaScores.length > 0
 // Primary stat cards (visible)
 const statCards = [
   makeYoYCard('Incidents (90d)', recentCrimes90d.length, recentCrimes90dPrev.length),
-  { ...makeYoYCard('Murders (YTD)', countCrimeType(crimesCurrentYTD, 'Murder'), countCrimeType(crimesPreviousYTD, 'Murder')), highlight: true },
+  makeYoYCard('Murders (YTD)', countCrimeType(crimesCurrentYTD, 'Murder'), countCrimeType(crimesPreviousYTD, 'Murder')),
   makeYoYCard('Robberies (YTD)', countCrimeType(crimesCurrentYTD, 'Robbery'), countCrimeType(crimesPreviousYTD, 'Robbery')),
   {
     label: 'Risk Level',

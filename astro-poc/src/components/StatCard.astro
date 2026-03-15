@@ -22,7 +22,7 @@ const { value, label, id, crimeType } = Astro.props;
   id={id}
   data-crime-type={crimeType}
 >
-  <div class={`text-3xl font-bold ${crimeType === 'Murder' ? 'text-rose-600' : 'text-slate-700 dark:text-[hsl(0_0%_90%)]'}`}>{value}</div>
+  <div class="text-3xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{value}</div>
   <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{label}</div>
   <!-- Trend indicator (populated by JavaScript) -->
   <div class="trend-indicator text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-4 hidden"></div>

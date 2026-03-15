@@ -19,7 +19,6 @@ interface StatCard {
   yoyChange?: number;
   direction?: 'up' | 'down' | 'flat';
   subtitle?: string;
-  highlight?: boolean; // true = render count in rose-600 (e.g. murder stats)
   size?: 'large'; // bumps number size — used for Risk Level
   riskColor?: 'high' | 'neutral' | 'low'; // level-specific color for risk score
   shareText?: string; // pre-formatted WhatsApp share message for this stat
@@ -50,7 +49,6 @@ function formatPercentChange(change: number): string {
         stat.riskColor === 'high' ? 'text-amber-600 dark:text-amber-400' :
         stat.riskColor === 'low'  ? 'text-emerald-600 dark:text-emerald-400' :
         stat.riskColor === 'neutral' ? 'text-slate-700 dark:text-[hsl(0_0%_85%)]' :
-        stat.highlight ? 'text-rose-600 dark:text-rose-400' :
         'text-slate-800 dark:text-[hsl(0_0%_95%)]'
       }`}>{stat.current}</div>
       {stat.subtitle ? (

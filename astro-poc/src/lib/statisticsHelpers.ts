@@ -12,15 +12,18 @@ import { countCrimeType } from './dashboardHelpers';
  */
 export const TRACKED_CRIME_TYPES = [
   'Murder',
-  'Robbery',
-  'Shooting',
-  'Home Invasion',
-  'Assault',
-  'Carjacking',
-  'Domestic Violence',
-  'Burglary',
+  'Attempted Murder',
   'Kidnapping',
+  'Sexual Assault',
+  'Shooting',
+  'Assault',
+  'Home Invasion',
+  'Carjacking',
+  'Arson',
+  'Robbery',
+  'Domestic Violence',
   'Extortion',
+  'Burglary',
   'Theft',
   'Seizures'
 ] as const;

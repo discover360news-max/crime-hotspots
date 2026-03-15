@@ -72,7 +72,7 @@ const regionStats = mp.regionSlugs.map((regionSlug: string) => {
     regionName,
     statCards: [
       makeYoYCard('Incidents (90d)', crimes90d.length, crimes90dPrev.length),
-      { ...makeYoYCard('Murders (YTD)', countCrimeType(currentYTD, 'Murder'), countCrimeType(previousYTD, 'Murder')), highlight: true },
+      makeYoYCard('Murders (YTD)', countCrimeType(currentYTD, 'Murder'), countCrimeType(previousYTD, 'Murder')),
       makeYoYCard('Robberies (YTD)', countCrimeType(currentYTD, 'Robbery'), countCrimeType(previousYTD, 'Robbery')),
     ],
   };

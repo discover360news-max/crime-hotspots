@@ -136,7 +136,6 @@ const statCards = [
   makeYoYCard('Incidents (90d)', recentCrimes90d.length, recentCrimes90dPrev.length),
   {
     ...makeYoYCard('Murders (YTD)', murderYTDCount, murderPrevCount),
-    highlight: true,
     shareText: `${areaName}: ${murderYTDCount} murders in ${currentYear} — ${murderTrend}. Crime data for Trinidad and Tobago: ${areaPageUrl}`,
   },
   makeYoYCard('Robberies (YTD)', countCrimeType(crimesCurrentYTD, 'Robbery'), countCrimeType(crimesPreviousYTD, 'Robbery')),
