@@ -46,7 +46,7 @@ const murdersThisWeek = countCrimeType(thisWeekCrimes, 'Murder');
 const latestCrime = allCrimes[0]; // Already sorted newest first
 ---
 
-embedded ? (
+{embedded ? (
   /* ── Embedded mode: stats block inside a parent card ── */
   <div class="px-4 pb-4 pt-3 border-t border-slate-100 dark:border-[var(--ch-border-subtle)]">
     <!-- "This week" label -->
@@ -198,4 +198,4 @@ embedded ? (
       </a>
     </div>
   </section>
-)
+)}
