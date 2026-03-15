@@ -1,44 +1,39 @@
 ---
 id: L001
 type: learning
-status: active
+status: archived
 created: 2026-03-01
-updated: 2026-03-07
-related: [B002, L002, L004]
+updated: 2026-03-15
+related: [B002, L002]
 ---
 
 ## Summary
-`astro:page-load` is the only correct pattern for interactive scripts in an Astro site with View Transitions. Module scripts run once; `DOMContentLoaded` doesn't fire on SPA navigation; `is:inline` is deduplicated. Only `astro:page-load` fires on every navigation including back/forward.
+**SUPERSEDED Mar 15 2026: ClientRouter (SPA) removed. See B002.**
 
-## Implementation Details
+`astro:page-load` is no longer used. All interactive scripts use `DOMContentLoaded`.
 
-**The correct pattern:**
+## Current Pattern (post-SPA removal)
+
 ```html
 <script>
-  document.addEventListener('astro:page-load', () => {
-    // All interactive logic here
-    // Re-runs on every navigation
+  document.addEventListener('DOMContentLoaded', () => {
+    // All interactive logic here — runs on every full page load
   });
 </script>
 ```
 
-**Related lifecycle events:**
-- `astro:page-load` — fires after each navigation (DOM ready)
-- `astro:before-navigate` — fires before leaving a page (use for cleanup/intercept)
-- `astro:after-swap` — fires after DOM swap but before scripts run
+`DOMContentLoaded` fires reliably after the DOM is ready on every full page navigation.
+No SPA timing ambiguity. No `is:inline` hacks needed.
 
-**Never use:**
-- `DOMContentLoaded` — only fires once, not on SPA nav
-- `<script is:inline>` for logic — see B002
-- Module-level code outside event listeners — runs once only
+## What Was Tried and Failed
+- `is:inline` — deduplicated, stops re-running after first page load (B002)
+- `astro:page-load` — fired unreliably on first SPA visit to dynamic routes,
+  causing site-wide accordion/interactive failures across 31+ files
 
-## Decisions Made
-Migrated all 16 interactive files from DOMContentLoaded → astro:page-load on Mar 1, 2026.
-
-## Known Issues / Gotchas
-- `cookieConsent.ts` calls `show()` on every `astro:page-load` — `show()` is a no-op if already consented, so this is safe
-- `dashboard.astro` Leaflet: `mapShimmerStartTime` moved inside `initMap()` so it resets per navigation
-- `yearFilter.ts` — readyState check removed; `initYearFilter()` called directly since astro:page-load guarantees DOM readiness
+## Do Not Re-introduce
+Do not suggest `astro:page-load`, `ClientRouter`, or View Transitions.
+The pattern failed at scale on a content/data site. Full page loads with CDN are fast enough.
 
 ## Change Log
-- 2026-03-01: Pattern confirmed and applied project-wide
+- 2026-03-01: Pattern established, 16 files migrated to astro:page-load
+- 2026-03-15: ClientRouter removed; all files migrated back to DOMContentLoaded (commit e39bf9f)

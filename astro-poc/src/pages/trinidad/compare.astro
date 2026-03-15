@@ -204,8 +204,8 @@ const breadcrumbs = [
   const { availableAreas, areaStatsMap } = (window as any).__compareData || {};
   if (!availableAreas || !areaStatsMap) return;
 
-  const selectA = document.getElementById('selectA') as HTMLSelectElement;
-  const selectB = document.getElementById('selectB') as HTMLSelectElement;
+  const selectA = document.getElementById('selectA') as unknown as HTMLSelectElement;
+  const selectB = document.getElementById('selectB') as unknown as HTMLSelectElement;
   const resultsEl = document.getElementById('comparisonResults');
   const emptyEl = document.getElementById('emptyState') as HTMLElement;
 
@@ -380,7 +380,7 @@ const breadcrumbs = [
     const b = selectB.value;
 
     // Update URL without page reload
-    const url = new URL(window.location);
+    const url = new URL(window.location.href);
     if (a) url.searchParams.set('a', a); else url.searchParams.delete('a');
     if (b) url.searchParams.set('b', b); else url.searchParams.delete('b');
     history.replaceState(null, '', url);

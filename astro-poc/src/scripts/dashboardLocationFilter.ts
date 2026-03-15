@@ -32,7 +32,7 @@ function applyShimmerUpdate(
 // ── Area Cascade ──────────────────────────────────────────────────────────────
 
 function updateDashboardAreaOptions(selectedRegion: string): void {
-  const areaSelect = document.getElementById('areaFilter') as HTMLSelectElement | null;
+  const areaSelect = document.getElementById('areaFilter') as unknown as HTMLSelectElement | null;
   if (!areaSelect) return;
 
   const currentArea = areaSelect.value;
@@ -58,9 +58,9 @@ function updateDashboardAreaOptions(selectedRegion: string): void {
 function applyDashboardLocationFilter(): void {
   if (!(window as any).__crimesData) return;
 
-  const yearEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
-  const regionEl = document.getElementById('regionFilter') as HTMLSelectElement | null;
-  const areaEl = document.getElementById('areaFilter') as HTMLSelectElement | null;
+  const yearEl = document.getElementById('yearFilter') as unknown as HTMLSelectElement | null;
+  const regionEl = document.getElementById('regionFilter') as unknown as HTMLSelectElement | null;
+  const areaEl = document.getElementById('areaFilter') as unknown as HTMLSelectElement | null;
   if (!yearEl || !regionEl || !areaEl) return;
 
   const selectedYear = yearEl.value;
@@ -108,9 +108,9 @@ function hideDashboardFilterActive(): void {
 }
 
 function checkDashboardFilterState(): void {
-  const crimeTypeEl = document.getElementById('crimeTypeFilter') as HTMLSelectElement | null;
-  const regionEl = document.getElementById('regionFilter') as HTMLSelectElement | null;
-  const areaEl = document.getElementById('areaFilter') as HTMLSelectElement | null;
+  const crimeTypeEl = document.getElementById('crimeTypeFilter') as unknown as HTMLSelectElement | null;
+  const regionEl = document.getElementById('regionFilter') as unknown as HTMLSelectElement | null;
+  const areaEl = document.getElementById('areaFilter') as unknown as HTMLSelectElement | null;
   const active =
     (crimeTypeEl ? crimeTypeEl.value !== '' : false) ||
     (regionEl ? regionEl.value !== '' : false) ||
@@ -119,10 +119,10 @@ function checkDashboardFilterState(): void {
 }
 
 function clearDashboardFilters(): void {
-  const yearEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
-  const crimeTypeEl = document.getElementById('crimeTypeFilter') as HTMLSelectElement | null;
-  const regionEl = document.getElementById('regionFilter') as HTMLSelectElement | null;
-  const areaEl = document.getElementById('areaFilter') as HTMLSelectElement | null;
+  const yearEl = document.getElementById('yearFilter') as unknown as HTMLSelectElement | null;
+  const crimeTypeEl = document.getElementById('crimeTypeFilter') as unknown as HTMLSelectElement | null;
+  const regionEl = document.getElementById('regionFilter') as unknown as HTMLSelectElement | null;
+  const areaEl = document.getElementById('areaFilter') as unknown as HTMLSelectElement | null;
   const defaultYear = (window as any).__dashboardDefaultYear || '';
 
   if (yearEl && yearEl.value !== defaultYear) {
@@ -145,8 +145,8 @@ function clearDashboardFilters(): void {
 
 export function initializeDashboardLocationFilter(): void {
   function waitForElements() {
-    const regionEl = document.getElementById('regionFilter') as HTMLSelectElement | null;
-    const areaEl = document.getElementById('areaFilter') as HTMLSelectElement | null;
+    const regionEl = document.getElementById('regionFilter') as unknown as HTMLSelectElement | null;
+    const areaEl = document.getElementById('areaFilter') as unknown as HTMLSelectElement | null;
     if (!regionEl || !areaEl) { setTimeout(waitForElements, 100); return; }
 
     regionEl.addEventListener('change', () => {
@@ -159,8 +159,8 @@ export function initializeDashboardLocationFilter(): void {
       checkDashboardFilterState();
     });
 
-    const yearEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
-    const crimeTypeEl = document.getElementById('crimeTypeFilter') as HTMLSelectElement | null;
+    const yearEl = document.getElementById('yearFilter') as unknown as HTMLSelectElement | null;
+    const crimeTypeEl = document.getElementById('crimeTypeFilter') as unknown as HTMLSelectElement | null;
     if (yearEl) yearEl.addEventListener('change', checkDashboardFilterState);
     if (crimeTypeEl) crimeTypeEl.addEventListener('change', checkDashboardFilterState);
 

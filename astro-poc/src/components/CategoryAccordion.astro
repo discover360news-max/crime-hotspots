@@ -77,11 +77,13 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
   // <details> sets content to display:none on close, which kills CSS height transitions.
   // Intercept toggle: manage is-open class for animation, open attribute for ARIA semantics.
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.cat-accordion').forEach((details) => {
+    document.querySelectorAll<HTMLDetailsElement>('.cat-accordion').forEach((details) => {
       const content = details.querySelector('.cat-content');
       if (!content) return;
       if (details.open) content.classList.add('is-open');
-      details.querySelector('.cat-header').addEventListener('click', (e) => {
+      const header = details.querySelector('.cat-header');
+      if (!header) return;
+      header.addEventListener('click', (e) => {
         e.preventDefault(); // Prevent native <details> toggle — we manage open attribute ourselves
         if (details.open) {
           content.classList.remove('is-open');

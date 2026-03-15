@@ -15,14 +15,25 @@
 const CONSENT_COOKIE_NAME = 'crime_hotspots_consent';
 const CONSENT_DURATION_DAYS = 365;
 
+interface CookieConsentConfig {
+  position: string;
+  primaryColor: string;
+  onAccept: () => void;
+  onDecline: () => void;
+  [key: string]: unknown;
+}
+
 export class CookieConsent {
-  constructor(config = {}) {
+  private config: CookieConsentConfig;
+  private consentGiven: boolean;
+
+  constructor(config: Partial<CookieConsentConfig> = {}) {
     this.config = {
-      position: config.position || 'bottom', // 'bottom' or 'top'
-      primaryColor: config.primaryColor || '#e11d48', // rose-600
-      onAccept: config.onAccept || (() => {}),
-      onDecline: config.onDecline || (() => {}),
-      ...config
+      position: (config.position as string) || 'bottom',
+      primaryColor: (config.primaryColor as string) || '#e11d48',
+      onAccept: (config.onAccept as () => void) || (() => {}),
+      onDecline: (config.onDecline as () => void) || (() => {}),
+      ...config,
     };
 
     this.consentGiven = this.checkConsent();
@@ -148,7 +159,7 @@ export class CookieConsent {
   /**
    * Hide and remove banner
    */
-  hideBanner(banner) {
+  hideBanner(banner: HTMLElement) {
     banner.style.opacity = '0';
     banner.style.transform = `translateY(${this.config.position === 'bottom' ? '100%' : '-100%'})`;
 
@@ -180,7 +191,7 @@ export class CookieConsent {
   /**
    * Update GA4 Consent Mode v2 signals
    */
-  _updateGtagConsent(analyticsState) {
+  _updateGtagConsent(analyticsState: string) {
     if (typeof window.gtag === 'function') {
       window.gtag('consent', 'update', {
         analytics_storage: analyticsState,
@@ -194,7 +205,7 @@ export class CookieConsent {
   /**
    * Helper: Set cookie
    */
-  setCookie(name, value, days) {
+  setCookie(name: string, value: string, days: number) {
     const expires = new Date();
     expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
     document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Lax;Secure`;
@@ -203,7 +214,7 @@ export class CookieConsent {
   /**
    * Helper: Get cookie
    */
-  getCookie(name) {
+  getCookie(name: string) {
     const nameEQ = name + '=';
     const cookies = document.cookie.split(';');
 
@@ -229,7 +240,7 @@ export class CookieConsent {
 /**
  * Initialize consent banner (call this on every page)
  */
-export function initCookieConsent(config = {}) {
+export function initCookieConsent(config: Partial<CookieConsentConfig> = {}) {
   const consent = new CookieConsent(config);
 
   // Show banner on each page load (astro:page-load fires on initial load + after navigations)

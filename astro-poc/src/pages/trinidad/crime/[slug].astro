@@ -54,7 +54,7 @@ const prevCrime = crimeIndex > 0 ? sortedCrimes[crimeIndex - 1] : null;
 const nextCrime = crimeIndex > -1 && crimeIndex < sortedCrimes.length - 1 ? sortedCrimes[crimeIndex + 1] : null;
 
 // Load area aliases for tooltip (guarded)
-const areaAliases = crime ? await loadAreaAliases() : {};
+const areaAliases = crime ? await loadAreaAliases() : new Map<string, string>();
 const localName = crime ? getLocalName(areaAliases, crime.area) : '';
 
 // Calculate safety context for this area (guarded)

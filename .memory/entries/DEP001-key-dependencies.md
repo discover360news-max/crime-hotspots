@@ -3,8 +3,8 @@ id: DEP001
 type: dependency
 status: active
 created: 2026-03-07
-updated: 2026-03-07
-related: [B003, B011, CFG004]
+updated: 2026-03-15
+related: [B003, CFG004]
 ---
 
 ## Summary
@@ -14,7 +14,8 @@ Key non-trivial npm dependencies and why they exist. Most are in `astro-poc/pack
 
 | Package | Why it exists | Gotcha |
 |---------|---------------|--------|
-| `astro-pagefind` | Site-wide search indexing + UI | MUST be in `integrations[]` in astro.config.mjs (B011) |
+| `@astrojs/check` | `npm run check` — type-checks `.astro` files (tsc can't do this) | devDep only; run before committing |
+| `typescript` | Required peer dep for `@astrojs/check` | devDep; tsconfig extends `astro/tsconfigs/base` (not strict) |
 | `satori` | OG image SVG generation (murder count page) | Use `await import()` — crashes Workers at module level (B003) |
 | `sharp` | OG image PNG conversion | Same as satori — `await import()` only (B003) |
 | `@astrojs/rss` | RSS feed (`/rss.xml`) — blog posts + latest crimes | Standard usage |
@@ -28,3 +29,5 @@ Key non-trivial npm dependencies and why they exist. Most are in `astro-poc/pack
 ## Change Log
 - 2026-01-27: `@astrojs/cloudflare` updated to 12.6.12 (SSRF fix)
 - 2026-02-01: `@astrojs/rss` added for RSS feed
+- 2026-03-13: `astro-pagefind` removed (search replaced with D1 FTS5, see D007)
+- 2026-03-15: Added `@astrojs/check` + `typescript` devDeps; `npm run check` now available

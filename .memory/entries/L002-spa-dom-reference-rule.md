@@ -1,39 +1,31 @@
 ---
 id: L002
 type: learning
-status: active
+status: archived
 created: 2026-03-01
-updated: 2026-03-07
+updated: 2026-03-15
 related: [B002, L001]
 ---
 
 ## Summary
-Module-level `const el = document.getElementById(...)` captures a DOM reference on first load. After SPA navigation, the body is replaced — old references point to detached nodes. All DOM queries must happen fresh inside the function that uses them, or inside `astro:page-load`.
+**SUPERSEDED Mar 15 2026: ClientRouter (SPA) removed. Stale DOM refs are no longer an issue.**
 
-## Implementation Details
+Without SPA, every navigation is a full page load — the entire DOM is replaced naturally.
+Module-level DOM captures are still not a good pattern, but they won't cause "stale after nav"
+bugs because there is no SPA navigation.
 
-**Root cause of "menu unresponsive after SPA nav":**
+## Current Rule (simplified)
+Query DOM elements inside `DOMContentLoaded`, not at module level.
+This is just good practice, not a SPA-specific requirement.
+
 ```js
-// WRONG — module-level capture, stale after SPA nav
-const menuBtn = document.getElementById('menu-btn');
-menuBtn.addEventListener('click', openMenu);
-
-// CORRECT — query fresh on every use
-document.addEventListener('astro:page-load', () => {
-  const menuBtn = document.getElementById('menu-btn');
-  if (!menuBtn) return;
-  menuBtn.addEventListener('click', openMenu);
+// Good
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('my-btn');
+  btn?.addEventListener('click', handler);
 });
 ```
 
-**Files fixed Mar 1:**
-- `IslandSelectorModal.astro` — all `getElementById`/`querySelectorAll` moved inside open/close functions
-- `Header.astro` — converted to `<script>` + `astro:page-load`; `window.closeMobileMenu` + `window.navigateAreas` exposed as globals for inline onclick attributes
-
-## Known Issues / Gotchas
-- `window.*` globals (like `window.openIslandModal`) persist across navigations — they're safe to set once at module level
-- The rule is specifically about DOM element references, not window globals
-- `onclick` attributes in HTML must call window-exposed functions since inline handlers can't access module scope
-
 ## Change Log
-- 2026-03-01: Rule established after menu bug root cause analysis
+- 2026-03-01: Rule established for SPA dom-stale issue
+- 2026-03-15: Superseded by SPA removal (commit e39bf9f)

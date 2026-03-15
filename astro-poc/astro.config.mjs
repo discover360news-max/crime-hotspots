@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
@@ -19,6 +19,12 @@ export default defineConfig({
     sitemap(),
     redirectGenerator(),
   ],
+  env: {
+    schema: {
+      BUTTONDOWN_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+      PUBLIC_SAFETY_TIPS_GAS_URL: envField.string({ context: 'client', access: 'public', optional: true }),
+    }
+  },
   vite: {
     plugins: [tailwindcss()]
   }

@@ -112,7 +112,7 @@
 <script>
   // Uses astro:page-load (not is:inline) so it re-runs on SPA navigation (B002)
   document.addEventListener('DOMContentLoaded', () => {
-    const details = document.getElementById('legendDetails');
+    const details = document.getElementById('legendDetails') as HTMLDetailsElement | null;
     const body = document.getElementById('legendBody');
     if (!details || !body) return;
 

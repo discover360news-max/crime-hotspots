@@ -26,8 +26,8 @@ B019 | BUG | fixed | Quick Insights "Highest Crime Area" could show 'Unknown' �
 B020 | BUG | fixed | updateQuickInsights() used new Date(c.date) string parse (UTC midnight) for Peak Day/Busiest Month — shifts day for Trinidad (UTC-4). Fix: use c.dateObj when available → B019-quick-insights-unknown-area.md
 
 ## Learnings & Patterns (L)
-L001 | LEARN | active | astro:page-load is the ONLY correct pattern for interactive scripts on SPA → L001-astro-page-load-pattern.md
-L002 | LEARN | active | DOM refs go stale after SPA nav — always query fresh inside astro:page-load → L002-spa-dom-reference-rule.md
+L001 | LEARN | archived | ~~astro:page-load~~ — SPA removed Mar 15 2026. Use DOMContentLoaded. Do NOT re-introduce ClientRouter → L001-astro-page-load-pattern.md
+L002 | LEARN | archived | ~~SPA stale DOM refs~~ — not an issue without SPA → L002-spa-dom-reference-rule.md
 L003 | LEARN | active | CSS accordion: height:0→auto transition requires interpolate-size:allow-keywords → L003-css-accordion-pattern.md
 L004 | LEARN | active | Data passing: define:vars for window globals only; data-* attrs for per-page vars → L004-data-passing-patterns.md
 L005 | LEARN | active | Muted UI: rose=hover/interaction only; ghost button, muted pill, muted dot patterns → L005-muted-ui-system.md
@@ -70,7 +70,7 @@ C004 | COMP | active | MPSidebar: area pages (showAll=false: 2+chevron) + region
 ## Config (CFG)
 CFG001 | CFG | active | Project overview: Astro 5, Cloudflare Pages, GA4, GAS, Claude Haiku → CFG001-project-overview.md
 CFG002 | CFG | active | Build & deploy: npm commands, GitHub Actions, daily 6AM UTC rebuild → CFG002-build-deploy.md
-CFG003 | CFG | active | Cloudflare caching: crime pages CDN 24h + browser 1h; other pages static → CFG003-cloudflare-caching.md
+CFG003 | CFG | active | Cloudflare caching: ALL crime-data pages SSR + CDN ~23h. D1 free tier: 5M rows read/day; safe to ~15k visits/day → CFG003-cloudflare-caching.md
 CFG004 | CFG | active | astro.config.mjs: output:server, Cloudflare adapter, key integrations → CFG004-astro-config.md
 
 ## Tools (T)

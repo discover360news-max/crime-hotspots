@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { BUTTONDOWN_API_KEY } from 'astro:env/server';
 
 /**
  * POST /api/subscribe
@@ -17,9 +18,9 @@ export const POST: APIRoute = async ({ request }) => {
   let source: string;
 
   try {
-    const body = await request.json();
-    email = (body.email ?? '').trim();
-    source = (body.source ?? 'website').trim();
+    const body = await request.json() as Record<string, unknown>;
+    email = ((body.email ?? '') as string).trim();
+    source = ((body.source ?? 'website') as string).trim();
   } catch {
     return json({ error: 'Invalid request.' }, 400);
   }
@@ -28,7 +29,7 @@ export const POST: APIRoute = async ({ request }) => {
     return json({ error: 'Please enter a valid email address.' }, 400);
   }
 
-  const apiKey = import.meta.env.BUTTONDOWN_API_KEY;
+  const apiKey = BUTTONDOWN_API_KEY;
   if (!apiKey) {
     console.error('[subscribe] BUTTONDOWN_API_KEY is not set');
     return json({ error: 'Service temporarily unavailable. Please try again later.' }, 503);

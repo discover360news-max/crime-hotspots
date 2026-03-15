@@ -142,7 +142,7 @@ export default function redirectGenerator(): AstroIntegration {
         const allEntries: CrimeEntry[] = [];
 
         // Fetch 2025 data if different from current
-        if (TRINIDAD_CSV_URLS[2025] && TRINIDAD_CSV_URLS[2025] !== TRINIDAD_CSV_URLS.current) {
+        if (TRINIDAD_CSV_URLS[2025] && (TRINIDAD_CSV_URLS[2025] as string) !== TRINIDAD_CSV_URLS.current) {
           const entries2025 = await fetchAndParseCSV(TRINIDAD_CSV_URLS[2025], logger);
           allEntries.push(...entries2025);
           logger.info(`[redirectGenerator] Loaded ${entries2025.length} entries from 2025 sheet`);

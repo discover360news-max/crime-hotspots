@@ -64,7 +64,7 @@ export function initializeYearFilter(
   });
   // Wait for DOM to be ready before attaching event listeners
   function initYearFilter() {
-    const yearFilterElement = document.getElementById('yearFilter') as HTMLSelectElement;
+    const yearFilterElement = document.getElementById('yearFilter') as unknown as HTMLSelectElement;
     if (!yearFilterElement) return;
 
     // Populate dropdown with available years

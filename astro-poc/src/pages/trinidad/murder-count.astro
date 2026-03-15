@@ -30,7 +30,7 @@ const murderCount2025SamePeriod = countCrimeType(crimes2025.filter(crime => {
   const now = new Date();
   const crimeDate = new Date(crime.date);
   const startOf2025 = new Date('2025-01-01');
-  const dayOfYear2026 = Math.floor((now - new Date('2026-01-01')) / (1000 * 60 * 60 * 24));
+  const dayOfYear2026 = Math.floor((now.getTime() - new Date('2026-01-01').getTime()) / (1000 * 60 * 60 * 24));
   const samePeriodEnd2025 = new Date(startOf2025.getTime() + (dayOfYear2026 * 24 * 60 * 60 * 1000));
   return crimeDate >= startOf2025 && crimeDate <= samePeriodEnd2025;
 }), 'Murder');
@@ -54,7 +54,7 @@ const murderRate2025 = ((murderCount2025Full / POPULATION) * 100000).toFixed(1);
 // Project annual murder count and rate (based on current pace)
 const now = new Date();
 const startOf2026 = new Date('2026-01-01');
-const daysPassed = Math.floor((now - startOf2026) / (1000 * 60 * 60 * 24));
+const daysPassed = Math.floor((now.getTime() - startOf2026.getTime()) / (1000 * 60 * 60 * 24));
 const daysInYear = 365;
 const projectedAnnualMurders = daysPassed > 0 ? Math.round((murderCount / daysPassed) * daysInYear) : 0;
 const projectedMurderRate = ((projectedAnnualMurders / POPULATION) * 100000).toFixed(1);

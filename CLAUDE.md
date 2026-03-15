@@ -42,6 +42,9 @@ npm run preview  # preview production build
 - Working directory is `astro-poc/` — never work in the root (Vite version is deprecated)
 - Keep page files under ~500 lines (content/simple pages) or ~600 lines (complex interactive pages like dashboards) — extract to components/scripts if larger
 - No emojis unless Kavell asks
+- **Interactive scripts always use `DOMContentLoaded`** — no exceptions
+- **Never re-introduce `ClientRouter` / SPA / View Transitions** — removed Mar 15 2026 after causing site-wide interactive failures. Push back hard if suggested. See `.memory/entries/B002-isinline-spa-rerun.md`
+- **No fancy Astro patterns** (is:inline scripts, astro:page-load, transition directives) — keep it simple: plain `<script>` + `DOMContentLoaded`
 
 ## After Kavell Confirms a Task is Complete
 

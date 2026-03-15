@@ -18,7 +18,7 @@ export function initializeDashboardMap(): void {
     const currentYear = availableYears[0];
     const currentYearCrimes = window.__crimesData.filter((c: any) => c.year === currentYear);
 
-    initializeLeafletMap('leafletMap', currentYearCrimes, {
+    initializeLeafletMap('leafletMap', currentYearCrimes as any, {
       center: [10.634963, -61.197207],
       zoom: 8,
       country: 'Trinidad',

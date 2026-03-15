@@ -12,6 +12,7 @@ import TipCard from '../../../components/TipCard.astro';
 import TipVote from '../../../components/TipVote.astro';
 import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../../lib/crimeData';
 import { routes, buildRoute } from '../../../config/routes';
+import { PUBLIC_SAFETY_TIPS_GAS_URL } from 'astro:env/client';
 
 const { slug } = Astro.params;
 
@@ -43,7 +44,7 @@ const relatedTips = allTips
   .slice(0, 3);
 
 const { Content } = await tip.render();
-const gasUrl = import.meta.env.PUBLIC_SAFETY_TIPS_GAS_URL || '';
+const gasUrl = PUBLIC_SAFETY_TIPS_GAS_URL || '';
 
 const title = `${tip.data.title} | Safety Tips Trinidad — CrimeHotSpots.com`;
 const description = `Safety tip for ${tip.data.category} in Trinidad & Tobago. Context: ${tip.data.context}. Actionable advice to keep you safer.`;

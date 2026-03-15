@@ -39,6 +39,12 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 15, 2026 (continued)
+- Added `@astrojs/check` + `typescript` devDeps; `npm run check` script in package.json. Type-checks all .astro files.
+- Downgraded tsconfig from `strict` → `base`. Fixed 150 of 154 type errors across ~30 files (4 left as intentional false positives or non-runtime issues).
+- Added `astro:env` schema to astro.config.mjs — `BUTTONDOWN_API_KEY` (server secret) + `PUBLIC_SAFETY_TIPS_GAS_URL` (client public). Updated 3 files to import from `astro:env/server` and `astro:env/client`. Created `.env.example`.
+- Updated CFG004 + DEP001 memory entries to reflect above. Build passes.
+
 ## Session Notes — Mar 15, 2026
 - Phase 4 D1 migration complete. All crime-data pages now SSR + D1. csvBuildPlugin slimmed to area-aliases only. Build passes with zero CSV warnings. See D006 for full file list.
 

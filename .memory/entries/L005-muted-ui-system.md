@@ -34,6 +34,8 @@ Used on: RelatedCrimes type dot, TrendingHotspots heat dot, CompactTipCard sever
 
 **Source Links (crime detail):** Slate text + dotted underline at rest, rose on hover — not red by default.
 
+**Stat card numbers (StatCard + StatCards):** Always slate — never rose, regardless of crime type. The `highlight` prop on `StatCards` was a L005 violation (rose on Murder count) — removed Mar 15 2026. `StatCard` had a hardcoded `crimeType === 'Murder'` rose conditional — also removed. Rose only appears on the active-state border (`.stat-card.active { border-color: #e11d48 }`).
+
 ## Keep Semantic Colour (do NOT mute)
 - `SafetyContext` fills (amber/emerald/slate by risk level)
 - `SiteNotificationBanner` fills

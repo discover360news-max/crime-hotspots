@@ -13,11 +13,9 @@
 
 interface Props {
   headers: string[];
-  rows: any[][];
-  type?: 'comparison' | 'ranking';
 }
 
-const { headers, rows, type = 'comparison' } = Astro.props;
+const { headers } = Astro.props;
 ---
 
 <div class="bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] overflow-hidden shadow-sm">

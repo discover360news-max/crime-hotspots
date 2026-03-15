@@ -9,16 +9,36 @@
  * Only initializes after user consent
  */
 
+declare global {
+  interface Window {
+    dataLayer: unknown[];
+    gtag: (...args: unknown[]) => void;
+  }
+}
+
+interface AnalyticsConfig {
+  provider: string;
+  ga4MeasurementId: string;
+  cloudflareToken: string;
+  anonymizeIp: boolean;
+  cookieless: boolean;
+  debug: boolean;
+  [key: string]: unknown;
+}
+
 export class Analytics {
-  constructor(config = {}) {
+  private config: AnalyticsConfig;
+  private initialized: boolean;
+
+  constructor(config: Partial<AnalyticsConfig> = {}) {
     this.config = {
-      provider: config.provider || 'ga4', // 'ga4' or 'cloudflare' or 'both'
-      ga4MeasurementId: config.ga4MeasurementId || '',
-      cloudflareToken: config.cloudflareToken || '',
-      anonymizeIp: config.anonymizeIp !== false, // Default true
-      cookieless: config.cookieless || false,
-      debug: config.debug || false,
-      ...config
+      provider: (config.provider as string) || 'ga4',
+      ga4MeasurementId: (config.ga4MeasurementId as string) || '',
+      cloudflareToken: (config.cloudflareToken as string) || '',
+      anonymizeIp: config.anonymizeIp !== false,
+      cookieless: (config.cookieless as boolean) || false,
+      debug: (config.debug as boolean) || false,
+      ...config,
     };
 
     this.initialized = false;
@@ -68,15 +88,15 @@ export class Analytics {
     document.head.appendChild(script);
 
     window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      window.dataLayer.push(arguments);
+    function gtag(...args: unknown[]) {
+      window.dataLayer.push(args);
     }
     window.gtag = gtag;
 
     gtag('js', new Date());
     gtag('config', this.config.ga4MeasurementId, {
       anonymize_ip: this.config.anonymizeIp,
-      send_page_view: true
+      send_page_view: true,
     });
 
     this.log('GA4 initialized (fallback)');
@@ -104,7 +124,7 @@ export class Analytics {
   /**
    * Track custom event
    */
-  trackEvent(eventName, eventParams = {}) {
+  trackEvent(eventName: string, eventParams: Record<string, unknown> = {}) {
     if (!this.initialized) {
       this.log('Analytics not initialized, event not tracked:', eventName);
       return;
@@ -124,7 +144,7 @@ export class Analytics {
   /**
    * Track page view (for SPAs)
    */
-  trackPageView(pagePath) {
+  trackPageView(pagePath: string) {
     if (!this.initialized) {
       return;
     }
@@ -140,7 +160,7 @@ export class Analytics {
   /**
    * Helper: Console log in debug mode
    */
-  log(...args) {
+  log(...args: unknown[]) {
     if (this.config.debug) {
       console.log('[Analytics]', ...args);
     }

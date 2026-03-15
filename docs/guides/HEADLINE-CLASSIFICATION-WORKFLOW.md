@@ -126,10 +126,15 @@ Only add what the headline/article confirms. Do not infer.
 
 ## Step 5 — Set Victim Count
 
-| Primary type | victimCount |
+Count **all people directly affected** by the incident — shot, killed, robbed, beaten, held at gunpoint, tied up.
+
+| Rule | victimCount |
 |---|---|
-| Murder | Number of people killed (e.g. 2 murders = 2) |
-| Everything else | Always 1 |
+| Number explicitly stated | Use it exactly ("two shot" = 2, "three robbed" = 3) |
+| Plural but no number ("teens", "children", "family members") | Minimum 2 |
+| Count not stated | Default to 1 |
+
+For Murder: count the number **killed** (survivors are counted under their own crime type if split into separate rows).
 
 Related types never affect victim count.
 
@@ -144,7 +149,7 @@ Related types never affect victim count.
 | Chopped with cutlass and survived | **Attempted Murder** |
 | Beaten with bat, bottle, or any object and survived | **Attempted Murder** |
 | Punched, kicked, shoved — fists/feet only | **Assault** |
-| Weapon used but only threatening, not striking | Robbery or Assault depending on whether property was taken |
+| Weapon used but only threatening, not striking | Robbery (if property taken) — weapon threat alone is NOT Assault |
 
 > Rationale: Intentional weapon use against a person = "wounding with intent"
 > under TT law. The attacker would face Attempted Murder charges, not Assault.

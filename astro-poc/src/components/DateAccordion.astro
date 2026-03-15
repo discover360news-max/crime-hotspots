@@ -78,11 +78,13 @@ const formattedDate = new Date(date).toLocaleDateString('en-US', {
   // <details> sets content to display:none on close, which kills CSS height transitions.
   // Intercept toggle: manage is-open class for animation, open attribute for ARIA semantics.
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.date-accordion').forEach((details) => {
+    document.querySelectorAll<HTMLDetailsElement>('.date-accordion').forEach((details) => {
       const content = details.querySelector('.accordion-content');
       if (!content) return;
       if (details.open) content.classList.add('is-open');
-      details.querySelector('.accordion-header').addEventListener('click', (e) => {
+      const header = details.querySelector('.accordion-header');
+      if (!header) return;
+      header.addEventListener('click', (e) => {
         e.preventDefault(); // Prevent native <details> toggle — we manage open attribute ourselves
         if (details.open) {
           content.classList.remove('is-open');

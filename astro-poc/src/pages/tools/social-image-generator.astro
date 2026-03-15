@@ -381,6 +381,9 @@ const pageDescription = "Generate branded social media images for weekly crime s
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
+    // html2canvas is loaded via CDN <script> tag above — declare for TypeScript
+    declare const html2canvas: ((el: HTMLElement, opts?: object) => Promise<HTMLCanvasElement>) | undefined;
+
     // Initialize date pickers with current week (Dec 21-27, 2025)
     function initializeDatePickers() {
       const startDateInput = document.getElementById('startDate') as HTMLInputElement;

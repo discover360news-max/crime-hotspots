@@ -90,7 +90,7 @@ function applyAllFilters(callbacks: {
   let filteredCrimes = (window as any).__crimesData;
 
   // Apply year filter (if any)
-  const yearFilter = document.getElementById('yearFilter') as HTMLSelectElement;
+  const yearFilter = document.getElementById('yearFilter') as unknown as HTMLSelectElement;
   if (yearFilter && yearFilter.value !== 'all') {
     const selectedYears = yearFilter.value.split(',').map(y => parseInt(y.trim()));
     filteredCrimes = filteredCrimes.filter((crime: Crime) => {
@@ -203,7 +203,7 @@ export function initializeStatCardFiltering(callbacks: {
  * Initialize tray dropdown sync with stat cards
  */
 export function initializeTraySync() {
-  const crimeTypeDropdown = document.getElementById('crimeTypeFilter') as HTMLSelectElement;
+  const crimeTypeDropdown = document.getElementById('crimeTypeFilter') as unknown as HTMLSelectElement;
 
   if (!crimeTypeDropdown) return;
 

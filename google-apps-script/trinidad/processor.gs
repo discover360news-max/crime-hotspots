@@ -426,6 +426,16 @@ function processReadyArticles() {
         'Date_Updated':         ''
       });
 
+      // Fix A: Update in-memory cache so same-run duplicate detection works for
+      // subsequent articles in the same batch — without this, articles 2-N of the
+      // same incident bypass all checks because the cache snapshot was taken before
+      // article 1 was written.
+      const newLastRow = prodSheet.getLastRow();
+      if (newLastRow >= 2) {
+        const newRow = prodSheet.getRange(newLastRow, 1, 1, prodSheet.getLastColumn()).getValues()[0];
+        if (cachedProdData) cachedProdData.push(newRow);
+      }
+
       Logger.log(`✅ Added to production: ${crime.headline}
   [${geocoded.plus_code || 'No Plus Code'}]`);
 
@@ -1012,6 +1022,34 @@ function findPotentialDuplicate(sheet, crime, geocoded, cachedData, cachedColMap
           reason: `Shared keywords [${semanticResult.matchedKeywords.join(', ')}] with row ${rowNumber}, ${(semanticResult.similarity * 100).toFixed(0)}% similar`,
           matchRow: rowNumber
         };
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // POTENTIAL 4: Same victim name + date within 1 day
+    // Catches same-incident duplicates where different outlets extracted
+    // the crime date differently (e.g. CNC3 uses publish date, Express uses
+    // event date), so CHECK 2's exact-date guard misses them.
+    // Does NOT hard-skip — routes to Review Queue for human verification.
+    // ═══════════════════════════════════════════════════════════
+    const existingDateObjP4 = new Date(existingDate);
+    const crimeDateObjP4    = new Date(crime.crime_date);
+    const daysDiffP4 = Math.abs(Math.round((existingDateObjP4 - crimeDateObjP4) / (1000 * 60 * 60 * 24)));
+
+    if (daysDiffP4 === 1) {
+      const existingNamesP4 = extractNamesFromHeadline(existingHeadline);
+      const newNamesP4      = extractNamesFromHeadline(crime.headline);
+      for (const eName of existingNamesP4) {
+        for (const nName of newNamesP4) {
+          if (eName.length > 5 && nName.length > 5 &&
+              (eName.includes(nName) || nName.includes(eName))) {
+            return {
+              isPotential: true,
+              reason: `Same victim name "${eName}" in row ${rowNumber} with date 1 day apart (${existingDateStr} vs ${crime.crime_date}) — verify same incident`,
+              matchRow: rowNumber
+            };
+          }
+        }
       }
     }
   }

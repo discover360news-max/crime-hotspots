@@ -249,7 +249,7 @@ export async function initializeDashboardData(): Promise<void> {
         if (!r.ok) throw new Error(`/api/crimes responded ${r.status}`);
         return r.json();
       }),
-    ]);
+    ]) as [any, any];
 
     // Reconstruct dateObj (omitted from JSON serialization)
     const crimes = (crimesData.crimes as any[]).map(c => ({

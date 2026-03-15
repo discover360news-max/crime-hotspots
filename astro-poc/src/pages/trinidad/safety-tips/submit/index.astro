@@ -6,10 +6,11 @@ import Hero from '../../../../components/Hero.astro';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import { routes } from '../../../../config/routes';
 import { SAFETY_TIP_CATEGORIES, SAFETY_TIP_CONTEXTS } from '../../../../config/crimeSchema';
+import { PUBLIC_SAFETY_TIPS_GAS_URL } from 'astro:env/client';
 
 const categories = [...SAFETY_TIP_CATEGORIES];
 const contexts = [...SAFETY_TIP_CONTEXTS];
-const gasUrl = import.meta.env.PUBLIC_SAFETY_TIPS_GAS_URL || '';
+const gasUrl = PUBLIC_SAFETY_TIPS_GAS_URL || '';
 ---
 
 <Layout

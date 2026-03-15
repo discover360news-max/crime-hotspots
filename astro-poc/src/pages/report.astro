@@ -209,8 +209,8 @@ const description = "Help build safer communities: report crime anonymously via 
     import { generateId, cleanAreaName, getValidatedLocalStorage, validateHoneypot, RateLimiter } from '../utils/formHelpers';
     import { validateForm } from '../utils/reportValidation';
 
-    const countrySelect = document.getElementById("reportCountry") as HTMLSelectElement;
-    const areaSelect = document.getElementById("reportArea") as HTMLSelectElement;
+    const countrySelect = document.getElementById("reportCountry") as unknown as HTMLSelectElement;
+    const areaSelect = document.getElementById("reportArea") as unknown as HTMLSelectElement;
     const form = document.getElementById("reportForm") as HTMLFormElement;
     const resultBox = document.getElementById("reportResult") as HTMLDivElement;
     const submitBtn = document.getElementById("reportSubmit") as HTMLButtonElement;
@@ -349,8 +349,8 @@ const description = "Help build safer communities: report crime anonymously via 
         countryId,
         countryName: country?.name || "Unknown",
         date: (document.getElementById('reportDate') as HTMLInputElement).value,
-        crimeType: (document.getElementById('reportCrimeType') as HTMLSelectElement).value,
-        area: (document.getElementById('reportArea') as HTMLSelectElement).value,
+        crimeType: (document.getElementById('reportCrimeType') as unknown as HTMLSelectElement).value,
+        area: (document.getElementById('reportArea') as unknown as HTMLSelectElement).value,
         street: (document.getElementById('reportStreet') as HTMLInputElement).value,
         headline: (document.getElementById('reportHeadline') as HTMLInputElement).value,
         details: (document.getElementById('reportDetails') as HTMLTextAreaElement).value,
@@ -369,7 +369,7 @@ const description = "Help build safer communities: report crime anonymously via 
           body: JSON.stringify(payload),
         });
 
-        const data = await res.json();
+        const data = await res.json() as Record<string, unknown>;
 
         if (data.success) {
           const idDisplay = document.getElementById("reportIdDisplay")!;
@@ -504,7 +504,7 @@ const description = "Help build safer communities: report crime anonymously via 
 
       // Country change event
       countrySelect.addEventListener("change", (e) => {
-        const selectedId = (e.target as HTMLSelectElement).value;
+        const selectedId = (e.target as unknown as HTMLSelectElement).value;
 
         localStorage.setItem("ccw_selected_country", selectedId);
 
@@ -520,7 +520,7 @@ const description = "Help build safer communities: report crime anonymously via 
 
       // Save area selection
       areaSelect.addEventListener("change", (e) => {
-        const selectedArea = (e.target as HTMLSelectElement).value;
+        const selectedArea = (e.target as unknown as HTMLSelectElement).value;
         if (selectedArea) {
           localStorage.setItem("ccw_selected_area", selectedArea);
         }

@@ -151,7 +151,7 @@ const totalCrimeRatePrevious = ((totalCrimesPrevious / POPULATION) * 100000).toF
 // Projection calculations (based on current pace)
 const startOfYear = new Date(`${currentYear}-01-01`);
 const now = new Date();
-const daysElapsed = Math.floor((now - startOfYear) / (1000 * 60 * 60 * 24));
+const daysElapsed = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
 const daysInYear = 365;
 
 // Projected annual totals

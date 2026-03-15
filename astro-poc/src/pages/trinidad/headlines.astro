@@ -392,7 +392,7 @@ const breadcrumbs = [
 
     // ── Cascading area dropdown ────────────────────────────────────────────
     function updateAreaOptions(selectedRegion: string) {
-      const areaSelect = document.getElementById('areaFilter') as HTMLSelectElement;
+      const areaSelect = document.getElementById('areaFilter') as unknown as HTMLSelectElement;
       const currentArea = areaSelect.value;
       areaSelect.innerHTML = '<option value="">All Areas</option>';
 
@@ -415,9 +415,9 @@ const breadcrumbs = [
     function applyFilters() {
       const dateFrom = (document.getElementById('dateFrom') as HTMLInputElement).value;
       const dateTo = (document.getElementById('dateTo') as HTMLInputElement).value;
-      const crimeType = (document.getElementById('crimeTypeFilter') as HTMLSelectElement).value;
-      const region = (document.getElementById('regionFilter') as HTMLSelectElement).value;
-      const area = (document.getElementById('areaFilter') as HTMLSelectElement).value;
+      const crimeType = (document.getElementById('crimeTypeFilter') as unknown as HTMLSelectElement).value;
+      const region = (document.getElementById('regionFilter') as unknown as HTMLSelectElement).value;
+      const area = (document.getElementById('areaFilter') as unknown as HTMLSelectElement).value;
 
       isFiltered = !!(dateFrom || dateTo || crimeType || region || area);
 
@@ -591,10 +591,10 @@ const breadcrumbs = [
     function clearAllFilters() {
       (document.getElementById('dateFrom') as HTMLInputElement).value = '';
       (document.getElementById('dateTo') as HTMLInputElement).value = '';
-      (document.getElementById('crimeTypeFilter') as HTMLSelectElement).value = '';
-      (document.getElementById('regionFilter') as HTMLSelectElement).value = '';
+      (document.getElementById('crimeTypeFilter') as unknown as HTMLSelectElement).value = '';
+      (document.getElementById('regionFilter') as unknown as HTMLSelectElement).value = '';
       updateAreaOptions('');
-      (document.getElementById('areaFilter') as HTMLSelectElement).value = '';
+      (document.getElementById('areaFilter') as unknown as HTMLSelectElement).value = '';
       applyFilters();
       hideFilterActive();
     }
@@ -604,7 +604,7 @@ const breadcrumbs = [
     document.getElementById('dateTo')!.addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
     document.getElementById('crimeTypeFilter')!.addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
     document.getElementById('regionFilter')!.addEventListener('change', () => {
-      updateAreaOptions((document.getElementById('regionFilter') as HTMLSelectElement).value);
+      updateAreaOptions((document.getElementById('regionFilter') as unknown as HTMLSelectElement).value);
       applyFilters();
       syncFilterIndicator();
     });

@@ -395,7 +395,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     }
 
     function populateYearDropdown(crimes: any[]) {
-      const yearFilterEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
+      const yearFilterEl = document.getElementById('yearFilter') as unknown as HTMLSelectElement | null;
       if (!yearFilterEl) return;
 
       const defaultYear = (window as any).__dashboardDefaultYear;
@@ -441,7 +441,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       const [dashData, crimesData] = await Promise.all([
         fetch(`/api/dashboard/?year=${selectedValue}`).then(r => r.json()),
         fetch(`/api/crimes/?year=${selectedValue}`).then(r => r.json()),
-      ]);
+      ]) as [any, any];
 
       const crimes = (crimesData.crimes as any[]).map((c: any) => ({
         ...c,
@@ -470,7 +470,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
       populateYearDropdown(crimes);
 
-      const yearFilterEl = document.getElementById('yearFilter') as HTMLSelectElement | null;
+      const yearFilterEl = document.getElementById('yearFilter') as unknown as HTMLSelectElement | null;
       if (yearFilterEl) {
         yearFilterEl.addEventListener('change', (e) => {
           onYearChange((e.target as HTMLSelectElement).value);

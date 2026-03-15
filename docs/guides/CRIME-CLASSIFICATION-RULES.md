@@ -199,9 +199,10 @@ consistent with "wounding with intent" charges under TT law (Offences Against th
 | Chopped with cutlass and survived | **Attempted Murder** |
 | Beaten with bat, bottle, or any wielded object and survived | **Attempted Murder** |
 | Punched, kicked, or shoved — fists/feet only | **Assault** |
-| Weapon brandished as threat only, not used to strike | Robbery or Assault (not Attempted Murder) |
+| Weapon brandished as threat only, not used to strike | Robbery (if property taken) — no Assault, not Attempted Murder |
 
 > Assault is reserved for fists/feet only — physical violence without a weapon.
+> A weapon pointed at a victim without physical contact does NOT qualify as Assault.
 > If a weapon made contact with the victim and they survived, use Attempted Murder.
 
 ---

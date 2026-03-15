@@ -17,7 +17,8 @@ import healthData from '../data/health-data.json';
 // ── Dynamic month count ───────────────────────────────────────────────────────
 // Derived from the oldest_story date written into health-data.json at every build.
 // Displays as "14+ months", ticking up automatically over time.
-const oldestStoryDate = new Date(healthData.oldest_story);
+// oldest_story is written to health-data.json by csvBuildPlugin (planned field — fallback to 2025-01-01 if absent)
+const oldestStoryDate = new Date((healthData as Record<string, unknown>).oldest_story as string ?? '2025-01-01');
 const monthsElapsed = Math.floor(
   (Date.now() - oldestStoryDate.getTime()) / (1000 * 60 * 60 * 24 * 30.4375)
 );

@@ -9,7 +9,7 @@
 
 | File created | What it does | Lines saved |
 |---|---|---|
-| `src/components/MapLegend.astro` | Collapsible map legend (HTML + `is:inline` animation script) | ~100 |
+| `src/components/MapLegend.astro` | Collapsible map legend (HTML + `astro:page-load` animation script) | ~100 |
 | `src/scripts/dashboardMapInit.ts` | Polls `window.__crimesData`, then calls `initializeLeafletMap` with Trinidad config | ~49 |
 | `src/scripts/dashboardLocationFilter.ts` | Region/area cascading dropdowns, filter active state, clear logic | ~177 |
 
@@ -32,7 +32,7 @@ All dashboard-related scripts:
 - `yearFilter.ts` — year select init + callbacks
 - `statCardFiltering.ts` — stat card click → filter sync
 - `statsScroll.ts` — horizontal scroll wheel handler
-- `leafletMap.ts` — Leaflet wrapper (`initializeLeafletMap`, `updateLeafletMap`)
+- `leafletMap.ts` — Leaflet wrapper (`initializeLeafletMap`, `updateLeafletMap`). `CRIME_COLORS` has all 15 schema types. Legend in `MapLegend.astro` also shows all 15, ordered by severity, grid-cols-2/3/5.
 
 ## Extraction signal
 If a `<script>` block in a page exceeds ~50 lines and contains named functions, extract it to `src/scripts/`. The page entry point should be a 2–3 line import + `addEventListener`.

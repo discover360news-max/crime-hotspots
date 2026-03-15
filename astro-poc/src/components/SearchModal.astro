@@ -283,7 +283,7 @@
     try {
       const res = await fetch('/api/latest-crimes.json');
       if (!res.ok) return;
-      const { crimes } = await res.json();
+      const { crimes } = await res.json() as { crimes: unknown[] };
       if (!crimes || crimes.length === 0) return;
       container.innerHTML = crimes.map((c: any) => `
         <a href="/trinidad/crime/${c.slug}/"
@@ -366,7 +366,7 @@
     try {
       const res = await fetch(`/api/search/?q=${encodeURIComponent(q.trim())}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const { results: data } = await res.json();
+      const { results: data } = await res.json() as { results: unknown[] };
       // Only render if query hasn't changed while we were fetching
       if (q === lastQuery) {
         renderResults(data ?? [], q);

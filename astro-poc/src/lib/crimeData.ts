@@ -227,7 +227,7 @@ export async function getTrinidadCrimes(): Promise<Crime[]> {
     const allCrimes: Crime[] = [];
 
     // Fetch 2025 data (only if it's different from current sheet)
-    if (TRINIDAD_CSV_URLS[2025] && TRINIDAD_CSV_URLS[2025] !== TRINIDAD_CSV_URLS.current) {
+    if (TRINIDAD_CSV_URLS[2025] && (TRINIDAD_CSV_URLS[2025] as string) !== TRINIDAD_CSV_URLS.current) {
       const crimes2025 = await fetchCrimeDataFromURL(TRINIDAD_CSV_URLS[2025], '2025');
       allCrimes.push(...crimes2025);
       console.log(`✅ Loaded ${crimes2025.length} crimes from 2025 sheet`);
