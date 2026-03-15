@@ -82,7 +82,7 @@ const breadcrumbs = [
 
 <Layout title={pageTitle} description={pageDescription}>
   <!-- Hero section — consistent with dashboard hero pattern -->
-  <section class="w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-rose-950/30 dark:via-[hsl(0_0%_5%)] dark:to-[hsl(0_0%_5%)] py-6 sm:py-8" data-pagefind-ignore>
+  <section class="w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-rose-950/30 dark:via-[hsl(0_0%_13%)] dark:to-[hsl(0_0%_13%)] py-6 sm:py-8" data-pagefind-ignore>
     <div class="mx-auto max-w-3xl px-4 sm:px-6">
       <Breadcrumbs items={breadcrumbs} />
       <h1 class="font-bold text-slate-800 dark:text-[hsl(0_0%_95%)] text-heading leading-snug">Compare Areas</h1>
@@ -90,12 +90,12 @@ const breadcrumbs = [
   </section>
 
   <!-- Sticky selector bar — mirrors dashboard filterBar pattern -->
-  <div id="selectorBar" class="sticky top-16 z-30 bg-white/95 dark:bg-[hsl(0_0%_5%)]/95 backdrop-blur-sm border-b border-slate-200 dark:border-[hsl(0_0%_15%)]">
+  <div id="selectorBar" class="sticky top-16 z-30 bg-white/95 dark:bg-[var(--ch-surface)]/95 backdrop-blur-sm border-b border-slate-200 dark:border-[var(--ch-border-subtle)]">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-3 flex-wrap">
       <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_48%)] font-medium shrink-0">Area A</span>
       <select
         id="selectA"
-        class="filter-select max-w-[180px] py-1 pl-2.5 pr-6 text-xs border border-slate-200 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-md bg-white dark:bg-[hsl(0_0%_8%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium cursor-pointer"
+        class="filter-select max-w-[180px] py-1 pl-2.5 pr-6 text-xs border border-slate-200 dark:border-[var(--ch-border)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-md bg-white dark:bg-[var(--ch-bg)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium cursor-pointer"
       >
         <option value="">Select...</option>
         {availableAreas.map(a => (
@@ -106,7 +106,7 @@ const breadcrumbs = [
       <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_48%)] font-medium shrink-0">Area B</span>
       <select
         id="selectB"
-        class="filter-select max-w-[180px] py-1 pl-2.5 pr-6 text-xs border border-slate-200 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-md bg-white dark:bg-[hsl(0_0%_8%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium cursor-pointer"
+        class="filter-select max-w-[180px] py-1 pl-2.5 pr-6 text-xs border border-slate-200 dark:border-[var(--ch-border)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-md bg-white dark:bg-[var(--ch-bg)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium cursor-pointer"
       >
         <option value="">Select...</option>
         {availableAreas.map(a => (
@@ -121,11 +121,11 @@ const breadcrumbs = [
     <div id="comparisonResults"></div>
 
     <!-- Empty State — shown only when one param is provided but not both -->
-    <div id="emptyState" class="bg-white/85 dark:bg-[hsl(0_0%_8%)] backdrop-blur-md rounded-xl border border-slate-100 dark:border-[hsl(0_0%_15%)] shadow-md p-8 text-center">
+    <div id="emptyState" class="bg-white/85 dark:bg-[var(--ch-surface)] backdrop-blur-md rounded-xl border border-slate-100 dark:border-[var(--ch-border-subtle)] shadow-md p-8 text-center">
       <svg class="w-12 h-12 text-slate-300 dark:text-[hsl(0_0%_25%)] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
-      <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">Select two areas above to compare them.</p>
+      <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">Select two areas above to compare them.</p>
     </div>
   </main>
 

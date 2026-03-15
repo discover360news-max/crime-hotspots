@@ -21,15 +21,15 @@ const { tipId, gasUrl } = Astro.props;
   data-gas-url={gasUrl}
 >
   <div class="tip-vote-buttons flex items-center justify-between">
-    <span class="text-caption font-medium text-slate-500 dark:text-[hsl(0_0%_55%)]">Was this tip helpful?</span>
+    <span class="text-caption font-medium text-slate-500 dark:text-[var(--ch-text-muted)]">Was this tip helpful?</span>
     <div class="flex items-center gap-2">
       <button
-        class="tip-vote-btn px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-emerald-500 hover:text-emerald-600 dark:hover:border-emerald-600 dark:hover:text-emerald-400 transition"
+        class="tip-vote-btn px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[var(--ch-border)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-emerald-500 hover:text-emerald-600 dark:hover:border-emerald-600 dark:hover:text-emerald-400 transition"
         data-vote="helpful"
         aria-label="Yes, this tip was helpful"
       >Yes, helpful</button>
       <button
-        class="tip-vote-btn px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-slate-400 dark:hover:border-[hsl(0_0%_35%)] transition"
+        class="tip-vote-btn px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[var(--ch-border)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-slate-400 dark:hover:border-[hsl(0_0%_35%)] transition"
         data-vote="not_helpful"
         aria-label="No, this tip needs improvement"
       >Needs improvement</button>
@@ -37,7 +37,7 @@ const { tipId, gasUrl } = Astro.props;
   </div>
 
   <div class="tip-vote-thanks hidden">
-    <span class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">Thanks for your feedback</span>
+    <span class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">Thanks for your feedback</span>
   </div>
 </div>
 

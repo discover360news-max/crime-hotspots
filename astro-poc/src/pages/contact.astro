@@ -25,7 +25,7 @@ const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
 
     <h1 class="text-display font-semibold mb-3 text-center pt-4 dark:text-[hsl(0_0%_95%)]">Contact Us</h1>
 
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
       <!-- Intro -->
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-8 text-center max-w-md mx-auto">
         Have a question, partnership idea, or want to request coverage for your island? We'd love to hear from you.
@@ -48,7 +48,7 @@ const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
         </a>
 
         <!-- Email address (for copy/paste) -->
-        <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] text-center">
+        <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] text-center">
           or copy: <span class="font-mono text-slate-600 dark:text-[hsl(0_0%_75%)] select-all">{email}</span>
         </p>
       </div>
@@ -56,32 +56,32 @@ const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
       <!-- Divider -->
       <div class="flex items-center gap-3 my-8">
         <div class="flex-1 h-px bg-slate-200 dark:bg-[hsl(0_0%_22%)]"></div>
-        <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">What we can help with</span>
+        <span class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">What we can help with</span>
         <div class="flex-1 h-px bg-slate-200 dark:bg-[hsl(0_0%_22%)]"></div>
       </div>
 
       <!-- Topics Grid -->
       <div class="grid sm:grid-cols-2 gap-4">
-        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
           <h3 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">General Inquiries</h3>
           <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Questions about our data, methodology, or platform.</p>
         </div>
-        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
           <h3 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Data Requests</h3>
           <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Access crime data for research or journalism.</p>
         </div>
-        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
           <h3 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Partnerships</h3>
           <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Media collaborations and business opportunities.</p>
         </div>
-        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
           <h3 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Island Coverage</h3>
           <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Request Crime Hotspots for your Caribbean island.</p>
         </div>
       </div>
 
       <!-- Response Time Note -->
-      <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] text-center mt-8">
+      <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] text-center mt-8">
         We typically respond within 24-48 hours.
       </p>
     </div>

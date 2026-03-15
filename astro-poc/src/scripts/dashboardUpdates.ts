@@ -345,15 +345,15 @@ export function updateTopRegions(crimes: Crime[]) {
     const regionSlug = generateNameSlug(region);
     const mobileHidden = index >= 5 ? 'hidden sm:flex' : '';
     return `
-    <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
+    <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[var(--ch-border-card)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
-        <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] truncate flex-1">${region}</span>
+        <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] truncate flex-1">${region}</span>
         <div class="flex items-center gap-1.5 flex-shrink-0">
-          <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_55%)] text-xs font-medium">
+          <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[var(--ch-text-muted)] text-xs font-medium">
             ${crimeCount}
           </span>
-          <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">${crimeCount === 1 ? 'crime' : 'crimes'}</span>
-          <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[hsl(0_0%_50%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">${crimeCount === 1 ? 'crime' : 'crimes'}</span>
+          <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[var(--ch-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
@@ -502,15 +502,15 @@ export function applyPrecomputedTopRegions(regions: TopRegionEntry[]): void {
     const regionSlug = generateNameSlug(region);
     const mobileHidden = index >= 5 ? 'hidden sm:flex' : '';
     return `
-    <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
+    <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[var(--ch-border-card)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
-        <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] truncate flex-1">${region}</span>
+        <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] truncate flex-1">${region}</span>
         <div class="flex items-center gap-1.5 flex-shrink-0">
-          <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_55%)] text-xs font-medium">
+          <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[var(--ch-text-muted)] text-xs font-medium">
             ${crimeCount}
           </span>
-          <span class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">${crimeCount === 1 ? 'crime' : 'crimes'}</span>
-          <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[hsl(0_0%_50%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">${crimeCount === 1 ? 'crime' : 'crimes'}</span>
+          <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[var(--ch-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>

@@ -100,7 +100,7 @@
 ### Narrative & Engagement
 | Component | Purpose |
 |-----------|---------|
-| HomepagePulse.astro | Live Trinidad stats below country card (incidents, top area, murders, latest headline) |
+| HomepagePulse.astro | Live Trinidad stats below country card (incidents, top area, murders, latest headline). Always renders card bottom — shows "No incidents reported this week." if no recent data (CTA always visible) |
 | DashboardStory.astro | Narrative summary at top of dashboard (week-over-week incidents, top area, murder trend) |
 | AreaNarrative.astro | "This Week in [Area]" prose + contextual CTAs (compare, archive) + "New Since" badge slot |
 | QuickAnswers.astro | FAQPage schema + H3 questions targeting Google "People Also Ask" boxes. 40-50 word answers with internal deep-dive links. Used on homepage. |

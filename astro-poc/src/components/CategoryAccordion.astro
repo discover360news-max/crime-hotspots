@@ -16,26 +16,26 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
 ---
 
 <details class="cat-accordion mb-3" open={isExpanded || undefined}>
-  <summary class="cat-header w-full px-4 py-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group list-none cursor-pointer">
+  <summary class="cat-header w-full px-4 py-3 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group list-none cursor-pointer">
     <div class="flex items-center gap-3">
       <svg
-        class="cat-chevron w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_55%)] transition-transform duration-200 flex-shrink-0"
+        class="cat-chevron w-4 h-4 text-slate-400 dark:text-[var(--ch-text-muted)] transition-transform duration-200 flex-shrink-0"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
       >
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
       </svg>
-      <span class="text-body font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">{category}</span>
+      <span class="text-body font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">{category}</span>
     </div>
 
     <div class="flex items-center gap-2">
-      <span class="px-2 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)] text-caption font-medium">
+      <span class="px-2 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[var(--ch-text-muted)] text-caption font-medium">
         {count} {count === 1 ? 'tip' : 'tips'}
       </span>
       <a
         href={categoryHref}
-        class="hidden sm:inline text-caption text-slate-400 dark:text-[hsl(0_0%_50%)] hover:text-rose-600 dark:hover:text-rose-400 hover:underline transition"
+        class="hidden sm:inline text-caption text-slate-400 dark:text-[var(--ch-text-faint)] hover:text-rose-600 dark:hover:text-rose-400 hover:underline transition"
         onclick="event.stopPropagation()"
       >
         See all →

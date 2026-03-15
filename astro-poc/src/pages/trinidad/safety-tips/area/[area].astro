@@ -54,19 +54,19 @@ tips.sort((a, b) => b.data.date_added.getTime() - a.data.date_added.getTime());
   </Hero>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[var(--ch-border-card)]">
 
       <div class="flex items-center justify-between mb-4">
-        <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">
+        <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">
           {tips.length} tip{tips.length !== 1 ? 's' : ''} · <a href={buildRoute.area(area)} class="font-bold text-rose-600 dark:text-rose-400 hover:underline">View {areaName} crime profile →</a>
         </p>
-        <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">
+        <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">
           All tips
         </a>
       </div>
 
       {tips.length === 0 ? (
-        <p class="py-10 text-center text-body text-slate-500 dark:text-[hsl(0_0%_55%)]">No tips for this area yet.</p>
+        <p class="py-10 text-center text-body text-slate-500 dark:text-[var(--ch-text-muted)]">No tips for this area yet.</p>
       ) : (
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {tips.map(tip => <TipCard tip={tip} />)}

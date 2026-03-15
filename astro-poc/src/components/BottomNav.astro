@@ -54,7 +54,7 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
 <!-- Bottom Navigation Bar -->
 <nav
   id="bottomNav"
-  class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[hsl(0_0%_6%_/_0.95)] backdrop-blur-sm border-t border-slate-200 dark:border-[hsl(0_0%_18%)] md:hidden safe-area-bottom"
+  class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[hsl(0_0%_6%_/_0.95)] backdrop-blur-sm border-t border-slate-200 dark:border-[var(--ch-border-card)] md:hidden safe-area-bottom"
   aria-label="Primary mobile navigation"
   data-pagefind-ignore
   data-country-name={countryName}
@@ -62,10 +62,10 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
 >
   <!-- Country indicator strip (always visible) -->
   <div
-    class="flex items-center justify-center gap-1.5 py-1 border-b border-slate-100 dark:border-[hsl(0_0%_15%)]"
+    class="flex items-center justify-center gap-1.5 py-1 border-b border-slate-100 dark:border-[var(--ch-border-subtle)]"
     aria-hidden="true"
   >
-    <span class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] font-bold tracking-wide">Viewing {countryFlag} {countryName}</span>
+    <span class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] font-bold tracking-wide">Viewing {countryFlag} {countryName}</span>
   </div>
 
   <div class="flex items-center justify-around h-16 px-2">
@@ -76,7 +76,7 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
         class={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
           isActive(section.url)
             ? 'text-rose-600'
-            : 'text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)] active:text-rose-600'
+            : 'text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)] active:text-rose-600'
         }`}
         aria-current={isActive(section.url) ? 'page' : undefined}
       >
@@ -112,7 +112,7 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
       class={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
         isReportActive
           ? 'text-rose-600'
-          : 'text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)] active:text-rose-600'
+          : 'text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)] active:text-rose-600'
       }`}
       aria-current={isReportActive ? 'page' : undefined}
     >
@@ -133,7 +133,7 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
       class={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
         isMoreActive
           ? 'text-rose-600'
-          : 'text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)] active:text-rose-600'
+          : 'text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)] active:text-rose-600'
       }`}
       aria-expanded="false"
       aria-controls="moreMenuDialog"
@@ -155,7 +155,7 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
 <dialog
   id="moreMenuDialog"
   aria-label="More navigation options"
-  class="bg-white dark:bg-[hsl(0_0%_8%)] shadow-2xl"
+  class="bg-white dark:bg-[var(--ch-surface)] shadow-2xl"
   data-pagefind-ignore
 >
   <!-- Handle bar -->
@@ -164,11 +164,11 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
   </div>
 
   <!-- Menu Header -->
-  <div class="flex items-center justify-between px-6 pb-3 border-b border-slate-200 dark:border-[hsl(0_0%_18%)]">
-    <h2 class="text-body font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Explore {countryName} {countryFlag}</h2>
+  <div class="flex items-center justify-between px-6 pb-3 border-b border-slate-200 dark:border-[var(--ch-border-card)]">
+    <h2 class="text-body font-bold text-slate-700 dark:text-[var(--ch-text)]">Explore {countryName} {countryFlag}</h2>
     <button
       id="moreMenuClose"
-      class="p-2 rounded-full text-slate-500 dark:text-[hsl(0_0%_55%)] hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-200 transition"
+      class="p-2 rounded-full text-slate-500 dark:text-[var(--ch-text-muted)] hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-200 transition"
       aria-label="Close menu"
     >
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -190,7 +190,7 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
               class={`flex items-center gap-3 p-3 rounded-lg transition ${
                 isActive(section.url)
                   ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400'
-                  : 'hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 text-slate-700 dark:text-[hsl(0_0%_85%)]'
+                  : 'hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 text-slate-700 dark:text-[var(--ch-text-strong)]'
               }`}
             >
               <span class="text-sm font-medium">{section.label}</span>
@@ -210,7 +210,7 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
             class={`flex items-center gap-3 p-3 rounded-lg transition ${
               isActive(link.url)
                 ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400'
-                : 'hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 text-slate-700 dark:text-[hsl(0_0%_85%)]'
+                : 'hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 text-slate-700 dark:text-[var(--ch-text-strong)]'
             }`}
           >
             <span class="text-sm font-medium">{link.label}</span>
@@ -219,21 +219,21 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
         <!-- Subscribe -->
         <button
           id="moreMenuSubscribe"
-          class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 text-slate-700 dark:text-[hsl(0_0%_85%)] transition text-left"
+          class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 text-slate-700 dark:text-[var(--ch-text-strong)] transition text-left"
         >
           <span class="text-sm font-medium">Subscribe</span>
         </button>
         <!-- Search -->
         <button
           id="moreMenuSearch"
-          class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 text-slate-700 dark:text-[hsl(0_0%_85%)] transition text-left"
+          class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 text-slate-700 dark:text-[var(--ch-text-strong)] transition text-left"
         >
           <span class="text-sm font-medium">Search</span>
         </button>
         <!-- Theme toggle -->
         <button
           id="moreMenuThemeToggle"
-          class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 text-slate-700 dark:text-[hsl(0_0%_85%)] transition text-left w-full col-span-2"
+          class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 text-slate-700 dark:text-[var(--ch-text-strong)] transition text-left w-full col-span-2"
         >
           <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>

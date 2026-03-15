@@ -24,11 +24,11 @@ Primary entry point — jump to the token files for any component.
 | Component | Source File | Token Files | Key Tokens | Usage Note |
 |-----------|-------------|-------------|------------|------------|
 | **HomepagePulse** | `src/components/HomepagePulse.astro` | [patterns](./tokens/patterns.md), [colors](./tokens/colors.md) | `animate-ping`, `bg-rose-400`, `bg-rose-500` | Always pair pulse dot with `shrink-0 mt-1.5` |
-| **AreaNarrative** | `src/components/AreaNarrative.astro` | [patterns](./tokens/patterns.md), [colors](./tokens/colors.md) | `bg-white/70 dark:bg-[hsl(0_0%_5%)]` | Uses both Live Pulse and Contextual CTA Links |
+| **AreaNarrative** | `src/components/AreaNarrative.astro` | [patterns](./tokens/patterns.md), [colors](./tokens/colors.md) | `bg-white/70 dark:bg-[var(--ch-surface)]` | Uses both Live Pulse and Contextual CTA Links |
 | **DashboardStory** | `src/components/DashboardStory.astro` | [patterns](./tokens/patterns.md), [colors](./tokens/colors.md) | `animate-ping`, standard card | Live pulse in narrative card container |
 | **"New Since" Badge** | `src/pages/trinidad/area/[slug].astro` | [patterns](./tokens/patterns.md), [colors](./tokens/colors.md) | `bg-rose-50 dark:bg-rose-950/30`, `text-rose-700 dark:text-rose-300` | Client-rendered; `hidden` by default, shown by JS |
 | **Compare Prompt** | `src/pages/trinidad/area/[slug].astro` | [patterns](./tokens/patterns.md), [colors](./tokens/colors.md) | `bg-slate-50` (not `bg-white`) | Uses `?a=slug&b=slug` query params |
-| **SafetyContext** | `src/components/SafetyContext.astro` | [colors](./tokens/colors.md) | `dark:bg-amber-950/50`, `dark:bg-emerald-950/50`, `dark:bg-[hsl(0_0%_6%)]` | Three risk levels; uses `dark:` — not CSS vars |
+| **SafetyContext** | `src/components/SafetyContext.astro` | [colors](./tokens/colors.md) | `dark:bg-amber-950/50`, `dark:bg-emerald-950/50`, `dark:bg-[var(--ch-surface-sub)]` | Three risk levels |
 | **CrimeDetailModal** | `src/components/CrimeDetailModal.astro` | [components](./tokens/components.md), [colors](./tokens/colors.md) | `--ch-surface`, `--ch-border`, `--ch-text` | Built at runtime — must use CSS vars, not `dark:` |
 | **FlipCounter** | `src/components/FlipCounter.astro` | [components](./tokens/components.md) | `::after` pseudo-element floor shadow | Add extra bottom padding to parent for shadow room |
 | **InfoPopup** | `src/components/InfoPopup.astro` | [patterns](./tokens/patterns.md), [components](./tokens/components.md) | `bg-white/80`, `rounded-2xl`, `z-[9999]` | Titles: `font-bold text-slate-700` — never rose, never semibold |
@@ -54,8 +54,10 @@ Primary entry point — jump to the token files for any component.
 | `text-heading font-semibold` | `text-heading font-bold` | No `font-semibold` |
 | `bg-white/70 backdrop-blur-md` | `bg-white/85 backdrop-blur-md` | Card opacity |
 | `text-gray-500` | `text-slate-500` | Slate palette only |
-| `text-xl font-semibold text-slate-700` on dashboard h2 | `text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)]` | Muted labels on data pages |
+| `text-xl font-semibold text-slate-700` on dashboard h2 | `text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)]` | Muted labels on data pages |
 | `dark:bg-[hsl(0_0%_8%)/70]` | `dark:bg-[hsl(0_0%_8%_/_0.7)]` | Tailwind v4: alpha inside HSL |
+| `dark:bg-[hsl(0_0%_13%)]` | `dark:bg-[var(--ch-surface)]` | Always use CSS vars — not raw HSL |
+| `dark:text-[hsl(0_0%_55%)]` | `dark:text-[var(--ch-text-muted)]` | Always use CSS vars — not raw HSL |
 
 ---
 

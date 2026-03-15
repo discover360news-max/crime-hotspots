@@ -293,7 +293,7 @@ const breadcrumbs = [
         <div class="mt-2">
           <button
             id="moreStatsToggle"
-            class="w-full flex items-center justify-center gap-1 py-2 text-xs font-medium text-slate-400 dark:text-[hsl(0_0%_50%)] hover:text-rose-600 transition cursor-pointer"
+            class="w-full flex items-center justify-center gap-1 py-2 text-xs font-medium text-slate-400 dark:text-[var(--ch-text-faint)] hover:text-rose-600 transition cursor-pointer"
           >
             <span id="moreStatsLabel">More stats</span>
             <svg id="moreStatsChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -328,19 +328,19 @@ const breadcrumbs = [
     {suggestedCompare && (
       <a
         href={`${routes.trinidad.compare}?a=${slug}&b=${suggestedCompare.slug}`}
-        class="block mt-4 p-3 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-white/70 dark:bg-[hsl(0_0%_5%)] hover:border-rose-300 dark:hover:border-rose-900/40 transition group"
+        class="block mt-4 p-3 rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] bg-white/70 dark:bg-[var(--ch-surface)] hover:border-rose-300 dark:hover:border-rose-900/40 transition group"
       >
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-slate-600 dark:text-[hsl(0_0%_80%)]">
-              See how <span class="text-slate-700 dark:text-[hsl(0_0%_90%)] font-bold">{areaName}</span> compares
-              to <span class="text-slate-700 dark:text-[hsl(0_0%_90%)] font-bold">{suggestedCompare.name}</span>
+              See how <span class="text-slate-700 dark:text-[var(--ch-text-heading)] font-bold">{areaName}</span> compares
+              to <span class="text-slate-700 dark:text-[var(--ch-text-heading)] font-bold">{suggestedCompare.name}</span>
             </p>
-            <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-0.5">
+            <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-0.5">
               Side-by-side safety scores and crime breakdown
             </p>
           </div>
-          <svg class="w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_50%)] group-hover:text-rose-600 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-5 h-5 text-slate-400 dark:text-[var(--ch-text-faint)] group-hover:text-rose-600 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
           </svg>
         </div>
@@ -355,13 +355,13 @@ const breadcrumbs = [
     <!-- Crime Type Breakdown -->
     {crimeTypeBreakdown.length > 0 && (
       <section class="mt-6">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] mb-4">Crime Breakdown (Year-to-Date)</h2>
+        <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">Crime Breakdown (Year-to-Date)</h2>
         <DataTable headers={['Crime Type', String(currentYear), String(previousYear), 'Change']}>
           {crimeTypeBreakdown.map(row => (
             <tr class="hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)]">
-              <td class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_90%)]">{row.type}</td>
-              <td class="px-4 py-3 text-sm text-right text-slate-700 dark:text-[hsl(0_0%_90%)]">{row.currentCount}</td>
-              <td class="px-4 py-3 text-sm text-right text-slate-500 dark:text-[hsl(0_0%_55%)]">{row.previousCount}</td>
+              <td class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-[var(--ch-text-heading)]">{row.type}</td>
+              <td class="px-4 py-3 text-sm text-right text-slate-700 dark:text-[var(--ch-text-heading)]">{row.currentCount}</td>
+              <td class="px-4 py-3 text-sm text-right text-slate-500 dark:text-[var(--ch-text-muted)]">{row.previousCount}</td>
               <td class={`px-4 py-3 text-sm text-right font-medium ${
                 row.direction === 'up' ? 'text-rose-600' :
                 row.direction === 'down' ? 'text-emerald-600' :
@@ -379,42 +379,42 @@ const breadcrumbs = [
     <!-- Recent Headlines (Last 30 Days) -->
     {recentCrimes30d.length > 0 && (
       <section class="mt-8" data-pagefind-ignore>
-        <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] mb-4">
+        <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">
           Recent Headlines
-          <span class="text-sm font-normal text-slate-500 dark:text-[hsl(0_0%_55%)] ml-2">Last 30 days</span>
+          <span class="text-sm font-normal text-slate-500 dark:text-[var(--ch-text-muted)] ml-2">Last 30 days</span>
         </h2>
 
         <div class="space-y-2">
           {Array.from(headlinesByDate.entries()).map(([dateStr, crimes]) => (
-            <div class="bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] overflow-hidden">
+            <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] overflow-hidden">
               <!-- Accordion Header -->
               <button
                 class="accordion-toggle w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)] transition cursor-pointer"
                 aria-expanded="false"
               >
                 <div class="flex items-center gap-2">
-                  <svg class="accordion-chevron w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_50%)] transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="accordion-chevron w-4 h-4 text-slate-400 dark:text-[var(--ch-text-faint)] transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                   </svg>
-                  <span class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_90%)]">{dateStr}</span>
+                  <span class="text-sm font-medium text-slate-700 dark:text-[var(--ch-text-heading)]">{dateStr}</span>
                 </div>
-                <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">{crimes.length} incident{crimes.length !== 1 ? 's' : ''}</span>
+                <span class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">{crimes.length} incident{crimes.length !== 1 ? 's' : ''}</span>
               </button>
 
               <!-- Accordion Content -->
               <div class="accordion-content">
-                <div class="border-t border-slate-100 dark:border-[hsl(0_0%_15%)] px-4 py-3 space-y-3">
+                <div class="border-t border-slate-100 dark:border-[var(--ch-border-subtle)] px-4 py-3 space-y-3">
                   {crimes.map(crime => (
                     <a
                       href={buildRoute.crime(crime.slug)}
                       data-crime-slug={crime.slug}
                       class="crime-card-link block p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group"
                     >
-                      <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600 transition">
+                      <div class="text-sm font-medium text-slate-700 dark:text-[var(--ch-text-heading)] group-hover:text-rose-600 transition">
                         {escapeHtml(crime.headline)}
                       </div>
-                      <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">
-                        <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_12%)] text-slate-500 dark:text-[hsl(0_0%_55%)]">{crime.primaryCrimeType || crime.crimeType}</span>
+                      <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">
+                        <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_12%)] text-slate-500 dark:text-[var(--ch-text-muted)]">{crime.primaryCrimeType || crime.crimeType}</span>
                         {crime.street && <span>{escapeHtml(crime.street)}</span>}
                       </div>
                     </a>
@@ -429,18 +429,18 @@ const breadcrumbs = [
 
     {recentCrimes30d.length === 0 && (
       <section class="mt-8">
-        <div class="bg-slate-50 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-6 text-center">
-          <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_55%)]">No incidents recorded in {areaName} in the last 30 days.</p>
+        <div class="bg-slate-50 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-6 text-center">
+          <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)]">No incidents recorded in {areaName} in the last 30 days.</p>
         </div>
       </section>
     )}
 
     <!-- Related Areas -->
     {(relatedAreas.length > 0 || otherRegionAreas.length > 0) && (
-      <div class="mt-8 bg-slate-50 dark:bg-[hsl(0_0%_5%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] p-5 sm:p-6">
+      <div class="mt-8 bg-slate-50 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-5 sm:p-6">
         {relatedAreas.length > 0 && (
           <section>
-            <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] mb-4">
+            <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">
               Other Areas in {region}
             </h2>
             <div class="grid grid-cols-2 gap-3">
@@ -449,13 +449,13 @@ const breadcrumbs = [
                   href={a.hasCrimes ? buildRoute.area(a.slug) : '#'}
                   class={`block px-4 py-3 rounded-lg border text-sm font-medium transition ${
                     a.hasCrimes
-                      ? 'bg-white dark:bg-[hsl(0_0%_8%)] border-slate-200 dark:border-[hsl(0_0%_15%)] text-slate-700 dark:text-[hsl(0_0%_90%)] hover:border-rose-300 hover:text-rose-600'
-                      : 'bg-white/50 dark:bg-[hsl(0_0%_8%)]/50 border-slate-100 dark:border-[hsl(0_0%_12%)] text-slate-400 dark:text-[hsl(0_0%_40%)] cursor-default'
+                      ? 'bg-white dark:bg-[var(--ch-surface)] border-slate-200 dark:border-[var(--ch-border-subtle)] text-slate-700 dark:text-[var(--ch-text-heading)] hover:border-rose-300 hover:text-rose-600'
+                      : 'bg-white/50 dark:bg-[var(--ch-surface)]/50 border-slate-100 dark:border-[hsl(0_0%_12%)] text-slate-400 dark:text-[hsl(0_0%_40%)] cursor-default'
                   }`}
                 >
                   <span>{a.name}</span>
                   {a.knownAs && a.knownAs !== a.name && (
-                    <span class="block text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-0.5">Also known as: {a.knownAs}</span>
+                    <span class="block text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-0.5">Also known as: {a.knownAs}</span>
                   )}
                 </a>
               ))}
@@ -464,18 +464,18 @@ const breadcrumbs = [
         )}
 
         {otherRegionAreas.length > 0 && (
-          <section class={relatedAreas.length > 0 ? 'mt-6 pt-6 border-t border-slate-200 dark:border-[hsl(0_0%_18%)]' : ''}>
-            <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] mb-4">
+          <section class={relatedAreas.length > 0 ? 'mt-6 pt-6 border-t border-slate-200 dark:border-[var(--ch-border-card)]' : ''}>
+            <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">
               Other Areas in Trinidad
             </h2>
             <div class="grid grid-cols-2 gap-3">
               {otherRegionAreas.map(a => (
                 <a
                   href={buildRoute.area(a.slug)}
-                  class="block px-4 py-3 rounded-lg border bg-white dark:bg-[hsl(0_0%_8%)] border-slate-200 dark:border-[hsl(0_0%_15%)] text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_90%)] hover:border-rose-300 hover:text-rose-600 transition"
+                  class="block px-4 py-3 rounded-lg border bg-white dark:bg-[var(--ch-surface)] border-slate-200 dark:border-[var(--ch-border-subtle)] text-sm font-medium text-slate-700 dark:text-[var(--ch-text-heading)] hover:border-rose-300 hover:text-rose-600 transition"
                 >
                   <span>{a.name}</span>
-                  <span class="block text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-0.5">
+                  <span class="block text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-0.5">
                     {a.region}{a.knownAs && a.knownAs !== a.name ? ` • ${a.knownAs}` : ''}
                   </span>
                 </a>

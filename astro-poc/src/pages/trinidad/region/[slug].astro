@@ -207,15 +207,15 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
 
     <!-- Area Ranking -->
     <section class="mt-8">
-      <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-4">Areas in {regionName}</h2>
+      <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text)] mb-4">Areas in {regionName}</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {regionAreas.map((area, index) => (
           <a
             href={area.hasCrimes ? `/trinidad/area/${area.slug}/` : '#'}
             class={`block rounded-lg border p-4 transition ${
               area.hasCrimes
-                ? 'bg-white dark:bg-[hsl(0_0%_10%)] border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md group'
-                : 'bg-slate-50 dark:bg-[hsl(0_0%_8%)] border-slate-100 dark:border-[hsl(0_0%_15%)] cursor-default'
+                ? 'bg-white dark:bg-[var(--ch-surface-sub)] border-slate-200 dark:border-[var(--ch-border-card)] hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md group'
+                : 'bg-slate-50 dark:bg-[var(--ch-surface)] border-slate-100 dark:border-[var(--ch-border-subtle)] cursor-default'
             }`}
           >
             <div class="flex items-start justify-between mb-2">
@@ -223,7 +223,7 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
                 <div class="flex items-center gap-2">
                   <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] font-medium">#{index + 1}</span>
                   <h3 class={`text-sm font-semibold truncate ${
-                    area.hasCrimes ? 'text-slate-800 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600 transition' : 'text-slate-400 dark:text-[hsl(0_0%_40%)]'
+                    area.hasCrimes ? 'text-slate-800 dark:text-[var(--ch-text-heading)] group-hover:text-rose-600 transition' : 'text-slate-400 dark:text-[hsl(0_0%_40%)]'
                   }`}>
                     {area.name}
                   </h3>
@@ -240,7 +240,7 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
                 Risk Level: {area.score.toFixed(1)}
               </span>
             </div>
-            <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">
+            <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">
               {area.crimeCount} incident{area.crimeCount !== 1 ? 's' : ''} (90d)
             </div>
           </a>
@@ -251,13 +251,13 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
     <!-- Crime Type Breakdown -->
     {crimeTypeBreakdown.length > 0 && (
       <section class="mt-8">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-4">Crime Breakdown (Year-to-Date)</h2>
+        <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text)] mb-4">Crime Breakdown (Year-to-Date)</h2>
         <DataTable headers={['Crime Type', String(currentYear), String(previousYear), 'Change']}>
           {crimeTypeBreakdown.map(row => (
             <tr class="hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)]">
               <td class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)]">{row.type}</td>
               <td class="px-4 py-3 text-sm text-right text-slate-700 dark:text-[hsl(0_0%_80%)]">{row.currentCount}</td>
-              <td class="px-4 py-3 text-sm text-right text-slate-500 dark:text-[hsl(0_0%_55%)]">{row.previousCount}</td>
+              <td class="px-4 py-3 text-sm text-right text-slate-500 dark:text-[var(--ch-text-muted)]">{row.previousCount}</td>
               <td class={`px-4 py-3 text-sm text-right font-medium ${
                 row.direction === 'up' ? 'text-rose-600' :
                 row.direction === 'down' ? 'text-emerald-600' :
@@ -275,14 +275,14 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
     <!-- Recent Headlines -->
     {recentCrimes30d.length > 0 && (
       <section class="mt-8">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-4">
+        <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text)] mb-4">
           Recent Headlines
-          <span class="text-sm font-normal text-slate-500 dark:text-[hsl(0_0%_55%)] ml-2">Last 30 days</span>
+          <span class="text-sm font-normal text-slate-500 dark:text-[var(--ch-text-muted)] ml-2">Last 30 days</span>
         </h2>
 
         <div class="space-y-2">
           {Array.from(headlinesByDate.entries()).map(([dateStr, crimes]) => (
-            <div class="bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] overflow-hidden">
+            <div class="bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] overflow-hidden">
               <button
                 class="accordion-toggle w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition cursor-pointer"
                 aria-expanded="false"
@@ -297,7 +297,7 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
               </button>
 
               <div class="accordion-content">
-                <div class="border-t border-slate-100 dark:border-[hsl(0_0%_15%)] px-4 py-3 space-y-3">
+                <div class="border-t border-slate-100 dark:border-[var(--ch-border-subtle)] px-4 py-3 space-y-3">
                   {crimes.map(crime => (
                     <a
                       href={`/trinidad/crime/${crime.slug}`}

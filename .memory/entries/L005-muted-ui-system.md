@@ -14,7 +14,7 @@ Muted UI direction established Mar 2026: Rose is reserved for hover/interaction 
 
 **Ghost Button:**
 ```
-border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)]
+border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[var(--ch-text-strong)]
 hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400
 active:bg-rose-50 dark:active:bg-rose-950/40 rounded-lg transition font-medium text-xs whitespace-nowrap
 ```
@@ -22,7 +22,7 @@ Used on: Load More (headlines), Hero primaryCTA, crime detail top nav buttons, R
 
 **Muted Pill:**
 ```
-px-1.5 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)]
+px-1.5 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[var(--ch-text-muted)]
 ```
 Used on: accordion count badges, CategoryAccordion count, "Same area" badge, crime count badge, category badge (CompactTipCard).
 
@@ -48,3 +48,4 @@ Full design system: `docs/guides/DESIGN-TOKENS.md`
 
 ## Change Log
 - 2026-03-02: Muted UI direction established and rolled out to all non-semantic components
+- 2026-03-15: Updated patterns to use CSS vars (`--ch-text-strong`, `--ch-text-muted`) — see L014 for full var system

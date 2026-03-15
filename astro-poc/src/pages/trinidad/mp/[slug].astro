@@ -150,11 +150,11 @@ const personSchema: Record<string, unknown> = {
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
 
     <!-- 2-column profile + contact card -->
-    <div class="mt-2 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] overflow-hidden">
+    <div class="mt-2 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] overflow-hidden">
       <div class="grid grid-cols-1 sm:grid-cols-2">
 
         <!-- Left: image only — fills full height of right column -->
-        <div class="relative sm:border-r border-slate-100 dark:border-[hsl(0_0%_15%)] min-h-48 bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
+        <div class="relative sm:border-r border-slate-100 dark:border-[var(--ch-border-subtle)] min-h-48 bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
           <img
             src={photoSrc}
             alt={mp.photo ? `${mp.fullName}, MP for ${mp.constituency}` : ''}
@@ -164,7 +164,7 @@ const personSchema: Record<string, unknown> = {
         </div>
 
         <!-- Right: identity + contact -->
-        <section class="border-t sm:border-t-0 border-slate-100 dark:border-[hsl(0_0%_15%)] divide-y divide-slate-100 dark:divide-[hsl(0_0%_15%)]" aria-label="Contact information">
+        <section class="border-t sm:border-t-0 border-slate-100 dark:border-[var(--ch-border-subtle)] divide-y divide-slate-100 dark:divide-[hsl(0_0%_15%)]" aria-label="Contact information">
 
           <!-- Identity row -->
           <div class="px-4 py-3">
@@ -172,7 +172,7 @@ const personSchema: Record<string, unknown> = {
             <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-0.5">{mp.constituency}</p>
             <div class="flex flex-wrap items-center gap-2 mt-2">
               <span class={`px-2 py-0.5 rounded-full text-xs font-medium ${partyBadge}`}>{mp.party}</span>
-              <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">MP since {mp.electionYear}</span>
+              <span class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">MP since {mp.electionYear}</span>
             </div>
           </div>
 
@@ -250,10 +250,10 @@ const personSchema: Record<string, unknown> = {
             <div class="flex items-center gap-3 px-4 py-3">
               <svg class="w-4 h-4 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
               <div class="flex items-center gap-4">
-                {mp.socials.facebook && <a href={sanitizeUrl(mp.socials.facebook)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">Facebook</a>}
-                {mp.socials.instagram && <a href={sanitizeUrl(mp.socials.instagram)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">Instagram</a>}
-                {mp.socials.x && <a href={sanitizeUrl(mp.socials.x)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">X</a>}
-                {mp.socials.youtube && <a href={sanitizeUrl(mp.socials.youtube)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">YouTube</a>}
+                {mp.socials.facebook && <a href={sanitizeUrl(mp.socials.facebook)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">Facebook</a>}
+                {mp.socials.instagram && <a href={sanitizeUrl(mp.socials.instagram)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">Instagram</a>}
+                {mp.socials.x && <a href={sanitizeUrl(mp.socials.x)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">X</a>}
+                {mp.socials.youtube && <a href={sanitizeUrl(mp.socials.youtube)} target="_blank" rel="noopener noreferrer" class="text-xs font-medium text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">YouTube</a>}
               </div>
             </div>
           )}
@@ -264,16 +264,16 @@ const personSchema: Record<string, unknown> = {
 
     <!-- Ambiguous boundary note -->
     {mp.regionConfidence === 'ambiguous' && (
-      <div class="mt-5 flex items-start gap-2.5 p-3.5 rounded-lg bg-slate-50 dark:bg-[hsl(0_0%_8%)] border border-slate-200 dark:border-[hsl(0_0%_18%)]">
+      <div class="mt-5 flex items-start gap-2.5 p-3.5 rounded-lg bg-slate-50 dark:bg-[var(--ch-surface)] border border-slate-200 dark:border-[var(--ch-border-card)]">
         <svg class="w-4 h-4 mt-0.5 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">This constituency spans two administrative regions. Crime data is shown for both below.</p>
+        <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">This constituency spans two administrative regions. Crime data is shown for both below.</p>
       </div>
     )}
 
     <!-- Crime data per region -->
     {regionStats.map((region: { regionSlug: string; regionName: string; statCards: any[] }) => (
       <section class="mt-8">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-4">
+        <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text)] mb-4">
           Crime data for {region.regionName}
         </h2>
         <StatCards stats={region.statCards} />

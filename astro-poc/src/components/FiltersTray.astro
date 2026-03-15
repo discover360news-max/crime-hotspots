@@ -24,12 +24,12 @@ const crimeTypes = CRIME_TYPE_LABELS;
   <div id="filtersBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
 
   <!-- Tray Content -->
-  <div id="filtersTrayContent" class="absolute right-0 top-0 h-full w-80 bg-white/85 dark:bg-[hsl(0_0%_8%)]/90 backdrop-blur-lg rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto overflow-y-auto">
+  <div id="filtersTrayContent" class="absolute right-0 top-0 h-full w-80 bg-white/85 dark:bg-[var(--ch-surface)]/90 backdrop-blur-lg rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto overflow-y-auto">
     <div class="p-5">
       <!-- Header -->
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-lg font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Filters</h2>
-        <button id="closeFiltersBtn" class="text-slate-400 dark:text-[hsl(0_0%_50%)] hover:text-slate-600 dark:hover:text-[hsl(0_0%_75%)] transition">
+        <h2 class="text-lg font-bold text-slate-700 dark:text-[var(--ch-text)]">Filters</h2>
+        <button id="closeFiltersBtn" class="text-slate-400 dark:text-[var(--ch-text-faint)] hover:text-slate-600 dark:hover:text-[hsl(0_0%_75%)] transition">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -41,8 +41,8 @@ const crimeTypes = CRIME_TYPE_LABELS;
         <!-- Year Filter -->
         {showYearFilter && (
           <div>
-            <label for="yearFilter" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Select Year</label>
-            <select id="yearFilter" class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]">
+            <label for="yearFilter" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">Select Year</label>
+            <select id="yearFilter" class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]">
               <!-- Options populated dynamically by JavaScript -->
             </select>
           </div>
@@ -51,10 +51,10 @@ const crimeTypes = CRIME_TYPE_LABELS;
         <!-- Crime Type Filter -->
         {showCrimeTypeFilter && (
           <div>
-            <label for="crimeTypeFilter" class="block text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_85%)] mb-2">Crime Types</label>
+            <label for="crimeTypeFilter" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">Crime Types</label>
             <select
               id="crimeTypeFilter"
-              class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[hsl(0_0%_22%)] text-slate-500 dark:text-[hsl(0_0%_55%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[hsl(0_0%_10%)]"
+              class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]"
             >
               <option value="" selected>All Crime Types</option>
               {crimeTypes.map((crimeType) => (

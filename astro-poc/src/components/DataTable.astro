@@ -18,10 +18,10 @@ interface Props {
 const { headers } = Astro.props;
 ---
 
-<div class="bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] overflow-hidden shadow-sm">
+<div class="bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] overflow-hidden shadow-sm">
   <div class="overflow-x-auto">
     <table class="w-full text-sm">
-      <thead class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] border-b border-slate-200 dark:border-[hsl(0_0%_18%)]">
+      <thead class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] border-b border-slate-200 dark:border-[var(--ch-border-card)]">
         <tr>
           {headers.map((header, index) => (
             <th class={`px-4 py-3 font-semibold text-slate-700 dark:text-[hsl(0_0%_80%)] ${index === 0 ? 'text-left' : 'text-right'}`}>

@@ -79,11 +79,11 @@ const countries = [
         <div role="listitem">
           <a
             href={routes.trinidad.dashboard}
-            class="group relative block w-full max-w-[280px] sm:max-w-xs rounded-2xl shadow-sm overflow-hidden dark:ring-1 dark:ring-white/15 bg-white/70 dark:bg-[hsl(0_0%_5%)] hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+            class="group relative block w-full max-w-[280px] sm:max-w-xs rounded-2xl shadow-sm overflow-hidden dark:ring-1 dark:ring-white/15 bg-white/70 dark:bg-[var(--ch-surface)] hover:shadow-lg transition-shadow duration-300 cursor-pointer"
           >
             <!-- Card header: country name + LIVE badge -->
             <div class="flex items-center justify-between px-3 pt-2.5 pb-2">
-              <h2 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)]">🇹🇹 Trinidad & Tobago</h2>
+              <h2 class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">🇹🇹 Trinidad & Tobago</h2>
               <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-600/90 backdrop-blur-sm text-white text-[10px] font-bold tracking-wide uppercase">
                 <span class="relative flex h-1.5 w-1.5">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -126,11 +126,11 @@ const countries = [
         <div class="flex gap-6 sm:gap-8">
           {countries.filter(c => !c.available).map(country => (
             <div
-              class="w-full max-w-[200px] sm:max-w-[220px] rounded-2xl shadow-sm overflow-hidden dark:ring-1 dark:ring-white/15 bg-white/70 dark:bg-[hsl(0_0%_5%)] opacity-60 cursor-not-allowed"
+              class="w-full max-w-[200px] sm:max-w-[220px] rounded-2xl shadow-sm overflow-hidden dark:ring-1 dark:ring-white/15 bg-white/70 dark:bg-[var(--ch-surface)] opacity-60 cursor-not-allowed"
               role="listitem"
             >
               <div class="block" aria-disabled="true" role="button" tabindex="-1">
-                <div class="w-full aspect-square overflow-hidden bg-slate-200 dark:bg-[hsl(0_0%_10%)] relative">
+                <div class="w-full aspect-square overflow-hidden bg-slate-200 dark:bg-[var(--ch-surface-sub)] relative">
                   <Image
                     src={country.image}
                     alt={`${country.name} map`}
@@ -156,7 +156,7 @@ const countries = [
                 <div class="pb-8 px-3 text-center">
                   <h2 class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_70%)] mb-1">{country.name}</h2>
                   <div class="mt-3">
-                    <span class="inline-block px-6 py-1 rounded-full bg-slate-200 dark:bg-[hsl(0_0%_12%)] text-xs text-slate-500 dark:text-[hsl(0_0%_50%)] font-medium">
+                    <span class="inline-block px-6 py-1 rounded-full bg-slate-200 dark:bg-[hsl(0_0%_12%)] text-xs text-slate-500 dark:text-[var(--ch-text-faint)] font-medium">
                       Coming Soon
                     </span>
                   </div>
@@ -173,14 +173,14 @@ const countries = [
           <span class="inline-block px-3 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 text-xs font-semibold tracking-wide uppercase mb-3">
             Explore
           </span>
-          <h2 class="text-heading font-bold text-slate-800 dark:text-[hsl(0_0%_92%)]">
+          <h2 class="text-heading font-bold text-slate-800 dark:text-[var(--ch-text)]">
             Where do you want to start?
           </h2>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
-          <a href={routes.trinidad.areas} class="group bg-white/70 dark:bg-[hsl(0_0%_5%)] backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 dark:border-[hsl(0_0%_12%)] p-5 flex flex-col gap-2 hover:shadow-md transition-shadow">
-            <p class="text-body font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] leading-snug">See your area's risk level</p>
+          <a href={routes.trinidad.areas} class="group bg-white/70 dark:bg-[var(--ch-surface)] backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 dark:border-[hsl(0_0%_12%)] p-5 flex flex-col gap-2 hover:shadow-md transition-shadow">
+            <p class="text-body font-bold text-slate-800 dark:text-[var(--ch-text)] leading-snug">See your area's risk level</p>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] leading-relaxed flex-1">Check how your area ranks across Trinidad by crime count and risk score.</p>
             <span class="inline-flex items-center gap-1 text-xs text-rose-600 dark:text-rose-400 font-medium group-hover:text-rose-700 dark:group-hover:text-rose-300 transition-colors">
               Browse areas
@@ -188,8 +188,8 @@ const countries = [
             </span>
           </a>
 
-          <a href={routes.trinidad.murderCount} class="group bg-white/70 dark:bg-[hsl(0_0%_5%)] backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 dark:border-[hsl(0_0%_12%)] p-5 flex flex-col gap-2 hover:shadow-md transition-shadow">
-            <p class="text-body font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] leading-snug">Track the murder count</p>
+          <a href={routes.trinidad.murderCount} class="group bg-white/70 dark:bg-[var(--ch-surface)] backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 dark:border-[hsl(0_0%_12%)] p-5 flex flex-col gap-2 hover:shadow-md transition-shadow">
+            <p class="text-body font-bold text-slate-800 dark:text-[var(--ch-text)] leading-snug">Track the murder count</p>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] leading-relaxed flex-1">Follow the 2026 running total with a week-by-week breakdown and trend line.</p>
             <span class="inline-flex items-center gap-1 text-xs text-rose-600 dark:text-rose-400 font-medium group-hover:text-rose-700 dark:group-hover:text-rose-300 transition-colors">
               View count
@@ -197,8 +197,8 @@ const countries = [
             </span>
           </a>
 
-          <a href={routes.blog} class="group bg-white/70 dark:bg-[hsl(0_0%_5%)] backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 dark:border-[hsl(0_0%_12%)] p-5 flex flex-col gap-2 hover:shadow-md transition-shadow">
-            <p class="text-body font-bold text-slate-800 dark:text-[hsl(0_0%_92%)] leading-snug">Read this week's report</p>
+          <a href={routes.blog} class="group bg-white/70 dark:bg-[var(--ch-surface)] backdrop-blur-md rounded-2xl shadow-sm border border-slate-100 dark:border-[hsl(0_0%_12%)] p-5 flex flex-col gap-2 hover:shadow-md transition-shadow">
+            <p class="text-body font-bold text-slate-800 dark:text-[var(--ch-text)] leading-snug">Read this week's report</p>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] leading-relaxed flex-1">Weekly crime analysis covering incidents, trends, and what's changed across the island.</p>
             <span class="inline-flex items-center gap-1 text-xs text-rose-600 dark:text-rose-400 font-medium group-hover:text-rose-700 dark:group-hover:text-rose-300 transition-colors">
               Read report

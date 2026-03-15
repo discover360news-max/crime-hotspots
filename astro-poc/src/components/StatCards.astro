@@ -41,19 +41,19 @@ function formatPercentChange(change: number): string {
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
   {stats.map((stat) => (
-    <div class="bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-4 shadow-sm">
+    <div class="bg-white/85 dark:bg-[var(--ch-surface)]/85 rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-4 shadow-sm">
       <div class="text-caption text-slate-500 dark:text-[hsl(0_0%_60%)] font-bold">{stat.label}</div>
       <div class={`font-bold mt-1 ${
         stat.size === 'large' ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'
       } ${
         stat.riskColor === 'high' ? 'text-amber-600 dark:text-amber-400' :
         stat.riskColor === 'low'  ? 'text-emerald-600 dark:text-emerald-400' :
-        stat.riskColor === 'neutral' ? 'text-slate-700 dark:text-[hsl(0_0%_85%)]' :
+        stat.riskColor === 'neutral' ? 'text-slate-700 dark:text-[var(--ch-text-strong)]' :
         'text-slate-800 dark:text-[hsl(0_0%_95%)]'
       }`}>{stat.current}</div>
       {stat.subtitle ? (
         <div class="text-caption mt-1 flex items-center justify-between gap-1">
-          <span class="text-slate-400 dark:text-[hsl(0_0%_50%)]">{stat.subtitle}</span>
+          <span class="text-slate-400 dark:text-[var(--ch-text-faint)]">{stat.subtitle}</span>
           {stat.shareText && (
             <a
               href={`https://wa.me/?text=${encodeURIComponent(stat.shareText)}`}
@@ -72,7 +72,7 @@ function formatPercentChange(change: number): string {
           <span class={`${
             stat.direction === 'down' ? 'text-emerald-600 dark:text-emerald-400' :
             stat.direction === 'up' ? 'text-rose-600' :
-            'text-slate-400 dark:text-[hsl(0_0%_50%)]'
+            'text-slate-400 dark:text-[var(--ch-text-faint)]'
           }`}>
             {stat.direction === 'down' ? '↓' : stat.direction === 'up' ? '↑' : '→'}
             {formatPercentChange(stat.yoyChange)} vs {previousYear}

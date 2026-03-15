@@ -25,9 +25,9 @@ export function generateSafetyContextHTML(areaName: string, context: SafetyConte
     },
     neutral: {
       bg: 'bg-slate-50 dark:bg-[hsl(0_0%_6%)]',
-      border: 'border-slate-200 dark:border-[hsl(0_0%_18%)]',
-      icon: 'text-slate-500 dark:text-[hsl(0_0%_55%)]',
-      title: 'text-slate-700 dark:text-[hsl(0_0%_85%)]',
+      border: 'border-slate-200 dark:border-[var(--ch-border-card)]',
+      icon: 'text-slate-500 dark:text-[var(--ch-text-muted)]',
+      title: 'text-slate-700 dark:text-[var(--ch-text-strong)]',
       text: 'text-slate-600 dark:text-[hsl(0_0%_72%)]',
       label: 'Community Standing: Stable',
       iconPath: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z'
@@ -57,7 +57,7 @@ export function generateSafetyContextHTML(areaName: string, context: SafetyConte
           <h3 class="text-sm font-semibold ${style.title} mb-1">
             ${style.label} - ${escapeHtml(areaName)}
           </h3>
-          <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mb-3">
+          <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mb-3">
             Risk Level: ${context.score.toFixed(1)}/10
             ${context.primaryCrimeType ? ` • Primary Concern: ${escapeHtml(context.primaryCrimeType)}` : ''}
           </div>
@@ -65,7 +65,7 @@ export function generateSafetyContextHTML(areaName: string, context: SafetyConte
             ${escapeHtml(context.tip)}
           </p>
           ${context.positiveNote ? `
-            <div class="mt-3 pt-3 border-t border-slate-200 dark:border-[hsl(0_0%_18%)]">
+            <div class="mt-3 pt-3 border-t border-slate-200 dark:border-[var(--ch-border-card)]">
               <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_70%)] leading-relaxed italic">
                 ${escapeHtml(context.positiveNote)}
               </p>

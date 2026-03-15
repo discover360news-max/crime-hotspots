@@ -306,9 +306,9 @@ const breadcrumbData = {
 
     <!-- Quick Answer box — structured for Google featured snippet capture -->
     <!-- Targets: "trinidad crime rate 2026", "trinidad and tobago crime statistics 2026" -->
-    <section class="mb-8 p-4 rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-slate-50 dark:bg-[hsl(0_0%_9%)]">
+    <section class="mb-8 p-4 rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] bg-slate-50 dark:bg-[hsl(0_0%_9%)]">
       <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-[hsl(0_0%_45%)] mb-3">Quick Answer — {currentYear} Crime Statistics</p>
-      <p class="text-sm text-slate-700 dark:text-[hsl(0_0%_85%)] leading-relaxed">
+      <p class="text-sm text-slate-700 dark:text-[var(--ch-text-strong)] leading-relaxed">
         Trinidad and Tobago has recorded <strong class="text-slate-900 dark:text-white">{total2026YTD} crimes</strong> in {currentYear} as of {lastUpdated}, including <strong class="text-rose-600 dark:text-rose-400">{murderCount} murders</strong> (annualized rate: {murderRateProjected}/100k), {robberyCount} robberies, and {shootingCount} shootings.
         {previousYear} ended with a murder rate of <strong class="text-slate-900 dark:text-white">{murderRatePrevious} per 100,000</strong> — one of the highest in the Caribbean.
         {yoyDirection === 'up'
@@ -322,7 +322,7 @@ const breadcrumbData = {
 
     <!-- Current Year Summary -->
     <section class="mb-10">
-      <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-4">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
         {currentYear} Year-to-Date Summary
       </h2>
       <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mb-4">
@@ -334,7 +334,7 @@ const breadcrumbData = {
 
     <!-- Trinidad Crime Rate -->
     <section class="mb-10">
-      <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-4">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
         Trinidad Crime Rate {currentYear}
       </h2>
       <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mb-4">
@@ -343,25 +343,25 @@ const breadcrumbData = {
 
       <!-- Previous Year Final (Official Rate) -->
       <div class="mb-6">
-        <h3 class="text-base font-semibold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-3">
+        <h3 class="text-base font-semibold text-slate-700 dark:text-[var(--ch-text)] mb-3">
           {previousYear} Final Crime Rate (Official)
         </h3>
-        <div class="bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5 shadow-sm">
+        <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5 shadow-sm">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="text-center p-3 bg-slate-50 dark:bg-[hsl(0_0%_10%)] rounded-lg">
+            <div class="text-center p-3 bg-slate-50 dark:bg-[var(--ch-surface-sub)] rounded-lg">
               <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Murder Rate</div>
               <div class="text-2xl font-bold text-rose-600 dark:text-rose-400">{murderRatePrevious}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{murderCountPrevious} murders</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{murderCountPrevious} murders</div>
             </div>
-            <div class="text-center p-3 bg-slate-50 dark:bg-[hsl(0_0%_10%)] rounded-lg">
+            <div class="text-center p-3 bg-slate-50 dark:bg-[var(--ch-surface-sub)] rounded-lg">
               <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Robbery Rate</div>
-              <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">{robberyRatePrevious}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{robberyCountPrevious} robberies</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text)]">{robberyRatePrevious}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{robberyCountPrevious} robberies</div>
             </div>
-            <div class="text-center p-3 bg-slate-50 dark:bg-[hsl(0_0%_10%)] rounded-lg">
+            <div class="text-center p-3 bg-slate-50 dark:bg-[var(--ch-surface-sub)] rounded-lg">
               <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Overall Rate</div>
-              <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">{totalCrimeRatePrevious}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{totalCrimesPrevious} crimes</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text)]">{totalCrimeRatePrevious}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{totalCrimesPrevious} crimes</div>
             </div>
           </div>
         </div>
@@ -369,25 +369,25 @@ const breadcrumbData = {
 
       <!-- Current Year Annualized Rate -->
       <div>
-        <h3 class="text-base font-semibold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-3">
+        <h3 class="text-base font-semibold text-slate-700 dark:text-[var(--ch-text)] mb-3">
           {currentYear} Annualized Rate (at current pace)
         </h3>
-        <div class="bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5 shadow-sm">
+        <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5 shadow-sm">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="text-center p-3 bg-rose-50 dark:bg-rose-950/30 rounded-lg">
               <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Murder Rate</div>
               <div class="text-2xl font-bold text-rose-600 dark:text-rose-400">{murderRateProjected}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{murderCount} murders in {daysElapsed} days</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{murderCount} murders in {daysElapsed} days</div>
             </div>
-            <div class="text-center p-3 bg-slate-50 dark:bg-[hsl(0_0%_10%)] rounded-lg">
+            <div class="text-center p-3 bg-slate-50 dark:bg-[var(--ch-surface-sub)] rounded-lg">
               <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Robbery Rate</div>
-              <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">{robberyRateProjected}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{robberyCount} robberies in {daysElapsed} days</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text)]">{robberyRateProjected}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{robberyCount} robberies in {daysElapsed} days</div>
             </div>
-            <div class="text-center p-3 bg-slate-50 dark:bg-[hsl(0_0%_10%)] rounded-lg">
+            <div class="text-center p-3 bg-slate-50 dark:bg-[var(--ch-surface-sub)] rounded-lg">
               <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Overall Rate</div>
-              <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">{totalCrimeRateProjected}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">{totalCrimesCurrent} crimes in {daysElapsed} days</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text)]">{totalCrimeRateProjected}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{totalCrimesCurrent} crimes in {daysElapsed} days</div>
             </div>
           </div>
           <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] mt-3 text-center">
@@ -403,27 +403,27 @@ const breadcrumbData = {
 
     <!-- Crime by Type -->
     <section class="mb-10">
-      <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-4">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
         Crime by Type ({currentYear})
       </h2>
-      <div class="bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] overflow-hidden shadow-sm">
+      <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
-            <thead class="bg-slate-50 dark:bg-[hsl(0_0%_10%)] border-b border-slate-200 dark:border-[hsl(0_0%_12%)]">
+            <thead class="bg-slate-50 dark:bg-[var(--ch-surface-sub)] border-b border-slate-200 dark:border-[hsl(0_0%_12%)]">
               <tr>
-                <th class="text-left px-4 py-3 font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)]">Crime Type</th>
-                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)]">{currentYear} Count</th>
-                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)]">{previousYear} (Same Period)</th>
-                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)]">Change</th>
+                <th class="text-left px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">Crime Type</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">{currentYear} Count</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">{previousYear} (Same Period)</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">Change</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[hsl(0_0%_12%)]">
               {yoyComparisons.filter(c => c.count2026 > 0 || c.count2025 > 0).map(comparison => (
                 <tr class="hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)]">
-                  <td class="px-4 py-3 text-slate-700 dark:text-[hsl(0_0%_85%)] font-medium">{comparison.type}</td>
-                  <td class="px-4 py-3 text-right text-slate-700 dark:text-[hsl(0_0%_85%)]">{comparison.count2026}</td>
+                  <td class="px-4 py-3 text-slate-700 dark:text-[var(--ch-text-strong)] font-medium">{comparison.type}</td>
+                  <td class="px-4 py-3 text-right text-slate-700 dark:text-[var(--ch-text-strong)]">{comparison.count2026}</td>
                   <td class="px-4 py-3 text-right text-slate-500 dark:text-[hsl(0_0%_60%)]">{comparison.count2025}</td>
-                  <td class={`px-4 py-3 text-right font-medium ${comparison.direction === 'down' ? 'text-emerald-600 dark:text-emerald-400' : comparison.direction === 'up' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-[hsl(0_0%_50%)]'}`}>
+                  <td class={`px-4 py-3 text-right font-medium ${comparison.direction === 'down' ? 'text-emerald-600 dark:text-emerald-400' : comparison.direction === 'up' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-[var(--ch-text-faint)]'}`}>
                     {comparison.direction === 'down' ? '↓' : comparison.direction === 'up' ? '↑' : '→'}
                     {formatPercentChange(comparison.percentChange)}
                   </td>
@@ -437,34 +437,34 @@ const breadcrumbData = {
 
     <!-- Regional Breakdown -->
     <section class="mb-10">
-      <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-4">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
         Regional Breakdown ({currentYear})
       </h2>
       <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mb-4">
         Top 5 divisions by crime count
       </p>
-      <div class="bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] overflow-hidden shadow-sm">
+      <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
           <table class="w-full text-sm">
-            <thead class="bg-slate-50 dark:bg-[hsl(0_0%_10%)] border-b border-slate-200 dark:border-[hsl(0_0%_12%)]">
+            <thead class="bg-slate-50 dark:bg-[var(--ch-surface-sub)] border-b border-slate-200 dark:border-[hsl(0_0%_12%)]">
               <tr>
-                <th class="text-left px-4 py-3 font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)]">Division</th>
-                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)]">Crimes</th>
-                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[hsl(0_0%_85%)]">% of Total</th>
+                <th class="text-left px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">Division</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">Crimes</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">% of Total</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[hsl(0_0%_12%)]">
               {topRegions.map((region, index) => (
                 <tr class="hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)]">
-                  <td class="px-4 py-3 text-slate-700 dark:text-[hsl(0_0%_85%)]">
+                  <td class="px-4 py-3 text-slate-700 dark:text-[var(--ch-text-strong)]">
                     <span class="inline-flex items-center">
-                      <span class="w-5 h-5 flex items-center justify-center bg-slate-100 dark:bg-[hsl(0_0%_13%)] rounded text-xs font-medium text-slate-500 dark:text-[hsl(0_0%_55%)] mr-2">
+                      <span class="w-5 h-5 flex items-center justify-center bg-slate-100 dark:bg-[var(--ch-surface)] rounded text-xs font-medium text-slate-500 dark:text-[var(--ch-text-muted)] mr-2">
                         {index + 1}
                       </span>
                       {region.region}
                     </span>
                   </td>
-                  <td class="px-4 py-3 text-right text-slate-700 dark:text-[hsl(0_0%_85%)] font-medium">{region.count}</td>
+                  <td class="px-4 py-3 text-right text-slate-700 dark:text-[var(--ch-text-strong)] font-medium">{region.count}</td>
                   <td class="px-4 py-3 text-right text-slate-500 dark:text-[hsl(0_0%_60%)]">{region.percentage.toFixed(1)}%</td>
                 </tr>
               ))}
@@ -477,12 +477,12 @@ const breadcrumbData = {
     <!-- Latest Analysis -->
     {latestPost && (
       <section class="mb-10">
-        <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-4">
+        <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
           Latest Analysis
         </h2>
-        <div class="bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-6 shadow-sm">
-          <h3 class="text-lg font-semibold text-slate-800 dark:text-[hsl(0_0%_92%)] mb-3">
-            <a href={`/blog/${latestPost.slug}/`} class="hover:text-rose-600 dark:text-[hsl(0_0%_92%)] dark:hover:text-rose-400 transition-colors">
+        <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-slate-800 dark:text-[var(--ch-text)] mb-3">
+            <a href={`/blog/${latestPost.slug}/`} class="hover:text-rose-600 dark:text-[var(--ch-text)] dark:hover:text-rose-400 transition-colors">
               {latestPost.data.title}
             </a>
           </h3>
@@ -490,7 +490,7 @@ const breadcrumbData = {
             {latestPost.data.excerpt}
           </p>
           <div class="flex items-center justify-between flex-wrap gap-4">
-            <div class="flex items-center gap-4 text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">
+            <div class="flex items-center gap-4 text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">
               <span>{latestPost.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
               <span>{latestPost.data.readTime}</span>
             </div>
@@ -510,7 +510,7 @@ const breadcrumbData = {
 
     <!-- Download Data -->
     <section class="mb-10">
-      <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-4">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
         Download Data
       </h2>
       <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mb-4">
@@ -532,7 +532,7 @@ const breadcrumbData = {
           href={TRINIDAD_CSV_URLS[previousYear]}
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center justify-center px-5 py-3 min-h-[44px] border border-slate-300 dark:border-[hsl(0_0%_25%)] text-slate-700 dark:text-[hsl(0_0%_85%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_12%)] transition font-medium text-sm"
+          class="inline-flex items-center justify-center px-5 py-3 min-h-[44px] border border-slate-300 dark:border-[hsl(0_0%_25%)] text-slate-700 dark:text-[var(--ch-text-strong)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_12%)] transition font-medium text-sm"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -544,10 +544,10 @@ const breadcrumbData = {
 
     <!-- Methodology -->
     <section class="mb-10">
-      <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-4">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
         Methodology
       </h2>
-      <div class="bg-slate-50 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5">
+      <div class="bg-slate-50 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5">
         <p class="text-slate-600 dark:text-[hsl(0_0%_65%)] text-sm">
           Learn how we collect, verify, and categorize crime data from verified news sources across Trinidad & Tobago.
         </p>
@@ -565,7 +565,7 @@ const breadcrumbData = {
 
     <!-- Share & Cite -->
     <section class="mb-10">
-      <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-4">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
         Share & Cite
       </h2>
       <div class="space-y-4">
@@ -614,8 +614,8 @@ const breadcrumbData = {
         <p id="copy-feedback" class="text-xs text-emerald-600 opacity-0 transition-opacity">Link copied!</p>
 
         <!-- Citation -->
-        <div class="bg-slate-50 dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4">
-          <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mb-2">Cite this page:</p>
+        <div class="bg-slate-50 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4">
+          <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mb-2">Cite this page:</p>
           <p class="text-sm text-slate-700 dark:text-[hsl(0_0%_80%)] font-mono">
             Crime Hotspots. ({currentYear}). Trinidad & Tobago Crime Statistics {currentYear}.
             Retrieved {lastUpdated}, from {canonicalUrl}
@@ -626,24 +626,24 @@ const breadcrumbData = {
 
     <!-- Related Links -->
     <section class="mb-10">
-      <h2 class="text-body font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-4">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
         Related Resources
       </h2>
       <div class="grid sm:grid-cols-2 gap-4">
-        <a href={routes.trinidad.dashboard} class="block bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
-          <h3 class="font-semibold text-slate-800 dark:text-[hsl(0_0%_92%)]">Interactive Dashboard</h3>
+        <a href={routes.trinidad.dashboard} class="block bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800 dark:text-[var(--ch-text)]">Interactive Dashboard</h3>
           <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-1">Map visualization, filters, and detailed crime listings</p>
         </a>
-        <a href={routes.trinidad.murderCount} class="block bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
-          <h3 class="font-semibold text-slate-800 dark:text-[hsl(0_0%_92%)]">Murder Count 2026</h3>
+        <a href={routes.trinidad.murderCount} class="block bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800 dark:text-[var(--ch-text)]">Murder Count 2026</h3>
           <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-1">Live murder toll counter for Trinidad & Tobago</p>
         </a>
-        <a href={routes.blog} class="block bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
-          <h3 class="font-semibold text-slate-800 dark:text-[hsl(0_0%_92%)]">Weekly Reports</h3>
+        <a href={routes.blog} class="block bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800 dark:text-[var(--ch-text)]">Weekly Reports</h3>
           <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-1">In-depth analysis and trend reports</p>
         </a>
-        <a href={routes.report} class="block bg-white dark:bg-[hsl(0_0%_8%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
-          <h3 class="font-semibold text-slate-800 dark:text-[hsl(0_0%_92%)]">Report a Crime</h3>
+        <a href={routes.report} class="block bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800 dark:text-[var(--ch-text)]">Report a Crime</h3>
           <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-1">Anonymous crime reporting form</p>
         </a>
       </div>

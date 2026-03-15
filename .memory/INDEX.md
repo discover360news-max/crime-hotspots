@@ -39,6 +39,7 @@ L010 | LEARN | active | Schema centralization COMPLETE (all follow-ups resolved)
 L011 | LEARN | active | Utility control pattern: filled bg button + sticky bar, separate from nav CTA ghost buttons. Confirmed on dashboard + compare page (Mar 10 2026) → L011-utility-control-pattern.md
 L012 | LEARN | active | Dashboard script extraction (Mar 10 2026): 869→554 lines. MapLegend.astro + dashboardMapInit.ts + dashboardLocationFilter.ts. Extraction signal: >50-line named-function script → move to src/scripts/ → L012-dashboard-script-extraction.md
 L013 | LEARN | active | Crime classification rules: 2 hard rules (Carjacking→Robbery, HomeInvasion→Burglary), Shooting vs AttemptedMurder intent standard, Robbery≠Theft. Encoded in schema.gs + crimeTypeProcessor.gs + claudeClient.gs. Doc: docs/guides/CRIME-CLASSIFICATION-RULES.md → L013-crime-classification-rules.md
+L014 | LEARN | active | CSS var token system: `--ch-*` vars in Layout.astro control all dark mode colours. Use `var(--ch-*)` in Tailwind, never raw HSL. One edit = site-wide change. → L014-css-var-token-system.md
 
 ## Decisions (D)
 D001 | DEC | active | Crime pages: full SSR + Cloudflare CDN 24h cache (migrated from hybrid prerender) → D001-crime-page-ssr.md

@@ -90,13 +90,13 @@ const severityBadge: Record<string, string> = {
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
     <div class="mb-3">
-      <a href={routes.trinidad.safetyTips} class="inline-flex items-center gap-1.5 text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">
+      <a href={routes.trinidad.safetyTips} class="inline-flex items-center gap-1.5 text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
         All Safety Tips
       </a>
     </div>
 
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
 
       <!-- Badges -->
       <div class="flex flex-wrap gap-2 mb-5">
@@ -126,12 +126,12 @@ const severityBadge: Record<string, string> = {
       </div>
 
       <!-- Tip body -->
-      <div class="tip-body text-body text-slate-700 dark:text-[hsl(0_0%_85%)] leading-relaxed mb-5">
+      <div class="tip-body text-body text-slate-700 dark:text-[var(--ch-text-strong)] leading-relaxed mb-5">
         <Content />
       </div>
 
       <!-- Meta -->
-      <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_50%)] mb-5">
+      <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)] mb-5">
         Added {tip.data.date_added.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
         {tip.data.date_updated && ` · Updated ${tip.data.date_updated.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`}
         · Source: {tip.data.source === 'community' ? 'Community (reviewed)' : 'Editorial'}
@@ -140,7 +140,7 @@ const severityBadge: Record<string, string> = {
       <!-- Related incidents -->
       {relatedCrimes.length > 0 && (
         <div class="mb-5 pt-5 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">
-          <p class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] uppercase tracking-wider mb-3">
+          <p class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] uppercase tracking-wider mb-3">
             Related incidents ({relatedCrimes.length})
           </p>
           <ul class="space-y-2">
@@ -149,8 +149,8 @@ const severityBadge: Record<string, string> = {
                 <a href={buildRoute.crime(crime.slug)} class="group flex items-start gap-2">
                   <span class="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-rose-400"></span>
                   <span>
-                    <span class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">{crime.headline}</span>
-                    <span class="ml-2 text-caption text-slate-400 dark:text-[hsl(0_0%_50%)]">{crime.area} · {crime.dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    <span class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-strong)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">{crime.headline}</span>
+                    <span class="ml-2 text-caption text-slate-400 dark:text-[var(--ch-text-faint)]">{crime.area} · {crime.dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                   </span>
                 </a>
               </li>
@@ -165,7 +165,7 @@ const severityBadge: Record<string, string> = {
       <!-- Share + back -->
       <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">
         <div class="flex items-center gap-4">
-          <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 transition">
+          <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">
             ← All tips
           </a>
           <a href={routes.trinidad.safetyTipsSubmit} class="text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline transition">
@@ -174,7 +174,7 @@ const severityBadge: Record<string, string> = {
         </div>
         <button
           id="shareTipBtn"
-          class="px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[hsl(0_0%_22%)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-rose-500 dark:hover:border-rose-700 hover:text-rose-600 dark:hover:text-rose-400 transition"
+          class="px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[var(--ch-border)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-rose-500 dark:hover:border-rose-700 hover:text-rose-600 dark:hover:text-rose-400 transition"
         >
           Share
         </button>
@@ -184,7 +184,7 @@ const severityBadge: Record<string, string> = {
     <!-- Related tips -->
     {relatedTips.length > 0 && (
       <section class="mt-6">
-        <p class="text-caption font-bold text-slate-500 dark:text-[hsl(0_0%_55%)] uppercase tracking-wider mb-3">Related tips</p>
+        <p class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] uppercase tracking-wider mb-3">Related tips</p>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {relatedTips.map(t => <TipCard tip={t} />)}
         </div>

@@ -46,10 +46,10 @@ tips.sort((a, b) => b.data.date_added.getTime() - a.data.date_added.getTime());
   </Hero>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[var(--ch-border-card)]">
 
       <div class="flex items-center justify-between mb-4">
-        <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">
+        <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">
           {tips.length} tip{tips.length !== 1 ? 's' : ''} in this category
         </p>
         <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline">
@@ -58,7 +58,7 @@ tips.sort((a, b) => b.data.date_added.getTime() - a.data.date_added.getTime());
       </div>
 
       {tips.length === 0 ? (
-        <p class="py-10 text-center text-body text-slate-500 dark:text-[hsl(0_0%_55%)]">
+        <p class="py-10 text-center text-body text-slate-500 dark:text-[var(--ch-text-muted)]">
           No published tips in this category yet.
         </p>
       ) : (
@@ -67,7 +67,7 @@ tips.sort((a, b) => b.data.date_added.getTime() - a.data.date_added.getTime());
         </div>
       )}
 
-      <div class="mt-5 pt-5 border-t border-slate-100 dark:border-[hsl(0_0%_15%)] text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">
+      <div class="mt-5 pt-5 border-t border-slate-100 dark:border-[var(--ch-border-subtle)] text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">
         Looking for {category.toLowerCase()} incidents?
         <a href={routes.trinidad.headlines} class="ml-1 font-bold text-rose-600 dark:text-rose-400 hover:underline">Browse crime headlines →</a>
       </div>

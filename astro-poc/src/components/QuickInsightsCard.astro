@@ -28,17 +28,17 @@ const dangerousSlug = generateNameSlug(insights.mostDangerousRegion);
 const safestSlug = generateNameSlug(insights.safestRegion);
 ---
 
-<div id="quickInsightsCard" class="bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md rounded-lg p-5 shadow-md border border-slate-100 dark:border-[hsl(0_0%_15%)]">
+<div id="quickInsightsCard" class="bg-white/85 dark:bg-[var(--ch-surface)]/85 backdrop-blur-md rounded-lg p-5 shadow-md border border-slate-100 dark:border-[var(--ch-border-subtle)]">
   <div class="flex gap-4">
 
     <!-- Left 1/3: Daily Average, centered -->
-    <div class="flex flex-col items-center justify-center text-center w-1/2 pr-4 border-r border-slate-200 dark:border-[hsl(0_0%_18%)]">
-      <svg class="w-4 h-4 md:w-5 md:h-5 text-slate-400 dark:text-[hsl(0_0%_50%)] mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="flex flex-col items-center justify-center text-center w-1/2 pr-4 border-r border-slate-200 dark:border-[var(--ch-border-card)]">
+      <svg class="w-4 h-4 md:w-5 md:h-5 text-slate-400 dark:text-[var(--ch-text-faint)] mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
-      <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mb-1">Daily Average</div>
-      <div id="avgPerDay" class="text-base md:text-xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] leading-tight">{insights.avgPerDay} crimes/day</div>
-      <div id="victimsPerDay" class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] mt-1">{insights.victimsPerDay} victims/day</div>
+      <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mb-1">Daily Average</div>
+      <div id="avgPerDay" class="text-base md:text-xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)] leading-tight">{insights.avgPerDay} crimes/day</div>
+      <div id="victimsPerDay" class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-1">{insights.victimsPerDay} victims/day</div>
     </div>
 
     <!-- Right 1/2: 2x2 grid -->
@@ -46,47 +46,47 @@ const safestSlug = generateNameSlug(insights.safestRegion);
 
       <!-- Peak Day -->
       <div class="flex items-start gap-1.5 min-w-0">
-        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[hsl(0_0%_50%)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[var(--ch-text-faint)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
         <div class="min-w-0">
-          <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">Peak Day</div>
-          <div id="mostDangerousDay" class="text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_90%)] truncate">{insights.mostDangerousDay}s</div>
+          <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">Peak Day</div>
+          <div id="mostDangerousDay" class="text-sm font-semibold text-slate-700 dark:text-[var(--ch-text-heading)] truncate">{insights.mostDangerousDay}s</div>
         </div>
       </div>
 
       <!-- Busiest Month -->
       <div class="flex items-start gap-1.5 min-w-0">
-        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[hsl(0_0%_50%)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[var(--ch-text-faint)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
         <div class="min-w-0">
-          <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{busiestLabel}</div>
-          <div id="busiestMonth" class="text-sm font-semibold text-slate-700 dark:text-[hsl(0_0%_90%)] truncate">{insights.busiestMonth}</div>
+          <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">{busiestLabel}</div>
+          <div id="busiestMonth" class="text-sm font-semibold text-slate-700 dark:text-[var(--ch-text-heading)] truncate">{insights.busiestMonth}</div>
         </div>
       </div>
 
       <!-- Highest Crime Area -->
       <a href={buildRoute.area(dangerousSlug)} class="flex items-start gap-1.5 min-w-0 hover:bg-rose-50 dark:hover:bg-rose-950/60 active:bg-rose-50 dark:active:bg-rose-950/60 rounded-lg px-1.5 py-1 -mx-1.5 -my-1 transition">
-        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[hsl(0_0%_50%)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[var(--ch-text-faint)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
         </svg>
         <div class="min-w-0">
-          <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">Highest Area</div>
+          <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">Highest Area</div>
           <div id="mostDangerousRegion" class="text-sm font-semibold text-rose-600 underline decoration-dotted decoration-rose-300 underline-offset-2 truncate">{insights.mostDangerousRegion}</div>
-          <div id="mostDangerousRegionCount" class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{insights.mostDangerousRegionCount} crimes</div>
+          <div id="mostDangerousRegionCount" class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">{insights.mostDangerousRegionCount} crimes</div>
         </div>
       </a>
 
       <!-- Lowest Crime Area -->
       <a href={buildRoute.area(safestSlug)} class="flex items-start gap-1.5 min-w-0 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 active:bg-emerald-50 dark:active:bg-emerald-950/60 rounded-lg px-1.5 py-1 -mx-1.5 -my-1 transition">
-        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[hsl(0_0%_50%)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[var(--ch-text-faint)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
         </svg>
         <div class="min-w-0">
-          <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">Lowest Area</div>
+          <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">Lowest Area</div>
           <div id="safestRegion" class="text-sm font-semibold text-emerald-600 underline decoration-dotted decoration-emerald-300 underline-offset-2 truncate">{insights.safestRegion}</div>
-          <div id="safestRegionCount" class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{insights.safestRegionCount} crimes</div>
+          <div id="safestRegionCount" class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">{insights.safestRegionCount} crimes</div>
         </div>
       </a>
 

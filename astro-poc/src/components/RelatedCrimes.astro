@@ -81,9 +81,9 @@ const areaSlug = currentCrime.area.toLowerCase().replace(/\s+/g, '-').replace(/[
 ---
 
 {relatedCrimes.length > 0 && (
-  <aside class="p-4 bg-slate-50/80 dark:bg-[hsl(0_0%_6%_/_0.8)] backdrop-blur-sm rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)]" data-pagefind-ignore>
-    <h2 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_85%)] mb-3 flex items-center gap-2 uppercase tracking-wider">
-      <svg class="w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_50%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <aside class="p-4 bg-slate-50/80 dark:bg-[hsl(0_0%_6%_/_0.8)] backdrop-blur-sm rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)]" data-pagefind-ignore>
+    <h2 class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-strong)] mb-3 flex items-center gap-2 uppercase tracking-wider">
+      <svg class="w-4 h-4 text-slate-400 dark:text-[var(--ch-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
       </svg>
       Related Crimes
@@ -97,7 +97,7 @@ const areaSlug = currentCrime.area.toLowerCase().replace(/\s+/g, '-').replace(/[
         return (
           <a
             href={buildRoute.crime(crime.slug)}
-            class="block p-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-100 dark:border-[hsl(0_0%_15%)] hover:border-rose-200 dark:hover:border-rose-800 hover:shadow-sm transition-all group"
+            class="block p-3 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-100 dark:border-[var(--ch-border-subtle)] hover:border-rose-200 dark:hover:border-rose-800 hover:shadow-sm transition-all group"
           >
             <div class="flex items-start gap-2">
               {/* Crime type indicator dot */}
@@ -111,16 +111,16 @@ const areaSlug = currentCrime.area.toLowerCase().replace(/\s+/g, '-').replace(/[
 
                 {/* Meta row */}
                 <div class="flex items-center gap-2 mt-1">
-                  <span class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)]">
+                  <span class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)]">
                     {formatDate(crime.date)}
                   </span>
                   {!isSameArea && (
-                    <span class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)] truncate">
+                    <span class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] truncate">
                       {crime.area}
                     </span>
                   )}
                   {isSameArea && (
-                    <span class="ml-auto text-caption px-1.5 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)]">
+                    <span class="ml-auto text-caption px-1.5 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[var(--ch-text-muted)]">
                       Same area
                     </span>
                   )}

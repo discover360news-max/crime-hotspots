@@ -17,16 +17,16 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
 
 <dialog
   id="sectionPickerModal"
-  class="m-auto p-0 bg-white/90 dark:bg-[hsl(0_0%_8%)]/95 backdrop-blur-xl rounded-2xl shadow-2xl border-0 outline-none"
+  class="m-auto p-0 bg-white/90 dark:bg-[var(--ch-surface)]/95 backdrop-blur-xl rounded-2xl shadow-2xl border-0 outline-none"
   aria-labelledby="sectionPickerTitle"
   data-pagefind-ignore
 >
   <!-- Header -->
-  <div class="sticky top-0 bg-white/80 dark:bg-[hsl(0_0%_8%)]/90 backdrop-blur-md border-b border-slate-200 dark:border-[hsl(0_0%_18%)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
-    <h2 id="sectionPickerTitle" class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_92%)]">Select Section</h2>
+  <div class="sticky top-0 bg-white/80 dark:bg-[var(--ch-surface)]/90 backdrop-blur-md border-b border-slate-200 dark:border-[var(--ch-border-card)] px-6 py-4 flex items-center justify-between rounded-t-2xl">
+    <h2 id="sectionPickerTitle" class="text-heading font-bold text-slate-700 dark:text-[var(--ch-text)]">Select Section</h2>
     <button
       id="closeSectionPickerModal"
-      class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 dark:active:bg-[hsl(0_0%_15%)] transition text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
+      class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-200 dark:active:bg-[hsl(0_0%_15%)] transition text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-slate-700 dark:hover:text-[hsl(0_0%_85%)]"
       aria-label="Close"
     >
       <span class="text-2xl leading-none">&times;</span>
@@ -51,7 +51,7 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
               <a
                 href={section.url}
                 class:list={[
-                  "group relative bg-white/80 dark:bg-[hsl(0_0%_10%)] backdrop-blur-md rounded-lg p-4 hover:shadow-lg transition-all duration-300 flex items-center justify-between",
+                  "group relative bg-white/80 dark:bg-[var(--ch-surface-sub)] backdrop-blur-md rounded-lg p-4 hover:shadow-lg transition-all duration-300 flex items-center justify-between",
                   isRecommended
                     ? "border-2 border-rose-500 shadow-md"
                     : "border-2 border-slate-200 dark:border-[hsl(0_0%_20%)] hover:border-rose-600 dark:hover:border-rose-700"
@@ -61,7 +61,7 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
                   <div class="flex items-center gap-2 mb-1">
                     <h3 class:list={[
                       "text-small font-bold transition",
-                      isRecommended ? "text-rose-600" : "text-slate-700 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600"
+                      isRecommended ? "text-rose-600" : "text-slate-700 dark:text-[var(--ch-text-heading)] group-hover:text-rose-600"
                     ]}>
                       {section.label}
                     </h3>
@@ -71,7 +71,7 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
                       </span>
                     )}
                   </div>
-                  <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">{section.description}</p>
+                  <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">{section.description}</p>
                 </div>
                 <svg class:list={[
                   "w-5 h-5 shrink-0 ml-3 transition",
@@ -121,7 +121,7 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
 
   <!-- Footer Help Text -->
   <div class="px-6 pb-6 pt-4">
-    <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)] text-center">
+    <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] text-center">
       Don't see your island? <a href={routes.contact} class="text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 underline">Contact us</a> to request coverage.
     </p>
   </div>

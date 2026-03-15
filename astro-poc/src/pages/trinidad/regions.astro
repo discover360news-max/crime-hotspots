@@ -85,17 +85,17 @@ const pageDescription = `Crime statistics for all ${regions.length} regions in T
   </Hero>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
 
     <!-- Region Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {regions.map((region, index) => (
         <a
           href={`/trinidad/region/${region.slug}`}
-          class="block bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] p-5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
+          class="block bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
         >
           <div class="flex items-start justify-between mb-3">
-            <h2 class="text-base font-bold text-slate-800 dark:text-[hsl(0_0%_90%)] group-hover:text-rose-600 transition">
+            <h2 class="text-base font-bold text-slate-800 dark:text-[var(--ch-text-heading)] group-hover:text-rose-600 transition">
               {region.name}
             </h2>
             <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] font-medium">#{index + 1}</span>
@@ -103,16 +103,16 @@ const pageDescription = `Crime statistics for all ${regions.length} regions in T
 
           <div class="grid grid-cols-3 gap-3 text-center">
             <div>
-              <div class="text-lg font-bold text-slate-800 dark:text-[hsl(0_0%_90%)]">{region.crimeCount90d}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">Incidents (90d)</div>
+              <div class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text-heading)]">{region.crimeCount90d}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">Incidents (90d)</div>
             </div>
             <div>
               <div class="text-lg font-bold text-rose-600">{region.murders}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">Murders (YTD)</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">Murders (YTD)</div>
             </div>
             <div>
               <div class="text-lg font-bold text-slate-600 dark:text-[hsl(0_0%_70%)]">{region.areaCount}</div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">Areas</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">Areas</div>
             </div>
           </div>
         </a>

@@ -28,26 +28,26 @@ const description = "Help build safer communities: report crime anonymously via 
       Your report is anonymous. Please provide as much detail as possible to help us identify trends and verify reports.
     </p>
 
-    <form id="reportForm" class="space-y-4 bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+    <form id="reportForm" class="space-y-4 bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md p-6 rounded-2xl shadow-lg border border-slate-100 dark:border-[var(--ch-border-card)]">
       <!-- Honeypot -->
       <input type="text" id="hp_field" name="hp_field" autocomplete="off" style="display:none !important" aria-hidden="true" />
 
       <!-- Incident Details Section -->
-      <div class="space-y-4 pb-4 border-b border-slate-200 dark:border-[hsl(0_0%_22%)]">
+      <div class="space-y-4 pb-4 border-b border-slate-200 dark:border-[var(--ch-border)]">
         <h3 class="text-small font-semibold text-slate-600 dark:text-[hsl(0_0%_75%)] uppercase tracking-wide">Incident Details</h3>
 
         <div>
           <label for="reportDate" class="text-xs font-semibold text-slate-500 dark:text-[hsl(0_0%_65%)] block mb-2">
             Date of Incident <span class="text-rose-600">*</span>
           </label>
-          <input id="reportDate" name="reportDate" type="date" class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_25%)] dark:bg-[hsl(0_0%_12%)] rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-700 dark:text-[hsl(0_0%_85%)]" required />
+          <input id="reportDate" name="reportDate" type="date" class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_25%)] dark:bg-[hsl(0_0%_12%)] rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-700 dark:text-[var(--ch-text-strong)]" required />
         </div>
 
         <div>
           <label for="reportCrimeType" class="text-xs font-semibold text-slate-500 dark:text-[hsl(0_0%_65%)] block mb-2">
             Crime Type <span class="text-rose-600">*</span>
           </label>
-          <select id="reportCrimeType" name="reportCrimeType" class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_25%)] dark:bg-[hsl(0_0%_12%)] rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-700 dark:text-[hsl(0_0%_85%)]" required>
+          <select id="reportCrimeType" name="reportCrimeType" class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_25%)] dark:bg-[hsl(0_0%_12%)] rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-700 dark:text-[var(--ch-text-strong)]" required>
             <option value="">Select a crime</option>
             {CRIME_TYPE_LABELS.map(label => <option>{label}</option>)}
             <option>Other</option>
@@ -56,21 +56,21 @@ const description = "Help build safer communities: report crime anonymously via 
       </div>
 
       <!-- Location Section -->
-      <div class="space-y-4 pb-4 border-b border-slate-200 dark:border-[hsl(0_0%_22%)]">
+      <div class="space-y-4 pb-4 border-b border-slate-200 dark:border-[var(--ch-border)]">
         <h3 class="text-small font-semibold text-slate-600 dark:text-[hsl(0_0%_75%)] uppercase tracking-wide">Location</h3>
 
         <div>
           <label for="reportCountry" class="text-xs font-semibold text-slate-500 dark:text-[hsl(0_0%_65%)] block mb-2">
             Country / Island <span class="text-rose-600">*</span>
           </label>
-          <select id="reportCountry" name="reportCountry" class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_25%)] dark:bg-[hsl(0_0%_12%)] rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-700 dark:text-[hsl(0_0%_85%)]" required>
+          <select id="reportCountry" name="reportCountry" class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_25%)] dark:bg-[hsl(0_0%_12%)] rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-700 dark:text-[var(--ch-text-strong)]" required>
             <option value="">Select a country</option>
           </select>
         </div>
 
         <div>
           <label for="reportArea" class="text-xs font-semibold text-slate-500 dark:text-[hsl(0_0%_65%)] block mb-2">
-            Area <span class="text-xs font-normal text-slate-500 dark:text-[hsl(0_0%_55%)]">(optional)</span>
+            Area <span class="text-xs font-normal text-slate-500 dark:text-[var(--ch-text-muted)]">(optional)</span>
           </label>
           <select id="reportArea" name="reportArea" class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_25%)] dark:bg-[hsl(0_0%_12%)] rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
             <option value="">Select area (optional)</option>
@@ -79,7 +79,7 @@ const description = "Help build safer communities: report crime anonymously via 
 
         <div>
           <label for="reportStreet" class="text-xs font-semibold text-slate-500 dark:text-[hsl(0_0%_65%)] block mb-2">
-            Street / Location <span class="text-xs font-normal text-slate-500 dark:text-[hsl(0_0%_55%)]">(optional)</span>
+            Street / Location <span class="text-xs font-normal text-slate-500 dark:text-[var(--ch-text-muted)]">(optional)</span>
           </label>
           <input id="reportStreet" name="reportStreet" type="text" class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_25%)] dark:bg-[hsl(0_0%_12%)] rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] dark:placeholder-[hsl(0_0%_45%)]" placeholder="e.g., Main Street near the plaza" />
         </div>
@@ -92,7 +92,7 @@ const description = "Help build safer communities: report crime anonymously via 
         <div>
           <label for="reportHeadline" class="text-xs font-semibold text-slate-500 dark:text-[hsl(0_0%_65%)] block mb-2">
             Headline <span class="text-rose-600">*</span>
-            <span class="text-xs font-normal text-slate-500 dark:text-[hsl(0_0%_55%)]">(120 chars max)</span>
+            <span class="text-xs font-normal text-slate-500 dark:text-[var(--ch-text-muted)]">(120 chars max)</span>
           </label>
           <input id="reportHeadline" name="reportHeadline" maxlength="120" type="text" class="w-full px-3 py-2 border border-slate-300 dark:border-[hsl(0_0%_25%)] dark:bg-[hsl(0_0%_12%)] rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-rose-500 text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] dark:placeholder-[hsl(0_0%_45%)]" placeholder="Brief summary of the incident" required />
         </div>
@@ -109,7 +109,7 @@ const description = "Help build safer communities: report crime anonymously via 
       <!-- With ?render=explicit mode, config is passed to render() function, NOT via data attributes -->
       <div id="reportTurnstile" class="cf-turnstile" style="height: 0; overflow: hidden;"></div>
       <div class="flex items-center justify-between mt-4">
-        <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">
+        <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">
           You'll receive a unique anonymous report ID.
         </div>
         <button
@@ -127,7 +127,7 @@ const description = "Help build safer communities: report crime anonymously via 
       id="reportSuccess"
       class="hidden fixed inset-0 bg-white/70 dark:bg-[hsl(0_0%_3%_/_0.85)] backdrop-blur-md flex flex-col items-center justify-center z-50 text-center p-8 transition-all duration-700"
     >
-      <div class="bg-white/80 dark:bg-[hsl(0_0%_10%_/_0.9)] backdrop-blur-xl rounded-2xl shadow-xl p-8 max-w-md w-full border border-slate-200 dark:border-[hsl(0_0%_22%)]">
+      <div class="bg-white/80 dark:bg-[hsl(0_0%_10%_/_0.9)] backdrop-blur-xl rounded-2xl shadow-xl p-8 max-w-md w-full border border-slate-200 dark:border-[var(--ch-border)]">
         <!-- Success Icon -->
         <div class="flex justify-center mb-4">
           <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/50 rounded-full flex items-center justify-center">
@@ -138,7 +138,7 @@ const description = "Help build safer communities: report crime anonymously via 
         </div>
 
         <!-- Thank You Message -->
-        <h2 class="text-display font-bold text-slate-700 dark:text-[hsl(0_0%_92%)] mb-2">Thank You!</h2>
+        <h2 class="text-display font-bold text-slate-700 dark:text-[var(--ch-text)] mb-2">Thank You!</h2>
         <p class="text-body text-slate-600 dark:text-[hsl(0_0%_70%)] mb-6">
           Your anonymous report has been submitted successfully. Save this ID for your records.
         </p>
@@ -160,10 +160,10 @@ const description = "Help build safer communities: report crime anonymously via 
         </button>
 
         <!-- Divider -->
-        <div class="border-t border-slate-200 dark:border-[hsl(0_0%_22%)] mb-6"></div>
+        <div class="border-t border-slate-200 dark:border-[var(--ch-border)] mb-6"></div>
 
         <!-- Next Steps -->
-        <p class="text-xs font-semibold text-slate-500 dark:text-[hsl(0_0%_55%)] mb-3 uppercase tracking-wide">What's Next?</p>
+        <p class="text-xs font-semibold text-slate-500 dark:text-[var(--ch-text-muted)] mb-3 uppercase tracking-wide">What's Next?</p>
         <div class="grid grid-cols-2 gap-3 mb-4">
           <button
             id="exploreCountryBtn"
@@ -175,7 +175,7 @@ const description = "Help build safer communities: report crime anonymously via 
             </svg>
             Explore
           </button>
-          <a href={routes.report} class="px-4 py-2.5 bg-white dark:bg-[hsl(0_0%_12%)] border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_85%)] rounded-lg hover:border-rose-600 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 transition font-medium text-xs flex items-center justify-center gap-1.5">
+          <a href={routes.report} class="px-4 py-2.5 bg-white dark:bg-[hsl(0_0%_12%)] border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[var(--ch-text-strong)] rounded-lg hover:border-rose-600 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 transition font-medium text-xs flex items-center justify-center gap-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
@@ -184,7 +184,7 @@ const description = "Help build safer communities: report crime anonymously via 
         </div>
 
         <!-- Home Link -->
-        <a href="/" class="text-small text-slate-500 dark:text-[hsl(0_0%_55%)] hover:text-rose-600 dark:hover:text-rose-400 underline">
+        <a href="/" class="text-small text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 underline">
           Return to Homepage
         </a>
       </div>

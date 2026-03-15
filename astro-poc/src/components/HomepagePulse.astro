@@ -46,95 +46,27 @@ const murdersThisWeek = countCrimeType(thisWeekCrimes, 'Murder');
 const latestCrime = allCrimes[0]; // Already sorted newest first
 ---
 
-{thisWeekCrimes.length > 0 && (
-  embedded ? (
-    /* ── Embedded mode: stats block inside a parent card ── */
-    <div class="px-4 pb-4 pt-3 border-t border-slate-100 dark:border-[hsl(0_0%_15%)]">
-      <!-- "This week" label -->
-      <div class="flex items-center gap-1.5 mb-3">
-        <span class="relative flex h-1.5 w-1.5">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
-        </span>
-        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[hsl(0_0%_50%)]">This Week</p>
-      </div>
-
-      <!-- Stats row -->
-      <div class="grid grid-cols-3 gap-3 mb-3">
-        <div>
-          <div class="text-xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">
-            {thisWeekCrimes.length}
-          </div>
-          <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">
-            crimes
-            {weekChange !== 0 && (
-              <span class={weekChange > 0 ? 'text-rose-600' : 'text-emerald-600'}>
-                {' '}{weekChange > 0 ? '+' : ''}{weekChange}%
-              </span>
-            )}
-          </div>
-        </div>
-
-        {topArea && (
-          <div>
-            <div class="text-sm font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] truncate">
-              {topArea.area}
-            </div>
-            <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">
-              top area
-            </div>
-          </div>
-        )}
-
-        <div>
-          <div class="text-xl font-bold text-rose-600">
-            {murdersThisWeek}
-          </div>
-          <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">
-            murders
-          </div>
-        </div>
-      </div>
-
-      <!-- Latest headline -->
-      {latestCrime && (
-        <div class="border-t border-slate-100 dark:border-[hsl(0_0%_15%)] pt-2.5 mb-3">
-          <p class="text-[10px] text-slate-400 dark:text-[hsl(0_0%_50%)] mb-0.5">Latest</p>
-          <p class="text-xs text-slate-600 dark:text-[hsl(0_0%_75%)] line-clamp-2 leading-relaxed">
-            {escapeHtml(latestCrime.headline)}
-          </p>
-        </div>
-      )}
-
-      <!-- Explore CTA — styled div, not <a> (parent card is the link) -->
-      <div class="inline-flex items-center gap-1 text-sm font-bold text-rose-600 group-hover:text-rose-700 transition-colors">
-        Explore Dashboard
-        <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </div>
+embedded ? (
+  /* ── Embedded mode: stats block inside a parent card ── */
+  <div class="px-4 pb-4 pt-3 border-t border-slate-100 dark:border-[var(--ch-border-subtle)]">
+    <!-- "This week" label -->
+    <div class="flex items-center gap-1.5 mb-3">
+      <span class="relative flex h-1.5 w-1.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
+      </span>
+      <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-[var(--ch-text-faint)]">This Week</p>
     </div>
-  ) : (
-    /* ── Standalone mode: full card with own border ── */
-    <section class="mt-10 max-w-2xl mx-auto">
-      <div class="rounded-lg border border-slate-200 dark:border-[hsl(0_0%_15%)] bg-white/70 dark:bg-[hsl(0_0%_5%)] p-5">
-        <div class="flex items-center gap-2 mb-3">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-          </span>
-          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[hsl(0_0%_55%)]">
-            {countryName} This Week
-          </h2>
-        </div>
 
+    {thisWeekCrimes.length > 0 ? (
+      <>
         <!-- Stats row -->
-        <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="grid grid-cols-3 gap-3 mb-3">
           <div>
-            <div class="text-2xl font-bold text-slate-700 dark:text-[hsl(0_0%_90%)]">
+            <div class="text-xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">
               {thisWeekCrimes.length}
             </div>
-            <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">
+            <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">
               crimes
               {weekChange !== 0 && (
                 <span class={weekChange > 0 ? 'text-rose-600' : 'text-emerald-600'}>
@@ -146,20 +78,20 @@ const latestCrime = allCrimes[0]; // Already sorted newest first
 
           {topArea && (
             <div>
-              <div class="text-sm font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] truncate">
+              <div class="text-sm font-bold text-slate-700 dark:text-[var(--ch-text-heading)] truncate">
                 {topArea.area}
               </div>
-              <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">
-                top area ({topArea.count})
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">
+                top area
               </div>
             </div>
           )}
 
           <div>
-            <div class="text-2xl font-bold text-rose-600">
+            <div class="text-xl font-bold text-rose-600">
               {murdersThisWeek}
             </div>
-            <div class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)]">
+            <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">
               murders
             </div>
           </div>
@@ -167,25 +99,103 @@ const latestCrime = allCrimes[0]; // Already sorted newest first
 
         <!-- Latest headline -->
         {latestCrime && (
-          <div class="border-t border-slate-100 dark:border-[hsl(0_0%_15%)] pt-3">
-            <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_50%)] mb-1">Latest</p>
-            <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_80%)] line-clamp-1">
+          <div class="border-t border-slate-100 dark:border-[var(--ch-border-subtle)] pt-2.5 mb-3">
+            <p class="text-[10px] text-slate-400 dark:text-[var(--ch-text-faint)] mb-0.5">Latest</p>
+            <p class="text-xs text-slate-600 dark:text-[hsl(0_0%_75%)] line-clamp-2 leading-relaxed">
               {escapeHtml(latestCrime.headline)}
             </p>
           </div>
         )}
+      </>
+    ) : (
+      <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mb-3">No incidents reported this week.</p>
+    )}
 
-        <!-- CTA -->
-        <a
-          href={dashboardUrl}
-          class="mt-4 inline-flex items-center gap-1 text-sm font-bold text-rose-600 hover:text-rose-700 transition"
-        >
-          Explore Trinidad Dashboard
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </a>
+    <!-- Explore CTA — always shown; styled div, not <a> (parent card is the link) -->
+    <div class="inline-flex items-center gap-1 text-sm font-bold text-rose-600 group-hover:text-rose-700 transition-colors">
+      Explore Dashboard
+      <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+      </svg>
+    </div>
+  </div>
+) : (
+  /* ── Standalone mode: full card with own border ── */
+  <section class="mt-10 max-w-2xl mx-auto">
+    <div class="rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] bg-white/70 dark:bg-[var(--ch-surface)] p-5">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+        </span>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-[var(--ch-text-muted)]">
+          {countryName} This Week
+        </h2>
       </div>
-    </section>
-  )
-)}
+
+      {thisWeekCrimes.length > 0 ? (
+        <>
+          <!-- Stats row -->
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">
+                {thisWeekCrimes.length}
+              </div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">
+                crimes
+                {weekChange !== 0 && (
+                  <span class={weekChange > 0 ? 'text-rose-600' : 'text-emerald-600'}>
+                    {' '}{weekChange > 0 ? '+' : ''}{weekChange}%
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {topArea && (
+              <div>
+                <div class="text-sm font-bold text-slate-700 dark:text-[var(--ch-text-heading)] truncate">
+                  {topArea.area}
+                </div>
+                <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">
+                  top area ({topArea.count})
+                </div>
+              </div>
+            )}
+
+            <div>
+              <div class="text-2xl font-bold text-rose-600">
+                {murdersThisWeek}
+              </div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">
+                murders
+              </div>
+            </div>
+          </div>
+
+          <!-- Latest headline -->
+          {latestCrime && (
+            <div class="border-t border-slate-100 dark:border-[var(--ch-border-subtle)] pt-3 mb-4">
+              <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mb-1">Latest</p>
+              <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_80%)] line-clamp-1">
+                {escapeHtml(latestCrime.headline)}
+              </p>
+            </div>
+          )}
+        </>
+      ) : (
+        <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] mb-4">No incidents reported this week.</p>
+      )}
+
+      <!-- CTA — always shown -->
+      <a
+        href={dashboardUrl}
+        class="inline-flex items-center gap-1 text-sm font-bold text-rose-600 hover:text-rose-700 transition"
+      >
+        Explore Trinidad Dashboard
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+  </section>
+)

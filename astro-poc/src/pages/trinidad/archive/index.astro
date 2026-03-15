@@ -62,7 +62,7 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
   </Hero>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[hsl(0_0%_18%)]">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
 
     <!-- Site Notification Banner -->
     <SiteNotificationBanner notification={dataUpdateNotice} />
@@ -74,14 +74,14 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
         return (
           <a
             href={buildRoute.archive(archive.year, String(archive.month).padStart(2, '0'))}
-            class="block bg-white/70 dark:bg-[hsl(0_0%_8%)]/70 rounded-lg shadow-sm border border-slate-200 dark:border-[hsl(0_0%_15%)] p-6 hover:border-rose-600 hover:shadow-md active:shadow-lg transition group"
+            class="block bg-white/70 dark:bg-[var(--ch-surface)]/70 rounded-lg shadow-sm border border-slate-200 dark:border-[var(--ch-border-subtle)] p-6 hover:border-rose-600 hover:shadow-md active:shadow-lg transition group"
           >
             <div class="flex items-start justify-between">
               <div>
-                <h2 class={`text-body font-bold transition ${archive.year === currentYear && archive.month === currentMonth ? 'text-rose-600 group-hover:text-rose-700' : 'text-slate-500 dark:text-[hsl(0_0%_55%)] group-hover:text-rose-600'}`}>
+                <h2 class={`text-body font-bold transition ${archive.year === currentYear && archive.month === currentMonth ? 'text-rose-600 group-hover:text-rose-700' : 'text-slate-500 dark:text-[var(--ch-text-muted)] group-hover:text-rose-600'}`}>
                   {monthName} <br>{archive.year}</br>
                 </h2>
-                <p class="text-tiny text-slate-500 dark:text-[hsl(0_0%_55%)] mt-1">
+                <p class="text-tiny text-slate-500 dark:text-[var(--ch-text-muted)] mt-1">
                   {archive.count} {archive.count === 1 ? 'crime' : 'crimes'}
                 </p>
               </div>
@@ -90,7 +90,7 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
               </svg>
             </div>
 
-            <div class="mt-4 flex items-center text-xs text-slate-500 dark:text-[hsl(0_0%_55%)]">
+            <div class="mt-4 flex items-center text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">
               View full report
             </div>
           </a>
@@ -100,7 +100,7 @@ const description = "Browse crime statistics archives for Trinidad & Tobago by m
 
     {archives.length === 0 && (
       <div class="text-center py-12">
-        <p class="text-body text-slate-600 dark:text-[hsl(0_0%_55%)]">No archives available yet.</p>
+        <p class="text-body text-slate-600 dark:text-[var(--ch-text-muted)]">No archives available yet.</p>
       </div>
     )}
 
