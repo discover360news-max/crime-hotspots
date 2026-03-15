@@ -521,7 +521,7 @@ const breadcrumbs = [
 ></div>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     // --- Accordion toggle ---
     document.querySelectorAll('.accordion-toggle').forEach(button => {
       button.addEventListener('click', function() {

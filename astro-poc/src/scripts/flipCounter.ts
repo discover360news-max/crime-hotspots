@@ -162,7 +162,7 @@ export function getDigitCount(value: number): number {
  * Uses astro:page-load which fires on initial load (with ClientRouter) and after navigations.
  */
 export function initOnLoad(containerId: string, targetValue: number): void {
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     initFlipCounter(containerId, targetValue);
   });
 }

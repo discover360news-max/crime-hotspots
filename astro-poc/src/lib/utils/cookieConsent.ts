@@ -234,7 +234,7 @@ export function initCookieConsent(config = {}) {
 
   // Show banner on each page load (astro:page-load fires on initial load + after navigations)
   // consent.show() is a no-op if user has already consented
-  document.addEventListener('astro:page-load', () => consent.show());
+  document.addEventListener('DOMContentLoaded', () => consent.show());
 
   return consent;
 }

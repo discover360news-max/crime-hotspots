@@ -563,17 +563,9 @@ const inactiveNavClass = `${baseNavClass} text-slate-700 dark:text-[hsl(0_0%_85%
   // Expose for inline onclick attributes in the template
   (window as any).navigateAreas = navigateAreas;
 
-  // SPA navigation guard — close any open dialogs immediately, unlock scroll
-  document.addEventListener('astro:before-preparation', () => {
-    const mobileMenuDialog = document.getElementById('mobileMenuDialog') as HTMLDialogElement | null;
-    const subscribeDialog = document.getElementById('subscribeDialog') as HTMLDialogElement | null;
-    if (mobileMenuDialog?.open) mobileMenuDialog.close();
-    if (subscribeDialog?.open) subscribeDialog.close();
-    unlockScroll();
-  });
 
   // Re-attach all element-specific listeners on every navigation
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     // ── Mobile menu ──────────────────────────────────────────────────────────
     const menuToggle = document.getElementById('menuToggle') as HTMLButtonElement | null;
     const mobileMenuDialog = document.getElementById('mobileMenuDialog') as HTMLDialogElement | null;

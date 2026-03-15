@@ -210,7 +210,7 @@ const allQuestions = faqData.flatMap(category => category.questions);
 
   <!-- FAQ Accordion Script -->
   <script>
-    document.addEventListener('astro:page-load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
       const questions = document.querySelectorAll('.faq-question');
 
       questions.forEach(question => {

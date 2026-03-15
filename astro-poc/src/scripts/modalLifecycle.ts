@@ -112,23 +112,6 @@ export function createModalLifecycle(ids: ModalElementIds): ModalLifecycle {
     }
   });
 
-  // When ClientRouter is active, intercept traversals (back/forward) while the modal is
-  // open: prevent the page swap and close the modal instead.
-  // For link (push) navigations while the modal is open: don't block the navigation
-  // but release the scroll lock so the next page isn't stuck with overflow:hidden.
-  // `isClosing` guards the traverse case — when close() calls history.back() the
-  // resulting traverse should only change the URL, not trigger a second close cycle.
-  document.addEventListener('astro:before-navigate', (e: Event) => {
-    const nav = e as any;
-    if (nav.navigationType === 'traverse' && isOpen()) {
-      nav.preventDefault(); // Block page swap — Back should only close the modal
-      if (!isClosing) close(true);
-    } else if (isOpen()) {
-      // Push/replace navigation (e.g. "View Full Page") — allow it but clean up state
-      resetForNavigation();
-    }
-  });
-
   // Escape key closes modal
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && isOpen()) {

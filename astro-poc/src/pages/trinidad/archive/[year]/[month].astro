@@ -386,11 +386,7 @@ const breadcrumbs = [
     });
   }
 
-  // Runs on every SPA navigation (and first load when ClientRouter fires it)
-  document.addEventListener('astro:page-load', initArchiveAccordions);
-  // Fallback: also run immediately in case astro:page-load already fired
-  // before this module executed (first SPA visit to this route)
-  initArchiveAccordions();
+  document.addEventListener('DOMContentLoaded', initArchiveAccordions);
 </script>
 
 <style>

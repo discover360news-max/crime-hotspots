@@ -245,7 +245,7 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
 </Layout>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('areaSearch');
     const regionContainer = document.getElementById('regionContainer');
     const noResults = document.getElementById('noResults');

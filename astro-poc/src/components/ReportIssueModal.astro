@@ -218,7 +218,7 @@ const {
 
 <script define:vars={{ idPrefix, APPS_SCRIPT_URL }}>
   // Wrap everything in astro:page-load (works with ClientRouter on each navigation)
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
 
     const openBtn = document.getElementById(`${idPrefix}reportIssueBtn`);
     const closeBtn = document.getElementById(`${idPrefix}closeModalBtn`);

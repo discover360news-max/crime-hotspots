@@ -76,7 +76,7 @@ const { category, count, categoryHref, isExpanded = false } = Astro.props;
 <script>
   // <details> sets content to display:none on close, which kills CSS height transitions.
   // Intercept toggle: manage is-open class for animation, open attribute for ARIA semantics.
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.cat-accordion').forEach((details) => {
       const content = details.querySelector('.cat-content');
       if (!content) return;

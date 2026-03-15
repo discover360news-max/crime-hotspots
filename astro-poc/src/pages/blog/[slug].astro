@@ -423,7 +423,7 @@ const newsArticleSchema = {
 
   <!-- Social Share Script -->
   <script is:inline define:vars={{ title: post.data.title }}>
-    document.addEventListener('astro:page-load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
       const url = window.location.href;
       const text = title;
 

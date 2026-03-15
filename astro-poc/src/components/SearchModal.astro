@@ -476,7 +476,7 @@
   };
 
   // ── Re-attach listeners after each SPA nav ────────────────────────────────
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     latestCrimesFetched = false;
     lastQuery = '';
 
@@ -505,8 +505,4 @@
     }
   });
 
-  // Restore scroll lock if SPA nav happens while modal is open
-  document.addEventListener('astro:before-preparation', () => {
-    document.body.style.overflow = '';
-  });
 </script>

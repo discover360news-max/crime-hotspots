@@ -118,7 +118,7 @@ const crimeTypes = CRIME_TYPE_LABELS;
 
   // Re-attach click listeners on every navigation (astro:page-load fires on
   // initial load + after each SPA navigation via ClientRouter)
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const filtersBtn = document.getElementById('filtersBtn');
     const filtersBackdrop = document.getElementById('filtersBackdrop');
     const closeFiltersBtn = document.getElementById('closeFiltersBtn');

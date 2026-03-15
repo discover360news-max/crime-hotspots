@@ -199,7 +199,7 @@ const breadcrumbs = [
 </script>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
   // Area links: keep in sync with src/config/routes.ts
   const { availableAreas, areaStatsMap } = (window as any).__compareData || {};
   if (!availableAreas || !areaStatsMap) return;

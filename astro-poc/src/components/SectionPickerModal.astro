@@ -206,7 +206,7 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
   };
 
   // Re-attach click listeners after every SPA navigation (body is replaced each time)
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const dialog = document.getElementById('sectionPickerModal') as HTMLDialogElement | null;
     const closeBtn = document.getElementById('closeSectionPickerModal');
 
@@ -224,8 +224,4 @@ const availableCountries = COUNTRIES.filter(c => c.available && c.sections?.leng
     });
   });
 
-  // Restore scroll lock if SPA nav happens while modal is open
-  document.addEventListener('astro:before-preparation', () => {
-    document.body.style.overflow = '';
-  });
 </script>

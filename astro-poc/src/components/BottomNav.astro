@@ -317,14 +317,8 @@ const isMoreActive = moreSections.some(s => isActive(s.url)) ||
     document.body.style.paddingRight = '';
   }
 
-  // SPA navigation guard — close dialog immediately, unlock scroll
-  document.addEventListener('astro:before-preparation', () => {
-    const dialog = document.getElementById('moreMenuDialog') as HTMLDialogElement | null;
-    if (dialog?.open) dialog.close();
-    unlockScroll();
-  });
 
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const dialog = document.getElementById('moreMenuDialog') as HTMLDialogElement | null;
     const btn = document.getElementById('moreMenuBtn') as HTMLButtonElement | null;
     const closeBtn = document.getElementById('moreMenuClose') as HTMLButtonElement | null;

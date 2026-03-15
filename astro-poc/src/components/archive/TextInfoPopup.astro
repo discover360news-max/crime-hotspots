@@ -120,7 +120,7 @@ const { id, triggerText } = Astro.props;
   }
 
   // Initialize all text info popups on each page load (astro:page-load works with ClientRouter)
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const triggers = document.querySelectorAll('.text-info-popup-trigger');
     triggers.forEach(trigger => {
       trigger.addEventListener('click', (e) => {

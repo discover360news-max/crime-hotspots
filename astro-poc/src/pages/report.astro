@@ -461,8 +461,7 @@ const description = "Help build safer communities: report crime anonymously via 
     }
 
     // --- Initialize ---
-    // astro:page-load fires on initial load (with ClientRouter) and after each navigation
-    document.addEventListener("astro:page-load", () => {
+    document.addEventListener("DOMContentLoaded", () => {
       // Render Turnstile widget
       renderTurnstile();
 

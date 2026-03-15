@@ -401,7 +401,7 @@ const description = `Trinidad murder count 2026: ${murderCount} murders (death t
 </Layout>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Share buttons (X, Facebook, WhatsApp)
     document.querySelectorAll<HTMLElement>('.sb-share-btn').forEach(btn => {
       btn.addEventListener('click', () => {

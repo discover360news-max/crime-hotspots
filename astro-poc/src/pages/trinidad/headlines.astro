@@ -330,17 +330,14 @@ const breadcrumbs = [
   }
 </style>
 
-<!-- Data only: expose to window for module script to read after SPA navigation -->
+<!-- Data bridge: expose server data to module script -->
 <script define:vars={{ allCrimes, regionToAreas, allAreas: areas }}>
   window.__hlData = { allCrimes, regionToAreas, allAreas };
 </script>
 
-<!-- Filter tray + filter logic: module script, re-runs callback on every navigation -->
+<!-- Filter tray + filter logic -->
 <script>
-  // Clear headlines data when navigating away so the page-load guard works correctly on other pages
-  document.addEventListener('astro:before-swap', () => { delete (window as any).__hlData; });
-
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const { allCrimes, regionToAreas, allAreas } = (window as any).__hlData || {};
     if (!allCrimes) return;
 
@@ -635,7 +632,7 @@ const breadcrumbs = [
 
 <!-- Accordion toggle: event delegation on container, re-fires on every navigation -->
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('crimeAccordions');
     if (!container) return;
     container.addEventListener('click', (e) => {

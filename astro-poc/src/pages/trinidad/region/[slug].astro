@@ -345,7 +345,7 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
 </style>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Accordion toggles
     document.querySelectorAll('.accordion-toggle').forEach(button => {
       button.addEventListener('click', function() {

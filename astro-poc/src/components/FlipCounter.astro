@@ -142,7 +142,7 @@ const initialDigits = animateOnLoad
     }
 
     // Run animation after page load (astro:page-load works with ClientRouter)
-    document.addEventListener('astro:page-load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
       setTimeout(initFlipCounter, 300);
     });
   </script>

@@ -245,7 +245,7 @@ function mpCard(mp: MP) {
 </aside>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     // Share buttons
     document.querySelectorAll<HTMLElement>('.sb-share-btn').forEach(btn => {
       btn.addEventListener('click', () => {
