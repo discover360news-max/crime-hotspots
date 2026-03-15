@@ -297,15 +297,14 @@ const breadcrumbs = [
           });
 
           return (
-            <div class={`date-accordion mb-3 rounded-xl transition-colors duration-300 ${isExpanded ? 'bg-slate-50/60 dark:bg-[hsl(0_0%_6%)]/60 border border-rose-200 dark:border-rose-900/40' : ''}`} data-date={date}>
+            <div class="date-accordion mb-3" data-date={date}>
               <button
-                class="accordion-header w-full px-4 py-3 bg-white/85 dark:bg-[hsl(0_0%_8%)]/85 backdrop-blur-md rounded-lg hover:bg-white/90 dark:hover:bg-[hsl(0_0%_10%)]/90 transition flex items-center justify-between group border"
-                style={isExpanded ? 'border-color:#e11d48' : 'border-color:var(--ch-border)'}
-                aria-expanded={isExpanded}
+                class="da-header w-full px-4 py-3 bg-white dark:bg-[hsl(0_0%_10%)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_18%)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group"
+                aria-expanded={isExpanded ? 'true' : 'false'}
               >
                 <div class="flex items-center gap-3">
                   <svg
-                    class={`chevron w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_50%)] transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}
+                    class={`da-chevron w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_55%)] transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -314,23 +313,20 @@ const breadcrumbs = [
                   </svg>
 
                   <div class="text-left">
-                    <h3 class="accordion-title text-caption font-bold leading-snug" style={isExpanded ? 'color:#e11d48' : 'color:var(--ch-text)'}>{formattedDate}</h3>
-                    <p class="text-caption text-slate-500 dark:text-[hsl(0_0%_55%)]">{incidentCount} {incidentCount === 1 ? 'crime' : 'crimes'} affecting {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+                    <h3 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_90%)] leading-snug">{formattedDate}</h3>
+                    <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_55%)]">{incidentCount} {incidentCount === 1 ? 'crime' : 'crimes'} · {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
                   </div>
                 </div>
 
-                <div class="flex items-center gap-2">
-                  <span class={`tap-hint text-caption text-slate-400 dark:text-[hsl(0_0%_45%)] ${isExpanded ? 'hidden' : ''}`}>Tap to view</span>
-                  <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[hsl(0_0%_55%)] text-caption font-medium">
-                    {incidentCount}
-                  </span>
-                </div>
+                <span class="px-2 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[hsl(0_0%_55%)] text-caption font-medium">
+                  {incidentCount}
+                </span>
               </button>
 
-              <div class={`accordion-content overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[10000px] mt-3 px-3 pb-3' : 'max-h-0'}`}>
-                <div class="relative pl-7">
+              <div class={`da-content overflow-hidden${isExpanded ? ' is-open' : ''}`}>
+                <div class="relative pl-7 py-2">
                   {/* Vertical dotted line */}
-                  <div class="absolute left-2.5 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
+                  <div class="absolute left-3.5 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
 
                   <div class="space-y-1">
                     {dateCrimes.map(crime => (
@@ -366,45 +362,40 @@ const breadcrumbs = [
 
 <script>
   document.addEventListener('astro:page-load', () => {
-    // Accordion toggle listeners
-    const headers = document.querySelectorAll('.accordion-header');
-    headers.forEach(header => {
-      header.addEventListener('click', () => {
-        const accordion = header.closest('.date-accordion');
-        const content = accordion?.querySelector('.accordion-content');
-        const chevron = header.querySelector('.chevron');
-        const title = header.querySelector('.accordion-title');
-        const tapHint = header.querySelector('.tap-hint');
-        const isExpanded = header.getAttribute('aria-expanded') === 'true';
-
-        if (content && chevron && title && accordion) {
-          if (isExpanded) {
-            header.setAttribute('aria-expanded', 'false');
-            content.classList.remove('max-h-[10000px]', 'mt-3', 'px-3', 'pb-3');
-            content.classList.add('max-h-0');
-            chevron.classList.remove('rotate-90');
-            header.style.borderColor = 'var(--ch-border)';
-            title.style.color = 'var(--ch-text)';
-            accordion.classList.remove('bg-slate-50/60', 'dark:bg-[hsl(0_0%_6%)]/60', 'border', 'border-rose-200', 'dark:border-rose-900/40');
-            if (tapHint) tapHint.classList.remove('hidden');
-          } else {
-            header.setAttribute('aria-expanded', 'true');
-            content.classList.add('max-h-[10000px]', 'mt-3', 'px-3', 'pb-3');
-            content.classList.remove('max-h-0');
-            chevron.classList.add('rotate-90');
-            header.style.borderColor = '#e11d48';
-            title.style.color = '#e11d48';
-            accordion.classList.add('bg-slate-50/60', 'dark:bg-[hsl(0_0%_6%)]/60', 'border', 'border-rose-200', 'dark:border-rose-900/40');
-            if (tapHint) tapHint.classList.add('hidden');
-          }
+    const container = document.getElementById('crimeAccordions');
+    container?.addEventListener('click', (e) => {
+      const header = (e.target as Element).closest('.da-header');
+      if (!header) return;
+      const accordion = header.closest('.date-accordion');
+      const content = accordion?.querySelector('.da-content');
+      const chevron = header.querySelector('.da-chevron');
+      const expanded = header.getAttribute('aria-expanded') === 'true';
+      if (content) {
+        if (expanded) {
+          header.setAttribute('aria-expanded', 'false');
+          content.classList.remove('is-open');
+          chevron?.classList.remove('rotate-90');
+        } else {
+          header.setAttribute('aria-expanded', 'true');
+          content.classList.add('is-open');
+          chevron?.classList.add('rotate-90');
         }
-      });
+      }
     });
-
   });
 </script>
 
 <style>
+  /* height: auto is animatable because Layout.astro sets html { interpolate-size: allow-keywords } */
+  :global(.da-content) {
+    height: 0;
+    transition: height 300ms ease, margin-top 200ms ease;
+  }
+  :global(.da-content.is-open) {
+    height: auto;
+    margin-top: 0.75rem;
+  }
+
   /* Hide scrollbar on touch devices, show on desktop */
   .hide-scrollbar {
     -ms-overflow-style: none;
