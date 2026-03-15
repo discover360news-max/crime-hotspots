@@ -32,7 +32,6 @@ import {
   TRACKED_CRIME_TYPES
 } from '../../lib/statisticsHelpers';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
-import { generateStatisticsOgImage } from '../../lib/generateOgImage';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
@@ -165,16 +164,9 @@ const murderRateProjected = ((murderProjected / POPULATION) * 100000).toFixed(1)
 const robberyRateProjected = ((robberyProjected / POPULATION) * 100000).toFixed(1);
 const totalCrimeRateProjected = ((totalCrimesProjected / POPULATION) * 100000).toFixed(1);
 
-// Generate dynamic OG image with live stats
-const ogImagePath = await generateStatisticsOgImage({
-  totalCrimes: total2026YTD,
-  murderCount,
-  robberyCount,
-  shootingCount,
-  currentYear,
-  murderRate: murderRateProjected,
-  yoyChange: totalYoYChange,
-});
+// OG image is generated at build time by GitHub Actions (daily rebuild).
+// Do NOT call generateStatisticsOgImage here — sharp + node:fs crash in Cloudflare Workers.
+const ogImagePath = '/og-images/statistics.png';
 
 // SEO
 const title = `Trinidad Crime Statistics & Crime Rate ${currentYear} - Live Data | Crime Hotspots`;
