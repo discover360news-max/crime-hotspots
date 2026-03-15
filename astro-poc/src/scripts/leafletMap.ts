@@ -39,18 +39,20 @@ interface Crime {
 // Crime type color mappings
 const CRIME_COLORS: Record<string, string> = {
   'Murder': '#e11d48',
-  'Shooting': '#dc2626',
-  'Robbery': '#f97316',
-  'Home Invasion': '#9333ea',
-  'Theft': '#06b6d4',
+  'Attempted Murder': '#f43f5e',
   'Kidnapping': '#ec4899',
   'Sexual Assault': '#c026d3',
+  'Shooting': '#dc2626',
   'Assault': '#8b5cf6',
+  'Home Invasion': '#9333ea',
   'Carjacking': '#f59e0b',
+  'Arson': '#ea580c',
+  'Robbery': '#f97316',
   'Domestic Violence': '#fb7185',
   'Extortion': '#059669',
+  'Burglary': '#eab308',
+  'Theft': '#06b6d4',
   'Seizures': '#3b82f6',
-  'Burglary': '#eab308'
 };
 
 /**
