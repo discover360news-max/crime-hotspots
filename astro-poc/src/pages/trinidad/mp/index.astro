@@ -86,7 +86,7 @@ const pageDescription = 'Directory of all 41 Members of Parliament in Trinidad a
                 class="flex items-center gap-3 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-3 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm transition group"
               >
                 <div class="shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
-                  <img src={photoSrc} alt="" class="w-full h-full object-cover" loading="lazy" />
+                  <img src={photoSrc} alt={mp.photo ? `${displayName}, MP` : ''} class="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <div class="min-w-0">
                   <div class="text-sm font-semibold text-slate-700 dark:text-[var(--ch-text-strong)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug">{displayName}</div>

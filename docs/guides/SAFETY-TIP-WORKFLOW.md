@@ -82,7 +82,7 @@ Both `category` and `context` must exist in `astro-poc/src/content/config.ts`.
 `Robbery`, `Carjacking`, `Home Invasion`, `ATM Crime`, `Online Scam`, `Kidnapping`, `Sexual Violence`, `Fraud`, `Assault`, `Domestic Violence`, `Extortion`, `Shooting`, `Burglary`, `Other`
 
 **Current valid contexts:**
-`At Home`, `In Your Car`, `At the ATM`, `In a Mall`, `Walking Alone`, `Online`, `At Work`, `Using Public Transport`, `At an Event`, `At a Hotel`, `Other`
+`At Home`, `In Your Car`, `At the ATM`, `In a Mall`, `Walking Alone`, `Online`, `At Work`, `Using Public Transport`, `At an Event`, `At a Hotel`, `At a Bar`, `Other`
 
 If a value does not exist in the enum → add it to the `config.ts` enum **first**, then create the tip file. A mismatched value will break the build immediately.
 
@@ -107,7 +107,7 @@ Glob pattern="*.md" path="astro-poc/src/content/tips/"
 
 Find the highest-numbered file. Next tip = last ID + 1. Zero-pad to 5 digits (`TIP-00031`, `TIP-00032`, etc.).
 
-> **Current last tip:** TIP-00061 (as of March 14, 2026)
+> **Current last tip:** TIP-00067 (as of March 17, 2026)
 
 ---
 

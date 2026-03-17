@@ -1,0 +1,651 @@
+---
+/**
+ * Jamaica Crime Statistics Hub
+ * Authority page for Jamaica crime statistics
+ * Target keyword: "jamaica crime statistics"
+ *
+ * Features:
+ * - Auto-updates daily via Astro SSG + GitHub Actions rebuild
+ * - Indexable text content for SEO
+ * - Year-over-year comparisons
+ * - TODO: wire to Jamaica D1 — replace empty allCrimes with getAllCrimesFromD1(db, 'JM')
+ *   when Jamaica DB binding is configured in wrangler.toml
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Hero from '../../components/Hero.astro';
+import StatCards from '../../components/StatCards.astro';
+import DataTable from '../../components/DataTable.astro';
+import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
+import { JAMAICA_CSV_URL } from '../../config/csvUrls';
+import { routes } from '../../config/routes';
+import {
+  compareYearToDate,
+  getTopRegions,
+  getTotalCrimeCount,
+  filterToSamePeriod,
+  formatPercentChange,
+  getCurrentPeriodDescription,
+  TRACKED_CRIME_TYPES
+} from '../../lib/statisticsHelpers';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import type { Crime } from '../../lib/crimeData';
+
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+// TODO: wire to Jamaica D1 when pipeline is live
+// Replace: const allCrimes = db ? await getAllCrimesFromD1(db, 'JM') : [];
+const allCrimes: Crime[] = [];
+
+// Dynamic year handling
+const currentYear = new Date().getFullYear();
+const previousYear = currentYear - 1;
+
+// Filter by year
+const crimesCurrent = allCrimes.filter(c => c.year === currentYear);
+const crimesPrevious = allCrimes.filter(c => c.year === previousYear);
+
+// Calculate statistics
+const yoyComparisons = compareYearToDate(crimesCurrent, crimesPrevious, currentYear, previousYear);
+const topRegions = getTopRegions(crimesCurrent);
+const totalCrimesCurrent = getTotalCrimeCount(crimesCurrent);
+const totalCrimesPrevious = getTotalCrimeCount(crimesPrevious);
+
+// Key crime counts for current year
+const murderCount = countCrimeType(crimesCurrent, 'Murder');
+const robberyCount = countCrimeType(crimesCurrent, 'Robbery');
+const shootingCount = countCrimeType(crimesCurrent, 'Shooting');
+
+// Previous year final counts
+const murderCountPrevious = countCrimeType(crimesPrevious, 'Murder');
+const robberyCountPrevious = countCrimeType(crimesPrevious, 'Robbery');
+
+// YTD same-period comparison
+const crimes2YTD = filterToSamePeriod(crimesCurrent, currentYear);
+const crimesPrevSamePeriod = filterToSamePeriod(crimesPrevious, previousYear);
+const totalCurrentYTD = getTotalCrimeCount(crimes2YTD);
+const totalPrevSamePeriod = getTotalCrimeCount(crimesPrevSamePeriod);
+const totalYoYChange = totalPrevSamePeriod > 0
+  ? ((totalCurrentYTD - totalPrevSamePeriod) / totalPrevSamePeriod) * 100
+  : 0;
+
+// Extract YoY comparisons
+const murderComp = yoyComparisons.find(c => c.type === 'Murder') ?? { countPrevious: 0, percentChange: 0, direction: 'flat' as const };
+const robberyComp = yoyComparisons.find(c => c.type === 'Robbery') ?? { countPrevious: 0, percentChange: 0, direction: 'flat' as const };
+const shootingComp = yoyComparisons.find(c => c.type === 'Shooting') ?? { countPrevious: 0, percentChange: 0, direction: 'flat' as const };
+
+// Stat cards
+const statsPageUrl = 'https://crimehotspots.com/jamaica/statistics/';
+function buildShareText(count: number, noun: string, direction: string, change: number): string {
+  const trend = direction === 'up'
+    ? `up ${Math.round(Math.abs(change))}% vs ${previousYear}`
+    : direction === 'down'
+      ? `down ${Math.round(Math.abs(change))}% vs ${previousYear}`
+      : `similar to ${previousYear}`;
+  return `Jamaica: ${count} ${noun} in ${currentYear} — ${trend}. Track it live: ${statsPageUrl}`;
+}
+
+const statCardsData = [
+  {
+    label: 'Murders',
+    current: murderCount,
+    previous: murderComp.countPrevious,
+    yoyChange: murderComp.percentChange,
+    direction: murderComp.direction,
+    shareText: buildShareText(murderCount, 'murders', murderComp.direction, murderComp.percentChange),
+  },
+  {
+    label: 'Robberies',
+    current: robberyCount,
+    previous: robberyComp.countPrevious,
+    yoyChange: robberyComp.percentChange,
+    direction: robberyComp.direction,
+    shareText: buildShareText(robberyCount, 'robberies', robberyComp.direction, robberyComp.percentChange),
+  },
+  {
+    label: 'Shootings',
+    current: shootingCount,
+    previous: shootingComp.countPrevious,
+    yoyChange: shootingComp.percentChange,
+    direction: shootingComp.direction as 'flat' | 'up' | 'down' | 'same',
+  },
+  {
+    label: 'All Crimes',
+    current: totalCurrentYTD,
+    previous: totalPrevSamePeriod,
+    yoyChange: totalYoYChange,
+    direction: (totalYoYChange < -0.5 ? 'down' : totalYoYChange > 0.5 ? 'up' : 'flat') as 'flat' | 'up' | 'down' | 'same',
+  }
+];
+
+// Current period description
+const periodDescription = getCurrentPeriodDescription();
+
+// Last updated = build time
+const lastUpdated = new Date().toLocaleDateString('en-US', {
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric'
+});
+
+// Crime rate calculations — Jamaica population ~2.8 million (2024 estimate)
+const POPULATION = 2800000;
+
+// Previous year FINAL rates
+const murderRatePrevious = ((murderCountPrevious / POPULATION) * 100000).toFixed(1);
+const robberyRatePrevious = ((robberyCountPrevious / POPULATION) * 100000).toFixed(1);
+const totalCrimeRatePrevious = ((totalCrimesPrevious / POPULATION) * 100000).toFixed(1);
+
+// Projection calculations
+const startOfYear = new Date(`${currentYear}-01-01`);
+const now = new Date();
+const daysElapsed = Math.max(1, Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)));
+const daysInYear = 365;
+
+const murderProjected = Math.round((murderCount / daysElapsed) * daysInYear);
+const robberyProjected = Math.round((robberyCount / daysElapsed) * daysInYear);
+const totalCrimesProjected = Math.round((totalCrimesCurrent / daysElapsed) * daysInYear);
+
+const murderRateProjected = ((murderProjected / POPULATION) * 100000).toFixed(1);
+const robberyRateProjected = ((robberyProjected / POPULATION) * 100000).toFixed(1);
+const totalCrimeRateProjected = ((totalCrimesProjected / POPULATION) * 100000).toFixed(1);
+
+const canonicalUrl = 'https://crimehotspots.com/jamaica/statistics/';
+
+// SEO
+const title = `Jamaica Crime Statistics & Crime Rate ${currentYear} - Live Data | Crime Hotspots`;
+const description = `Jamaica ${currentYear} crime statistics: ${totalCurrentYTD} total crimes — ${murderCount} murders, ${robberyCount} robberies, ${shootingCount} shootings (murder rate ${murderRateProjected} per 100k annualized, ${murderProjected} projected annually). ${previousYear} final: ${murderRatePrevious} per 100k. Updated daily.`;
+
+// Structured Data — Dataset
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "Dataset",
+  "name": `Jamaica Crime Statistics ${currentYear}`,
+  "description": `Jamaica crime statistics ${currentYear}: ${totalCurrentYTD} total crimes, ${murderCount} murders, ${robberyCount} robberies, ${shootingCount} shootings. ${previousYear} final murder rate: ${murderRatePrevious} per 100k. Updated daily from verified news sources.`,
+  "url": canonicalUrl,
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "creator": {
+    "@type": "Organization",
+    "name": "Crime Hotspots",
+    "url": "https://crimehotspots.com"
+  },
+  "distribution": [
+    {
+      "@type": "DataDownload",
+      "encodingFormat": "text/csv",
+      "contentUrl": JAMAICA_CSV_URL
+    }
+  ],
+  "temporalCoverage": `${previousYear}/${currentYear}`,
+  "spatialCoverage": {
+    "@type": "Place",
+    "name": "Jamaica",
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 18.1096,
+      "longitude": -77.2975
+    }
+  },
+  "dateModified": new Date().toISOString()
+};
+
+// FAQ structured data — targets "People Also Ask" for Jamaica crime queries
+const topCrimeType = ['Murder', 'Robbery', 'Shooting', 'Home Invasion', 'Theft']
+  .map(t => ({ type: t, count: countCrimeType(crimesCurrent, t) }))
+  .sort((a, b) => b.count - a.count)[0]?.type ?? 'Robbery';
+const yoyDirection = totalYoYChange > 5 ? 'up' : totalYoYChange < -5 ? 'down' : 'similar';
+const yoyFaqText = yoyDirection === 'up'
+  ? `${currentYear} is tracking higher — ${totalCurrentYTD} crimes YTD vs ${totalPrevSamePeriod} over the same period in ${previousYear} (up ${Math.round(totalYoYChange)}%).`
+  : yoyDirection === 'down'
+    ? `${currentYear} is tracking lower — ${totalCurrentYTD} crimes YTD vs ${totalPrevSamePeriod} over the same period in ${previousYear} (down ${Math.round(Math.abs(totalYoYChange))}%).`
+    : `${currentYear} is tracking similar to ${previousYear} — ${totalCurrentYTD} crimes YTD vs ${totalPrevSamePeriod} over the same period last year.`;
+
+const faqData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `How many murders in Jamaica in ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Jamaica has recorded ${murderCount} murders so far in ${currentYear} (as of ${lastUpdated}). At the current pace, the annualized murder rate is ${murderRateProjected} per 100,000 population, with ${murderProjected} murders projected by year end.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `What is the crime rate in Jamaica in ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Jamaica's annualized murder rate in ${currentYear} is ${murderRateProjected} per 100,000 population (${murderCount} murders in ${daysElapsed} days as of ${lastUpdated}). The ${previousYear} final murder rate was ${murderRatePrevious} per 100,000. Total crimes tracked in ${currentYear}: ${totalCurrentYTD}, including ${robberyCount} robberies and ${shootingCount} shootings.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `What is the most common crime in Jamaica in ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `${topCrimeType} is the most frequently recorded crime type in Jamaica in ${currentYear}, based on verified news reports tracked by Crime Hotspots. Other major crime types include murder (${murderCount}), robbery (${robberyCount}), and shootings (${shootingCount}).`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `How does Jamaica's ${currentYear} crime rate compare to ${previousYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `${yoyFaqText} The ${previousYear} final murder rate was ${murderRatePrevious} per 100,000 — consistently one of the highest in the Caribbean. Data is updated daily from verified news sources.`
+      }
+    }
+  ]
+};
+
+// Breadcrumb structured data
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://crimehotspots.com/" },
+    { "@type": "ListItem", "position": 2, "name": "Jamaica", "item": "https://crimehotspots.com/jamaica/dashboard/" },
+    { "@type": "ListItem", "position": 3, "name": "Statistics" }
+  ]
+};
+---
+
+<Layout title={title} description={description} noindex={true}>
+  <Hero
+    compact
+    narrowContainer={true}
+    title="Jamaica Crime Statistics"
+    subtitle="Real-time crime statistics and data analysis for Jamaica. Track the crime rate, murder statistics, robbery trends, and parish crime data. Updated daily from verified sources."
+    badge={`Updated daily • Last updated: ${lastUpdated}`}
+    primaryCTA={{
+      text: "View Interactive Dashboard",
+      href: routes.jamaica.dashboard,
+      icon: "dashboard"
+    }}
+    secondaryCTA={{
+      text: `Download ${currentYear} Data`,
+      href: JAMAICA_CSV_URL,
+      icon: "download",
+      target: "_blank",
+      rel: "noopener noreferrer"
+    }}
+  >
+    <Breadcrumbs items={[
+      { label: 'Home', href: '/' },
+      { label: 'Jamaica', href: routes.jamaica.dashboard },
+      { label: 'Statistics' }
+    ]} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 py-8">
+
+    <!-- Quick Answer box — structured for Google featured snippet capture -->
+    <!-- Targets: "jamaica crime rate 2026", "jamaica crime statistics 2026" -->
+    <section class="mb-8 p-4 rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] bg-slate-50 dark:bg-[hsl(0_0%_9%)]">
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-[hsl(0_0%_45%)] mb-3">Quick Answer — {currentYear} Crime Statistics</p>
+      {allCrimes.length === 0 ? (
+        <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] leading-relaxed">
+          Jamaica crime statistics are updated daily once the data pipeline is live. Check back soon.
+        </p>
+      ) : (
+        <p class="text-sm text-slate-700 dark:text-[var(--ch-text-strong)] leading-relaxed">
+          Jamaica has recorded <strong class="text-slate-900 dark:text-white">{totalCurrentYTD} crimes</strong> in {currentYear} as of {lastUpdated}, including <strong class="text-rose-600 dark:text-rose-400">{murderCount} murders</strong> (annualized rate: {murderRateProjected}/100k), {robberyCount} robberies, and {shootingCount} shootings.
+          {previousYear} ended with a murder rate of <strong class="text-slate-900 dark:text-white">{murderRatePrevious} per 100,000</strong> — one of the highest in the Caribbean.
+          {yoyDirection === 'up'
+            ? `Crime in ${currentYear} is tracking ${Math.round(totalYoYChange)}% higher than the same period in ${previousYear}.`
+            : yoyDirection === 'down'
+              ? `Crime in ${currentYear} is tracking ${Math.round(Math.abs(totalYoYChange))}% lower than the same period in ${previousYear}.`
+              : `Crime in ${currentYear} is tracking similar to the same period in ${previousYear}.`
+          }
+        </p>
+      )}
+    </section>
+
+    <!-- Current Year Summary -->
+    <section class="mb-10">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
+        {currentYear} Year-to-Date Summary
+      </h2>
+      <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mb-4">
+        {periodDescription}
+      </p>
+      <StatCards stats={statCardsData} />
+    </section>
+
+    <!-- Jamaica Crime Rate -->
+    <section class="mb-10">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
+        Jamaica Crime Rate {currentYear}
+      </h2>
+      <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mb-4">
+        Crime rates per 100,000 population (based on ~2.8 million population)
+      </p>
+
+      <!-- Previous Year Final (Official Rate) -->
+      <div class="mb-6">
+        <h3 class="text-base font-semibold text-slate-700 dark:text-[var(--ch-text)] mb-3">
+          {previousYear} Final Crime Rate (Official)
+        </h3>
+        <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5 shadow-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="text-center p-3 bg-slate-50 dark:bg-[var(--ch-surface-sub)] rounded-lg">
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Murder Rate</div>
+              <div class="text-2xl font-bold text-rose-600 dark:text-rose-400">{murderRatePrevious}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{murderCountPrevious} murders</div>
+            </div>
+            <div class="text-center p-3 bg-slate-50 dark:bg-[var(--ch-surface-sub)] rounded-lg">
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Robbery Rate</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text)]">{robberyRatePrevious}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{robberyCountPrevious} robberies</div>
+            </div>
+            <div class="text-center p-3 bg-slate-50 dark:bg-[var(--ch-surface-sub)] rounded-lg">
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Overall Rate</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text)]">{totalCrimeRatePrevious}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{totalCrimesPrevious} crimes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Year Annualized Rate -->
+      <div>
+        <h3 class="text-base font-semibold text-slate-700 dark:text-[var(--ch-text)] mb-3">
+          {currentYear} Annualized Rate (at current pace)
+        </h3>
+        <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5 shadow-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="text-center p-3 bg-rose-50 dark:bg-rose-950/30 rounded-lg">
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Murder Rate</div>
+              <div class="text-2xl font-bold text-rose-600 dark:text-rose-400">{murderRateProjected}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{murderCount} murders in {daysElapsed} days</div>
+            </div>
+            <div class="text-center p-3 bg-slate-50 dark:bg-[var(--ch-surface-sub)] rounded-lg">
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Robbery Rate</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text)]">{robberyRateProjected}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{robberyCount} robberies in {daysElapsed} days</div>
+            </div>
+            <div class="text-center p-3 bg-slate-50 dark:bg-[var(--ch-surface-sub)] rounded-lg">
+              <div class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] font-medium mb-1">Overall Rate</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text)]">{totalCrimeRateProjected}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">{totalCrimesCurrent} crimes in {daysElapsed} days</div>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] mt-3 text-center">
+            Rates annualized from {daysElapsed} days of data ({lastUpdated}). Assumes current pace continues through year end.
+          </p>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_60%)] mt-4">
+        The Jamaica crime rate is calculated per 100,000 population to enable fair comparison with other countries and historical trends.
+      </p>
+    </section>
+
+    <!-- Crime by Type -->
+    <section class="mb-10">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
+        Crime by Type ({currentYear})
+      </h2>
+      <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-50 dark:bg-[var(--ch-surface-sub)] border-b border-slate-200 dark:border-[hsl(0_0%_12%)]">
+              <tr>
+                <th class="text-left px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">Crime Type</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">{currentYear} Count</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">{previousYear} (Same Period)</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">Change</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-[hsl(0_0%_12%)]">
+              {yoyComparisons.filter(c => c.countCurrent > 0 || c.countPrevious > 0).length === 0 ? (
+                <tr>
+                  <td colspan="4" class="px-4 py-8 text-center text-sm text-slate-400 dark:text-[var(--ch-text-faint)]">
+                    Data will appear here once the Jamaica pipeline is live.
+                  </td>
+                </tr>
+              ) : (
+                yoyComparisons.filter(c => c.countCurrent > 0 || c.countPrevious > 0).map(comparison => (
+                  <tr class="hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)]">
+                    <td class="px-4 py-3 text-slate-700 dark:text-[var(--ch-text-strong)] font-medium">{comparison.type}</td>
+                    <td class="px-4 py-3 text-right text-slate-700 dark:text-[var(--ch-text-strong)]">{comparison.countCurrent}</td>
+                    <td class="px-4 py-3 text-right text-slate-500 dark:text-[hsl(0_0%_60%)]">{comparison.countPrevious}</td>
+                    <td class={`px-4 py-3 text-right font-medium ${comparison.direction === 'down' ? 'text-emerald-600 dark:text-emerald-400' : comparison.direction === 'up' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-[var(--ch-text-faint)]'}`}>
+                      {comparison.direction === 'down' ? '↓' : comparison.direction === 'up' ? '↑' : '→'}
+                      {formatPercentChange(comparison.percentChange)}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Parish Breakdown -->
+    <section class="mb-10">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
+        Parish Breakdown ({currentYear})
+      </h2>
+      <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mb-4">
+        Top 5 parishes by crime count
+      </p>
+      <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-50 dark:bg-[var(--ch-surface-sub)] border-b border-slate-200 dark:border-[hsl(0_0%_12%)]">
+              <tr>
+                <th class="text-left px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">Parish</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">Crimes</th>
+                <th class="text-right px-4 py-3 font-semibold text-slate-700 dark:text-[var(--ch-text-strong)]">% of Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-[hsl(0_0%_12%)]">
+              {topRegions.length === 0 ? (
+                <tr>
+                  <td colspan="3" class="px-4 py-8 text-center text-sm text-slate-400 dark:text-[var(--ch-text-faint)]">
+                    Parish data will appear here once the Jamaica pipeline is live.
+                  </td>
+                </tr>
+              ) : (
+                topRegions.map((region, index) => (
+                  <tr class="hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)]">
+                    <td class="px-4 py-3 text-slate-700 dark:text-[var(--ch-text-strong)]">
+                      <span class="inline-flex items-center">
+                        <span class="w-5 h-5 flex items-center justify-center bg-slate-100 dark:bg-[var(--ch-surface)] rounded text-xs font-medium text-slate-500 dark:text-[var(--ch-text-muted)] mr-2">
+                          {index + 1}
+                        </span>
+                        {region.region}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 text-right text-slate-700 dark:text-[var(--ch-text-strong)] font-medium">{region.count}</td>
+                    <td class="px-4 py-3 text-right text-slate-500 dark:text-[hsl(0_0%_60%)]">{region.percentage.toFixed(1)}%</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download Data -->
+    <section class="mb-10">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
+        Download Data
+      </h2>
+      <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mb-4">
+        Raw crime data in CSV format. Free to use with attribution.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a
+          href={JAMAICA_CSV_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center px-5 py-3 min-h-[44px] bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:bg-rose-800 transition font-medium text-sm shadow-sm"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download {currentYear} Data (CSV)
+        </a>
+      </div>
+    </section>
+
+    <!-- Methodology -->
+    <section class="mb-10">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
+        Methodology
+      </h2>
+      <div class="bg-slate-50 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-5">
+        <p class="text-slate-600 dark:text-[hsl(0_0%_65%)] text-sm">
+          Learn how we collect, verify, and categorize crime data from verified news sources across Jamaica.
+        </p>
+        <a
+          href={routes.methodology}
+          class="inline-flex items-center mt-3 text-sm font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300"
+        >
+          View full methodology
+          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- Share & Cite -->
+    <section class="mb-10">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
+        Share & Cite
+      </h2>
+      <div class="space-y-4">
+        <div class="flex gap-3">
+          <a
+            id="share-whatsapp"
+            href="#"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-200 dark:active:bg-rose-950/60 transition shadow-sm"
+            aria-label="Share on WhatsApp"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+          </a>
+          <a
+            id="share-facebook"
+            href="#"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-200 dark:active:bg-rose-950/60 transition shadow-sm"
+            aria-label="Share on Facebook"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </a>
+          <a
+            id="share-twitter"
+            href="#"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-200 dark:active:bg-rose-950/60 transition shadow-sm"
+            aria-label="Share on X"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          <button
+            id="share-copy"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_70%)] hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-200 dark:active:bg-rose-950/60 transition shadow-sm"
+            aria-label="Copy link"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
+        </div>
+        <p id="copy-feedback" class="text-xs text-emerald-600 opacity-0 transition-opacity">Link copied!</p>
+
+        <!-- Citation -->
+        <div class="bg-slate-50 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4">
+          <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mb-2">Cite this page:</p>
+          <p class="text-sm text-slate-700 dark:text-[hsl(0_0%_80%)] font-mono">
+            Crime Hotspots. ({currentYear}). Jamaica Crime Statistics {currentYear}.
+            Retrieved {lastUpdated}, from {canonicalUrl}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Related Links -->
+    <section class="mb-10">
+      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
+        Related Resources
+      </h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <a href={routes.jamaica.dashboard} class="block bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800 dark:text-[var(--ch-text)]">Interactive Dashboard</h3>
+          <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-1">Map visualization, filters, and detailed crime listings</p>
+        </a>
+        <a href={routes.jamaica.murderCount} class="block bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800 dark:text-[var(--ch-text)]">Murder Count {currentYear}</h3>
+          <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-1">Live murder toll counter for Jamaica</p>
+        </a>
+        <a href={routes.jamaica.parishes} class="block bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800 dark:text-[var(--ch-text)]">Parishes</h3>
+          <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-1">Crime data by parish across Jamaica</p>
+        </a>
+        <a href={routes.report} class="block bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
+          <h3 class="font-semibold text-slate-800 dark:text-[var(--ch-text)]">Report a Crime</h3>
+          <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-1">Anonymous crime reporting form</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Newsletter Signup -->
+    <section class="mb-10">
+      <NewsletterSignup variant="inline" source="jamaica-statistics-page" />
+    </section>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
+  </main>
+</Layout>
+
+<script define:vars={{ canonicalUrl, murderCount, currentYear, murderProjected }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    const pageUrl = canonicalUrl;
+    const shareText = `Jamaica Crime Statistics ${currentYear}: ${murderCount} murders so far, projected ${murderProjected} annually. View live data and analysis.`;
+
+    const waLink = document.getElementById('share-whatsapp');
+    const fbLink = document.getElementById('share-facebook');
+    const twLink = document.getElementById('share-twitter');
+    const copyBtn = document.getElementById('share-copy');
+
+    if (waLink) waLink.href = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + pageUrl)}`;
+    if (fbLink) fbLink.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
+    if (twLink) twLink.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`;
+
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(pageUrl);
+        } catch {
+          const input = document.createElement('input');
+          input.value = pageUrl;
+          document.body.appendChild(input);
+          input.select();
+          document.execCommand('copy');
+          document.body.removeChild(input);
+        }
+        const feedback = document.getElementById('copy-feedback');
+        if (feedback) {
+          feedback.style.opacity = '1';
+          setTimeout(() => { feedback.style.opacity = '0'; }, 2000);
+        }
+      });
+    }
+  });
+</script>

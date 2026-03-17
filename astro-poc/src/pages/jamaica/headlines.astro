@@ -1,0 +1,57 @@
+---
+/**
+ * Jamaica Headlines Page
+ * SSR shell — data will appear once Jamaica D1 is configured.
+ * Route: /jamaica/headlines/
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Hero from '../../components/Hero.astro';
+import { routes } from '../../config/routes';
+
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+// TODO: wire to Jamaica D1 — replace empty array with getAllCrimesFromD1(db, 'JM')
+const allCrimes: never[] = [];
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Jamaica', href: routes.jamaica.dashboard },
+  { label: 'Headlines' },
+];
+
+const pageTitle = 'Jamaica Crime Headlines | Crime Hotspots';
+const pageDescription = 'Browse verified crime incidents from Jamaica, filtered by parish, crime type, and date. Coming soon.';
+---
+
+<Layout title={pageTitle} description={pageDescription} noindex={true}>
+  <Hero
+    compact
+    narrowContainer={true}
+    title="Jamaica Headlines"
+    subtitle="Crime incidents — coming soon"
+    primaryCTA={{ text: 'Dashboard', href: routes.jamaica.dashboard, icon: 'arrow' }}
+  >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
+
+      <div class="text-center py-12">
+        <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)]">
+          Crime headlines will appear here once the Jamaica data pipeline is live.
+        </p>
+        <a
+          href={routes.jamaica.dashboard}
+          class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-rose-600 dark:text-rose-400 hover:underline"
+        >
+          Back to Dashboard
+        </a>
+      </div>
+
+    </div>
+  </main>
+</Layout>

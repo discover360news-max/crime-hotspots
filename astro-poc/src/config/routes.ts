@@ -38,6 +38,15 @@ export const routes = {
     safetyTipsSubmit: '/trinidad/safety-tips/submit/',
     mps: '/trinidad/mp/',
   },
+  jamaica: {
+    dashboard:   '/jamaica/dashboard/',
+    headlines:   '/jamaica/headlines/',
+    archive:     '/jamaica/archive/',
+    parishes:    '/jamaica/parishes/',
+    statistics:  '/jamaica/statistics/',
+    murderCount: '/jamaica/murder-count/',
+    mps:         '/jamaica/mp/',
+  },
 } as const;
 
 // Dynamic route builders
@@ -54,6 +63,8 @@ export const buildRoute = {
   safetyTipsContext: (context: string) => `/trinidad/safety-tips/context/${slugifyParam(context)}/`,
   safetyTipsArea: (area: string) => `/trinidad/safety-tips/area/${area}/`,
   mp: (nameSlug: string) => `/trinidad/mp/${nameSlug}/`,
+  jamaicaMp:     (nameSlug: string) => `/jamaica/mp/${nameSlug}/`,
+  jamaicaParish: (slug: string)     => `/jamaica/parish/${slug}/`,
 } as const;
 
 /** Slugify a category/context string for use in URL path segments */

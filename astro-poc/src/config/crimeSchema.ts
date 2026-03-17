@@ -1,7 +1,7 @@
 // astro-poc/src/config/crimeSchema.ts
 // Mirror of google-apps-script/trinidad/schema.gs — kept in sync manually.
 // Source of truth for frontend: filters, display labels, route slugs, validation.
-// SYNC NOTE: Keep in sync with schema.gs — last synced: 2026-03-14 (CRIME_HARD_IMPLICATIONS added; Carjacking rule fixed)
+// SYNC NOTE: Keep in sync with schema.gs — last synced: 2026-03-17 (Fraud crime type added)
 
 export const CRIME_TYPES = {
   MURDER:           { label: 'Murder',           severity: 10, isContextType: false },
@@ -16,6 +16,7 @@ export const CRIME_TYPES = {
   ROBBERY:          { label: 'Robbery',          severity: 4,  isContextType: false },
   DOMESTIC_VIOLENCE:{ label: 'Domestic Violence',severity: 4,  isContextType: true  },
   EXTORTION:        { label: 'Extortion',        severity: 3,  isContextType: false },
+  FRAUD:            { label: 'Fraud',            severity: 3,  isContextType: false },
   BURGLARY:         { label: 'Burglary',         severity: 3,  isContextType: false },
   THEFT:            { label: 'Theft',            severity: 2,  isContextType: false },
   SEIZURES:         { label: 'Seizures',         severity: 1,  isContextType: false },
@@ -78,6 +79,7 @@ export const SAFETY_TIP_CONTEXTS = [
   'Using Public Transport',
   'At an Event',
   'At a Hotel',
+  'At a Bar',
   'Other',
 ] as const;
 

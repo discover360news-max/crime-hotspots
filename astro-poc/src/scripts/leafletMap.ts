@@ -36,8 +36,11 @@ interface Crime {
   day: number;
 }
 
+import type { CrimeTypeLabel } from '../config/crimeSchema';
+
 // Crime type color mappings
-const CRIME_COLORS: Record<string, string> = {
+// EXHAUSTIVENESS: Record<CrimeTypeLabel, string> — TypeScript errors if any type is missing.
+const CRIME_COLORS: Record<CrimeTypeLabel, string> = {
   'Murder': '#e11d48',
   'Attempted Murder': '#f43f5e',
   'Kidnapping': '#ec4899',
@@ -50,6 +53,7 @@ const CRIME_COLORS: Record<string, string> = {
   'Robbery': '#f97316',
   'Domestic Violence': '#fb7185',
   'Extortion': '#059669',
+  'Fraud': '#14b8a6',
   'Burglary': '#eab308',
   'Theft': '#06b6d4',
   'Seizures': '#3b82f6',
@@ -59,7 +63,7 @@ const CRIME_COLORS: Record<string, string> = {
  * Get crime type icon for map markers
  */
 function getCrimeIcon(crimeType: string) {
-  const color = CRIME_COLORS[crimeType] || '#64748b';
+  const color = (CRIME_COLORS as Record<string, string>)[crimeType] || '#64748b';
 
   return (window as any).L.divIcon({
     html: `<div style="background-color: ${color}; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,

@@ -10,11 +10,15 @@
  * ensure these build-time-only packages are never evaluated at runtime.
  */
 
+import type { CrimeTypeLabel } from '../config/crimeSchema';
+
 const SIZE = 200;
 
-/** Crime type → short label + hex color */
-const CRIME_THUMBNAILS: Record<string, { label: string; color: string }> = {
+/** Crime type → short label + hex color
+ * EXHAUSTIVENESS: Record<CrimeTypeLabel, ...> — TypeScript errors if any type is missing. */
+const CRIME_THUMBNAILS: Record<CrimeTypeLabel, { label: string; color: string }> = {
   'Murder':           { label: 'M',   color: '#e11d48' },
+  'Attempted Murder': { label: 'AM',  color: '#f43f5e' },
   'Shooting':         { label: 'SH',  color: '#dc2626' },
   'Robbery':          { label: 'R',   color: '#f97316' },
   'Burglary':         { label: 'B',   color: '#eab308' },
@@ -25,7 +29,9 @@ const CRIME_THUMBNAILS: Record<string, { label: string; color: string }> = {
   'Assault':          { label: 'A',   color: '#8b5cf6' },
   'Carjacking':       { label: 'CJ',  color: '#f59e0b' },
   'Domestic Violence':{ label: 'DV',  color: '#fb7185' },
+  'Arson':            { label: 'AR',  color: '#ea580c' },
   'Extortion':        { label: 'EX',  color: '#059669' },
+  'Fraud':            { label: 'FR',  color: '#14b8a6' },
   'Seizures':         { label: 'SZ',  color: '#3b82f6' },
 };
 

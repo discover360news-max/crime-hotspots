@@ -47,3 +47,18 @@ export const REGION_POPULATION_CSV_URL =
  * Type for year keys in TRINIDAD_CSV_URLS
  */
 export type TrinidadYear = keyof typeof TRINIDAD_CSV_URLS;
+
+/**
+ * Jamaica crime data CSV URL (LIVE production sheet)
+ * Populated by the Jamaica GAS pipeline (RSS → AI → Sheets → LIVE)
+ */
+export const JAMAICA_CSV_URL =
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaZbgg8gAOl5DBg0GAuohDnecZL3qG4olfL5O57UPc2eg7bXj0w1UoRJ3TELGUXcRUTXVhFDzb6VgV/pub?gid=1963637925&single=true&output=csv';
+
+/**
+ * Jamaica Region/Area metadata CSV URL
+ * Contains: Area, Parish, Division, known_as, population
+ * Source: Jamaica Google Sheet → RegionData tab
+ */
+export const JAMAICA_REGION_DATA_CSV_URL =
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaZbgg8gAOl5DBg0GAuohDnecZL3qG4olfL5O57UPc2eg7bXj0w1UoRJ3TELGUXcRUTXVhFDzb6VgV/pub?gid=910363151&single=true&output=csv';

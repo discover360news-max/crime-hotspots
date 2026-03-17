@@ -1,0 +1,57 @@
+---
+/**
+ * Jamaica Archive Index Page
+ * Prerendered shell — archive entries will appear once Jamaica D1 is configured.
+ * Route: /jamaica/archive/
+ */
+
+export const prerender = true;
+
+import Layout from '../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import Hero from '../../../components/Hero.astro';
+import { routes } from '../../../config/routes';
+
+// TODO: wire to Jamaica D1 — replace empty array with getAllCrimesFromD1(db, 'JM')
+const archives: never[] = [];
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Jamaica', href: routes.jamaica.dashboard },
+  { label: 'Archive' },
+];
+
+const pageTitle = 'Jamaica Crime Archives | Crime Hotspots';
+const pageDescription = 'Browse Jamaica crime statistics archives by month. Coming soon.';
+---
+
+<Layout title={pageTitle} description={pageDescription} noindex={true}>
+  <Hero
+    compact
+    narrowContainer={true}
+    title="Jamaica Crime Archives"
+    subtitle="Monthly archives — coming soon"
+    primaryCTA={{ text: 'Dashboard', href: routes.jamaica.dashboard, icon: 'dashboard' }}
+    secondaryCTA={{ text: 'Headlines', href: routes.jamaica.headlines }}
+  >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
+
+      <div class="text-center py-12">
+        <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)]">
+          Monthly archives will appear here once the Jamaica data pipeline is live.
+        </p>
+        <a
+          href={routes.jamaica.dashboard}
+          class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-rose-600 dark:text-rose-400 hover:underline"
+        >
+          Back to Dashboard
+        </a>
+      </div>
+
+    </div>
+  </main>
+</Layout>

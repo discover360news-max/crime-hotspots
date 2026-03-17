@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 13, 2026 (crime schema overhaul — 3 new types + isContextType)
+**Last Updated:** March 17, 2026 (Jamaica statistics + murder-count upgraded to full production; Jamaica area aliases wired)
 
 ---
 
@@ -11,7 +11,7 @@
 ### Marketing & Static
 | Page | Route | Purpose |
 |------|-------|---------|
-| Homepage | `/` | Country cards (direct link to dashboard), HomepagePulse live stats, Explore 3-tile section (Areas / Murder Count / Blog), QuickAnswers FAQ section |
+| Homepage | `/` | Country cards (direct link to dashboard), HomepagePulse live stats, Explore 3-tile section (Areas / Murder Count / Blog), QuickAnswers FAQ section. Jamaica card: full-colour `jamaica-card-trsp-bg.png`, amber "JUL 2026" badge, live D:HH:MM countdown to `2026-07-04T00:00:00` (60s setInterval, "Launching soon" fallback at zero). Guyana/Barbados: same card structure, greyscale image, "Coming Soon" pill. |
 | About | `/about/` | Project background |
 | Contact | `/contact/` | Contact information |
 | Methodology | `/methodology/` | Data collection process |
@@ -21,6 +21,20 @@
 | Data Capability Sheet | `/data-capability-sheet/` | Institutional document (insurers, researchers, grant committees). Content driven by `src/config/capabilitySheetConfig.ts`. Month count is dynamic from `health-data.json`. Placeholders: set `contact.email`, `contact.entity`, `contact.dataEthicsPath` to non-null when ready. |
 | Report | `/report/` | Anonymous crime reporting form (Turnstile CAPTCHA) |
 | 404 | `/404` | Custom error page |
+
+### Jamaica Crime Data
+| Page | Route | Rendering | Purpose |
+|------|-------|-----------|---------|
+| Dashboard | `/jamaica/` | Pre-rendered | Jamaica crime dashboard (data pipeline pending) |
+| Headlines | `/jamaica/headlines/` | Pre-rendered | Jamaica headlines |
+| Parishes | `/jamaica/parishes/` | Pre-rendered | Browse by parish |
+| Statistics | `/jamaica/statistics/` | **SSR + CDN cache** | Full statistics page (T&T parity). Dataset + FAQPage (4 Q&As) + BreadcrumbList JSON-LD. Population 2.8M, "parishes" language. Dynamic years. `allCrimes: Crime[] = []` stub until Jamaica D1 live (one TODO comment to uncomment). |
+| Murder Count | `/jamaica/murder-count/` | **SSR + CDN cache** | Full murder count page (T&T parity). FlipCounter, YoY comparison, 3 rate cards (YTD / Projected / Previous Final). WebPage + Dataset + BreadcrumbList JSON-LD. Population 2.8M. Latest incidents sidebar hidden until data live. `allCrimes: Crime[] = []` stub until Jamaica D1 live. |
+| Archive Index | `/jamaica/archive/` | Pre-rendered | Browse by year |
+| MP Index | `/jamaica/mp/` | Pre-rendered | Directory of all 63 MPs grouped by parish. Each card: photo, name, party badge, constituency. |
+| MP Profile | `/jamaica/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left (`min-h-[500px]`), identity+contact right. Social links rendered as brand SVG icons (Facebook, Instagram, X, YouTube, TikTok). JSON-LD Person schema. Data: `src/data/mps-jamaica.json`. Crime stats placeholder until Jamaica D1 pipeline is live. |
+
+---
 
 ### Trinidad Crime Data
 | Page | Route | Rendering | Purpose |
@@ -166,7 +180,7 @@
 
 | File | Purpose |
 |------|---------|
-| csvBuildPlugin.ts | Vite plugin — fetches CSV at build:start with retry (2s/4s/8s), validates rows, writes `csv-cache.json` + `health-data.json` + `area-aliases.json` (116 area→known_as mappings from RegionData CSV). **NEVER use `await import()` inside hook — causes Vite runner error (B012). Pagefind indexer removed (Mar 2026) — no longer writes pagefind index.** |
+| csvBuildPlugin.ts | Vite plugin — fetches CSVs at build:start with retry (2s/4s/8s), writes `health-data.json` + `area-aliases.json` (T&T; ~116 area→known_as) + `area-aliases-jamaica.json` (Jamaica; ~12 known_as aliases from `JAMAICA_REGION_DATA_CSV_URL`). **NEVER use `await import()` inside hook — causes Vite runner error (B012).** |
 | redirectGenerator.ts | Build-time redirect map generator — writes `src/data/redirect-map.json` (~1,984 old→new slug mappings). Static top-level imports only. |
 
 ---
@@ -194,9 +208,10 @@
 
 | File | Purpose | Notes |
 |------|---------|-------|
-| csvUrls.ts | CSV data source URLs | **Single source of truth** for all CSV URLs |
+| csvUrls.ts | CSV data source URLs | **Single source of truth** for all CSV URLs. Exports: `TRINIDAD_CSV_URLS` (year-keyed), `REGION_DATA_CSV_URL`, `REGION_POPULATION_CSV_URL`, `JAMAICA_CSV_URL`, `JAMAICA_REGION_DATA_CSV_URL` (area aliases; gid=910363151 on Jamaica sheet). |
 | routes.ts | All internal routes + builders | `routes.*` for static, `buildRoute.*` for dynamic. Includes `routes.trinidad.mps` + `buildRoute.mp(nameSlug)`. |
-| mps.json | 41 MP records | Schema: nameSlug, fullName, honorific, constituency, constituencySlug, party, partyFull, electionYear, regionSlugs, regionConfidence, contact, socials, photo. Photos in `public/images/mps/` (placeholder.svg always present). |
+| mps.json | 41 T&T MP records | Schema: nameSlug, fullName, honorific, constituency, constituencySlug, party, partyFull, electionYear, regionSlugs, regionConfidence, contact{email,emailAlt,phone,whatsapp,office,parliamentProfile}, socials{facebook,instagram,x,youtube}, photo. Photos in `public/images/mps/` (placeholder.svg always present). Social links render as brand SVG icons. |
+| mps-jamaica.json | 63 Jamaica MP records | Schema mirrors mps.json but: `parishSlugs` (not regionSlugs), socials adds `tiktok` field. Photos in `public/images/mps/jamaica/` subfolder — set `photo` as `"jamaica/filename.jpg"`. |
 | crimeTypeConfig.ts | Crime type definitions + victim count rules | Victim count applies to PRIMARY crime only. 15 types: Murder/Attempted Murder/Kidnapping/Sexual Assault/Shooting/Assault/Home Invasion/Carjacking/Arson/Robbery/Domestic Violence/Extortion/Burglary/Theft/Seizures. |
 | siteNotifications.ts | Site notification banner content | Toggle-based enable/disable |
 | riskWeights.ts | Crime severity weights | Used by `TopRegionsCard.astro`, `dashboardUpdates.ts` (Top Regions card), and `safetyHelpers.ts` (SafetyContext). Full methodology: `docs/guides/RISK-SCORING-METHODOLOGY.md` |

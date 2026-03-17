@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import { buildRoute } from '../config/routes';
 import { slugifyCategory } from '../lib/safetyTipsHelpers';
 import mpsData from '../data/mps.json';
+import mpsJamaicaData from '../data/mps-jamaica.json';
 
 /**
  * Main Sitemap
@@ -137,9 +138,25 @@ export const GET: APIRoute = async ({ locals }) => {
     changefreq: 'weekly' as const
   }));
 
-  // MP profile pages — 41 individual pages
+  // T&T MP profile pages — 41 individual pages
   const mpPages = mpsData.map(mp => ({
     url: buildRoute.mp(mp.nameSlug).slice(1),
+    lastmod: new Date().toISOString(),
+    priority: 0.7,
+    changefreq: 'yearly' as const,
+  }));
+
+  // Jamaica static pages — only include pages with real content.
+  // Data pages (dashboard, headlines, statistics, murder-count, archive) are noindex
+  // and excluded here until Jamaica D1 is wired (Phase C).
+  const jamaicaStaticPages = [
+    { url: 'jamaica/mp/', priority: 0.7, changefreq: 'yearly' as const },
+    { url: 'jamaica/parishes/', priority: 0.6, changefreq: 'yearly' as const },
+  ].map(p => ({ ...p, lastmod: new Date().toISOString() }));
+
+  // Jamaica MP profile pages — 63 individual pages
+  const jamaicaMpPages = mpsJamaicaData.map(mp => ({
+    url: buildRoute.jamaicaMp(mp.nameSlug).slice(1),
     lastmod: new Date().toISOString(),
     priority: 0.7,
     changefreq: 'yearly' as const,
@@ -173,6 +190,8 @@ export const GET: APIRoute = async ({ locals }) => {
     ...tipContextPages,
     ...tipAreaPages,
     ...mpPages,
+    ...jamaicaStaticPages,
+    ...jamaicaMpPages,
     ...crimePages
   ];
 

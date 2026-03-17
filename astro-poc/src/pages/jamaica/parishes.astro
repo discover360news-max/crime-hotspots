@@ -1,0 +1,95 @@
+---
+/**
+ * Jamaica Parishes Page
+ * Static listing of all 14 parishes with constituency counts.
+ * Route: /jamaica/parishes/
+ */
+
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Hero from '../../components/Hero.astro';
+import { routes } from '../../config/routes';
+
+const parishes = [
+  { name: 'Kingston',       slug: 'kingston',     constituencies: 3,  capital: 'Kingston City' },
+  { name: 'St. Andrew',     slug: 'st-andrew',    constituencies: 12, capital: 'Half Way Tree' },
+  { name: 'St. Thomas',     slug: 'st-thomas',    constituencies: 2,  capital: 'Morant Bay' },
+  { name: 'Portland',       slug: 'portland',     constituencies: 2,  capital: 'Port Antonio' },
+  { name: 'St. Mary',       slug: 'st-mary',      constituencies: 3,  capital: 'Port Maria' },
+  { name: 'St. Ann',        slug: 'st-ann',       constituencies: 4,  capital: "Ocho Rios" },
+  { name: 'Trelawny',       slug: 'trelawny',     constituencies: 2,  capital: 'Falmouth' },
+  { name: 'St. James',      slug: 'st-james',     constituencies: 5,  capital: 'Montego Bay' },
+  { name: 'Hanover',        slug: 'hanover',      constituencies: 2,  capital: 'Lucea' },
+  { name: 'Westmoreland',   slug: 'westmoreland', constituencies: 3,  capital: 'Savanna-la-Mar' },
+  { name: 'St. Elizabeth',  slug: 'st-elizabeth', constituencies: 4,  capital: 'Black River' },
+  { name: 'Manchester',     slug: 'manchester',   constituencies: 4,  capital: 'Mandeville' },
+  { name: 'Clarendon',      slug: 'clarendon',    constituencies: 6,  capital: 'May Pen' },
+  { name: 'St. Catherine',  slug: 'st-catherine', constituencies: 11, capital: 'Spanish Town' },
+];
+
+const totalConstituencies = parishes.reduce((sum, p) => sum + p.constituencies, 0);
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Jamaica', href: routes.jamaica.dashboard },
+  { label: 'Parishes' },
+];
+
+const pageTitle = 'Jamaica Parishes — Crime Statistics by Parish | Crime Hotspots';
+const pageDescription = `Browse crime statistics for all 14 parishes in Jamaica across ${totalConstituencies} parliamentary constituencies. Data available once pipeline is live.`;
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <Hero
+    compact
+    narrowContainer={true}
+    title="Parishes of Jamaica"
+    subtitle={`${parishes.length} parishes · ${totalConstituencies} constituencies`}
+    badge="Detailed statistics available once data pipeline is live"
+    primaryCTA={{ text: 'View MPs', href: routes.jamaica.mps, icon: 'arrow' }}
+  >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
+
+    <!-- Info banner -->
+    <div class="mb-6 flex items-start gap-2.5 p-4 rounded-lg bg-slate-50 dark:bg-[var(--ch-surface)] border border-slate-200 dark:border-[var(--ch-border-card)]">
+      <svg class="w-4 h-4 mt-0.5 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)]">
+        Detailed crime statistics per parish will appear here once the Jamaica data pipeline is configured.
+        Individual parish pages are coming in a future update.
+      </p>
+    </div>
+
+    <!-- Parish grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {parishes.map((parish, index) => (
+        <div class="block bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-5">
+          <div class="flex items-start justify-between mb-3">
+            <h2 class="text-base font-bold text-slate-800 dark:text-[var(--ch-text-heading)]">
+              {parish.name}
+            </h2>
+            <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] font-medium">#{index + 1}</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-center">
+            <div>
+              <div class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text-heading)]">{parish.constituencies}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">
+                {parish.constituencies === 1 ? 'Constituency' : 'Constituencies'}
+              </div>
+            </div>
+            <div>
+              <div class="text-sm font-medium text-slate-500 dark:text-[hsl(0_0%_65%)] leading-tight">{parish.capital}</div>
+              <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">Capital</div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </main>
+</Layout>

@@ -8,6 +8,16 @@
 
 ## March 2026
 
+### Safety Tips Batch: TIP-00065 to TIP-00067 (Mar 17)
+
+- **UPDATED TIP-00030** — Added Story 571 to `related_story_ids` (forged WhatsApp receipt — same tactic already covered)
+- **Schema:** Added `'At a Bar'` to the `context` enum in `src/config/crimeSchema.ts` (new context page auto-generated: `/trinidad/safety-tips/context/at-a-bar/`)
+- **NEW TIP TIP-00065** — Securing Rear and Perimeter Entry Points at Home (Home Invasion / At Home)
+- **NEW TIP TIP-00066** — Reducing Snatch-Theft Risk While Waiting for Transport (Robbery / Walking Alone)
+- **NEW TIP TIP-00067** — Avoiding Dangerous Escalation at Late-Night Bars (Assault / At a Bar)
+
+---
+
 ### Complete D1 Migration — All Pages Off CSV (Mar 15)
 
 All crime-data pages now serve live D1 data at request time (CDN-cached ~23h). `prerender = true` and `getTrinidadCrimes()` as primary data source removed from all in-scope pages.

@@ -1,0 +1,69 @@
+---
+/**
+ * Jamaica Dashboard
+ * Shell page — data will appear once Jamaica D1 is configured.
+ * Route: /jamaica/dashboard/
+ */
+
+export const prerender = true;
+
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Hero from '../../components/Hero.astro';
+import { routes } from '../../config/routes';
+
+// TODO: wire to Jamaica D1 — replace empty array with getAllCrimesFromD1(db, 'JM')
+const allCrimes: never[] = [];
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Jamaica' },
+];
+
+const pageTitle = 'Jamaica Crime Statistics Dashboard | Crime Hotspots';
+const pageDescription = 'Live crime statistics and interactive map for Jamaica. Track murders, robberies, and incidents by parish with verified data. Coming soon.';
+---
+
+<Layout title={pageTitle} description={pageDescription} includeLeaflet={false} noindex={true}>
+  <Hero
+    compact
+    narrowContainer={true}
+    title="Jamaica Dashboard"
+    subtitle="Live crime data — coming soon"
+    primaryCTA={{ text: 'View MPs', href: routes.jamaica.mps, icon: 'arrow' }}
+    secondaryCTA={{ text: 'Parishes', href: routes.jamaica.parishes }}
+  >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
+  </Hero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
+
+      <!-- Empty state -->
+      <div class="text-center py-12">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-slate-100 dark:bg-[hsl(0_0%_15%)] flex items-center justify-center">
+          <span class="text-3xl" aria-hidden="true">🇯🇲</span>
+        </div>
+        <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text)] mb-2">Data Pipeline Not Yet Live</h2>
+        <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)] max-w-sm mx-auto mb-6">
+          The Jamaica crime data pipeline is being configured. Statistics, maps, and trends will appear here once the D1 database is connected.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a
+            href={routes.jamaica.mps}
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-rose-600 text-white text-sm font-medium hover:bg-rose-700 transition"
+          >
+            Browse MPs
+          </a>
+          <a
+            href={routes.jamaica.parishes}
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-700 dark:text-[var(--ch-text)] text-sm font-medium hover:bg-slate-200 dark:hover:bg-[hsl(0_0%_20%)] transition"
+          >
+            Browse Parishes
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</Layout>

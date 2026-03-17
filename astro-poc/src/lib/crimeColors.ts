@@ -1,12 +1,21 @@
 /**
  * Crime Type Color Mappings
  * Reusable across all components
+ *
+ * EXHAUSTIVENESS: Typed as Record<CrimeTypeLabel, ...> so TypeScript errors
+ * at `npm run check` time if any crime type from crimeSchema.ts is missing here.
  */
 
-export const CRIME_COLORS = {
+import type { CrimeTypeLabel } from '../config/crimeSchema';
+
+export const CRIME_COLORS: Record<CrimeTypeLabel, { tailwind: string; hex: string }> = {
   'Murder': {
     tailwind: 'bg-rose-600',
     hex: '#e11d48'
+  },
+  'Attempted Murder': {
+    tailwind: 'bg-rose-500',
+    hex: '#f43f5e'
   },
   'Shooting': {
     tailwind: 'bg-red-600',
@@ -48,15 +57,23 @@ export const CRIME_COLORS = {
     tailwind: 'bg-rose-400',
     hex: '#fb7185'
   },
+  'Arson': {
+    tailwind: 'bg-orange-600',
+    hex: '#ea580c'
+  },
   'Extortion': {
     tailwind: 'bg-emerald-600',
     hex: '#059669'
+  },
+  'Fraud': {
+    tailwind: 'bg-teal-500',
+    hex: '#14b8a6'
   },
   'Seizures': {
     tailwind: 'bg-blue-500',
     hex: '#3b82f6'
   },
-} as const;
+};
 
 export const DEFAULT_CRIME_COLOR = {
   tailwind: 'bg-slate-500',

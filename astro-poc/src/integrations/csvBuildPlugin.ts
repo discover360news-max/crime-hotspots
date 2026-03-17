@@ -14,7 +14,7 @@ import type { AstroIntegration } from 'astro';
 import { writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
-import { REGION_DATA_CSV_URL } from '../config/csvUrls.ts';
+import { REGION_DATA_CSV_URL, JAMAICA_REGION_DATA_CSV_URL } from '../config/csvUrls.ts';
 
 // ---------------------------------------------------------------------------
 // Inline CSV utilities (avoids ESM/CJS import issues inside integration hooks)
@@ -117,6 +117,7 @@ function parseAreaAliases(csvText: string): Record<string, string> {
 
 const DIR = fileURLToPath(new URL('.', import.meta.url));
 const AREA_ALIASES_PATH = join(DIR, '../data/area-aliases.json');
+const JAMAICA_AREA_ALIASES_PATH = join(DIR, '../data/area-aliases-jamaica.json');
 const HEALTH_DATA_PATH = join(DIR, '../data/health-data.json');
 
 // ---------------------------------------------------------------------------
@@ -146,11 +147,26 @@ export default function csvBuildPlugin(): AstroIntegration {
           logger.warn(`[csvBuildPlugin] ⚠️ RegionData fetch failed (${msg}) — area-aliases.json unchanged`);
         }
 
+        // --- Generate area-aliases-jamaica.json from Jamaica RegionData CSV ---
+        let jamaicaAliasCount = 0;
+        try {
+          logger.info('[csvBuildPlugin] Fetching Jamaica RegionData CSV for area aliases...');
+          const jamaicaRegionCsvText = await fetchWithRetry(JAMAICA_REGION_DATA_CSV_URL, logger);
+          const jamaicaAliases = parseAreaAliases(jamaicaRegionCsvText);
+          jamaicaAliasCount = Object.keys(jamaicaAliases).length;
+          writeFileSync(JAMAICA_AREA_ALIASES_PATH, JSON.stringify(jamaicaAliases, null, 2), 'utf-8');
+          logger.info(`[csvBuildPlugin] area-aliases-jamaica.json written — ${jamaicaAliasCount} aliases`);
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          logger.warn(`[csvBuildPlugin] ⚠️ Jamaica RegionData fetch failed (${msg}) — area-aliases-jamaica.json unchanged`);
+        }
+
         // --- Write health-data.json ---
         const healthData = {
           status: 'ok',
           build_time: buildStartedAt,
           area_aliases_count: aliasCount,
+          jamaica_area_aliases_count: jamaicaAliasCount,
         };
         writeFileSync(HEALTH_DATA_PATH, JSON.stringify(healthData, null, 2), 'utf-8');
         logger.info('[csvBuildPlugin] health-data.json written');

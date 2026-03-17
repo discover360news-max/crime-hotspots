@@ -55,6 +55,7 @@ function updateQuickInsightsTitle(crimeType: string | null) {
       'Domestic Violence': 'Domestic Violence',
       'Sexual Assault': 'Sexual Assaults',
       'Extortion': 'Extortion',
+      'Fraud': 'Fraud',
       'Arson': 'Arson',
       'Seizures': 'Seizures',
     };

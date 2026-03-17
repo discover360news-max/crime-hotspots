@@ -7,9 +7,9 @@ area: ""
 severity: "medium"
 source: "manual"
 status: "published"
-related_story_ids: ["473"]
+related_story_ids: ["473", "571"]
 date_added: 2026-03-06
-date_updated:
+date_updated: 2026-03-17
 ---
 
 A growing scam targeting online sellers involves a "buyer" who arranges a purchase through social media, then sends a third party to collect the item without making payment. The seller, expecting the original buyer, hands over the goods to the accomplice assuming payment will follow — it never does. This works because sellers extend goodwill to someone who appears to be acting on the buyer's behalf, and the original "buyer" becomes unreachable immediately after. The moment you hand over an item before cash is confirmed in your hand, you have no recourse. Payment promises, screenshots, or transfer receipts shown on a phone are easily faked and cannot be trusted until funds are physically received or confirmed by your bank.

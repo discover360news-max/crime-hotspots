@@ -39,6 +39,44 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 17, 2026 (continued x8)
+- `JAMAICA-INTEGRATION-PLAN.md` updated: Phase 1.5 enhancements documented (statistics/murder-count full production, countdown card, area aliases, csvBuildPlugin), 108-day launch plan added (Phases A–F), Progress Tracker updated with all new checkboxes.
+- `facebookSubmitter.gs` country selector built: `JAMAICA_PIPELINE_SHEET_ID` placeholder constant, `targetCountry` param added to `submitFacebookPost()`, Jamaica location prepend hint for Claude extraction, country-aware location filter, 3-way routing (Jamaica → `appendToJamaicaProduction`, T&T 2025 → FR1, T&T 2026 → Production), new `appendToJamaicaProduction()` function (opens Jamaica sheet by ID, geocodes with Jamaica address). HTML: Year toggle wrapped in `#yearSection` div (hidden for Jamaica), Country toggle added (T&T/JM), `setCountry()`/`loadStickyCountry()` JS, country badge (JA/TT) in session history, subtitle updates dynamically.
+- **ONE MANUAL STEP NEEDED:** Open `google-apps-script/trinidad/facebookSubmitter.gs`, find `JAMAICA_PIPELINE_SHEET_ID = 'YOUR_JAMAICA_SHEET_ID_HERE'` and fill in the Jamaica pipeline spreadsheet ID (copy from Jamaica Sheet URL bar).
+- F013 step 1 (FB Submitter country toggle) is now DONE.
+
+## Session Notes — Mar 17, 2026 (continued x7)
+- Jamaica homepage card: added `jamaica-card-trsp-bg.png` (transparent-bg island+flag image). Card extracted from coming-soon loop — now its own block with: header row (flag+name left, amber "JUL 2026" badge right), full-colour image, D:HH:MM live countdown to 2026-07-04T00:00:00 local (updates every 60s via setInterval), "Launching soon" fallback when diff≤0. Guyana/Barbados loop updated to match card structure (flag+name in header, "Coming Soon" pill at same footer level, invisible spacer line for height alignment). Build passes. Full launch prep plan written to F013-jamaica-launch-prep.md.
+
+## Session Notes — Mar 17, 2026 (continued x6)
+- Jamaica RegionData CSV published by Kavell: `JAMAICA_REGION_DATA_CSV_URL` added to csvUrls.ts (gid=910363151, Jamaica spreadsheet). Build plugin updated to also generate `area-aliases-jamaica.json` alongside T&T's `area-aliases.json`. 113 areas, 12 known_as aliases. health-data.json now includes `jamaica_area_aliases_count`. Created F013-jamaica-launch-prep.md. Launch sequence step 2 (RegionData CSV + area aliases) is now DONE.
+- Next launch sequence steps: (1) FB submitter country toggle, (3) pipeline producing rows, (4) D1 setup, (5) uncomment TODO.
+
+## Session Notes — Mar 17, 2026 (continued x5)
+- SEO audit (Jamaica pages): foundation solid (title/desc/canonical/robots/OG all inherited via Layout.astro). Fixed: T&T murder-count hardcoded years (currentYear=2026, dates, JSX strings, structured data names → all dynamic). Fixed: alt="" on both MP index pages (T&T + Jamaica) → `mp.photo ? \`${displayName}, MP\` : ''`. Fixed: Jamaica MP slug ogType → "profile" (63 pages).
+- Upgraded Jamaica statistics + murder-count from bare stubs to full production pages (T&T parity). Jamaica-specific: population 2.8M, "parishes" not "divisions", single `JAMAICA_CSV_URL`, Jamaica geo coords (18.1096, -77.2975). Full SEO on both: Dataset schema + FAQPage (4 Q&As) + BreadcrumbList on statistics; WebPage+Dataset+BreadcrumbList on murder-count. Both have graceful empty state while allCrimes=[]. TODO comment marks the one line to uncomment when Jamaica D1 is live. Build passes.
+- FB submitter (`google-apps-script/trinidad/facebookSubmitter.gs`) is a manual paste tool (not automated). Decision: add country selector (T&T/Jamaica) to existing tool. Changes needed: UI toggle, location filter update (lines 93–103), sheet routing to Jamaica spreadsheet ID. Claude extraction in claudeClient.gs should be made country-aware for better area/location accuracy.
+- D1 for Jamaica: deferred until pipeline is producing rows. Do NOT set up D1 infrastructure before data is flowing.
+- Jamaica area seed data provided (110 areas, 14 parishes, JCF Area 1–4 as Division). Covers Kingston, St. Andrew, St. Catherine, St. James most thoroughly. See F013-jamaica-launch-prep.md. Kavell will add to Jamaica RegionData sheet and publish CSV URL. Once URL is available → wire area aliases.
+- Jamaica launch sequence: (1) FB submitter country toggle → (2) RegionData CSV published + area aliases wired → (3) pipeline producing rows confirmed → (4) Jamaica D1 setup + sync worker → (5) uncomment TODO in statistics + murder-count pages.
+
+## Session Notes — Mar 17, 2026 (continued x4)
+- Jamaica GAS Pipeline (Phase 1) in progress — NOT yet complete. 1a (sheet + LIVE_SHEET_ID configured) and 1b (all 9 script files built: config.gs with 4 RSS sources, orchestrator.gs with split trigger functions, syncToLive.gs, claudeClient.gs) are done. Triggers (1d) deliberately deferred — Kavell prioritised frontend shell first. Testing (1c) pending triggers. Next: activate triggers in GAS editor, then run test checklist. Plan doc status: "Phase 1 in progress (1a + 1b done, triggers pending)".
+
+## Session Notes — Mar 17, 2026 (continued x3)
+- Jamaica Frontend Shell (Phase 1.5) COMPLETE. All pages live: /jamaica/dashboard/, /jamaica/mp/ (63 MPs, 14 parishes), /jamaica/parishes/, /jamaica/headlines/, /jamaica/statistics/, /jamaica/murder-count/, /jamaica/archive/. Homepage: Jamaica card added as first coming-soon entry (flag emoji placeholder, no image yet). routes.ts: jamaica block + buildRoute.jamaicaMp/jamaicaParish. csvUrls.ts: JAMAICA_CSV_URL added. sitemap-0.xml.ts: 7 Jamaica static pages + 63 MP pages. Schema: mps-jamaica.json uses parishSlugs (not regionSlugs). Shell data pages use `const allCrimes: never[] = []` with TODO comment. Build passes (20s).
+
+## Session Notes — Mar 17, 2026 (continued x2)
+
+- SAFETY_TIP_CATEGORIES audit: count is 14 (not 13 — user miscounted). 'Online Scam' IS in use — 3 tips: tip-00005 (WhatsApp), tip-00021 (marketplace), tip-00030 (online sales). No drift. Both 'Online Scam' (tip category) and 'Fraud' (crime type) intentionally coexist.
+- Facebook sources for Jamaica documented in plan doc (Phase 0c complete): Broadcast — Observer, TVJ, CVM TV, Nationwide 90FM, RJR News. Official — JCF (~357K followers), Crime Stop JA (~8.6K). Advocacy (Phase 2+) — Jamaica Women & Children Murdered RIP, Jamaicans for Justice. Priority order defined.
+- Official govt stats sites assessed: JCF stats page (jcf.gov.jm/stats-2/) is JS-rendered Highcharts — not scrapeable, manual reference only, but actively maintained (last mod Mar 15 2026). STATIN (statinja.gov.jm) is annual data only, ASP.NET, skip. DISCOVERY: JCF has a live RSS feed at https://jcf.gov.jm/feed/ — updated hourly, police-confirmed press releases. Added as Source 4 in plan (highest confidence, needs pre-filter for non-crime posts).
+- Next session: Phase 1 — Jamaica GAS Pipeline. Start with 1a (new Google Sheet setup).
+
+## Session Notes — Mar 17, 2026 (continued)
+- Phase 0 of Jamaica integration COMPLETE. Added `Fraud` crime type (severity 3, isContextType false) to: schema.gs, crimeSchema.ts, crimeTypeConfig.ts (useVictimCount: false), crimeColors.ts (teal-500 / #14b8a6), leafletMap.ts, generateCrimeTypeThumbnails.ts (label 'FR'), statCardFiltering.ts pluralMap. Also fixed pre-existing gaps: SAFETY_TIP_CATEGORIES in schema.gs synced with crimeSchema.ts (added Domestic Violence, Extortion, Burglary); Arson added to crimeTypeConfig.ts; Attempted Murder + Arson added to crimeColors.ts + generateCrimeTypeThumbnails.ts. Build passes. Plan doc: docs/guides/JAMAICA-INTEGRATION-PLAN.md.
+- Jamaica integration plan: Jamaica (not Barbados) chosen for expansion (>1,500 murders/yr, 3M diaspora). Separate D1 DB + GAS project + sync worker per country. 3 confirmed RSS sources: Observer Crime Watch (https://www.jamaicaobserver.com/category/crime-watch/feed/ — includes parish tags), Gleaner (https://jamaica-gleaner.com/feed/news.xml), Star (http://jamaica-star.com/rss/news/feed). 14 parishes. Next: Phase 1 (GAS pipeline setup).
+
 ## Session Notes — Mar 17, 2026
 - Dashboard Crime Statistics maintenance: InfoPopup now covers all 15 crime types (was 9). Added Attempted Murder + Carjacking stat cards; removed Seizures (law enforcement action, not a citizen-safety indicator). Card order: All Crimes → Murder → Attempted Murder → Shooting → Robbery → Carjacking → Home Invasion → Burglary → Theft → Assault → Kidnapping.
 - Fixed brittle positional `statCards[n]` indexing in `dashboardUpdates.ts` (both `updateStatsCards` and `applyPrecomputedStats`). Now uses `document.querySelector('.stat-card[data-crime-type="..."]')`. Adding a new stat card only requires: new count vars in dashboardUpdates.ts + new StatCard in dashboard.astro + new entry in buildStats() in /api/dashboard.ts + new entry in pluralMap in statCardFiltering.ts.
@@ -87,6 +125,31 @@ Never duplicate content already in CLAUDE.md's hard rules.
 - sync worker redeployed. Committed 687b22b + pushed. Cloudflare Pages deploy triggered.
 - One pending manual step: CDN cache purge for /api/dashboard/ if stale (from prior session).
 - Crime schema overhaul: 3 new types (Carjacking sev 5, Domestic Violence sev 4 context, Extortion sev 3). isContextType flag added to all 15 types. Context types (Home Invasion, Domestic Violence) can no longer become primary crime in crimeTypeProcessor.gs. Assault+Robbery combination rule + context type ordering rule added to claudeClient.gs system prompt. Architecture fix: reportValidation.ts + report.astro dropdown now schema-driven. blogDataGenerator.gs BLOG_CRIME_TYPE_CONFIG synced (also fixed pre-existing Arson + Attempted Murder drift). Vehicle Theft removed from crimeColors.ts + generateCrimeTypeThumbnails.ts. Build passes. See L010 for full file list.
+
+## Adding a New Crime Type — Mandatory Procedure
+
+Follow these steps in order. Do not skip any.
+
+**GAS side (schema.gs):**
+1. Add entry to `CRIME_TYPES` (label, severity, isContextType, promptDescription)
+2. If also a safety tip category, add to `SAFETY_TIP_CATEGORIES`
+3. Run `validateSchemaSync()` in GAS editor → copy the output block
+
+**Frontend side (astro-poc/):**
+4. Update `src/config/crimeSchema.ts` CRIME_TYPES — paste from validateSchemaSync() output
+5. Run `npm run check` — TypeScript will now **error on every file** that needs updating (crimeTypeConfig.ts, crimeColors.ts, leafletMap.ts, generateCrimeTypeThumbnails.ts are all exhaustiveness-checked)
+6. Fix each error:
+   - `crimeTypeConfig.ts` — add `'Label': { useVictimCount: true/false }`
+   - `crimeColors.ts` — add tailwind + hex color entry
+   - `leafletMap.ts` — add hex color entry
+   - `generateCrimeTypeThumbnails.ts` — add label abbreviation + hex color
+7. `statCardFiltering.ts` pluralMap — add plural form (fallback exists but add explicitly)
+8. `docs/guides/CRIME-CLASSIFICATION-RULES.md` — document the new classification rule
+9. Run `npm run build` — must pass before committing
+
+**Do NOT add a stat card to dashboard.astro** unless T&T data actually contains the new type.
+
+---
 
 ## Key External Docs
 
