@@ -118,51 +118,55 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
   // Uses countCrimeType to count across both primaryCrimeType and relatedCrimeTypes
   const displayTotal = getTotalCrimeCount(crimes);
   const displayMurders = countCrimeType(crimes, 'Murder');
-  const displayRobberies = countCrimeType(crimes, 'Robbery');
-  const displayHomeInvasions = countCrimeType(crimes, 'Home Invasion');
-  const displayThefts = countCrimeType(crimes, 'Theft');
+  const displayAttemptedMurders = countCrimeType(crimes, 'Attempted Murder');
   const displayShootings = countCrimeType(crimes, 'Shooting');
-  const displayAssaults = countCrimeType(crimes, 'Assault');
+  const displayRobberies = countCrimeType(crimes, 'Robbery');
+  const displayCarjackings = countCrimeType(crimes, 'Carjacking');
+  const displayHomeInvasions = countCrimeType(crimes, 'Home Invasion');
   const displayBurglaries = countCrimeType(crimes, 'Burglary');
-  const displaySeizures = countCrimeType(crimes, 'Seizures');
+  const displayThefts = countCrimeType(crimes, 'Theft');
+  const displayAssaults = countCrimeType(crimes, 'Assault');
   const displayKidnappings = countCrimeType(crimes, 'Kidnapping');
 
   // Calculate trend counts (last 30 days from ALL crimes)
   const last30Total = getTotalCrimeCount(last30DaysCrimes);
   const last30Murders = countCrimeType(last30DaysCrimes, 'Murder');
-  const last30Robberies = countCrimeType(last30DaysCrimes, 'Robbery');
-  const last30HomeInvasions = countCrimeType(last30DaysCrimes, 'Home Invasion');
-  const last30Thefts = countCrimeType(last30DaysCrimes, 'Theft');
+  const last30AttemptedMurders = countCrimeType(last30DaysCrimes, 'Attempted Murder');
   const last30Shootings = countCrimeType(last30DaysCrimes, 'Shooting');
-  const last30Assaults = countCrimeType(last30DaysCrimes, 'Assault');
+  const last30Robberies = countCrimeType(last30DaysCrimes, 'Robbery');
+  const last30Carjackings = countCrimeType(last30DaysCrimes, 'Carjacking');
+  const last30HomeInvasions = countCrimeType(last30DaysCrimes, 'Home Invasion');
   const last30Burglaries = countCrimeType(last30DaysCrimes, 'Burglary');
-  const last30Seizures = countCrimeType(last30DaysCrimes, 'Seizures');
+  const last30Thefts = countCrimeType(last30DaysCrimes, 'Theft');
+  const last30Assaults = countCrimeType(last30DaysCrimes, 'Assault');
   const last30Kidnappings = countCrimeType(last30DaysCrimes, 'Kidnapping');
 
   // Calculate previous 30-day counts
   const prev30Total = getTotalCrimeCount(prev30DaysCrimes);
   const prev30Murders = countCrimeType(prev30DaysCrimes, 'Murder');
-  const prev30Robberies = countCrimeType(prev30DaysCrimes, 'Robbery');
-  const prev30HomeInvasions = countCrimeType(prev30DaysCrimes, 'Home Invasion');
-  const prev30Thefts = countCrimeType(prev30DaysCrimes, 'Theft');
+  const prev30AttemptedMurders = countCrimeType(prev30DaysCrimes, 'Attempted Murder');
   const prev30Shootings = countCrimeType(prev30DaysCrimes, 'Shooting');
-  const prev30Assaults = countCrimeType(prev30DaysCrimes, 'Assault');
+  const prev30Robberies = countCrimeType(prev30DaysCrimes, 'Robbery');
+  const prev30Carjackings = countCrimeType(prev30DaysCrimes, 'Carjacking');
+  const prev30HomeInvasions = countCrimeType(prev30DaysCrimes, 'Home Invasion');
   const prev30Burglaries = countCrimeType(prev30DaysCrimes, 'Burglary');
-  const prev30Seizures = countCrimeType(prev30DaysCrimes, 'Seizures');
+  const prev30Thefts = countCrimeType(prev30DaysCrimes, 'Theft');
+  const prev30Assaults = countCrimeType(prev30DaysCrimes, 'Assault');
   const prev30Kidnappings = countCrimeType(prev30DaysCrimes, 'Kidnapping');
 
-  // Update all cards with trends
-  const statCards = document.querySelectorAll('.stat-card');
+  // Update all cards with trends — data-crime-type attribute lookup (not brittle positional index)
+  const cardByType = (type: string) => document.querySelector(`.stat-card[data-crime-type="${type}"]`);
   updateCardWithTrend(document.getElementById('totalIncidents'), displayTotal, last30Total, prev30Total);
-  updateCardWithTrend(statCards[1], displayMurders, last30Murders, prev30Murders);
-  updateCardWithTrend(statCards[2], displayRobberies, last30Robberies, prev30Robberies);
-  updateCardWithTrend(statCards[3], displayHomeInvasions, last30HomeInvasions, prev30HomeInvasions);
-  updateCardWithTrend(statCards[4], displayThefts, last30Thefts, prev30Thefts);
-  updateCardWithTrend(statCards[5], displayShootings, last30Shootings, prev30Shootings);
-  updateCardWithTrend(statCards[6], displayAssaults, last30Assaults, prev30Assaults);
-  updateCardWithTrend(statCards[7], displayBurglaries, last30Burglaries, prev30Burglaries);
-  updateCardWithTrend(statCards[8], displaySeizures, last30Seizures, prev30Seizures);
-  updateCardWithTrend(statCards[9], displayKidnappings, last30Kidnappings, prev30Kidnappings);
+  updateCardWithTrend(cardByType('Murder'), displayMurders, last30Murders, prev30Murders);
+  updateCardWithTrend(cardByType('Attempted Murder'), displayAttemptedMurders, last30AttemptedMurders, prev30AttemptedMurders);
+  updateCardWithTrend(cardByType('Shooting'), displayShootings, last30Shootings, prev30Shootings);
+  updateCardWithTrend(cardByType('Robbery'), displayRobberies, last30Robberies, prev30Robberies);
+  updateCardWithTrend(cardByType('Carjacking'), displayCarjackings, last30Carjackings, prev30Carjackings);
+  updateCardWithTrend(cardByType('Home Invasion'), displayHomeInvasions, last30HomeInvasions, prev30HomeInvasions);
+  updateCardWithTrend(cardByType('Burglary'), displayBurglaries, last30Burglaries, prev30Burglaries);
+  updateCardWithTrend(cardByType('Theft'), displayThefts, last30Thefts, prev30Thefts);
+  updateCardWithTrend(cardByType('Assault'), displayAssaults, last30Assaults, prev30Assaults);
+  updateCardWithTrend(cardByType('Kidnapping'), displayKidnappings, last30Kidnappings, prev30Kidnappings);
 }
 
 /**
@@ -401,13 +405,14 @@ function getRiskTextColor(barWidth: number): string {
 export interface DashboardStats {
   total: number;
   murders: number;
-  robberies: number;
-  homeInvasions: number;
-  thefts: number;
+  attemptedMurders: number;
   shootings: number;
-  assaults: number;
+  robberies: number;
+  carjackings: number;
+  homeInvasions: number;
   burglaries: number;
-  seizures: number;
+  thefts: number;
+  assaults: number;
   kidnappings: number;
 }
 
@@ -439,17 +444,18 @@ export interface TopRegionEntry {
  * No client-side computation — values come from /api/dashboard.
  */
 export function applyPrecomputedStats(stats: DashboardStats, trends: DashboardTrends): void {
-  const statCards = document.querySelectorAll('.stat-card');
+  const cardByType = (type: string) => document.querySelector(`.stat-card[data-crime-type="${type}"]`);
   updateCardWithTrend(document.getElementById('totalIncidents'), stats.total, trends.last30.total, trends.prev30.total);
-  updateCardWithTrend(statCards[1], stats.murders, trends.last30.murders, trends.prev30.murders);
-  updateCardWithTrend(statCards[2], stats.robberies, trends.last30.robberies, trends.prev30.robberies);
-  updateCardWithTrend(statCards[3], stats.homeInvasions, trends.last30.homeInvasions, trends.prev30.homeInvasions);
-  updateCardWithTrend(statCards[4], stats.thefts, trends.last30.thefts, trends.prev30.thefts);
-  updateCardWithTrend(statCards[5], stats.shootings, trends.last30.shootings, trends.prev30.shootings);
-  updateCardWithTrend(statCards[6], stats.assaults, trends.last30.assaults, trends.prev30.assaults);
-  updateCardWithTrend(statCards[7], stats.burglaries, trends.last30.burglaries, trends.prev30.burglaries);
-  updateCardWithTrend(statCards[8], stats.seizures, trends.last30.seizures, trends.prev30.seizures);
-  updateCardWithTrend(statCards[9], stats.kidnappings, trends.last30.kidnappings, trends.prev30.kidnappings);
+  updateCardWithTrend(cardByType('Murder'), stats.murders, trends.last30.murders, trends.prev30.murders);
+  updateCardWithTrend(cardByType('Attempted Murder'), stats.attemptedMurders, trends.last30.attemptedMurders, trends.prev30.attemptedMurders);
+  updateCardWithTrend(cardByType('Shooting'), stats.shootings, trends.last30.shootings, trends.prev30.shootings);
+  updateCardWithTrend(cardByType('Robbery'), stats.robberies, trends.last30.robberies, trends.prev30.robberies);
+  updateCardWithTrend(cardByType('Carjacking'), stats.carjackings, trends.last30.carjackings, trends.prev30.carjackings);
+  updateCardWithTrend(cardByType('Home Invasion'), stats.homeInvasions, trends.last30.homeInvasions, trends.prev30.homeInvasions);
+  updateCardWithTrend(cardByType('Burglary'), stats.burglaries, trends.last30.burglaries, trends.prev30.burglaries);
+  updateCardWithTrend(cardByType('Theft'), stats.thefts, trends.last30.thefts, trends.prev30.thefts);
+  updateCardWithTrend(cardByType('Assault'), stats.assaults, trends.last30.assaults, trends.prev30.assaults);
+  updateCardWithTrend(cardByType('Kidnapping'), stats.kidnappings, trends.last30.kidnappings, trends.prev30.kidnappings);
 }
 
 /**

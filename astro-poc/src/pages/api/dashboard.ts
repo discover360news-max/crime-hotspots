@@ -36,13 +36,14 @@ function buildStats(crimes: Crime[]) {
   return {
     total: getTotalCrimeCount(crimes),
     murders: countCrimeType(crimes, 'Murder'),
-    robberies: countCrimeType(crimes, 'Robbery'),
-    homeInvasions: countCrimeType(crimes, 'Home Invasion'),
-    thefts: countCrimeType(crimes, 'Theft'),
+    attemptedMurders: countCrimeType(crimes, 'Attempted Murder'),
     shootings: countCrimeType(crimes, 'Shooting'),
-    assaults: countCrimeType(crimes, 'Assault'),
+    robberies: countCrimeType(crimes, 'Robbery'),
+    carjackings: countCrimeType(crimes, 'Carjacking'),
+    homeInvasions: countCrimeType(crimes, 'Home Invasion'),
     burglaries: countCrimeType(crimes, 'Burglary'),
-    seizures: countCrimeType(crimes, 'Seizures'),
+    thefts: countCrimeType(crimes, 'Theft'),
+    assaults: countCrimeType(crimes, 'Assault'),
     kidnappings: countCrimeType(crimes, 'Kidnapping'),
   };
 }

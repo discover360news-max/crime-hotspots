@@ -39,6 +39,23 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 17, 2026
+- Dashboard Crime Statistics maintenance: InfoPopup now covers all 15 crime types (was 9). Added Attempted Murder + Carjacking stat cards; removed Seizures (law enforcement action, not a citizen-safety indicator). Card order: All Crimes → Murder → Attempted Murder → Shooting → Robbery → Carjacking → Home Invasion → Burglary → Theft → Assault → Kidnapping.
+- Fixed brittle positional `statCards[n]` indexing in `dashboardUpdates.ts` (both `updateStatsCards` and `applyPrecomputedStats`). Now uses `document.querySelector('.stat-card[data-crime-type="..."]')`. Adding a new stat card only requires: new count vars in dashboardUpdates.ts + new StatCard in dashboard.astro + new entry in buildStats() in /api/dashboard.ts + new entry in pluralMap in statCardFiltering.ts.
+- `DashboardStats` interface + `buildStats()` in `/api/dashboard.ts` updated to match (seizures removed, attemptedMurders + carjackings added).
+
+## Session Notes — Mar 16, 2026 (continued)
+- Classification rule v1.2: Flipped the Shooting vs Attempted Murder default. Old: "intent unclear → Shooting". New: "person directly targeted → Attempted Murder (primary) + Shooting (related)". Shooting reserved for: unintended bystanders (stray bullets) and no person targeted (shots at property, into air). Drive-bys targeting a group = Attempted Murder. Going forward only; existing records unchanged. Updated: claudeClient.gs, schema.gs, CRIME-CLASSIFICATION-RULES.md v1.2, HEADLINE-CLASSIFICATION-WORKFLOW.md v1.2, L013.
+
+## Session Notes — Mar 16, 2026
+- Statistics page: Attempted Murder showed 0 for 2026. Root cause: Google Sheet was reclassified (Shooting→Attempted Murder for ~16 rows) but D1 held pre-reclassification data from prior sync. Fixed by triggering manual sync: `curl -X POST https://crime-sync.discover360news.workers.dev/sync`.
+- Fixed hardcoded year bug in `statisticsHelpers.ts`: `compareYearToDate()` was calling `filterToSamePeriod(crimes, 2025)` and `filterToSamePeriod(crimes, 2026)` with literals. Refactored to accept `currentYear: number, previousYear: number` parameters. `YoYComparison` interface: `count2026`/`count2025` → `countCurrent`/`countPrevious`. Updated all callsites in `statistics.astro`.
+- Fixed D1 cron timing sequencing bug (B022): sync ran at 10am UTC — 4h AFTER the 6am site rebuild. Worst-case staleness ~44h. Changed `workers/crime-sync/wrangler.toml` cron: `0 10 * * *` → `0 5 * * *`. D1 now syncs at 5am, one hour before rebuild. CFG002 updated to document the dependency.
+
+## Session Notes — Mar 15, 2026 (continued x2)
+- Fixed HomepagePulse.astro: bare ternary `embedded ? (...) : (...)` in template was rendering as literal text on live site. Wrapped in `{...}`. Committed + pushed (35c8ab3).
+- Upgraded tsconfig.json `base` → `strict`. Fixed all 78 TypeScript errors across 11 files: null safety (safetyContext, resultsEl, querySelector), implicit any (analytics.ts, event listener `this`, sort callbacks, compare.astro helpers), type mismatches (Crime interface storyId/oldSlug, StatCard direction, TRINIDAD_CSV_URLS number indexing), invalid void element (`<br>content</br>` in archive). `npm run check` = 0 errors. Build passes. CFG004 updated.
+
 ## Session Notes — Mar 15, 2026 (continued)
 - Added `@astrojs/check` + `typescript` devDeps; `npm run check` script in package.json. Type-checks all .astro files.
 - Downgraded tsconfig from `strict` → `base`. Fixed 150 of 154 type errors across ~30 files (4 left as intentional false positives or non-runtime issues).

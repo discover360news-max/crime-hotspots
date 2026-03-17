@@ -25,7 +25,7 @@
 ### Trinidad Crime Data
 | Page | Route | Rendering | Purpose |
 |------|-------|-----------|---------|
-| Dashboard | `/trinidad/` | Pre-rendered | DashboardStory (two-column: live weekly narrative + latest blog post), sticky year filter bar, stat cards, Leaflet map, Filters drawer (crime type/region/area), Quick Insights card, Top Regions, trend indicators |
+| Dashboard | `/trinidad/` | Pre-rendered | DashboardStory (two-column: live weekly narrative + latest blog post), sticky year filter bar, stat cards (11 cards: All Crimes, Murder, Attempted Murder, Shooting, Robbery, Carjacking, Home Invasion, Burglary, Theft, Assault, Kidnapping — Seizures removed Mar 2026), Leaflet map, Filters drawer (crime type/region/area), Quick Insights card, Top Regions, trend indicators |
 | Headlines | `/trinidad/headlines/` | Pre-rendered | Latest crimes, date accordion, victim counts, empty state for filters |
 | Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | Individual crime page, safety context, related crimes, trending hotspots |
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
@@ -148,8 +148,8 @@
 | Script | Purpose |
 |--------|---------|
 | dashboardDataLoader.ts | Primary path: fetches `/api/dashboard/` + `/api/crimes/` in parallel; sets `window.__crimesData`; dispatches `crimesDataReady` event; applies pre-computed stats via `applyPrecomputed*`. CSV fallback via `initializeDashboardDataFromCSV()` if API fails. |
-| dashboardUpdates.ts | Updates dashboard on filter change. Also exports `applyPrecomputedStats`, `applyPrecomputedInsights`, `applyPrecomputedTopRegions` (used by API path) + `updateCardWithTrend` (shared helper). |
-| statCardFiltering.ts | Stat card click-to-filter |
+| dashboardUpdates.ts | Updates dashboard on filter change. Also exports `applyPrecomputedStats`, `applyPrecomputedInsights`, `applyPrecomputedTopRegions` (used by API path) + `updateCardWithTrend` (shared helper). Stat card lookups use `data-crime-type` attribute (not positional index) — adding/reordering cards requires only new count vars here + a new StatCard in dashboard.astro. `DashboardStats` interface must match `buildStats()` in `/api/dashboard.ts`. |
+| statCardFiltering.ts | Stat card click-to-filter. `pluralMap` covers all 15 crime types — add new entries here when adding a new stat card. |
 | statsScroll.ts | Smooth scroll to stats section |
 | leafletMap.ts | Interactive Leaflet map with crime markers |
 | yearFilter.ts | Year selection filter control |

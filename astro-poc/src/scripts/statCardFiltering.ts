@@ -19,6 +19,8 @@ interface Crime {
   longitude: number;
   summary: string;
   slug: string;
+  storyId: string;
+  oldSlug: string;
   dateObj: Date;
   year: number;
   month: number;
@@ -41,17 +43,20 @@ function updateQuickInsightsTitle(crimeType: string | null) {
     // Handle pluralization
     const pluralMap: Record<string, string> = {
       'Murder': 'Murders',
-      'Robbery': 'Robberies',
-      'Home Invasion': 'Home Invasions',
-      'Theft': 'Thefts',
+      'Attempted Murder': 'Attempted Murders',
       'Shooting': 'Shootings',
-      'Assault': 'Assaults',
-      'Burglary': 'Burglaries',
-      'Seizures': 'Seizures',
-      'Kidnapping': 'Kidnappings',
+      'Robbery': 'Robberies',
       'Carjacking': 'Carjackings',
+      'Home Invasion': 'Home Invasions',
+      'Burglary': 'Burglaries',
+      'Theft': 'Thefts',
+      'Assault': 'Assaults',
+      'Kidnapping': 'Kidnappings',
       'Domestic Violence': 'Domestic Violence',
+      'Sexual Assault': 'Sexual Assaults',
       'Extortion': 'Extortion',
+      'Arson': 'Arson',
+      'Seizures': 'Seizures',
     };
 
     const plural = pluralMap[crimeType] || crimeType;
@@ -101,22 +106,23 @@ function applyAllFilters(callbacks: {
 
   // Apply crime type filter (check primary, legacy, and related crime types)
   if (activeCrimeTypeFilter && activeCrimeTypeFilter !== 'All') {
+    const typeFilter = activeCrimeTypeFilter; // capture for narrowing inside callbacks
     filteredCrimes = filteredCrimes.filter((crime: Crime) => {
       // Check if primaryCrimeType matches
-      if (crime.primaryCrimeType === activeCrimeTypeFilter) return true;
+      if (crime.primaryCrimeType === typeFilter) return true;
 
       // Check if crimeType matches (fallback for old data)
-      if (crime.crimeType === activeCrimeTypeFilter) return true;
+      if (crime.crimeType === typeFilter) return true;
 
       // Check if relatedCrimeTypes contains the target type
       if (crime.relatedCrimeTypes) {
         const relatedTypes = crime.relatedCrimeTypes.split(',').map(t => t.trim());
-        if (relatedTypes.includes(activeCrimeTypeFilter)) return true;
+        if (relatedTypes.includes(typeFilter)) return true;
       }
 
       return false;
     });
-    console.log(`📊 Filtered to ${filteredCrimes.length} ${activeCrimeTypeFilter} incidents`);
+    console.log(`📊 Filtered to ${filteredCrimes.length} ${typeFilter} incidents`);
   }
 
   // Update dashboard components (but NOT stats cards - they show year totals)
