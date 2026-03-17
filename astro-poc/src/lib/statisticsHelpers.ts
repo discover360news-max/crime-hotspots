@@ -35,8 +35,8 @@ export type TrackedCrimeType = typeof TRACKED_CRIME_TYPES[number];
  */
 export interface YoYComparison {
   type: string;
-  count2026: number;
-  count2025: number;
+  countCurrent: number;
+  countPrevious: number;
   percentChange: number;
   direction: 'up' | 'down' | 'same';
 }
@@ -84,29 +84,30 @@ export function filterToSamePeriod(crimes: Crime[], targetYear: number): Crime[]
 }
 
 /**
- * Compare same period between two years
+ * Compare same period between two years (dynamic — works for any year pair)
  * Example: If today is Jan 23 2026, compare:
- * - 2026: Jan 1 - Jan 23
- * - 2025: Jan 1 - Jan 23
+ * - currentYear (2026): Jan 1 - Jan 23
+ * - previousYear (2025): Jan 1 - Jan 23
  *
- * @param crimes2026 - Full year 2026 crimes (will be filtered to YTD)
- * @param crimes2025 - Full year 2025 crimes (will be filtered to same period)
+ * @param crimesCurrentYear - Current year crimes (will be filtered to YTD)
+ * @param crimesPreviousYear - Previous year crimes (will be filtered to same period)
+ * @param currentYear - The current year number (e.g. 2026)
+ * @param previousYear - The previous year number (e.g. 2025)
  * @returns Array of YoY comparisons for each tracked crime type
  */
 export function compareYearToDate(
-  crimes2026: Crime[],
-  crimes2025: Crime[]
+  crimesCurrentYear: Crime[],
+  crimesPreviousYear: Crime[],
+  currentYear: number,
+  previousYear: number
 ): YoYComparison[] {
-  // Filter 2025 to same period as current date
-  const crimes2025SamePeriod = filterToSamePeriod(crimes2025, 2025);
-
-  // 2026 crimes are already filtered to current year, but ensure YTD only
-  const crimes2026YTD = filterToSamePeriod(crimes2026, 2026);
+  const crimesPreviousSamePeriod = filterToSamePeriod(crimesPreviousYear, previousYear);
+  const crimesCurrentYTD = filterToSamePeriod(crimesCurrentYear, currentYear);
 
   return TRACKED_CRIME_TYPES.map(type => {
-    const count2026 = countCrimeType(crimes2026YTD, type);
-    const count2025 = countCrimeType(crimes2025SamePeriod, type);
-    const percentChange = calculatePercentChange(count2025, count2026);
+    const countCurrent = countCrimeType(crimesCurrentYTD, type);
+    const countPrevious = countCrimeType(crimesPreviousSamePeriod, type);
+    const percentChange = calculatePercentChange(countPrevious, countCurrent);
 
     let direction: 'up' | 'down' | 'same' = 'same';
     if (percentChange > 0.5) direction = 'up';
@@ -114,8 +115,8 @@ export function compareYearToDate(
 
     return {
       type,
-      count2026,
-      count2025,
+      countCurrent,
+      countPrevious,
       percentChange,
       direction
     };

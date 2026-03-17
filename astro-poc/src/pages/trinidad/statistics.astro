@@ -42,13 +42,16 @@ const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 // Dynamic year handling (future-proof)
 const currentYear = new Date().getFullYear();
 const previousYear = currentYear - 1;
+// Helper: index TRINIDAD_CSV_URLS by runtime year number
+const csvUrlByYear = (year: number): string =>
+  (TRINIDAD_CSV_URLS as Record<number, string>)[year] ?? '';
 
 // Filter by year
 const crimesCurrent = allCrimes.filter(c => c.year === currentYear);
 const crimesPrevious = allCrimes.filter(c => c.year === previousYear);
 
 // Calculate statistics
-const yoyComparisons = compareYearToDate(crimesCurrent, crimesPrevious);
+const yoyComparisons = compareYearToDate(crimesCurrent, crimesPrevious, currentYear, previousYear);
 const topRegions = getTopRegions(crimesCurrent);
 const insightsCurrent = calculateInsights(crimesCurrent);
 const totalCrimesCurrent = getTotalCrimeCount(crimesCurrent);
@@ -74,9 +77,9 @@ const totalYoYChange = total2025SamePeriod > 0
   : 0;
 
 // Extract YoY comparisons (avoids repeated .find() calls)
-const murderComp = yoyComparisons.find(c => c.type === 'Murder') ?? { count2025: 0, percentChange: 0, direction: 'flat' as const };
-const robberyComp = yoyComparisons.find(c => c.type === 'Robbery') ?? { count2025: 0, percentChange: 0, direction: 'flat' as const };
-const shootingComp = yoyComparisons.find(c => c.type === 'Shooting') ?? { count2025: 0, percentChange: 0, direction: 'flat' as const };
+const murderComp = yoyComparisons.find(c => c.type === 'Murder') ?? { countPrevious: 0, percentChange: 0, direction: 'flat' as const };
+const robberyComp = yoyComparisons.find(c => c.type === 'Robbery') ?? { countPrevious: 0, percentChange: 0, direction: 'flat' as const };
+const shootingComp = yoyComparisons.find(c => c.type === 'Shooting') ?? { countPrevious: 0, percentChange: 0, direction: 'flat' as const };
 
 // Build WhatsApp share text for a stat card
 const statsPageUrl = 'https://crimehotspots.com/trinidad/statistics/';
@@ -94,7 +97,7 @@ const statCardsData = [
   {
     label: 'Murders',
     current: murderCount,
-    previous: murderComp.count2025,
+    previous: murderComp.countPrevious,
     yoyChange: murderComp.percentChange,
     direction: murderComp.direction,
     shareText: buildShareText(murderCount, 'murders', murderComp.direction, murderComp.percentChange),
@@ -102,7 +105,7 @@ const statCardsData = [
   {
     label: 'Robberies',
     current: robberyCount,
-    previous: robberyComp.count2025,
+    previous: robberyComp.countPrevious,
     yoyChange: robberyComp.percentChange,
     direction: robberyComp.direction,
     shareText: buildShareText(robberyCount, 'robberies', robberyComp.direction, robberyComp.percentChange),
@@ -110,16 +113,16 @@ const statCardsData = [
   {
     label: 'Shootings',
     current: shootingCount,
-    previous: shootingComp.count2025,
+    previous: shootingComp.countPrevious,
     yoyChange: shootingComp.percentChange,
-    direction: shootingComp.direction,
+    direction: shootingComp.direction as 'flat' | 'up' | 'down' | 'same',
   },
   {
     label: 'All Crimes',
     current: total2026YTD,
     previous: total2025SamePeriod,
     yoyChange: totalYoYChange,
-    direction: totalYoYChange < -0.5 ? 'down' : totalYoYChange > 0.5 ? 'up' : 'flat',
+    direction: (totalYoYChange < -0.5 ? 'down' : totalYoYChange > 0.5 ? 'up' : 'flat') as 'flat' | 'up' | 'down' | 'same',
   }
 ];
 
@@ -190,12 +193,12 @@ const structuredData = {
     {
       "@type": "DataDownload",
       "encodingFormat": "text/csv",
-      "contentUrl": TRINIDAD_CSV_URLS[currentYear]
+      "contentUrl": csvUrlByYear(currentYear)
     },
     {
       "@type": "DataDownload",
       "encodingFormat": "text/csv",
-      "contentUrl": TRINIDAD_CSV_URLS[previousYear]
+      "contentUrl": csvUrlByYear(previousYear)
     }
   ],
   "temporalCoverage": `${previousYear}/${currentYear}`,
@@ -288,7 +291,7 @@ const breadcrumbData = {
     }}
     secondaryCTA={{
       text: `Download ${currentYear} Data`,
-      href: TRINIDAD_CSV_URLS[currentYear],
+      href: csvUrlByYear(currentYear),
       icon: "download",
       target: "_blank",
       rel: "noopener noreferrer"
@@ -418,11 +421,11 @@ const breadcrumbData = {
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-[hsl(0_0%_12%)]">
-              {yoyComparisons.filter(c => c.count2026 > 0 || c.count2025 > 0).map(comparison => (
+              {yoyComparisons.filter(c => c.countCurrent > 0 || c.countPrevious > 0).map(comparison => (
                 <tr class="hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)]">
                   <td class="px-4 py-3 text-slate-700 dark:text-[var(--ch-text-strong)] font-medium">{comparison.type}</td>
-                  <td class="px-4 py-3 text-right text-slate-700 dark:text-[var(--ch-text-strong)]">{comparison.count2026}</td>
-                  <td class="px-4 py-3 text-right text-slate-500 dark:text-[hsl(0_0%_60%)]">{comparison.count2025}</td>
+                  <td class="px-4 py-3 text-right text-slate-700 dark:text-[var(--ch-text-strong)]">{comparison.countCurrent}</td>
+                  <td class="px-4 py-3 text-right text-slate-500 dark:text-[hsl(0_0%_60%)]">{comparison.countPrevious}</td>
                   <td class={`px-4 py-3 text-right font-medium ${comparison.direction === 'down' ? 'text-emerald-600 dark:text-emerald-400' : comparison.direction === 'up' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400 dark:text-[var(--ch-text-faint)]'}`}>
                     {comparison.direction === 'down' ? '↓' : comparison.direction === 'up' ? '↑' : '→'}
                     {formatPercentChange(comparison.percentChange)}
@@ -518,7 +521,7 @@ const breadcrumbData = {
       </p>
       <div class="flex flex-col sm:flex-row gap-3">
         <a
-          href={TRINIDAD_CSV_URLS[currentYear]}
+          href={csvUrlByYear(currentYear)}
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center justify-center px-5 py-3 min-h-[44px] bg-rose-600 text-white rounded-lg hover:bg-rose-700 active:bg-rose-800 transition font-medium text-sm shadow-sm"
@@ -529,7 +532,7 @@ const breadcrumbData = {
           Download {currentYear} Data (CSV)
         </a>
         <a
-          href={TRINIDAD_CSV_URLS[previousYear]}
+          href={csvUrlByYear(previousYear)}
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center justify-center px-5 py-3 min-h-[44px] border border-slate-300 dark:border-[hsl(0_0%_25%)] text-slate-700 dark:text-[var(--ch-text-strong)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_12%)] transition font-medium text-sm"
