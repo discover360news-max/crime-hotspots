@@ -31,10 +31,12 @@ Enforced at two layers:
 **Carjacking and Theft:**
 - Vehicle + phone/wallet taken = Carjacking + Robbery (covers all). Never also add Theft.
 
-**Shooting (primary) vs Attempted Murder (primary):**
-- Confirmed intent to kill (execution-style, stated intent, multiple shots at close range) → Attempted Murder (primary) + Shooting (related)
-- Intent unclear / victim shot and survived → Shooting (primary)
-- Default when in doubt: Shooting as primary (matches FBI NIBRS standard)
+**Shooting (primary) vs Attempted Murder (primary) — T&T rule (v1.2):**
+- Person directly targeted and shot, survived → **Attempted Murder** (primary) + Shooting (related). Always.
+- Group deliberately targeted (drive-by), all survived → **Attempted Murder** (primary)
+- Victim was unintended bystander (stray bullet) → **Shooting** (primary)
+- No person targeted (shots at property, into air, warning shots) → **Shooting** (primary)
+- Old "intent unclear → default Shooting" standard deliberately removed for T&T context — shooting at a person implies intent to kill here.
 
 **Shooting vs Assault — not stackable as peers:**
 - Firearm discharged → Shooting (not also Assault)
@@ -63,3 +65,4 @@ Adding a new crime type to `CRIME_TYPES` in `schema.gs` automatically includes i
 ## Change Log
 - 2026-03-14: Rules established, doc created, all files updated
 - 2026-03-14: Prompt quality overhaul — buildClassificationRulesBlock() wired in; promptDescriptions enriched for Murder, Attempted Murder, Arson; prompt restructured (hierarchy first)
+- 2026-03-16: v1.2 — Shooting vs Attempted Murder default flipped. Old: "intent unclear → Shooting". New: "person directly targeted → Attempted Murder". Shooting reserved for stray/unintended victims and shots not aimed at any person. Applies going forward; existing records not retroactively reclassified. Updated: claudeClient.gs, schema.gs (both promptDescriptions), CRIME-CLASSIFICATION-RULES.md, HEADLINE-CLASSIFICATION-WORKFLOW.md.

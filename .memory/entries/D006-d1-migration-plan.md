@@ -102,5 +102,7 @@ Tips / feeds / sitemaps (D1 pattern + CDN cache headers):
 Remaining `prerender = true` pages (intentional — no live crime data dependency):
 - `dashboard.astro` (SSR shell, loads via /api/dashboard), `compare.astro`, `mp/` pages, safety-tips static pages
 
+- 2026-03-16: Moved D1 sync cron from `0 10 * * *` → `0 5 * * *` (5am UTC). Fixes sequencing bug where D1 synced 4h AFTER the 6am site rebuild — serving stale data all day. Sync now runs before rebuild. See B022.
+
 ## Deferred Cleanup
 - ~~Remove `historicalTrends` key from `TRINIDAD_CSV_URLS`~~ — DONE Mar 12, 2026. Key removed from `csvUrls.ts`; fallback in `dashboardDataLoader.ts` simplified to fetch only `current`. 60+ days of 2026 data makes cross-year historical snippet unnecessary.

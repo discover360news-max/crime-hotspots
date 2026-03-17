@@ -24,10 +24,13 @@ npm run preview  # Preview production build locally
 3. Crime pages served SSR via Cloudflare Workers
 4. Other pages served as static files from Cloudflare CDN
 
-**Daily rebuild:** GitHub Actions cron `0 6 * * *` (6AM UTC = 2AM Trinidad)
-- Ensures murder count page reflects latest data
-- Regenerates OG images
-- Manual trigger: GitHub Actions UI → "Build and Validate" → "Run workflow"
+**Daily sequence (order matters):**
+1. **05:00 UTC** — D1 sync worker cron (`workers/crime-sync/wrangler.toml`) — fetches latest Google Sheets CSV → upserts into D1
+2. **06:00 UTC** — GitHub Actions rebuild cron `0 6 * * *` (2AM Trinidad) — builds site with fresh D1 data; invalidates CDN cache
+
+D1 sync MUST run before the rebuild. If either schedule changes, update the other. See B022 for the bug caused when D1 ran at 10am (4h after rebuild).
+- Manual rebuild trigger: GitHub Actions UI → "Build and Validate" → "Run workflow"
+- Manual D1 sync trigger: `curl -X POST https://crime-sync.discover360news.workers.dev/sync`
 
 ## Environment Variables (Cloudflare Pages)
 - `PUBLIC_SAFETY_TIPS_GAS_URL` — GAS web app URL for safety tips + voting

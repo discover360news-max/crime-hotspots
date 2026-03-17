@@ -3,28 +3,34 @@ id: B015
 type: bug
 status: active
 created: 2026-03-12
+updated: 2026-03-17
 related: [CFG004, D006]
 ---
 
 ## Summary
-Astro `trailingSlash: 'always'` (set in astro.config.mjs) compiles API endpoint route patterns
-with a required trailing slash: `^\\/api\\/dashboard\\/$`. Client-side `fetch('/api/dashboard?year=2026')`
-(no trailing slash) does NOT match — wrangler serves the full site HTML with status 200 instead.
-`r.json()` on HTML content throws SyntaxError → triggers fallback path silently.
+Astro `trailingSlash: 'always'` means EVERY internal link and fetch call must include a trailing slash. Missing slash causes the Cloudflare Worker to fall through and serve the homepage HTML instead of the intended page — no error, no redirect, silent failure.
 
-## Symptom
-- Dashboard falls back to CSV even though API endpoints exist
-- Network tab shows `/api/dashboard?year=2026` returning `200 text/html`
-- No console error — just the fallback warning
+## Affects Two Things
 
-## Fix
-Always use trailing slashes in fetch calls to SSR endpoints:
-```ts
-fetch(`/api/dashboard/?year=${year}`)  // ✅
-fetch(`/api/dashboard?year=${year}`)   // ❌
+**1. `href` links in templates** — missing slash serves homepage silently
+```astro
+<a href="/data-capability-sheet/">...</a>   ✅
+<a href="/data-capability-sheet">...</a>    ❌ → serves homepage
 ```
 
+**2. `fetch()` calls to SSR API endpoints** — missing slash returns 200 HTML, not JSON
+```ts
+fetch(`/api/dashboard/?year=${year}`)  // ✅
+fetch(`/api/dashboard?year=${year}`)   // ❌ → r.json() throws SyntaxError silently
+```
+
+## Symptoms
+- Page navigates to homepage instead of intended destination (href case)
+- Dashboard falls back to CSV even though API endpoints exist (fetch case)
+- Network tab shows target URL returning `200 text/html`
+- No console error in either case
+
 ## Notes
-- In production Cloudflare Pages, Astro middleware may redirect non-slash → slash, but in
-  local `wrangler pages dev` no redirect occurs — it falls through to the SPA HTML shell.
-- Check ALL fetch calls targeting `src/pages/api/*.ts` endpoints.
+- In production Cloudflare Pages, Astro does NOT auto-redirect missing trailing slashes — it falls through to serving homepage/HTML
+- Check ALL `href` values in templates and ALL `fetch()` calls to internal endpoints
+- Breadcrumb `href` values are a common miss — check whenever adding a new breadcrumb trail

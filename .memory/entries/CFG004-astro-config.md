@@ -49,3 +49,4 @@ Adding a new env var = add to schema here + add to `.env.example`.
 - 2026-02-04: Switched to full `output: 'server'`
 - 2026-03-13: Removed `astro-pagefind` (replaced with D1 FTS5 search)
 - 2026-03-15: Added `astro:env` schema for typed env vars; `envField` import added
+- 2026-03-15: Upgraded tsconfig.json from `astro/tsconfigs/base` → `astro/tsconfigs/strict`. Fixed 78 errors across 11 files (null safety, implicit any, type mismatches). `npm run check` now passes at 0 errors.

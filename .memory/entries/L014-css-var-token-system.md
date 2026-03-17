@@ -59,5 +59,13 @@ hover state:      --ch-surface-hover(18%)← lightest interactive
 ## Off-spec values (tech debt, fix when touching file)
 `text-65%`, `text-88%`, `bg-12%`, `border-30%` — documented in `docs/guides/tokens/colors.md`
 
+## Hero gradient pattern
+Hero sections use a `bg` → `surface` diagonal fade in dark mode:
+```html
+dark:from-[var(--ch-bg)] dark:via-[var(--ch-surface)] dark:to-[var(--ch-surface)]
+```
+Three pages have inline hero markup (not using Hero.astro): `dashboard.astro`, `compare.astro`. If adding a new page with an inline hero, use this pattern — not `rose-950/30`.
+
 ## Change Log
 - 2026-03-15: CSS var consolidation complete. ~976 hardcoded dark: classes swept across all .astro/.ts files.
+- 2026-03-15: Hero gradient rose tint removed — dark:from-rose-950/30 → dark:from-[var(--ch-bg)] across Hero.astro, dashboard.astro, compare.astro.

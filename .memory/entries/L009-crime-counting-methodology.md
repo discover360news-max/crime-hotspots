@@ -35,7 +35,9 @@ related: [D003, L007, B010]
 - This is confirmed locked-in with Kavell — do not revert to row counting
 - Raw row count would undercount crimes (misses related types)
 - Victim count would overcount (inflated by high-victim events)
-- `Murder|Murder` in related crimes = 2 deaths — never deduplicate with Set()
+- `Murder|Murder` in related crimes = 2 deaths — never deduplicate with Set() in analytics
+- **Display is different from analytics:** `CrimeDetailModal` and `crime/[slug]` deduplicate pills with `Set()` for display only — this is correct and intentional. Do NOT remove it. Do NOT apply Set() in analytics functions.
 
 ## Change Log
 - 2026-03-03: Methodology locked in with Kavell; applied across all calculation points
+- 2026-03-17: Clarified display-dedup vs analytics-dedup distinction

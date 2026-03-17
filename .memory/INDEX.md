@@ -18,12 +18,14 @@ B011 | BUG | archived | astro-pagefind removed (Mar 13 2026) — search now uses
 B012 | BUG | active | NEVER `await import()` inside Astro integration hooks — crashes Vite runner → B012-await-import-hooks.md
 B013 | BUG | fixed | Raw Articles sheet column is "Publish Date" not "Published Date" — caused all crime dates to use run date → B013-gas-publish-date-column-mismatch.md
 B014 | BUG | archived | Pagefind ranking issues → fully resolved by removing Pagefind (Mar 13 2026). Search now uses D1 FTS5 (see D007) → B014-pagefind-crime-indexer.md
-B015 | BUG | active | Astro trailingSlash:'always' — fetch to SSR endpoints MUST use trailing slash (/api/dashboard/?year=) or 200 HTML is returned → B015-astro-trailing-slash-api-fetch.md
+B015 | BUG | active | Astro trailingSlash:'always' — ALL internal hrefs AND fetch calls MUST use trailing slash or homepage HTML is served silently → B015-astro-trailing-slash-api-fetch.md
 B016 | BUG | active | SSR handlers: wrap ENTIRE body in try/catch, not just DB queries — uncaught throws return 200 HTML from Astro error handler → B016-ssr-handler-try-catch.md
 B017 | BUG | active | Local D1 is empty — apply schema manually before using wrangler pages dev locally → B017-local-d1-empty.md
 B018 | BUG | fixed | D1 date column stored as MM/DD/YYYY (raw CSV) — range queries with YYYY-MM-DD always returned 0 rows → trend indicators hidden. Fix: normalize in sync worker + re-sync → B018-d1-date-format-mismatch.md
 B019 | BUG | fixed | Quick Insights "Highest Crime Area" could show 'Unknown' — calculateInsights() + updateQuickInsights() used areaArray[0] instead of validAreas[0]. Fix: both server (dashboardHelpers.ts) + client (dashboardUpdates.ts) now use validAreas[0] → B019-quick-insights-unknown-area.md
 B020 | BUG | fixed | updateQuickInsights() used new Date(c.date) string parse (UTC midnight) for Peak Day/Busiest Month — shifts day for Trinidad (UTC-4). Fix: use c.dateObj when available → B019-quick-insights-unknown-area.md
+B021 | BUG | fixed | Astro template bare ternary `expr ? (...) : (...)` renders as literal text — MUST wrap in `{}`. Hit HomepagePulse (Mar 15 2026) → B021-astro-template-bare-ternary.md
+B022 | BUG | fixed | D1 sync ran at 10am UTC — AFTER 6am site rebuild → stale data all day. Fix: moved cron to 5am. D1 MUST sync before rebuild. See B022-d1-cron-timing-sequencing.md
 
 ## Learnings & Patterns (L)
 L001 | LEARN | archived | ~~astro:page-load~~ — SPA removed Mar 15 2026. Use DOMContentLoaded. Do NOT re-introduce ClientRouter → L001-astro-page-load-pattern.md
@@ -52,6 +54,7 @@ D007 | DEC | active | Search: replaced Pagefind with D1 FTS5. crimes_fts virtual
 
 ## Features (F)
 F010 | FEAT | active | MP profiles: 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg → F010-mp-profiles.md
+F011 | FEAT | active | Data Capability Sheet: /data-capability-sheet/ — B2B institutional one-pager, PDF-printable, content in capabilitySheetConfig.ts. CSV/PDF formats are on-engagement only, not self-serve → F011-data-capability-sheet.md
 F001 | FEAT | active | Security: escapeHtml, sanitizeUrl, CSP headers, Turnstile, Secure cookies → F001-security-system.md
 F002 | FEAT | active | GAS pipeline: RSS → preFilter → Claude Haiku → Sheets → CSV → site → F002-gas-automation-pipeline.md
 F003 | FEAT | active | Safety tips: 61 tips, category/context/area pages, submit form, voting. Categories: Robbery, Carjacking, Home Invasion, ATM Crime, Online Scam, Kidnapping, Sexual Violence, Fraud, Assault, Domestic Violence, Extortion, Shooting, Burglary (added Mar 2026), Other → F003-safety-tips-system.md
@@ -73,6 +76,9 @@ CFG001 | CFG | active | Project overview: Astro 5, Cloudflare Pages, GA4, GAS, C
 CFG002 | CFG | active | Build & deploy: npm commands, GitHub Actions, daily 6AM UTC rebuild → CFG002-build-deploy.md
 CFG003 | CFG | active | Cloudflare caching: ALL crime-data pages SSR + CDN ~23h. D1 free tier: 5M rows read/day; safe to ~15k visits/day → CFG003-cloudflare-caching.md
 CFG004 | CFG | active | astro.config.mjs: output:server, Cloudflare adapter, key integrations → CFG004-astro-config.md
+
+## Social Media (SM)
+SM001 | WORKFLOW | active | Weekly social image prompts for Gemini: 4 images (3 spikes + 1 positive), clinical/visceral styles, creative concept library → docs/guides/SOCIAL-IMAGE-WORKFLOW.md
 
 ## Tools (T)
 T001 | TOOL | archived | dedup-2025: one-time GAS script to de-duplicate Raw Articles sheet entries. `google-apps-script/tools/dedup-2025/dedup.gs` + `index.html`. Ran Mar 2026; kept for reference if de-dup needed again.
