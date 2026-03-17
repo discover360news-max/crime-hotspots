@@ -54,37 +54,31 @@ export const capabilitySheetConfig = {
       name: "Incident-level crime data",
       coverage: "TT-wide, {MONTHS}",
       frequency: "Daily",
-      formats: "CSV, JSON, API",
+      formats: "CSV †, JSON, API",
     },
     {
       name: "Area statistics",
       coverage: "District and community level",
       frequency: "Weekly",
-      formats: "CSV, PDF Report",
+      formats: "CSV †, PDF Report †",
     },
     {
       name: "Crime type breakdown",
       coverage: "8 categories",
       frequency: "Weekly",
-      formats: "CSV, PDF Report",
+      formats: "CSV †, PDF Report †",
     },
     {
       name: "Week-over-week trends",
       coverage: "TT-wide and by area",
       frequency: "Weekly",
-      formats: "Dashboard, CSV",
-    },
-    {
-      name: "Unreported crime estimates",
-      coverage: "Selected areas",
-      frequency: "Monthly",
-      formats: "Aggregate PDF only",
+      formats: "Dashboard, CSV †",
     },
     {
       name: "Historical comparisons",
       coverage: "18-month baseline",
       frequency: "Quarterly",
-      formats: "CSV, PDF Report",
+      formats: "CSV †, PDF Report †",
     },
   ] as Dataset[],
 
@@ -100,7 +94,6 @@ export const capabilitySheetConfig = {
     "Victim Count",
     "Primary Crime Type",
     "Related Crime Types",
-    "Source Type (Reported / Unreported)",
   ],
 
   // ─── Institutional use cases ───────────────────────────────────────────────
