@@ -1,6 +1,6 @@
 # Headline Classification Workflow
 
-**Version:** 1.1 — March 2026
+**Version:** 1.2 — March 2026
 **Use for:** Manually classifying crime headlines into the Crime Hotspots database
 **Output columns:** `primaryCrimeType` | `relatedCrimeTypes` | `victimCount`
 **Full rules reference:** `docs/guides/CRIME-CLASSIFICATION-RULES.md`
@@ -32,7 +32,7 @@ Use only the 15 valid types (exact spelling):
 | Attempted Murder | 9 | Weapon used intentionally + victim survived OR intent to kill confirmed |
 | Kidnapping | 8 | Person taken/held against will |
 | Sexual Assault | 7 | |
-| Shooting | 6 | Firearm discharged at person; victim survived; intent unclear |
+| Shooting | 6 | Firearm discharged; victim was unintended bystander OR no person targeted. Use Attempted Murder when victim was deliberately targeted. |
 | Assault | 5 | Physical violence only, **no weapon** (fists, kicks, shoving) |
 | Home Invasion | 5 | Context type — attacker entered occupied home |
 | Carjacking | 5 | Vehicle taken from person by force |
@@ -156,13 +156,18 @@ Related types never affect victim count.
 > Fists/feet only = Assault.
 
 ### Shooting vs Attempted Murder
+Default: person directly targeted → **Attempted Murder** (primary) + Shooting (related).
+Shooting as primary only for stray/unintended victims or no person targeted.
+
 | Scenario | Primary |
 |---|---|
-| Shot, survived, intent unclear | **Shooting** |
-| Shot execution-style (head/neck), survived | **Attempted Murder** |
-| Shot multiple times at close range, survived | **Attempted Murder** |
-| Drive-by, multiple hit, all survived | **Shooting** |
-| When in doubt on intent | Default to **Shooting** |
+| Person directly shot at, survived | **Attempted Murder** |
+| Shot in leg/arm, survived | **Attempted Murder** (person was the target) |
+| Drive-by targeting a group, all survived | **Attempted Murder** (group was deliberately targeted) |
+| Robber shot at victim | **Attempted Murder** (victim was directly targeted) |
+| Stray bullet struck uninvolved bystander | **Shooting** (unintended victim) |
+| Shots fired at building, no one hit | **Shooting** (no person targeted) |
+| Warning shots into the air | **Shooting** (no person targeted) |
 
 ### Robbery vs Theft
 | Scenario | Classification |
@@ -240,8 +245,8 @@ Flag a record (don't guess) when:
 
 **"Woman injured in gallery of home shooting"**
 → Gallery = front porch, NOT inside the home — no Home Invasion
-→ Shot, survived, intent unclear
-→ PRIMARY: Shooting | RELATED: NONE | VICTIMS: 1
+→ Shot, survived — person was directly targeted
+→ PRIMARY: Attempted Murder | RELATED: Shooting | VICTIMS: 1
 
 **"Man carjacked at traffic lights"**
 → Vehicle taken from person by force → Carjacking + Robbery (hard rule)

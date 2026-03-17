@@ -309,13 +309,16 @@ FATAL SHOOTINGS \u2014 always pair Murder and Shooting:
 \u2705 "Stabbed to death" \u2192 ["Murder"] only (no stabbing crime type)
 \u274c WRONG: "Man shot dead" \u2192 ["Murder"] alone \u2014 Shooting is always required when shot
 
-NON-FATAL SHOOTINGS \u2014 intent determines primary type:
-Use Shooting as primary when victim was shot, survived, but intent to kill is NOT confirmed.
-Use Attempted Murder only when intent IS confirmed: execution-style, multiple shots at close range, or stated intent to kill. When in doubt \u2192 default to Shooting.
-\u2705 "Man shot in leg, rushed to hospital" \u2192 ["Shooting"] (intent unclear)
-\u2705 "Three shot during drive-by, all survived" \u2192 ["Shooting"] (intent unclear)
-\u2705 "Gunman fired repeatedly at man's head, victim survived" \u2192 ["Attempted Murder", "Shooting"] (intent confirmed)
-\u274c WRONG: "Man shot, survived" \u2192 ["Attempted Murder", "Shooting"] (intent assumed, not stated)
+NON-FATAL SHOOTINGS \u2014 person directly targeted:
+Default: if a person was directly targeted and shot (or shot at), use Attempted Murder as primary + Shooting as related.
+Use Shooting as primary ONLY when the victim was an unintended bystander (stray bullet, crossfire not aimed at them) OR no person was directly targeted (shots at property, into the air, warning shots).
+Drive-bys targeting a group of people \u2192 Attempted Murder (the group was deliberately targeted).
+\u2705 "Man shot in leg, rushed to hospital" \u2192 ["Attempted Murder", "Shooting"] (directly targeted)
+\u2705 "Three shot during drive-by, all survived" \u2192 ["Attempted Murder", "Shooting"] (group was the target)
+\u2705 "Stray bullet strikes bystander at Carnival" \u2192 ["Shooting"] (unintended victim \u2014 not the target)
+\u2705 "Shots fired at house, no one inside" \u2192 ["Shooting"] (no person targeted)
+\u2705 "Gunman fired repeatedly at man's head, victim survived" \u2192 ["Attempted Murder", "Shooting"] (directly targeted)
+\u274c WRONG: "Man shot, survived" \u2192 ["Shooting"] (person was directly shot \u2014 use Attempted Murder)
 
 \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
 MULTI-CRIME LOGIC + ISOLATION RULE

@@ -1,6 +1,6 @@
 # Crime Classification Rules
 
-**Version:** 1.1 — March 2026
+**Version:** 1.2 — March 2026
 **Applies to:** All crime records in the Crime Hotspots database (Trinidad & Tobago)
 **Implements:** The primary + related crime type system in `crimeSchema.ts` / `schema.gs`
 **Recording standard reference:** FBI NIBRS, UK Home Office Counting Rules (harm hierarchy)
@@ -92,8 +92,7 @@ Add these **only when confirmed by the article**. Do not infer.
 | Domestic Violence *(context)* | Partner/family perpetrator |
 
 ### Shooting — non-fatal (primary)
-*Use Shooting as primary when victim was shot, survived, and intent to kill is NOT confirmed.
-This is the correct standard (per FBI NIBRS) when outcome doesn't qualify for Attempted Murder.*
+*Use Shooting as primary ONLY when the victim was an unintended bystander (stray bullet, not targeted) OR no person was directly targeted (shots at property, into the air, warning shots). When a specific person or group was deliberately targeted, use Attempted Murder as primary.*
 
 | Add as Related | When |
 |---|---|
@@ -214,19 +213,23 @@ consistent with "wounding with intent" charges under TT law (Offences Against th
 - Exception: if there was BOTH a shooting AND a separate physical beating (e.g. beaten then shot), include both
 
 ### Shooting (primary) vs. Attempted Murder (primary)
-Based on FBI NIBRS and UK Home Office harm hierarchy:
+
+**Default: person directly targeted → Attempted Murder (primary) + Shooting (related).**
+Shooting as primary is the exception, not the rule.
 
 | Outcome | Primary | Related |
 |---|---|---|
 | Victim(s) killed | Murder | Shooting |
-| Victim(s) survived, intent to kill confirmed | Attempted Murder | Shooting |
-| Victim(s) survived, intent unclear | **Shooting** | — |
-| No victims hit (drive-by, warning shots, discharge) | **Shooting** | — |
+| Person directly targeted, survived (any scenario) | **Attempted Murder** | Shooting |
+| Group deliberately targeted (drive-by), all survived | **Attempted Murder** | Shooting |
+| Victim was an unintended bystander (stray bullet) | **Shooting** | — |
+| No person targeted — shots at property, into air, warning shots | **Shooting** | — |
 
-**Confirmed intent to kill** means: execution-style (shot in head at close range), perpetrator
-stated intent, multiple shots fired at close range targeting the individual.
+**Shooting as primary** is reserved for cases where the harm to the victim was incidental — they were not the intended target. If any specific person or group was being shot at, use Attempted Murder.
 
-**When in doubt on intent → default to Shooting as primary.**
+> Note: the old "intent unclear → default Shooting" standard (FBI NIBRS) has been deliberately
+> set aside for T&T context. In T&T, discharging a firearm at a person almost universally
+> reflects an intent to kill. Stray bullets and warning shots are the narrow exceptions.
 
 ### Home Invasion vs. Burglary
 - Occupants home AND confronted → Add **Home Invasion** (context) + **Burglary** (hard rule auto-adds it)
@@ -261,11 +264,13 @@ stated intent, multiple shots fired at close range targeting the individual.
 ### "Is this Shooting or Attempted Murder?"
 | Scenario | Correct primary |
 |---|---|
-| Shot, survived, intent to kill unclear | Shooting |
-| Shot execution-style (head), survived | Attempted Murder |
-| Shot multiple times at close range, survived | Attempted Murder |
-| Drive-by, multiple people hit, all survived | Shooting |
-| Robber shot at victim who dodged | Shooting (intent probable but not confirmed) |
+| Person directly shot at, survived | **Attempted Murder** |
+| Shot in leg/arm, survived | **Attempted Murder** (person was the target) |
+| Drive-by targeting a group, all survived | **Attempted Murder** (group was the target) |
+| Robber shot at victim who dodged | **Attempted Murder** (person was directly targeted) |
+| Stray bullet struck uninvolved bystander | Shooting (unintended victim) |
+| Shots fired at building/property, no person hit | Shooting (no person targeted) |
+| Warning shots into the air | Shooting (no person targeted) |
 
 ### "Is this a Home Invasion or just Burglary?"
 | Scenario | Correct types |
