@@ -206,8 +206,9 @@ const breadcrumbs = [
 
   const selectA = document.getElementById('selectA') as unknown as HTMLSelectElement;
   const selectB = document.getElementById('selectB') as unknown as HTMLSelectElement;
-  const resultsEl = document.getElementById('comparisonResults');
+  const resultsEl = document.getElementById('comparisonResults') as HTMLElement;
   const emptyEl = document.getElementById('emptyState') as HTMLElement;
+  if (!resultsEl || !emptyEl) return;
 
   // Build slug → area info lookup
   const slugToArea: Record<string, any> = {};
@@ -220,35 +221,35 @@ const breadcrumbs = [
   if (initialA) selectA.value = initialA;
   if (initialB) selectB.value = initialB;
 
-  function getWinner(valA, valB) {
+  function getWinner(valA: number, valB: number): string {
     if (valA === valB) return 'tie';
     return valA < valB ? 'a' : 'b';
   }
 
-  function winnerClass(winner, side) {
+  function winnerClass(winner: string, side: string): string {
     if (winner === 'tie') return 'text-slate-700';
     return winner === side ? 'text-emerald-600' : 'text-rose-600';
   }
 
-  function levelLabel(level) {
+  function levelLabel(level: string): string {
     if (level === 'low') return 'Low Risk';
     if (level === 'neutral') return 'Moderate';
     return 'High Risk';
   }
 
-  function levelColor(level) {
+  function levelColor(level: string): string {
     if (level === 'low') return 'text-emerald-600';
     if (level === 'neutral') return 'text-slate-500';
     return 'text-amber-600';
   }
 
-  function scoreBorder(winner, side) {
+  function scoreBorder(winner: string, side: string): string {
     if (winner === side) return 'border-emerald-300 bg-emerald-50';
     if (winner === 'tie') return 'border-slate-200 bg-white';
     return 'border-rose-200 bg-rose-50';
   }
 
-  function renderComparison(slugA, slugB) {
+  function renderComparison(slugA: string, slugB: string): void {
     const areaA = slugToArea[slugA];
     const areaB = slugToArea[slugB];
     const statsA = areaStatsMap[slugA];
@@ -268,13 +269,13 @@ const breadcrumbs = [
 
     // Merge breakdown types
     const allTypes = new Set([
-      ...statsA.breakdown.map(b => b.type),
-      ...statsB.breakdown.map(b => b.type),
+      ...statsA.breakdown.map((b: any) => b.type),
+      ...statsB.breakdown.map((b: any) => b.type),
     ]);
     let breakdownRows = '';
     allTypes.forEach(type => {
-      const countA = (statsA.breakdown.find(b => b.type === type) || {}).count || 0;
-      const countB = (statsB.breakdown.find(b => b.type === type) || {}).count || 0;
+      const countA = (statsA.breakdown.find((b: any) => b.type === type) || {}).count || 0;
+      const countB = (statsB.breakdown.find((b: any) => b.type === type) || {}).count || 0;
       const clsA = countA < countB ? 'text-emerald-600' : countA > countB ? 'text-rose-600' : 'text-slate-600';
       const clsB = countB < countA ? 'text-emerald-600' : countB > countA ? 'text-rose-600' : 'text-slate-600';
       breakdownRows += `<tr class="hover:bg-slate-50">

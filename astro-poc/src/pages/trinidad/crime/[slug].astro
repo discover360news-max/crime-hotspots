@@ -221,9 +221,9 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
               <!-- Related Crime Types (2026+) -->
               {crime.relatedCrimeTypes && crime.relatedCrimeTypes.trim() && (
                 <>
-                  {crime.relatedCrimeTypes.split(',').map((relatedCrime) => (
+                  {[...new Set(crime.relatedCrimeTypes.split(',').map((t) => t.trim()))].map((relatedCrime) => (
                     <span class="px-3 py-1 min-h-[22px] flex items-center justify-center rounded-full bg-slate-300 dark:bg-[hsl(0_0%_20%)] text-slate-700 dark:text-[var(--ch-text-strong)] font-medium" data-pagefind-ignore>
-                      {relatedCrime.trim()}
+                      {relatedCrime}
                     </span>
                   ))}
                 </>
@@ -345,14 +345,16 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
     />
 
     <!-- Safety Context for Area -->
-    <SafetyContext
-      areaName={crime.area}
-      score={safetyContext.score}
-      level={safetyContext.level}
-      tip={safetyContext.tip}
-      positiveNote={safetyContext.positiveNote}
-      primaryCrimeType={safetyContext.primaryCrimeType}
-    />
+    {safetyContext && (
+      <SafetyContext
+        areaName={crime.area}
+        score={safetyContext.score}
+        level={safetyContext.level}
+        tip={safetyContext.tip}
+        positiveNote={safetyContext.positiveNote}
+        primaryCrimeType={safetyContext.primaryCrimeType}
+      />
+    )}
 
     <!-- Curated Safety Tips (matched by crime type + area) -->
     {matchedTips.length > 0 && (

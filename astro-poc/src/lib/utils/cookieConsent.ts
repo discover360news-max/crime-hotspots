@@ -143,12 +143,12 @@ export class CookieConsent {
     `;
 
     // Event listeners
-    banner.querySelector('#cookie-accept').addEventListener('click', () => {
+    banner.querySelector('#cookie-accept')?.addEventListener('click', () => {
       this.acceptConsent();
       this.hideBanner(banner);
     });
 
-    banner.querySelector('#cookie-decline').addEventListener('click', () => {
+    banner.querySelector('#cookie-decline')?.addEventListener('click', () => {
       this.declineConsent();
       this.hideBanner(banner);
     });

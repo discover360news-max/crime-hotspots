@@ -721,16 +721,16 @@ const pageDescription = "Generate branded social media images for weekly crime s
           useCORS: true,
           allowTaint: true,
           logging: false,
-          ignoreElements: (element) => {
+          ignoreElements: (element: Element) => {
             // Skip elements that might have problematic styles
             const style = window.getComputedStyle(element);
             const hasOklch = style.cssText && style.cssText.includes('oklch');
             return hasOklch;
           },
-          onclone: (clonedDoc) => {
+          onclone: (clonedDoc: Document) => {
             // Remove all Tailwind-generated stylesheets from clone to avoid oklch
             const styleSheets = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
-            styleSheets.forEach(sheet => {
+            styleSheets.forEach((sheet: Element) => {
               if (sheet.textContent && sheet.textContent.includes('oklch')) {
                 sheet.remove();
               }

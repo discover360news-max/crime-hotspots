@@ -204,8 +204,7 @@ import NewsletterSignup from './NewsletterSignup.astro';
     // Populate metadata
     let relatedCrimesPills = '';
     if (crime.relatedCrimeTypes?.trim()) {
-      relatedCrimesPills = crime.relatedCrimeTypes.split(',')
-        .map((c: string) => c.trim())
+      relatedCrimesPills = [...new Set(crime.relatedCrimeTypes.split(',').map((c: string) => c.trim()))]
         .map((rc: string) => `<span class="px-3 py-1 rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[var(--ch-text-muted)] font-medium">${escapeHtml(rc)}</span>`)
         .join('');
     }

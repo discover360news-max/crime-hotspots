@@ -76,7 +76,7 @@ export class Analytics {
     // Consent Mode v2: gtag.js is already loaded in <head> with consent denied by default.
     // cookieConsent.ts has already called gtag('consent', 'update', {granted}) at this point.
     // Nothing left to do here — just mark as ready.
-    if (window.gtag) {
+    if (typeof window.gtag === 'function') {
       this.log('GA4 ready (Consent Mode v2)');
       return;
     }
@@ -182,21 +182,21 @@ export class Analytics {
  * // Track events
  * trackEvent('dashboard_viewed', { country: 'trinidad' });
  */
-let analyticsInstance = null;
+let analyticsInstance: Analytics | null = null;
 
-export function initAnalytics(config) {
+export function initAnalytics(config: Partial<AnalyticsConfig>): Analytics {
   analyticsInstance = new Analytics(config);
   analyticsInstance.init();
   return analyticsInstance;
 }
 
-export function trackEvent(eventName, eventParams) {
+export function trackEvent(eventName: string, eventParams: Record<string, unknown> = {}): void {
   if (analyticsInstance) {
     analyticsInstance.trackEvent(eventName, eventParams);
   }
 }
 
-export function trackPageView(pagePath) {
+export function trackPageView(pagePath: string): void {
   if (analyticsInstance) {
     analyticsInstance.trackPageView(pagePath);
   }
@@ -207,23 +207,23 @@ export function trackPageView(pagePath) {
  */
 export const Events = {
   // Dashboard interactions
-  dashboardViewed: (country) => trackEvent('dashboard_viewed', { country }),
-  dashboardLoaded: (country, loadTime) => trackEvent('dashboard_loaded', { country, load_time_ms: loadTime }),
+  dashboardViewed: (country: string) => trackEvent('dashboard_viewed', { country }),
+  dashboardLoaded: (country: string, loadTime: number) => trackEvent('dashboard_loaded', { country, load_time_ms: loadTime }),
 
   // Headlines interactions
-  headlineViewed: (country, area) => trackEvent('headline_viewed', { country, area }),
-  headlineFiltered: (country, area) => trackEvent('headline_filtered', { country, area }),
-  loadMoreClicked: (country) => trackEvent('load_more_clicked', { country }),
+  headlineViewed: (country: string, area: string) => trackEvent('headline_viewed', { country, area }),
+  headlineFiltered: (country: string, area: string) => trackEvent('headline_filtered', { country, area }),
+  loadMoreClicked: (country: string) => trackEvent('load_more_clicked', { country }),
 
   // Blog interactions
-  blogPostViewed: (slug, country) => trackEvent('blog_post_viewed', { slug, country }),
-  blogShared: (platform, slug) => trackEvent('blog_shared', { platform, slug }),
+  blogPostViewed: (slug: string, country: string) => trackEvent('blog_post_viewed', { slug, country }),
+  blogShared: (platform: string, slug: string) => trackEvent('blog_shared', { platform, slug }),
 
   // Form interactions
-  reportSubmitted: (country) => trackEvent('report_submitted', { country }),
-  reportFailed: (country, error) => trackEvent('report_failed', { country, error_type: error }),
+  reportSubmitted: (country: string) => trackEvent('report_submitted', { country }),
+  reportFailed: (country: string, error: string) => trackEvent('report_failed', { country, error_type: error }),
 
   // Navigation
-  countrySelected: (country) => trackEvent('country_selected', { country }),
-  externalLinkClicked: (url) => trackEvent('external_link_clicked', { url })
+  countrySelected: (country: string) => trackEvent('country_selected', { country }),
+  externalLinkClicked: (url: string) => trackEvent('external_link_clicked', { url })
 };

@@ -152,7 +152,7 @@ recentCrimes30d.slice(0, 20).forEach(crime => {
   headlinesByDate.get(dateKey)!.push(crime);
 });
 
-const regionMPs = mpsData.filter(mp => mp.regionSlugs.includes(slug));
+const regionMPs = mpsData.filter(mp => mp.regionSlugs.includes(slug!));
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
@@ -348,9 +348,9 @@ const pageDescription = `Crime statistics for ${regionName}, Trinidad. ${recentC
   document.addEventListener('DOMContentLoaded', () => {
     // Accordion toggles
     document.querySelectorAll('.accordion-toggle').forEach(button => {
-      button.addEventListener('click', function() {
-        const content = this.nextElementSibling;
-        const chevron = this.querySelector('.accordion-chevron');
+      button.addEventListener('click', function(this: HTMLElement) {
+        const content = this.nextElementSibling as HTMLElement;
+        const chevron = this.querySelector('.accordion-chevron') as HTMLElement;
         const isOpen = this.getAttribute('aria-expanded') === 'true';
         this.setAttribute('aria-expanded', String(!isOpen));
         content.classList.toggle('is-open');

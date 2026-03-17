@@ -214,9 +214,9 @@ const allQuestions = faqData.flatMap(category => category.questions);
       const questions = document.querySelectorAll('.faq-question');
 
       questions.forEach(question => {
-        question.addEventListener('click', function() {
-          const answer = this.nextElementSibling;
-          const icon = this.querySelector('.faq-icon');
+        question.addEventListener('click', function(this: HTMLElement) {
+          const answer = this.nextElementSibling as HTMLElement;
+          const icon = this.querySelector('.faq-icon') as HTMLElement;
           const isExpanded = this.getAttribute('aria-expanded') === 'true';
 
           if (isExpanded) {
