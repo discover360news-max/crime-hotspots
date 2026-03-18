@@ -39,6 +39,14 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 18, 2026
+
+- New page `/trinidad/murders/` (`src/pages/trinidad/murders.astro`): current-year murders-only list, date-grouped chronological, links to individual crime pages via `buildRoute.crime()`, victim count badge when >1, footer link to statistics, newsletter at bottom. In sitemap. `routes.ts`: added `murders: '/trinidad/murders/'` under trinidad block.
+- `murder-count.astro` (T&T): "View all {year} murders →" link added at bottom of Latest Incidents sidebar block, pointing to `/trinidad/murders/`.
+- T&T murder-count page synced with Jamaica: "Projected Rate" → **"Annualized Rate"** (card label + InfoPopup bullet + footer note). Card subtext changed from `~N murders` to `{murderCount} murders in {daysPassed} days`. Days calculation hardened with `Math.max(1, ...)` (removes divide-by-zero ternary). Footer note now matches Jamaica's descriptive version.
+- 16 Jamaica MP photos committed (`public/images/mps/jamaica/`): andrea-purkiss, dayton-campbell, devon-mcdaniel, edmund-bartlett, george-wright, heatha-miller-bennett, heroy-clarke, horace-chang, ian-hayles, kenneth-russell, krystal-lee, marlene-malahoo-forte, matthew-samuda, nekeisha-burchell, tova-hamilton, zavia-mayne.
+- `site-features.md`: page count 28 → 29; murders list page added; murder-count entries updated to reflect Annualized Rate.
+
 ## Session Notes — Mar 17, 2026 (continued x8)
 - `JAMAICA-INTEGRATION-PLAN.md` updated: Phase 1.5 enhancements documented (statistics/murder-count full production, countdown card, area aliases, csvBuildPlugin), 108-day launch plan added (Phases A–F), Progress Tracker updated with all new checkboxes.
 - `facebookSubmitter.gs` country selector built: `JAMAICA_PIPELINE_SHEET_ID` placeholder constant, `targetCountry` param added to `submitFacebookPost()`, Jamaica location prepend hint for Claude extraction, country-aware location filter, 3-way routing (Jamaica → `appendToJamaicaProduction`, T&T 2025 → FR1, T&T 2026 → Production), new `appendToJamaicaProduction()` function (opens Jamaica sheet by ID, geocodes with Jamaica address). HTML: Year toggle wrapped in `#yearSection` div (hidden for Jamaica), Country toggle added (T&T/JM), `setCountry()`/`loadStickyCountry()` JS, country badge (JA/TT) in session history, subtitle updates dynamically.

@@ -34,6 +34,7 @@ export const routes = {
     statistics: '/trinidad/statistics/',
     regions: '/trinidad/regions/',
     murderCount: '/trinidad/murder-count/',
+    murders: '/trinidad/murders/',
     safetyTips: '/trinidad/safety-tips/',
     safetyTipsSubmit: '/trinidad/safety-tips/submit/',
     mps: '/trinidad/mp/',

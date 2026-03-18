@@ -55,9 +55,9 @@ const murderRate2025 = ((murderCount2025Full / POPULATION) * 100000).toFixed(1);
 // Project annual murder count and rate (based on current pace)
 const now = new Date();
 const startOfYear = new Date(`${currentYear}-01-01`);
-const daysPassed = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+const daysPassed = Math.max(1, Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)));
 const daysInYear = 365;
-const projectedAnnualMurders = daysPassed > 0 ? Math.round((murderCount / daysPassed) * daysInYear) : 0;
+const projectedAnnualMurders = Math.round((murderCount / daysPassed) * daysInYear);
 const projectedMurderRate = ((projectedAnnualMurders / POPULATION) * 100000).toFixed(1);
 
 // Latest 10 murders for the incidents section
@@ -165,7 +165,7 @@ const description = `Trinidad murder count ${currentYear}: ${murderCount} murder
               <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">What Each Card Means</p>
               <ul class="list-disc list-inside space-y-1">
                 <li><span class="font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">Current Rate (YTD)</span> — The murder rate so far this year, based on the first {daysPassed} days of data.</li>
-                <li><span class="font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">Projected Rate</span> — If murders continue at the current pace for the full year, this is the estimated annual rate. The ~{projectedAnnualMurders} shown is the projected total murders.</li>
+                <li><span class="font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">Annualized Rate</span> — If murders continue at the current pace for the full year, this is the estimated annual rate ({projectedAnnualMurders} murders projected).</li>
                 <li><span class="font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">{previousYear} Final Rate</span> — Last year's actual rate, based on {murderCount2025Full} total murders recorded.</li>
               </ul>
 
@@ -185,10 +185,10 @@ const description = `Trinidad murder count ${currentYear}: ${murderCount} murder
 
             <!-- Projected Annual Rate -->
             <div class="bg-slate-100 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-4 text-center">
-              <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] font-medium mb-1">Projected Rate</div>
+              <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] font-medium mb-1">Annualized Rate</div>
               <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">{projectedMurderRate}</div>
               <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">per 100k ({currentYear})</div>
-              <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-2 pt-2 border-t border-slate-200 dark:border-[var(--ch-border-card)]">~{projectedAnnualMurders} murders</div>
+              <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-2 pt-2 border-t border-slate-200 dark:border-[var(--ch-border-card)]">{murderCount} murders in {daysPassed} days</div>
             </div>
 
             <!-- 2025 Final Rate -->
@@ -201,7 +201,7 @@ const description = `Trinidad murder count ${currentYear}: ${murderCount} murder
           </div>
 
           <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-3">
-            Based on population estimate of {(POPULATION / 1000000).toFixed(1)}M
+            Annualized rate from {daysPassed} days of data. Assumes current pace continues through year end. Based on population estimate of {(POPULATION / 1000000).toFixed(1)}M.
           </p>
         </div>
 
@@ -310,6 +310,14 @@ const description = `Trinidad murder count ${currentYear}: ${murderCount} murder
                   </span>
                 </a>
               ))}
+            </div>
+            <div class="px-3 pb-3 pt-1">
+              <a
+                href={routes.trinidad.murders}
+                class="block text-center text-xs font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 py-1.5"
+              >
+                View all {currentYear} murders &rarr;
+              </a>
             </div>
           </div>
         )}

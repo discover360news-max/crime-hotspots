@@ -2,11 +2,11 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 17, 2026 (Jamaica statistics + murder-count upgraded to full production; Jamaica area aliases wired)
+**Last Updated:** March 18, 2026 (New /trinidad/murders/ list page; T&T murder-count annualized rate sync; 16 Jamaica MP photos added)
 
 ---
 
-## Pages & Routes (28 pages)
+## Pages & Routes (29 pages)
 
 ### Marketing & Static
 | Page | Route | Purpose |
@@ -29,7 +29,7 @@
 | Headlines | `/jamaica/headlines/` | Pre-rendered | Jamaica headlines |
 | Parishes | `/jamaica/parishes/` | Pre-rendered | Browse by parish |
 | Statistics | `/jamaica/statistics/` | **SSR + CDN cache** | Full statistics page (T&T parity). Dataset + FAQPage (4 Q&As) + BreadcrumbList JSON-LD. Population 2.8M, "parishes" language. Dynamic years. `allCrimes: Crime[] = []` stub until Jamaica D1 live (one TODO comment to uncomment). |
-| Murder Count | `/jamaica/murder-count/` | **SSR + CDN cache** | Full murder count page (T&T parity). FlipCounter, YoY comparison, 3 rate cards (YTD / Projected / Previous Final). WebPage + Dataset + BreadcrumbList JSON-LD. Population 2.8M. Latest incidents sidebar hidden until data live. `allCrimes: Crime[] = []` stub until Jamaica D1 live. |
+| Murder Count | `/jamaica/murder-count/` | **SSR + CDN cache** | Full murder count page (T&T parity). FlipCounter, YoY comparison, 3 rate cards (YTD / **Annualized** / Previous Final). WebPage + Dataset + BreadcrumbList JSON-LD. Population 2.8M. Latest incidents sidebar hidden until data live. `allCrimes: Crime[] = []` stub until Jamaica D1 live. |
 | Archive Index | `/jamaica/archive/` | Pre-rendered | Browse by year |
 | MP Index | `/jamaica/mp/` | Pre-rendered | Directory of all 63 MPs grouped by parish. Each card: photo, name, party badge, constituency. |
 | MP Profile | `/jamaica/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left (`min-h-[500px]`), identity+contact right. Social links rendered as brand SVG icons (Facebook, Instagram, X, YouTube, TikTok). JSON-LD Person schema. Data: `src/data/mps-jamaica.json`. Crime stats placeholder until Jamaica D1 pipeline is live. |
@@ -50,7 +50,8 @@
 | MP Index | `/trinidad/mp/` | Pre-rendered | Directory of all 41 MPs grouped by region. Each card: photo, honorific name, party badge, constituency. |
 | MP Profile | `/trinidad/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left, identity+contact right. Crime stat cards per region (reuses region page pattern). JSON-LD Person schema. Ambiguous MPs show boundary note + two region sections. Data: `src/data/mps.json`. |
 | Compare | `/trinidad/compare/` | Pre-rendered | Side-by-side area comparison. Pre-loads Port of Spain vs San Juan by default. Rose gradient hero + sticky selector bar (matches dashboard pattern). |
-| Murder Count | `/trinidad/murder-count/` | Pre-rendered | `max-w-5xl` sidebar layout. Left: flip counter, YoY comparison, rate cards, blog post. Right sidebar: share buttons (`.sb-share-btn` pattern), latest 10 murder incidents, newsletter. Header (h1/year) above grid. |
+| Murder Count | `/trinidad/murder-count/` | Pre-rendered | `max-w-5xl` sidebar layout. Left: flip counter, YoY comparison, 3 rate cards (YTD / **Annualized** / Previous Final), blog post. Right sidebar: share buttons (`.sb-share-btn` pattern), latest 10 murder incidents with "View all {year} murders →" link to `/trinidad/murders/`, newsletter. Header (h1/year) above grid. |
+| Murders List | `/trinidad/murders/` | SSR + CDN cache | Current-year murders only, date-grouped chronological list, links to individual crime pages. Victim count badge shown when >1. Footer link to statistics page. Newsletter at bottom. Breadcrumb: Home > T&T > Murder Count > All Murders. In sitemap. |
 | Archive Index | `/trinidad/archive/` | Pre-rendered | Browse by year |
 | Archive Month | `/trinidad/archive/[year]/[month]` | Pre-rendered | Crimes for specific month |
 
