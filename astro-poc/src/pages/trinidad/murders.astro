@@ -9,6 +9,7 @@ import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../lib/crimeData';
+import { countCrimeType } from '../../lib/dashboardHelpers';
 import { routes, buildRoute } from '../../config/routes';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
@@ -29,7 +30,10 @@ const murders = allCrimes
   )
   .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
 
-const murderCount = murders.length;
+// Victim-aware total — matches murder-count page (applies victimCount multiplier)
+const murderCount = countCrimeType(murders, 'Murder');
+// Incident count — number of rows in the list (one per event)
+const incidentCount = murders.length;
 
 // Group by date (YYYY-MM-DD)
 const byDate = new Map<string, typeof murders>();
@@ -45,7 +49,7 @@ const INITIAL_GROUPS = 14;
 const lastUpdated = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
 const title = `Trinidad Murders ${currentYear} — Full List (${murderCount} Recorded) | Crime Hotspots`;
-const description = `Full list of ${murderCount} murders recorded in Trinidad & Tobago in ${currentYear}, updated daily. Browse all incidents by date with links to individual reports.`;
+const description = `Full list of ${murderCount} murders recorded in Trinidad & Tobago in ${currentYear} across ${incidentCount} incidents, updated daily. Browse all incidents by date with links to individual reports.`;
 const pageUrl = `https://crimehotspots.com/trinidad/murders/`;
 ---
 
@@ -69,6 +73,11 @@ const pageUrl = `https://crimehotspots.com/trinidad/murders/`;
       <p class="text-slate-500 dark:text-[var(--ch-text-muted)] mt-1 text-sm">
         {murderCount} murders recorded &mdash; Updated {lastUpdated}
       </p>
+      {murderCount !== incidentCount && (
+        <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-0.5">
+          across {incidentCount} incidents &mdash; some involved multiple victims
+        </p>
+      )}
     </div>
 
     <!-- Back link -->
@@ -88,7 +97,7 @@ const pageUrl = `https://crimehotspots.com/trinidad/murders/`;
       <div id="murders-list" class="space-y-6">
         {sortedDates.map((dateKey, groupIndex) => {
           const dayMurders = byDate.get(dateKey)!;
-          const dayCount = dayMurders.length;
+          const dayCount = countCrimeType(dayMurders, 'Murder');
           const dateLabel = dayMurders[0].dateObj.toLocaleDateString('en-US', {
             weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
           });
