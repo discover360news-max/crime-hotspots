@@ -55,6 +55,7 @@ D007 | DEC | active | Search: replaced Pagefind with D1 FTS5. crimes_fts virtual
 ## Features (F)
 F010 | FEAT | active | MP profiles (T&T): 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg. Socials render as brand SVG icons. → F010-mp-profiles.md
 F012 | FEAT | active | MP profiles (Jamaica): 63 pages /jamaica/mp/[slug]/, index /jamaica/mp/, mps-jamaica.json. Same card layout as T&T. Photo min-h-[500px]. TikTok in socials. Photos in public/images/mps/jamaica/. Crime stats placeholder until D1 pipeline live. → site-features.md
+F014 | WORKFLOW | active | MP data update workflow: contact info, photos, parliament profiles, bulk updates, gotchas → docs/guides/MP-UPDATE-WORKFLOW.md
 F013 | FEAT | in-progress | Jamaica launch prep: statistics + murder-count at T&T parity, RegionData CSV wired (113 areas, area-aliases-jamaica.json), FB submitter country selector pending, D1 deferred. Launch sequence in entry. → F013-jamaica-launch-prep.md
 F011 | FEAT | active | Data Capability Sheet: /data-capability-sheet/ — B2B institutional one-pager, PDF-printable, content in capabilitySheetConfig.ts. CSV/PDF formats are on-engagement only, not self-serve → F011-data-capability-sheet.md
 F001 | FEAT | active | Security: escapeHtml, sanitizeUrl, CSP headers, Turnstile, Secure cookies → F001-security-system.md

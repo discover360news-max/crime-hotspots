@@ -8,6 +8,23 @@
 
 ## March 2026
 
+### Safety Tips Batch: TIP-00070 to TIP-00072 (Mar 18)
+
+- **NEW TIP TIP-00070** — Protecting Open Religious and Community Premises (Robbery / At Work)
+- **NEW TIP TIP-00071** — Reducing Ambush Risk on Residential Lanes (Robbery / Walking Alone)
+- **NEW TIP TIP-00072** — Vehicle-Based Robbery at Your Home Gate (Robbery / At Home)
+- **UPDATED TIP-00055** — Added Story 586 to `related_story_ids` (extortion / same tactic)
+- **UPDATED TIP-00064** — Added Story 587 to `related_story_ids` (jewelry snatch / same tactic)
+
+---
+
+### Safety Tips Batch: TIP-00068 to TIP-00069 (Mar 18)
+
+- **NEW TIP TIP-00068** — Recognising Signs of Human Trafficking Near You (Sexual Violence / Other)
+- **NEW TIP TIP-00069** — Securing Overlooked Entry Points at Work (Burglary / At Work)
+
+---
+
 ### Safety Tips Batch: TIP-00065 to TIP-00067 (Mar 17)
 
 - **UPDATED TIP-00030** — Added Story 571 to `related_story_ids` (forged WhatsApp receipt — same tactic already covered)
