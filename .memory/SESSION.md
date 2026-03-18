@@ -46,6 +46,8 @@ Never duplicate content already in CLAUDE.md's hard rules.
 - T&T murder-count page synced with Jamaica: "Projected Rate" → **"Annualized Rate"** (card label + InfoPopup bullet + footer note). Card subtext changed from `~N murders` to `{murderCount} murders in {daysPassed} days`. Days calculation hardened with `Math.max(1, ...)` (removes divide-by-zero ternary). Footer note now matches Jamaica's descriptive version.
 - 16 Jamaica MP photos committed (`public/images/mps/jamaica/`): andrea-purkiss, dayton-campbell, devon-mcdaniel, edmund-bartlett, george-wright, heatha-miller-bennett, heroy-clarke, horace-chang, ian-hayles, kenneth-russell, krystal-lee, marlene-malahoo-forte, matthew-samuda, nekeisha-burchell, tova-hamilton, zavia-mayne.
 - `site-features.md`: page count 28 → 29; murders list page added; murder-count entries updated to reflect Annualized Rate.
+- `/trinidad/murders/` updated: date-group badge changed from bare number to `N murder(s)` (singular/plural); "Load more" added — shows 14 groups initially, reveals 14 more per click, status line "Showing X of Y days", button+status self-remove when all shown. No-JS fallback: all groups present in HTML, `hidden` class toggled by JS only.
+- Pipeline artifacts: `area-aliases.json` (+1 alias: Fonrose → Rio Claro), `redirect-map.json` (+22 legacy slug redirects), `health-data.json` (build timestamp).
 
 ## Session Notes — Mar 17, 2026 (continued x8)
 - `JAMAICA-INTEGRATION-PLAN.md` updated: Phase 1.5 enhancements documented (statistics/murder-count full production, countdown card, area aliases, csvBuildPlugin), 108-day launch plan added (Phases A–F), Progress Tracker updated with all new checkboxes.

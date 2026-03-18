@@ -40,6 +40,8 @@ for (const crime of murders) {
 }
 const sortedDates = Array.from(byDate.keys()).sort((a, b) => b.localeCompare(a));
 
+const INITIAL_GROUPS = 14;
+
 const lastUpdated = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
 const title = `Trinidad Murders ${currentYear} — Full List (${murderCount} Recorded) | Crime Hotspots`;
@@ -83,23 +85,22 @@ const pageUrl = `https://crimehotspots.com/trinidad/murders/`;
     {sortedDates.length === 0 ? (
       <p class="text-slate-500 dark:text-[var(--ch-text-muted)] text-sm">No murders recorded yet for {currentYear}.</p>
     ) : (
-      <div class="space-y-6">
-        {sortedDates.map(dateKey => {
+      <div id="murders-list" class="space-y-6">
+        {sortedDates.map((dateKey, groupIndex) => {
           const dayMurders = byDate.get(dateKey)!;
+          const dayCount = dayMurders.length;
           const dateLabel = dayMurders[0].dateObj.toLocaleDateString('en-US', {
             weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
           });
           return (
-            <div>
+            <div data-group-index={groupIndex} class={groupIndex >= INITIAL_GROUPS ? 'hidden' : ''}>
               <div class="flex items-center gap-3 mb-2">
                 <h2 class="text-xs font-semibold text-slate-500 dark:text-[var(--ch-text-faint)] uppercase tracking-wide">
                   {dateLabel}
                 </h2>
-                {dayMurders.length > 1 && (
-                  <span class="text-xs bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-medium px-1.5 py-0.5 rounded">
-                    {dayMurders.length}
-                  </span>
-                )}
+                <span class="text-xs bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 font-medium px-1.5 py-0.5 rounded">
+                  {dayCount} {dayCount === 1 ? 'murder' : 'murders'}
+                </span>
               </div>
               <div class="space-y-1.5">
                 {dayMurders.map(crime => (
@@ -126,6 +127,24 @@ const pageUrl = `https://crimehotspots.com/trinidad/murders/`;
             </div>
           );
         })}
+      </div>
+    )}
+
+    <!-- Load more -->
+    {sortedDates.length > INITIAL_GROUPS && (
+      <div id="load-more-wrap" class="mt-8 text-center">
+        <button
+          id="load-more-btn"
+          class="px-6 py-3 min-h-[44px] border border-slate-300 dark:border-[var(--ch-border)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition font-medium text-sm"
+          data-total={sortedDates.length}
+          data-shown={INITIAL_GROUPS}
+          data-batch={INITIAL_GROUPS}
+        >
+          Load more
+        </button>
+        <p id="load-more-status" class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-2">
+          Showing {INITIAL_GROUPS} of {sortedDates.length} days
+        </p>
       </div>
     )}
 
@@ -160,3 +179,31 @@ const pageUrl = `https://crimehotspots.com/trinidad/murders/`;
     }
   })} />
 </Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('load-more-btn') as HTMLButtonElement | null;
+    const wrap = document.getElementById('load-more-wrap');
+    const status = document.getElementById('load-more-status');
+    if (!btn || !wrap) return;
+
+    const total = parseInt(btn.dataset.total ?? '0', 10);
+    const batch = parseInt(btn.dataset.batch ?? '14', 10);
+    let shown = parseInt(btn.dataset.shown ?? '14', 10);
+
+    btn.addEventListener('click', () => {
+      const next = shown + batch;
+      document.querySelectorAll<HTMLElement>('#murders-list [data-group-index]').forEach(el => {
+        const idx = parseInt(el.dataset.groupIndex ?? '0', 10);
+        if (idx >= shown && idx < next) el.classList.remove('hidden');
+      });
+      shown = next;
+
+      if (shown >= total) {
+        wrap.remove();
+      } else if (status) {
+        status.textContent = `Showing ${shown} of ${total} days`;
+      }
+    });
+  });
+</script>
