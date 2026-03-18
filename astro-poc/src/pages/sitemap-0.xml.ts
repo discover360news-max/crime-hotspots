@@ -48,6 +48,7 @@ export const GET: APIRoute = async ({ locals }) => {
     { url: 'trinidad/headlines/', priority: 0.9, changefreq: 'daily' },
     { url: 'trinidad/statistics/', priority: 0.9, changefreq: 'weekly' },
     { url: 'trinidad/murder-count/', priority: 0.8, changefreq: 'daily' },
+    { url: 'trinidad/murders/', priority: 0.8, changefreq: 'daily' },
     { url: 'headlines/', priority: 0.8, changefreq: 'daily' },
     { url: 'blog/', priority: 0.8, changefreq: 'weekly' },
     { url: 'trinidad/areas/', priority: 0.7, changefreq: 'weekly' },

@@ -170,11 +170,11 @@ const pageUrl = `https://crimehotspots.com/trinidad/murders/`;
 
   </div>
 
-  <!-- Structured Data -->
-  <script type="application/ld+json" set:html={JSON.stringify({
+  <!-- SEO: WebPage + Dataset structured data — injected into <head> via slot="head". -->
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": `Trinidad & Tobago Murders ${currentYear}`,
+    "name": `Trinidad & Tobago Murders List ${currentYear}`,
     "description": description,
     "url": pageUrl,
     "breadcrumb": {
@@ -185,6 +185,24 @@ const pageUrl = `https://crimehotspots.com/trinidad/murders/`;
         { "@type": "ListItem", "position": 3, "name": "Murder Count", "item": "https://crimehotspots.com/trinidad/murder-count/" },
         { "@type": "ListItem", "position": 4, "name": `All Murders ${currentYear}` }
       ]
+    },
+    "mainEntity": {
+      "@type": "Dataset",
+      "name": `Trinidad & Tobago Murder Incidents ${currentYear}`,
+      "description": `Complete list of ${murderCount} murders recorded in Trinidad & Tobago in ${currentYear} across ${incidentCount} incidents, updated daily.`,
+      "variableMeasured": [
+        { "@type": "PropertyValue", "name": "Total Murders", "value": murderCount, "unitText": "murders" },
+        { "@type": "PropertyValue", "name": "Total Incidents", "value": incidentCount, "unitText": "incidents" },
+        { "@type": "PropertyValue", "name": "Days with Murders", "value": sortedDates.length, "unitText": "days" }
+      ],
+      "temporalCoverage": currentYear.toString(),
+      "spatialCoverage": {
+        "@type": "Place",
+        "name": "Trinidad and Tobago",
+        "geo": { "@type": "GeoCoordinates", "latitude": 10.6918, "longitude": -61.2225 }
+      },
+      "creator": { "@type": "Organization", "name": "Crime Hotspots", "url": "https://crimehotspots.com" },
+      "license": "https://creativecommons.org/licenses/by/4.0/"
     }
   })} />
 </Layout>
