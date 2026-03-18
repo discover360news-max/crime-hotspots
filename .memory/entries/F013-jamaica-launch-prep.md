@@ -157,3 +157,4 @@
 | Mar 17, 2026 | Homepage Jamaica card: `jamaica-card-trsp-bg.png` added, D:HH:MM countdown to Jul 4 2026, amber badge. Guyana/Barbados cards restructured to match. |
 | Mar 17, 2026 | FB Submitter country selector built in `facebookSubmitter.gs`. T&T/Jamaica toggle, year section hidden for JA, `appendToJamaicaProduction()` added. `JAMAICA_PIPELINE_SHEET_ID` placeholder needs manual fill + redeploy. |
 | Mar 17, 2026 | JAMAICA-INTEGRATION-PLAN.md updated with Phase 1.5 enhancements and 108-day launch plan. |
+| Mar 18, 2026 | murder-count.astro aligned with statistics.astro projection terminology: `daysPassed`→`daysElapsed`, `projectedAnnualMurders`→`murderProjected`, `projectedMurderRate`→`murderRateProjected`. Card label "Projected Rate"→"Annualized Rate". Sub-text now shows `{murderCount} murders in {daysElapsed} days`. Footer note added explaining annualization methodology. |

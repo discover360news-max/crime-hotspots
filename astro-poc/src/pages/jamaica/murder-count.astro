@@ -61,10 +61,10 @@ const murderRatePrevious = ((murderCountPreviousFull / POPULATION) * 100000).toF
 
 // Projections
 const startOfYear = new Date(`${currentYear}-01-01`);
-const daysPassed = Math.max(1, Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)));
+const daysElapsed = Math.max(1, Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)));
 const daysInYear = 365;
-const projectedAnnualMurders = Math.round((murderCount / daysPassed) * daysInYear);
-const projectedMurderRate = ((projectedAnnualMurders / POPULATION) * 100000).toFixed(1);
+const murderProjected = Math.round((murderCount / daysElapsed) * daysInYear);
+const murderRateProjected = ((murderProjected / POPULATION) * 100000).toFixed(1);
 
 const lastUpdated = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
 
@@ -72,7 +72,7 @@ const pageUrl = 'https://crimehotspots.com/jamaica/murder-count/';
 const shareText = `Jamaica Murder Count ${currentYear}: ${murderCount} murders so far. Track live statistics at Crime Hotspots.`;
 
 const title = `Jamaica Murder Count ${currentYear}: ${murderCount} Murders So Far — Updated Daily | Crime Hotspots`;
-const description = `Jamaica murder count ${currentYear}: ${murderCount} murders (death toll updated daily). Murder rate: ${currentMurderRate} per 100k. Murder toll projected at ${projectedMurderRate} per 100k for full year. Track the Jamaica murder toll and murder rate live.`;
+const description = `Jamaica murder count ${currentYear}: ${murderCount} murders (death toll updated daily). Murder rate: ${currentMurderRate} per 100k. Annualized murder rate: ${murderRateProjected} per 100k. Track the Jamaica murder toll and murder rate live.`;
 
 // Latest murders for sidebar (empty until pipeline is live)
 const latestMurders = crimesCurrent
@@ -156,8 +156,8 @@ const latestMurders = crimesCurrent
 
               <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">What Each Card Means</p>
               <ul class="list-disc list-inside space-y-1">
-                <li><span class="font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">Current Rate (YTD)</span> — The murder rate so far this year, based on the first {daysPassed} days of data.</li>
-                <li><span class="font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">Projected Rate</span> — If murders continue at the current pace for the full year, this is the estimated annual rate. The ~{projectedAnnualMurders} shown is the projected total murders.</li>
+                <li><span class="font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">Current Rate (YTD)</span> — The murder rate so far this year, based on {daysElapsed} days of data.</li>
+                <li><span class="font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">Annualized Rate</span> — If murders continue at the current pace for the full year, this is the estimated annual rate ({murderProjected} murders projected).</li>
                 <li><span class="font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">{previousYear} Final Rate</span> — Last year's actual rate, based on {murderCountPreviousFull} total murders recorded.</li>
               </ul>
 
@@ -175,12 +175,12 @@ const latestMurders = crimesCurrent
               <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-2 pt-2 border-t border-rose-100 dark:border-rose-900/40">{murderCount} murders</div>
             </div>
 
-            <!-- Projected Rate -->
+            <!-- Annualized Rate -->
             <div class="bg-slate-100 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-4 text-center">
-              <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] font-medium mb-1">Projected Rate</div>
-              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">{projectedMurderRate}</div>
+              <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] font-medium mb-1">Annualized Rate</div>
+              <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">{murderRateProjected}</div>
               <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">per 100k ({currentYear})</div>
-              <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-2 pt-2 border-t border-slate-200 dark:border-[var(--ch-border-card)]">~{projectedAnnualMurders} murders</div>
+              <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-2 pt-2 border-t border-slate-200 dark:border-[var(--ch-border-card)]">{murderCount} murders in {daysElapsed} days</div>
             </div>
 
             <!-- Previous Year Final Rate -->
@@ -193,7 +193,7 @@ const latestMurders = crimesCurrent
           </div>
 
           <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-3">
-            Based on population estimate of {(POPULATION / 1000000).toFixed(1)}M
+            Annualized rate from {daysElapsed} days of data. Assumes current pace continues through year end. Based on population estimate of {(POPULATION / 1000000).toFixed(1)}M.
           </p>
         </div>
 
@@ -323,8 +323,8 @@ const latestMurders = crimesCurrent
         "variableMeasured": [
           { "@type": "PropertyValue", "name": "Murder Count", "value": murderCount, "unitText": "murders" },
           { "@type": "PropertyValue", "name": "Murder Rate", "value": currentMurderRate, "unitText": "per 100,000 population" },
-          { "@type": "PropertyValue", "name": "Projected Annual Murder Rate", "value": projectedMurderRate, "unitText": "per 100,000 population" },
-          { "@type": "PropertyValue", "name": "Projected Annual Murder Count", "value": projectedAnnualMurders, "unitText": "murders" },
+          { "@type": "PropertyValue", "name": "Annualized Murder Rate", "value": murderRateProjected, "unitText": "per 100,000 population" },
+          { "@type": "PropertyValue", "name": "Projected Annual Murder Count", "value": murderProjected, "unitText": "murders" },
           { "@type": "PropertyValue", "name": `${previousYear} Final Murder Count`, "value": murderCountPreviousFull, "unitText": "murders" }
         ],
         "temporalCoverage": currentYear.toString(),
