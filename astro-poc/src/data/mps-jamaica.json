@@ -28,7 +28,7 @@
     "electionYear": 2025,
     "parishSlugs": ["kingston"],
     "regionConfidence": "clear",
-    "contact": { "email": "kingstoneastandportroyal@gmail.com", "emailAlt": "", "phone": "+1 876-622-3005", "whatsapp": "", "office": "71 Windward Road, Kingston, Jamaica", "parliamentProfile": "" },
+    "contact": { "email": "kingstoneastandportroyal@gmail.com", "emailAlt": "", "phone": "+1 876-622-3005", "whatsapp": "", "office": "71 Windward Road, Kingston, Jamaica", "parliamentProfile": "https://www.jampja.org/parliamentarian/phillip-paulwell/?highlight=Phillip%20Paulwell" },
     "website": "",
     "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
     "photo": "jamaica/phillip-paulwell.jpg"
@@ -45,7 +45,7 @@
     "electionYear": 2025,
     "parishSlugs": ["kingston"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "https://www.jampja.org/parliamentarian/desmond-mckenzie-2/?highlight=Desmond%20McKenzie" },
     "website": "",
     "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
     "photo": "jamaica/desmond-mckenzie.jpg"
@@ -62,7 +62,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "https://www.jampja.org/parliamentarian/dennis-gordon/?highlight=Dennis%20Gordon" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/DennisGordonECSA/", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
     "photo": "jamaica/dennis-gordon.webp"
@@ -79,7 +79,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "eastrural@julietholness.com", "emailAlt": "", "phone": "+1 876-813-5017", "whatsapp": "", "office": "57 Gordon Town Road, Kingston 6, St. Andrew", "parliamentProfile": "" },
+    "contact": { "email": "eastrural@julietholness.com", "emailAlt": "", "phone": "+1 876-813-5017", "whatsapp": "", "office": "57 Gordon Town Road, Kingston 6, St. Andrew", "parliamentProfile": "https://www.jampja.org/parliamentarian/juliet-holness/?highlight=Juliet%20Holness" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/JulietHolnessJA/", "instagram": "https://www.instagram.com/julietholness/", "x": "https://x.com/JulietHolness", "youtube": "", "tiktok": "" },
     "photo": "jamaica/juliet-holness.webp"
@@ -96,7 +96,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "fayvalw@gmail.com", "emailAlt": "", "phone": "+1 876-667-7572", "whatsapp": "", "office": "1 Chavez Avenue, Kingston 3", "parliamentProfile": "" },
+    "contact": { "email": "fayvalw@gmail.com", "emailAlt": "", "phone": "+1 876-667-7572", "whatsapp": "", "office": "1 Chavez Avenue, Kingston 3", "parliamentProfile": "https://www.jampja.org/parliamentarian/fayval-williams/?highlight=Fayval%20Williams" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/Thefayvalwilliams/", "instagram": "https://www.instagram.com/fayvalwilliams/", "x": "https://x.com/fayvalwilliams", "youtube": "", "tiktok": "" },
     "photo": "jamaica/fayval-williams.webp"
@@ -113,7 +113,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "ncstandrew@yahoo.com", "emailAlt": "", "phone": "+1 876-931-1870", "whatsapp": "", "office": "Shop 8 Krystal's Plaza, 143 1/2 Red Hills Road, Kingston 19, St. Andrew", "parliamentProfile": "" },
+    "contact": { "email": "ncstandrew@yahoo.com", "emailAlt": "", "phone": "+1 876-931-1870", "whatsapp": "", "office": "Shop 8 Krystal's Plaza, 143 1/2 Red Hills Road, Kingston 19, St. Andrew", "parliamentProfile": "https://www.jampja.org/parliamentarian/delano-seiveright/?highlight=Delano%20Seiveright" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/dseiveright/", "instagram": "https://www.instagram.com/delanoseiv/", "x": "https://x.com/DelanoSeiv", "youtube": "", "tiktok": "" },
     "photo": "jamaica/delano-seiveright.webp"
@@ -130,7 +130,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "delchuck@yahoo.com", "emailAlt": "", "phone": "+1 876-598-7706, +1 876-632-6172", "whatsapp": "", "office": "18 Grants Pen Road, Kingston 8", "parliamentProfile": "" },
+    "contact": { "email": "delchuck@yahoo.com", "emailAlt": "", "phone": "+1 876-598-7706, +1 876-632-6172", "whatsapp": "", "office": "18 Grants Pen Road, Kingston 8", "parliamentProfile": "https://www.jampja.org/parliamentarian/delroy-chuck-2/?highlight=Delroy%20Chuck" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/DelroyChuckofficial/", "instagram": "https://www.instagram.com/delroychuckofficial/", "x": "https://x.com/Delroychuckjm", "youtube": "", "tiktok": "" },
     "photo": "jamaica/delroy-chuck.webp"
@@ -147,7 +147,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "nwstandrew.office@gmail.com", "emailAlt": "", "phone": "+1 876-851-5049, +1 876-671-3747", "whatsapp": "", "office": "8 Chincona Avenue, Pembroke Hall, Kingston 20", "parliamentProfile": "" },
+    "contact": { "email": "nwstandrew.office@gmail.com", "emailAlt": "", "phone": "+1 876-851-5049, +1 876-671-3747", "whatsapp": "", "office": "8 Chincona Avenue, Pembroke Hall, Kingston 20", "parliamentProfile": "https://www.jampja.org/parliamentarian/duane-smith/?highlight=Duane%20Smith" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/duanesmithja/", "instagram": "https://www.instagram.com/dcesjam/", "x": "https://x.com/dcesjam", "youtube": "", "tiktok": "" },
     "photo": "jamaica/duane-smith.webp"
@@ -164,7 +164,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "julianjrobinson@gmail.com", "emailAlt": "", "phone": "+1 876-579-4270, +1 876-978-1337 Ext. 232", "whatsapp": "", "office": "89 Old Hope Road, Kingston 6", "parliamentProfile": "" },
+    "contact": { "email": "julianjrobinson@gmail.com", "emailAlt": "", "phone": "+1 876-579-4270, +1 876-978-1337 Ext. 232", "whatsapp": "", "office": "89 Old Hope Road, Kingston 6", "parliamentProfile": "https://www.jampja.org/parliamentarian/julian-robinson/?highlight=Julian%20Robinson" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/julianjayrobinson", "instagram": "https://www.instagram.com/julianjayrobinson/", "x": "https://x.com/julianjay", "youtube": "", "tiktok": "" },
     "photo": "jamaica/julian-robinson.webp"
@@ -181,7 +181,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "brownburke@yahoo.com", "emailAlt": "", "phone": "+1 876-351-7553", "whatsapp": "", "office": "88-100 Spanish Town Road, St. Andrew", "parliamentProfile": "" },
+    "contact": { "email": "brownburke@yahoo.com", "emailAlt": "", "phone": "+1 876-351-7553", "whatsapp": "", "office": "88-100 Spanish Town Road, St. Andrew", "parliamentProfile": "https://www.jampja.org/parliamentarian/angela-brown-burke/?highlight=Angela%20Brown-Burke" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/cde.brownburke", "instagram": "https://www.instagram.com/brownburke/", "x": "https://x.com/brownburke", "youtube": "", "tiktok": "" },
     "photo": "jamaica/angela-brown-burke.webp"
@@ -198,7 +198,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "mjgolding@cwjamaica.com", "emailAlt": "", "phone": "+1 876-960-1876, +1 876-960-1784", "whatsapp": "", "office": "18 Avon Park Crescent, Kingston 5", "parliamentProfile": "" },
+    "contact": { "email": "mjgolding@cwjamaica.com", "emailAlt": "", "phone": "+1 876-960-1876, +1 876-960-1784", "whatsapp": "", "office": "18 Avon Park Crescent, Kingston 5", "parliamentProfile": "https://www.jampja.org/parliamentarian/mark-golding/?highlight=Mark%20Golding" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/markjeffersongolding/", "instagram": "https://www.instagram.com/markjgolding/", "x": "https://x.com/MarkJGolding", "youtube": "", "tiktok": "" },
     "photo": "jamaica/mark-golding.webp"
@@ -215,7 +215,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "WestCentralSaintAndrew@gmail.com", "emailAlt": "", "phone": "", "whatsapp": "", "office": "119B Olympic Way, Kingston 11, St. Andrew", "parliamentProfile": "" },
+    "contact": { "email": "WestCentralSaintAndrew@gmail.com", "emailAlt": "", "phone": "", "whatsapp": "", "office": "119B Olympic Way, Kingston 11, St. Andrew", "parliamentProfile": "https://www.jampja.org/parliamentarian/andrew-holness/?highlight=Juliet%20Holness" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/AndrewHolnessJM/", "instagram": "https://www.instagram.com/andrewholnessjm/", "x": "https://x.com/AndrewHolnessJM", "youtube": "", "tiktok": "" },
     "photo": "jamaica/andrew-holness.webp"
@@ -232,7 +232,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "julietcuthbert@gmail.com", "emailAlt": "", "phone": "+1 876-838-7861", "whatsapp": "", "office": "Fort George Road, Stony Hill P.O., St. Andrew", "parliamentProfile": "" },
+    "contact": { "email": "julietcuthbert@gmail.com", "emailAlt": "", "phone": "+1 876-838-7861", "whatsapp": "", "office": "Fort George Road, Stony Hill P.O., St. Andrew", "parliamentProfile": "https://www.jampja.org/parliamentarian/juliet-cuthbert-flynn/?highlight=Juliet%20Holness" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/p/MP-Juliet-Cuthbert-Flynn-West-Rural-St-Andrew-100043442515294/", "instagram": "https://www.instagram.com/julietsamantha/", "x": "https://x.com/julietcuthbert", "youtube": "", "tiktok": "" },
     "photo": "jamaica/juliet-cuthbert-flynn.webp"
@@ -249,7 +249,7 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "anthony.hylton@yahoo.com", "emailAlt": "", "phone": "+1 876-765-2751", "whatsapp": "", "office": "60 Salkey Avenue, Kingston 20", "parliamentProfile": "" },
+    "contact": { "email": "anthony.hylton@yahoo.com", "emailAlt": "", "phone": "+1 876-765-2751", "whatsapp": "", "office": "60 Salkey Avenue, Kingston 20", "parliamentProfile": "https://www.jampja.org/parliamentarian/g-anthony-hylton/?highlight=Anthony%20Hylton" },
     "website": "",
     "socials": { "facebook": "https://www.facebook.com/WESTERNST.ANDREW/", "instagram": "https://www.instagram.com/ganthonyhylton/", "x": "https://x.com/GAnthonyHylton", "youtube": "", "tiktok": "" },
     "photo": "jamaica/anthony-hylton.webp"
@@ -266,10 +266,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-thomas"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "stthomaseasternreseys@gmail.com", "emailAlt": "", "phone": "876-894-4078", "whatsapp": "", "office": "22 Queen Street, Morant Bay, St. Thomas", "parliamentProfile": "https://www.jampja.org/parliamentarian/yvonne-shaw/?highlight=%20Yvonne%20Shaw" },
     "website": "",
     "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "photo": "jamaica/yvonne-shaw.webp"
   },
   {
     "nameSlug": "james-robertson",
@@ -283,10 +283,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-thomas"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "jamesrerobertson@yahoo.com", "emailAlt": "", "phone": "876-982-7272", "whatsapp": "", "office": "Yallahs Main Road, P.O Box 222 Yallahs P.O., St. Thomas", "parliamentProfile": "https://www.jampja.org/parliamentarian/james-robertson/?highlight=James%20Robertson" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/St-Thomas-Western-JLP-107970581025861", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/james-robertson.webp"
   },
   {
     "nameSlug": "isat-buchanan",
@@ -300,10 +300,10 @@
     "electionYear": 2025,
     "parishSlugs": ["portland"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "1bportlandeastern@gmail.com", "emailAlt": "", "phone": "876-468-6355, 876-394-4632", "whatsapp": "", "office": "6 Allan Avenue", "parliamentProfile": "https://www.jampja.org/parliamentarian/isat-buchanan/?highlight=Isat%20Buchanan" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/Isatbuc/", "instagram": "https://www.instagram.com/isatbuchanan/?hl=en", "x": "https://x.com/isatbuchanan", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/isat-buchanan.webp"
   },
   {
     "nameSlug": "daryl-vaz",
@@ -317,10 +317,10 @@
     "electionYear": 2025,
     "parishSlugs": ["portland"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "darylwvaz@yahoo.com", "emailAlt": "", "phone": "876-913-6354, 876-478-2289, 876-913-6928", "whatsapp": "", "office": "1 Victoria Road, Buff Bay, Portland", "parliamentProfile": "https://www.jampja.org/parliamentarian/daryl-vaz-2/?highlight=Daryl%20Vaz" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/DarylVazMP/", "instagram": "https://www.instagram.com/darylvazmp/", "x": "https://twitter.com/darylvazmp", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/daryl-vaz.webp"
   },
   {
     "nameSlug": "omar-newell",
@@ -334,10 +334,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-mary"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "centralstmary@gmail.com", "emailAlt": "", "phone": "876-330-1276", "whatsapp": "", "office": "29 Warners Street, Port Maria, St Mary", "parliamentProfile": "https://www.jampja.org/parliamentarian/omar-newell/?highlight=Omar%20Newell" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/OmarANewell/", "instagram": "https://www.instagram.com/omarnewell/?hl=en", "x": "https://x.com/OmarNewell", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/omar-newell.webp"
   },
   {
     "nameSlug": "christopher-brown",
@@ -351,10 +351,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-mary"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "southeaststmarypnp@gmail.com", "emailAlt": "", "phone": "876-798-0830, 876-580-0924", "whatsapp": "", "office": "Top Bay, Annotto Bay, St. Mary", "parliamentProfile": "https://www.jampja.org/parliamentarian/christopher-brown/?highlight=Christopher%20Brown" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/people/South-East-St-Mary-PNP/61552132644818/", "instagram": "https://www.instagram.com/se.stmarypnp/", "x": "", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/christopher-brown.webp"
   },
   {
     "nameSlug": "robert-montague",
@@ -368,10 +368,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-mary"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "westernst.marymontague@gmail.com", "emailAlt": "", "phone": "876-389-0846, 876-869-2442", "whatsapp": "", "office": "Gayle P.O., St Mary", "parliamentProfile": "https://www.jampja.org/parliamentarian/robert-montague-2/?highlight=Robert%20Montague" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/bobbystmary/", "instagram": "https://www.instagram.com/robertstaubynmontague/", "x": "https://twitter.com/BobbyMontagueJM", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/robert-montague.webp"
   },
   {
     "nameSlug": "matthew-samuda",
