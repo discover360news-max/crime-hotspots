@@ -77,15 +77,16 @@ export const GET: APIRoute = async ({ request, locals }) => {
     if (db) {
       const ftsQuery = buildFtsQuery(q);
 
-      // Crimes — FTS5 BM25 ranked, title weighted 10x over body
+      // Crimes — FTS5 matched, sorted by most recent first (year/month/day DESC)
       if (ftsQuery) {
         const crimeRows = await db
           .prepare(`
-            SELECT title, url,
+            SELECT crimes_fts.title, crimes_fts.url,
               snippet(crimes_fts, 2, '', '', '...', 20) AS excerpt
             FROM crimes_fts
+            JOIN crimes ON crimes_fts.story_id = crimes.story_id
             WHERE crimes_fts MATCH ?
-            ORDER BY bm25(crimes_fts, 0.0, 10.0, 1.0, 0.0)
+            ORDER BY crimes.year DESC, crimes.month DESC, crimes.day DESC
             LIMIT ?
           `)
           .bind(ftsQuery, MAX_CRIMES)
