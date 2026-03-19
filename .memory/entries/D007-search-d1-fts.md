@@ -3,7 +3,7 @@ id: D007
 type: decision
 status: active
 created: 2026-03-13
-updated: 2026-03-13
+updated: 2026-03-18
 related: [D006, C002, B014]
 ---
 
@@ -32,7 +32,7 @@ CREATE VIRTUAL TABLE crimes_fts USING fts5(
 
 **Search endpoint (`src/pages/api/search.ts`):**
 - `GET /api/search/?q=...` — prerender: false, no CDN cache
-- Crimes: FTS5 MATCH with prefix tokens (`word*`), BM25 ranked (title 10x over body)
+- Crimes: FTS5 MATCH with prefix tokens (`word*`), sorted by recency (JOIN crimes on story_id, ORDER BY year DESC, month DESC, day DESC)
 - Areas: `SELECT DISTINCT area, region FROM crimes WHERE LOWER(area) LIKE LOWER(?)`
 - MPs: static filter over `mps.json` (fullName, constituency, party, partyFull)
 - Returns `{ results: SearchResult[] }` typed array
@@ -65,7 +65,8 @@ curl -X POST https://crime-sync.discover360news.workers.dev/sync
 - Areas query uses D1 LIKE (not FTS5) — different mechanism, but correct
 - MPs query is pure in-process JSON filter — no D1 call needed
 - No build-time index needed — crimes appear in search as soon as cron worker syncs
-- BM25 ranking: `bm25(crimes_fts, 0.0, 10.0, 1.0, 0.0)` — title weighted 10x
+- Crime results sorted by recency (year/month/day DESC), not BM25 — news site UX: users want latest, not highest term frequency. FTS5 still filters by relevance; only matching stories are returned.
 
 ## Change Log
+- 2026-03-18: Switched crime result sort from BM25 to recency (year/month/day DESC via JOIN with crimes table). Uses integer columns to avoid date string format issues.
 - 2026-03-13: Implemented. Build passes (2596 rows). Pagefind fully removed.

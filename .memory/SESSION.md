@@ -39,6 +39,35 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 19, 2026 (continued x2)
+- **Deduplication of similarity helpers:** Removed `calculateSimilarity` and `levenshteinDistance` from `preFilterDuplicates.gs` in both Trinidad and Jamaica. Canonical definitions remain in `processorDuplicates.gs` — in global GAS scope, so preFilter code picks them up automatically. No logic changes; purely removing dead duplicate code.
+- Files changed: `google-apps-script/trinidad/preFilterDuplicates.gs`, `google-apps-script/jamaica/preFilterDuplicates.gs`
+- F002 updated: `preFilterDuplicates.gs` line count corrected to 265 lines; Trinidad legacy deletions added to Change Log.
+
+## Session Notes — Mar 19, 2026 (continued)
+- **GAS file refactoring — both islands:** Monolithic scripts split into focused files (applied identically to Trinidad + Jamaica):
+  - `processor.gs` (~1370 lines) → `processorCore.gs` (325/324) + `processorOutputMapper.gs` (207/200) + `processorDuplicates.gs` (637) + `processorMaintenance.gs` (202)
+  - `preFilter.gs` (~1148 lines) → `preFilterCore.gs` (241) + `preFilterKeywords.gs` (240/241) + `preFilterUrlIndex.gs` (188) + `preFilterDuplicates.gs` (265) + `preFilterArchive.gs` (157)
+  - `claudeClient.gs` (~780 lines) → `claudeClientCore.gs` (433) + `claudePrompts.gs` (343 T&T / 352 JM)
+  - `facebookSubmitter.gs` → `facebookSubmitterCore.gs` (338 T&T / 229 JM) + `facebookSubmitterHtml.gs` (772 T&T / 730 JM)
+- **Trinidad legacy cleanup:** Deleted `geminiClient.gs` (old Gemini API client), `groqClient.gs` (old Groq API client), `plusCodeConverter.gs` (standalone Plus Code helper — logic absorbed into processorCore.gs). These predate the Claude Haiku migration (Jan 2026) and were dead code.
+- F002 updated with full refactored file inventory + line counts.
+
+## Session Notes — Mar 19, 2026
+- **Date accuracy overhaul (B023):** diagnosed multi-root date failure via CNC3 human trafficking article (published Mar 17, stored as Mar 18 = run date). Root causes: (1) empty RSS pubDate stored as `''` → falsy publishedDate → `|| new Date()` fallback everywhere; (2) Claude returning `crime_date: null` for ongoing crimes (trafficking/abuse with multi-year span); (3) `getDay()` in buildUserPrompt uses V8 UTC clock, not script timezone — can produce inconsistent date/day-of-week pair; (4) no prompt rules for "a day after [X]" cross-references or ongoing crimes with specific event dates.
+- **6 fixes applied identically to both Trinidad and Jamaica pipelines:**
+  - `rssCollector.gs`: pubDate now has 3-step fallback (pubDate → dc:date namespace → collection timestamp + 🚨 log)
+  - `processor.gs`: `publishDateMissing` flag detected immediately; all crimes from missing-pubDate articles capped to confidence ≤5 → Review Queue with ambiguity note
+  - `processor.gs`: `!crime.crime_date` check before routing; null date forces Review Queue with "verify date against article" reason
+  - `claudeClient.gs`: `dayOfWeek` now uses `Utilities.formatDate(pubDate, Session.getScriptTimeZone(), 'EEEE')` (timezone-consistent with pubDateStr)
+  - `claudeClient.gs` system prompt: DATE CALCULATION RULES table extended with "a day after [X]" and "two days after [X]" rows
+  - `claudeClient.gs` system prompt: new "A DAY AFTER CROSS-REFERENCE RULE" block + "ONGOING CRIMES WITH A SPECIFIC EVENT DATE" block
+- **Jamaica note:** `"a day after"` example in Jamaica's prompt uses Spanish Town/Kingston (not Rio Claro/Cunupia)
+- **Diagnostic signal:** crime date = run date (matches Timestamp column) → publishedDate was falsy AND crime_date was null. Check "Publish Date" cell in Raw Articles sheet first.
+- Files changed: `google-apps-script/trinidad/rssCollector.gs`, `processor.gs`, `claudeClient.gs`; `google-apps-script/jamaica/rssCollector.gs`, `processor.gs`, `claudeClient.gs`
+- Memory: B023 entry created; F002 updated (related list, Known Issues, Date Extraction Rules, Change Log)
+- **DEPLOY REQUIRED:** All 6 GAS files must be manually copied into the live GAS editor (Trinidad + Jamaica projects). Prompt caching means the old system prompt may be served briefly after deploy — first new article will pick up the updated rules.
+
 ## Session Notes — Mar 18, 2026
 
 - New page `/trinidad/murders/` (`src/pages/trinidad/murders.astro`): current-year murders-only list, date-grouped chronological, links to individual crime pages via `buildRoute.crime()`, victim count badge when >1, footer link to statistics, newsletter at bottom. In sitemap. `routes.ts`: added `murders: '/trinidad/murders/'` under trinidad block.
