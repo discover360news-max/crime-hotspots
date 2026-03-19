@@ -40,7 +40,7 @@ Primary entry point — jump to the token files for any component.
 | **Homepage** | `src/pages/index.astro` | [colors](./tokens/colors.md), [typography](./tokens/typography.md) | Standard card, `text-display` | Section picker modal driven by `countries.ts` sections array |
 | **Dashboard** | `src/pages/trinidad/dashboard.astro` | [components](./tokens/components.md), [behaviors](./tokens/behaviors.md), [colors](./tokens/colors.md) | `skeleton-metric/chart/map`, Leaflet tile URLs | Full SSR + CDN cache; section `<h2>` use `text-slate-500` |
 | **Area Detail** | `src/pages/trinidad/area/[slug].astro` | [colors](./tokens/colors.md), [components](./tokens/components.md) | `window.__crimesData` (area crimes only) | Alert Badge + Compare Prompt both live here |
-| **Headlines** | `src/pages/trinidad/headlines.astro` | [colors](./tokens/colors.md), [layout](./tokens/layout.md) | `--ch-*` CSS vars in `<script define:vars>` | Browse/selection layout (`max-w-6xl` outer, `max-w-3xl` inner) |
+| **Headlines** | `src/pages/trinidad/headlines.astro` | [colors](./tokens/colors.md), [layout](./tokens/layout.md), [typography](./tokens/typography.md) | `--ch-*` CSS vars in `<script define:vars>`; date accordion header = `text-body font-bold` | Browse/selection layout (`max-w-6xl` outer, `max-w-3xl` inner). Date group headers use `text-body`, not `text-caption` — must be scannable at a glance |
 
 ---
 

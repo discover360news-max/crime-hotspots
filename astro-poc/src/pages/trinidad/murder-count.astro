@@ -91,6 +91,37 @@ const shareText = `Trinidad Murder Count ${currentYear}: ${murderCount} murders 
 
 const title = `Trinidad Murder Count ${currentYear}: ${murderCount} Murders So Far — Updated Daily | Crime Hotspots`;
 const description = `Trinidad murder count ${currentYear}: ${murderCount} murders (death toll updated daily). Murder rate: ${currentMurderRate} per 100k. Murder toll projected at ${projectedMurderRate} per 100k for full year. Track the Trinidad & Tobago murder toll and murder rate live.`;
+
+const faqData = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": `How many murders in Trinidad and Tobago in ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Trinidad and Tobago has recorded ${murderCount} murders so far in ${currentYear} (as of ${lastUpdated}). At the current pace, the annualized murder rate is ${projectedMurderRate} per 100,000 population, with ${projectedAnnualMurders} murders projected by year end. Data is updated daily.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `What is the Trinidad murder rate in ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `Trinidad and Tobago's annualized murder rate in ${currentYear} is ${projectedMurderRate} per 100,000 population, based on ${murderCount} murders in the first ${daysPassed} days of the year. The ${previousYear} final murder rate was ${murderRate2025} per 100,000 — one of the highest in the Caribbean.`
+      }
+    },
+    {
+      "@type": "Question",
+      "name": `What is the Trinidad murder toll so far in ${currentYear}?`,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": `The Trinidad murder toll stands at ${murderCount} as of ${lastUpdated}. This is ${yoyDirection === 'up' ? `up ${Math.abs(yoyChange).toFixed(0)}% compared to the same period in ${previousYear}` : yoyDirection === 'down' ? `down ${Math.abs(yoyChange).toFixed(0)}% compared to the same period in ${previousYear}` : `similar to the same period in ${previousYear}`} (${murderCount2025SamePeriod} murders). Data updated daily from verified news sources.`
+      }
+    }
+  ]
+};
 ---
 
 <Layout title={title} description={description} includePagefind={false} ogImage={`https://crimehotspots.com${ogImagePath}`}>
@@ -106,15 +137,11 @@ const description = `Trinidad murder count ${currentYear}: ${murderCount} murder
 
     <!-- Page header — above grid so sidebar aligns with counter, not title -->
     <div class="text-center mb-8">
-      <h1 class="text-2xl sm:text-3xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">
-        Trinidad & Tobago
+      <h1 class="text-center">
+        <span class="block text-2xl sm:text-3xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">Trinidad & Tobago</span>
+        <span class="block text-lg sm:text-xl text-slate-500 dark:text-[var(--ch-text-muted)] font-medium">Murder Count</span>
+        <span class="block text-4xl sm:text-5xl font-bold text-rose-600">{currentYear}</span>
       </h1>
-      <p class="text-lg sm:text-xl text-slate-500 dark:text-[var(--ch-text-muted)] font-medium">
-        Murder Count
-      </p>
-      <p class="text-4xl sm:text-5xl font-bold text-rose-600">
-        {currentYear}
-      </p>
     </div>
 
     <!-- Two-column grid — starts at counter level -->
@@ -329,6 +356,7 @@ const description = `Trinidad murder count ${currentYear}: ${murderCount} murder
     </div>
 
     <!-- Structured Data for SEO -->
+    <script type="application/ld+json" set:html={JSON.stringify(faqData)} />
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebPage",
@@ -403,7 +431,8 @@ const description = `Trinidad murder count ${currentYear}: ${murderCount} murder
           "name": "Crime Hotspots",
           "url": "https://crimehotspots.com"
         },
-        "license": "https://creativecommons.org/licenses/by/4.0/"
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "dateModified": new Date().toISOString()
       }
     })} />
   </div>

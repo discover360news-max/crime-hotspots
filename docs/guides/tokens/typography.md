@@ -34,6 +34,15 @@ Part of [DESIGN-TOKENS.md](../DESIGN-TOKENS.md)
 ```
 Section labels use `text-body` (18px) muted `text-slate-500` — subordinate to page title (`text-2xl` = 24px).
 
+**Data list pages with grouped accordions** (headlines — date-grouped crime list):
+```html
+<!-- Date GROUP LABEL — primary section anchor, must be scannable at a glance -->
+<h3 class="text-body font-bold text-slate-700 dark:text-[var(--ch-text-heading)] leading-snug">Saturday, March 18, 2025</h3>
+<!-- Sub-line stats — subordinate metadata -->
+<p class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)]">4 crimes · 5 victims</p>
+```
+**Rule:** A date that *organises* a group (accordion header, section label) = `text-body`. A date/timestamp *inside* a list item = `text-caption`.
+
 **Modals and cards:**
 ```html
 <h2 class="text-heading font-bold text-slate-700 leading-snug">Card Title</h2>
