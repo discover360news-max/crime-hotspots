@@ -45,9 +45,9 @@
     "electionYear": 2025,
     "parishSlugs": ["kingston"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "https://www.jampja.org/parliamentarian/desmond-mckenzie-2/?highlight=Desmond%20McKenzie" },
+    "contact": { "email": "westkingstonmp@hotmail.com", "emailAlt": "", "phone": "876-967-1417, 876-967-0232", "whatsapp": "", "office": "85 Charles Street, Kingston 14", "parliamentProfile": "https://www.jampja.org/parliamentarian/desmond-mckenzie-2/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
+    "socials": { "facebook": "https://www.facebook.com/people/West-Kingston-Jlp-McKenzie/100011401632320", "instagram": "https://www.instagram.com/westkingstonmp/", "x": "", "youtube": "", "tiktok": "" },
     "photo": "jamaica/desmond-mckenzie.jpg"
   },
   {
@@ -62,9 +62,9 @@
     "electionYear": 2025,
     "parishSlugs": ["st-andrew"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "https://www.jampja.org/parliamentarian/dennis-gordon/?highlight=Dennis%20Gordon" },
+    "contact": { "email": "mpgordonecsa@gmail.com", "emailAlt": "", "phone": "876-727-4654, 876-620-8096", "whatsapp": "", "office": "113 Hagley Park Road, Kingston 10, St. Andrew", "parliamentProfile": "https://www.jampja.org/parliamentarian/dennis-gordon/" },
     "website": "",
-    "socials": { "facebook": "https://www.facebook.com/DennisGordonECSA/", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
+    "socials": { "facebook": "https://www.facebook.com/DennisGordonECSA/", "instagram": "https://www.instagram.com/dennisgordonecsa/", "x": "", "youtube": "", "tiktok": "" },
     "photo": "jamaica/dennis-gordon.webp"
   },
   {
@@ -657,10 +657,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-elizabeth"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "mpjess.nese@gmail.com", "emailAlt": "", "phone": "876-824-7583", "whatsapp": "", "office": "Coke Drive, Santa Cruz, St. Elizabeth", "parliamentProfile": "https://www.jampja.org/parliamentarian/zuleika-jess/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/zuleika.jess", "instagram": "https://www.instagram.com/zuleika_jess/", "x": "", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/zuleika-jess.webp"
   },
   {
     "nameSlug": "andrew-morris",
@@ -674,10 +674,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-elizabeth"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "", "emailAlt": "", "phone": "876-392-7430, 876-966-6836", "whatsapp": "", "office": "Lacovia Community Centre, Main Street Lacovia, St. Elizabeth", "parliamentProfile": "https://www.jampja.org/parliamentarian/andrew-morris/" },
     "website": "",
     "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "photo": "jamaica/andrew-morris.webp"
   },
   {
     "nameSlug": "franklyn-witter",
@@ -691,10 +691,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-elizabeth"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "witter11.fw@gmail.com", "emailAlt": "", "phone": "876-965-8660, 876-427-5954", "whatsapp": "", "office": "31a Pines Plaza, Junction, St. Elizabeth", "parliamentProfile": "https://www.jampja.org/parliamentarian/franklin-witter/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/frankwitterjlp/", "instagram": "https://www.instagram.com/frankwitterja/", "x": "https://twitter.com/frankwitterjlp", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/franklyn-witter.webp"
   },
   {
     "nameSlug": "floyd-green",
@@ -708,10 +708,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-elizabeth"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "oursouthwest@gmail.com", "emailAlt": "", "phone": "876-330-6639", "whatsapp": "", "office": "7 High Street, Black River, St. Elizabeth", "parliamentProfile": "https://www.jampja.org/parliamentarian/floyd-green/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/Floyd-Green-South-West-St-ElizabethMP-828102700556725/", "instagram": "https://www.instagram.com/floydgreenja/", "x": "https://x.com/floydgreenja", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/floyd-green.webp"
   },
   {
     "nameSlug": "rhoda-moy-crawford",
@@ -725,10 +725,10 @@
     "electionYear": 2025,
     "parishSlugs": ["manchester"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "Getitrightmc@gmail.com", "emailAlt": "", "phone": "876-580-1833, 876-580-1719", "whatsapp": "", "office": "Shop F19, 24 Hargeaves Avenue, Mandeville, Manchester", "parliamentProfile": "https://www.jampja.org/parliamentarian/rhoda-moy-crawford/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/Rhoda-Moy-Crawford-107626207598605/", "instagram": "https://www.instagram.com/rhodamoycrawfordmp/", "x": "https://twitter.com/rhodamcrawford", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/rhoda-moy-crawford.webp"
   },
   {
     "nameSlug": "audrey-marks",
@@ -742,10 +742,10 @@
     "electionYear": 2025,
     "parishSlugs": ["manchester"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "northeastmanchester@gmail.com", "emailAlt": "", "phone": "658-219-6617, 658-219-6614, 658-219-6618, 658-219-6621, 658-219-6622", "whatsapp": "", "office": "Sedburgh, Christiana", "parliamentProfile": "https://www.jampja.org/parliamentarian/audrey-marks/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/AmbassadorMarks/", "instagram": "https://www.instagram.com/audreymarksjm/", "x": "https://x.com/AmbAPMarks", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/audrey-marks.webp"
   },
   {
     "nameSlug": "mikael-phillips",
@@ -759,10 +759,10 @@
     "electionYear": 2025,
     "parishSlugs": ["manchester"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "nwmanchester.mp2020@gmail.com", "emailAlt": "", "phone": "876-808-3910", "whatsapp": "", "office": "Mile Gully P.O., Manchester", "parliamentProfile": "https://www.jampja.org/parliamentarian/mikael-phillips/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/mikael.phillips", "instagram": "https://www.instagram.com/mikaelphillipsja/", "x": "https://twitter.com/MikaelPhillips", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/mikael-phillips.webp"
   },
   {
     "nameSlug": "peter-bunting",
@@ -776,10 +776,10 @@
     "electionYear": 2025,
     "parishSlugs": ["manchester"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "peter@bunting.org.jm", "emailAlt": "", "phone": "876-341-9191", "whatsapp": "", "office": "Newport Square, Newport P.O., Manchester", "parliamentProfile": "https://www.jampja.org/parliamentarian/peter-bunting/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/peter.buntingmp.75", "instagram": "https://www.instagram.com/peterbuntingworks/", "x": "https://twitter.com/PeterBuntingMP", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/peter-bunting.webp"
   },
   {
     "nameSlug": "delroy-williams",
@@ -793,10 +793,10 @@
     "electionYear": 2025,
     "parishSlugs": ["clarendon"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "Shop 6, May Pen Arcade, 3 Bryans Crescent, May Pen", "parliamentProfile": "https://www.jampja.org/parliamentarian/delroy-williams/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/DelroyWilliamsJa/", "instagram": "https://www.instagram.com/delroywilliamsja/", "x": "https://x.com/DWilliamsJam", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/delroy-williams.webp"
   },
   {
     "nameSlug": "robert-nesta-morgan",
@@ -810,10 +810,10 @@
     "electionYear": 2025,
     "parishSlugs": ["clarendon"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "robertnestamorgan@gmail.com", "emailAlt": "", "phone": "876-832-1101", "whatsapp": "", "office": "Main Street, Chapleton, Clarendon", "parliamentProfile": "https://www.jampja.org/parliamentarian/robert-nesta-morgan/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/robertnestamorganja/", "instagram": "https://www.instagram.com/nestaja/", "x": "https://twitter.com/NestaJA", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/robert-nesta-morgan.webp"
   },
   {
     "nameSlug": "richard-azan",
@@ -827,10 +827,10 @@
     "electionYear": 2025,
     "parishSlugs": ["clarendon"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "azanrichard@yahoo.com", "emailAlt": "", "phone": "876-990-9202, 658-204-6415", "whatsapp": "", "office": "P.O. Box 56 Knox Road, Spalding, Clarendon", "parliamentProfile": "https://www.jampja.org/parliamentarian/richard-azan/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/azanrichard", "instagram": "https://www.instagram.com/richardazan/", "x": "https://twitter.com/richard_azan", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/richard-azan.webp"
   },
   {
     "nameSlug": "wavell-hinds",
@@ -844,10 +844,10 @@
     "electionYear": 2025,
     "parishSlugs": ["clarendon"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "officeofwavellhindsmp@gmail.com", "emailAlt": "", "phone": "876-469-4333", "whatsapp": "", "office": "Main Street, Clarendon", "parliamentProfile": "https://www.jampja.org/parliamentarian/wavell-hinds/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/p/Wavell-Hinds-61560352109777/", "instagram": "https://www.instagram.com/wavellhindsjm/", "x": "https://x.com/wavellhindsjm", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/wavell-hinds.webp"
   },
   {
     "nameSlug": "pearnel-charles-jr",
@@ -861,10 +861,10 @@
     "electionYear": 2025,
     "parishSlugs": ["clarendon"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "seclarendon2020@gmail.com", "emailAlt": "", "phone": "876-634-5151", "whatsapp": "", "office": "Shop #3 Mineral Heights Shopping Complex, May Pen P.O., Clarendon", "parliamentProfile": "https://www.jampja.org/parliamentarian/pearnel-charles-jr-2/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/pcharlesjr/", "instagram": "https://www.instagram.com/pcharlesjr/", "x": "https://twitter.com/pcharlesjr", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/pearnel-charles-jr.webp"
   },
   {
     "nameSlug": "lothan-cousins",
@@ -878,10 +878,10 @@
     "electionYear": 2025,
     "parishSlugs": ["clarendon"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "lothan.cousins@gmail.com", "emailAlt": "", "phone": "876-987-0678, 876-810-3576", "whatsapp": "", "office": "Shop 11, Four Paths Shopping Centre, Four Paths P.O., Clarendon", "parliamentProfile": "https://www.jampja.org/parliamentarian/lothan-cousins/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/lothancousins/", "instagram": "https://www.instagram.com/lothancousinsja/", "x": "https://twitter.com/lothancousinsja", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/lothan-cousins.webp"
   },
   {
     "nameSlug": "olivia-grange",
@@ -895,10 +895,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "stcatherinecentral1@gmail.com", "emailAlt": "", "phone": "876-334-8637, 876-361-1706", "whatsapp": "", "office": "2A Prince Avenue, Spanish Town, St. Catherine", "parliamentProfile": "https://www.jampja.org/parliamentarian/olivia-grange/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/hon.babsygrange/", "instagram": "https://www.instagram.com/hon.oliviagrange/", "x": "https://twitter.com/babsy_grange", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/olivia-grange.webp"
   },
   {
     "nameSlug": "alando-terrelonge",
@@ -912,10 +912,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "antlonge@gmail.com", "emailAlt": "", "phone": "876-797-2483", "whatsapp": "", "office": "7 Newlands Road, Greater Portmore, St. Catherine", "parliamentProfile": "https://www.jampja.org/parliamentarian/alando-terrlonge/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/East-Central-St-Catherine-Alando-N-Terrelonge-Member-of-Parliament-368600693306190/", "instagram": "https://www.instagram.com/alandoterrelongejm/", "x": "https://www.twitter.com/terrelonge2016", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/alando-terrelonge.webp"
   },
   {
     "nameSlug": "denise-daley",
@@ -929,14 +929,14 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "easternstcatherine1@gmail.com", "emailAlt": "", "phone": "876-749-3223, 876-828-6573", "whatsapp": "", "office": "24 White Church Street, Spanish Town, St. Catherine", "parliamentProfile": "https://www.jampja.org/parliamentarian/denise-daley/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/denise.daley.5220", "instagram": "https://www.instagram.com/denisedaleymp/", "x": "https://twitter.com/daley_mp", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/denise-daley.webp"
   },
   {
     "nameSlug": "natalie-neita",
-    "fullName": "Natalie Neita",
+    "fullName": "Natalie Neita Garvey",
     "title": "MP",
     "honorific": "",
     "constituency": "St Catherine North Central",
@@ -946,10 +946,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "natalieneita@yahoo.com", "emailAlt": "", "phone": "876-601-8433", "whatsapp": "", "office": "Church Road, Bog Walk, St. Catherine", "parliamentProfile": "https://www.jampja.org/parliamentarian/natalie-neita-headley/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/NorthCentralSaintCatherine/", "instagram": "https://www.instagram.com/natalieneitagarveymp/", "x": "https://twitter.com/NatalieNeita", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/natalie-neita.webp"
   },
   {
     "nameSlug": "kerensia-morrison",
@@ -963,10 +963,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "KerensiaNESC@gmail.com", "emailAlt": "", "phone": "876-903-7694, 876-310-2648", "whatsapp": "", "office": "Riversdale District, Riversdale P.O., St. Catherine", "parliamentProfile": "https://www.jampja.org/parliamentarian/kerensia-morrison/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/profile.php?id=100001490442932", "instagram": "https://www.instagram.com/kerensiamorrison/", "x": "https://twitter.com/kerensia_m", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/kerensia-morrison.webp"
   },
   {
     "nameSlug": "damion-crawford",
@@ -980,10 +980,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "mpdamioncrawford@gmail.com", "emailAlt": "", "phone": "876-985-2791", "whatsapp": "", "office": "41 Fletchers Avenue, Linstead P.O., St. Catherine", "parliamentProfile": "https://www.jampja.org/parliamentarian/damion-crawford/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/DamionOCrawford/", "instagram": "https://www.instagram.com/damioncrawford/", "x": "https://x.com/DamionCrawfordJ", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/damion-crawford.webp"
   },
   {
     "nameSlug": "andrew-wheatley",
@@ -997,10 +997,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "jlpscstcatherine@gmail.com", "emailAlt": "", "phone": "876-648-7151, 876-981-8974", "whatsapp": "", "office": "28B Old Harbour Road, St. Catherine", "parliamentProfile": "https://www.jampja.org/parliamentarian/andrew-wheatley/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/andrew.wheatley.509", "instagram": "https://www.instagram.com/aowheatley/", "x": "https://twitter.com/Aowheatley", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/andrew-wheatley.webp"
   },
   {
     "nameSlug": "alfred-dawes",
@@ -1014,10 +1014,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "sestcatherine@gmail.com", "emailAlt": "", "phone": "876-509-8519, 876-552-8856", "whatsapp": "", "office": "Independence City Plaza, Portmore, St. Catherine", "parliamentProfile": "https://www.jampja.org/parliamentarian/alfred-dawes/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/draldawes/", "instagram": "https://www.instagram.com/dr_aldawes/", "x": "https://x.com/dawes_dr", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/dr-alfred-dawes.webp"
   },
   {
     "nameSlug": "everald-warmington",
@@ -1031,10 +1031,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "cewarmington@cwjamaica.com", "emailAlt": "", "phone": "876-983-9226", "whatsapp": "", "office": "30 Marley Acres Drive, Old Harbour, St. Catherine", "parliamentProfile": "https://www.jampja.org/parliamentarian/everald-warmington/" },
     "website": "",
     "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "photo": "jamaica/everald-warmington.webp"
   },
   {
     "nameSlug": "fitz-jackson",
@@ -1048,10 +1048,10 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "mpjackson@yahoo.com", "emailAlt": "", "phone": "876-939-7068, 876-669-0095", "whatsapp": "876-370-7849", "office": "Newland Road, Naggo Head, Bridgeport P.O.", "parliamentProfile": "https://www.jampja.org/parliamentarian/fitz-jackson/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/fitzj", "instagram": "https://www.instagram.com/fitzjacksonja/", "x": "https://twitter.com/FitzJacksonpnp1", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/fitz-jackson.webp"
   },
   {
     "nameSlug": "christopher-tufton",
@@ -1065,9 +1065,9 @@
     "electionYear": 2025,
     "parishSlugs": ["st-catherine"],
     "regionConfidence": "clear",
-    "contact": { "email": "", "emailAlt": "", "phone": "", "whatsapp": "", "office": "", "parliamentProfile": "" },
+    "contact": { "email": "cctufton@gmail.com", "emailAlt": "", "phone": "876-779-4507", "whatsapp": "", "office": "Watermount PO, St. Catherine", "parliamentProfile": "https://www.jampja.org/parliamentarian/christopher-tufton-2/" },
     "website": "",
-    "socials": { "facebook": "", "instagram": "", "x": "", "youtube": "", "tiktok": "" },
-    "photo": ""
+    "socials": { "facebook": "https://www.facebook.com/christufton/", "instagram": "https://www.instagram.com/christufton/", "x": "https://x.com/christufton", "youtube": "", "tiktok": "" },
+    "photo": "jamaica/christopher-tufton.webp"
   }
 ]
