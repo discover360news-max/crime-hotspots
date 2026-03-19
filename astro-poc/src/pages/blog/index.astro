@@ -1,13 +1,15 @@
 ---
 /**
  * Blog Index Page
- * Displays all blog posts with country filtering
+ * Displays all blog posts with country filtering and load more (8 per batch).
  */
 
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Hero from '../../components/Hero.astro';
+
+const BATCH_SIZE = 8;
 
 const allPosts = await getCollection('blog');
 const sortedPosts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -70,12 +72,13 @@ function formatDate(date: Date) {
       </a>
     </div>
 
-    <!-- Blog Posts List -->
+    <!-- Blog Posts List — posts beyond initial batch hidden server-side to prevent flash -->
     <div id="blog-posts" class="space-y-4">
-      {sortedPosts.map((post) => (
+      {sortedPosts.map((post, index) => (
         <article
-          class="blog-post border-b border-slate-100 dark:border-[var(--ch-border-subtle)] last:border-0 pb-4 last:pb-0"
+          class={`blog-post border-b border-slate-100 dark:border-[var(--ch-border-subtle)] last:border-0 pb-4 last:pb-0${index >= BATCH_SIZE ? ' hidden' : ''}`}
           data-country={post.data.country}
+          data-post-index={index}
         >
           <a href={`/blog/${post.slug}`} class="flex gap-4 items-start group">
             <img src={post.data.image} alt={post.data.countryName} class="w-24 h-24 object-cover rounded-lg shrink-0" loading="lazy">
@@ -99,6 +102,16 @@ function formatDate(date: Date) {
       ))}
     </div>
 
+    <!-- Load More -->
+    <div id="load-more-wrapper" class={`mt-6 text-center${sortedPosts.length <= BATCH_SIZE ? ' hidden' : ''}`}>
+      <button
+        id="load-more-btn"
+        class="px-6 py-2.5 min-h-[44px] rounded-lg border border-slate-300 dark:border-[var(--ch-border)] text-slate-600 dark:text-[hsl(0_0%_70%)] text-sm font-medium hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition"
+      >
+        Load {Math.min(BATCH_SIZE, sortedPosts.length - BATCH_SIZE)} more ({sortedPosts.length - BATCH_SIZE} remaining)
+      </button>
+    </div>
+
     <!-- Empty State -->
     <div id="empty-state" class="hidden text-center py-12">
       <p class="text-slate-600 dark:text-[hsl(0_0%_65%)] text-body">No blog posts found for this filter.</p>
@@ -107,25 +120,40 @@ function formatDate(date: Date) {
     </div>
   </main>
 
-  <!-- Filter Script -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      const BATCH_SIZE = 8;
       let currentFilter = 'all';
+      let visibleCount = BATCH_SIZE;
 
-      function filterPosts() {
-        const posts = document.querySelectorAll('.blog-post');
-        const emptyState = document.getElementById('empty-state');
-        let visibleCount = 0;
-        posts.forEach(post => {
-          const country = post.getAttribute('data-country');
-          if (currentFilter === 'all' || country === currentFilter) {
-            post.classList.remove('hidden');
-            visibleCount++;
-          } else {
-            post.classList.add('hidden');
-          }
-        });
-        emptyState?.classList.toggle('hidden', visibleCount > 0);
+      const loadMoreWrapper = document.getElementById('load-more-wrapper');
+      const loadMoreBtn = document.getElementById('load-more-btn');
+      const emptyState = document.getElementById('empty-state');
+
+      function getFilteredPosts(): HTMLElement[] {
+        const posts = Array.from(document.querySelectorAll<HTMLElement>('.blog-post'));
+        return currentFilter === 'all' ? posts : posts.filter(p => p.dataset.country === currentFilter);
+      }
+
+      function render() {
+        const allPosts = document.querySelectorAll<HTMLElement>('.blog-post');
+        const filtered = getFilteredPosts();
+
+        // Hide all, then reveal first visibleCount of the filtered set
+        allPosts.forEach(p => p.classList.add('hidden'));
+        filtered.slice(0, visibleCount).forEach(p => p.classList.remove('hidden'));
+
+        // Empty state
+        emptyState?.classList.toggle('hidden', filtered.length > 0);
+
+        // Load more button
+        const remaining = filtered.length - visibleCount;
+        const hasMore = remaining > 0;
+        loadMoreWrapper?.classList.toggle('hidden', !hasMore);
+        if (hasMore && loadMoreBtn) {
+          const nextBatch = Math.min(remaining, BATCH_SIZE);
+          loadMoreBtn.textContent = `Load ${nextBatch} more (${remaining} remaining)`;
+        }
       }
 
       function updateFilterButtons(activeId: string) {
@@ -142,13 +170,21 @@ function formatDate(date: Date) {
         });
       }
 
+      // Filter buttons — reset count on every filter change
       const filterButtons: Record<string, string> = { 'filter-all': 'all', 'filter-tt': 'tt' };
       Object.entries(filterButtons).forEach(([buttonId, filter]) => {
         document.getElementById(buttonId)?.addEventListener('click', () => {
           currentFilter = filter;
+          visibleCount = BATCH_SIZE;
           updateFilterButtons(buttonId);
-          filterPosts();
+          render();
         });
+      });
+
+      // Load more
+      loadMoreBtn?.addEventListener('click', () => {
+        visibleCount += BATCH_SIZE;
+        render();
       });
     });
   </script>
