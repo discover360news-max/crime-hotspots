@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 18, 2026 (New /trinidad/murders/ list page; T&T murder-count annualized rate sync; 16 Jamaica MP photos added)
+**Last Updated:** March 19, 2026 (SEO: murder-count H1 fix, FAQPage schema + dateModified; statistics H1 year; corrected SSR rendering labels for both T&T pages)
 
 ---
 
@@ -44,13 +44,13 @@
 | Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | Individual crime page, safety context, related crimes, trending hotspots |
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
 | Area Detail | `/trinidad/area/[slug]` | Pre-rendered | AreaNarrative summary (text-body weight), "New Since" badge, compare prompt, stat cards (Risk Level card: larger number + level color — amber=high, emerald=low), share buttons, crime type breakdown table, related areas (sorted by crime count) |
-| Statistics | `/trinidad/statistics/` | Pre-rendered | Two-tier crime rates: previous year final (official) + current year annualized at current pace. All displayed rates are annualized for apples-to-apples comparison. Raw YTD rates removed Mar 2026. |
+| Statistics | `/trinidad/statistics/` | **SSR + CDN cache** | Two-tier crime rates: previous year final (official) + current year annualized at current pace. All displayed rates are annualized for apples-to-apples comparison. Raw YTD rates removed Mar 2026. FAQPage JSON-LD (4 Q&As) + Dataset + BreadcrumbList. |
 | Regions | `/trinidad/regions/` | Pre-rendered | Browse by region |
 | Region Detail | `/trinidad/region/[slug]` | Pre-rendered | Region-specific crimes. Includes "Members of Parliament" card (filters mps.json by regionSlugs, shows photo/name/party/constituency, links to MP profile). |
 | MP Index | `/trinidad/mp/` | Pre-rendered | Directory of all 41 MPs grouped by region. Each card: photo, honorific name, party badge, constituency. |
 | MP Profile | `/trinidad/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left, identity+contact right. Crime stat cards per region (reuses region page pattern). JSON-LD Person schema. Ambiguous MPs show boundary note + two region sections. Data: `src/data/mps.json`. |
 | Compare | `/trinidad/compare/` | Pre-rendered | Side-by-side area comparison. Pre-loads Port of Spain vs San Juan by default. Rose gradient hero + sticky selector bar (matches dashboard pattern). |
-| Murder Count | `/trinidad/murder-count/` | Pre-rendered | `max-w-5xl` sidebar layout. Left: flip counter, YoY comparison, 3 rate cards (YTD / **Annualized** / Previous Final), blog post. Right sidebar: share buttons (`.sb-share-btn` pattern), latest 10 murder incidents with "View all {year} murders →" link to `/trinidad/murders/`, newsletter. Header (h1/year) above grid. |
+| Murder Count | `/trinidad/murder-count/` | **SSR + CDN cache** | `max-w-5xl` sidebar layout. Left: flip counter, YoY comparison, 3 rate cards (YTD / **Annualized** / Previous Final), blog post. Right sidebar: share buttons (`.sb-share-btn` pattern), latest 10 murder incidents with "View all {year} murders →" link to `/trinidad/murders/`, newsletter. Single `<h1>` with 3 spans = "Trinidad & Tobago Murder Count {year}". FAQPage JSON-LD (3 Q&As: count, rate, toll) + WebPage + Dataset (dateModified) + BreadcrumbList. |
 | Murders List | `/trinidad/murders/` | SSR + CDN cache | Current-year murders only, date-grouped chronological list, links to individual crime pages. Header shows victim-aware `countCrimeType()` total; secondary line "across N incidents" shown when counts differ. Day badge also victim-aware. Load more: 14 groups initially, +14 per click. Sitemap: `priority 0.8, changefreq daily`. Schema: `WebPage` + `Dataset` (`slot="head"`), self-updating variableMeasured. |
 | Archive Index | `/trinidad/archive/` | Pre-rendered | Browse by year |
 | Archive Month | `/trinidad/archive/[year]/[month]` | Pre-rendered | Crimes for specific month |
