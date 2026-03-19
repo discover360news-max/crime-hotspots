@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 19, 2026 (SEO: murder-count H1 fix, FAQPage schema + dateModified; statistics H1 year; corrected SSR rendering labels for both T&T pages)
+**Last Updated:** March 19, 2026 (SEO fixes on murder-count + statistics; blog index load more 8/+8 with filter-awareness)
 
 ---
 
@@ -68,7 +68,7 @@
 ### Blog & Tools
 | Page | Route | Purpose |
 |------|-------|---------|
-| Blog Index | `/blog/` | All blog posts, weekly reports, RSS link |
+| Blog Index | `/blog/` | All blog posts, weekly reports, RSS link. Country filter (All / Trinidad & Tobago). Load more: 8 posts initially (hidden server-side to prevent flash), +8 per click. Button label shows `Load N more (X remaining)`. Filter change resets visible count to 8 for the filtered set. Both controls share a single `render()` — no state conflicts. |
 | Blog Post | `/blog/[slug]` | Individual post, "More Weekly Reports" section |
 | RSS Feed | `/rss.xml` | Blog posts + latest 20 crime headlines (pre-rendered) |
 | Social Image Generator | `/tools/social-image-generator/` | Create shareable crime stat images |
