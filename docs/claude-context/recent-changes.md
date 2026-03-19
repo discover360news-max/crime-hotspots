@@ -8,6 +8,24 @@
 
 ## March 2026
 
+### Safety Tips Batch: TIP-00074 to TIP-00075 (Mar 19)
+
+- **NEW TIP TIP-00074** — Designing Security Lighting Criminals Cannot Map (Burglary / At Home)
+- **NEW TIP TIP-00075** — Protecting Shift Workers at Isolated Transport Stops (Robbery / Using Public Transport)
+- **UPDATED TIP-00033** — Added Story 596 to `related_story_ids` (retail robbery during hours — same tactic)
+- **UPDATED TIP-00034** — Added Story 595 to `related_story_ids` (3am forced entry + hammer assault — pre-dawn entry already covered)
+- **Workflow:** Autonomous execution — no confirmation step; recommendations stand immediately upon receiving flagged rows
+
+---
+
+### Safety Tips (Mar 19)
+
+- **NEW TIP TIP-00073** — Avoiding Isolated Locations on Late-Night Outings (Kidnapping / Other)
+- **UPDATED TIP-00055** — Added Story 592 to `related_story_ids` (ransom demand via video call — extortion angle already covered)
+- **Workflow:** Added explicit no-duplicates rule to Step 2 of `SAFETY-TIP-WORKFLOW.md` — stories that match existing tactics must be attached, not given a new file; partial-overlap case also documented
+
+---
+
 ### Safety Tips Batch: TIP-00070 to TIP-00072 (Mar 18)
 
 - **NEW TIP TIP-00070** — Protecting Open Religious and Community Premises (Robbery / At Work)

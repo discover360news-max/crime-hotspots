@@ -7,9 +7,10 @@
 ## My Role
 
 - I (Claude) own the full safety tip pipeline end-to-end.
-- I make all decisions about category, context, severity, and content unless Kavell specifies otherwise.
+- I make all decisions about category, context, severity, and content. My recommendations stand — no verification or approval step is required.
 - Kavell supplies the raw flagged data and Story IDs. I do the rest.
 - I ask for Story IDs if they are missing before creating any tip.
+- I execute immediately upon receiving flagged rows: overlap check → decision → create/update → build → changelog. No confirmation pause unless Story IDs are absent.
 
 ---
 
@@ -50,6 +51,8 @@ Extract from each flagged row:
 
 ## Step 2 — Check for Overlap
 
+**Rule: No duplicate tips.** If a new story is covered by an existing tip's tactic, attach the story to that tip — do not create a new file. One tip per tactic, no matter how many stories illustrate the same behaviour.
+
 Before creating anything, confirm no existing tip covers the same tactic.
 
 ```
@@ -59,6 +62,7 @@ Glob pattern="*.md" path="astro-poc/src/content/tips/"
 Scan titles for same category + context. Ask: "Does any existing tip give the same actionable advice?"
 
 - **Yes** → update `related_story_ids` on the existing tip instead. No new file needed.
+- **Partially** → attach the story to the closest existing tip and note the partial overlap in `recent-changes.md`. Only create a new tip if the new story reveals a meaningfully different prevention angle.
 - **No** → proceed to Step 3.
 
 **Tips most likely to overlap (check these first):**
@@ -107,7 +111,7 @@ Glob pattern="*.md" path="astro-poc/src/content/tips/"
 
 Find the highest-numbered file. Next tip = last ID + 1. Zero-pad to 5 digits (`TIP-00031`, `TIP-00032`, etc.).
 
-> **Current last tip:** TIP-00067 (as of March 17, 2026)
+> **Current last tip:** TIP-00075 (as of March 19, 2026)
 
 ---
 
