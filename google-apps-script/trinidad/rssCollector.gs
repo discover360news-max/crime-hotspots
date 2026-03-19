@@ -111,11 +111,23 @@ function fetchAndParseFeed(feed) {
   const items = root.getChild('channel', namespace).getChildren('item', namespace);
 
   return items.map(item => {
+    // Try standard RSS pubDate first, then dc:date namespace fallback
+    let pubDate = getChildText(item, 'pubDate', namespace);
+    if (!pubDate) {
+      // Try Dublin Core date (some feeds use <dc:date> instead of <pubDate>)
+      const dcNs = XmlService.getNamespace('dc', 'http://purl.org/dc/elements/1.1/');
+      pubDate = getChildText(item, 'date', dcNs) || '';
+    }
+    if (!pubDate) {
+      // Last resort: use current date as ISO string and log prominently
+      pubDate = Utilities.formatDate(new Date(), 'America/Port_of_Spain', "yyyy-MM-dd'T'HH:mm:ss");
+      Logger.log(`⚠️ RSS item missing <pubDate> — using collection timestamp as fallback. Title: ${getChildText(item, 'title', namespace)}`);
+    }
     return {
       title: getChildText(item, 'title', namespace),
       url: getChildText(item, 'link', namespace),
       description: getChildText(item, 'description', namespace) || '',
-      pubDate: getChildText(item, 'pubDate', namespace),
+      pubDate: pubDate,
       fullText: '' // Will be fetched later by articleFetcher.md
     };
   });
