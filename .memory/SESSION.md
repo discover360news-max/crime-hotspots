@@ -39,6 +39,11 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 19, 2026 (continued x3)
+- **Push learnings:** When splitting a monolithic GAS file, git rename detection assigns the rename to the most similar output file (by content). `claudeClient.gs → claudePrompts.gs` (64% similar) was detected as a rename; `claudeClientCore.gs` appeared as `create mode` even though it contains the core logic. Same pattern: `processor.gs → processorDuplicates.gs` (51%), `facebookSubmitter.gs → facebookSubmitterHtml.gs` (73%). Not a problem — just means git history for the "core" split file looks like a new file rather than a rename. Worth knowing when reading `git log --follow` on these files.
+- **Net line reduction:** Refactoring produced -1,449 net lines (5,171 insertions, 6,620 deletions). Accounts for: Trinidad legacy deletions (geminiClient 672 + groqClient 593 + plusCodeConverter 183 = 1,448 lines) + duplicate similarity helpers removed (~116 lines across both preFilterDuplicates files). No logic was lost.
+- `p1-01-dashboard-after.png` left untracked in repo root (stray screenshot, not project code — Kavell can delete or gitignore).
+
 ## Session Notes — Mar 19, 2026 (continued x2)
 - **Deduplication of similarity helpers:** Removed `calculateSimilarity` and `levenshteinDistance` from `preFilterDuplicates.gs` in both Trinidad and Jamaica. Canonical definitions remain in `processorDuplicates.gs` — in global GAS scope, so preFilter code picks them up automatically. No logic changes; purely removing dead duplicate code.
 - Files changed: `google-apps-script/trinidad/preFilterDuplicates.gs`, `google-apps-script/jamaica/preFilterDuplicates.gs`
