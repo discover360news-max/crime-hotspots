@@ -1,153 +1,154 @@
 # UX & UI Design System Audit — Progress Tracker
 
-**Initiated:** February 17, 2026
+**Initiated:** February 17, 2026 | **Last updated:** March 20, 2026
 **Goal:** Polished, app-like professional feel through strict design system discipline.
-**Full Plan:** `/Users/kavellforde/.claude/plans/radiant-bubbling-aho.md`
 
 ---
 
-## Phase 0 — Setup
-- [x] Create this progress tracker
+## Completed (Feb–Mar 2026)
+
+- Typography 4-level scale added to `tailwind.config.mjs` + `Layout.astro` (`text-display/heading/body/caption`)
+- `borderRadius.lg` updated 0.5rem → 0.75rem
+- `IslandSelectorModal.astro` created; replaced 4 separate modal files (Dashboard/Headlines/Archives/Areas)
+- `rounded-md` removed from active use; `rounded-lg` is standard
+- SPA / ClientRouter / View Transitions removed (Mar 15)
+- `about.astro` body text: `text-xs` → `text-body`; typo fixed (Mar 20)
+- `contact.astro`: H1/button `font-semibold` → `font-bold`; intro `text-body`; card H3s `text-caption font-bold`; hard dividers → gradient; all `text-xs` → token (Mar 20)
+- Jamaica `statistics.astro` + `murder-count.astro`: `noindex={true}` already set (confirmed Mar 20)
+- `animate-fadeIn` on `methodology.astro` — **verify this is actually defined in tailwind config**
 
 ---
 
-## Phase 1 — Global Foundation (Design Tokens)
+## P0 — Fix These First (Visible defects / SEO harm)
 
-### 1A. Typography — Strict 4-Level Scale
-**Files:** `astro-poc/tailwind.config.mjs` + `astro-poc/src/layouts/Layout.astro`
+- [x] **`about.astro` — body text was `text-xs` (12px)** — fixed Mar 20. All paragraphs now `text-body text-slate-600 dark:text-[var(--ch-text-muted)]`. Typo "currrently" fixed.
 
-| New Token | Size | Replaces |
-|-----------|------|----------|
-| `text-display` | 2rem (32px), leading-tight | `display` (36px) + `h1` (32px) |
-| `text-heading` | 1.375rem (22px), leading-snug | `h2` (24px) + `h3` (20px) |
-| `text-body` | 1.125rem (18px), leading-relaxed | `body` (16px) |
-| `text-caption` | 0.75rem (12px), leading-snug | `small` + `tiny` + `nav` |
+- [x] **`contact.astro` — H1/button used `font-semibold`** — fixed Mar 20. H1 + CTA button → `font-bold`. Card H3s were `text-small font-semibold` → `text-caption font-bold`. Intro para → `text-body`. All `text-xs` → `text-caption` tokens throughout.
 
-- [ ] Update `tailwind.config.mjs` — new 4-level `fontSize` config
-- [ ] Update `Layout.astro` `@theme` block — remove 8 old tokens, add 4 new
-- [ ] Bump body text to 18px (`text-body: 1.125rem`)
-- [ ] 2 weights only: `font-normal` and `font-bold` (no `font-semibold` on headings)
+- [x] **Hard dividers in `contact.astro`** — fixed Mar 20. Replaced solid `bg-slate-200` lines with gradient lines (kept label text structure, mirrored gradient direction on right side). Search `h-px bg-slate-200` on other pages still needed — only contact confirmed so far.
 
-### 1B. Color Standardization
-- [ ] Replace all `gray-*` with `slate-*` equivalents (found in `DashboardInfoCards.astro`)
-- [ ] Standardize card opacity: all `bg-white/70`, `bg-white/80`, `bg-white/90` → `bg-white/85`
-- [ ] Fix Leaflet cluster colors in `Layout.astro` (lines ~239–248): replace raw hex with rose palette vars
-
-### 1C. Spacing — 8px Grid
-**File:** `astro-poc/tailwind.config.mjs` + `astro-poc/src/layouts/Layout.astro`
-
-- [ ] Fix `mt-30` in footer → `mt-16`
-- [ ] Add `'Inter'` to front of `fontFamily.sans` array in tailwind.config.mjs
-- [ ] Change `borderRadius.lg` from `0.5rem` → `0.75rem` (currently same as `DEFAULT`)
-- [ ] Add `minHeight['button']: '22px'` to replace hardcoded `min-h-[22px]`
-- [ ] Document `p-3` (12px) and `p-5` (20px) as accepted 4px grid exceptions
+- [x] **Jamaica stats + murder count `noindex`** — already set (`noindex={true}` confirmed on both pages). No action needed.
 
 ---
 
-## Phase 2 — Component Consolidation
+## P1 — High (Cross-page inconsistencies)
 
-### 2A. Modal Consolidation
-**New:** `astro-poc/src/components/IslandSelectorModal.astro`
-**Pattern from:** `SectionPickerModal.astro`
+- [ ] **Utility page H1 treatment inconsistent**
+  `about.astro` has `<Hero>`. `contact`, `faq`, `terms`, `privacy`, `methodology` don't — and that's **fine** (lighter feel is defensible, not a best-practice violation). But their inline H1s must follow the same rules:
+  - `font-bold` not `font-semibold`
+  - `text-display` token (not raw sizes)
+  - `py-4 sm:py-12` on `<main>` consistently
+  - Confirmed violation: `contact.astro` H1 already captured in P0 above.
+  - Check `faq`, `terms`, `privacy`, `methodology` for the same `font-semibold` drift.
 
-- [ ] Create `IslandSelectorModal.astro` with `type` prop
-- [ ] Update `src/pages/index.astro` — replace old modal imports
-- [ ] Update `src/pages/trinidad/headlines.astro` — replace HeadlinesModal
-- [ ] Update `src/pages/trinidad/areas.astro` — replace AreasModal
-- [ ] Update dashboard page — replace DashboardModal/ArchivesModal
-- [ ] Delete `HeadlinesModal.astro`
-- [ ] Delete `DashboardModal.astro`
-- [ ] Delete `ArchivesModal.astro`
-- [ ] Delete `AreasModal.astro`
+- [ ] **`methodology.astro` main has no responsive spacing**
+  Uses `py-4 animate-fadeIn` with no `sm:` breakpoint. All sibling pages use `py-4 sm:py-12`.
 
-### 2B. Header.astro Targeted Fixes
-**File:** `astro-poc/src/components/Header.astro`
+- [ ] **`trinidad/murders.astro` H1 uses raw `text-2xl`**
+  Should be `text-display font-bold`. Every other page uses the 4-level token.
 
-- [ ] Replace all `text-nav` → `text-caption` (per new type scale)
-- [ ] Replace all `text-small` → `text-caption`
-- [ ] Desktop nav links: use `text-body` (18px)
-- [ ] Fix mobile Report CTA: `text-rose-400 hover:text-rose-600` → `text-rose-600 font-bold`
-- [ ] Replace any `text-gray-500` → `text-slate-500`
+- [ ] **`trinidad/dashboard.astro` H1 uses `text-heading` not `text-display`**
+  H1 on the most-visited page renders at 22px instead of 32px. Should be `text-display font-bold`.
 
-### 2C. BottomNav.astro
-**File:** `astro-poc/src/components/BottomNav.astro`
+- [ ] **`business-solutions.astro` has a hand-rolled hero section**
+  Inline gradient section built from scratch — not using `<Hero>` component. Won't inherit dark mode or future design system changes. Should be migrated to `<Hero compact={false} narrowContainer={false} ...>`.
 
-- [ ] Replace `text-[10px]` → `text-caption`
+- [ ] **`data-capability-sheet.astro` uses `max-w-4xl` — document as intentional**
+  Wider than site standard (`max-w-3xl`). Justified for B2B document layout — add a comment at top of file and note in site-features.md to prevent future "fix" that breaks the layout.
+
+- [ ] **Global `/headlines` vs country headlines — structural decision needed**
+  `/headlines` (root) uses Browse/Selection pattern (`max-w-6xl` outer, `max-w-3xl` inner). Since each island will need its own headlines page, the global `/headlines` route is likely either a redirect hub or a Jamaica placeholder. Decision: does it stay as-is, redirect, or become an island picker page?
 
 ---
 
-## Phase 3 — Component Token Pass
+## P2 — Medium (Design token violations)
 
-**Migration rule:** `text-small/tiny/nav` → `text-caption` | `text-h1` → `text-display` | `text-h2/h3` → `text-heading`
+- [ ] **Raw HSL values instead of CSS vars — sitewide drift**
+  Rule: `dark:bg-[var(--ch-surface)]` not `dark:bg-[hsl(0_0%_13%)]`. Confirmed in `about.astro:29` and throughout. Run a grep for `dark:bg-\[hsl` and `dark:text-\[hsl` to find all instances.
 
-- [ ] `CrimeCard.astro` — date → `text-caption`; headline → add `leading-snug`
-- [ ] `SafetyContext.astro` — meta → `text-caption` (tip text already has `leading-relaxed`)
-- [ ] `RelatedCrimes.astro` — `text-xs`/`text-[10px]` → `text-caption`
-- [ ] `TrendingHotspots.astro` — `text-xs`/`text-[10px]` → `text-caption`
-- [ ] `StatCards.astro` — label → `text-caption` (note: number sizes `text-2xl/3xl` are documented exception)
-- [ ] `Hero.astro` — H1 → `text-display leading-tight`; subheading → `text-body`
-- [ ] `InfoPopup.astro` — body → `text-body`; meta → `text-caption`
-- [ ] `Breadcrumbs.astro` — items → `text-caption`
-- [ ] `DashboardInfoCards.astro` — replace `text-gray-*` → `text-slate-*`
+- [ ] **`font-semibold` on headings — sitewide sweep needed**
+  Confirmed in `contact.astro`. Run grep for `font-semibold` across `src/pages/` and `src/components/`. Replace all heading/label instances with `font-bold`. (Note: `font-semibold` is permitted on inline body text emphasis, not on headings or buttons.)
 
----
+- [ ] **Card opacity not standardized**
+  Multiple values exist: `bg-white/70`, `bg-white/80`, `bg-white/90`. Standard is `bg-white/85`. Grep and normalize.
 
-## Phase 4 — Page-Level Polish
+- [ ] **`gray-*` → `slate-*` in `DashboardInfoCards.astro`**
+  Slate palette only — no gray.
 
-### Crime Detail Page
-**File:** `astro-poc/src/pages/trinidad/crime/[slug].astro`
+- [ ] **`blog/[slug].astro` — `<Content />` not wrapped in `max-w-prose`**
+  Long lines go unbounded on wide viewports. Wrap in `<div class="max-w-prose">` (65ch).
 
-- [ ] Add `leading-tight` to H1 (`text-display`)
-- [ ] Metadata (date, location, source) → `text-caption`
+- [ ] **`blog/[slug].astro` — share button colors use `bg-slate-400`**
+  Fix to branded colors: Facebook `bg-[#1877F2]`, X `bg-slate-900`, WhatsApp `bg-[#25D366]`, Copy Link `bg-rose-600`.
 
-### Headlines Page
-**File:** `astro-poc/src/pages/trinidad/headlines.astro`
+- [ ] **`blog/[slug].astro` — H1 missing `leading-tight`**
 
-- [ ] Add `aria-hidden="true"` to timeline dot `<div>` elements
-- [ ] Filter tray: `w-80` → `max-w-[min(20rem,calc(100vw-2rem))]`
-- [ ] Accordion date headers: add `leading-snug`
-- [ ] Update all text tokens to new 4-level scale
+- [ ] **`trinidad/crime/[slug].astro` — H1 missing `leading-tight`; metadata not on `text-caption`**
 
-### Blog Post Page
-**File:** `astro-poc/src/pages/blog/[slug].astro`
+- [ ] **Component token sweep** (from Feb audit, still open)
+  - `CrimeCard.astro` — date → `text-caption`; headline → add `leading-snug`
+  - `RelatedCrimes.astro` — `text-xs`/`text-[10px]` → `text-caption`
+  - `TrendingHotspots.astro` — `text-xs`/`text-[10px]` → `text-caption`
+  - `StatCards.astro` — label → `text-caption` (number sizes `text-2xl/3xl` are a documented exception)
+  - `Breadcrumbs.astro` — items → `text-caption`
+  - `SafetyContext.astro` — meta → `text-caption`
 
-- [ ] Fix share button colors:
-  - Facebook: `bg-[#1877F2] text-white`
-  - X/Twitter: `bg-slate-900 text-white`
-  - WhatsApp: `bg-[#25D366] text-white`
-  - Copy Link: `bg-rose-600 text-white`
-  - Remove `bg-slate-400`
-- [ ] Wrap `<Content />` in `<div class="max-w-prose">` (65ch line length)
-- [ ] Add `leading-tight` to page H1
+- [ ] **Header.astro — token fixes** (from Feb audit)
+  - Desktop nav links: replace any remaining `text-nav`/`text-small` → `text-caption`
+  - Mobile Report CTA: confirm `text-rose-600 font-bold`
 
-### Areas Index Page
-**File:** `astro-poc/src/pages/trinidad/areas.astro`
+- [ ] **BottomNav.astro** — replace `text-[10px]` → `text-caption`
 
-- [ ] Region H2 headers: add `leading-tight`
-- [ ] Area card H3 titles: add `leading-snug`
-- [ ] Area card titles: add `line-clamp-1`
+- [ ] **Footer `mt-30`** → `mt-16` (invalid Tailwind spacing token)
+
+- [ ] **`min-h-[22px]` → `min-h-button` sitewide**
+  `minHeight['button']: '22px'` should be in `tailwind.config.mjs`. Once confirmed, run find/replace.
 
 ---
 
-## Verification Checklist
+## P3 — Low (Structural gaps)
 
-After all phases complete:
+- [ ] **Missing JSON-LD on high-value pages**
+  | Page | Missing Schema | Why it matters |
+  |------|---------------|----------------|
+  | `trinidad/crime/[slug]` | `NewsArticle` | Google News eligibility — highest priority |
+  | `about.astro` | `Organization` | Knowledge panel signals |
+  | `jamaica/statistics` | `Dataset` | Google Dataset Search (once data live) |
 
-- [ ] `npm run build` passes under 15 minutes
-- [ ] Dev server visual check:
-  - [ ] `/` — homepage (SectionPickerModal still works)
-  - [ ] `/trinidad/headlines` — filter tray, accordion, timeline dots
-  - [ ] `/trinidad/crime/[slug]` — article typography, 4 type sizes visible
-  - [ ] `/blog/[slug]` — share button colors, content width
-  - [ ] `/trinidad/areas` — heading hierarchy
-- [ ] Mobile 375px viewport check — filter tray, BottomNav, modals
-- [ ] Accessibility: Tab through headlines page — timeline dots not focusable
-- [ ] No visual regressions on dashboard, murder-count page
+- [ ] **`report.astro` missing `<Breadcrumbs>`**
+  Every content page has breadcrumbs except report and 404. 404 is fine; report page should have them.
+
+- [ ] **`animate-fadeIn` in `methodology.astro` — verify definition**
+  Not in the documented design tokens. Either it's in `tailwind.config.mjs` as a custom animation (check) or it's silently doing nothing.
+
+- [ ] **`trinidad/areas.astro` — heading hierarchy leading**
+  Region H2 headers: add `leading-tight`. Area card H3 titles: add `leading-snug` + `line-clamp-1`.
+
+- [ ] **`trinidad/headlines.astro` — accessibility + filter tray**
+  - Timeline dot `<div>` elements: add `aria-hidden="true"`
+  - Filter tray: `w-80` → `max-w-[min(20rem,calc(100vw-2rem))]` (prevents overflow on small screens)
+
+- [ ] **Jamaica T&T parity pass** — deferred until Jamaica D1 is live
+  When Jamaica data goes live: audit statistics, murder-count, dashboard for container widths, H1 patterns, breadcrumbs, and JSON-LD matching T&T equivalents.
+
+---
+
+## Verification Checklist (run after each fix batch)
+
+- [ ] `npm run build` passes
+- [ ] `/` — homepage
+- [ ] `/about`, `/contact`, `/faq` — H1 weight + spacing look consistent
+- [ ] `/trinidad/dashboard` — H1 renders at display size
+- [ ] `/trinidad/headlines` — filter tray, accordion, timeline dots
+- [ ] `/trinidad/crime/[slug]` — H1 leading, metadata caption size
+- [ ] `/blog/[slug]` — share button colors, content width capped
+- [ ] Mobile 375px — filter tray, BottomNav, no overflow
 
 ---
 
 ## Out of Scope (Deferred)
 - Breaking news badge
-- Dark mode
+- Dark mode overhaul
 - Header mobile menu extraction to sub-component
 - StatCards number sizes (`text-2xl/3xl`) — documented scale exception
+- Leaflet cluster colors → rose palette vars (low visibility)

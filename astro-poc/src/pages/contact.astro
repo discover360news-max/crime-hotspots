@@ -23,11 +23,11 @@ const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
       { label: 'Contact' }
     ]} />
 
-    <h1 class="text-display font-semibold mb-3 text-center pt-4 dark:text-[hsl(0_0%_95%)]">Contact Us</h1>
+    <h1 class="text-display font-bold mb-3 text-center pt-4 dark:text-[hsl(0_0%_95%)]">Contact Us</h1>
 
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
       <!-- Intro -->
-      <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-8 text-center max-w-md mx-auto">
+      <p class="text-body text-slate-500 dark:text-[var(--ch-text-muted)] mb-8 text-center max-w-md mx-auto">
         Have a question, partnership idea, or want to request coverage for your island? We'd love to hear from you.
       </p>
 
@@ -36,7 +36,7 @@ const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
         <!-- Primary: Email Button -->
         <a
           href={mailtoLink}
-          class="group flex items-center justify-center gap-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-lg px-6 py-4 transition-all duration-200 shadow-md hover:shadow-lg"
+          class="group flex items-center justify-center gap-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg px-6 py-4 transition-all duration-200 shadow-md hover:shadow-lg"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -48,47 +48,47 @@ const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
         </a>
 
         <!-- Email address (for copy/paste) -->
-        <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] text-center">
+        <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)] text-center">
           or copy: <span class="font-mono text-slate-600 dark:text-[hsl(0_0%_75%)] select-all">{email}</span>
         </p>
       </div>
 
       <!-- Divider -->
       <div class="flex items-center gap-3 my-8">
-        <div class="flex-1 h-px bg-slate-200 dark:bg-[hsl(0_0%_22%)]"></div>
-        <span class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">What we can help with</span>
-        <div class="flex-1 h-px bg-slate-200 dark:bg-[hsl(0_0%_22%)]"></div>
+        <div class="flex-1 h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent"></div>
+        <span class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)]">What we can help with</span>
+        <div class="flex-1 h-px bg-gradient-to-l from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent"></div>
       </div>
 
       <!-- Topics Grid -->
       <div class="grid sm:grid-cols-2 gap-4">
         <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
-          <h3 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">General Inquiries</h3>
-          <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Questions about our data, methodology, or platform.</p>
+          <h3 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">General Inquiries</h3>
+          <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">Questions about our data, methodology, or platform.</p>
         </div>
         <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
-          <h3 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Data Requests</h3>
-          <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Access crime data for research or journalism.</p>
+          <h3 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Data Requests</h3>
+          <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">Access crime data for research or journalism.</p>
         </div>
         <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
-          <h3 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Partnerships</h3>
-          <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Media collaborations and business opportunities.</p>
+          <h3 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Partnerships</h3>
+          <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">Media collaborations and business opportunities.</p>
         </div>
         <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
-          <h3 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Island Coverage</h3>
-          <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Request Crime Hotspots for your Caribbean island.</p>
+          <h3 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Island Coverage</h3>
+          <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">Request Crime Hotspots for your Caribbean island.</p>
         </div>
       </div>
 
       <!-- Response Time Note -->
-      <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] text-center mt-8">
+      <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)] text-center mt-8">
         We typically respond within 24-48 hours.
       </p>
     </div>
 
     <!-- Report Crime CTA -->
     <div class="mt-6 text-center">
-      <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">
+      <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">
         Want to report a crime anonymously? <a href={routes.report} class="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 underline">Submit a report</a>
       </p>
     </div>

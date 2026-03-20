@@ -1,6 +1,6 @@
 # Crime Hotspots SEO Implementation Status
 
-**Last Updated:** March 5, 2026
+**Last Updated:** March 20, 2026
 **Status:** Phase 1 + Phase 2 (Social) Complete ✅
 
 ---
@@ -21,7 +21,7 @@
 - ✅ Content Security Policy (CSP) — Grade A
 - ✅ Self-hosted Inter font (eliminated Google Fonts external request chain)
 - ✅ RSS feed at /rss.xml (blog posts + latest 20 crime headlines)
-- ✅ Daily rebuild at 6 AM UTC via GitHub Actions
+- ✅ Daily rebuild at 6 AM UTC via GitHub Actions + Google sitemap ping post-deploy
 
 ### Structured Data (Schema.org)
 - ✅ NewsArticle Schema on ALL crime detail pages (`/trinidad/crime/[slug]/`)
@@ -35,8 +35,10 @@
 
 ### News Sitemap
 - ✅ `/news-sitemap.xml` — Google News sitemap with `<news:news>` elements (Mar 2026)
-  - Includes blog posts from last 2 days (Google News window)
+  - Includes blog posts + crime pages from last 2 days (Google News window)
   - Rebuilt daily via Cloudflare Pages deployment
+  - Registered in `sitemap-index.xml` and `robots.txt` (Mar 20 2026 — previously undiscoverable)
+  - CDN cache: 30 min edge, 30 min browser (faster refresh than main sitemap's 23h)
 
 ### Content & Trust (E-E-A-T)
 - ✅ FAQ page (13 questions)
@@ -70,10 +72,10 @@
 
 ---
 
-## 📋 GOOGLE NEWS — SUBMITTED, AWAITING REVIEW (Mar 5, 2026)
+## 📋 GOOGLE NEWS — SUBMITTED, DECISION PENDING (Mar 5, 2026)
 
-**Status:** Application submitted. Google says approval takes ~2 weeks.
-**Revisit date:** ~March 19, 2026
+**Status:** Application submitted Mar 5. Review window (2 weeks) has elapsed as of Mar 19.
+**Action:** Check GSC → Search Appearance → News tab to see if articles are appearing. If no news traffic by end of March, treat as rejected and follow the rejection plan below.
 
 ### What Was Done (Mar 5, 2026)
 - ✅ Upgraded blog post schema: `BlogPosting` → `NewsArticle` (`blog/[slug].astro`)
@@ -152,9 +154,15 @@
 - Social referrals (WhatsApp, Facebook, X)
 - Google News inclusion (check Search Console > News tab)
 
-**Current Baseline (Feb 2026, last 28 days):**
+**Baseline (Feb 2026, last 28 days):**
 - GSC: 494 clicks (~18/day), 8,410 impressions, CTR 5.9%, avg position 7.5
 - GA4: ~119 unique users/day, ~2,307 page views
+
+**Current (Mar 20, 2026 — last 28 days, site-wide):**
+- GSC: 625 clicks (~22/day), 10,755 impressions, CTR 5.81%, avg position ~7
+- Trend: last 5 days averaging 30–37 clicks/day — strong upward momentum
+- Top query: "how many murders in trinidad for 2026 today" (pos 3.0, 16% CTR)
+- Traffic split: T&T 61%, US 11%, UK 8%, Canada 8%, diaspora total ~27%
 
 ---
 

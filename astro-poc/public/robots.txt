@@ -6,6 +6,7 @@ Allow: /
 
 # Sitemap location
 Sitemap: https://crimehotspots.com/sitemap-index.xml
+Sitemap: https://crimehotspots.com/news-sitemap.xml
 
 # Crawl delay to prevent overwhelming the server
 Crawl-delay: 1

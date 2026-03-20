@@ -1,7 +1,7 @@
 # SEO-CONFIG.md
 
 Complete reference for all SEO infrastructure in Crime Hotspots.
-**Last updated:** February 23, 2026 (monitoring added)
+**Last updated:** March 20, 2026
 
 ---
 
@@ -23,8 +23,9 @@ Complete reference for all SEO infrastructure in Crime Hotspots.
 | Dataset schema | `src/pages/trinidad/statistics.astro` | Inline in body (Google accepts either location) |
 | WebSite schema | `src/pages/index.astro` | Inline in body |
 | Sitemap | `src/pages/sitemap-0.xml.ts` | Dynamic SSR, all pages |
-| Sitemap index | `src/pages/sitemap-index.xml.ts` | Points to `sitemap-0.xml` |
-| robots.txt | `public/robots.txt` | `Sitemap:` pointer + `Crawl-delay: 1` |
+| News sitemap | `src/pages/news-sitemap.xml.ts` | Google News spec; last-2-days crimes + blog |
+| Sitemap index | `src/pages/sitemap-index.xml.ts` | Points to `sitemap-0.xml` + `news-sitemap.xml` |
+| robots.txt | `public/robots.txt` | Two `Sitemap:` lines + `Crawl-delay: 1` |
 | Cache headers | `public/_headers` | Cloudflare Pages header rules |
 | CSP | `public/_headers` (the `/*` block) | Single source of truth — no `<meta>` CSP |
 | RSS feed content | `src/pages/rss.xml.ts` | Blog + last 20 headlines; pre-rendered |
@@ -131,8 +132,9 @@ Fields populated from CSV:
 ## 4. Sitemap
 
 **Files:**
-- `src/pages/sitemap-index.xml.ts` — index that points to `sitemap-0.xml`
+- `src/pages/sitemap-index.xml.ts` — index pointing to `sitemap-0.xml` + `news-sitemap.xml`
 - `src/pages/sitemap-0.xml.ts` — all pages, dynamically generated at request time
+- `src/pages/news-sitemap.xml.ts` — Google News sitemap; crimes + blog from last 2 days
 
 ### Priority Guide
 
@@ -155,11 +157,51 @@ Fields populated from CSV:
 
 **WARNING:** Google ignores inflated changefreq values. Don't set everything to `daily`.
 
+### lastmod Integrity Rule
+
+`sitemap-0.xml.ts` uses two lastmod strategies — do not mix them up:
+
+- **Data-driven pages** (homepage, dashboard, murder-count, headlines, statistics, etc.): use
+  `buildTime` variable (`new Date().toISOString()` at request time). Content genuinely changes
+  every build.
+- **Static content pages** (about, faq, methodology, privacy, terms, compare, report, submit,
+  tools, mp index pages): use a **hardcoded date string** (`'YYYY-MM-DD'`).
+
+**When you edit a static content page**, manually update its `lastmod` date in the `staticPages`
+array. Same rule applies to `mpPages`, `jamaicaMpPages`, and `jamaicaStaticPages` — update
+their hardcoded dates when you refresh the underlying JSON data.
+
+**Why this matters:** If static pages emit `lastmod: today` on every build, Google learns to
+ignore `lastmod` sitewide and stops using it as a crawl signal — including on pages where it
+actually matters (murder-count, headlines, etc.).
+
 ### Adding a New Page to Sitemap
 
 1. Open `src/pages/sitemap-0.xml.ts`
-2. Add to `staticPages` array: `{ url: 'your/path', priority: 0.X, changefreq: 'weekly' }`
-3. URL format: no leading slash, no trailing slash (they're added in the XML generator)
+2. Decide: is this page data-driven or static content?
+   - Data-driven → add to the first block with `lastmod: buildTime`
+   - Static content → add to the second block with a hardcoded `lastmod: 'YYYY-MM-DD'`
+3. Set `{ url: 'your/path/', priority: 0.X, changefreq: '...' }` — trailing slash required
+4. URL format: no leading slash, trailing slash required (`trailingSlash: 'always'`)
+
+### Google Sitemap Ping (Post-Deploy)
+
+After every successful Cloudflare deployment, `deploy.yml` automatically pings Google:
+- `https://www.google.com/ping?sitemap=https://crimehotspots.com/sitemap-index.xml`
+- `https://www.google.com/ping?sitemap=https://crimehotspots.com/news-sitemap.xml`
+
+60-second delay gives Cloudflare time to go live before the ping fires. This triggers Googlebot
+re-crawl within hours rather than leaving it to Googlebot's own schedule (which can be 24–48h).
+
+### News Sitemap
+
+**File:** `src/pages/news-sitemap.xml.ts`
+
+- Fully Google News spec compliant (`xmlns:news`, `<news:publication>`, `<news:publication_date>`, `<news:title>`)
+- Filters to crimes and blog posts published in the last 2 days (Google News indexing window)
+- Crimes capped at 100 entries (well within Google's 1,000 limit)
+- Cache: `CDN-Cache-Control: max-age=1800` (30 min edge), `Cache-Control: max-age=1800` (30 min browser)
+- Registered in both `sitemap-index.xml` and `robots.txt`
 
 ---
 
@@ -171,12 +213,13 @@ Fields populated from CSV:
 User-agent: *
 Allow: /
 Sitemap: https://crimehotspots.com/sitemap-index.xml
+Sitemap: https://crimehotspots.com/news-sitemap.xml
 Crawl-delay: 1
 ```
 
 - Allows all crawlers unconditionally.
-- Points to sitemap index (not `sitemap-0.xml` directly — allows future multi-sitemap scaling).
-- `Crawl-delay: 1` — respected by compliant bots, prevents hammering the SSR origin.
+- Two `Sitemap:` lines — index for Googlebot, news-sitemap directly for Google News bot.
+- `Crawl-delay: 1` — respected by Bing and compliant bots; Google ignores it entirely.
 
 **WARNING:** Do NOT add `Disallow:` rules without careful thought. Blocking paths removes them from Google's index.
 
@@ -243,7 +286,9 @@ Cloudflare Pages applies ALL matching rules and uses the more specific path when
 - [ ] Pass `title` and `description` props to `<Layout>`
 - [ ] Choose correct `ogType`: `"website"` for data pages, `"article"` for content pages
 - [ ] Add appropriate structured data (use `slot="head"` for JSON-LD in `<head>`)
-- [ ] Add to `sitemap-0.xml.ts` staticPages with correct priority/changefreq
+- [ ] Add to `sitemap-0.xml.ts` `staticPages` with correct `priority`, `changefreq`, and `lastmod`
+  - Data-driven page → `lastmod: buildTime`
+  - Static content page → `lastmod: 'YYYY-MM-DD'` (today's date when you create it)
 - [ ] Verify breadcrumbs render correctly (use `<Breadcrumbs>` component)
 - [ ] Check that `prerender = true` is set if the page is static (dashboard is dynamic, statistics is static)
 
@@ -272,7 +317,7 @@ Cloudflare Pages applies ALL matching rules and uses the more specific path when
 | Element | Why |
 |---------|-----|
 | `<slot name="head" />` in Layout | NewsArticle schema silently disappears |
-| `Sitemap:` line in robots.txt | Googlebot uses this to discover all pages |
+| Both `Sitemap:` lines in robots.txt | Googlebot + Google News bot use these to discover pages |
 | `CDN-Cache-Control: max-age=86400` on crime pages | Remove = Cloudflare re-renders every hit, kills LCP |
 | CSP in `_headers` `/*` block | Don't add `<meta>` CSP — dual CSP breaks Turnstile |
 | `trailingSlash: 'always'` in astro.config.mjs | Changing creates duplicate content (with and without `/`) |

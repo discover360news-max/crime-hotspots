@@ -85,7 +85,8 @@ ${parts.join('\n')}
   return new Response(sitemap, {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=3600',
+      'CDN-Cache-Control': 'max-age=1800',
+      'Cache-Control': 'public, max-age=1800, must-revalidate',
     },
   });
 };

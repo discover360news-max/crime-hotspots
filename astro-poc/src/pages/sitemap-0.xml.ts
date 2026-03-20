@@ -38,33 +38,41 @@ export const GET: APIRoute = async ({ locals }) => {
   // SEO CRITICAL: static pages sitemap. Update this list whenever adding a new section or country.
   // priority: 1.0=homepage, 0.9=high-value stats, 0.8=content hubs, 0.7=archive/areas, 0.5=utility
   // changefreq: set to actual update cadence (Google ignores inflated values).
+  // lastmod rules:
+  //   - Data-driven pages (daily/weekly): use buildTime so Google sees a fresh signal after each deploy.
+  //   - Static content pages: HARDCODE the date you last edited the file. Do not use buildTime —
+  //     Google will learn to ignore lastmod if it changes on every build for pages that never change.
+  //     Update the hardcoded date manually whenever you meaningfully edit that page's content.
   // See docs/claude-context/SEO-CONFIG.md — Sitemap section.
   // IMPORTANT: All URLs must include trailing slashes.
   // Astro is configured with trailingSlash: 'always' — URLs without trailing slashes
   // receive a 308 redirect, which GSC reports as "Page with redirect" and won't index.
+  const buildTime = new Date().toISOString();
   const staticPages = [
-    { url: '', priority: 1.0, changefreq: 'daily' },
-    { url: 'trinidad/dashboard/', priority: 1.0, changefreq: 'daily' },
-    { url: 'trinidad/headlines/', priority: 0.9, changefreq: 'daily' },
-    { url: 'trinidad/statistics/', priority: 0.9, changefreq: 'weekly' },
-    { url: 'trinidad/murder-count/', priority: 0.8, changefreq: 'daily' },
-    { url: 'trinidad/murders/', priority: 0.8, changefreq: 'daily' },
-    { url: 'headlines/', priority: 0.8, changefreq: 'daily' },
-    { url: 'blog/', priority: 0.8, changefreq: 'weekly' },
-    { url: 'trinidad/areas/', priority: 0.7, changefreq: 'weekly' },
-    { url: 'trinidad/archive/', priority: 0.7, changefreq: 'weekly' },
-    { url: 'trinidad/regions/', priority: 0.6, changefreq: 'weekly' },
-    { url: 'trinidad/compare/', priority: 0.5, changefreq: 'monthly' },
-    { url: 'trinidad/mp/', priority: 0.7, changefreq: 'yearly' },
-    { url: 'trinidad/safety-tips/', priority: 0.8, changefreq: 'weekly' },
-    { url: 'trinidad/safety-tips/submit/', priority: 0.5, changefreq: 'monthly' },
-    { url: 'report/', priority: 0.6, changefreq: 'monthly' },
-    { url: 'about/', priority: 0.7, changefreq: 'monthly' },
-    { url: 'faq/', priority: 0.7, changefreq: 'monthly' },
-    { url: 'methodology/', priority: 0.7, changefreq: 'monthly' },
-    { url: 'privacy/', priority: 0.5, changefreq: 'yearly' },
-    { url: 'terms/', priority: 0.5, changefreq: 'yearly' },
-    { url: 'tools/social-image-generator/', priority: 0.4, changefreq: 'monthly' },
+    // Data-driven — content changes on every build
+    { url: '', priority: 1.0, changefreq: 'daily', lastmod: buildTime },
+    { url: 'trinidad/dashboard/', priority: 1.0, changefreq: 'daily', lastmod: buildTime },
+    { url: 'trinidad/headlines/', priority: 0.9, changefreq: 'daily', lastmod: buildTime },
+    { url: 'trinidad/statistics/', priority: 0.9, changefreq: 'weekly', lastmod: buildTime },
+    { url: 'trinidad/murder-count/', priority: 0.8, changefreq: 'daily', lastmod: buildTime },
+    { url: 'trinidad/murders/', priority: 0.8, changefreq: 'daily', lastmod: buildTime },
+    { url: 'headlines/', priority: 0.8, changefreq: 'daily', lastmod: buildTime },
+    { url: 'blog/', priority: 0.8, changefreq: 'weekly', lastmod: buildTime },
+    { url: 'trinidad/areas/', priority: 0.7, changefreq: 'weekly', lastmod: buildTime },
+    { url: 'trinidad/archive/', priority: 0.7, changefreq: 'weekly', lastmod: buildTime },
+    { url: 'trinidad/regions/', priority: 0.6, changefreq: 'weekly', lastmod: buildTime },
+    { url: 'trinidad/safety-tips/', priority: 0.8, changefreq: 'weekly', lastmod: buildTime },
+    // Static content — update the hardcoded date when you edit the page content
+    { url: 'trinidad/compare/', priority: 0.5, changefreq: 'monthly', lastmod: '2026-03-17' },
+    { url: 'trinidad/mp/', priority: 0.7, changefreq: 'yearly', lastmod: '2026-03-17' },
+    { url: 'trinidad/safety-tips/submit/', priority: 0.5, changefreq: 'monthly', lastmod: '2026-03-15' },
+    { url: 'report/', priority: 0.6, changefreq: 'monthly', lastmod: '2026-03-15' },
+    { url: 'about/', priority: 0.7, changefreq: 'monthly', lastmod: '2026-03-15' },
+    { url: 'faq/', priority: 0.7, changefreq: 'monthly', lastmod: '2026-03-17' },
+    { url: 'methodology/', priority: 0.7, changefreq: 'monthly', lastmod: '2026-03-15' },
+    { url: 'privacy/', priority: 0.5, changefreq: 'yearly', lastmod: '2026-03-15' },
+    { url: 'terms/', priority: 0.5, changefreq: 'yearly', lastmod: '2026-03-15' },
+    { url: 'tools/social-image-generator/', priority: 0.4, changefreq: 'monthly', lastmod: '2026-03-17' },
   ];
 
   // Crime pages - prioritize recent crimes
@@ -140,9 +148,10 @@ export const GET: APIRoute = async ({ locals }) => {
   }));
 
   // T&T MP profile pages — 41 individual pages
+  // lastmod: update when mps.json data is refreshed
   const mpPages = mpsData.map(mp => ({
     url: buildRoute.mp(mp.nameSlug).slice(1),
-    lastmod: new Date().toISOString(),
+    lastmod: '2026-03-17',
     priority: 0.7,
     changefreq: 'yearly' as const,
   }));
@@ -150,15 +159,17 @@ export const GET: APIRoute = async ({ locals }) => {
   // Jamaica static pages — only include pages with real content.
   // Data pages (dashboard, headlines, statistics, murder-count, archive) are noindex
   // and excluded here until Jamaica D1 is wired (Phase C).
+  // lastmod: update when page content or jamaica MP data is refreshed
   const jamaicaStaticPages = [
-    { url: 'jamaica/mp/', priority: 0.7, changefreq: 'yearly' as const },
-    { url: 'jamaica/parishes/', priority: 0.6, changefreq: 'yearly' as const },
-  ].map(p => ({ ...p, lastmod: new Date().toISOString() }));
+    { url: 'jamaica/mp/', priority: 0.7, changefreq: 'yearly' as const, lastmod: '2026-03-17' },
+    { url: 'jamaica/parishes/', priority: 0.6, changefreq: 'yearly' as const, lastmod: '2026-03-17' },
+  ];
 
   // Jamaica MP profile pages — 63 individual pages
+  // lastmod: update when mps-jamaica.json data is refreshed
   const jamaicaMpPages = mpsJamaicaData.map(mp => ({
     url: buildRoute.jamaicaMp(mp.nameSlug).slice(1),
-    lastmod: new Date().toISOString(),
+    lastmod: '2026-03-17',
     priority: 0.7,
     changefreq: 'yearly' as const,
   }));
@@ -182,7 +193,7 @@ export const GET: APIRoute = async ({ locals }) => {
 
   // Combine all pages
   const allPages = [
-    ...staticPages.map(p => ({ ...p, lastmod: new Date().toISOString() })),
+    ...staticPages,
     ...archivePages,
     ...areaPages,
     ...blogPages,

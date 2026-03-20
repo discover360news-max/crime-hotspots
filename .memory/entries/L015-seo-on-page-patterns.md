@@ -68,6 +68,19 @@ Yearless evergreen queries require content authority (multi-year data + backlink
 
 ---
 
+## Sitemap lastmod integrity rule (Mar 20 2026)
+
+Static content pages in `sitemap-0.xml.ts` use **hardcoded** `lastmod` dates — not `new Date()`.
+Data-driven pages (daily/weekly updates) use `buildTime` variable set at request time.
+
+**Rule:** When you edit a static page's content (about, faq, methodology, privacy, terms, compare,
+report, submit, social-image-generator, mp index), manually update its `lastmod` date in `staticPages`.
+Same applies to `mpPages`, `jamaicaMpPages`, and `jamaicaStaticPages` — update when JSON data changes.
+
+Using `new Date()` on static pages trains Google to ignore `lastmod` site-wide. Don't do it.
+
+---
+
 ## GSC data interpretation notes (from Mar 19 2026 audit)
 
 - Traffic spikes on "today" queries (`murders in trinidad 2026 update today`) are news-cycle driven — not lost rankings

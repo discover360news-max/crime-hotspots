@@ -36,6 +36,12 @@ D1 sync MUST run before the rebuild. If either schedule changes, update the othe
 - `PUBLIC_SAFETY_TIPS_GAS_URL` — GAS web app URL for safety tips + voting
 - Any other `PUBLIC_*` vars are exposed to the client
 
+## Sitemap Ping (post-deploy)
+After Cloudflare deployment is triggered, the workflow waits 60s then pings Google for both sitemaps:
+- `https://www.google.com/ping?sitemap=https://crimehotspots.com/sitemap-index.xml`
+- `https://www.google.com/ping?sitemap=https://crimehotspots.com/news-sitemap.xml`
+This signals Google immediately after every 6am rebuild so Googlebot re-crawls within hours, not days.
+
 ## Known Issues / Gotchas
 - Build time limit: 15 minutes (Cloudflare Pages free tier)
 - Current build: ~31 seconds — well within limit
@@ -43,3 +49,4 @@ D1 sync MUST run before the rebuild. If either schedule changes, update the othe
 
 ## Change Log
 - 2025-12-16: GitHub Actions + Cloudflare Pages pipeline established
+- 2026-03-20: Added Google sitemap ping step to deploy.yml (60s post-deploy delay)

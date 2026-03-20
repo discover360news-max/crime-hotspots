@@ -60,3 +60,13 @@ jobs:
             echo "❌ Deployment failed with status code: $http_code"
             exit 1
           fi
+
+      - name: Ping Google Sitemaps
+        run: |
+          echo "Waiting 60s for Cloudflare deployment to go live..."
+          sleep 60
+          echo "Pinging Google sitemap index..."
+          curl -s "https://www.google.com/ping?sitemap=https://crimehotspots.com/sitemap-index.xml" -o /dev/null -w "sitemap-index: %{http_code}\n"
+          echo "Pinging Google news sitemap..."
+          curl -s "https://www.google.com/ping?sitemap=https://crimehotspots.com/news-sitemap.xml" -o /dev/null -w "news-sitemap: %{http_code}\n"
+          echo "✅ Google notified"
