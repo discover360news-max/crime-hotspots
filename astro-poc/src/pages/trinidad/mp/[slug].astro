@@ -168,7 +168,7 @@ const personSchema: Record<string, unknown> = {
 
           <!-- Identity row -->
           <div class="px-4 py-3">
-            <h2 class="text-base font-bold text-slate-800 dark:text-[hsl(0_0%_95%)] leading-tight">{displayName}</h2>
+            <h2 class="text-body font-bold text-slate-800 dark:text-[hsl(0_0%_95%)] leading-tight">{displayName}</h2>
             <p class="text-sm text-slate-500 dark:text-[hsl(0_0%_60%)] mt-0.5">{mp.constituency}</p>
             <div class="flex flex-wrap items-center gap-2 mt-2">
               <span class={`px-2 py-0.5 rounded-full text-xs font-medium ${partyBadge}`}>{mp.party}</span>
@@ -289,7 +289,7 @@ const personSchema: Record<string, unknown> = {
     <!-- Crime data per region -->
     {regionStats.map((region: { regionSlug: string; regionName: string; statCards: any[] }) => (
       <section class="mt-8">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text)] mb-4">
+        <h2 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text)] mb-4">
           Crime data for {region.regionName}
         </h2>
         <StatCards stats={region.statCards} />

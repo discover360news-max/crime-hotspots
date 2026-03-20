@@ -55,4 +55,37 @@ Remaining `text-small` / `font-semibold` cleanup on secondary/tool pages and com
 - [x] **`tools/social-image-generator.astro` L69, L109, L258** — Internal tool h3s `text-lg font-semibold` → `text-body font-bold`
 - [x] **`trinidad/region/[slug].astro` L225** — Crime-type chip label `text-sm font-semibold` → `text-caption font-bold`
 - [x] **`trinidad/crime/[slug].astro` L285, L316, L363** — Inline paragraphs + label `font-semibold` → `font-bold`
-- [ ] **`compare.astro`** — Hand-rolled hero not using `<Hero>` component (consistency; low visual impact since it has a sticky selector bar)
+- [~] **`compare.astro`** — Hero migration deferred: H1 uses `text-heading` correctly (Hero compact mode pattern). Full `<Hero>` migration blocked by (1) subtitle required, (2) `narrowContainer` gives `max-w-5xl` vs current `max-w-3xl`. Not a token violation.
+
+---
+
+## Post-P3 Sweep (2026-03-20)
+
+Full grep sweep across `src/pages/` + `src/components/` found additional violations missed in P0–P3.
+
+**`font-semibold` on heading elements — fixed:**
+- `QuickAnswers.astro` — h3 `font-semibold` → `font-bold`
+- `NewsletterSignup.astro` — h3 `text-sm font-semibold` → `text-caption font-bold`
+- `BottomNav.astro` (×2) — h3 `text-xs font-semibold` → `font-bold`
+- `MapLegend.astro` — h3 `text-xs font-semibold` → `font-bold`
+- `trinidad/murders.astro` — h2 date group label `text-xs font-semibold` → `font-bold`
+
+**Raw size tokens on heading elements — fixed:**
+- `CrimeDetailModal.astro` — h2 `text-lg` → `text-heading` (modal title)
+- `FiltersTray.astro` — h2 `text-lg` → `text-heading` (panel title)
+- `TrendingHotspots.astro` — h2 `text-sm` → `text-caption`
+- `blog/index.astro` — h3 `text-sm` → `text-caption`
+- `business-solutions.astro` — h3 `text-sm` → `text-caption`
+- `trinidad/compare.astro` — h3 (JS template) `text-sm` → `text-caption`
+- `trinidad/murder-count.astro` — h3 `text-sm` → `text-caption`
+- `trinidad/area/[slug].astro` (×4) — h2 `text-lg` → `text-body`
+- `trinidad/mp/[slug].astro` — h2 `text-base` → `text-body`; h2 `text-lg` → `text-body`
+- `trinidad/mp/index.astro` — h2 `text-lg` → `text-body`
+- `trinidad/region/[slug].astro` (×3) — h2 `text-lg` → `text-body`
+- `jamaica/parishes.astro` — h2 `text-base` → `text-body`
+- `jamaica/mp/[slug].astro` — h2 `text-base` → `text-body`
+- `jamaica/mp/index.astro` — h2 `text-lg` → `text-body`
+- `jamaica/murder-count.astro` — h2 `text-xl` → `text-heading`
+- `jamaica/dashboard.astro` — h2 `text-lg` → `text-body`
+
+**Result: All three sweeps (`text-small`, `font-semibold` on headings, raw size on headings) return 0 matches.**

@@ -355,7 +355,7 @@ const breadcrumbs = [
     <!-- Crime Type Breakdown -->
     {crimeTypeBreakdown.length > 0 && (
       <section class="mt-6">
-        <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">Crime Breakdown (Year-to-Date)</h2>
+        <h2 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">Crime Breakdown (Year-to-Date)</h2>
         <DataTable headers={['Crime Type', String(currentYear), String(previousYear), 'Change']}>
           {crimeTypeBreakdown.map(row => (
             <tr class="hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_10%)]">
@@ -379,7 +379,7 @@ const breadcrumbs = [
     <!-- Recent Headlines (Last 30 Days) -->
     {recentCrimes30d.length > 0 && (
       <section class="mt-8" data-pagefind-ignore>
-        <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">
+        <h2 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">
           Recent Headlines
           <span class="text-sm font-normal text-slate-500 dark:text-[var(--ch-text-muted)] ml-2">Last 30 days</span>
         </h2>
@@ -440,7 +440,7 @@ const breadcrumbs = [
       <div class="mt-8 bg-slate-50 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-5 sm:p-6">
         {relatedAreas.length > 0 && (
           <section>
-            <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">
+            <h2 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">
               Other Areas in {region}
             </h2>
             <div class="grid grid-cols-2 gap-3">
@@ -465,7 +465,7 @@ const breadcrumbs = [
 
         {otherRegionAreas.length > 0 && (
           <section class={relatedAreas.length > 0 ? 'mt-6 pt-6 border-t border-slate-200 dark:border-[var(--ch-border-card)]' : ''}>
-            <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">
+            <h2 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text-heading)] mb-4">
               Other Areas in Trinidad
             </h2>
             <div class="grid grid-cols-2 gap-3">

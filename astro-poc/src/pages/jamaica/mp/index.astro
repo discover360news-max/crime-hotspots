@@ -72,7 +72,7 @@ const pageDescription = `Directory of all ${mpsData.length} Members of Parliamen
     {grouped.map(group => (
       <section class="mt-8 first:mt-4">
         <div class="flex items-center justify-between mb-3">
-          <h2 class="text-lg font-bold text-slate-800 dark:text-[var(--ch-text)]">{group.parishName}</h2>
+          <h2 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text)]">{group.parishName}</h2>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {group.mps.map(mp => {

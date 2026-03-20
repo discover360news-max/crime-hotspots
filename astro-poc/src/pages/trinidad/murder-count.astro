@@ -253,7 +253,7 @@ const faqData = {
           <div>
             <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)] mb-3">Latest Analysis</p>
             <a href={`/blog/${latestPost.slug}/`} class="block bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
-              <h3 class="font-bold text-slate-800 dark:text-[var(--ch-text-heading)] text-sm mb-2">{latestPost.data.title}</h3>
+              <h3 class="font-bold text-slate-800 dark:text-[var(--ch-text-heading)] text-caption mb-2">{latestPost.data.title}</h3>
               <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">{latestPost.data.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} &bull; {latestPost.data.readTime}</p>
             </a>
           </div>
