@@ -46,13 +46,13 @@ Token violations and missing dark mode variants on main user-facing pages.
 
 Remaining `text-small` / `font-semibold` cleanup on secondary/tool pages and components.
 
-- [ ] **`headlines.astro` (global) L75** — `text-small` → `text-caption` on help text paragraph
-- [ ] **`404.astro` L38, L50, L62, L74, L86, L98** — Nav link labels `text-small font-semibold` → `text-caption font-bold`
-- [ ] **`business-solutions.astro` L181–L226** — Card h4s + body para `text-small` → `text-caption`
-- [ ] **`SectionPickerModal.astro` L63** — `text-small` → `text-caption`
-- [ ] **`report.astro` L154, L187, L194** — Button/link/feedback `text-small` → `text-caption`
-- [ ] **`trinidad/dashboard.astro` L345, L351** — Info widget h3s `font-semibold text-sm` → `font-bold text-caption`
-- [ ] **`tools/social-image-generator.astro` L69, L109, L258** — Internal tool h3s `text-lg font-semibold` → `text-body font-bold`
-- [ ] **`trinidad/region/[slug].astro` L225** — Crime-type chip label `text-sm font-semibold` → `text-caption font-bold`
-- [ ] **`trinidad/crime/[slug].astro` L285, L316, L363** — Inline paragraphs + label `font-semibold` → `font-bold`
+- [x] **`headlines.astro` (global) L75** — `text-small` → `text-caption` on help text paragraph
+- [x] **`404.astro` L38, L50, L62, L74, L86, L98** — Nav link labels `text-small font-semibold` → `text-caption font-bold`
+- [x] **`business-solutions.astro` L181–L226** — Card h4s + body para `text-small` → `text-caption`
+- [x] **`SectionPickerModal.astro` L63** — `text-small` → `text-caption`
+- [x] **`report.astro` L154, L187, L194** — Button/link/feedback `text-small` → `text-caption`
+- [x] **`trinidad/dashboard.astro` L345, L351** — Info widget h3s `font-semibold text-sm` → `font-bold text-caption`
+- [x] **`tools/social-image-generator.astro` L69, L109, L258** — Internal tool h3s `text-lg font-semibold` → `text-body font-bold`
+- [x] **`trinidad/region/[slug].astro` L225** — Crime-type chip label `text-sm font-semibold` → `text-caption font-bold`
+- [x] **`trinidad/crime/[slug].astro` L285, L316, L363** — Inline paragraphs + label `font-semibold` → `font-bold`
 - [ ] **`compare.astro`** — Hand-rolled hero not using `<Hero>` component (consistency; low visual impact since it has a sticky selector bar)
