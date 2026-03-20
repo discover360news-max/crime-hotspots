@@ -139,13 +139,13 @@ const allQuestions = faqData.flatMap(category => category.questions);
       { label: 'Home', href: routes.home },
       { label: 'FAQ' }
     ]} />
-    <h1 class="text-display text-slate-700 dark:text-[hsl(0_0%_95%)] font-semibold mb-3 text-center pt-4">Frequently Asked Questions</h1>
+    <h1 class="text-display text-slate-700 dark:text-[hsl(0_0%_95%)] font-bold mb-3 text-center pt-4">Frequently Asked Questions</h1>
     <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-8 text-center">Common questions about Crime Hotspots, our data sources, and how to use the platform.</p>
 
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
       {faqData.map((category) => (
         <div class="mb-8 last:mb-0">
-          <h2 class="text-heading font-semibold mb-4 text-slate-600 dark:text-[hsl(0_0%_75%)]">{category.category}</h2>
+          <h2 class="text-heading font-bold mb-4 text-slate-600 dark:text-[hsl(0_0%_75%)]">{category.category}</h2>
           <div class="space-y-3">
             {category.questions.map((item, index) => (
               <div class="border border-slate-200 dark:border-[hsl(0_0%_20%)] rounded-lg overflow-hidden">

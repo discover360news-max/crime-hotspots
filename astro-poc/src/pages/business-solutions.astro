@@ -6,6 +6,7 @@
 
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Hero from '../components/Hero.astro';
 
 const title = "Turn Crime Data Into Strategic Intelligence — Business Solutions";
 const description = "Enterprise crime intelligence for security firms, real estate agencies, insurance companies, and researchers. Structured Caribbean crime data via API, custom analytics, and data licensing.";
@@ -20,42 +21,19 @@ const description = "Enterprise crime intelligence for security firms, real esta
     ]} />
   </div>
 
-  <!-- Hero Section (Full Width) -->
-  <section class="w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-[hsl(0_0%_13%)] dark:via-[hsl(0_0%_13%)] dark:to-[hsl(0_0%_13%)] py-12 sm:py-20 px-4">
-    <div class="max-w-4xl mx-auto text-center">
-      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800 dark:text-[hsl(0_0%_95%)] mb-4 sm:mb-6 leading-tight">
-        Turn Crime Data Into Strategic Intelligence
-      </h1>
-      <p class="text-base sm:text-lg text-slate-600 dark:text-[hsl(0_0%_72%)] mb-6 max-w-3xl mx-auto leading-relaxed">
-        Structured, verified Caribbean crime data that transforms hours of research into instant insights.
-        Trusted by security professionals, real estate leaders, and risk analysts.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
-        <a
-          href="#solutions"
-          class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 transition text-sm font-medium shadow-lg hover:shadow-xl min-h-[44px]"
-        >
-          Explore Solutions
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </a>
-        <a
-          href="mailto:discover360news@gmail.com?subject=Business%20Solutions%20Inquiry&body=Hi%20Crime%20Hotspots%20Team%2C%0A%0AI'm%20interested%20in%20learning%20more%20about%20your%20business%20solutions.%20Specifically%2C%20I%20would%20like%20to%20discuss%3A%0A%0A%5BPlease%20describe%20your%20needs%20-%20API%20access%2C%20custom%20reports%2C%20data%20licensing%2C%20etc.%5D%0A%0ACompany%3A%20%0AIndustry%3A%20%0AContact%20Name%3A%20%0A%0AThank%20you%21"
-          class="inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[hsl(0_0%_75%)] hover:border-rose-600 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/20 transition text-sm font-medium min-h-[44px]"
-        >
-          Contact Sales
-        </a>
-      </div>
-    </div>
-  </section>
+  <Hero
+    title="Turn Crime Data Into Strategic Intelligence"
+    subtitle="Structured, verified Caribbean crime data that transforms hours of research into instant insights. Trusted by security professionals, real estate leaders, and risk analysts."
+    primaryCTA={{ text: "Explore Solutions", href: "#solutions", icon: "arrow" }}
+    secondaryCTA={{ text: "Contact Sales", href: "mailto:discover360news@gmail.com?subject=Business%20Solutions%20Inquiry&body=Hi%20Crime%20Hotspots%20Team%2C%0A%0AI'm%20interested%20in%20learning%20more%20about%20your%20business%20solutions.%20Specifically%2C%20I%20would%20like%20to%20discuss%3A%0A%0A%5BPlease%20describe%20your%20needs%20-%20API%20access%2C%20custom%20reports%2C%20data%20licensing%2C%20etc.%5D%0A%0ACompany%3A%20%0AIndustry%3A%20%0AContact%20Name%3A%20%0A%0AThank%20you%21" }}
+  />
 
   <!-- Content -->
   <main class="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 text-slate-700 dark:text-[hsl(0_0%_82%)]">
 
     <!-- Value Proposition -->
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)] mb-8 mt-6">
-      <h2 class="text-heading font-semibold mb-4 text-slate-700 dark:text-[hsl(0_0%_88%)]">Why Choose Crime Hotspots?</h2>
+      <h2 class="text-heading font-bold mb-4 text-slate-700 dark:text-[hsl(0_0%_88%)]">Why Choose Crime Hotspots?</h2>
       <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-4">
         Crime Hotspots aggregates and structures verified crime data from trusted Caribbean news outlets, providing clean,
         queryable datasets that would otherwise require hours of manual research. Our platform serves thousands of data points
@@ -78,7 +56,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
             </svg>
           </div>
           <div>
-            <h3 class="text-nav font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-2">API Access</h3>
+            <h3 class="text-nav font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-2">API Access</h3>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-3">
               Programmatic access to structured crime data via RESTful API. Query by location, crime type, date range,
               and more. JSON/CSV export formats available.
@@ -102,7 +80,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
             </svg>
           </div>
           <div>
-            <h3 class="text-nav font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-2">Custom Reports & Analytics</h3>
+            <h3 class="text-nav font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-2">Custom Reports & Analytics</h3>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-3">
               Weekly, monthly, or quarterly crime trend reports tailored to specific geographic areas or crime categories.
               Professional-grade visualizations and executive summaries.
@@ -126,7 +104,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
             </svg>
           </div>
           <div>
-            <h3 class="text-nav font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-2">Data Licensing</h3>
+            <h3 class="text-nav font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-2">Data Licensing</h3>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-3">
               Full historical datasets for research, analysis, or integration into proprietary systems. One-time or
               annual licensing agreements available.
@@ -150,7 +128,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
             </svg>
           </div>
           <div>
-            <h3 class="text-nav font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-2">Embeddable Widgets</h3>
+            <h3 class="text-nav font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-2">Embeddable Widgets</h3>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-3">
               White-label crime data widgets for your website or client dashboards. Customizable by location, crime type,
               and branding. Auto-updates with latest data.
@@ -174,7 +152,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
         </svg>
       </div>
       <div class="flex-1 min-w-0">
-        <h3 class="text-sm font-semibold text-white mb-1">Institutional Data Capability Sheet</h3>
+        <h3 class="text-sm font-bold text-white mb-1">Institutional Data Capability Sheet</h3>
         <p class="text-xs text-slate-400 leading-relaxed">
           Full dataset overview, incident record schema, data packages, and expansion roadmap —
           formatted for insurance companies, risk consultancies, researchers, and grant committees.
@@ -193,14 +171,14 @@ const description = "Enterprise crime intelligence for security firms, real esta
 
     <!-- Target Industries -->
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)] mb-8">
-      <h2 class="text-heading font-semibold mb-4 text-slate-700 dark:text-[hsl(0_0%_88%)]">Industries We Serve</h2>
+      <h2 class="text-heading font-bold mb-4 text-slate-700 dark:text-[hsl(0_0%_88%)]">Industries We Serve</h2>
       <div class="grid sm:grid-cols-2 gap-4">
         <div class="flex items-start gap-3">
           <svg class="w-5 h-5 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
           </svg>
           <div>
-            <h4 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)]">Security & Risk Management</h4>
+            <h4 class="text-small font-bold text-slate-700 dark:text-[hsl(0_0%_88%)]">Security & Risk Management</h4>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Private security firms, risk consultants, personal protection services</p>
           </div>
         </div>
@@ -209,7 +187,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
           </svg>
           <div>
-            <h4 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)]">Real Estate</h4>
+            <h4 class="text-small font-bold text-slate-700 dark:text-[hsl(0_0%_88%)]">Real Estate</h4>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Property platforms, realtors, relocation services, property management</p>
           </div>
         </div>
@@ -218,7 +196,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
           </svg>
           <div>
-            <h4 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)]">Insurance</h4>
+            <h4 class="text-small font-bold text-slate-700 dark:text-[hsl(0_0%_88%)]">Insurance</h4>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Risk assessment, premium calculation, claims analysis</p>
           </div>
         </div>
@@ -227,7 +205,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
           </svg>
           <div>
-            <h4 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)]">Media & Journalism</h4>
+            <h4 class="text-small font-bold text-slate-700 dark:text-[hsl(0_0%_88%)]">Media & Journalism</h4>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">News outlets, investigative journalists, crime reporters</p>
           </div>
         </div>
@@ -236,7 +214,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
           </svg>
           <div>
-            <h4 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)]">Research & Academia</h4>
+            <h4 class="text-small font-bold text-slate-700 dark:text-[hsl(0_0%_88%)]">Research & Academia</h4>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Universities, criminology departments, policy research organizations</p>
           </div>
         </div>
@@ -245,7 +223,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
           </svg>
           <div>
-            <h4 class="text-small font-semibold text-slate-700 dark:text-[hsl(0_0%_88%)]">Technology & Apps</h4>
+            <h4 class="text-small font-bold text-slate-700 dark:text-[hsl(0_0%_88%)]">Technology & Apps</h4>
             <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)]">Safety apps, neighborhood platforms, emergency services</p>
           </div>
         </div>
@@ -254,7 +232,7 @@ const description = "Enterprise crime intelligence for security firms, real esta
 
     <!-- CTA Section -->
     <div id="contact" class="bg-gradient-to-r from-rose-50 to-rose-100 dark:from-rose-950/20 dark:to-rose-950/30 rounded-3xl shadow-md p-6 sm:p-10 border border-rose-200 dark:border-rose-900/30 text-center">
-      <h2 class="text-heading font-semibold mb-3 text-slate-800 dark:text-[hsl(0_0%_95%)]">Ready to Get Started?</h2>
+      <h2 class="text-heading font-bold mb-3 text-slate-800 dark:text-[hsl(0_0%_95%)]">Ready to Get Started?</h2>
       <p class="text-small text-slate-600 dark:text-[hsl(0_0%_72%)] mb-6 max-w-xl mx-auto">
         Contact us to discuss your specific needs and receive a custom quote. We offer flexible pricing
         based on data volume, update frequency, and feature requirements.
