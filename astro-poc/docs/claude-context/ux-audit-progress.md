@@ -24,10 +24,35 @@ Started: 2026-03-20
 
 ## P2 — Medium Priority
 
-*(Not yet started)*
+Token violations and missing dark mode variants on main user-facing pages.
+
+**`text-small` is not a design token** (silently ignored by Tailwind — element inherits font-size from parent). The 4-token scale is: `text-display` / `text-heading` / `text-body` / `text-caption`.
+
+- [x] **`DateAccordion.astro` L41** — Date header `text-small font-semibold` → `text-body font-bold` (per typography token for accordion date labels)
+- [x] **`report.astro` L27** — Page H1 `font-semibold` → `font-bold`
+- [x] **`report.astro` L37, L60, L90** — Form section `<h3>` labels: `text-small font-semibold` → `text-caption font-bold`
+- [x] **`headlines.astro` (global /headlines/)  L27, L28** — H1 and body text missing dark mode variants (`dark:text-[hsl(0_0%_95%)]` on H1, `dark:text-[hsl(0_0%_65%)]` on body)
+- [x] **`trinidad/statistics.astro` L349, L375** — Sub-section h3: `text-base font-semibold` → `text-body font-bold`
+- [x] **`trinidad/statistics.astro` L487** — "Latest Analysis" card h3: `text-lg font-semibold` → `text-body font-bold`
+- [x] **`trinidad/statistics.astro` L637, L641, L645, L649** — "Related Resources" card h3s: missing size token + `font-semibold` → add `text-body font-bold`
+- [x] **`jamaica/statistics.astro` L329, L355** — Same sub-section pattern as trinidad
+- [x] **`jamaica/statistics.astro` L587, L591, L595, L599** — Same related resources pattern
+- [x] **`trinidad/murder-count.astro` L185** — H2 `text-xl font-bold` → `text-heading font-bold`
+- [x] **`trinidad/regions.astro` L98** — Region card h2 `text-base font-bold` → `text-body font-bold`
 
 ---
 
 ## P3 — Low Priority
 
-*(Not yet started)*
+Remaining `text-small` / `font-semibold` cleanup on secondary/tool pages and components.
+
+- [ ] **`headlines.astro` (global) L75** — `text-small` → `text-caption` on help text paragraph
+- [ ] **`404.astro` L38, L50, L62, L74, L86, L98** — Nav link labels `text-small font-semibold` → `text-caption font-bold`
+- [ ] **`business-solutions.astro` L181–L226** — Card h4s + body para `text-small` → `text-caption`
+- [ ] **`SectionPickerModal.astro` L63** — `text-small` → `text-caption`
+- [ ] **`report.astro` L154, L187, L194** — Button/link/feedback `text-small` → `text-caption`
+- [ ] **`trinidad/dashboard.astro` L345, L351** — Info widget h3s `font-semibold text-sm` → `font-bold text-caption`
+- [ ] **`tools/social-image-generator.astro` L69, L109, L258** — Internal tool h3s `text-lg font-semibold` → `text-body font-bold`
+- [ ] **`trinidad/region/[slug].astro` L225** — Crime-type chip label `text-sm font-semibold` → `text-caption font-bold`
+- [ ] **`trinidad/crime/[slug].astro` L285, L316, L363** — Inline paragraphs + label `font-semibold` → `font-bold`
+- [ ] **`compare.astro`** — Hand-rolled hero not using `<Hero>` component (consistency; low visual impact since it has a sticky selector bar)
