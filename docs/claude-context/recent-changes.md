@@ -8,6 +8,15 @@
 
 ## March 2026
 
+### Safety Tips Batch: TIP-00076 to TIP-00077 (Mar 22)
+
+- **NEW TIP TIP-00076** — Armed Robbery Along Transit Corridors at Night (Robbery / Using Public Transport)
+- **NEW TIP TIP-00077** — Securing Your Property During Extended Absence (Burglary / At Home)
+- **UPDATED TIP-00064** — Added Stories 616, 617 to `related_story_ids` (chain snatch while walking — same tactic)
+- **UPDATED TIP-00027** — Added Story 618 to `related_story_ids` (daytime home invasion while occupant present — same tactic)
+
+---
+
 ### Safety Tips Batch: TIP-00074 to TIP-00075 (Mar 19)
 
 - **NEW TIP TIP-00074** — Designing Security Lighting Criminals Cannot Map (Burglary / At Home)
