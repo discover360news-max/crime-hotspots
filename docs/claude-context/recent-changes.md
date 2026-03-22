@@ -14,6 +14,7 @@
 - **NEW TIP TIP-00077** — Securing Your Property During Extended Absence (Burglary / At Home)
 - **UPDATED TIP-00064** — Added Stories 616, 617 to `related_story_ids` (chain snatch while walking — same tactic)
 - **UPDATED TIP-00027** — Added Story 618 to `related_story_ids` (daytime home invasion while occupant present — same tactic)
+- **UPDATED TIP-00033** — Added Story 620 to `related_story_ids` (false-customer cafe robbery — same tactic)
 
 ---
 
