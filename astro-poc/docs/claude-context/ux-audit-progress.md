@@ -55,7 +55,7 @@ Remaining `text-small` / `font-semibold` cleanup on secondary/tool pages and com
 - [x] **`tools/social-image-generator.astro` L69, L109, L258** — Internal tool h3s `text-lg font-semibold` → `text-body font-bold`
 - [x] **`trinidad/region/[slug].astro` L225** — Crime-type chip label `text-sm font-semibold` → `text-caption font-bold`
 - [x] **`trinidad/crime/[slug].astro` L285, L316, L363** — Inline paragraphs + label `font-semibold` → `font-bold`
-- [~] **`compare.astro`** — Hero migration deferred: H1 uses `text-heading` correctly (Hero compact mode pattern). Full `<Hero>` migration blocked by (1) subtitle required, (2) `narrowContainer` gives `max-w-5xl` vs current `max-w-3xl`. Not a token violation.
+- [x] **`compare.astro`** — Intentional exception. No token violations (H1 uses `text-heading font-bold`, matches compact Hero pattern exactly). Full `<Hero>` migration is not warranted: `subtitle` is required by `<Hero>` but this page has none; `narrowContainer` yields `max-w-5xl` but this page must stay `max-w-3xl` to match the sticky selector bar and `<main>` below. Extending the component for one compliant page would add API surface with no design benefit. Closed.
 
 ---
 
@@ -89,3 +89,9 @@ Full grep sweep across `src/pages/` + `src/components/` found additional violati
 - `jamaica/dashboard.astro` — h2 `text-lg` → `text-body`
 
 **Result: All three sweeps (`text-small`, `font-semibold` on headings, raw size on headings) return 0 matches.**
+
+---
+
+## Audit Complete — 2026-03-20
+
+All P0–P3 items resolved. All grep sweeps return 0 matches. `compare.astro` closed as intentional exception (no violations). Design system is consistent across all pages and components.

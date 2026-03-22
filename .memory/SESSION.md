@@ -36,6 +36,28 @@ Run through this checklist — update anything that's now stale:
 **If a config/build/deployment change was made:**
 - Update the relevant CFG### entry
 
+**If a feature, page, algorithm, or crime type was added or changed:**
+- `src/content/help/` — check whether any help article is now stale using the map below. If a major new feature has no coverage, consider a new article and add it to the sitemap (`sitemap-0.xml.ts` → `helpArticles`).
+- `src/pages/faq.astro` — if a "how do I" or "what is" question came up during the session that isn't already answered in the FAQ, add a Q&A entry.
+
+**Help Centre — topic → article map (for quick staleness check):**
+
+| If you changed... | Review this article |
+|-------------------|---------------------|
+| Risk scoring, area scores, safety context | `understanding-risk-scores.md` |
+| Dashboard, filters, map, Quick Insights | `dashboard-filters.md` |
+| Trend indicators | `trend-indicators.md` |
+| Compare page | `comparing-areas.md` |
+| Area pages, area coverage | `finding-your-area.md` |
+| Crime types, classification rules | `crime-classification.md` |
+| Data sources, pipeline, RSS feeds | `data-sources.md` |
+| Coverage, geographic limits, data lag | `data-coverage-limitations.md` |
+| Safety tips system, categories, contexts | `using-safety-tips.md` |
+| Safety tips submit form | `submitting-a-safety-tip.md` |
+| Crime report form | `submitting-a-crime-report.md` |
+| Privacy, form data handling | `report-privacy.md` |
+| Bulk data access, citations | `citing-our-data.md` |
+
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 

@@ -123,6 +123,8 @@ SHOOTING CLASSIFICATION
 
 \u26a0\ufe0f Gun Present \u2260 Shooting. "Shooting" means a firearm was DISCHARGED \u2014 a bullet was fired at a person.
 "At gunpoint" / "armed with a gun" / "brandished firearm" = gun used as THREAT only, NOT a Shooting.
+❌ "Man robbed at gunpoint" → ["Robbery"] — NOT ["Robbery", "Shooting"]
+❌ "Family held at gunpoint during home invasion" → ["Robbery", "Home Invasion"] — NOT adding Shooting
 
 FATAL SHOOTINGS \u2014 always pair Murder and Shooting:
 \u2705 "Shot dead" / "shot and killed" / "gunned down" \u2192 ["Murder", "Shooting"]

@@ -252,6 +252,16 @@ Shooting as primary is the exception, not the rule.
 | Carjacking | Carjacking + Robbery (hard rule) — no Theft |
 | Burglary with confirmed stolen items | Burglary + Theft |
 
+### "Should I add Shooting to this armed robbery?"
+Gun present ≠ Shooting. **Shooting requires the firearm to have been discharged.**
+
+| Scenario | Correct types |
+|---|---|
+| Robbed at gunpoint, no shots fired | **Robbery** only — NOT Robbery + Shooting |
+| Home invaded at gunpoint, no shots fired | **Robbery + Home Invasion** — NOT adding Shooting |
+| Carjacked at gunpoint, no shots fired | **Carjacking + Robbery** — NOT adding Shooting |
+| Robber fired at victim during robbery | Robbery + **Shooting** (or Attempted Murder if targeted) |
+
 ### "Is this Shooting or Assault?"
 | Scenario | Correct type |
 |---|---|

@@ -41,7 +41,7 @@ L009 | LEARN | active | Crime counting: primary+related types per row — NOT ra
 L010 | LEARN | active | Schema centralization COMPLETE (all follow-ups resolved). crimeSchema.ts ↔ schema.gs fully in sync. crimeTypeConfig.ts has Attempted Murder. → L010-gas-schema-centralization.md
 L011 | LEARN | active | Utility control pattern: filled bg button + sticky bar, separate from nav CTA ghost buttons. Confirmed on dashboard + compare page (Mar 10 2026) → L011-utility-control-pattern.md
 L012 | LEARN | active | Dashboard script extraction (Mar 10 2026): 869→554 lines. MapLegend.astro + dashboardMapInit.ts + dashboardLocationFilter.ts. Extraction signal: >50-line named-function script → move to src/scripts/ → L012-dashboard-script-extraction.md
-L013 | LEARN | active | Crime classification rules: 2 hard rules (Carjacking→Robbery, HomeInvasion→Burglary), Shooting vs AttemptedMurder intent standard, Robbery≠Theft. Encoded in schema.gs + crimeTypeProcessor.gs + claudeClient.gs. Doc: docs/guides/CRIME-CLASSIFICATION-RULES.md → L013-crime-classification-rules.md
+L013 | LEARN | active | Crime classification rules: 2 hard rules (Carjacking→Robbery, HomeInvasion→Burglary), Shooting vs AttemptedMurder intent standard, Robbery≠Theft, Gun Present≠Shooting (armed robbery at gunpoint = Robbery only, not Shooting). Encoded in schema.gs + crimeTypeProcessor.gs + claudePrompts.gs (both TT+JM). Doc: docs/guides/CRIME-CLASSIFICATION-RULES.md → L013-crime-classification-rules.md
 L014 | LEARN | active | CSS var token system: `--ch-*` vars in Layout.astro control all dark mode colours. Use `var(--ch-*)` in Tailwind, never raw HSL. One edit = site-wide change. → L014-css-var-token-system.md
 L015 | LEARN | active | SEO on-page patterns: H1 must be single element with full keyword phrase, FAQPage JSON-LD targets People Also Ask, dateModified on Dataset = freshness signal, yearless queries are content gap not optimisation problem → L015-seo-on-page-patterns.md
 
@@ -53,6 +53,9 @@ D004 | DEC | active | Slug migration: Story_ID+6words new format; legacy headlin
 D005 | DEC | active | Migrated to Astro (Dec 2025) from Vite for SSR, content collections, scalability → D005-astro-migration.md
 D006 | DEC | active | CSV → D1 migration. ALL 3 PHASES COMPLETE. Infra live (DB ID: 23311480). Dashboard uses /api/dashboard + /api/crimes (D1-backed, CDN-cached). area-aliases.json baked at build. → D006-d1-migration-plan.md
 D007 | DEC | active | Search: replaced Pagefind with D1 FTS5. crimes_fts virtual table (FTS5). /api/search endpoint (crimes via FTS5, MPs via mps.json, areas via D1 LIKE). Sync worker clears+repopulates FTS on every sync. → D007-search-d1-fts.md
+
+## Backlog (IDEA)
+IDEA001 | IDEA | tabled | Criminal behavioural patterns page: public editorial (~1500w, 8 documented patterns from tips corpus) + internal content strategy doc. Value confirmed. Constraint: frame as "documented patterns" not stats. Tabled Mar 22 2026 — revisit when tips batch work slows.
 
 ## Features (F)
 F010 | FEAT | active | MP profiles (T&T): 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg. Socials render as brand SVG icons. → F010-mp-profiles.md

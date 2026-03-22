@@ -2,11 +2,11 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 19, 2026 (SEO fixes on murder-count + statistics; blog index load more 8/+8 with filter-awareness)
+**Last Updated:** March 22, 2026 (Help Centre added: /help/ index + 14 articles across 6 sections, SEO + sitemap wired)
 
 ---
 
-## Pages & Routes (29 pages)
+## Pages & Routes (31 pages)
 
 ### Marketing & Static
 | Page | Route | Purpose |
@@ -20,6 +20,8 @@
 | Business Solutions | `/business-solutions/` | B2B offerings — links to capability sheet |
 | Data Capability Sheet | `/data-capability-sheet/` | Institutional document (insurers, researchers, grant committees). Content driven by `src/config/capabilitySheetConfig.ts`. Month count is dynamic from `health-data.json`. Placeholders: set `contact.email`, `contact.entity`, `contact.dataEthicsPath` to non-null when ready. |
 | Report | `/report/` | Anonymous crime reporting form (Turnstile CAPTCHA) |
+| Help Centre Index | `/help/` | Pre-rendered. Search bar (client-side, `define:vars` helpIndex) + 6 section cards + footer CTA row (FAQ, Methodology, Contact). `CollectionPage` JSON-LD. Sitemap: `priority 0.7, changefreq monthly`. |
+| Help Article | `/help/[slug]` | Pre-rendered. 14 articles across 6 sections (Getting Started, Understanding the Data, Using the Dashboard, Safety Tips, Crime Reports, For Researchers). Sidebar: section nav + cross-section related + Ko-fi card. Related articles panel before prev/next. `Article` JSON-LD (`headline`, `description`, `articleSection`, `dateModified`, `author`/`publisher`). BreadcrumbList via Breadcrumbs component. `related` frontmatter field drives cross-links. Sitemap: `priority 0.6`, `lastmod` from `date_updated`. **Update relevant articles whenever features change — see SESSION.md checklist.** |
 | 404 | `/404` | Custom error page |
 
 ### Jamaica Crime Data
@@ -281,7 +283,7 @@
 - **Rate Limiting:** Honeypot fields + RateLimiter class on report forms
 
 ### SEO
-- **Structured Data:** JSON-LD (WebPage, BreadcrumbList, Dataset, BlogPosting)
+- **Structured Data:** JSON-LD (WebPage, BreadcrumbList, Dataset, BlogPosting, Article, CollectionPage)
 - **Sitemap:** Auto-generated, submitted to Google Search Console
 - **OG Images:** Dynamic murder count OG image (satori + sharp, regenerates daily)
 - **Search:** D1 FTS5 via `/api/search` (crimes, MPs, areas). Dark mode. Suggestions on empty state. No build-time indexing.
