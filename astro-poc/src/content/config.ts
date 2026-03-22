@@ -1,6 +1,8 @@
 import { defineCollection, z } from 'astro:content';
 import { SAFETY_TIP_CATEGORIES, SAFETY_TIP_CONTEXTS } from '../config/crimeSchema';
 
+const HELP_SECTIONS = ['Getting Started', 'Understanding the Data', 'Using the Dashboard', 'Safety Tips', 'Crime Reports', 'For Researchers', 'Technical'] as const;
+
 const blog = defineCollection({
   type: 'content',
   schema: z.object({
@@ -33,4 +35,16 @@ const tips = defineCollection({
   }),
 });
 
-export const collections = { blog, tips };
+const help = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    section: z.enum(HELP_SECTIONS),
+    summary: z.string(),
+    order: z.number().default(99),
+    related: z.array(z.string()).default([]),
+    date_updated: z.date().nullish(),
+  }),
+});
+
+export const collections = { blog, tips, help };

@@ -35,6 +35,14 @@ export const GET: APIRoute = async ({ locals }) => {
     // Tips collection might be empty
   }
 
+  // Get help articles
+  let helpArticles: any[] = [];
+  try {
+    helpArticles = await getCollection('help');
+  } catch (e) {
+    // Help collection might not exist yet
+  }
+
   // SEO CRITICAL: static pages sitemap. Update this list whenever adding a new section or country.
   // priority: 1.0=homepage, 0.9=high-value stats, 0.8=content hubs, 0.7=archive/areas, 0.5=utility
   // changefreq: set to actual update cadence (Google ignores inflated values).
@@ -68,6 +76,7 @@ export const GET: APIRoute = async ({ locals }) => {
     { url: 'trinidad/safety-tips/submit/', priority: 0.5, changefreq: 'monthly', lastmod: '2026-03-15' },
     { url: 'report/', priority: 0.6, changefreq: 'monthly', lastmod: '2026-03-15' },
     { url: 'about/', priority: 0.7, changefreq: 'monthly', lastmod: '2026-03-15' },
+    { url: 'help/', priority: 0.7, changefreq: 'monthly', lastmod: '2026-03-22' },
     { url: 'faq/', priority: 0.7, changefreq: 'monthly', lastmod: '2026-03-17' },
     { url: 'methodology/', priority: 0.7, changefreq: 'monthly', lastmod: '2026-03-15' },
     { url: 'privacy/', priority: 0.5, changefreq: 'yearly', lastmod: '2026-03-15' },
@@ -119,6 +128,14 @@ export const GET: APIRoute = async ({ locals }) => {
     lastmod: post.data.pubDate?.toISOString() || new Date().toISOString(),
     priority: 0.7,
     changefreq: 'monthly' as const
+  }));
+
+  // Help article pages — lastmod from date_updated frontmatter, fallback to launch date
+  const helpPages = helpArticles.map((article: any) => ({
+    url: `help/${article.slug}/`,
+    lastmod: article.data.date_updated?.toISOString() ?? '2026-03-22',
+    priority: 0.6,
+    changefreq: 'monthly' as const,
   }));
 
   // Tip individual pages
@@ -197,6 +214,7 @@ export const GET: APIRoute = async ({ locals }) => {
     ...archivePages,
     ...areaPages,
     ...blogPages,
+    ...helpPages,
     ...tipPages,
     ...tipCategoryPages,
     ...tipContextPages,

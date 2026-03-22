@@ -22,6 +22,7 @@ export const routes = {
   about: '/about/',
   contact: '/contact/',
   faq: '/faq/',
+  help: '/help/',
   methodology: '/methodology/',
   privacy: '/privacy/',
   businessSolutions: '/business-solutions/',
@@ -58,6 +59,7 @@ export const buildRoute = {
   region: (slug: string) => `/trinidad/region/${slug}/`,
   archive: (year: number, month?: string) =>
     month ? `/trinidad/archive/${year}/${month}/` : `/trinidad/archive/${year}/`,
+  helpArticle: (slug: string) => `/help/${slug}/`,
   blogPost: (slug: string) => `/blog/${slug}/`,
   safetyTip: (slug: string) => `/trinidad/safety-tips/${slug}/`,
   safetyTipsCategory: (category: string) => `/trinidad/safety-tips/category/${slugifyParam(category)}/`,
