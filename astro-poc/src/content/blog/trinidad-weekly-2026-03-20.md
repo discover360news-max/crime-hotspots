@@ -2,7 +2,7 @@
 title: 'Trinidad 2026: 9 Murders This Week — 71 Total Crimes (Mar 20)'
 country: 'tt'
 countryName: 'Trinidad & Tobago'
-date: 2026-03-20
+date: 2026-03-23
 excerpt: 'Trinidad recorded 71 crimes last week including 9 murders — a dramatic 200% spike in homicides compared to the previous week''s 3 victims. This represents the most significant surge in violent crime...'
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'

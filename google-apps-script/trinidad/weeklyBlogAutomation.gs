@@ -542,7 +542,9 @@ function parseClaudeBlogResponse(response) {
  * Builds the final Astro-compatible markdown file with frontmatter
  */
 function buildFinalBlogMarkdown(parsed, blogData) {
-  const dateStr = formatBlogDateStr(blogData.weekEnd);
+  // weekEnd = end of the data collection window (used for filename only)
+  // publishDate = today = actual publication date shown to readers
+  const publishDateStr = formatBlogDateStr(new Date());
 
   // Escape single quotes in title and excerpt for YAML
   const safeTitle = parsed.title.replace(/'/g, "''");
@@ -552,7 +554,7 @@ function buildFinalBlogMarkdown(parsed, blogData) {
 title: '${safeTitle}'
 country: 'tt'
 countryName: 'Trinidad & Tobago'
-date: ${dateStr}
+date: ${publishDateStr}
 excerpt: '${safeExcerpt}'
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'
