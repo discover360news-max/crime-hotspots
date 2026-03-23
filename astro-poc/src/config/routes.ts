@@ -23,6 +23,7 @@ export const routes = {
   contact: '/contact/',
   faq: '/faq/',
   help: '/help/',
+  support: '/support/',
   methodology: '/methodology/',
   privacy: '/privacy/',
   businessSolutions: '/business-solutions/',

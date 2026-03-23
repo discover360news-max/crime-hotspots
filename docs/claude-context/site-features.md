@@ -224,25 +224,32 @@
 
 ## Google Apps Script Automation (`google-apps-script/trinidad/`)
 
+Same structure applies to `google-apps-script/jamaica/` (identical split). Full file inventory + line counts in `.memory/entries/F002-gas-automation-pipeline.md`.
+
 ### Data Collection Pipeline
 | Script | Purpose |
 |--------|---------|
-| rssCollector.gs | Fetches news articles from RSS feeds |
-| articleFetcherImproved.gs | Retrieves & parses article content |
-| preFilter.gs | Pre-filters articles before AI processing |
+| rssCollector.gs | Fetches RSS feeds. 3-step pubDate fallback: pubDate → dc:date → collection timestamp + 🚨 log (B023). |
+| articleFetcherImproved.gs | Retrieves + parses article content |
 | orchestrator.gs | Main automation flow controller |
-| processor.gs | Processes articles, routes to Production/Archive sheets |
-| claudeClient.gs | Claude Haiku 4.5 for crime extraction. System prompt includes: Assault+Robbery combination rule (add Assault when victim physically struck), context type ordering rule (Home Invasion/Domestic Violence always after harm types), Carjacking/Domestic Violence/Extortion classification rules. |
-| geminiClient.gs | Gemini API client (legacy backup) |
-| groqClient.gs | Groq API client (legacy backup) |
-| crimeTypeProcessor.gs | Determines primary + related crime types. After severity sort, partitions harm types first, context types (Home Invasion, Domestic Violence) last — context types can never be primary when a harm type is present. Calls `getContextTypeLabels()` from schema.gs. |
+| crimeTypeProcessor.gs | Validates/processes crime types; partitions harm types before context types (Home Invasion/Domestic Violence always last). Reads from schema.gs. |
+| **preFilterCore.gs** | PREFILTER_CONFIG + preFilterArticles orchestrator + promoteFilteredArticle |
+| **preFilterKeywords.gs** | loadKeywords + scoreArticle + logFilteredArticle + API tracker helpers |
+| **preFilterUrlIndex.gs** | buildUrlIndex + refreshUrlIndexCache |
+| **preFilterDuplicates.gs** | All checkFor* duplicate functions. Similarity helpers (calculateSimilarity, levenshteinDistance) removed — canonical defs in processorDuplicates.gs (global GAS scope). |
+| **preFilterArchive.gs** | autoArchiveProcessedArticles + previewArchivableArticles |
+| **processorCore.gs** | Shared helpers + main loop + date utilities (absorbed plusCodeConverter logic) |
+| **processorOutputMapper.gs** | appendToProduction + appendToReviewQueue |
+| **processorDuplicates.gs** | isDuplicateCrime, checkSemanticDuplicate, similarity helpers (canonical defs for preFilter too) |
+| **processorMaintenance.gs** | Backlog monitoring + archiving |
+| **claudeClientCore.gs** | extractCrimeData + parseClaudeResponse + test functions (Claude Haiku 4.5, prompt caching) |
+| **claudePrompts.gs** | buildSystemPrompt + buildUserPrompt. Prompt includes: Assault+Robbery combination rule, context type ordering, Carjacking/DV/Extortion rules, date cross-reference rules ("a day after"), ongoing crimes rule (B023). |
 
 ### Data Management
 | Script | Purpose |
 |--------|---------|
 | validationHelpers.gs | Data validation utilities |
 | geocoder.gs | Location name → coordinates |
-| plusCodeConverter.gs | Plus Codes → coordinates |
 | syncToLive.gs | Staging → production sheet sync |
 | archiveScraper.gs | Historical crime data scraping |
 
@@ -257,7 +264,8 @@
 | weeklyBlogAutomation.gs | Auto weekly blog (Claude Haiku → GitHub → Cloudflare) |
 | blogDataGenerator.gs | Prepares crime stats for blog generation. `BLOG_CRIME_TYPE_CONFIG` mirrors `crimeTypeConfig.ts` — keep in sync when adding crime types. |
 | socialMediaStats.gs | Daily/monthly/custom social media stats |
-| facebookSubmitter.gs | Web app for manual Facebook post entry (Guardian source) |
+| **facebookSubmitterCore.gs** | Web app doGet + submitFacebookPost + sheet writer. Country selector: T&T vs Jamaica toggle, 3-way sheet routing (Jamaica prod / T&T 2025 FR1 / T&T 2026 prod). |
+| **facebookSubmitterHtml.gs** | All HTML/CSS/JS for the facebookSubmitter web app UI |
 | linkChecker.gs | Bi-weekly dead link detection + email reports |
 
 ### Infrastructure

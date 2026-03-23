@@ -8,6 +8,16 @@
 
 ## March 2026
 
+### Safety Tips Batch: TIP-00078 to TIP-00081 (Mar 23)
+
+- **NEW TIP TIP-00078** — Protecting Your Residence When Arson Is Threatened (Extortion / At Home)
+- **NEW TIP TIP-00079** — Reducing Risk When You May Be a Drive-By Target (Shooting / Walking Alone)
+- **NEW TIP TIP-00080** — Complying Safely During an Armed Carjacking (Carjacking / In Your Car)
+- **NEW TIP TIP-00081** — Vetting Acquaintances Before Granting Home Access (Home Invasion / At Home)
+- **UPDATED TIP-00064** — Added Story 628 to `related_story_ids` (vehicle-based chain snatch from pedestrian — same tactic as existing tips)
+
+---
+
 ### Safety Tips Batch: TIP-00076 to TIP-00077 (Mar 22)
 
 - **NEW TIP TIP-00076** — Armed Robbery Along Transit Corridors at Night (Robbery / Using Public Transport)

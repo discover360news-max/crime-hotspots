@@ -50,42 +50,103 @@ Hotspots: [Area] ([N]), [Area] ([N])
 
 ## Step 4 — Pick a Creative Concept
 
-Choose one concept per image from the library below, or invent a new one.
-Rotate concepts week-to-week for variety — avoid repeating the same visual 2 weeks in a row.
+The library below is a **starting point, not a ceiling.** Each week, Claude should:
+1. Check the library for a strong match
+2. If nothing fits precisely — **invent a bespoke concept** for that week's specific data
+3. Add strong new concepts to the library with a date tag so it grows over time
 
-### Clinical / Data Journalism Concepts
+Rotate concepts week-to-week. Never repeat the same concept two weeks running for the same crime type.
+
+---
+
+### Visual Alignment Rule
+
+**The subject must be immediately recognisable as connected to that crime type — without the viewer needing to read the text.**
+
+A viewer who sees the image for 1 second should feel **surprise or anger** before they read a word. Generic props that require logical leaps (e.g. a padlock for assault) are invalid — they dilute the emotional punch and confuse the message.
+
+**Crime-type direction guide** *(use as inspiration, not a locked list — add to it):*
+
+| Crime Type | Avoid | Direction |
+|------------|-------|-----------|
+| Assault | Padlocks, keys, generic crime tape | Physical impact — broken glasses, hospital wristband, bruised skin close-up, overturned scene |
+| Robbery | Generic bags, evidence bags | Loss and violation — scattered belongings on dark ground, open empty wallet, motion blur of a snatched item |
+| Theft | Generic props | Missing or damaged — shattered car window, damaged phone, outline where something was |
+| Burglary | Intact padlocks | Forced entry — splintered door frame, cut chain, pried window frame |
+| Seizures | Generic crime tape | The haul itself — contraband spread, drugs/cash/weapons laid out, evidence bags being handled |
+| Attempted Murder | Neutral props | Close brush with death — hospital wristband, surgical glove with smear, aftermath of violence |
+| Shooting | Generic alleys | Ballistic aftermath — shell casings, shattered glass at head height, police tape |
+| Murder | Any prop | Aftermath only, no body — police tape, burned wreck, empty scene under hard light |
+| Overall total (up) | Any single prop | Scale and atmosphere — rain-slicked city street at night, police lights across a skyline |
+| Overall total (down) | Celebration imagery | Absence of harm — empty evidence bag, open handcuffs, clean unmarked surface |
+
+---
+
+### Style Library *(evolving — add new entries as invented)*
+
+#### Clinical / Data Journalism
 Aesthetic: pure white or pale grey background, cold neutral studio lighting, zero shadows, forensic, detached.
 
-| # | Subject | Notes |
-|---|---------|-------|
-| C1 | Shattered car window glass spread on white surface | Works for theft, carjacking |
-| C2 | Single closed padlock on white surface | Positive stats / security |
-| C3 | Empty evidence bag lying flat on white | Neutral — works for most |
-| C4 | Lone key in a lock, overhead shot | Security / prevention angle |
-| C5 | Wallet lying open and empty, overhead shot | Theft, robbery |
-| C6 | Torn legal document on white surface | Fraud, financial crime |
-| C7 | CCTV camera close-up, neutral bg | Any crime — surveillance angle |
-| C8 | Empty handcuffs lying open on white | Positive stats — nobody arrested, no crime |
-| C9 | Police evidence tags laid out in a row | Seizures, any crime |
-| C10 | Single item (phone, bag, watch) with visible damage | Theft, robbery, assault |
+| # | Subject | Crime types | Added |
+|---|---------|-------------|-------|
+| C1 | Shattered car window glass spread on white surface | Theft, carjacking | Mar 2026 |
+| C2 | Single closed padlock on white surface | Burglary positive / security messaging only | Mar 2026 |
+| C3 | Empty evidence bag lying flat on white | Positive stats — absence of crime | Mar 2026 |
+| C4 | Lone key in a lock, overhead shot | Burglary prevention angle | Mar 2026 |
+| C5 | Wallet lying open and empty, overhead shot | Theft, robbery | Mar 2026 |
+| C6 | Torn legal document on white surface | Fraud, financial crime | Mar 2026 |
+| C7 | CCTV camera close-up, neutral bg | Surveillance / deterrence angle | Mar 2026 |
+| C8 | Empty handcuffs lying open on white | Positive stats — nobody arrested, no crime | Mar 2026 |
+| C9 | Police evidence tags laid out in a row | Seizures | Mar 2026 |
+| C10 | Single item (phone, bag, watch) with visible damage | Theft, robbery | Mar 2026 |
+| C11 | Broken eyeglasses lying on white surface, one lens cracked | Assault, domestic violence | Mar 2026 |
+| C12 | Single latex surgical glove, pristine white — with one faint smear | Attempted murder, assault (clinical contrast) | Mar 2026 |
 
-### Raw / Visceral Concepts
+#### Raw / Visceral
 Aesthetic: dark or textured background, hard directional light, deep shadows, high contrast, unsettling.
 
-| # | Subject | Notes |
-|---|---------|-------|
-| V1 | Top-down confiscated contraband spread on dark concrete | Seizures — drugs, weapons, cash |
-| V2 | Splintered wooden door frame — forced entry | Assault, home invasion, burglary |
-| V3 | Single overturned chair under a dangling bare bulb | Assault, general violence |
-| V4 | Dark alley with single harsh streetlight | General crime, robbery, shooting |
-| V5 | Gloved hands holding an evidence bag against dark bg | Seizures, investigation |
-| V6 | Close-up of broken padlock, chain cut | Burglary, theft, forced entry |
-| V7 | Smashed window on a dark surface, glass fragments | Robbery, theft, assault |
-| V8 | Silhouette of a figure against a lit doorway | General crime, unease |
-| V9 | Hospital wristband on a dark surface, clinical light | Assault, shooting, murder |
-| V10 | Burned-out car wreck at night, embers faint | Arson, extreme crime |
-| V11 | Police tape stretched across a dark background | Any crime — aftermath |
-| V12 | Close-up hands in handcuffs, dramatic lighting | Arrest, seizure, general |
+| # | Subject | Crime types | Added |
+|---|---------|-------------|-------|
+| V1 | Top-down confiscated contraband spread on dark concrete | Seizures — drugs, weapons, cash | Mar 2026 |
+| V2 | Splintered wooden door frame — forced entry | Burglary, home invasion | Mar 2026 |
+| V3 | Single overturned chair under a dangling bare bulb | Assault, general violence | Mar 2026 |
+| V4 | Dark alley with single harsh streetlight | Robbery, shooting | Mar 2026 |
+| V5 | Gloved hands holding an evidence bag against dark bg | Seizures, investigation | Mar 2026 |
+| V6 | Close-up of broken padlock, chain cut | Burglary, forced entry | Mar 2026 |
+| V7 | Smashed window on a dark surface, glass fragments | Robbery, theft | Mar 2026 |
+| V8 | Silhouette of a figure against a lit doorway | General unease, home invasion | Mar 2026 |
+| V9 | Hospital wristband on a dark surface, clinical light | Assault, shooting, attempted murder | Mar 2026 |
+| V10 | Burned-out car wreck at night, embers faint | Arson, extreme crime | Mar 2026 |
+| V11 | Police tape stretched across a dark background | Any crime — aftermath | Mar 2026 |
+| V12 | Close-up hands in handcuffs, dramatic lighting | Arrest, seizure | Mar 2026 |
+| V13 | Scattered personal items on dark wet ground — phone, keys, wallet | Robbery, mugging | Mar 2026 |
+| V14 | Shell casings on dark concrete, single overhead light | Shooting, attempted murder | Mar 2026 |
+
+#### Cinematic / Atmospheric *(experimental — added Mar 2026)*
+Aesthetic: real-world environments, low ambient light, depth, moody — more editorial than forensic.
+
+| # | Subject | Crime types | Added |
+|---|---------|-------------|-------|
+| A1 | Overhead rain-slicked urban street at night, police strobe out of focus in distance | Overall totals, general crime | Mar 2026 |
+
+#### High-Contrast B&W / Graphic *(experimental — added Mar 2026)*
+Aesthetic: colour stripped entirely, extreme crushed blacks and blown-out whites, almost graphic-design-level contrast.
+
+| # | Subject | Crime types | Added |
+|---|---------|-------------|-------|
+| G1 | Heavy object (padlock, cuffs, evidence bag) under extreme B&W contrast | Burglary, positive stats | Mar 2026 |
+
+---
+
+### Adding New Concepts
+
+When a new concept is invented during a weekly run, add it to the relevant style table above with:
+- A new sequential ID (C13, V15, A2, G2, etc.)
+- Subject description
+- Crime type(s) it suits
+- Date added
+
+If a concept underperforms or feels wrong in retrospect, note it in the **Concept Log** below.
 
 ---
 
@@ -138,6 +199,8 @@ Fill in from the weekly stats:
 - [ ] No unintended text or watermarks in the image
 - [ ] 4:5 crop is clean — no important subject cut off
 - [ ] The 4 images feel visually distinct from each other
+- [ ] **Visual subject is directly tied to the crime type** — a viewer could identify the crime category without reading the text
+- [ ] **Emotional response check** — does the image produce surprise or anger on first glance?
 
 ---
 
@@ -157,6 +220,23 @@ You can also say:
 - "Use concept V4 for the seizures image" to override the concept choice
 - "Make all 4 clinical this week" to override styles
 - "Skip the positive image this week" if no stat qualifies
+
+---
+
+---
+
+## Concept Log
+
+Track what was used, what worked, what to retire. Update after each week once engagement data is in.
+
+| Week | Image | Concept used | Style | Notes |
+|------|-------|--------------|-------|-------|
+| Mar 12-20 | Seizures ↑17% | V1 contraband spread | Visceral | First run — no data yet |
+| Mar 12-20 | Attempted Murder ↑13% | C12 surgical glove + smear | Clinical contrast | First run — no data yet |
+| Mar 12-20 | Total ↑18% | A1 rain-slicked street at night | Cinematic | New style — testing |
+| Mar 12-20 | Assault ↓17% | C3 empty evidence bag | Clinical | Replaced invalid padlock concept |
+
+*Performance key: — = no data yet | ✓ = strong performer (keep rotating in) | ~ = average | ✗ = retire*
 
 ---
 

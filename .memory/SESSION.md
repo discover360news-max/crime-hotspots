@@ -61,6 +61,12 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 22, 2026
+- **Help Centre launched:** `/help/` index + 14 pre-rendered articles committed + pushed. 6 sections (Getting Started, Understanding the Data, Using the Dashboard, Safety Tips, Crime Reports, For Researchers). Nav link added (desktop + mobile), footer "Help Centre" link added. `content/config.ts` help collection schema (`section`, `summary`, `order`, `related`, `date_updated`). Sitemap: index priority 0.7, articles 0.6 with `date_updated` as lastmod. Added F015 to INDEX.md.
+- **Docs cleanup:** `site-features.md` GAS section updated to reflect Mar 19 refactored file structure (split files now listed; deleted `geminiClient.gs`, `groqClient.gs`, `plusCodeConverter.gs` removed; `facebookSubmitter.gs` → two-file split noted).
+- **Data:** 12 new redirect entries (Stories 612–624), 4 new Jamaica area aliases (Black River, Kingston, Middleton, Seaforth — count now 17), health-data.json refreshed.
+- `p1-01-dashboard-after.png` remains untracked in repo root (stray screenshot — delete or gitignore).
+
 ## Session Notes — Mar 19, 2026 (continued x3)
 - **Push learnings:** When splitting a monolithic GAS file, git rename detection assigns the rename to the most similar output file (by content). `claudeClient.gs → claudePrompts.gs` (64% similar) was detected as a rename; `claudeClientCore.gs` appeared as `create mode` even though it contains the core logic. Same pattern: `processor.gs → processorDuplicates.gs` (51%), `facebookSubmitter.gs → facebookSubmitterHtml.gs` (73%). Not a problem — just means git history for the "core" split file looks like a new file rather than a rename. Worth knowing when reading `git log --follow` on these files.
 - **Net line reduction:** Refactoring produced -1,449 net lines (5,171 insertions, 6,620 deletions). Accounts for: Trinidad legacy deletions (geminiClient 672 + groqClient 593 + plusCodeConverter 183 = 1,448 lines) + duplicate similarity helpers removed (~116 lines across both preFilterDuplicates files). No logic was lost.

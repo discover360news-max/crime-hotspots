@@ -1,0 +1,110 @@
+---
+/**
+ * Support Page
+ * Ko-fi CTA page — destination for newsletter + header "Support" links
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { routes } from '../config/routes';
+
+const title = "Support Crime Hotspots — Keep Caribbean Crime Data Free";
+const description = "Crime Hotspots is free, ad-free, and independent. Support the project on Ko-fi to help keep it running for communities across the Caribbean.";
+---
+
+<Layout title={title} description={description}>
+  <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-12 text-slate-700 dark:text-[hsl(0_0%_82%)]">
+    <Breadcrumbs items={[
+      { label: 'Home', href: routes.home },
+      { label: 'Support' }
+    ]} />
+
+    <h1 class="text-display font-bold mb-3 text-center pt-4 dark:text-[hsl(0_0%_95%)]">Support Crime Hotspots</h1>
+
+    <p class="text-body text-slate-500 dark:text-[var(--ch-text-muted)] text-center max-w-md mx-auto mb-8">
+      100% free. No ads. No paywalls. No sponsored content. If this platform helps you or your community, consider helping us keep it that way.
+    </p>
+
+    <!-- Primary CTA -->
+    <div class="flex flex-col items-center gap-3 mb-10">
+      <a
+        href="https://ko-fi.com/crimehotspots"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg px-8 py-4 transition-all duration-200 shadow-md hover:shadow-lg text-body"
+      >
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"/>
+        </svg>
+        Support on Ko-fi
+      </a>
+      <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)]">One-time or monthly — any amount helps.</p>
+    </div>
+
+    <!-- What support covers -->
+    <div class="bg-white/85 backdrop-blur-md rounded-lg shadow-md border border-slate-100 dark:border-[var(--ch-border-card)] dark:bg-[var(--ch-surface)] p-6 sm:p-8 mb-6">
+      <h2 class="text-heading font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">What your support covers</h2>
+      <p class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] mb-6">Everything it takes to keep reliable crime data flowing to Caribbean communities.</p>
+
+      <div class="grid sm:grid-cols-3 gap-4">
+        <!-- Hosting -->
+        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
+          <div class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center mb-3">
+            <svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+            </svg>
+          </div>
+          <h3 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Hosting & Infrastructure</h3>
+          <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">Cloudflare Pages, Workers, and D1 database — keeping the site fast and online 24/7 across the Caribbean.</p>
+        </div>
+
+        <!-- AI Pipeline -->
+        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
+          <div class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center mb-3">
+            <svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">AI Data Pipeline</h3>
+          <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">We use Claude AI to process hundreds of news articles weekly — extracting and structuring crime data accurately at scale.</p>
+        </div>
+
+        <!-- Development -->
+        <div class="bg-slate-50 dark:bg-[hsl(0_0%_12%)] rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-card)]">
+          <div class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center mb-3">
+            <svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
+          </div>
+          <h3 class="text-caption font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] mb-1">Development</h3>
+          <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">New features, new islands, and ongoing data quality — building tools that actually serve Caribbean communities.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent my-8"></div>
+
+    <!-- Secondary CTAs -->
+    <div class="grid sm:grid-cols-2 gap-4 text-center">
+      <a
+        href={routes.report}
+        class="group flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_75%)] hover:border-rose-600 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 transition text-caption font-bold"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        Submit a Crime Report
+      </a>
+      <a
+        href={routes.help}
+        class="group flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_75%)] hover:border-rose-600 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 transition text-caption font-bold"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Visit the Help Centre
+      </a>
+    </div>
+  </main>
+</Layout>
