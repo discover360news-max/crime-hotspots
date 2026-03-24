@@ -61,6 +61,14 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 24, 2026 (continued)
+- **B025 fixed** — `dashboardDataLoader.ts` SSR path now fetches `/api/dashboard/?year=...` in parallel with `/api/crimes/`. Calls `applyPrecomputedStats()` to populate `.trend-indicator` (always `hidden` in SSR HTML, never populated before). Counts were always correct from SSR HTML; only trend arrows were missing.
+- **B026 fixed** — `/api/dashboard.ts` trend queries gated on `isCurrentOrAllYears`. Historical year selections return zero trends → indicators hidden. Previously 2025 stat cards showed live 2026 rolling-window trend arrows.
+- **Pluralization fix** — `AreaNarrative.astro` `total90d` fallback sentence now `incident{total90d !== 1 ? 's' : ''}` (was hardcoded "incidents").
+- **Hover fix** — `area/[slug].astro` "Other Areas" sections: added `hover:bg-rose-50 dark:hover:bg-rose-950/30` + `dark:hover:border-rose-800` + `dark:hover:text-rose-400` to both link grids.
+- **Reminder:** Purge Cloudflare CDN cache for `/api/dashboard/` to immediately invalidate stale 2025-with-trends responses.
+- `p1-01-dashboard-after.png` still untracked in repo root — stray screenshot, safe to delete.
+
 ## Session Notes — Mar 24, 2026
 - **Newsletter prompt:** Created reusable Buttondown prompt for weekly roundup — urgent/factual tone, ~300 words, fixed sections (This Week's Hotspots, By The Numbers, Stay Safe, Reports Matter), CTAs to `/trinidad/statistics`, `/trinidad/murder-toll`, `/report`, `/support`. Prompt-only deliverable, no code changes.
 - **`/support/` page created** (`src/pages/support.astro`): Ko-fi CTA approach (button out to ko-fi.com/crimehotspots), 3 "what support covers" cards (Hosting & Infrastructure, AI Data Pipeline, Development), secondary ghost CTAs to /report + /help. Pre-rendered static.

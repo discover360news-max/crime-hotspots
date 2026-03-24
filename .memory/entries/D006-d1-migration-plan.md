@@ -103,6 +103,8 @@ Remaining `prerender = true` pages (intentional — no live crime data dependenc
 - `dashboard.astro` (SSR shell, loads via /api/dashboard), `compare.astro`, `mp/` pages, safety-tips static pages
 
 - 2026-03-16: Moved D1 sync cron from `0 10 * * *` → `0 5 * * *` (5am UTC). Fixes sequencing bug where D1 synced 4h AFTER the 6am site rebuild — serving stale data all day. Sync now runs before rebuild. See B022.
+- 2026-03-24: B025 fixed — SSR path in `dashboardDataLoader.ts` now fetches `/api/dashboard/` in parallel with `/api/crimes/` and calls `applyPrecomputedStats()`. Previously the SSR path skipped `/api/dashboard`, so `.trend-indicator` elements (always `hidden` in SSR HTML) were never populated on first load.
+- 2026-03-24: B026 fixed — `/api/dashboard.ts` trend queries now gated on `isCurrentOrAllYears`. Historical year selections (e.g. 2025) receive zero trends → indicators hidden. Previously 2025 stat cards showed live 2026 rolling-window arrows (misleading). Purge Cloudflare CDN cache for `/api/dashboard/` after deploying.
 
 ## Deferred Cleanup
 - ~~Remove `historicalTrends` key from `TRINIDAD_CSV_URLS`~~ — DONE Mar 12, 2026. Key removed from `csvUrls.ts`; fallback in `dashboardDataLoader.ts` simplified to fetch only `current`. 60+ days of 2026 data makes cross-year historical snippet unnecessary.
