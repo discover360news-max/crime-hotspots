@@ -61,6 +61,12 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 24, 2026 (continued x3)
+- **`statistics.astro` JNews hierarchy** — dark hero + 4-card vitals (Total Crimes/slate, Murders/crimson, YoY Change/amber, Murder Rate/violet) + full-width dark separator band ("Crime by Type, Region & Rate") between StatCards and detailed tables. Separator is a direct `<Layout>` child (not inside `max-w-5xl` container) — same pattern as dashboard. `max-w-3xl` → `max-w-5xl`. Fixed hardcoded `Murder Count 2026` → `{currentYear}`. `yoyChangeDisplay` guards NaN/zero-denominator.
+- **Footer 3→5 columns** — Browse split (Dashboard/Headlines/Archive/Murder Count) + Content new (Blog/Safety Tips/Murders). Help split (Help Centre/FAQ/Methodology/Contact) + Company new (About/Support/Privacy/Business Solutions/Report a Crime). Grid: `grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`.
+- **`DESIGN-ALIGNMENT-GUIDE.md`** created (`docs/guides/`) — reference for JNews hierarchy rollout to remaining pages. Per-page priority: region/area = HIGH, murders/regions = MEDIUM, headlines = LOW, compare = already aligned.
+- **Next:** Apply JNews hierarchy to `region/[slug].astro` (HIGH) then `area/[slug].astro` (HIGH).
+
 ## Session Notes — Mar 24, 2026 (continued x2)
 - **Dashboard JNews overhaul** — complete. Full layout hierarchy: dark hero band → 4 `GradientStatCard` vitals (Total Incidents/Murders/Victims/Crimes/Day) → `DashboardStory` narrative → crime breakdown scroll → sticky year filter bar → 2-col map (`leafletMap`) + top areas (`TopRegionsCard`) → Quick Insights card. New component: `GradientStatCard.astro` (slot in Dashboard & Stats section of site-features.md). Stat cards (11 types) remain below.
 - **`onYearChange` try/catch** — year filter froze dashboard (shimmers stuck) when API call failed. Now catch block restores all visible states.

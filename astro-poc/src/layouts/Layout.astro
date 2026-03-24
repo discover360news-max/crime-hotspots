@@ -364,7 +364,7 @@ const detectedCountryId = Object.entries(countryPathMap).find(
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
       <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[var(--ch-border)] to-transparent mb-8"></div>
       <!-- Navigation Columns -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-8">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
         <!-- Browse -->
         <div>
           <h4 class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text)] mb-4 uppercase tracking-wider">Browse</h4>
@@ -373,8 +373,16 @@ const detectedCountryId = Object.entries(countryPathMap).find(
             <li><a href={routes.trinidad.headlines} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Headlines</a></li>
             <li><a href={routes.trinidad.archive} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Archive</a></li>
             <li><a href={routes.trinidad.murderCount} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Murder Count</a></li>
+          </ul>
+        </div>
+
+        <!-- Content -->
+        <div>
+          <h4 class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text)] mb-4 uppercase tracking-wider">Content</h4>
+          <ul class="space-y-1">
             <li><a href={routes.blog} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Blog</a></li>
             <li><a href={routes.trinidad.safetyTips} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Safety Tips</a></li>
+            <li><a href={routes.trinidad.murders} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Murders</a></li>
           </ul>
         </div>
 
@@ -390,18 +398,25 @@ const detectedCountryId = Object.entries(countryPathMap).find(
         </div>
 
         <!-- Help -->
-        <div class="col-span-2 sm:col-span-1">
+        <div>
           <h4 class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text)] mb-4 uppercase tracking-wider">Help</h4>
-          <ul class="grid grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-1">
+          <ul class="space-y-1">
             <li><a href={routes.help} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Help Centre</a></li>
-            <li><a href={routes.support} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Support the Project</a></li>
-            <li><a href={routes.about} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">About</a></li>
             <li><a href={routes.faq} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">FAQ</a></li>
             <li><a href={routes.methodology} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Methodology</a></li>
             <li><a href={routes.contact} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Contact</a></li>
-            <li><a href={routes.report} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Report a Crime</a></li>
+          </ul>
+        </div>
+
+        <!-- Company -->
+        <div>
+          <h4 class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text)] mb-4 uppercase tracking-wider">Company</h4>
+          <ul class="space-y-1">
+            <li><a href={routes.about} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">About</a></li>
+            <li><a href={routes.support} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Support the Project</a></li>
             <li><a href={routes.privacy} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Privacy Policy</a></li>
             <li><a href={routes.businessSolutions} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Business Solutions</a></li>
+            <li><a href={routes.report} class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400">Report a Crime</a></li>
           </ul>
         </div>
       </div>

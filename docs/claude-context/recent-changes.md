@@ -8,6 +8,16 @@
 
 ## March 2026
 
+### JNews design rollout: statistics + footer (Mar 24, session 3)
+
+- **`statistics.astro`** — JNews hierarchy applied. Replaced `Hero.astro` with custom dark hero (`from-slate-900 to-slate-800`, inline breadcrumb, live pulse, rose CTA + ghost download CTA, freshness line). Added 4-card vitals row: Total Crimes (slate) / Murders (crimson) / YoY Change (amber) / Murder Rate per 100k (violet). Full-width dark separator band ("Crime by Type, Region & Rate") between StatCards section and detailed tables — separator is a direct `<Layout>` child to match dashboard (not inside the constrained container). `max-w-3xl` → `max-w-5xl` throughout. `yoyChangeDisplay` variable guards NaN/zero-denominator edge case.
+- **Footer restructure** (`Layout.astro`) — 3-col → 5-col nav grid (`grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`). Split Help (9 links) into **Help** (Help Centre, FAQ, Methodology, Contact) + **Company** (About, Support the Project, Privacy Policy, Business Solutions, Report a Crime). Split Browse (6 links) into **Browse** (Dashboard, Headlines, Archive, Murder Count) + **Content** (Blog, Safety Tips, Murders). Removed the old mobile 2-col sub-grid hack on Help. All columns now use plain `space-y-1` lists.
+- **`DESIGN-ALIGNMENT-GUIDE.md`** (`docs/guides/`) — new doc. Reference guide for applying JNews hierarchy to remaining pages: dark hero pattern, vitals row variants, separator band, section label rules, two-column zones, dark mode pairs, per-page assessment (statistics ✓, region HIGH, area HIGH, murders MEDIUM, regions MEDIUM, headlines LOW).
+- **`statistics.astro`** — fixed hardcoded `Murder Count 2026` link label in Related Resources → `Murder Count {currentYear}`.
+- **Pipeline artifacts** — `redirect-map.json` +16 slug redirects (Stories 2126–2142), `health-data.json` build timestamp.
+
+---
+
 ### Dashboard JNews hierarchy + redirect bug fixes (Mar 24, session 2)
 
 - **`dashboard.astro`** — full layout overhaul. New hierarchy: dark hero band → 4 `GradientStatCard` vitals (Total Incidents/Murders/Victims/Crimes/Day) → `DashboardStory` narrative → crime breakdown scroll → sticky year filter bar → 2-col map+top-areas → Quick Insights. New `GradientStatCard.astro` component with `variant` prop (slate/crimson/amber/violet).
