@@ -61,6 +61,10 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 24, 2026 (continued x4)
+- **`region/[slug].astro` JNews hierarchy** — dark hero (H1 "{regionName} Region", live pulse = 90d incident count across N areas) + 4-card GradientStatCard vitals: Incidents 90d (slate), Murders YTD (crimson), Avg Risk Score (amber), Most Active Area (violet, links to area page). Extra stats expandable tray (Shootings/Home Invasions/etc.) moved into vitals zone. Dark separator band ("Regional Breakdown" label + "Areas in {regionName}" h2) before area ranking. Existing area grid, crime breakdown table, recent headlines accordion unchanged. Section headings → `text-sm font-bold text-slate-500` pattern. Hero.astro + Breadcrumbs.astro removed; GradientStatCard added. SSR render mode corrected in site-features.md (was incorrectly "Pre-rendered"). 376 → 410 lines.
+- **Next:** `area/[slug].astro` JNews hierarchy (HIGH).
+
 ## Session Notes — Mar 24, 2026 (continued x3)
 - **`statistics.astro` JNews hierarchy** — dark hero + 4-card vitals (Total Crimes/slate, Murders/crimson, YoY Change/amber, Murder Rate/violet) + full-width dark separator band ("Crime by Type, Region & Rate") between StatCards and detailed tables. Separator is a direct `<Layout>` child (not inside `max-w-5xl` container) — same pattern as dashboard. `max-w-3xl` → `max-w-5xl`. Fixed hardcoded `Murder Count 2026` → `{currentYear}`. `yoyChangeDisplay` guards NaN/zero-denominator.
 - **Footer 3→5 columns** — Browse split (Dashboard/Headlines/Archive/Murder Count) + Content new (Blog/Safety Tips/Murders). Help split (Help Centre/FAQ/Methodology/Contact) + Company new (About/Support/Privacy/Business Solutions/Report a Crime). Grid: `grid-cols-2 sm:grid-cols-3 lg:grid-cols-5`.
