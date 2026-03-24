@@ -7,8 +7,7 @@
  */
 
 import Layout from '../../../layouts/Layout.astro';
-import Breadcrumbs from '../../../components/Breadcrumbs.astro';
-import Hero from '../../../components/Hero.astro';
+import GradientStatCard from '../../../components/GradientStatCard.astro';
 import StatCards from '../../../components/StatCards.astro';
 import DataTable from '../../../components/DataTable.astro';
 import SafetyContext from '../../../components/SafetyContext.astro';
@@ -119,35 +118,7 @@ function makeYoYCard(label: string, currentCount: number, previousCount: number)
 }
 
 // Precompute murder stats for share text (reused in statCards and shareText)
-const areaPageUrl = `https://crimehotspots.com/trinidad/area/${slug}/`;
 const murderYTDCount = countCrimeType(crimesCurrentYTD, 'Murder');
-const murderPrevCount = countCrimeType(crimesPreviousYTD, 'Murder');
-const murderYTDChange = calculatePercentChange(murderPrevCount, murderYTDCount);
-const murderYTDDir: 'up' | 'down' | 'flat' = murderYTDCount > murderPrevCount ? 'up' : murderYTDCount < murderPrevCount ? 'down' : 'flat';
-const murderTrend = murderYTDDir === 'up'
-  ? `up ${Math.round(Math.abs(murderYTDChange))}% vs ${previousYear}`
-  : murderYTDDir === 'down'
-    ? `down ${Math.round(Math.abs(murderYTDChange))}% vs ${previousYear}`
-    : `similar to ${previousYear}`;
-const riskLevelLabel = safety.level === 'high' ? 'High Risk' : safety.level === 'low' ? 'Low Risk' : 'Stable';
-
-// Primary stat cards (visible)
-const statCards = [
-  makeYoYCard('Incidents (90d)', recentCrimes90d.length, recentCrimes90dPrev.length),
-  {
-    ...makeYoYCard('Murders (YTD)', murderYTDCount, murderPrevCount),
-    shareText: `${areaName}: ${murderYTDCount} murders in ${currentYear} — ${murderTrend}. Crime data for Trinidad and Tobago: ${areaPageUrl}`,
-  },
-  makeYoYCard('Robberies (YTD)', countCrimeType(crimesCurrentYTD, 'Robbery'), countCrimeType(crimesPreviousYTD, 'Robbery')),
-  {
-    label: 'Risk Level',
-    current: parseFloat(safety.score.toFixed(1)),
-    subtitle: 'out of 10',
-    size: 'large' as const,
-    riskColor: safety.level,
-    shareText: `${areaName} risk level: ${safety.score.toFixed(1)}/10 — ${riskLevelLabel}. Crime data for Trinidad and Tobago: ${areaPageUrl}`,
-  },
-];
 
 // Extra stat cards for expandable tray (only show types with data)
 const extraStatCards = [
@@ -243,32 +214,59 @@ const schemaData = {
   "url": `https://crimehotspots.com/trinidad/area/${slug}/`,
 };
 
-const breadcrumbs = [
-  { label: 'Home', href: routes.home },
-  { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
-  { label: 'Areas', href: routes.trinidad.areas },
-  { label: areaName },
-];
+const lastUpdated = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
   <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
 
-  <Hero
-    compact
-    narrowContainer={true}
-    title={subtitle}
-    subtitle={`${region} Region • ${division} Division • ${areaCrimes.length} total recorded crimes`}
-    badge="Updated daily"
-    riskBadge={{
-      level: safety.level,
-      label: safety.level === 'high' ? `High Risk · ${safety.score.toFixed(1)}/10` : safety.level === 'low' ? `Low Risk · ${safety.score.toFixed(1)}/10` : `Stable · ${safety.score.toFixed(1)}/10`,
-    }}
-    primaryCTA={{ text: 'View Dashboard', href: routes.trinidad.dashboard, icon: 'dashboard' }}
-    secondaryCTA={{ text: 'Compare Area', href: `${routes.trinidad.compare}?a=${slug}`, icon: 'arrow' }}
-  >
-    <Breadcrumbs items={breadcrumbs} slot="before" />
-  </Hero>
+  <!-- Dark Hero -->
+  <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <nav aria-label="Breadcrumb" class="mb-4">
+        <ol class="flex items-center gap-1.5 text-xs text-slate-500">
+          <li><a href="/" class="hover:text-slate-300 transition">Home</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li><a href="/trinidad/dashboard/" class="hover:text-slate-300 transition">Trinidad &amp; Tobago</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li><a href={routes.trinidad.areas} class="hover:text-slate-300 transition">Areas</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="text-slate-400">{areaName}</li>
+        </ol>
+      </nav>
+      <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight mb-2">
+        {areaName}
+      </h1>
+      <p class="text-slate-400 text-sm mb-5">{region} Region · {division} Division</p>
+      <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+        <span class="relative flex h-2 w-2 mt-1 shrink-0">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+        </span>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Risk score <strong class="text-white">{safety.score.toFixed(1)}/10</strong> — {recentCrimes90d.length} incidents in the last 90 days.
+        </p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href={routes.trinidad.dashboard} class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition font-medium text-xs">View Dashboard</a>
+        <a href={`${routes.trinidad.compare}?a=${slug}`} class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs">Compare Area</a>
+      </div>
+      <p class="text-slate-500 text-xs mt-5 flex items-center gap-1">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Data as of {lastUpdated}
+      </p>
+    </div>
+  </section>
+
+  <!-- Vitals Row -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 pb-2">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <GradientStatCard variant="amber"   value={safety.score.toFixed(1)} label="Risk Score"     sublabel="out of 10" />
+      <GradientStatCard variant="slate"   value={recentCrimes90d.length}  label="Incidents"      sublabel="last 90 days" />
+      <GradientStatCard variant="crimson" value={murderYTDCount}           label="Murders"        sublabel="year to date" />
+      <GradientStatCard variant="violet"  value={topCrimeType ?? '—'}     label="Top Crime Type" sublabel={`${currentYear} YTD`} />
+    </div>
+  </div>
 
   <div class="max-w-5xl mx-auto px-4 sm:px-6 py-5">
   <div class="lg:grid lg:grid-cols-[1fr_256px] lg:gap-8 lg:items-start">
@@ -285,27 +283,22 @@ const breadcrumbs = [
       compareUrl={`${routes.trinidad.compare}?a=${slug}`}
     />
 
-    <!-- Stat Cards -->
-    <div class="mt-6">
-      <StatCards stats={statCards} />
-
-      {extraStatCards.length > 0 && (
-        <div class="mt-2">
-          <button
-            id="moreStatsToggle"
-            class="w-full flex items-center justify-center gap-1 py-2 text-xs font-medium text-slate-400 dark:text-[var(--ch-text-faint)] hover:text-rose-600 transition cursor-pointer"
-          >
-            <span id="moreStatsLabel">More stats</span>
-            <svg id="moreStatsChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          <div id="moreStatsContent" class="more-stats-content mt-2">
-            <StatCards stats={extraStatCards} />
-          </div>
+    {extraStatCards.length > 0 && (
+      <div class="mt-6">
+        <button
+          id="moreStatsToggle"
+          class="w-full flex items-center justify-center gap-1 py-2 text-xs font-medium text-slate-400 dark:text-[var(--ch-text-faint)] hover:text-rose-600 transition cursor-pointer"
+        >
+          <span id="moreStatsLabel">More stats</span>
+          <svg id="moreStatsChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="moreStatsContent" class="more-stats-content mt-2">
+          <StatCards stats={extraStatCards} />
         </div>
-      )}
-    </div>
+      </div>
+    )}
 
     <!-- Safety Context -->
     <SafetyContext
@@ -512,7 +505,7 @@ const breadcrumbs = [
   }
 </style>
 
-{/* Data element — read by module script on every astro:page-load */}
+{/* Data element — read by DOMContentLoaded script */}
 <div id="areaPageData" class="hidden"
   data-slug={slug}
   data-name={subtitle}

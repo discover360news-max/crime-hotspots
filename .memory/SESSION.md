@@ -61,9 +61,13 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 24, 2026 (continued x5)
+- **`area/[slug].astro` JNews hierarchy** — dark hero (H1 "{areaName}", subtitle = region + division, live pulse = risk score + 90d count, freshness line, View Dashboard/Compare CTAs) + 4-card GradientStatCard vitals (Risk Score/amber, Incidents 90d/slate, Murders YTD/crimson, Top Crime Type/violet). Hero.astro + Breadcrumbs.astro removed; GradientStatCard added. `areaPageUrl`, `murderPrevCount`, `murderYTDChange/Dir`, `murderTrend`, `riskLevelLabel`, `statCards` array all removed (replaced by vitals cards). Primary StatCards render removed; extraStatCards "More stats" tray kept in main. AreaNarrative stays first in main (already below vitals structurally). Stale `astro:page-load` comment fixed. Render mode corrected in site-features.md (was "Pre-rendered" → SSR + CDN cache). 563 → 556 lines. Build passes.
+- **Next:** `murders.astro` JNews hierarchy (MEDIUM) — dark hero + flip counter as vitals.
+
 ## Session Notes — Mar 24, 2026 (continued x4)
 - **`region/[slug].astro` JNews hierarchy** — dark hero (H1 "{regionName} Region", live pulse = 90d incident count across N areas) + 4-card GradientStatCard vitals: Incidents 90d (slate), Murders YTD (crimson), Avg Risk Score (amber), Most Active Area (violet, links to area page). Extra stats expandable tray (Shootings/Home Invasions/etc.) moved into vitals zone. Dark separator band ("Regional Breakdown" label + "Areas in {regionName}" h2) before area ranking. Existing area grid, crime breakdown table, recent headlines accordion unchanged. Section headings → `text-sm font-bold text-slate-500` pattern. Hero.astro + Breadcrumbs.astro removed; GradientStatCard added. SSR render mode corrected in site-features.md (was incorrectly "Pre-rendered"). 376 → 410 lines.
-- **Next:** `area/[slug].astro` JNews hierarchy (HIGH).
+- **Next:** `area/[slug].astro` JNews hierarchy (HIGH). ✓ DONE
 
 ## Session Notes — Mar 24, 2026 (continued x3)
 - **`statistics.astro` JNews hierarchy** — dark hero + 4-card vitals (Total Crimes/slate, Murders/crimson, YoY Change/amber, Murder Rate/violet) + full-width dark separator band ("Crime by Type, Region & Rate") between StatCards and detailed tables. Separator is a direct `<Layout>` child (not inside `max-w-5xl` container) — same pattern as dashboard. `max-w-3xl` → `max-w-5xl`. Fixed hardcoded `Murder Count 2026` → `{currentYear}`. `yoyChangeDisplay` guards NaN/zero-denominator.

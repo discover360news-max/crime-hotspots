@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 24, 2026 (Dashboard JNews hierarchy overhaul; GradientStatCard added; 301→302 on slug-not-found)
+**Last Updated:** March 24, 2026 (area/[slug].astro JNews hierarchy; region/[slug].astro JNews hierarchy; Dashboard JNews hierarchy overhaul; GradientStatCard added; 301→302 on slug-not-found)
 
 ---
 
@@ -46,7 +46,7 @@
 | Headlines | `/trinidad/headlines/` | Pre-rendered | Latest crimes, date accordion, victim counts, empty state for filters |
 | Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | Individual crime page, safety context, related crimes, trending hotspots |
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
-| Area Detail | `/trinidad/area/[slug]` | Pre-rendered | AreaNarrative summary (text-body weight), "New Since" badge, compare prompt, stat cards (Risk Level card: larger number + level color — amber=high, emerald=low), share buttons, crime type breakdown table, related areas (sorted by crime count) |
+| Area Detail | `/trinidad/area/[slug]` | **SSR + CDN cache** | **JNews hierarchy (Mar 24 2026):** dark hero (H1 = "{areaName}", live pulse = risk score + 90d incident count, freshness line) → 4-card GradientStatCard vitals (Risk Score/amber, Incidents 90d/slate, Murders YTD/crimson, Top Crime Type/violet) → 2-col layout (1fr/256px). Main: AreaNarrative summary, expandable extra stats tray (Shootings/Home Invasions/etc.), SafetyContext, FeedbackToggle, compare prompt, newsletter, crime type breakdown table, recent headlines accordion, related areas. MPSidebar (showAll=false). |
 | Statistics | `/trinidad/statistics/` | **SSR + CDN cache** | Two-tier crime rates: previous year final (official) + current year annualized at current pace. All displayed rates are annualized for apples-to-apples comparison. Raw YTD rates removed Mar 2026. FAQPage JSON-LD (4 Q&As) + Dataset + BreadcrumbList. |
 | Regions | `/trinidad/regions/` | Pre-rendered | Browse by region |
 | Region Detail | `/trinidad/region/[slug]` | **SSR + CDN cache** | JNews hierarchy (Mar 24 2026): dark hero (H1 = "{regionName} Region", live pulse = 90d incident count), 4-card GradientStatCard vitals (Incidents 90d/slate, Murders YTD/crimson, Avg Risk Score/amber, Most Active Area/violet), expandable extra stats tray, dark separator band ("Regional Breakdown"), area ranking grid, crime breakdown YoY table, recent headlines accordion. MPSidebar (showAll=true). |
