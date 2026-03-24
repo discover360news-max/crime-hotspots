@@ -558,29 +558,42 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       if (mapShimmer) { mapShimmer.style.opacity = '1'; mapShimmer.style.pointerEvents = ''; }
       if (leafletMapEl) leafletMapEl.style.opacity = '0';
 
-      const [dashData, crimesData] = await Promise.all([
-        fetch(`/api/dashboard/?year=${selectedValue}`).then(r => r.json()),
-        fetch(`/api/crimes/?year=${selectedValue}`).then(r => r.json()),
-      ]) as [any, any];
+      try {
+        const [dashData, crimesData] = await Promise.all([
+          fetch(`/api/dashboard/?year=${selectedValue}`).then(r => r.json()),
+          fetch(`/api/crimes/?year=${selectedValue}`).then(r => r.json()),
+        ]) as [any, any];
 
-      const crimes = (crimesData.crimes as any[]).map((c: any) => ({
-        ...c,
-        dateObj: new Date(c.year, c.month - 1, c.day),
-      }));
-      window.__crimesData = crimes;
+        const crimes = (crimesData.crimes as any[]).map((c: any) => ({
+          ...c,
+          dateObj: new Date(c.year, c.month - 1, c.day),
+        }));
+        window.__crimesData = crimes;
 
-      applyPrecomputedStats(dashData.stats, dashData.trends);
-      applyPrecomputedInsights(dashData.insights);
-      applyPrecomputedTopRegions(dashData.topRegions);
-      updateLeafletMap(crimes, '/trinidad/crime/');
-      updateSubtitleYear(selectedValue);
+        applyPrecomputedStats(dashData.stats, dashData.trends);
+        applyPrecomputedInsights(dashData.insights);
+        applyPrecomputedTopRegions(dashData.topRegions);
+        updateLeafletMap(crimes, '/trinidad/crime/');
+        updateSubtitleYear(selectedValue);
 
-      await Promise.all([
-        window.hideShimmerWithMinTime(statsShimmer, statsContainer, updateStart),
-        window.hideShimmerWithMinTime(insightsShimmer, insightsCards, updateStart),
-        window.hideShimmerWithMinTime(topRegionsShimmer, topRegionsCard, updateStart),
-        window.hideShimmerWithMinTime(mapShimmer, leafletMapEl, updateStart),
-      ]);
+        await Promise.all([
+          window.hideShimmerWithMinTime(statsShimmer, statsContainer, updateStart),
+          window.hideShimmerWithMinTime(insightsShimmer, insightsCards, updateStart),
+          window.hideShimmerWithMinTime(topRegionsShimmer, topRegionsCard, updateStart),
+          window.hideShimmerWithMinTime(mapShimmer, leafletMapEl, updateStart),
+        ]);
+      } catch (err) {
+        console.warn('Year filter update failed:', err);
+        // Restore visible state so the dashboard doesn't freeze on shimmers
+        if (statsShimmer) { statsShimmer.style.opacity = '0'; statsShimmer.style.pointerEvents = 'none'; }
+        if (statsContainer) statsContainer.style.opacity = '1';
+        if (insightsShimmer) { insightsShimmer.style.opacity = '0'; insightsShimmer.style.pointerEvents = 'none'; }
+        if (insightsCards) insightsCards.style.opacity = '1';
+        if (topRegionsShimmer) { topRegionsShimmer.style.opacity = '0'; topRegionsShimmer.style.pointerEvents = 'none'; }
+        if (topRegionsCard) topRegionsCard.style.opacity = '1';
+        if (mapShimmer) { mapShimmer.style.opacity = '0'; mapShimmer.style.pointerEvents = 'none'; }
+        if (leafletMapEl) leafletMapEl.style.opacity = '1';
+      }
     }
 
     function setupYearFilter() {
