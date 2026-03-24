@@ -8,6 +8,16 @@
 
 ## March 2026
 
+### Dashboard + Compare: prerender → SSR (D1 migration complete) (Mar 24)
+
+- **`dashboard.astro`**: Removed `export const prerender = true`. Now SSR + CDN cached (`max-age=3600, s-maxage=82800`). Uses `getAllCrimesFromD1(db)` with `getTrinidadCrimes()` CSV fallback. No longer fetches CSV at build time.
+- **`compare.astro`**: Same SSR migration. Removed `export const prerender = true` and `loadFullAreaData()` CSV call. Area info now derived from `allCrimes` (region from D1) + `area-aliases.json` (knownAs — static, build-time). `getSafetyContext` 90-day window now always current at request time.
+- **Shimmer behaviour updated** (`dashboardDataLoader.ts`): SSR path detects `window.__dashboardSSR` (set via `define:vars`). On SSR load, stats/insights/topRegions are revealed immediately (no shimmer — real data already in HTML). Shimmers now only show on year filter changes (`onYearChange`). Map shimmer stays briefly while `/api/crimes/` is fetched silently for Leaflet map + year filter interactivity.
+- **CSV fallback kept**: `initializeDashboardDataFromCSV()` retained as safety net for local dev without D1 (non-SSR path only).
+- **CSV audit**: All crime-data pages now on D1. `statistics.astro` uses `TRINIDAD_CSV_URLS` only for CSV download links (not data). `mp/[slug].astro` uses CSV (pre-rendered, intentional). `redirectGenerator.ts` uses CSV at build time for redirect map (intentional).
+
+---
+
 ### /support page + blog date fix (Mar 24)
 
 - **NEW PAGE `/support/`** (`src/pages/support.astro`): Ko-fi CTA page — primary rose button to ko-fi.com/crimehotspots, 3 cards (Hosting & Infrastructure, AI Data Pipeline, Development), secondary ghost CTAs to /report + /help. Pre-rendered static.
@@ -15,6 +25,16 @@
 - **Header.astro:** All 3 Ko-fi links (desktop nav, subscribe tray, hamburger) now route through `/support/` instead of direct ko-fi URL.
 - **Layout.astro footer:** Help nav section now includes "Support the Project" link; footer Ko-fi button also routes through `/support/`.
 - **B024 fixed — blog publish date:** `weeklyBlogAutomation.gs` `buildFinalBlogMarkdown()` frontmatter `date` now uses `new Date()` (publication day). Previously used `blogData.weekEnd` (lagDays=3 behind), causing Monday posts to show Friday's date. Filename still uses `weekEnd` as data-period identifier. `trinidad-weekly-2026-03-20.md` corrected to `2026-03-23`.
+
+---
+
+### Safety Tips Batch: TIP-00082 to TIP-00085 (Mar 24)
+
+- **NEW TIP TIP-00082** — Concealing Jewellery at Late-Night Bar Exits (Robbery / At a Bar)
+- **NEW TIP TIP-00083** — Limiting Outdoor Exposure in Residential Areas After Dark (Shooting / Walking Alone)
+- **NEW TIP TIP-00084** — Employee Safety During an Armed Retail Raid (Robbery / At Work)
+- **NEW TIP TIP-00085** — Protecting Yourself in a Chase-and-Overpower Robbery (Robbery / Walking Alone)
+- **UPDATED TIP-00033** — Added Story 638 to `related_story_ids` (early-morning minimart robbery — low-staff period already covered)
 
 ---
 

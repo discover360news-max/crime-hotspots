@@ -52,7 +52,7 @@ D002 | DEC | active | CSV URLs: single source of truth in csvUrls.ts — all oth
 D003 | DEC | active | Victim count: PRIMARY crime only; related always +1; Murder|Murder = 2 victims → D003-victim-count-rules.md
 D004 | DEC | active | Slug migration: Story_ID+6words new format; legacy headline-date → 301 via SSR → D004-slug-migration.md
 D005 | DEC | active | Migrated to Astro (Dec 2025) from Vite for SSR, content collections, scalability → D005-astro-migration.md
-D006 | DEC | active | CSV → D1 migration. ALL 3 PHASES COMPLETE. Infra live (DB ID: 23311480). Dashboard uses /api/dashboard + /api/crimes (D1-backed, CDN-cached). area-aliases.json baked at build. → D006-d1-migration-plan.md
+D006 | DEC | active | CSV → D1 migration. ALL PHASES COMPLETE (incl. dashboard + compare, Mar 24 2026). Dashboard + Compare now SSR+CDN. Shimmer skipped on SSR initial load (window.__dashboardSSR). Only mp/[slug].astro still uses CSV (pre-rendered, intentional). → D006-d1-migration-plan.md
 D007 | DEC | active | Search: replaced Pagefind with D1 FTS5. crimes_fts virtual table (FTS5). /api/search endpoint (crimes via FTS5, MPs via mps.json, areas via D1 LIKE). Sync worker clears+repopulates FTS on every sync. → D007-search-d1-fts.md
 
 ## Backlog (IDEA)
@@ -67,7 +67,7 @@ F015 | FEAT | active | Help Centre: /help/ index + 14 pre-rendered articles (6 s
 F011 | FEAT | active | Data Capability Sheet: /data-capability-sheet/ — B2B institutional one-pager, PDF-printable, content in capabilitySheetConfig.ts. CSV/PDF formats are on-engagement only, not self-serve → F011-data-capability-sheet.md
 F001 | FEAT | active | Security: escapeHtml, sanitizeUrl, CSP headers, Turnstile, Secure cookies → F001-security-system.md
 F002 | FEAT | active | GAS pipeline: RSS → preFilter → Claude Haiku → Sheets → CSV → site → F002-gas-automation-pipeline.md
-F003 | FEAT | active | Safety tips: 71 tips (last: TIP-00081, Mar 23 2026), category/context/area pages, submit form, voting. Categories: Robbery, Carjacking, Home Invasion, ATM Crime, Online Scam, Kidnapping, Sexual Violence, Fraud, Assault, Domestic Violence, Extortion, Shooting, Burglary, Other. Contexts include At a Bar (added Mar 17 2026) → F003-safety-tips-system.md
+F003 | FEAT | active | Safety tips: 75 tips (last: TIP-00085, Mar 24 2026), category/context/area pages, submit form, voting. Categories: Robbery, Carjacking, Home Invasion, ATM Crime, Online Scam, Kidnapping, Sexual Violence, Fraud, Assault, Domestic Violence, Extortion, Shooting, Burglary, Other. Contexts include At a Bar (added Mar 17 2026) → F003-safety-tips-system.md
 F004 | FEAT | active | Weekly blog: Mon 10AM GAS → Claude Haiku → GitHub commit → Cloudflare deploy → F004-weekly-blog-automation.md
 F005 | FEAT | active | Safety context: area crime score 1–10, 90-day window, 3 risk levels → F005-safety-context-system.md
 F006 | FEAT | active | Slug redirects: SSR handles legacy→new; redirect-map.json is reference only → F006-slug-redirect-system.md

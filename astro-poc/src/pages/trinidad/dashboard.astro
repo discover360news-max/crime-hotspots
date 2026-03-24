@@ -4,11 +4,8 @@
  * Interactive dashboard with regional SVG map and Leaflet incidents map
  */
 
-// Keep dashboard static (pre-rendered at build time)
-export const prerender = true;
-
 import Layout from '../../layouts/Layout.astro';
-import { getTrinidadCrimes } from '../../lib/crimeData';
+import { getAllCrimesFromD1, getTrinidadCrimes } from '../../lib/crimeData';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
 import { getTotalCrimeCount } from '../../lib/statisticsHelpers';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
@@ -28,8 +25,11 @@ import { getCountryName } from '../../data/countries';
 import { routes } from '../../config/routes';
 import '../../styles/dashboard.css';
 
-// Get all crimes (will be used for year filtering on client-side)
-const allCrimes = await getTrinidadCrimes();
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // Get available years for dropdown (sorted descending)
 const availableYears = [...new Set(allCrimes.map(c => c.year))].sort((a, b) => b - a);
@@ -406,8 +406,8 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       if (!yearFilterEl) return;
 
       const defaultYear = (window as any).__dashboardDefaultYear;
-      const availableYears = [...new Set(crimes.map((c: any) => c.year as number))]
-        .sort((a, b) => b - a);
+      const availableYears: number[] = ((window as any).__dashboardAvailableYears as number[] | undefined) ??
+        [...new Set(crimes.map((c: any) => c.year as number))].sort((a, b) => b - a);
 
       yearFilterEl.innerHTML = '';
       availableYears.forEach(year => {
@@ -530,10 +530,12 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
   </FiltersTray>
 
   <!-- Expose region/area data to window for the location filter script below -->
-  <script is:inline define:vars={{ dashboardRegionToAreas, dashboardAllAreas: dashboardAreas, dashboardDefaultYear: String(currentYear) }}>
+  <script is:inline define:vars={{ dashboardRegionToAreas, dashboardAllAreas: dashboardAreas, dashboardDefaultYear: String(currentYear), dashboardAvailableYears: availableYears, dashboardSSR: true }}>
     window.__dashboardRegionToAreas = dashboardRegionToAreas;
     window.__dashboardAllAreas = dashboardAllAreas;
     window.__dashboardDefaultYear = dashboardDefaultYear;
+    window.__dashboardAvailableYears = dashboardAvailableYears;
+    window.__dashboardSSR = dashboardSSR;
   </script>
 
   <!-- Region / Area filter for dashboard -->

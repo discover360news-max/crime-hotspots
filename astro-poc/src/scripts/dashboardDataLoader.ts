@@ -227,17 +227,65 @@ async function initializeDashboardDataFromCSV(): Promise<void> {
 
 /**
  * Initialize dashboard data loading.
- * PRIMARY: Fetches pre-computed stats from /api/dashboard + crimes from /api/crimes (D1-backed).
+ *
+ * SSR PATH (production): Initial HTML already has real D1 data. Skip shimmer dance —
+ * immediately reveal stats/insights/topRegions, then silently fetch /api/crimes/ for
+ * window.__crimesData (needed by Leaflet map + onYearChange year filter).
+ *
+ * NON-SSR PATH (local dev without D1): shimmer → fetch /api/dashboard + /api/crimes → apply.
  * FALLBACK: Falls back to CSV fetches if the API is unavailable.
  */
 export async function initializeDashboardData(): Promise<void> {
-  const shimmerStartTime = Date.now();
-
   // Area aliases — static, zero network cost
   (window as any).__areaAliases = areaAliasesJson;
 
-  // Default year set via define:vars in dashboard.astro
+  // Default year and SSR flag set via define:vars in dashboard.astro
   const year = (window as any).__dashboardDefaultYear || String(new Date().getFullYear());
+  const isSSR = !!(window as any).__dashboardSSR;
+
+  if (isSSR) {
+    // SSR path: stats/insights/topRegions already rendered with real D1 data.
+    // Reveal them immediately — no shimmer needed on first load.
+    const statsShimmer = document.getElementById('statsShimmer');
+    const statsContainer = document.querySelector('.stats-scroll-container') as HTMLElement | null;
+    const insightsShimmer = document.getElementById('insightsShimmer');
+    const insightsCards = document.getElementById('insightsCards');
+    const topRegionsShimmer = document.getElementById('topRegionsShimmer');
+    const topRegionsCard = document.getElementById('topRegionsCard');
+
+    if (statsShimmer) { statsShimmer.style.opacity = '0'; statsShimmer.style.pointerEvents = 'none'; }
+    if (statsContainer) statsContainer.style.opacity = '1';
+    if (insightsShimmer) { insightsShimmer.style.opacity = '0'; insightsShimmer.style.pointerEvents = 'none'; }
+    if (insightsCards) insightsCards.style.opacity = '1';
+    if (topRegionsShimmer) { topRegionsShimmer.style.opacity = '0'; topRegionsShimmer.style.pointerEvents = 'none'; }
+    if (topRegionsCard) topRegionsCard.style.opacity = '1';
+
+    const statsScrollHint = document.getElementById('statsScrollHint');
+    if (statsScrollHint) statsScrollHint.style.opacity = '1';
+
+    // Fetch crimes for Leaflet map + year filter interactivity.
+    // Map shimmer stays until window.__crimesData is set (dashboardMapInit polls for it).
+    try {
+      const crimesData = await fetch(`/api/crimes/?year=${year}`).then(r => {
+        if (!r.ok) throw new Error(`/api/crimes responded ${r.status}`);
+        return r.json();
+      }) as any;
+      const crimes = (crimesData.crimes as any[]).map(c => ({
+        ...c,
+        dateObj: new Date(c.year, c.month - 1, c.day),
+      }));
+      (window as any).__crimesData = crimes;
+    } catch (err) {
+      console.warn('Background crimes fetch failed (map/filter may not work):', err);
+    }
+
+    // Signal crimes data ready — wires up year filter dropdown
+    window.dispatchEvent(new CustomEvent('crimesDataReady'));
+    return;
+  }
+
+  // Non-SSR path (local dev without D1): shimmer → API → apply precomputed stats
+  const shimmerStartTime = Date.now();
 
   try {
     const [dashData, crimesData] = await Promise.all([
