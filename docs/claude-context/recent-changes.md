@@ -8,6 +8,16 @@
 
 ## March 2026
 
+### /support page + blog date fix (Mar 24)
+
+- **NEW PAGE `/support/`** (`src/pages/support.astro`): Ko-fi CTA page — primary rose button to ko-fi.com/crimehotspots, 3 cards (Hosting & Infrastructure, AI Data Pipeline, Development), secondary ghost CTAs to /report + /help. Pre-rendered static.
+- **Routes:** `routes.support = '/support/'` added to `routes.ts`.
+- **Header.astro:** All 3 Ko-fi links (desktop nav, subscribe tray, hamburger) now route through `/support/` instead of direct ko-fi URL.
+- **Layout.astro footer:** Help nav section now includes "Support the Project" link; footer Ko-fi button also routes through `/support/`.
+- **B024 fixed — blog publish date:** `weeklyBlogAutomation.gs` `buildFinalBlogMarkdown()` frontmatter `date` now uses `new Date()` (publication day). Previously used `blogData.weekEnd` (lagDays=3 behind), causing Monday posts to show Friday's date. Filename still uses `weekEnd` as data-period identifier. `trinidad-weekly-2026-03-20.md` corrected to `2026-03-23`.
+
+---
+
 ### Safety Tips Batch: TIP-00078 to TIP-00081 (Mar 23)
 
 - **NEW TIP TIP-00078** — Protecting Your Residence When Arson Is Threatened (Extortion / At Home)

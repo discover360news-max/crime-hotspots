@@ -61,6 +61,13 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 24, 2026
+- **Newsletter prompt:** Created reusable Buttondown prompt for weekly roundup — urgent/factual tone, ~300 words, fixed sections (This Week's Hotspots, By The Numbers, Stay Safe, Reports Matter), CTAs to `/trinidad/statistics`, `/trinidad/murder-toll`, `/report`, `/support`. Prompt-only deliverable, no code changes.
+- **`/support/` page created** (`src/pages/support.astro`): Ko-fi CTA approach (button out to ko-fi.com/crimehotspots), 3 "what support covers" cards (Hosting & Infrastructure, AI Data Pipeline, Development), secondary ghost CTAs to /report + /help. Pre-rendered static.
+- **Routes + nav wired:** `routes.ts` → `support: '/support/'`. Header.astro (3 links: desktop nav, subscribe tray, hamburger) + Layout.astro footer button all updated from direct Ko-fi URL → `/support/`. Footer Help nav section has "Support the Project" link added.
+- **B024 blog date fix:** `weeklyBlogAutomation.gs` `buildFinalBlogMarkdown()` — frontmatter `date` now uses `formatBlogDateStr(new Date())` (publish day) instead of `blogData.weekEnd` (data window end). Fixes 3-day offset caused by `lagDays=3`. Filename still uses `weekEnd`. Also corrected existing `trinidad-weekly-2026-03-20.md` frontmatter date → `2026-03-23`.
+- `p1-01-dashboard-after.png` still untracked in repo root — stray screenshot, safe to delete.
+
 ## Session Notes — Mar 22, 2026
 - **Help Centre launched:** `/help/` index + 14 pre-rendered articles committed + pushed. 6 sections (Getting Started, Understanding the Data, Using the Dashboard, Safety Tips, Crime Reports, For Researchers). Nav link added (desktop + mobile), footer "Help Centre" link added. `content/config.ts` help collection schema (`section`, `summary`, `order`, `related`, `date_updated`). Sitemap: index priority 0.7, articles 0.6 with `date_updated` as lastmod. Added F015 to INDEX.md.
 - **Docs cleanup:** `site-features.md` GAS section updated to reflect Mar 19 refactored file structure (split files now listed; deleted `geminiClient.gs`, `groqClient.gs`, `plusCodeConverter.gs` removed; `facebookSubmitter.gs` → two-file split noted).

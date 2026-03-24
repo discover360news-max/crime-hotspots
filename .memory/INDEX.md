@@ -27,6 +27,7 @@ B020 | BUG | fixed | updateQuickInsights() used new Date(c.date) string parse (U
 B021 | BUG | fixed | Astro template bare ternary `expr ? (...) : (...)` renders as literal text — MUST wrap in `{}`. Hit HomepagePulse (Mar 15 2026) → B021-astro-template-bare-ternary.md
 B022 | BUG | fixed | D1 sync ran at 10am UTC — AFTER 6am site rebuild → stale data all day. Fix: moved cron to 5am. D1 MUST sync before rebuild. See B022-d1-cron-timing-sequencing.md
 B023 | BUG | fixed | Crime dates stored as run date: 3 compounding bugs — empty RSS pubDate, Claude returning null crime_date for ongoing crimes, dayOfWeek using getDay() (UTC not TZ). + missing "a day after" prompt rule. → B023-gas-date-accuracy-multi-root.md
+B024 | BUG | fixed | Blog frontmatter `date` used `blogData.weekEnd` (lagDays=3 offset) instead of `new Date()` — Monday publish showed Friday's date. Fix: `publishDateStr = formatBlogDateStr(new Date())` in buildFinalBlogMarkdown(). Filename still uses weekEnd. → weeklyBlogAutomation.gs
 
 ## Learnings & Patterns (L)
 L001 | LEARN | archived | ~~astro:page-load~~ — SPA removed Mar 15 2026. Use DOMContentLoaded. Do NOT re-introduce ClientRouter → L001-astro-page-load-pattern.md
