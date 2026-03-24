@@ -285,6 +285,8 @@ export async function initializeDashboardData(): Promise<void> {
       applyPrecomputedStats(dashData.stats, dashData.trends);
     } catch (err) {
       console.warn('Background fetch failed (trends/map/filter may not work):', err);
+      // Ensure map can still initialize (will show empty tiles rather than hanging shimmer)
+      if (!(window as any).__crimesData) (window as any).__crimesData = [];
     }
 
     // Signal crimes data ready — wires up year filter dropdown
