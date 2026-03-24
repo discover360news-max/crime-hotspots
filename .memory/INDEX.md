@@ -28,6 +28,8 @@ B021 | BUG | fixed | Astro template bare ternary `expr ? (...) : (...)` renders 
 B022 | BUG | fixed | D1 sync ran at 10am UTC — AFTER 6am site rebuild → stale data all day. Fix: moved cron to 5am. D1 MUST sync before rebuild. See B022-d1-cron-timing-sequencing.md
 B023 | BUG | fixed | Crime dates stored as run date: 3 compounding bugs — empty RSS pubDate, Claude returning null crime_date for ongoing crimes, dayOfWeek using getDay() (UTC not TZ). + missing "a day after" prompt rule. → B023-gas-date-accuracy-multi-root.md
 B024 | BUG | fixed | Blog frontmatter `date` used `blogData.weekEnd` (lagDays=3 offset) instead of `new Date()` — Monday publish showed Friday's date. Fix: `publishDateStr = formatBlogDateStr(new Date())` in buildFinalBlogMarkdown(). Filename still uses weekEnd. → weeklyBlogAutomation.gs
+B025 | BUG | fixed | SSR dashboard path fetched only `/api/crimes/` — `.trend-indicator` (always `hidden` in SSR HTML) never populated on first load. Fix: also fetch `/api/dashboard/` in parallel + call `applyPrecomputedStats()`. See dashboardDataLoader.ts SSR path. → recent-changes.md Mar 24
+B026 | BUG | fixed | `/api/dashboard` trend queries always used `now-3/33/63d` regardless of year param — historical year (e.g. 2025) showed live 2026 rolling-window arrows next to 2025 totals. Fix: skip trend queries for non-current years; return zero trends → indicators hidden. → api/dashboard.ts
 
 ## Learnings & Patterns (L)
 L001 | LEARN | archived | ~~astro:page-load~~ — SPA removed Mar 15 2026. Use DOMContentLoaded. Do NOT re-introduce ClientRouter → L001-astro-page-load-pattern.md

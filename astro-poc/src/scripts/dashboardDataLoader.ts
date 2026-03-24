@@ -263,20 +263,28 @@ export async function initializeDashboardData(): Promise<void> {
     const statsScrollHint = document.getElementById('statsScrollHint');
     if (statsScrollHint) statsScrollHint.style.opacity = '1';
 
-    // Fetch crimes for Leaflet map + year filter interactivity.
-    // Map shimmer stays until window.__crimesData is set (dashboardMapInit polls for it).
+    // Fetch crimes (for map/filter) and dashboard stats (for trend indicators) in parallel.
+    // Both are CDN-cached. Counts are already correct in SSR HTML — only trends need populating.
     try {
-      const crimesData = await fetch(`/api/crimes/?year=${year}`).then(r => {
-        if (!r.ok) throw new Error(`/api/crimes responded ${r.status}`);
-        return r.json();
-      }) as any;
+      const [crimesData, dashData] = await Promise.all([
+        fetch(`/api/crimes/?year=${year}`).then(r => {
+          if (!r.ok) throw new Error(`/api/crimes responded ${r.status}`);
+          return r.json();
+        }),
+        fetch(`/api/dashboard/?year=${year}`).then(r => {
+          if (!r.ok) throw new Error(`/api/dashboard responded ${r.status}`);
+          return r.json();
+        }),
+      ]) as [any, any];
       const crimes = (crimesData.crimes as any[]).map(c => ({
         ...c,
         dateObj: new Date(c.year, c.month - 1, c.day),
       }));
       (window as any).__crimesData = crimes;
+      const { applyPrecomputedStats } = await import('./dashboardUpdates');
+      applyPrecomputedStats(dashData.stats, dashData.trends);
     } catch (err) {
-      console.warn('Background crimes fetch failed (map/filter may not work):', err);
+      console.warn('Background fetch failed (trends/map/filter may not work):', err);
     }
 
     // Signal crimes data ready — wires up year filter dropdown

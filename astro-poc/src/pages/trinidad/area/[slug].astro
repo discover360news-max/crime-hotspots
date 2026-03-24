@@ -449,7 +449,7 @@ const breadcrumbs = [
                   href={a.hasCrimes ? buildRoute.area(a.slug) : '#'}
                   class={`block px-4 py-3 rounded-lg border text-sm font-medium transition ${
                     a.hasCrimes
-                      ? 'bg-white dark:bg-[var(--ch-surface)] border-slate-200 dark:border-[var(--ch-border-subtle)] text-slate-700 dark:text-[var(--ch-text-heading)] hover:border-rose-300 hover:text-rose-600'
+                      ? 'bg-white dark:bg-[var(--ch-surface)] border-slate-200 dark:border-[var(--ch-border-subtle)] text-slate-700 dark:text-[var(--ch-text-heading)] hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:border-rose-300 dark:hover:border-rose-800 hover:text-rose-600 dark:hover:text-rose-400'
                       : 'bg-white/50 dark:bg-[var(--ch-surface)]/50 border-slate-100 dark:border-[hsl(0_0%_12%)] text-slate-400 dark:text-[hsl(0_0%_40%)] cursor-default'
                   }`}
                 >
@@ -472,7 +472,7 @@ const breadcrumbs = [
               {otherRegionAreas.map(a => (
                 <a
                   href={buildRoute.area(a.slug)}
-                  class="block px-4 py-3 rounded-lg border bg-white dark:bg-[var(--ch-surface)] border-slate-200 dark:border-[var(--ch-border-subtle)] text-sm font-medium text-slate-700 dark:text-[var(--ch-text-heading)] hover:border-rose-300 hover:text-rose-600 transition"
+                  class="block px-4 py-3 rounded-lg border bg-white dark:bg-[var(--ch-surface)] border-slate-200 dark:border-[var(--ch-border-subtle)] text-sm font-medium text-slate-700 dark:text-[var(--ch-text-heading)] hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:border-rose-300 dark:hover:border-rose-800 hover:text-rose-600 dark:hover:text-rose-400 transition"
                 >
                   <span>{a.name}</span>
                   <span class="block text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-0.5">

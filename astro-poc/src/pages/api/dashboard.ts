@@ -121,8 +121,9 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   try {
     let crimes: Crime[];
-    let last30Crimes: Crime[];
-    let prev30Crimes: Crime[];
+    let last30Crimes: Crime[] = [];
+    let prev30Crimes: Crime[] = [];
+    const isCurrentOrAllYears = yearParam === 'all' || parseInt(yearParam, 10) === new Date().getFullYear();
 
     if (yearParam === 'all') {
       crimes = await getAllCrimesFromD1(db);
@@ -137,11 +138,14 @@ export const GET: APIRoute = async ({ request, locals }) => {
       crimes = await getCrimesByYearFromD1(db, year);
     }
 
-    // Trend queries cross year boundaries naturally in D1 — no historicalTrends CSV needed
-    [last30Crimes, prev30Crimes] = await Promise.all([
-      getCrimesByDateRangeFromD1(db, formatDate(thirtyThreeDaysAgo), formatDate(threeDaysAgo)),
-      getCrimesByDateRangeFromD1(db, formatDate(sixtyThreeDaysAgo), formatDate(thirtyThreeDaysAgo)),
-    ]);
+    // Only compute rolling 30-day trends for current year or all-years view.
+    // For past years, empty arrays cause trend indicators to be hidden (prev30Count === 0).
+    if (isCurrentOrAllYears) {
+      [last30Crimes, prev30Crimes] = await Promise.all([
+        getCrimesByDateRangeFromD1(db, formatDate(thirtyThreeDaysAgo), formatDate(threeDaysAgo)),
+        getCrimesByDateRangeFromD1(db, formatDate(sixtyThreeDaysAgo), formatDate(thirtyThreeDaysAgo)),
+      ]);
+    }
 
     const stats = buildStats(crimes);
     const trends = {

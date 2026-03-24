@@ -8,6 +8,15 @@
 
 ## March 2026
 
+### Dashboard + area page bug fixes (Mar 24)
+
+- **`dashboardDataLoader.ts`**: SSR path now fetches `/api/dashboard/?year=...` in parallel with `/api/crimes/` and calls `applyPrecomputedStats()`. Previously the SSR path never fetched `/api/dashboard`, so `.trend-indicator` elements (always `hidden` in SSR HTML) were never populated on first load. Counts were correct; only trend arrows were missing.
+- **`api/dashboard.ts`**: Rolling 30-day trend queries now only run for current year or `all`. Historical year selections (e.g. 2025) return zero trends so trend indicators are hidden. Previously 2025 stat cards showed live 2026 rolling-window arrows, which was misleading.
+- **`AreaNarrative.astro`**: Fixed pluralization — `total90d` fallback sentence (`thisWeekCount === 0` branch) now correctly shows "1 incident" not "1 incidents".
+- **`area/[slug].astro`**: Added `hover:bg-rose-50 dark:hover:bg-rose-950/30` + dark mode hover variants (`dark:hover:border-rose-800`, `dark:hover:text-rose-400`) to both "Other Areas" link sections.
+
+---
+
 ### Dashboard + Compare: prerender → SSR (D1 migration complete) (Mar 24)
 
 - **`dashboard.astro`**: Removed `export const prerender = true`. Now SSR + CDN cached (`max-age=3600, s-maxage=82800`). Uses `getAllCrimesFromD1(db)` with `getTrinidadCrimes()` CSV fallback. No longer fetches CSV at build time.
