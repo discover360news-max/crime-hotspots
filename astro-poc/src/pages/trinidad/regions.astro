@@ -91,7 +91,7 @@ const pageDescription = `Crime statistics for all ${regions.length} regions in T
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {regions.map((region, index) => (
         <a
-          href={`/trinidad/region/${region.slug}`}
+          href={`/trinidad/region/${region.slug}/`}
           class="block bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
         >
           <div class="flex items-start justify-between mb-3">

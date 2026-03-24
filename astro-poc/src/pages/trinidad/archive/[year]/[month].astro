@@ -22,7 +22,7 @@ const year = parseInt(yearParam ?? '', 10);
 const month = parseInt(monthParam ?? '', 10);
 
 if (isNaN(year) || isNaN(month) || month < 1 || month > 12) {
-  return Astro.redirect('/404/', 301);
+  return Astro.redirect('/404/', 302);
 }
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
@@ -37,7 +37,7 @@ const [crimes, allCrimes] = db
     })();
 
 if (crimes.length === 0) {
-  return Astro.redirect('/404/', 301);
+  return Astro.redirect('/404/', 302);
 }
 
 const monthName = new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long' });

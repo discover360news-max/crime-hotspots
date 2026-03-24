@@ -31,7 +31,7 @@ const regions = new Set(areaData.map(a => a.region).filter(r => r));
 const regionName = Array.from(regions).find(r => generateNameSlug(r) === slug);
 
 if (!regionName) {
-  return Astro.redirect('/404/', 301);
+  return Astro.redirect('/404/', 302);
 }
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');

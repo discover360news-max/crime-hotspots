@@ -158,6 +158,9 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
   const cardByType = (type: string) => document.querySelector(`.stat-card[data-crime-type="${type}"]`);
   updateCardWithTrend(document.getElementById('totalIncidents'), displayTotal, last30Total, prev30Total);
   updateCardWithTrend(cardByType('Murder'), displayMurders, last30Murders, prev30Murders);
+  // Sync vitals row murders card
+  const vitalsMurdersEl = document.getElementById('vitals-murders');
+  if (vitalsMurdersEl) { const v = vitalsMurdersEl.querySelector('.text-3xl'); if (v) v.textContent = String(displayMurders); }
   updateCardWithTrend(cardByType('Attempted Murder'), displayAttemptedMurders, last30AttemptedMurders, prev30AttemptedMurders);
   updateCardWithTrend(cardByType('Shooting'), displayShootings, last30Shootings, prev30Shootings);
   updateCardWithTrend(cardByType('Robbery'), displayRobberies, last30Robberies, prev30Robberies);
@@ -288,6 +291,10 @@ export function updateQuickInsights(crimes: Crime[]) {
   if (victimsPerDayEl) victimsPerDayEl.textContent = `${victimsPerDay} victims/day`;
   if (mostDangerousDayEl) mostDangerousDayEl.textContent = mostDangerousDay;
   if (busiestMonthEl) busiestMonthEl.textContent = busiestMonth;
+  // Sync vitals daily avg card
+  const vd = document.getElementById('vitals-daily'); if (vd) { const v = vd.querySelector('.text-3xl'); if (v) v.textContent = avgPerDay; const s = document.getElementById('vitals-daily-sub'); if (s) s.textContent = `${victimsPerDay} victims/day`; }
+  // Sync vitals hotspot card
+  const vh = document.getElementById('vitals-hotspot') as HTMLAnchorElement | null; if (vh) { const v = vh.querySelector('.text-3xl'); if (v) v.textContent = String(mostDangerousRegionCount); const s = document.getElementById('vitals-hotspot-sub'); if (s) s.textContent = mostDangerousRegion; vh.href = buildRoute.area(generateNameSlug(mostDangerousRegion)); }
   // Update area names and wrap parent <a> with correct href
   if (mostDangerousRegionEl) {
     mostDangerousRegionEl.textContent = mostDangerousRegion;
@@ -349,18 +356,12 @@ export function updateTopRegions(crimes: Crime[]) {
     const regionSlug = generateNameSlug(region);
     const mobileHidden = index >= 5 ? 'hidden sm:flex' : '';
     return `
-    <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[var(--ch-border-card)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
+    <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[var(--ch-border-card)] hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_14%)] rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
         <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] truncate flex-1">${region}</span>
-        <div class="flex items-center gap-1.5 flex-shrink-0">
-          <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[var(--ch-text-muted)] text-xs font-medium">
-            ${crimeCount}
-          </span>
-          <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">${crimeCount === 1 ? 'crime' : 'crimes'}</span>
-          <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[var(--ch-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
+        <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-400 dark:text-[var(--ch-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
       </div>
       <!-- Bar width relative to #1 region's absolute weighted score -->
       <div class="relative w-full h-2 bg-slate-200 dark:bg-[hsl(0_0%_18%)] rounded-full overflow-hidden">
@@ -447,6 +448,9 @@ export function applyPrecomputedStats(stats: DashboardStats, trends: DashboardTr
   const cardByType = (type: string) => document.querySelector(`.stat-card[data-crime-type="${type}"]`);
   updateCardWithTrend(document.getElementById('totalIncidents'), stats.total, trends.last30.total, trends.prev30.total);
   updateCardWithTrend(cardByType('Murder'), stats.murders, trends.last30.murders, trends.prev30.murders);
+  // Sync vitals row murders card
+  const vitalsMurdersEl = document.getElementById('vitals-murders');
+  if (vitalsMurdersEl) { const v = vitalsMurdersEl.querySelector('.text-3xl'); if (v) v.textContent = String(stats.murders); }
   updateCardWithTrend(cardByType('Attempted Murder'), stats.attemptedMurders, trends.last30.attemptedMurders, trends.prev30.attemptedMurders);
   updateCardWithTrend(cardByType('Shooting'), stats.shootings, trends.last30.shootings, trends.prev30.shootings);
   updateCardWithTrend(cardByType('Robbery'), stats.robberies, trends.last30.robberies, trends.prev30.robberies);
@@ -475,6 +479,10 @@ export function applyPrecomputedInsights(insights: DashboardInsights): void {
   if (victimsPerDayEl) victimsPerDayEl.textContent = `${insights.victimsPerDay} victims/day`;
   if (mostDangerousDayEl) mostDangerousDayEl.textContent = insights.mostDangerousDay;
   if (busiestMonthEl) busiestMonthEl.textContent = insights.busiestMonth;
+  // Sync vitals daily avg card
+  const vd2 = document.getElementById('vitals-daily'); if (vd2) { const v = vd2.querySelector('.text-3xl'); if (v) v.textContent = insights.avgPerDay; const s = document.getElementById('vitals-daily-sub'); if (s) s.textContent = `${insights.victimsPerDay} victims/day`; }
+  // Sync vitals hotspot card
+  const vh2 = document.getElementById('vitals-hotspot') as HTMLAnchorElement | null; if (vh2) { const v = vh2.querySelector('.text-3xl'); if (v) v.textContent = String(insights.mostDangerousAreaCount); const s = document.getElementById('vitals-hotspot-sub'); if (s) s.textContent = insights.mostDangerousArea; vh2.href = buildRoute.area(generateNameSlug(insights.mostDangerousArea)); }
   if (mostDangerousRegionEl) {
     mostDangerousRegionEl.textContent = insights.mostDangerousArea;
     const dangerousLink = mostDangerousRegionEl.closest('a');
@@ -508,18 +516,12 @@ export function applyPrecomputedTopRegions(regions: TopRegionEntry[]): void {
     const regionSlug = generateNameSlug(region);
     const mobileHidden = index >= 5 ? 'hidden sm:flex' : '';
     return `
-    <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[var(--ch-border-card)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-50 dark:active:bg-[hsl(0_0%_12%)] rounded-lg px-2 -mx-2 py-2 transition">
+    <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[var(--ch-border-card)] hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_14%)] rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
         <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] truncate flex-1">${region}</span>
-        <div class="flex items-center gap-1.5 flex-shrink-0">
-          <span class="px-1.5 py-0.5 min-h-[20px] flex items-center justify-center rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[var(--ch-text-muted)] text-xs font-medium">
-            ${crimeCount}
-          </span>
-          <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">${crimeCount === 1 ? 'crime' : 'crimes'}</span>
-          <svg class="w-3.5 h-3.5 text-slate-400 dark:text-[var(--ch-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
+        <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-400 dark:text-[var(--ch-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
       </div>
       <div class="relative w-full h-2 bg-slate-200 dark:bg-[hsl(0_0%_18%)] rounded-full overflow-hidden">
         <div class="absolute top-0 left-0 h-full overflow-hidden transition-all duration-300" style="width: ${barWidth}%">
