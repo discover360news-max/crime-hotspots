@@ -6,7 +6,7 @@ date: 2026-01-02
 excerpt: 'Following a period of relative calm, Trinidad and Tobago recorded a sharp escalation in violence on January 1, 2026. This starting data reveals seven major incidents, including two murders and three shootings, primarily centered in Port of Spain and Mendez.'
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'
-image: '/assets/images/report-hero.svg'
+image: '/assets/images/blog/trinidad-weekly-2026-01-02.webp'
 tags: ['Trinidad', 'Weekly Report', 'Statistics']
 ---
 

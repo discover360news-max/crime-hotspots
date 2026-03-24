@@ -6,7 +6,7 @@ date: 2026-01-23
 excerpt: 'With a 33% decline in total incidents, Trinidad and Tobago saw a shift toward violence between January 17–23, 2026. While reports fell to 45, murders surged by 60% and shootings rose 29%, with Port of Spain remaining the primary crime hotspot.'
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'
-image: '/assets/images/trinidad-january-23.webp'
+image: '/assets/images/blog/trinidad-weekly-2026-01-23.webp'
 tags: ['Trinidad', 'Weekly Report', 'Statistics']
 ---
 

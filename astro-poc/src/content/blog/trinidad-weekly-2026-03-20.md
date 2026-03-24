@@ -6,7 +6,7 @@ date: 2026-03-23
 excerpt: 'Trinidad recorded 71 crimes last week including 9 murders — a dramatic 200% spike in homicides compared to the previous week''s 3 victims. This represents the most significant surge in violent crime...'
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'
-image: '/assets/images/report-hero.svg'
+image: '/assets/images/blog/trinidad-weekly-2026-03-20.webp'
 tags: ['Trinidad', 'Weekly Report', 'Statistics']
 ---
 

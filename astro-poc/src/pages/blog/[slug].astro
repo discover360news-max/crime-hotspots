@@ -32,8 +32,7 @@ const title = `${post.data.title} | Crime Hotspots Caribbean`;
 const description = post.data.excerpt;
 
 function formatDate(date: Date) {
-  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-  return new Date(date).toLocaleDateString('en-US', options);
+  return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 // Determine dashboard link based on country
@@ -91,24 +90,23 @@ const newsArticleSchema = {
 <style>
   /* Blog Content Styling */
   .blog-content {
-    color: #334155; /* slate-700 */
+    color: #334155;
   }
 
-  /* Headings */
   .blog-content :global(h2) {
-    font-size: 1.5rem; /* h2 */
+    font-size: 1.5rem;
     line-height: 2rem;
     font-weight: 600;
-    color: #334155; /* slate-700 */
+    color: #334155;
     margin-top: 2rem;
     margin-bottom: 1rem;
   }
 
   .blog-content :global(h3) {
-    font-size: 1.25rem; /* h3 */
+    font-size: 1.25rem;
     line-height: 1.75rem;
     font-weight: 600;
-    color: #334155; /* slate-700 */
+    color: #334155;
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
   }
@@ -117,37 +115,30 @@ const newsArticleSchema = {
     font-size: 1rem;
     line-height: 1.5rem;
     font-weight: 600;
-    color: #475569; /* slate-600 */
+    color: #475569;
     margin-top: 1.25rem;
     margin-bottom: 0.5rem;
   }
 
-  /* Paragraphs */
   .blog-content :global(p) {
-    font-size: 0.875rem; /* small */
-    line-height: 1.625rem;
-    color: #334155; /* slate-700 */
-    margin-bottom: 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.75rem;
+    color: #334155;
+    margin-bottom: 1.125rem;
   }
 
-  /* Lists */
   .blog-content :global(ul),
   .blog-content :global(ol) {
-    font-size: 0.875rem; /* small */
-    line-height: 1.625rem;
-    color: #334155; /* slate-700 */
+    font-size: 0.9375rem;
+    line-height: 1.75rem;
+    color: #334155;
     margin-top: 1rem;
     margin-bottom: 1rem;
     padding-left: 1.5rem;
   }
 
-  .blog-content :global(ul) {
-    list-style-type: disc;
-  }
-
-  .blog-content :global(ol) {
-    list-style-type: decimal;
-  }
+  .blog-content :global(ul) { list-style-type: disc; }
+  .blog-content :global(ol) { list-style-type: decimal; }
 
   .blog-content :global(li) {
     margin-top: 0.5rem;
@@ -161,46 +152,39 @@ const newsArticleSchema = {
     margin-bottom: 0.5rem;
   }
 
-  /* Strong/Bold */
   .blog-content :global(strong) {
     font-weight: 600;
-    color: #1e293b; /* slate-800 */
+    color: #1e293b;
   }
 
-  /* Links */
   .blog-content :global(a) {
-    color: #e11d48; /* rose-600 */
+    color: #e11d48;
     text-decoration: underline;
     font-weight: 500;
   }
 
-  .blog-content :global(a:hover) {
-    color: #be123c; /* rose-700 */
-  }
+  .blog-content :global(a:hover) { color: #be123c; }
 
-  /* Horizontal Rules */
   .blog-content :global(hr) {
     border: 0;
-    border-top: 1px solid #e2e8f0; /* slate-200 */
+    border-top: 1px solid #e2e8f0;
     margin-top: 2rem;
     margin-bottom: 2rem;
   }
 
-  /* Blockquotes */
   .blog-content :global(blockquote) {
-    border-left: 4px solid #e11d48; /* rose-600 */
+    border-left: 4px solid #e11d48;
     padding-left: 1rem;
     margin-left: 0;
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
     font-style: italic;
-    color: #475569; /* slate-600 */
+    color: #475569;
   }
 
-  /* Code */
   .blog-content :global(code) {
-    background-color: #f1f5f9; /* slate-100 */
-    color: #e11d48; /* rose-600 */
+    background-color: #f1f5f9;
+    color: #e11d48;
     padding: 0.125rem 0.375rem;
     border-radius: 0.25rem;
     font-size: 0.8125rem;
@@ -208,8 +192,8 @@ const newsArticleSchema = {
   }
 
   .blog-content :global(pre) {
-    background-color: #0f172a; /* slate-900 */
-    color: #f8fafc; /* slate-50 */
+    background-color: #0f172a;
+    color: #f8fafc;
     padding: 1rem;
     border-radius: 0.5rem;
     overflow-x: auto;
@@ -224,47 +208,6 @@ const newsArticleSchema = {
     font-size: 0.875rem;
   }
 
-  /* Dark Mode Overrides */
-  :global(.dark) .blog-content {
-    color: hsl(0 0% 82%);
-  }
-  :global(.dark) .blog-content :global(h2),
-  :global(.dark) .blog-content :global(h3) {
-    color: hsl(0 0% 88%);
-  }
-  :global(.dark) .blog-content :global(h4) {
-    color: hsl(0 0% 75%);
-  }
-  :global(.dark) .blog-content :global(p),
-  :global(.dark) .blog-content :global(li) {
-    color: hsl(0 0% 82%);
-  }
-  :global(.dark) .blog-content :global(strong) {
-    color: hsl(0 0% 92%);
-  }
-  :global(.dark) .blog-content :global(blockquote) {
-    color: hsl(0 0% 70%);
-  }
-  :global(.dark) .blog-content :global(hr) {
-    border-top-color: hsl(0 0% 22%);
-  }
-  :global(.dark) .blog-content :global(code) {
-    background-color: hsl(0 0% 14%);
-    color: #fb7185; /* rose-400 */
-  }
-  :global(.dark) .blog-content :global(th) {
-    background-color: hsl(0 0% 10%);
-    color: hsl(0 0% 85%);
-  }
-  :global(.dark) .blog-content :global(td) {
-    color: hsl(0 0% 80%);
-  }
-  :global(.dark) .blog-content :global(th),
-  :global(.dark) .blog-content :global(td) {
-    border-color: hsl(0 0% 22%);
-  }
-
-  /* Tables */
   .blog-content :global(table) {
     width: 100%;
     border-collapse: collapse;
@@ -275,181 +218,206 @@ const newsArticleSchema = {
 
   .blog-content :global(th),
   .blog-content :global(td) {
-    border: 1px solid #e2e8f0; /* slate-200 */
+    border: 1px solid #e2e8f0;
     padding: 0.75rem;
     text-align: left;
   }
 
   .blog-content :global(th) {
-    background-color: #f8fafc; /* slate-50 */
+    background-color: #f8fafc;
     font-weight: 600;
-    color: #334155; /* slate-700 */
+    color: #334155;
   }
 
-  .blog-content :global(td) {
-    color: #334155; /* slate-700 */
+  .blog-content :global(td) { color: #334155; }
+
+  /* Dark Mode */
+  :global(.dark) .blog-content { color: hsl(0 0% 82%); }
+  :global(.dark) .blog-content :global(h2),
+  :global(.dark) .blog-content :global(h3) { color: hsl(0 0% 88%); }
+  :global(.dark) .blog-content :global(h4) { color: hsl(0 0% 75%); }
+  :global(.dark) .blog-content :global(p),
+  :global(.dark) .blog-content :global(li) { color: hsl(0 0% 82%); }
+  :global(.dark) .blog-content :global(strong) { color: hsl(0 0% 92%); }
+  :global(.dark) .blog-content :global(blockquote) { color: hsl(0 0% 70%); }
+  :global(.dark) .blog-content :global(hr) { border-top-color: hsl(0 0% 22%); }
+  :global(.dark) .blog-content :global(code) {
+    background-color: hsl(0 0% 14%);
+    color: #fb7185;
   }
+  :global(.dark) .blog-content :global(th) {
+    background-color: hsl(0 0% 10%);
+    color: hsl(0 0% 85%);
+  }
+  :global(.dark) .blog-content :global(td) { color: hsl(0 0% 80%); }
+  :global(.dark) .blog-content :global(th),
+  :global(.dark) .blog-content :global(td) { border-color: hsl(0 0% 22%); }
 </style>
 
-<Layout title={title} description={description} ogImage={post.data.image}>
+<Layout title={title} description={description} ogType="article" ogImage={post.data.image}>
   <!-- NewsArticle Schema — required for Google News eligibility -->
   <script type="application/ld+json" set:html={JSON.stringify(newsArticleSchema)} />
 
-  <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-4 sm:py-12 text-slate-700 dark:text-[hsl(0_0%_82%)]">
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+
     <!-- Breadcrumbs -->
     <Breadcrumbs items={breadcrumbItems} />
 
     <article>
-      <!-- Hero Image (above card) -->
-      <div class="mb-6 sm:mb-8 rounded-2xl overflow-hidden">
+      <!-- Hero Image — larger, full container width -->
+      <div class="mt-3 mb-6 sm:mb-8 rounded-2xl overflow-hidden">
         <img
           src={post.data.image}
           alt={post.data.countryName}
-          class="w-full h-48 sm:h-64 md:h-80 object-cover"
+          class="w-full h-56 sm:h-80 md:h-[440px] object-cover"
+          width="1280"
+          height="440"
+          loading="eager"
+        />
+      </div>
+
+      <!-- Article Header -->
+      <header class="mb-6 sm:mb-8">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400">
+            {post.data.countryName}
+          </span>
+          <span class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">{formatDate(post.data.date)}</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 dark:text-[hsl(0_0%_95%)] leading-tight mb-4">{post.data.title}</h1>
+        <div class="flex items-center gap-3 text-sm text-slate-500 dark:text-[hsl(0_0%_60%)]">
+          <span>{post.data.author}</span>
+          <span class="text-slate-300 dark:text-[var(--ch-border)]">&middot;</span>
+          <span>{post.data.readTime}</span>
+        </div>
+      </header>
+
+      <!-- Divider -->
+      <hr class="border-slate-200 dark:border-[var(--ch-border-subtle)] mb-8" />
+
+      <!-- Article Body -->
+      <div class="blog-content max-w-2xl">
+        <Content />
+      </div>
+
+      <!-- Newsletter CTA -->
+      <div class="mt-10 max-w-2xl">
+        <NewsletterSignup variant="inline" source="blog-post" />
+      </div>
+
+      <!-- Social Share -->
+      <div class="mt-8 sm:mt-10 pt-6 border-t border-slate-200 dark:border-[var(--ch-border-card)] max-w-2xl" data-post-title={post.data.title}>
+        <h3 class="text-sm font-bold mb-3 text-slate-900 dark:text-[var(--ch-text)]">Share this article</h3>
+        <div class="flex flex-wrap gap-2">
+          <button id="share-facebook" class="px-4 py-1.5 min-h-button bg-[#1877F2] text-white rounded-lg hover:bg-[#0d6efd] transition text-xs font-bold">Facebook</button>
+          <button id="share-twitter" class="px-4 py-1.5 min-h-button bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition text-xs font-bold">X (Twitter)</button>
+          <button id="share-whatsapp" class="px-4 py-1.5 min-h-button bg-[#25D366] text-white rounded-lg hover:bg-[#1ebe5c] transition text-xs font-bold">WhatsApp</button>
+          <button id="share-copy" class="px-4 py-1.5 min-h-button bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition text-xs font-bold">Copy Link</button>
+        </div>
+      </div>
+
+      <!-- No-Ad Guarantee -->
+      <div class="mt-6 pt-5 border-t border-slate-100 dark:border-[var(--ch-border-card)] flex items-start gap-2.5 max-w-2xl">
+        <svg class="w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_45%)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+        <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_48%)] leading-relaxed">
+          This content is 100% ad-free. Supported by readers like you on <a href="https://ko-fi.com/crimehotspots" target="_blank" rel="noopener noreferrer" class="text-rose-500 dark:text-rose-400 hover:text-rose-600 font-medium">Ko-fi</a>.
+        </p>
+      </div>
+
+      <!-- Dashboard CTA -->
+      <div class="mt-6 sm:mt-8 p-4 sm:p-6 bg-rose-50/70 dark:bg-rose-950/30 rounded-xl border border-rose-200 dark:border-rose-900/60 max-w-2xl">
+        <h3 class="text-sm font-bold mb-2 text-slate-900 dark:text-[var(--ch-text)]">View Interactive Dashboard</h3>
+        <p class="text-xs text-slate-600 dark:text-[hsl(0_0%_70%)] mb-4">Explore the full crime statistics dashboard for detailed visualizations and filters.</p>
+        <a
+          href={dashboardLink}
+          class="inline-block px-4 py-1.5 min-h-button bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700 active:bg-rose-800 transition text-xs"
         >
-      </div>
-
-      <!-- Article Card -->
-      <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)] leading-relaxed">
-        <!-- Article Header -->
-        <header class="mb-6 sm:mb-8">
-          <div class="flex items-center gap-2 mb-3 sm:mb-4">
-            <span class="text-caption font-bold px-3 py-1 rounded bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400">
-              {post.data.countryName}
-            </span>
-            <span class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">{formatDate(post.data.date)}</span>
-          </div>
-          <h1 class="text-display font-bold text-slate-900 dark:text-[hsl(0_0%_95%)] leading-tight mb-3 sm:mb-4">{post.data.title}</h1>
-          <div class="flex items-center gap-4 text-caption text-slate-600 dark:text-[hsl(0_0%_70%)]">
-            <span>{post.data.author}</span>
-            <span>•</span>
-            <span>{post.data.readTime}</span>
-          </div>
-        </header>
-
-        <!-- Article Body -->
-        <div class="blog-content">
-          <Content />
-        </div>
-
-        <!-- Newsletter CTA -->
-        <div class="mt-8 sm:mt-10">
-          <NewsletterSignup variant="inline" source="blog-post" />
-        </div>
-
-        <!-- Social Share Buttons -->
-        <div class="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-slate-200 dark:border-[var(--ch-border-card)]">
-          <h3 class="text-heading font-bold mb-4 text-slate-900 dark:text-[var(--ch-text)] leading-snug">Share this article</h3>
-          <div class="flex flex-wrap gap-3">
-            <button
-              id="share-facebook"
-              class="px-4 py-1.5 min-h-button bg-[#1877F2] text-white rounded-lg hover:bg-[#0d6efd] transition text-caption font-bold"
-            >
-              Facebook
-            </button>
-            <button
-              id="share-twitter"
-              class="px-4 py-1.5 min-h-button bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition text-caption font-bold"
-            >
-              X (Twitter)
-            </button>
-            <button
-              id="share-whatsapp"
-              class="px-4 py-1.5 min-h-button bg-[#25D366] text-white rounded-lg hover:bg-[#1ebe5c] transition text-caption font-bold"
-            >
-              WhatsApp
-            </button>
-            <button
-              id="share-copy"
-              class="px-4 py-1.5 min-h-button bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition text-caption font-bold"
-            >
-              Copy Link
-            </button>
-          </div>
-        </div>
-
-        <!-- No-Ad Guarantee -->
-        <div class="mt-8 sm:mt-10 pt-6 border-t border-slate-100 dark:border-[var(--ch-border-card)] flex items-start gap-2.5">
-          <svg class="w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_45%)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-          <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_48%)] leading-relaxed">
-            This content is 100% ad-free. Supported by readers like you on <a href="https://ko-fi.com/crimehotspots" target="_blank" rel="noopener noreferrer" class="text-rose-500 dark:text-rose-400 hover:text-rose-600 font-medium">Ko-fi</a>.
-          </p>
-        </div>
-
-        <!-- Related Dashboard -->
-        <div class="mt-6 sm:mt-8 p-4 sm:p-6 bg-rose-50/70 dark:bg-rose-950/30 rounded-lg border border-rose-200 dark:border-rose-900/60">
-          <h3 class="text-heading font-bold mb-3 text-slate-900 dark:text-[var(--ch-text)] leading-snug">View Interactive Dashboard</h3>
-          <p class="text-body text-slate-600 dark:text-[hsl(0_0%_70%)] mb-4">Explore the full crime statistics dashboard for detailed visualizations and filters.</p>
-          <a
-            href={dashboardLink}
-            class="inline-block px-4 py-1.5 min-h-button bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700 active:bg-rose-800 transition text-caption"
-          >
-            View {post.data.countryName} Dashboard
-          </a>
-        </div>
-      </div>
-
-      <!-- More Reports (outside card) -->
-      {relatedPosts.length > 0 && (
-        <div class="mt-8 sm:mt-12">
-          <h3 class="text-heading font-bold mb-4 text-slate-900 dark:text-[var(--ch-text)] leading-snug">More Weekly Reports</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {relatedPosts.map((related) => (
-              <a href={buildRoute.blogPost(related.slug)} class="block bg-white/85 dark:bg-[var(--ch-surface-sub)] backdrop-blur-md rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-4 hover:shadow-md hover:border-rose-200 dark:hover:border-rose-800 transition-all">
-                <span class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">{formatDate(related.data.date)}</span>
-                <h4 class="text-caption font-bold text-slate-900 dark:text-[var(--ch-text-heading)] mt-1 line-clamp-2">{related.data.title}</h4>
-                <span class="text-caption text-rose-600 mt-2 block">{related.data.readTime}</span>
-              </a>
-            ))}
-          </div>
-          <div class="mt-4 text-center">
-            <a href={routes.blog} class="text-caption text-rose-600 hover:text-rose-700 font-bold">
-              View all reports →
-            </a>
-          </div>
-        </div>
-      )}
-
-      <!-- Back to Blog -->
-      <div class="mt-6 sm:mt-8">
-        <a href={routes.blog} class="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 font-bold text-caption">
-          ← Back to Blog
+          View {post.data.countryName} Dashboard
         </a>
       </div>
     </article>
+
+    <!-- More Weekly Reports -->
+    {relatedPosts.length > 0 && (
+      <div class="mt-10 sm:mt-14">
+        <div class="flex items-center gap-3 mb-5">
+          <h2 class="text-[11px] font-bold uppercase tracking-widest text-slate-400 dark:text-[var(--ch-text-faint)] whitespace-nowrap">More Reports</h2>
+          <div class="flex-1 h-px bg-slate-200 dark:bg-[var(--ch-border-subtle)]" />
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {relatedPosts.map(related => (
+            <a
+              href={buildRoute.blogPost(related.slug)}
+              class="group block bg-white dark:bg-[var(--ch-surface)] rounded-xl overflow-hidden border border-slate-200 dark:border-[var(--ch-border-card)] hover:shadow-md hover:border-rose-200 dark:hover:border-rose-900 transition-all"
+            >
+              <div class="overflow-hidden">
+                <img
+                  src={related.data.image}
+                  alt={related.data.countryName}
+                  class="w-full h-28 object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+                  loading="lazy"
+                  width="640"
+                  height="112"
+                />
+              </div>
+              <div class="p-3">
+                <span class="text-[10px] text-slate-400 dark:text-[var(--ch-text-faint)]">
+                  {new Date(related.data.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </span>
+                <h4 class="text-xs font-bold text-slate-900 dark:text-[var(--ch-text-heading)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition mt-1 line-clamp-2 leading-snug">{related.data.title}</h4>
+                <span class="text-[10px] text-rose-600 dark:text-rose-400 mt-2 block">{related.data.readTime}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+        <div class="mt-5 text-center">
+          <a href={routes.blog} class="text-xs text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 font-bold">
+            View all reports &rarr;
+          </a>
+        </div>
+      </div>
+    )}
+
+    <!-- Back to Blog -->
+    <div class="mt-6 sm:mt-8">
+      <a href={routes.blog} class="text-rose-600 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 font-bold text-xs">
+        &larr; Back to Blog
+      </a>
+    </div>
+
   </main>
 
-  <!-- Social Share Script -->
-  <script is:inline define:vars={{ title: post.data.title }}>
+  <!-- Social Share Script — reads post title from data attribute, no is:inline needed -->
+  <script>
     document.addEventListener('DOMContentLoaded', () => {
       const url = window.location.href;
-      const text = title;
+      const shareContainer = document.querySelector('[data-post-title]') as HTMLElement | null;
+      const text = shareContainer?.dataset.postTitle ?? document.title;
 
-      document.getElementById('share-facebook').addEventListener('click', () => {
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+      document.getElementById('share-facebook')?.addEventListener('click', () => {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank', 'noopener');
       });
 
-      document.getElementById('share-twitter').addEventListener('click', () => {
-        window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+      document.getElementById('share-twitter')?.addEventListener('click', () => {
+        window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank', 'noopener');
       });
 
-      document.getElementById('share-whatsapp').addEventListener('click', () => {
-        window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+      document.getElementById('share-whatsapp')?.addEventListener('click', () => {
+        window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank', 'noopener');
       });
 
-      document.getElementById('share-copy').addEventListener('click', async () => {
+      document.getElementById('share-copy')?.addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText(url);
           const btn = document.getElementById('share-copy');
-          const originalText = btn.textContent;
+          if (!btn) return;
+          const original = btn.textContent;
           btn.textContent = 'Copied!';
-          setTimeout(() => {
-            btn.textContent = originalText;
-          }, 2000);
-        } catch (err) {
-          console.error('Failed to copy:', err);
+          setTimeout(() => { btn.textContent = original; }, 2000);
+        } catch {
+          // clipboard not available
         }
       });
     });

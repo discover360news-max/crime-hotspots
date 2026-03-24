@@ -6,7 +6,7 @@ date: 2026-02-03
 excerpt: 'Trinidad recorded 25 incidents during the week of January 28 – February 3, 2026, representing a significant 28.6% decrease from the previous week''s 35 incidents. However, this overall improvement m...'
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'
-image: '/assets/images/report-hero.svg'
+image: '/assets/images/blog/trinidad-weekly-2026-02-03.webp'
 tags: ['Trinidad', 'Weekly Report', 'Statistics']
 ---
 

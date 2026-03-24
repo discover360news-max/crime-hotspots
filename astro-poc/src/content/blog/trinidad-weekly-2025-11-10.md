@@ -6,7 +6,7 @@ date: 2025-11-10
 excerpt: 'Analysis of 47 crime incidents reported this week. Murder rate decreased 12% compared to last week, while robbery incidents increased in Port of Spain area.'
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'
-image: '/assets/images/report-hero.svg'
+image: '/assets/images/blog/trinidad-weekly-2025-11-10.webp'
 tags: ['Trinidad', 'Weekly Report', 'Statistics']
 ---
 

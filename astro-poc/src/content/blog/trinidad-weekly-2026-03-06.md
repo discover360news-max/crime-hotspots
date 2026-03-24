@@ -6,7 +6,7 @@ date: 2026-03-06
 excerpt: 'Trinidad recorded 55 criminal incidents during the week of February 26 to March 6, 2026, representing a significant 17% decline from the previous week''s 66 incidents. However, this overall improvem...'
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'
-image: '/assets/images/report-hero.svg'
+image: '/assets/images/blog/trinidad-weekly-2026-03-06.webp'
 tags: ['Trinidad', 'Weekly Report', 'Statistics']
 ---
 

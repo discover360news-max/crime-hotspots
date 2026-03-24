@@ -6,7 +6,7 @@ date: 2026-03-13
 excerpt: 'Trinidad recorded 54 crimes last week including 4 murders — a 43% decrease from the previous week''s 7 homicides. While violent crime showed improvement, property crimes surged dramatically, with th...'
 author: 'Crime Hotspots Analytics'
 readTime: '4 min read'
-image: '/assets/images/report-hero.svg'
+image: '/assets/images/blog/trinidad-weekly-2026-03-13.webp'
 tags: ['Trinidad', 'Weekly Report', 'Statistics']
 ---
 
