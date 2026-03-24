@@ -1,0 +1,50 @@
+---
+/**
+ * GradientStatCard Component
+ * Large gradient card for the dashboard vitals row.
+ * Uses .text-3xl + .trend-indicator class names so updateCardWithTrend() works unchanged.
+ * Sublabel rendered with id="{id}-sub" so JS can update dynamic values.
+ */
+
+type Variant = 'slate' | 'crimson' | 'amber' | 'violet';
+
+interface Props {
+  value: string | number;
+  label: string;
+  sublabel?: string;
+  variant: Variant;
+  id?: string;
+  href?: string;
+}
+
+const { value, label, sublabel, variant, id, href } = Astro.props;
+
+const gradients: Record<Variant, string> = {
+  slate:   'from-slate-800 to-slate-600',
+  crimson: 'from-red-900 to-rose-700',
+  amber:   'from-amber-700 to-orange-500',
+  violet:  'from-violet-800 to-purple-600',
+};
+
+const base = `relative overflow-hidden bg-gradient-to-br ${gradients[variant]} rounded-xl p-4 sm:p-5 shadow-md text-white`;
+---
+
+{href ? (
+  <a class={`${base} block hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200 hover:brightness-110`} id={id} href={href}>
+    <div class="relative">
+      <div class="text-3xl font-black leading-none tracking-tight mb-1.5">{value}</div>
+      <div class="text-sm font-semibold text-white/90 mb-0.5">{label}</div>
+      {sublabel && <div id={`${id}-sub`} class="text-xs text-white/65 truncate">{sublabel}</div>}
+      <div class="trend-indicator text-xs text-white/70 mt-2.5 hidden"></div>
+    </div>
+  </a>
+) : (
+  <div class={base} id={id}>
+    <div class="relative">
+      <div class="text-3xl font-black leading-none tracking-tight mb-1.5">{value}</div>
+      <div class="text-sm font-semibold text-white/90 mb-0.5">{label}</div>
+      {sublabel && <div id={id ? `${id}-sub` : undefined} class="text-xs text-white/65 truncate">{sublabel}</div>}
+      <div class="trend-indicator text-xs text-white/70 mt-2.5 hidden"></div>
+    </div>
+  </div>
+)}

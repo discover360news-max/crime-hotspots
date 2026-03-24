@@ -1,14 +1,15 @@
 ---
 /**
- * Trinidad & Tobago Crime Dashboard
- * Interactive dashboard with regional SVG map and Leaflet incidents map
+ * Trinidad & Tobago Crime Dashboard — JNews-style hierarchy
+ * Layout: dark hero → vitals row → stat breakdown → dark band → map+areas → insights → tail
  */
 
 import Layout from '../../layouts/Layout.astro';
-import { getAllCrimesFromD1, getTrinidadCrimes } from '../../lib/crimeData';
+import { getAllCrimesFromD1, getTrinidadCrimes, generateNameSlug } from '../../lib/crimeData';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
 import { getTotalCrimeCount } from '../../lib/statisticsHelpers';
-import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+import GradientStatCard from '../../components/GradientStatCard.astro';
 import StatCard from '../../components/StatCard.astro';
 import QuickInsightsCard from '../../components/QuickInsightsCard.astro';
 import TopRegionsCard from '../../components/TopRegionsCard.astro';
@@ -18,11 +19,10 @@ import FiltersTray from '../../components/FiltersTray.astro';
 import InfoPopup from '../../components/InfoPopup.astro';
 import LoadingShimmer from '../../components/LoadingShimmer.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
-import DashboardStory from '../../components/DashboardStory.astro';
 import MapLegend from '../../components/MapLegend.astro';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { getCountryName } from '../../data/countries';
-import { routes } from '../../config/routes';
+import { routes, buildRoute } from '../../config/routes';
 import '../../styles/dashboard.css';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
@@ -31,17 +31,9 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalida
 const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
-// Get available years for dropdown (sorted descending)
 const availableYears = [...new Set(allCrimes.map(c => c.year))].sort((a, b) => b - a);
-
-// Use the highest year in the data as "current" (not calendar year)
-// This ensures we show the latest data, even if it's from a different year
 const currentYear = availableYears[0];
-
-// Filter to current year by default (server-side initial render)
 const crimes = allCrimes.filter(crime => crime.year === currentYear);
-
-// Calculate insights using imported helper
 const insights = calculateInsights(crimes);
 
 // Region / Area filter data
@@ -56,9 +48,45 @@ allCrimes.forEach(c => {
 });
 Object.values(dashboardRegionToAreas).forEach(arr => (arr as string[]).sort());
 
-// Most recent crime date for freshness indicator
+// Freshness
 const latestCrimeDate = crimes[0]?.dateObj ?? new Date();
 const freshnessText = latestCrimeDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
+// Hottest area slug for vitals card link
+const dangerousAreaSlug = generateNameSlug(insights.mostDangerousRegion);
+
+// This-week stats for hero pulse (3-day lag — crimes are logged by incident date)
+const now = new Date();
+const lagDays = 3;
+const weekEnd = new Date(); weekEnd.setDate(now.getDate() - lagDays); weekEnd.setHours(0, 0, 0, 0);
+const weekAgo = new Date(); weekAgo.setDate(now.getDate() - (7 + lagDays)); weekAgo.setHours(0, 0, 0, 0);
+const twoWeeksAgo = new Date(); twoWeeksAgo.setDate(now.getDate() - (14 + lagDays)); twoWeeksAgo.setHours(0, 0, 0, 0);
+const thisWeekCrimes = allCrimes.filter(c => c.dateObj >= weekAgo && c.dateObj < weekEnd);
+const lastWeekCrimes = allCrimes.filter(c => c.dateObj >= twoWeeksAgo && c.dateObj < weekAgo);
+const murdersThisWeek = countCrimeType(thisWeekCrimes, 'Murder');
+const murdersLastWeek = countCrimeType(lastWeekCrimes, 'Murder');
+const murderChange = murdersLastWeek > 0
+  ? Math.round(((murdersThisWeek - murdersLastWeek) / murdersLastWeek) * 100)
+  : 0;
+const weekChange = lastWeekCrimes.length > 0
+  ? Math.round(((thisWeekCrimes.length - lastWeekCrimes.length) / lastWeekCrimes.length) * 100)
+  : 0;
+const areaCountMap = new Map<string, number>();
+thisWeekCrimes.forEach(c => {
+  const a = c.area || 'Unknown';
+  if (a !== 'Unknown') areaCountMap.set(a, (areaCountMap.get(a) || 0) + 1);
+});
+const topArea = Array.from(areaCountMap.entries()).sort((a, b) => b[1] - a[1])[0];
+
+// Latest TT weekly blog post for hero card
+const allBlogPosts = await getCollection('blog');
+const latestPost = allBlogPosts
+  .filter(p => p.data.country === 'tt')
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())[0];
+
+function formatPostDate(date: Date) {
+  return new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
 
 const title = "Trinidad Crime Dashboard 2026 - Murder Count, Statistics & Live Map";
 const description = "Track Trinidad & Tobago crime statistics for 2026. Live murder count, robbery rates, and incident map. Updated daily with the latest crime data.";
@@ -67,54 +95,109 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
 <Layout title={title} description={description} includeLeaflet={true} includeTurnstile={true}>
 
-  <!-- Hero section — cohesive with Headlines page (Hero.astro compact pattern) -->
-  <section class="w-full bg-gradient-to-br from-rose-50 via-white to-slate-50 dark:from-[var(--ch-bg)] dark:via-[var(--ch-surface)] dark:to-[var(--ch-surface)] py-5 sm:py-6" data-pagefind-ignore>
-    <div class="mx-auto max-w-3xl px-4 sm:px-6">
-      <Breadcrumbs items={[
-        { label: 'Home', href: '/' },
-        { label: getCountryName('tt') }
-      ]} />
-      <h1 class="font-bold text-slate-800 dark:text-[hsl(0_0%_95%)] text-display leading-snug mb-2">
-        Trinidad & Tobago
-      </h1>
-      <p class="text-body text-slate-400 dark:text-[var(--ch-text-faint)] leading-relaxed mb-4">
-        Crime Statistics Dashboard <span id="dashboardYear" class="font-medium">for {currentYear}</span>
-      </p>
-      <p id="dataFreshness" class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] flex items-center gap-1 mb-3">
-        <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Data as of {freshnessText}
-      </p>
-      <!-- CTAs row: Headlines (primary) → Murder Count (secondary) -->
-      <div class="flex gap-4 items-center flex-row flex-wrap">
-          <a href={routes.trinidad.headlines}
-            class="px-4 py-1.5 min-h-[22px] inline-flex items-center gap-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 transition font-medium text-xs shadow-sm hover:shadow-md whitespace-nowrap">
-            Headlines
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-          </a>
-          <a href={routes.trinidad.murderCount}
-            class="px-4 py-1.5 min-h-[22px] inline-flex items-center gap-2 rounded-lg border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[var(--ch-text-strong)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 transition font-medium text-xs whitespace-nowrap">
-            Murder Count
-          </a>
+  <!-- ═══════════════════════════════════════════════════════════════
+       HERO — dark gradient, full viewport width
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800" data-pagefind-ignore>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+
+      <!-- Breadcrumb (light) -->
+      <nav aria-label="Breadcrumb" class="mb-4">
+        <ol class="flex items-center gap-1.5 text-xs text-slate-500">
+          <li><a href="/" class="hover:text-slate-300 transition">Home</a></li>
+          <li><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="text-slate-400">{getCountryName('tt')}</li>
+        </ol>
+      </nav>
+
+      <div class="grid sm:grid-cols-[1fr_200px] gap-6 items-start">
+
+        <!-- Left: title + pulse + CTAs -->
+        <div>
+          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight mb-2">
+            Trinidad &amp; Tobago
+          </h1>
+          <p class="text-slate-400 text-sm mb-5">
+            Crime Statistics Dashboard <span id="dashboardYear" class="font-medium text-slate-300">for {currentYear}</span>
+          </p>
+
+          <!-- Live this-week pulse -->
+          {thisWeekCrimes.length > 0 && (
+            <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+              <span class="relative flex h-2 w-2 mt-1 shrink-0">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+              </span>
+              <p class="text-slate-300 text-sm leading-relaxed">
+                This week: <strong class="text-white font-bold">{thisWeekCrimes.length} crimes</strong>
+                {weekChange !== 0 && (
+                  <span class={weekChange > 0 ? 'text-rose-400' : 'text-emerald-400'}>
+                    {' '}({weekChange > 0 ? '+' : ''}{weekChange}% vs last week)
+                  </span>
+                )}.
+                {topArea && <> <span class="text-white font-medium">{topArea[0]}</span> leads with {topArea[1]}.</>}
+                {murdersThisWeek > 0 && murderChange !== 0 && (
+                  <> Murders{' '}
+                    <span class={murderChange > 0 ? 'font-medium text-rose-400' : 'font-medium text-emerald-400'}>
+                      {murderChange > 0 ? 'up' : 'down'} {Math.abs(murderChange)}%
+                    </span> WoW.
+                  </>
+                )}
+              </p>
+            </div>
+          )}
+
+          <!-- CTAs -->
+          <div class="flex gap-3 items-center flex-wrap mb-5">
+            <a href={routes.trinidad.headlines}
+              class="px-4 py-2 inline-flex items-center gap-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 active:bg-rose-700 transition font-medium text-xs shadow-sm whitespace-nowrap">
+              Headlines
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </a>
+            <a href={routes.trinidad.murderCount}
+              class="px-4 py-2 inline-flex items-center gap-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white active:bg-white/5 transition font-medium text-xs whitespace-nowrap">
+              Murder Count
+            </a>
+          </div>
+
+          <!-- Data freshness -->
+          <p id="dataFreshness" class="text-slate-500 text-xs flex items-center gap-1">
+            <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Data as of {freshnessText}
+          </p>
         </div>
+
+        <!-- Right: latest report card -->
+        {latestPost && (
+          <a href={`/blog/${latestPost.slug}/`}
+            class="block bg-white/8 border border-white/10 rounded-xl p-4 hover:bg-white/12 hover:border-white/20 transition group">
+            <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Latest Report</span>
+            <h3 class="text-white text-sm font-bold mt-2 mb-3 leading-snug line-clamp-4 group-hover:text-rose-300 transition">
+              {latestPost.data.title}
+            </h3>
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-slate-500 text-xs">{formatPostDate(latestPost.data.date)}</span>
+              <span class="text-rose-400 text-xs font-semibold group-hover:text-rose-300 transition">Read &rarr;</span>
+            </div>
+          </a>
+        )}
+
+      </div>
     </div>
   </section>
 
-  <!-- Sticky Filter Bar — year inline, drawer for Region / Area / Crime Type -->
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       STICKY FILTER BAR
+       ═══════════════════════════════════════════════════════════════ -->
   <div id="filterBar" class="sticky top-16 z-30 bg-white/95 dark:bg-[var(--ch-surface)]/95 backdrop-blur-sm border-b border-slate-200 dark:border-[var(--ch-border-subtle)]">
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-3 flex-wrap">
-      <!-- Year label + inline select -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-2 flex items-center gap-3 flex-wrap">
       <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_48%)] font-medium shrink-0">Year</span>
       <select
         id="yearFilter"
         class="filter-select py-1 pl-2.5 pr-6 text-xs border border-slate-200 dark:border-[var(--ch-border)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-md bg-white dark:bg-[var(--ch-bg)] hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium cursor-pointer"
-      >
-        <!-- Options populated dynamically by yearFilter.ts -->
-      </select>
-
-      <!-- Divider -->
+      ></select>
       <span class="h-4 w-px bg-slate-200 dark:bg-[hsl(0_0%_20%)] shrink-0"></span>
-
-      <!-- Filters drawer button — funnel icon + label -->
       <button
         id="filtersBtn"
         class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-[hsl(0_0%_65%)] hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100 dark:bg-[hsl(0_0%_12%)] hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md px-2.5 py-1 transition cursor-pointer whitespace-nowrap"
@@ -124,29 +207,57 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
         </svg>
         <span id="filtersBtnText">Filters</span>
       </button>
-
-      <!-- Clear — shown only when drawer filters are active -->
       <button
         id="clearFiltersInline"
         class="hidden text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium whitespace-nowrap transition"
-      >
-        Clear
-      </button>
+      >Clear</button>
     </div>
   </div>
 
 
-  <div class="container mx-auto px-4 sm:px-6 py-6 max-w-3xl" data-pagefind-ignore>
+  <!-- ═══════════════════════════════════════════════════════════════
+       ZONE 1 — Notification + Vitals + Crime Breakdown
+       ═══════════════════════════════════════════════════════════════ -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-6 pb-2" data-pagefind-ignore>
 
-    <!-- Site Notification Banner -->
     <SiteNotificationBanner notification={dataUpdateNotice} />
 
-    <!-- Dashboard Story — narrative summary -->
-    <DashboardStory allCrimes={allCrimes} />
+    <!-- Vitals row: 4 gradient cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
+      <GradientStatCard
+        variant="slate"
+        value={getTotalCrimeCount(crimes)}
+        label="Total Crimes"
+        sublabel="year to date"
+        id="totalIncidents"
+      />
+      <GradientStatCard
+        variant="crimson"
+        value={countCrimeType(crimes, 'Murder')}
+        label="Murders"
+        sublabel="year to date"
+        id="vitals-murders"
+      />
+      <GradientStatCard
+        variant="amber"
+        value={Number.isNaN(+insights.avgPerDay) ? '—' : insights.avgPerDay}
+        label="Crimes / Day"
+        sublabel={Number.isNaN(+insights.victimsPerDay) ? '— victims/day' : `${insights.victimsPerDay} victims/day`}
+        id="vitals-daily"
+      />
+      <GradientStatCard
+        variant="violet"
+        value={insights.mostDangerousRegionCount}
+        label="Hottest Area"
+        sublabel={insights.mostDangerousRegion}
+        id="vitals-hotspot"
+        href={buildRoute.area(dangerousAreaSlug)}
+      />
+    </div>
 
-    <!-- Statistics Cards - Horizontal Scroll -->
-    <div class="flex items-center gap-1 px-4 mb-2">
-      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">Crime Statistics</h2>
+    <!-- Crime Breakdown -->
+    <div class="flex items-center gap-1 px-1 mb-2">
+      <h2 class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">Crime Breakdown</h2>
       <InfoPopup id="crime-types-info">
         <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">Crime Type Definitions</p>
         <ul class="space-y-1.5">
@@ -168,19 +279,18 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
         </ul>
       </InfoPopup>
     </div>
-    <div class="stats-wrapper relative min-h-[140px] overflow-hidden">
-      <!-- Stats Shimmer (shown during loading) -->
+
+    <div class="stats-wrapper relative min-h-[140px] overflow-hidden mb-6">
+      <!-- Shimmer -->
       <div id="statsShimmer" class="absolute inset-0 flex gap-4 overflow-x-auto pb-4 transition-opacity duration-300">
         {[...Array(10)].map(() => (
-          <div class="flex-shrink-0" style="width: 180px;">
+          <div class="flex-shrink-0" style="width: 160px;">
             <LoadingShimmer height="120px" />
           </div>
         ))}
       </div>
-
-      <!-- Actual Stats (hidden initially) -->
+      <!-- Stat cards -->
       <div class="stats-scroll-container absolute inset-0 opacity-0 transition-opacity duration-300">
-        <StatCard value={getTotalCrimeCount(crimes)} label="All Crimes" id="totalIncidents" crimeType="All" />
         <StatCard value={countCrimeType(crimes, 'Murder')} label="Murders" crimeType="Murder" />
         <StatCard value={countCrimeType(crimes, 'Attempted Murder')} label="Attempted Murders" crimeType="Attempted Murder" />
         <StatCard value={countCrimeType(crimes, 'Shooting')} label="Shootings" crimeType="Shooting" />
@@ -192,8 +302,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
         <StatCard value={countCrimeType(crimes, 'Assault')} label="Assaults" crimeType="Assault" />
         <StatCard value={countCrimeType(crimes, 'Kidnapping')} label="Kidnappings" crimeType="Kidnapping" />
       </div>
-
-      <!-- Fade gradient + pulsing arrow (right side) -->
+      <!-- Scroll hint -->
       <div id="statsScrollHint" class="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-white via-white/90 to-transparent dark:from-[var(--ch-bg)] dark:via-[hsl(0_0%_8%_/_0.9)] pointer-events-none flex items-center justify-end pr-2 opacity-0 transition-opacity duration-300">
         <svg class="w-4 h-4 text-rose-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -201,31 +310,122 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       </div>
     </div>
 
-    <!-- Separator -->
-        <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_20%)] to-transparent mb-4"></div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       DARK SEPARATOR BAND — full viewport width
+       ═══════════════════════════════════════════════════════════════ -->
+  <div class="w-full bg-slate-900 dark:bg-[hsl(0_0%_5%)] py-4" data-pagefind-ignore>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Live Data</p>
+      <h2 class="text-white font-black text-lg mt-0.5">Crime Incidents &amp; Hotspots</h2>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       ZONE 2 — Map + Top Areas (side by side on desktop)
+       ═══════════════════════════════════════════════════════════════ -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6" data-pagefind-ignore>
+
+    <div class="grid lg:grid-cols-[3fr_2fr] gap-6 mb-8 items-start">
+
+      <!-- Map column -->
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <h3 class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">Crime Incidents Map</h3>
+          <InfoPopup id="map-info">
+            <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">Understanding the Map</p>
+            <p class="mb-3">This map shows estimated/reported locations of crimes and is updated daily.</p>
+            <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">How to Use:</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Click clusters to zoom in</li>
+              <li>Click markers for incident details</li>
+              <li>Use two fingers to pan map</li>
+            </ul>
+          </InfoPopup>
+        </div>
+
+        <div id="mapContainer" class="relative h-[450px]">
+          <div id="mapShimmer" class="absolute inset-0 w-full transition-opacity duration-300">
+            <LoadingShimmer height="100%" />
+          </div>
+          <div id="leafletMap" class="absolute inset-0 w-full rounded-lg opacity-0 transition-opacity duration-300"></div>
+          <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-10">
+            <div class="bg-white/85 dark:bg-[var(--ch-surface)]/85 backdrop-blur-md rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
+              <p class="text-caption font-bold text-slate-600 dark:text-[var(--ch-text-heading)]">Use two fingers to move map</p>
+              <p class="text-caption text-slate-600 dark:text-[var(--ch-text-muted)] mt-1">One finger scrolls the page</p>
+            </div>
+          </div>
+        </div>
+        <MapLegend />
+      </div>
+
+      <!-- Top Areas column -->
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <h3 class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">Top Areas</h3>
+          <InfoPopup id="top-areas-risk-info">
+            <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">Understanding Risk Assessment</p>
+            <p class="mb-3">Each area's risk level is calculated based on crime severity and victim impact.</p>
+            <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">How It Works:</p>
+            <ul class="list-disc list-inside space-y-1 mb-3">
+              <li>Each crime type has a severity weight (Murder=10, Theft=2, etc.)</li>
+              <li>Victim counts multiply risk for serious crimes</li>
+              <li>Area risk = sum of all crime risk scores</li>
+              <li>Bar shows percentage relative to highest-risk area</li>
+            </ul>
+            <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">Color Guide:</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li><span class="text-green-600 font-medium">Green</span>: Low risk (0-33%)</li>
+              <li><span class="text-yellow-600 font-medium">Yellow</span>: Medium risk (34-66%)</li>
+              <li><span class="text-rose-600 font-medium">Red</span>: High risk (67-100%)</li>
+            </ul>
+          </InfoPopup>
+          <div class="ml-auto flex items-center gap-3">
+            <a href={routes.trinidad.compare} class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] hover:text-rose-600 dark:hover:text-rose-400 font-medium transition">
+              Compare
+              <svg class="w-3 h-3 inline-block ml-0.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+            <span class="text-slate-200 dark:text-[hsl(0_0%_20%)]">|</span>
+            <a href={routes.trinidad.areas} class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] hover:text-rose-600 dark:hover:text-rose-400 font-medium transition">
+              All
+              <svg class="w-3 h-3 inline-block ml-0.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div id="topRegionsShimmer" class="absolute inset-0 z-10 transition-opacity duration-300">
+            <LoadingShimmer height="100%" />
+          </div>
+          <div id="topRegionsCard" class="opacity-0 transition-opacity duration-300">
+            <TopRegionsCard crimes={crimes} />
+          </div>
+        </div>
+      </div>
+
+    </div>
+
 
     <!-- Quick Insights -->
-    <div class="mb-6">
-      <div class="flex items-center gap-2 pt-4 px-4 mb-4">
-        <h2 id="quickInsightsTitle" class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">Quick Insights</h2>
+    <div class="mb-8">
+      <div class="flex items-center gap-2 px-1 mb-3">
+        <h2 id="quickInsightsTitle" class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">Quick Insights</h2>
         <a href={routes.trinidad.statistics} class="ml-auto text-xs text-rose-600 hover:text-rose-700 active:text-rose-800 font-medium transition">
           Full Statistics
-          <svg class="w-3 h-3 inline-block ml-0.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
+          <svg class="w-3 h-3 inline-block ml-0.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </a>
       </div>
       <div class="relative">
         <div id="insightsShimmer" class="absolute inset-0 z-10 transition-opacity duration-300">
-          <!-- Structured skeleton matching QuickInsightsCard: 50/50 split, right side 2x2 grid -->
           <div class="bg-white/85 dark:bg-[var(--ch-surface)]/85 rounded-lg p-4 border border-slate-100 dark:border-[var(--ch-border-subtle)] h-full flex gap-4">
-            <!-- Left 50%: Daily Average skeleton -->
             <div class="w-1/2 pr-4 border-r border-slate-200 dark:border-[var(--ch-border-card)] flex flex-col items-center justify-center gap-2">
               <LoadingShimmer height="12px" width="40%" rounded="full" />
               <LoadingShimmer height="22px" width="70%" rounded="md" />
               <LoadingShimmer height="12px" width="45%" rounded="full" />
             </div>
-            <!-- Right 50%: 2x2 grid skeleton -->
             <div class="flex-1 grid grid-cols-2 gap-x-3 gap-y-3 content-center">
               {[...Array(4)].map(() => (
                 <div class="flex flex-col gap-1.5">
@@ -242,95 +442,8 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       </div>
     </div>
 
-    <!-- Leaflet Map -->
-    <div class="mb-6">
-      <div class="flex items-center gap-2 pt-4 px-4 mb-4">
-        <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">Crime Incidents Map</h2>
-        <InfoPopup id="map-info">
-          <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">Understanding the Map</p>
-          <p class="mb-3">This map shows estimated/reported locations of crimes and is updated daily.</p>
-          <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">How to Use:</p>
-          <ul class="list-disc list-inside space-y-1">
-            <li>Click clusters to zoom in</li>
-            <li>Click markers for incident details</li>
-            <li>Use two fingers to pan map</li>
-          </ul>
-        </InfoPopup>
-      </div>
-      <!-- Map (full width) -->
-      <div id="mapContainer" class="relative h-[450px]">
-        <!-- Map Shimmer (shown during loading) -->
-        <div id="mapShimmer" class="absolute inset-0 w-full transition-opacity duration-300">
-          <LoadingShimmer height="100%" />
-        </div>
-
-        <!-- Actual Map (hidden initially) -->
-        <div id="leafletMap" class="absolute inset-0 w-full rounded-lg opacity-0 transition-opacity duration-300"></div>
-
-        <!-- Pan instruction overlay (shown on single finger touch) -->
-        <div id="mapZoomHintTrinidad" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-10">
-          <div class="bg-white/85 dark:bg-[var(--ch-surface)]/85 backdrop-blur-md rounded-lg px-6 py-4 shadow-xl max-w-xs text-center">
-            <p class="text-caption font-bold text-slate-600 dark:text-[var(--ch-text-heading)]">Use two fingers to move map</p>
-            <p class="text-caption text-slate-600 dark:text-[var(--ch-text-muted)] mt-1">One finger scrolls the page</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Collapsible Legend -->
-      <MapLegend />
-    </div>
-
-    <!-- Top Areas -->
-    <div class="mb-6">
-      <!-- Header with InfoPopup (outside card to avoid backdrop-blur containment) -->
-      <div class="flex items-center gap-2 pt-4 mb-4 px-4">
-        <h3 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">Top Areas</h3>
-        <InfoPopup id="top-areas-risk-info">
-          <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">Understanding Risk Assessment</p>
-          <p class="mb-3">Each area's risk level is calculated based on crime severity and victim impact.</p>
-          <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">How It Works:</p>
-          <ul class="list-disc list-inside space-y-1 mb-3">
-            <li>Each crime type has a severity weight (Murder=10, Theft=2, etc.)</li>
-            <li>Victim counts multiply risk for serious crimes</li>
-            <li>Area risk = sum of all crime risk scores</li>
-            <li>Bar shows percentage relative to highest-risk area</li>
-          </ul>
-          <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">Color Guide:</p>
-          <ul class="list-disc list-inside space-y-1">
-            <li><span class="text-green-600 font-medium">Green</span>: Low risk (0-33%)</li>
-            <li><span class="text-yellow-600 font-medium">Yellow</span>: Medium risk (34-66%)</li>
-            <li><span class="text-rose-600 font-medium">Red</span>: High risk (67-100%)</li>
-          </ul>
-        </InfoPopup>
-        <div class="ml-auto flex items-center gap-3">
-          <a href={routes.trinidad.compare} class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] hover:text-rose-600 dark:hover:text-rose-400 font-medium transition">
-            Compare areas
-            <svg class="w-3 h-3 inline-block ml-0.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-          <span class="text-slate-200 dark:text-[hsl(0_0%_20%)]">|</span>
-          <a href={routes.trinidad.areas} class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] hover:text-rose-600 dark:hover:text-rose-400 font-medium transition">
-            View all
-            <svg class="w-3 h-3 inline-block ml-0.5 -mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </a>
-        </div>
-      </div>
-
-      <div class="relative">
-        <div id="topRegionsShimmer" class="absolute inset-0 z-10 transition-opacity duration-300">
-          <LoadingShimmer height="100%" />
-        </div>
-        <div id="topRegionsCard" class="opacity-0 transition-opacity duration-300">
-          <TopRegionsCard crimes={crimes} />
-        </div>
-      </div>
-    </div>
-
-    <!-- Newsletter CTA — after Top Regions, before info cards -->
-    <div class="mb-6">
+    <!-- Newsletter CTA -->
+    <div class="mb-8">
       <NewsletterSignup variant="inline" source="dashboard-page" />
     </div>
 
@@ -339,10 +452,10 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
     <!-- Related Resources -->
     <div class="mt-8">
-      <h2 class="text-body font-bold text-slate-500 dark:text-[var(--ch-text-muted)] pt-4 px-4 mb-4">Related Resources</h2>
+      <h2 class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)] px-1 mb-4">Related Resources</h2>
       <div class="grid sm:grid-cols-2 gap-3">
         <a href={routes.trinidad.statistics} class="block bg-white/85 dark:bg-[var(--ch-surface)]/85 backdrop-blur-md rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
-          <h3 class="font-bold text-caption text-slate-800 dark:text-[var(--ch-text-heading)]">Crime Statistics & Rate</h3>
+          <h3 class="font-bold text-caption text-slate-800 dark:text-[var(--ch-text-heading)]">Crime Statistics &amp; Rate</h3>
           <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-1">Comprehensive statistics with year-over-year analysis and crime rate calculations</p>
         </a>
         <a href={routes.trinidad.murderCount} class="block bg-rose-50 dark:bg-rose-950/40 rounded-lg border border-rose-200 dark:border-rose-900/50 p-4 hover:border-rose-400 dark:hover:border-rose-700 hover:shadow-md transition">
@@ -354,23 +467,24 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
         </a>
       </div>
     </div>
+
   </div>
 
-  <!-- Initialize Dashboard Data -->
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       SCRIPTS — unchanged from previous version
+       ═══════════════════════════════════════════════════════════════ -->
+
   <script>
     import { initializeDashboardData } from '../../scripts/dashboardDataLoader';
-
-    // astro:page-load fires on initial load (with ClientRouter) and after each navigation
     document.addEventListener('DOMContentLoaded', initializeDashboardData);
   </script>
 
-  <!-- Leaflet Map Initialization -->
   <script>
     import { initializeDashboardMap } from '../../scripts/dashboardMapInit';
     document.addEventListener('DOMContentLoaded', initializeDashboardMap);
   </script>
 
-  <!-- Year Filtering Script -->
   <script>
     import { updateLeafletMap } from '../../scripts/leafletMap';
     import {
@@ -426,7 +540,6 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     async function onYearChange(selectedValue: string) {
       const updateStart = Date.now();
 
-      // Show all shimmers
       const statsShimmer = document.getElementById('statsShimmer');
       const statsContainer = document.querySelector('.stats-scroll-container') as HTMLElement | null;
       const insightsShimmer = document.getElementById('insightsShimmer');
@@ -462,7 +575,6 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       updateLeafletMap(crimes, '/trinidad/crime/');
       updateSubtitleYear(selectedValue);
 
-      // Hide all shimmers
       await Promise.all([
         window.hideShimmerWithMinTime(statsShimmer, statsContainer, updateStart),
         window.hideShimmerWithMinTime(insightsShimmer, insightsCards, updateStart),
@@ -485,9 +597,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
       }
     }
 
-    // astro:page-load fires on initial load (with ClientRouter) and after each navigation
     document.addEventListener('DOMContentLoaded', () => {
-      // crimesDataReady is dispatched by initializeDashboardData() once API response is processed
       window.addEventListener('crimesDataReady', setupYearFilter, { once: true });
 
       initializeStatCardFiltering({
@@ -498,9 +608,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     });
   </script>
 
-  <!-- Filters Tray Component -->
   <FiltersTray showYearFilter={false} showCrimeTypeFilter={true}>
-    <!-- Region Filter (injected via slot) -->
     <div>
       <label for="regionFilter" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">Region</label>
       <select
@@ -513,8 +621,6 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
         ))}
       </select>
     </div>
-
-    <!-- Area Filter — cascades based on region (injected via slot) -->
     <div>
       <label for="areaFilter" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">Area</label>
       <select
@@ -529,7 +635,6 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     </div>
   </FiltersTray>
 
-  <!-- Expose region/area data to window for the location filter script below -->
   <script is:inline define:vars={{ dashboardRegionToAreas, dashboardAllAreas: dashboardAreas, dashboardDefaultYear: String(currentYear), dashboardAvailableYears: availableYears, dashboardSSR: true }}>
     window.__dashboardRegionToAreas = dashboardRegionToAreas;
     window.__dashboardAllAreas = dashboardAllAreas;
@@ -538,25 +643,19 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
     window.__dashboardSSR = dashboardSSR;
   </script>
 
-  <!-- Region / Area filter for dashboard -->
   <script>
     import { initializeDashboardLocationFilter } from '../../scripts/dashboardLocationFilter';
     document.addEventListener('DOMContentLoaded', initializeDashboardLocationFilter);
   </script>
 
-  <!-- Sync Stat Cards with Tray Checkboxes -->
   <script>
     import { initializeTraySync } from '../../scripts/statCardFiltering';
-
-    // DOM is ready at astro:page-load time
     document.addEventListener('DOMContentLoaded', initializeTraySync);
   </script>
 
-  <!-- Mouse Wheel Horizontal Scroll for Stats Cards -->
   <script>
     import { initializeStatsScroll } from '../../scripts/statsScroll';
-
-    // DOM is ready at astro:page-load time
     document.addEventListener('DOMContentLoaded', () => { initializeStatsScroll(); });
   </script>
+
 </Layout>

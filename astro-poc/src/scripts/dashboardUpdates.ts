@@ -158,6 +158,9 @@ export function updateStatsCards(crimes: Crime[], allCrimes?: Crime[]) {
   const cardByType = (type: string) => document.querySelector(`.stat-card[data-crime-type="${type}"]`);
   updateCardWithTrend(document.getElementById('totalIncidents'), displayTotal, last30Total, prev30Total);
   updateCardWithTrend(cardByType('Murder'), displayMurders, last30Murders, prev30Murders);
+  // Sync vitals row murders card
+  const vitalsMurdersEl = document.getElementById('vitals-murders');
+  if (vitalsMurdersEl) { const v = vitalsMurdersEl.querySelector('.text-3xl'); if (v) v.textContent = String(displayMurders); }
   updateCardWithTrend(cardByType('Attempted Murder'), displayAttemptedMurders, last30AttemptedMurders, prev30AttemptedMurders);
   updateCardWithTrend(cardByType('Shooting'), displayShootings, last30Shootings, prev30Shootings);
   updateCardWithTrend(cardByType('Robbery'), displayRobberies, last30Robberies, prev30Robberies);
@@ -288,6 +291,10 @@ export function updateQuickInsights(crimes: Crime[]) {
   if (victimsPerDayEl) victimsPerDayEl.textContent = `${victimsPerDay} victims/day`;
   if (mostDangerousDayEl) mostDangerousDayEl.textContent = mostDangerousDay;
   if (busiestMonthEl) busiestMonthEl.textContent = busiestMonth;
+  // Sync vitals daily avg card
+  const vd = document.getElementById('vitals-daily'); if (vd) { const v = vd.querySelector('.text-3xl'); if (v) v.textContent = avgPerDay; const s = document.getElementById('vitals-daily-sub'); if (s) s.textContent = `${victimsPerDay} victims/day`; }
+  // Sync vitals hotspot card
+  const vh = document.getElementById('vitals-hotspot') as HTMLAnchorElement | null; if (vh) { const v = vh.querySelector('.text-3xl'); if (v) v.textContent = String(mostDangerousRegionCount); const s = document.getElementById('vitals-hotspot-sub'); if (s) s.textContent = mostDangerousRegion; vh.href = buildRoute.area(generateNameSlug(mostDangerousRegion)); }
   // Update area names and wrap parent <a> with correct href
   if (mostDangerousRegionEl) {
     mostDangerousRegionEl.textContent = mostDangerousRegion;
@@ -447,6 +454,9 @@ export function applyPrecomputedStats(stats: DashboardStats, trends: DashboardTr
   const cardByType = (type: string) => document.querySelector(`.stat-card[data-crime-type="${type}"]`);
   updateCardWithTrend(document.getElementById('totalIncidents'), stats.total, trends.last30.total, trends.prev30.total);
   updateCardWithTrend(cardByType('Murder'), stats.murders, trends.last30.murders, trends.prev30.murders);
+  // Sync vitals row murders card
+  const vitalsMurdersEl = document.getElementById('vitals-murders');
+  if (vitalsMurdersEl) { const v = vitalsMurdersEl.querySelector('.text-3xl'); if (v) v.textContent = String(stats.murders); }
   updateCardWithTrend(cardByType('Attempted Murder'), stats.attemptedMurders, trends.last30.attemptedMurders, trends.prev30.attemptedMurders);
   updateCardWithTrend(cardByType('Shooting'), stats.shootings, trends.last30.shootings, trends.prev30.shootings);
   updateCardWithTrend(cardByType('Robbery'), stats.robberies, trends.last30.robberies, trends.prev30.robberies);
@@ -475,6 +485,10 @@ export function applyPrecomputedInsights(insights: DashboardInsights): void {
   if (victimsPerDayEl) victimsPerDayEl.textContent = `${insights.victimsPerDay} victims/day`;
   if (mostDangerousDayEl) mostDangerousDayEl.textContent = insights.mostDangerousDay;
   if (busiestMonthEl) busiestMonthEl.textContent = insights.busiestMonth;
+  // Sync vitals daily avg card
+  const vd2 = document.getElementById('vitals-daily'); if (vd2) { const v = vd2.querySelector('.text-3xl'); if (v) v.textContent = insights.avgPerDay; const s = document.getElementById('vitals-daily-sub'); if (s) s.textContent = `${insights.victimsPerDay} victims/day`; }
+  // Sync vitals hotspot card
+  const vh2 = document.getElementById('vitals-hotspot') as HTMLAnchorElement | null; if (vh2) { const v = vh2.querySelector('.text-3xl'); if (v) v.textContent = String(insights.mostDangerousAreaCount); const s = document.getElementById('vitals-hotspot-sub'); if (s) s.textContent = insights.mostDangerousArea; vh2.href = buildRoute.area(generateNameSlug(insights.mostDangerousArea)); }
   if (mostDangerousRegionEl) {
     mostDangerousRegionEl.textContent = insights.mostDangerousArea;
     const dangerousLink = mostDangerousRegionEl.closest('a');
