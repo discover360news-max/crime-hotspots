@@ -61,6 +61,15 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 24, 2026 (continued x2)
+- **Dashboard JNews overhaul** — complete. Full layout hierarchy: dark hero band → 4 `GradientStatCard` vitals (Total Incidents/Murders/Victims/Crimes/Day) → `DashboardStory` narrative → crime breakdown scroll → sticky year filter bar → 2-col map (`leafletMap`) + top areas (`TopRegionsCard`) → Quick Insights card. New component: `GradientStatCard.astro` (slot in Dashboard & Stats section of site-features.md). Stat cards (11 types) remain below.
+- **`onYearChange` try/catch** — year filter froze dashboard (shimmers stuck) when API call failed. Now catch block restores all visible states.
+- **Map shimmer fix** — `dashboardDataLoader.ts` SSR path catch block now sets `window.__crimesData = []` so Leaflet map can initialize instead of polling forever.
+- **TopRegionsCard + dashboardUpdates.ts** — count badge + "crimes" text removed; hover `slate-50` → `slate-100`.
+- **B027: 301 → 302 fix** — `region/[slug].astro`, `area/[slug].astro`, `archive/[year]/[month].astro` now use 302 for slug-not-found. 301s caused browser-cached permanent redirects when `loadFullAreaData()` transiently failed. `crime/[slug].astro` 301s left unchanged (intentional slug migrations). See B027.
+- **`regions.astro`** — missing trailing slash on region card `href` fixed.
+- All changes committed + pushed to `main` via merge from `dashboard-redesign` branch.
+
 ## Session Notes — Mar 24, 2026 (continued)
 - **B025 fixed** — `dashboardDataLoader.ts` SSR path now fetches `/api/dashboard/?year=...` in parallel with `/api/crimes/`. Calls `applyPrecomputedStats()` to populate `.trend-indicator` (always `hidden` in SSR HTML, never populated before). Counts were always correct from SSR HTML; only trend arrows were missing.
 - **B026 fixed** — `/api/dashboard.ts` trend queries gated on `isCurrentOrAllYears`. Historical year selections return zero trends → indicators hidden. Previously 2025 stat cards showed live 2026 rolling-window trend arrows.

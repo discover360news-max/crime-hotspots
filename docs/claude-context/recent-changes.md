@@ -8,6 +8,17 @@
 
 ## March 2026
 
+### Dashboard JNews hierarchy + redirect bug fixes (Mar 24, session 2)
+
+- **`dashboard.astro`** — full layout overhaul. New hierarchy: dark hero band → 4 `GradientStatCard` vitals (Total Incidents/Murders/Victims/Crimes/Day) → `DashboardStory` narrative → crime breakdown scroll → sticky year filter bar → 2-col map+top-areas → Quick Insights. New `GradientStatCard.astro` component with `variant` prop (slate/crimson/amber/violet).
+- **`onYearChange` try/catch** — year filter previously froze dashboard on shimmer if API call failed. Now catch block hides all shimmers + restores visible state.
+- **`dashboardDataLoader.ts`** — added `window.__crimesData = []` fallback in SSR path catch block so Leaflet map can initialize (no longer hangs on shimmer when `/api/crimes/` fails).
+- **`TopRegionsCard.astro` + `dashboardUpdates.ts`** — removed crime count badge + "crimes" text (too tight in 2fr column). Hover strengthened: `slate-50` → `slate-100`.
+- **301 → 302 on slug-not-found redirects** — `region/[slug].astro`, `area/[slug].astro`, `archive/[year]/[month].astro` all changed from `Astro.redirect('/404/', 301)` to `302`. 301s were being browser-cached permanently — if `loadFullAreaData()` temporarily failed, every visiting browser cached the redirect forever. `crime/[slug].astro` 301s left unchanged (intentional slug migrations). See B027.
+- **`regions.astro`** — fixed missing trailing slash on region card links (`/trinidad/region/${slug}` → `.../${slug}/`).
+
+---
+
 ### Dashboard + area page bug fixes (Mar 24)
 
 - **`dashboardDataLoader.ts`**: SSR path now fetches `/api/dashboard/?year=...` in parallel with `/api/crimes/` and calls `applyPrecomputedStats()`. Previously the SSR path never fetched `/api/dashboard`, so `.trend-indicator` elements (always `hidden` in SSR HTML) were never populated on first load. Counts were correct; only trend arrows were missing.
