@@ -224,9 +224,10 @@ async function runFullSync(db: D1Database): Promise<void> {
   const start = Date.now();
   let total = 0;
 
-  // Clear FTS before re-syncing so stale entries don't accumulate
+  // Clear both tables before re-syncing so deleted/deduped crimes don't persist as ghost rows
+  await db.prepare('DELETE FROM crimes').run();
   await db.prepare('DELETE FROM crimes_fts').run();
-  console.log('[sync] crimes_fts cleared — will re-populate from CSV');
+  console.log('[sync] crimes + crimes_fts cleared — will re-populate from CSV');
 
   for (const [year, url] of Object.entries(YEAR_CSV_URLS)) {
     const count = await syncCsvToD1(db, url, year);

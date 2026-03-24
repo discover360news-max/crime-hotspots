@@ -42,6 +42,16 @@ if (!crime) {
   }
 }
 
+// Fuzzy fallback: slug has a numeric ID prefix but ID changed (e.g. after dedup/renumbering)
+// Strip the leading "{digits}-" and match on the word portion alone → 301 to current slug
+if (!crime && /^\d+-/.test(slug)) {
+  const slugWords = slug.replace(/^\d+-/, '');
+  const fuzzyMatch = allCrimes.find(c => c.slug.replace(/^\d+-/, '') === slugWords);
+  if (fuzzyMatch) {
+    return Astro.redirect(`/trinidad/crime/${fuzzyMatch.slug}/`, 301);
+  }
+}
+
 // Unknown slug — render a crime-specific 404 page with helpful navigation
 if (!crime) {
   Astro.response.status = 404;
