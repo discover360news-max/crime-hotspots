@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 25, 2026 (regions.astro JNews dark hero; compare.astro dark hero + max-w-5xl throughout; utility bar above header in Layout.astro)
+**Last Updated:** March 25, 2026 (headlines.astro JNews dark hero; generateCrimeTypeThumbnails.ts build generator retired)
 
 ---
 
@@ -43,7 +43,7 @@
 | Page | Route | Rendering | Purpose |
 |------|-------|-----------|---------|
 | Dashboard | `/trinidad/` | **SSR + CDN cache** | **JNews-style hierarchy (Mar 24 2026):** dark hero band → 4 gradient `GradientStatCard` vitals (Total Incidents / Murders / Victims / Crimes/Day) → `DashboardStory` narrative → crime breakdown scroll → sticky year filter bar → 2-col section (Leaflet map left / Top Areas `TopRegionsCard` right) → Quick Insights card. Stat cards (11: All Crimes + 10 crime types) below. Filters drawer (crime type/region/area). Trend indicators. Initial render has real D1 data — shimmers only appear on year filter changes. `onYearChange` wrapped in try/catch — prevents shimmer freeze if API fails. |
-| Headlines | `/trinidad/headlines/` | Pre-rendered | Latest crimes, date accordion, victim counts, empty state for filters |
+| Headlines | `/trinidad/headlines/` | Pre-rendered | **JNews dark hero (Mar 25 2026):** H1 = "Latest Crime Headlines", live pulse = "{N} crimes in the last 30 days", CTA row (Dashboard/Murder Count/Filters). Date accordion list below unchanged. |
 | Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | **JNews article layout (Mar 25 2026):** category pill (crime type, rose) + related type pills above H1 → `font-black` H1 (headline) → byline row (date · area · source) → featured crime type thumbnail image (`h-40 sm:h-52 object-cover rounded-xl`) → slim nav row (Dashboard/Headlines/Safety Tips) → `SiteNotificationBanner` → `lg:grid-cols-[1fr_256px]` main+sidebar. Main: summary text → report issue card → `SafetyContext` → `CompactTipCard` (max 3, matched by type+area) → `FeedbackToggle` → `TrendingHotspots` → prev/next nav. Sidebar: share card (X/Facebook/WhatsApp) → `RelatedCrimes` → support card. `max-w-4xl` container. Share script uses `DOMContentLoaded`. `image` field added to NewsArticle JSON-LD schema. |
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
 | Area Detail | `/trinidad/area/[slug]` | **SSR + CDN cache** | **JNews hierarchy (Mar 24 2026):** dark hero (H1 = "{areaName}", live pulse = risk score + 90d incident count, freshness line) → 4-card GradientStatCard vitals (Risk Score/amber, Incidents 90d/slate, Murders YTD/crimson, Top Crime Type/violet) → 2-col layout (1fr/256px). Main: AreaNarrative summary, expandable extra stats tray (Shootings/Home Invasions/etc.), SafetyContext, FeedbackToggle, compare prompt, newsletter, crime type breakdown table, recent headlines accordion, related areas. MPSidebar (showAll=false). |
@@ -205,7 +205,7 @@
 | crimeColors.ts | Crime type → color hex mapping | 15 types (no Vehicle Theft). Exports `getCrimeTailwindColor()`, `getCrimeHexColor()`. Must stay in sync with crimeSchema.ts. |
 | areaAliases.ts | Area name aliases (handles quoted CSV fields) | Used by tooltip + area pages |
 | generateOgImage.ts | Dynamic OG image generation (satori + sharp) | Used by murder-count page (1200×630 PNG) |
-| generateCrimeTypeThumbnails.ts | Crime type thumbnail URL resolver | `getCrimeTypeThumbnailUrl()` returns `/images/crime-types/{slug}.webp` (or `generic.webp`). Images are AI-generated WebP files in `public/images/crime-types/` (replaced PNG, Mar 25 2026). Build-time generator (`generateAllCrimeTypeThumbnails`) still writes `.png` but is run manually via script — not called during `npm run build`. |
+| generateCrimeTypeThumbnails.ts | Crime type thumbnail URL resolver | `getCrimeTypeThumbnailUrl()` returns `/images/crime-types/{slug}.webp` (or `generic.webp`). Images are manually curated WebP files in `public/images/crime-types/`. Build-time PNG generator (`generateAllCrimeTypeThumbnails`) was retired Mar 25 2026 — stripped from file; manual curation is the intended workflow going forward. |
 
 ---
 
