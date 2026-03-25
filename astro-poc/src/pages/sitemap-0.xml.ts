@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers';
 import type { APIRoute } from 'astro';
 import { getTrinidadCrimes, getAllCrimesFromD1, generateNameSlug } from '../lib/crimeData';
 import { getCollection } from 'astro:content';
@@ -15,7 +16,7 @@ import mpsJamaicaData from '../data/mps-jamaica.json';
  * - Blog posts
  */
 export const GET: APIRoute = async ({ locals }) => {
-  const db = (locals as any).runtime?.env?.DB as D1Database | undefined;
+  const db = env.DB as D1Database | undefined;
   // Get all crimes for crime pages
   const crimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
@@ -124,7 +125,7 @@ export const GET: APIRoute = async ({ locals }) => {
 
   // Blog posts
   const blogPages = blogPosts.map(post => ({
-    url: buildRoute.blogPost(post.slug).slice(1),
+    url: buildRoute.blogPost(post.id).slice(1),
     lastmod: post.data.pubDate?.toISOString() || new Date().toISOString(),
     priority: 0.7,
     changefreq: 'monthly' as const
@@ -132,7 +133,7 @@ export const GET: APIRoute = async ({ locals }) => {
 
   // Help article pages — lastmod from date_updated frontmatter, fallback to launch date
   const helpPages = helpArticles.map((article: any) => ({
-    url: `help/${article.slug}/`,
+    url: `help/${article.id}/`,
     lastmod: article.data.date_updated?.toISOString() ?? '2026-03-22',
     priority: 0.6,
     changefreq: 'monthly' as const,
@@ -140,7 +141,7 @@ export const GET: APIRoute = async ({ locals }) => {
 
   // Tip individual pages
   const tipPages = publishedTips.map((tip: any) => ({
-    url: buildRoute.safetyTip(tip.slug).slice(1),
+    url: buildRoute.safetyTip(tip.id).slice(1),
     lastmod: (tip.data.date_updated || tip.data.date_added).toISOString(),
     priority: 0.7,
     changefreq: 'monthly' as const

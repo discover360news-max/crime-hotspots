@@ -1,10 +1,11 @@
 import { defineCollection, z } from 'astro:content';
-import { SAFETY_TIP_CATEGORIES, SAFETY_TIP_CONTEXTS } from '../config/crimeSchema';
+import { glob } from 'astro/loaders';
+import { SAFETY_TIP_CATEGORIES, SAFETY_TIP_CONTEXTS } from './config/crimeSchema';
 
 const HELP_SECTIONS = ['Getting Started', 'Understanding the Data', 'Using the Dashboard', 'Safety Tips', 'Crime Reports', 'For Researchers', 'Technical'] as const;
 
 const blog = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
   schema: z.object({
     title: z.string(),
     country: z.enum(['tt', 'gy']),
@@ -19,7 +20,7 @@ const blog = defineCollection({
 });
 
 const tips = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/*.md', base: './src/content/tips' }),
   schema: z.object({
     tip_id: z.string(),
     title: z.string(),
@@ -36,7 +37,7 @@ const tips = defineCollection({
 });
 
 const help = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/*.md', base: './src/content/help' }),
   schema: z.object({
     title: z.string(),
     section: z.enum(HELP_SECTIONS),

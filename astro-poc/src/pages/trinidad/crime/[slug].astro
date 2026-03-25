@@ -30,7 +30,8 @@ import { normalizedCrimeType, sortTipsByAreaRelevance } from '../../../lib/safet
 // At runtime on Cloudflare: use D1 (low-latency, always fresh, no Google Sheets dependency).
 // Fallback to CSV fetch when DB binding is absent (local astro dev, not wrangler pages dev).
 const { slug } = Astro.params;
-const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+import { env } from 'cloudflare:workers';
+const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 const crime = allCrimes.find(c => c.slug === slug);
 
@@ -44,7 +45,7 @@ if (!crime) {
 
 // Fuzzy fallback: slug has a numeric ID prefix but ID changed (e.g. after dedup/renumbering)
 // Strip the leading "{digits}-" and match on the word portion alone → 301 to current slug
-if (!crime && /^\d+-/.test(slug)) {
+if (!crime && slug && /^\d+-/.test(slug)) {
   const slugWords = slug.replace(/^\d+-/, '');
   const fuzzyMatch = allCrimes.find(c => c.slug.replace(/^\d+-/, '') === slugWords);
   if (fuzzyMatch) {

@@ -26,7 +26,8 @@ import barbadosDarkImg from '../assets/images/barbados-card-trsp-bg.png';
 // CDN cache: 1h browser, ~23h edge (matches daily rebuild cycle)
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, s-maxage=82800');
 
-const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+import { env } from 'cloudflare:workers';
+const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // This week vs last week

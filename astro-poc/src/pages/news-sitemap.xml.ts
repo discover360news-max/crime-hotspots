@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers';
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { buildRoute } from '../config/routes';
@@ -31,7 +32,7 @@ export const GET: APIRoute = async ({ locals }) => {
   // Recent crime pages — primary daily content with NewsArticle schema
   let crimeEntries: { loc: string; date: string; title: string }[] = [];
   try {
-    const db = (locals as any).runtime?.env?.DB as D1Database | undefined;
+    const db = env.DB as D1Database | undefined;
     const fromDate = twoDaysAgo.toISOString().slice(0, 10);
     const toDate = new Date().toISOString().slice(0, 10);
     const crimes = db
@@ -51,7 +52,7 @@ export const GET: APIRoute = async ({ locals }) => {
   }
 
   const blogXml = blogPosts.map(post => `  <url>
-    <loc>https://crimehotspots.com${buildRoute.blogPost(post.slug)}</loc>
+    <loc>https://crimehotspots.com${buildRoute.blogPost(post.id)}</loc>
     <news:news>
       <news:publication>
         <news:name>Crime Hotspots</news:name>

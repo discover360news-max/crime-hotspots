@@ -17,7 +17,8 @@ interface Props {
 
 const { countryName, dashboardUrl, embedded = false } = Astro.props;
 
-const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+import { env } from 'cloudflare:workers';
+const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // This week's crimes

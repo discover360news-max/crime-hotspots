@@ -18,7 +18,8 @@ import { routes, buildRoute } from '../../../config/routes';
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+import { env } from 'cloudflare:workers';
+const db = env.DB as D1Database | undefined;
 const crimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // Group by year and month

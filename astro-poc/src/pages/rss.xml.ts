@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers';
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { getTrinidadCrimes, getAllCrimesFromD1 } from '../lib/crimeData';
@@ -17,7 +18,7 @@ export const GET: APIRoute = async ({ locals }) => {
     const blogPosts = await getCollection('blog');
     blogItems = blogPosts.map(post => ({
       title: post.data.title,
-      link: `${site}${buildRoute.blogPost(post.slug)}`,
+      link: `${site}${buildRoute.blogPost(post.id)}`,
       description: post.data.excerpt,
       pubDate: new Date(post.data.date),
       updated: new Date(post.data.date),
@@ -31,7 +32,7 @@ export const GET: APIRoute = async ({ locals }) => {
   // Crime headlines (latest 20)
   let crimeItems: { title: string; link: string; description: string; pubDate: Date; updated: Date; author: string; category?: string }[] = [];
   try {
-    const db = (locals as any).runtime?.env?.DB as D1Database | undefined;
+    const db = env.DB as D1Database | undefined;
     const crimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
     crimeItems = crimes.slice(0, 20).map(crime => ({
       title: crime.headline,

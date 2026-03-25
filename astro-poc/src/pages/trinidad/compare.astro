@@ -18,7 +18,8 @@ import areaAliasesJson from '../../data/area-aliases.json';
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+import { env } from 'cloudflare:workers';
+const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // Build available areas from D1 data + static area aliases (no extra CSV fetch needed)

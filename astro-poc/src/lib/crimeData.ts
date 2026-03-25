@@ -392,7 +392,7 @@ function mapD1RowToCrime(row: D1CrimeRow): Crime {
 
 /**
  * Fetch ALL crimes from D1, sorted newest-first.
- * Use this in SSR pages (pass Astro.locals.runtime.env.DB).
+ * Use this in SSR pages (pass env.DB from 'cloudflare:workers').
  * Pre-rendered pages continue using getTrinidadCrimes() at build time.
  */
 export async function getAllCrimesFromD1(db: D1Database): Promise<Crime[]> {

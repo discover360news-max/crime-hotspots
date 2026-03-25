@@ -1,13 +1,12 @@
 /// <reference types="astro/client" />
 /// <reference types="@cloudflare/workers-types" />
 
-interface Env {
-  DB: D1Database;
-}
-
-declare namespace App {
-  interface Locals {
-    runtime: import('@astrojs/cloudflare').Runtime<Env>['runtime'];
+// Augment Cloudflare.Env so `import { env } from 'cloudflare:workers'` picks up our bindings.
+// (cloudflare:workers exports `env: Cloudflare.Env`, not the global `Env`)
+declare namespace Cloudflare {
+  interface Env {
+    DB: D1Database;
+    BUTTONDOWN_API_KEY?: string;
   }
 }
 

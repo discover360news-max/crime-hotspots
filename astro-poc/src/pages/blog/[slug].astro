@@ -11,13 +11,13 @@ import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import SocialProofStrip from '../../components/SocialProofStrip.astro';
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import { routes, buildRoute } from '../../config/routes';
 
 export async function getStaticPaths() {
   const blogPosts = await getCollection('blog');
   return blogPosts.map((post) => ({
-    params: { slug: post.slug },
+    params: { slug: post.id },
     props: { post },
   }));
 }
@@ -27,7 +27,7 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { Content } = await post.render();
+const { Content } = await render(post);
 
 const title = `${post.data.title} | Crime Hotspots Caribbean`;
 const description = post.data.excerpt;
@@ -45,13 +45,13 @@ const dashboardLink = post.data.country === 'tt'
 const breadcrumbItems = [
   { label: 'Home', href: routes.home },
   { label: 'Blog', href: routes.blog },
-  { label: post.slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) }
+  { label: post.id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) }
 ];
 
 // Get related posts (same country, most recent, excluding current)
 const allPosts = await getCollection('blog');
 const relatedPosts = allPosts
-  .filter(p => p.slug !== post.slug && p.data.country === post.data.country)
+  .filter(p => p.id !== post.id && p.data.country === post.data.country)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 
@@ -80,7 +80,7 @@ const newsArticleSchema = {
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": `https://crimehotspots.com/blog/${post.slug}/`
+    "@id": `https://crimehotspots.com/blog/${post.id}/`
   },
   "articleSection": "Crime Statistics",
   "keywords": post.data.tags.join(", "),
@@ -355,7 +355,7 @@ const newsArticleSchema = {
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {relatedPosts.map(related => (
             <a
-              href={buildRoute.blogPost(related.slug)}
+              href={buildRoute.blogPost(related.id)}
               class="group block bg-white dark:bg-[var(--ch-surface)] rounded-xl overflow-hidden border border-slate-200 dark:border-[var(--ch-border-card)] hover:shadow-md hover:border-rose-200 dark:hover:border-rose-900 transition-all"
             >
               <div class="overflow-hidden">

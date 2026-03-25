@@ -5,11 +5,12 @@
  * suggestions panel. CDN-cached at edge for ~23h.
  */
 
+import { env } from 'cloudflare:workers';
 import type { APIRoute } from 'astro';
 import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../lib/crimeData';
 
 export const GET: APIRoute = async ({ locals }) => {
-  const db = (locals as any).runtime?.env?.DB as D1Database | undefined;
+  const db = env.DB as D1Database | undefined;
   const crimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
   const latest = crimes

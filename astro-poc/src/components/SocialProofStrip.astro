@@ -6,6 +6,7 @@
  * Pass incidentCount from parent if allCrimes is already in scope — avoids a second D1 query.
  */
 import socialProof from '../data/social-proof.json';
+import { env } from 'cloudflare:workers';
 
 interface Props {
   variant?: 'strip' | 'compact' | 'sidebar' | 'hero';
@@ -17,7 +18,7 @@ const { variant = 'strip', incidentCount } = Astro.props;
 let incidents = incidentCount ?? 0;
 if (incidentCount === undefined) {
   try {
-    const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+    const db = env.DB as D1Database | undefined;
     if (db) {
       const result = await db.prepare('SELECT COUNT(*) as count FROM crimes').first<{ count: number }>();
       incidents = result?.count ?? socialProof.incident_count_fallback;

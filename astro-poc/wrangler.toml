@@ -1,10 +1,16 @@
 name = "crime-hotspots"
 compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
 
-# D1 binding for local development (wrangler pages dev)
-# Also add this binding in the Cloudflare Dashboard:
-#   Pages → crime-hotspots → Settings → Functions → D1 database bindings
-#   Variable name: DB | D1 database: crime-hotspots-db
+routes = [
+  { pattern = "crimehotspots.com/*", zone_name = "crimehotspots.com" },
+  { pattern = "www.crimehotspots.com/*", zone_name = "crimehotspots.com" }
+]
+
+[assets]
+directory = "./dist/client/"
+not_found_handling = "404-page"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "crime-hotspots-db"

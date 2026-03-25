@@ -9,6 +9,7 @@
 
 export const prerender = false;
 
+import { env } from 'cloudflare:workers';
 import type { APIRoute } from 'astro';
 import {
   getAllCrimesFromD1,
@@ -101,7 +102,7 @@ function computeTopRegions(crimes: Crime[]) {
 // ---------------------------------------------------------------------------
 
 export const GET: APIRoute = async ({ request, locals }) => {
-  const db = (locals as any).runtime?.env?.DB as D1Database | undefined;
+  const db = env.DB as D1Database | undefined;
 
   if (!db) {
     return new Response(JSON.stringify({ error: 'D1 database not available' }), {

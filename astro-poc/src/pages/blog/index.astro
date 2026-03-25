@@ -67,7 +67,7 @@ function formatShortDate(date: Date) {
 
     <!-- ========== HERO POST ========== -->
     {heroPost && (
-      <a href={`/blog/${heroPost.slug}/`} class="block relative rounded-2xl overflow-hidden mb-5 group" aria-label={`Read: ${heroPost.data.title}`}>
+      <a href={`/blog/${heroPost.id}/`} class="block relative rounded-2xl overflow-hidden mb-5 group" aria-label={`Read: ${heroPost.data.title}`}>
         <img
           src={heroPost.data.image}
           alt={heroPost.data.countryName}
@@ -102,7 +102,7 @@ function formatShortDate(date: Date) {
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {secondaryPosts.map(post => (
           <a
-            href={`/blog/${post.slug}/`}
+            href={`/blog/${post.id}/`}
             class="group block bg-white dark:bg-[var(--ch-surface)] rounded-xl overflow-hidden border border-slate-200 dark:border-[var(--ch-border-card)] hover:shadow-md hover:border-rose-200 dark:hover:border-rose-900 transition-all"
           >
             <div class="overflow-hidden">
@@ -152,7 +152,7 @@ function formatShortDate(date: Date) {
               data-country={post.data.country}
               data-post-index={index}
             >
-              <a href={`/blog/${post.slug}/`} class="flex gap-4 items-center p-3.5 group">
+              <a href={`/blog/${post.id}/`} class="flex gap-4 items-center p-3.5 group">
                 <img
                   src={post.data.image}
                   alt={post.data.countryName}

@@ -36,7 +36,8 @@ import NewsletterSignup from '../../components/NewsletterSignup.astro';
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+import { env } from 'cloudflare:workers';
+const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // Dynamic year handling (future-proof)
@@ -526,7 +527,7 @@ const breadcrumbData = {
         </h2>
         <div class="bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[hsl(0_0%_12%)] p-6 shadow-sm">
           <h3 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text)] mb-3">
-            <a href={`/blog/${latestPost.slug}/`} class="hover:text-rose-600 dark:text-[var(--ch-text)] dark:hover:text-rose-400 transition-colors">
+            <a href={`/blog/${latestPost.id}/`} class="hover:text-rose-600 dark:text-[var(--ch-text)] dark:hover:text-rose-400 transition-colors">
               {latestPost.data.title}
             </a>
           </h3>
@@ -539,7 +540,7 @@ const breadcrumbData = {
               <span>{latestPost.data.readTime}</span>
             </div>
             <a
-              href={`/blog/${latestPost.slug}/`}
+              href={`/blog/${latestPost.id}/`}
               class="inline-flex items-center text-sm font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300"
             >
               Read full report

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-**Live site:** https://crimehotspots.com | **Working directory:** `astro-poc/` | **Framework:** Astro 5.16.5
+**Live site:** https://crimehotspots.com | **Working directory:** `astro-poc/` | **Framework:** Astro 6.0.8
 
 ---
 

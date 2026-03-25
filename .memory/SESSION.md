@@ -61,6 +61,15 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 25, 2026 (continued x5)
+- **Astro 5→6 + Cloudflare Pages→Workers migration COMPLETE.** astro `^6.0.8`, `@astrojs/cloudflare` `^13.1.3` (moved to dependencies), `@cloudflare/workers-types` `^4.20260317.1`, `@astrojs/sitemap` `^3.7.1`, `@astrojs/check` `latest`. Content Layer API: `src/content.config.ts` (new location, glob loaders), all `entry.slug`→`entry.id`, `entry.render()`→`render(entry)`. Runtime: `import { env } from 'cloudflare:workers'; env.DB` replaces `Astro.locals.runtime?.env?.DB` across 21 files. `wrangler.toml`: `[assets]` block, `nodejs_compat` flag (for papaparse/stream), routes for `crimehotspots.com/*` + `www.crimehotspots.com/*`. GitHub Actions: Node 20→22, `npx wrangler deploy` replaces Pages curl. `BUTTONDOWN_API_KEY` set as Workers secret. Pages project decommissioned. B017 fixed. Local dev: `npm run build && npx wrangler dev` (port 8787, real D1). CFG001/CFG002/B017/CLAUDE.md all updated.
+- **Next:** —
+
+## Session Notes — Mar 25, 2026 (continued x4)
+- **SocialProofStrip rollout COMPLETE** — All 38 pages done across Trinidad, Jamaica, blog, and site pages. New component (`src/components/SocialProofStrip.astro`) + data file (`src/data/social-proof.json`). Hero variant on raw dark-hero pages (grid split with `grid lg:grid-cols-[1fr_auto] gap-8 items-center` + `w-full lg:w-52`); sidebar variant on Dashboard; strip variant on all others. incidentCount omitted on pre-rendered + all Jamaica pages (D1 not live). Tracker + F016 memory both COMPLETE. Committed 6f9a652 + pushed.
+- **B030** — zsh `git add` fails on `[slug].astro` filenames even when quoted. Fix: `noglob git add ...`. Documented in B030 entry.
+- **Next:** —
+
 ## Session Notes — Mar 25, 2026 (continued x3)
 - **`areas.astro` JNews redesign + MP strips** — dark hero (`from-slate-900 to-slate-800`, inline breadcrumb, live pulse, Compare/View Regions CTAs, `pb-16` for card overlap). 4-card vitals row (`-mt-5 z-10`): Incidents 90d (crimson), Highest Risk Area label+name+link (slate), Most Active Region count+name+link (amber), Areas Tracked (violet). `max-w-3xl` → `max-w-5xl`. MP strip per region group: `mpsData` loaded server-side, `mpsByRegionSlug` Map keyed by `regionSlugs` (same `generateNameSlug` canonical function — no drift confirmed). Each pill: 20px circular photo + party badge + name → profile link. Singular/plural "Member / Members of Parliament". Removed `Hero.astro` + `Breadcrumbs.astro` imports. Sort script unchanged (`querySelector('.grid')` targets area grid; MP row uses `flex` not `grid`). Bug fix: `areasWithCrime` was filtering on `totalCrimes` (all-time) instead of `crimeCount90d` — hero pulse always showed 196/196. Compare link added per region group: resolves to namesake area (e.g. Chaguanas → `?a=chaguanas`) with fallback to highest 90d crime area for multi-part regions. Pipe separator (`|`) between Compare and View Region. Build passes.
 - **Next:** —

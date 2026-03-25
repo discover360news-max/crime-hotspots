@@ -49,7 +49,8 @@ const regionSlug = generateNameSlug(region);
 const areaRegionMPs = mpsData.filter(mp => mp.regionSlugs.includes(regionSlug));
 
 // Fetch crimes — D1 at runtime, CSV fallback for local dev
-const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+import { env } from 'cloudflare:workers';
+const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 // Area crimes

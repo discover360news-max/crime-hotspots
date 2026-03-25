@@ -31,7 +31,7 @@ for (const s of SECTIONS) {
 
 // Serialise for client-side search
 const helpIndex = allArticles.map(a => ({
-  slug: a.slug,
+  slug: a.id,
   title: a.data.title,
   section: a.data.section,
   summary: a.data.summary,
@@ -111,7 +111,7 @@ const collectionPageSchema = {
                 {articles.slice(0, 3).map(article => (
                   <li>
                     <a
-                      href={`/help/${article.slug}/`}
+                      href={`/help/${article.id}/`}
                       class="text-caption text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 hover:underline leading-snug block"
                     >
                       {article.data.title}
@@ -174,7 +174,7 @@ const collectionPageSchema = {
         const li = document.createElement('li');
         li.className = 'bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-xl border border-slate-100 dark:border-[hsl(0_0%_18%)] p-4';
         li.innerHTML = `
-          <a href="/help/${article.slug}/" class="block">
+          <a href="/help/${article.id}/" class="block">
             <p class="text-body font-bold text-rose-600 dark:text-rose-400 hover:underline leading-snug">${escapeHtml(article.title)}</p>
             <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">${escapeHtml(article.section)}</p>
             <p class="text-caption text-slate-600 dark:text-[hsl(0_0%_60%)] mt-1.5 leading-relaxed">${escapeHtml(article.summary)}</p>

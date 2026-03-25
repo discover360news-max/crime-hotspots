@@ -87,7 +87,7 @@
 
 ---
 
-## Components (35 active)
+## Components (36 active)
 
 ### Core Layout (`src/layouts/`)
 | File | Purpose | Key Props |
@@ -153,6 +153,7 @@
 ### Utility & Engagement
 | Component | Purpose |
 |-----------|---------|
+| SocialProofStrip.astro | Trust-building metrics strip (Mar 25 2026). Props: `variant: 'hero'|'sidebar'|'strip'` (default `'strip'`), `incidentCount?: number`. **hero/sidebar:** 2×2 grid, `bg-blue-500/10 border border-blue-400/20` cards, `text-blue-300` numbers, abbreviated (`_short`) values. **strip:** 4-col row, `bg-blue-50 dark:bg-blue-950/40` cards, full (`_display`) values. Data: `src/data/social-proof.json` (update weekly). `incidentCount` falls back to D1 query then `incident_count_fallback` JSON. **On all 38 user-facing pages** — omit `incidentCount` on pre-rendered pages and all Jamaica pages (D1 not live). |
 | AreaNameTooltip.astro | Area alias tooltip (dotted underline) |
 | InfoPopup.astro | Click-based help tooltips |
 | LoadingShimmer.astro | Facebook-style skeleton loading |

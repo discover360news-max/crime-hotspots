@@ -22,7 +22,8 @@ import NewsletterSignup from '../../components/NewsletterSignup.astro';
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+import { env } from 'cloudflare:workers';
+const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
 const now = new Date();
@@ -317,7 +318,7 @@ const faqData = {
         {latestPost && (
           <div>
             <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)] mb-3">Latest Analysis</p>
-            <a href={`/blog/${latestPost.slug}/`}
+            <a href={`/blog/${latestPost.id}/`}
               class="block bg-white dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-4 hover:border-rose-300 dark:hover:border-rose-800 hover:shadow-sm transition">
               <h3 class="font-bold text-slate-800 dark:text-[var(--ch-text-heading)] text-caption mb-2">{latestPost.data.title}</h3>
               <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">

@@ -20,7 +20,7 @@ B013 | BUG | fixed | Raw Articles sheet column is "Publish Date" not "Published 
 B014 | BUG | archived | Pagefind ranking issues → fully resolved by removing Pagefind (Mar 13 2026). Search now uses D1 FTS5 (see D007) → B014-pagefind-crime-indexer.md
 B015 | BUG | active | Astro trailingSlash:'always' — ALL internal hrefs AND fetch calls MUST use trailing slash or homepage HTML is served silently → B015-astro-trailing-slash-api-fetch.md
 B016 | BUG | active | SSR handlers: wrap ENTIRE body in try/catch, not just DB queries — uncaught throws return 200 HTML from Astro error handler → B016-ssr-handler-try-catch.md
-B017 | BUG | active | Local D1 is empty — apply schema manually before using wrangler pages dev locally → B017-local-d1-empty.md
+B017 | BUG | fixed | Local D1 works: `npm run build && npx wrangler dev` (Workers v13 runs workerd locally) → B017-local-d1-empty.md
 B018 | BUG | fixed | D1 date column stored as MM/DD/YYYY (raw CSV) — range queries with YYYY-MM-DD always returned 0 rows → trend indicators hidden. Fix: normalize in sync worker + re-sync → B018-d1-date-format-mismatch.md
 B019 | BUG | fixed | Quick Insights "Highest Crime Area" could show 'Unknown' — calculateInsights() + updateQuickInsights() used areaArray[0] instead of validAreas[0]. Fix: both server (dashboardHelpers.ts) + client (dashboardUpdates.ts) now use validAreas[0] → B019-quick-insights-unknown-area.md
 B020 | BUG | fixed | updateQuickInsights() used new Date(c.date) string parse (UTC midnight) for Peak Day/Busiest Month — shifts day for Trinidad (UTC-4). Fix: use c.dateObj when available → B019-quick-insights-unknown-area.md
@@ -33,6 +33,7 @@ B026 | BUG | fixed | `/api/dashboard` trend queries always used `now-3/33/63d` r
 B027 | BUG | active | 301 on slug-not-found SSR pages gets browser-cached permanently — transient `loadFullAreaData()` failure poisons all visits forever. Use 302 for region/area/archive. crime/[slug] 301s are fine (intentional permanent migrations). → B027-301-redirect-browser-cache.md
 B028 | BUG | active | `flex-1` without `min-w-0` overflows narrow containers — flex children default to `min-width:auto` and won't shrink below intrinsic width. Fixed in NewsletterSignup card variant (content div + email input). Always add `min-w-0` alongside `flex-1` when container width is constrained. → B028-flex-min-w-0-overflow.md
 B029 | BUG | fixed | `escapeHtml()` in Astro `{expr}` causes double-encoding — Astro auto-escapes text nodes, so `{escapeHtml(x)}` renders `&#39;` literally. Use `{x}` directly; `escapeHtml()` only for `set:html`/`innerHTML`. → B029-escaphtml-double-encoding-astro.md
+B030 | BUG | active | zsh glob expansion breaks `git add` on bracket filenames (`[slug].astro`) even when quoted. Fix: prefix with `noglob` → B030-zsh-noglob-bracket-filenames.md
 
 ## Learnings & Patterns (L)
 L001 | LEARN | archived | ~~astro:page-load~~ — SPA removed Mar 15 2026. Use DOMContentLoaded. Do NOT re-introduce ClientRouter → L001-astro-page-load-pattern.md
@@ -64,7 +65,7 @@ D007 | DEC | active | Search: replaced Pagefind with D1 FTS5. crimes_fts virtual
 IDEA001 | IDEA | tabled | Criminal behavioural patterns page: public editorial (~1500w, 8 documented patterns from tips corpus) + internal content strategy doc. Value confirmed. Constraint: frame as "documented patterns" not stats. Tabled Mar 22 2026 — revisit when tips batch work slows.
 
 ## Features (F)
-F016 | FEAT | in-progress | SocialProofStrip: site-wide social proof component. 3 variants (hero/sidebar/strip). Central data: src/data/social-proof.json (update weekly). Live D1 incident count. Homepage + Dashboard done. 36 pages remain. Tracker: docs/guides/SOCIAL-PROOF-STRIP-IMPLEMENTATION.md → F016-social-proof-strip.md
+F016 | FEAT | complete | SocialProofStrip: all 38 pages done. 3 variants (hero/sidebar/strip). Data: src/data/social-proof.json (update weekly). Live D1 incident count. Tracker: docs/guides/SOCIAL-PROOF-STRIP-IMPLEMENTATION.md → F016-social-proof-strip.md
 F010 | FEAT | active | MP profiles (T&T): 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg. Socials render as brand SVG icons. → F010-mp-profiles.md
 F012 | FEAT | active | MP profiles (Jamaica): 63 pages /jamaica/mp/[slug]/, index /jamaica/mp/, mps-jamaica.json. Same card layout as T&T. Photo min-h-[500px]. TikTok in socials. Photos in public/images/mps/jamaica/. Crime stats placeholder until D1 pipeline live. → site-features.md
 F014 | WORKFLOW | active | MP data update workflow: contact info, photos, parliament profiles, bulk updates, gotchas → docs/guides/MP-UPDATE-WORKFLOW.md
@@ -88,8 +89,8 @@ C003 | COMP | active | IslandSelectorModal: unified picker; backward-compat wind
 C004 | COMP | active | MPSidebar: area pages (showAll=false: 2+chevron) + region pages (showAll=true: all on desktop, mobile toggle). Share + MPs + Ko-fi. Global width standard: max-w-5xl across header/footer/hero → C004-mpsidebar-design-rules.md
 
 ## Config (CFG)
-CFG001 | CFG | active | Project overview: Astro 5, Cloudflare Pages, GA4, GAS, Claude Haiku → CFG001-project-overview.md
-CFG002 | CFG | active | Build & deploy: npm commands, GitHub Actions, daily 6AM UTC rebuild → CFG002-build-deploy.md
+CFG001 | CFG | active | Project overview: Astro 6, Cloudflare Workers, GA4, GAS, Claude Haiku → CFG001-project-overview.md
+CFG002 | CFG | active | Build & deploy: `wrangler deploy`, wrangler dev for local D1, GitHub Actions, daily 6AM UTC → CFG002-build-deploy.md
 CFG003 | CFG | active | Cloudflare caching: ALL crime-data pages SSR + CDN ~23h. D1 free tier: 5M rows read/day; safe to ~15k visits/day → CFG003-cloudflare-caching.md
 CFG004 | CFG | active | astro.config.mjs: output:server, Cloudflare adapter, key integrations → CFG004-astro-config.md
 

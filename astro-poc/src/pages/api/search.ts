@@ -10,6 +10,7 @@
 
 export const prerender = false;
 
+import { env } from 'cloudflare:workers';
 import type { APIRoute } from 'astro';
 import { generateNameSlug } from '../../lib/csvParser';
 import mpsData from '../../data/mps.json';
@@ -61,7 +62,7 @@ function searchMps(q: string): SearchResult[] {
 }
 
 export const GET: APIRoute = async ({ request, locals }) => {
-  const db = (locals as any).runtime?.env?.DB as D1Database | undefined;
+  const db = env.DB as D1Database | undefined;
   const url = new URL(request.url);
   const q = url.searchParams.get('q')?.trim() ?? '';
 

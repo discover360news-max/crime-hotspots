@@ -4,7 +4,7 @@
  * JNews layout: dark hero → cardless article body → wider related tips grid
  */
 
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import TipCard from '../../../components/TipCard.astro';
 import SocialProofStrip from '../../../components/SocialProofStrip.astro';
@@ -12,11 +12,12 @@ import TipVote from '../../../components/TipVote.astro';
 import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../../lib/crimeData';
 import { routes, buildRoute } from '../../../config/routes';
 import { PUBLIC_SAFETY_TIPS_GAS_URL } from 'astro:env/client';
+import { env } from 'cloudflare:workers';
 
 const { slug } = Astro.params;
 
 const allTips = await getCollection('tips');
-const tip = allTips.find(t => t.slug === slug);
+const tip = allTips.find(t => t.id === slug);
 
 if (!tip || tip.data.status !== 'published') {
   return new Response(null, { status: 404 });
@@ -48,7 +49,7 @@ const hasManualIds = tip.data.related_story_ids.length > 0;
 
 let relatedCrimes: Awaited<ReturnType<typeof getTrinidadCrimes>> = [];
 if (hasManualIds || matchingTypes.length > 0) {
-  const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
+  const db = env.DB as D1Database | undefined;
   const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
   if (hasManualIds) {
@@ -71,13 +72,13 @@ if (hasManualIds || matchingTypes.length > 0) {
 // Related tips: same category or context, max 3, excluding self
 const relatedTips = allTips
   .filter(t =>
-    t.slug !== slug &&
+    t.id !== slug &&
     t.data.status === 'published' &&
     (t.data.category === tip.data.category || t.data.context === tip.data.context)
   )
   .slice(0, 3);
 
-const { Content } = await tip.render();
+const { Content } = await render(tip);
 const gasUrl = PUBLIC_SAFETY_TIPS_GAS_URL || '';
 
 const title = `${tip.data.title} | Safety Tips Trinidad — CrimeHotSpots.com`;
@@ -101,7 +102,7 @@ const shortTitle = tip.data.title.split(' ').slice(0, 5).join(' ') + (tip.data.t
     datePublished: tip.data.date_added.toISOString(),
     dateModified: (tip.data.date_updated || tip.data.date_added).toISOString(),
     description,
-    url: `https://crimehotspots.com${buildRoute.safetyTip(tip.slug)}`,
+    url: `https://crimehotspots.com${buildRoute.safetyTip(tip.id)}`,
     publisher: {
       '@type': 'Organization',
       name: 'Crime Hotspots',
@@ -213,7 +214,7 @@ const shortTitle = tip.data.title.split(' ').slice(0, 5).join(' ') + (tip.data.t
     )}
 
     <!-- Tip voting -->
-    <TipVote tipId={tip.slug} gasUrl={gasUrl} />
+    <TipVote tipId={tip.id} gasUrl={gasUrl} />
 
     <!-- Share + back footer -->
     <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">

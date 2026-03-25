@@ -118,7 +118,7 @@ function formatPostDate(date: Date) {
           <p class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_88%)] leading-snug line-clamp-1 mb-1">{latestPost.data.title}</p>
           <div class="flex items-center justify-between gap-2 mt-auto">
             <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">{formatPostDate(latestPost.data.date)}</span>
-            <a href={buildRoute.blogPost(latestPost.slug)} class="text-xs font-medium text-rose-600 hover:text-rose-700 active:text-rose-800 transition whitespace-nowrap">
+            <a href={buildRoute.blogPost(latestPost.id)} class="text-xs font-medium text-rose-600 hover:text-rose-700 active:text-rose-800 transition whitespace-nowrap">
               Read &rarr;
             </a>
           </div>
