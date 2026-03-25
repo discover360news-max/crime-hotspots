@@ -11,7 +11,7 @@
 ### Marketing & Static
 | Page | Route | Purpose |
 |------|-------|---------|
-| Homepage | `/` | Country cards (direct link to dashboard), HomepagePulse live stats, Explore 3-tile section (Areas / Murder Count / Blog), QuickAnswers FAQ section. Jamaica card: full-colour `jamaica-card-trsp-bg.png`, amber "JUL 2026" badge, live D:HH:MM countdown to `2026-07-04T00:00:00` (60s setInterval, "Launching soon" fallback at zero). Guyana/Barbados: same card structure, greyscale image, "Coming Soon" pill. |
+| Homepage | `/` | **SSR + CDN cache (Mar 25 2026). JNews WOW layout:** Dark hero (H1 = "Live Crime Statistics for the Caribbean", subtitle, live pulse = "X crimes in Trinidad this week · Y murders", CTAs: Dashboard/Murder Count) → T&T section (section label + 2-col: island card left / 3 latest headline cards right + Explore 3-tile row below) → dark separator ("More Countries") → coming-soon islands row (Jamaica countdown / Guyana / Barbados) → QuickAnswers. Headline cards: rose crime-type pill + headline (line-clamp-2) + area + date, each links to crime detail page. T&T card: `aspect-square` island image + inline stats (crimes/top area/murders this week). Render mode changed from pre-rendered to SSR + `Cache-Control: public, max-age=3600, s-maxage=82800`. `HomepagePulse` component no longer imported (inline D1 data). Jamaica countdown: same JS as before, D:HH:MM to 2026-07-04T00:00:00. |
 | About | `/about/` | Project background |
 | Contact | `/contact/` | Contact information |
 | Methodology | `/methodology/` | Data collection process |

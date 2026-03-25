@@ -61,6 +61,10 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 25, 2026 (continued x2)
+- **Homepage JNews WOW redesign** — SSR + CDN cache (was pre-rendered). Dark hero (H1 = "Live Crime Statistics for the Caribbean" — SEO H1 replacing brand tagline "Know Where. Stay Safe."; subtitle covers T&T/Jamaica/beyond; live pulse = crimes this week + murders; CTAs: Dashboard/Murder Count). T&T section: 2-col (island card left, 3 latest headline cards right) + explore tiles below. Dark separator "More Countries" → compact coming-soon row (Jamaica/Guyana/Barbados, `grid-cols-3`). QuickAnswers unchanged at bottom. `HomepagePulse` component removed from this page (D1 data inlined). CDN cache headers set via `Astro.response.headers.set`. Build passes.
+- **Next:** —
+
 ## Session Notes — Mar 25, 2026 (continued)
 - **`headlines.astro` JNews dark hero** — compact hero replacing `Hero.astro` + `Breadcrumbs.astro`. H1 = "Latest Crime Headlines", subtitle, live pulse = "N crimes reported in the last 30 days" (`count30d` computed from `allCrimes` with `cutoff30d`). CTA row: Dashboard (rose) + Murder Count (ghost) + Filters button (ghost, relocated from old Hero slot) + inline Clear (rose-400). Freshness line. `max-w-5xl` hero, existing `max-w-3xl` main unchanged. Removed imports: `Breadcrumbs`, `Hero`, `getCountryName`. Pre-rendered page. Build passes.
 - **`generateCrimeTypeThumbnails.ts` build generator retired** — `generateAllCrimeTypeThumbnails` + all build-time deps (satorio, sharp, fonts, darken helper, CRIME_THUMBNAILS map) stripped from file. Only `getCrimeTypeThumbnailUrl` + `KNOWN_TYPES` array remain (~35 lines). `crime/[slug].astro` import unchanged — still works. Manual WebP curation in `public/images/crime-types/` is the intended workflow. `site-features.md` updated.
