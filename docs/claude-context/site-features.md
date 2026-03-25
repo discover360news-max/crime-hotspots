@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 25, 2026 (headlines.astro full JNews redesign — dark date bands, type chips, sidebar; headlinesPage.ts extracted; NewsletterSignup card overflow fix B028)
+**Last Updated:** March 25, 2026 (murder-count JNews redesign + year filter + MonthlyBreakdownChart component)
 
 ---
 
@@ -53,7 +53,7 @@
 | MP Index | `/trinidad/mp/` | Pre-rendered | Directory of all 41 MPs grouped by region. Each card: photo, honorific name, party badge, constituency. |
 | MP Profile | `/trinidad/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left, identity+contact right. Crime stat cards per region (reuses region page pattern). JSON-LD Person schema. Ambiguous MPs show boundary note + two region sections. Data: `src/data/mps.json`. |
 | Compare | `/trinidad/compare/` | **SSR + CDN cache** | Side-by-side area comparison. Pre-loads Port of Spain vs San Juan by default. **Dark slate hero (Mar 25 2026):** from-slate-900 to-slate-800, H1 font-black text-white, inline breadcrumb nav. Sticky selector bar (Area A / Area B dropdowns). All containers `max-w-5xl`. Area list + per-area stats derived from D1 at request time; 90-day window always current. |
-| Murder Count | `/trinidad/murder-count/` | **SSR + CDN cache** | `max-w-5xl` sidebar layout. Left: flip counter, YoY comparison, 3 rate cards (YTD / **Annualized** / Previous Final), blog post. Right sidebar: share buttons (`.sb-share-btn` pattern), latest 10 murder incidents with "View all {year} murders →" link to `/trinidad/murders/`, newsletter. Single `<h1>` with 3 spans = "Trinidad & Tobago Murder Count {year}". FAQPage JSON-LD (3 Q&As: count, rate, toll) + WebPage + Dataset (dateModified) + BreadcrumbList. |
+| Murder Count | `/trinidad/murder-count/` | **SSR + CDN cache** | **JNews redesign (Mar 25 2026).** `?year=` URL param for historical views (validated: 2024–currentYear, falls back to currentYear). Dark hero: H1 + bigger flip counter (`.hero-counter-wrap` CSS override: 96/130/180px at sm/default/md+) + live pulse + YoY indicator + CTAs. GradientStatCard vitals row overlapping hero (4 cards). **Current year:** YTD Rate (crimson) / Annualized Rate (slate) / Previous Year Final (slate) / Days Between Murders (amber). **Past year:** Final Rate / Total Murders / vs previousYear % / Daily Average. Year pill selector always rendered (rose = active, slate = inactive). `MonthlyBreakdownChart` for monthly breakdown (currentMonthIdx=12 on closed years = all bars rendered as past). YoY comparison card hidden if no previous year data. Sidebar: share buttons + latest incidents scoped to selected year + newsletter. FAQPage JSON-LD (3 Q&As) + WebPage + Dataset (dateModified) + BreadcrumbList. **Note:** year selector shows only years present in `allCrimes` — if D1 only has current year loaded, only one pill appears. |
 | Murders List | `/trinidad/murders/` | **SSR + CDN cache** | **JNews hierarchy (Mar 25 2026):** dark hero (H1 = murder count as large number, subtitle = "Murders in Trinidad & Tobago · {year}", live pulse = YoY same-period comparison sentence) → 4-card GradientStatCard vitals (Murders YTD/crimson, Projected Annual/amber, vs Last Year %/violet, Days with Murders/slate) → "All Murders" section label → date-grouped list. YoY computed against same calendar date in previous year (not full-year total). `max-w-5xl`. Load more: 14 groups initially, +14 per click. Schema: `WebPage` + `Dataset` (`slot="head"`). |
 | Archive Index | `/trinidad/archive/` | Pre-rendered | Browse by year |
 | Archive Month | `/trinidad/archive/[year]/[month]` | Pre-rendered | Crimes for specific month |
@@ -127,6 +127,7 @@
 | Component | Purpose |
 |-----------|---------|
 | GradientStatCard.astro | Dashboard hero vitals card (Mar 24 2026). Props: `variant` (slate/crimson/amber/violet — controls gradient colour), `label`, `value`, `sublabel`, `trend`, `trendLabel`. Trend arrows use `.trend-indicator.hidden` pattern — JS populates via `updateCardWithTrend()` in `dashboardUpdates.ts`, same as `StatCard`. Variant class names are in a lookup object inside the component. |
+| MonthlyBreakdownChart.astro | Generic 12-bar monthly breakdown chart (Mar 25 2026). Props: `values: number[]` (12 monthly counts Jan–Dec), `currentMonthIdx: number` (0-indexed boundary — past months slate, current month accent, future months muted; pass `12` for closed years to render all as past), `label?: string`, `footnote?: string`, `accentColor?: 'rose'|'amber'|'slate'` (default `'rose'`). Caller computes the 12 values. Reusable on any crime or stats page. |
 | DashboardInfoCards.astro | Crime summary cards |
 | StatCard.astro | Individual stat card |
 | StatCards.astro | Grid of stat cards with YoY comparisons. Optional `size: 'large'` (bumps number to text-3xl/4xl) and `riskColor: 'high'|'neutral'|'low'` (amber/slate/emerald) props — used on Risk Level card on area pages. |
