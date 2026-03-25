@@ -232,6 +232,8 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
       {sortedRegions.map(({ region, areas, totalCrimes }) => {
         const regionSlug = generateNameSlug(region);
         const regionMPs = mpsByRegionSlug.get(regionSlug) ?? [];
+        const compareArea = areas.find(a => a.name.toLowerCase() === region.toLowerCase())
+          ?? areas.reduce((max, a) => a.crimeCount90d > max.crimeCount90d ? a : max, areas[0]);
         return (
           <section class="region-group bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[var(--ch-border-card)]" data-region={region.toLowerCase()}>
 
@@ -241,12 +243,20 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
                 <h2 class="text-heading font-bold text-slate-800 dark:text-[var(--ch-text)] leading-tight">{region}</h2>
                 <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">{areas.length} areas • {totalCrimes} crimes (90 days)</p>
               </div>
-              <a
-                href={buildRoute.region(regionSlug)}
-                class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
-              >
-                View Region
-              </a>
+              <div class="flex items-center gap-3">
+                <a
+                  href={`${routes.trinidad.compare}?a=${compareArea.slug}`}
+                  class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                >
+                  Compare
+                </a>
+                <a
+                  href={buildRoute.region(regionSlug)}
+                  class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
+                >
+                  View Region
+                </a>
+              </div>
             </div>
 
             <!-- MPs for this region -->
