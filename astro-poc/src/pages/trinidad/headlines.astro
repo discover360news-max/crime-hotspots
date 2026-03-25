@@ -1,36 +1,32 @@
 ---
 /**
  * Trinidad & Tobago Headlines Page
- * Shows all crime headlines with filters (Area, Crime Type, Date)
+ * JNews layout: dark hero → type chips → two-column (list + sidebar) → filter tray
  */
 
 import Layout from '../../layouts/Layout.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
-import BlogRotatingBanner from '../../components/BlogRotatingBanner.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
-import { getTrinidadCrimes, getAllCrimesFromD1, type Crime } from '../../lib/crimeData';
+import { getTrinidadCrimes, getAllCrimesFromD1, generateNameSlug, type Crime } from '../../lib/crimeData';
+import { getHotAreas } from '../../lib/trendingHelpers';
+import { countCrimeType } from '../../lib/dashboardHelpers';
 import { dataUpdateNotice } from '../../config/siteNotifications';
-import { routes } from '../../config/routes';
+import { routes, buildRoute } from '../../config/routes';
+import { escapeHtml } from '../../lib/escapeHtml';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
 const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
-// Fetch all crimes (server-side) - include all years for filtering
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
-// Get available years for filters
 const availableYears = [...new Set(allCrimes.map(c => c.year))].sort((a, b) => b - a);
 const currentYear = availableYears[0];
 
-console.log(`📰 Headlines loaded ${allCrimes.length} total crimes (${availableYears.join(', ')})`);
-
-// Get unique areas, regions, and crime types for filters (from all years)
+// Filter data
 const areas = [...new Set(allCrimes.map(c => c.area).filter(Boolean))].sort();
 const regions = [...new Set(allCrimes.map(c => c.region).filter(Boolean))].sort();
 const crimeTypes = [...new Set(allCrimes.map(c => c.crimeType).filter(Boolean))].sort();
-
-// Build region → areas mapping for cascading area dropdown
 const regionToAreas: Record<string, string[]> = {};
 allCrimes.forEach(c => {
   if (c.region && c.area) {
@@ -40,47 +36,57 @@ allCrimes.forEach(c => {
 });
 Object.values(regionToAreas).forEach(arr => (arr as string[]).sort());
 
-// Group crimes by date for initial render (first 30 crimes)
+// Crime type chips: ordered by frequency, most common first
+const typeFreq = allCrimes.reduce((acc: Record<string, number>, c) => {
+  const t = c.primaryCrimeType || c.crimeType;
+  if (t) acc[t] = (acc[t] || 0) + 1;
+  return acc;
+}, {});
+const crimeTypesByFreq = Object.entries(typeFreq)
+  .sort((a, b) => b[1] - a[1])
+  .map(([type]) => type);
+
+// Server-render first 30 crimes grouped by date
 const initialCrimes = allCrimes.slice(0, 30);
 const crimesByDate = new Map<string, Crime[]>();
-
 initialCrimes.forEach(crime => {
-  const dateKey = crime.date; // YYYY-MM-DD format
-  if (!crimesByDate.has(dateKey)) {
-    crimesByDate.set(dateKey, []);
-  }
-  crimesByDate.get(dateKey)!.push(crime);
+  const key = crime.date;
+  if (!crimesByDate.has(key)) crimesByDate.set(key, []);
+  crimesByDate.get(key)!.push(crime);
 });
+const sortedDates = Array.from(crimesByDate.keys()).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
-// Sort dates descending (most recent first)
-const sortedDates = Array.from(crimesByDate.keys()).sort((a, b) =>
-  new Date(b).getTime() - new Date(a).getTime()
-);
-
-// Helper function to calculate victim count
 function calculateVictimCount(crimes: Crime[]): number {
-  return crimes.reduce((total, crime) => {
-    const victimCount = crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1;
-    return total + victimCount;
-  }, 0);
+  return crimes.reduce((total, crime) => total + (crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1), 0);
 }
 
-// Most recent crime date for freshness indicator
+// Color helper — must stay in sync with headlinesPage.ts getTypeStyle()
+function getTypeStyle(crimeType: string): { hex: string; pillClass: string } {
+  const t = (crimeType || '').toLowerCase();
+  if (['murder', 'attempted murder'].some(s => t.includes(s)))
+    return { hex: '#e11d48', pillClass: 'text-rose-700 bg-rose-50 dark:bg-rose-950/40 dark:text-rose-400' };
+  if (['shooting', 'kidnapping', 'sexual assault', 'home invasion', 'arson', 'carjacking', 'robbery', 'domestic violence', 'extortion'].some(s => t.includes(s)))
+    return { hex: '#f59e0b', pillClass: 'text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400' };
+  return { hex: '#94a3b8', pillClass: 'text-slate-600 bg-slate-100 dark:bg-[hsl(0_0%_15%)] dark:text-[hsl(0_0%_60%)]' };
+}
+
+// Freshness + pulse
 const latestCrimeDate = allCrimes[0]?.dateObj ?? new Date();
 const freshnessText = latestCrimeDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-
-// 30-day crime count for hero pulse
 const cutoff30d = new Date();
 cutoff30d.setDate(cutoff30d.getDate() - 30);
 const count30d = allCrimes.filter(c => c.dateObj >= cutoff30d).length;
 
-// SEO
+// Sidebar data
+const ytdMurders = countCrimeType(allCrimes.filter(c => c.year === currentYear), 'Murder');
+const hotAreas = getHotAreas(allCrimes, 3);
+
 const title = `Trinidad & Tobago Crime Headlines — Latest Reports`;
 const description = `Trinidad & Tobago crime headlines updated daily. Filter incidents (Murder, Robbery, etc.) by area and date, sourced from Guardian, Express, and Newsday.`;
-
 ---
 
 <Layout title={title} description={description} includeTurnstile={true}>
+
   <!-- Dark Hero -->
   <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -95,7 +101,7 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
       </nav>
       <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight mb-2">Latest Crime Headlines</h1>
       <p class="text-slate-400 text-sm mb-5">Trinidad &amp; Tobago crime reports, updated daily.</p>
-      <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+      <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10 max-w-xl">
         <span class="relative flex h-2 w-2 mt-1 shrink-0">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
@@ -119,518 +125,277 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
     </div>
   </section>
 
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-ignore>
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
+  <!-- Type Filter Chips -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-5 pb-1">
+    <div id="chipScrollArea" class="flex items-center gap-2 overflow-x-auto pb-1">
+      <button class="chip-filter chip-active shrink-0" data-type="">All</button>
+      {crimeTypesByFreq.map(type => (
+        <button class="chip-filter shrink-0" data-type={type}>{type}</button>
+      ))}
+    </div>
+  </div>
 
-      <!-- Site Notification Banner -->
-      <SiteNotificationBanner notification={dataUpdateNotice} />
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-5" data-pagefind-ignore>
+    <div class="lg:grid lg:grid-cols-[1fr_272px] lg:gap-8 lg:items-start">
 
-      <!-- Results Count -->
-      <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[var(--ch-border)] to-transparent mb-3"></div>
-      <div class="mb-3 text-xs flex flex-wrap items-center justify-between gap-y-1.5">
-        <div class="text-slate-400 dark:text-[var(--ch-text-faint)]">
-          Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of <a href={routes.trinidad.archive} class="border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition"><span id="resultsTotal">{allCrimes.length}</span></a> listed crimes
+      <!-- ── Main column ────────────────────────────────────────────────── -->
+      <div>
+        <SiteNotificationBanner notification={dataUpdateNotice} />
+
+        <!-- Results row -->
+        <div class="mb-4 text-xs flex flex-wrap items-center justify-between gap-y-1.5 text-slate-400 dark:text-[var(--ch-text-faint)]">
+          <span>Showing <span id="resultsShowing">{Math.min(30, allCrimes.length)}</span> of <a href={routes.trinidad.archive} class="border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition"><span id="resultsTotal">{allCrimes.length}</span></a> crimes</span>
+          <a href={routes.trinidad.archive} class="border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition">Archive</a>
         </div>
-        <div class="basis-full sm:basis-auto">
-          <a href={routes.trinidad.archive} class="text-slate-400 dark:text-[var(--ch-text-faint)] border-b border-dotted border-slate-400 dark:border-[hsl(0_0%_40%)] hover:text-rose-600 hover:border-rose-600 transition">View Archive</a>
-        </div>
-      </div>
-      <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[var(--ch-border)] to-transparent mb-6"></div>
 
-      <!-- Blog Rotating Banner -->
-      <BlogRotatingBanner country="tt" limit={3} />
-
-      <!-- Newsletter CTA — above crime list (scroll rate is low, bottom is invisible) -->
-      <div class="mb-6">
-        <NewsletterSignup variant="inline" source="headlines-page" />
-      </div>
-
-      <!-- Crime Accordions by Date -->
-      <div id="crimeAccordions">
-        {sortedDates.map((date, index) => {
-          const crimes = crimesByDate.get(date)!;
-          const incidentCount = crimes.length;
-          const victimCount = calculateVictimCount(crimes);
-          const isExpanded = index === 0;
-          const formattedDate = new Date(date).toLocaleDateString('en-US', {
-            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
-          });
-          return (
-            <div class="date-accordion mb-3" data-date={date}>
-              <button
-                class="da-header w-full px-4 py-3 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group"
-                aria-expanded={isExpanded ? 'true' : 'false'}
-              >
-                <div class="flex items-center gap-3">
-                  <svg
-                    class={`da-chevron w-4 h-4 text-slate-400 dark:text-[var(--ch-text-muted)] transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`}
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                  <div class="text-left">
-                    <h3 class="text-body font-bold text-slate-700 dark:text-[var(--ch-text-heading)] leading-snug">{formattedDate}</h3>
-                    <p class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)]">{incidentCount} {incidentCount === 1 ? 'crime' : 'crimes'} · {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+        <!-- Crime accordions (dark separator bands) -->
+        <div id="crimeAccordions">
+          {sortedDates.map((date, index) => {
+            const crimes = crimesByDate.get(date)!;
+            const isExpanded = index < 3;
+            const incidentCount = crimes.length;
+            const victimCount = calculateVictimCount(crimes);
+            const c0 = crimes[0];
+            const d = new Date(c0.year, c0.month - 1, c0.day);
+            const weekday = d.toLocaleDateString('en-US', { weekday: 'long' });
+            const shortDate = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            return (
+              <div class="date-accordion mb-4" data-date={date}>
+                <button
+                  class="da-header w-full text-left bg-slate-800 dark:bg-[hsl(0_0%_8%)] rounded-xl px-4 py-3 flex items-center justify-between group hover:bg-slate-700 dark:hover:bg-[hsl(0_0%_11%)] transition-colors"
+                  aria-expanded={isExpanded ? 'true' : 'false'}
+                >
+                  <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{weekday}</p>
+                    <h3 class="text-white font-black text-base leading-tight">{shortDate}</h3>
+                    <p class="text-slate-400 text-xs mt-0.5">{incidentCount} {incidentCount === 1 ? 'crime' : 'crimes'} · {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
                   </div>
-                </div>
-                <span class="px-2 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[var(--ch-text-muted)] text-caption font-medium">
-                  {incidentCount}
-                </span>
-              </button>
-              <div class={`da-content overflow-hidden${isExpanded ? ' is-open' : ''}`}>
-                <div class="relative pl-7 py-2">
-                  <div class="absolute left-3.5 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
-                  <div class="space-y-1">
-                    {crimes.map(crime => (
-                      <a
-                        href={`/trinidad/crime/${crime.slug}/`}
-                        class="crime-card relative pl-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group block"
-                      >
-                        <div aria-hidden="true" class="absolute left-[-18px] top-4 w-2 h-2 rounded-full bg-slate-300 dark:bg-[hsl(0_0%_35%)]"></div>
-                        <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-rose-600 transition">{crime.headline}</div>
-                        <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">
-                          <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">{crime.primaryCrimeType || crime.crimeType}</span>
-                          <span>{crime.area}</span>
-                        </div>
-                      </a>
-                    ))}
+                  <svg class={`da-chevron w-4 h-4 text-slate-500 transition-transform${isExpanded ? ' rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+                <div class={`da-content overflow-hidden${isExpanded ? ' is-open' : ''}`}>
+                  <div class="space-y-1 pt-2">
+                    {crimes.map(crime => {
+                      const style = getTypeStyle(crime.primaryCrimeType ?? crime.crimeType);
+                      const pill = crime.primaryCrimeType ?? crime.crimeType;
+                      return (
+                        <a
+                          href={`/trinidad/crime/${crime.slug}/`}
+                          class="crime-card group flex items-start gap-3 py-3 px-3 rounded-xl hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_11%)] transition-colors block"
+                        >
+                          <div class="w-1 rounded-full shrink-0 mt-0.5" style={`background:${style.hex};min-height:36px;align-self:stretch`}></div>
+                          <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                              <span class={`${style.pillClass} inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide`}>
+                                {escapeHtml(pill)}
+                              </span>
+                              <span class="text-[10px] text-slate-400 dark:text-[hsl(0_0%_45%)] truncate">{escapeHtml(crime.area)}</span>
+                            </div>
+                            <p class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-slate-900 dark:group-hover:text-white leading-snug line-clamp-2 transition-colors">
+                              {escapeHtml(crime.headline)}
+                            </p>
+                          </div>
+                          <svg class="w-3.5 h-3.5 text-slate-300 dark:text-[hsl(0_0%_30%)] group-hover:text-rose-500 transition-colors shrink-0 mt-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                          </svg>
+                        </a>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+
+        <!-- Load More -->
+        <div class="mt-6 text-center">
+          <button
+            id="loadMore"
+            class="px-4 py-1.5 border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[var(--ch-text-strong)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 rounded-lg transition font-medium text-xs"
+          >
+            Load More
+          </button>
+        </div>
       </div>
 
-      <!-- Load More -->
-      <div class="mt-8 text-center">
-        <button
-          id="loadMore"
-          class="px-4 py-1.5 min-h-[22px] border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[var(--ch-text-strong)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 rounded-lg transition font-medium text-xs whitespace-nowrap"
+      <!-- ── Sidebar ─────────────────────────────────────────────────────── -->
+      <aside class="hidden lg:flex flex-col gap-5 sticky top-20 mt-0">
+
+        <!-- Murder count card -->
+        <a
+          href={routes.trinidad.murderCount}
+          class="group block rounded-xl overflow-hidden shadow-sm"
         >
-          Load More
-        </button>
-      </div>
+          <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-5 group-hover:from-slate-800 group-hover:to-slate-700 transition-colors">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Trinidad &amp; Tobago · {currentYear}</p>
+            <div class="text-5xl font-black text-white leading-none mb-1">{ytdMurders}</div>
+            <p class="text-slate-400 text-xs mb-4">murders year to date</p>
+            <span class="inline-flex items-center gap-1 text-rose-400 text-xs font-medium group-hover:text-rose-300 transition-colors">
+              View full count
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </span>
+          </div>
+        </a>
+
+        <!-- Hot areas this week -->
+        {hotAreas.length > 0 && (
+          <div class="rounded-xl border border-slate-100 dark:border-[var(--ch-border-subtle)] bg-white/70 dark:bg-[var(--ch-surface)] p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-xs font-bold text-slate-500 dark:text-[var(--ch-text-muted)] uppercase tracking-widest">Hot Areas This Week</h2>
+              <span class="relative flex h-1.5 w-1.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
+              </span>
+            </div>
+            <div class="space-y-1">
+              {hotAreas.map((area, i) => (
+                <a
+                  href={buildRoute.area(generateNameSlug(area.area))}
+                  class="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] group transition-colors"
+                >
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="text-xs font-bold text-slate-300 dark:text-[hsl(0_0%_35%)] w-4 shrink-0">{i + 1}</span>
+                    <span class="text-sm text-slate-700 dark:text-[var(--ch-text)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">{escapeHtml(area.area)}</span>
+                  </div>
+                  <span class="text-xs font-bold text-rose-600 dark:text-rose-400 shrink-0 ml-2">{area.count}</span>
+                </a>
+              ))}
+            </div>
+            <a href={routes.trinidad.areas} class="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium mt-3 block transition-colors">
+              Browse all areas →
+            </a>
+          </div>
+        )}
+
+        <!-- Newsletter -->
+        <NewsletterSignup variant="card" source="headlines-sidebar" />
+
+      </aside>
 
     </div>
   </main>
 
-  <!-- Filters Tray -->
+  <!-- Filter Tray -->
   <div id="filtersTray" class="fixed inset-0 z-50 pointer-events-none overflow-hidden">
     <div id="filtersBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
     <div id="filtersTrayContent" class="absolute right-0 top-0 h-full max-w-[min(20rem,calc(100vw-2rem))] w-full bg-white/85 dark:bg-[var(--ch-surface)]/90 backdrop-blur-lg rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto overflow-y-auto">
       <div class="p-5">
         <div class="flex items-center justify-between mb-6">
-          <h2 class="text-heading font-bold text-slate-700 dark:text-[var(--ch-text)] leading-tight">Filters</h2>
+          <h2 class="text-heading font-bold text-slate-700 dark:text-[var(--ch-text)]">Filters</h2>
           <button id="closeFiltersBtn" class="text-slate-400 dark:text-[var(--ch-text-faint)] hover:text-slate-600 dark:hover:text-[hsl(0_0%_75%)] transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
-
         <div class="space-y-4">
-          <!-- Date Range -->
           <div>
             <label for="dateFrom" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">From Date</label>
-            <input
-              type="date"
-              id="dateFrom"
-              class="filter-date-input w-full px-4 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]"
-            />
+            <input type="date" id="dateFrom" class="filter-date-input w-full px-4 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]" />
           </div>
           <div>
             <label for="dateTo" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">To Date</label>
-            <input
-              type="date"
-              id="dateTo"
-              class="filter-date-input w-full px-4 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]"
-            />
+            <input type="date" id="dateTo" class="filter-date-input w-full px-4 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]" />
           </div>
-
-          <!-- Crime Type -->
           <div>
             <label for="crimeTypeFilter" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">Crime Type</label>
-            <select
-              id="crimeTypeFilter"
-              class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]"
-            >
+            <select id="crimeTypeFilter" class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]">
               <option value="">All Types</option>
-              {crimeTypes.map(type => (
-                <option value={type}>{type}</option>
-              ))}
+              {crimeTypes.map(type => <option value={type}>{type}</option>)}
             </select>
           </div>
-
-          <!-- Region -->
           <div>
             <label for="regionFilter" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">Region</label>
-            <select
-              id="regionFilter"
-              class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]"
-            >
+            <select id="regionFilter" class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]">
               <option value="">All Regions</option>
-              {regions.map(region => (
-                <option value={region}>{region}</option>
-              ))}
+              {regions.map(region => <option value={region}>{region}</option>)}
             </select>
           </div>
-
-          <!-- Area (cascades on region) -->
           <div>
             <label for="areaFilter" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">Area</label>
-            <select
-              id="areaFilter"
-              class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]"
-            >
+            <select id="areaFilter" class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]">
               <option value="">All Areas</option>
-              {areas.map(area => (
-                <option value={area}>{area}</option>
-              ))}
+              {areas.map(area => <option value={area}>{area}</option>)}
             </select>
           </div>
-
-          <!-- Action Buttons -->
           <div class="flex gap-2 pt-2">
-            <button
-              id="clearFilters"
-              class="flex-1 px-4 py-2 text-rose-600 hover:text-rose-700 active:text-rose-800 transition font-medium text-xs"
-            >
-              Clear Filters
-            </button>
-            <button
-              id="applyFilters"
-              class="flex-1 px-4 py-2 border-2 border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg transition-all duration-200 font-medium text-xs"
-            >
-              Apply
-            </button>
+            <button id="clearFilters" class="flex-1 px-4 py-2 text-rose-600 hover:text-rose-700 transition font-medium text-xs">Clear Filters</button>
+            <button id="applyFilters" class="flex-1 px-4 py-2 border-2 border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg transition-all duration-200 font-medium text-xs">Apply</button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+</Layout>
+
 <style>
+  /* Accordion height transition */
   :global(.da-content) {
     height: 0;
     transition: height 300ms ease, margin-top 200ms ease;
   }
   :global(.da-content.is-open) {
     height: auto;
-    margin-top: 0.75rem;
+    margin-top: 0;
   }
-  .filter-date-input::-webkit-calendar-picker-indicator {
-    padding: 2px;
-    margin-right: 2px;
+
+  /* Type filter chips */
+  .chip-filter {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    border: 1.5px solid #e2e8f0;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 700;
     cursor: pointer;
-    opacity: 0.5;
+    transition: border-color 150ms, color 150ms, background 150ms;
+    white-space: nowrap;
   }
-  .filter-date-input::-webkit-calendar-picker-indicator:hover {
-    opacity: 0.8;
+  .chip-filter:hover {
+    border-color: #fda4af;
+    color: #e11d48;
   }
+  .chip-filter.chip-active {
+    background: #e11d48;
+    border-color: #e11d48;
+    color: #fff;
+  }
+  :global(.dark) .chip-filter {
+    border-color: hsl(0 0% 20%);
+    color: hsl(0 0% 55%);
+  }
+  :global(.dark) .chip-filter:hover {
+    border-color: hsl(346 77% 49% / 0.5);
+    color: #fb7185;
+  }
+  :global(.dark) .chip-filter.chip-active {
+    background: #e11d48;
+    border-color: #e11d48;
+    color: #fff;
+  }
+
+  /* Hide chip scroll bar */
+  #chipScrollArea::-webkit-scrollbar { display: none; }
+  #chipScrollArea { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Date input styling */
+  .filter-date-input::-webkit-calendar-picker-indicator {
+    padding: 2px; margin-right: 2px; cursor: pointer; opacity: 0.5;
+  }
+  .filter-date-input::-webkit-calendar-picker-indicator:hover { opacity: 0.8; }
 </style>
 
-<!-- Data bridge: expose server data to module script -->
+<!-- Data bridge -->
 <script define:vars={{ allCrimes, regionToAreas, allAreas: areas }}>
   window.__hlData = { allCrimes, regionToAreas, allAreas };
 </script>
 
-<!-- Filter tray + filter logic -->
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const { allCrimes, regionToAreas, allAreas } = (window as any).__hlData || {};
-    if (!allCrimes) return;
+<!-- Main filter/render/chip logic -->
+<script src="../../scripts/headlinesPage.ts"></script>
 
-    // ── State ──────────────────────────────────────────────────────────────
-    let currentPage = 1;
-    const perPage = 30;
-    let filteredCrimes = [...allCrimes];
-    let isFiltered = false;
-
-    // ── Tray open/close ────────────────────────────────────────────────────
-    const filtersTray = document.getElementById('filtersTray')!;
-    const filtersTrayContent = document.getElementById('filtersTrayContent')!;
-    const filtersBackdrop = document.getElementById('filtersBackdrop')!;
-    const filtersBtn = document.getElementById('filtersBtn')!;
-    const closeFiltersBtn = document.getElementById('closeFiltersBtn')!;
-
-    function openTray() {
-      filtersTray.classList.remove('pointer-events-none');
-      filtersBackdrop.classList.remove('pointer-events-none');
-      setTimeout(() => {
-        filtersBackdrop.classList.remove('opacity-0');
-        filtersTrayContent.classList.remove('translate-x-full');
-      }, 10);
-    }
-
-    function closeTray() {
-      filtersBackdrop.classList.add('opacity-0');
-      filtersTrayContent.classList.add('translate-x-full');
-      setTimeout(() => {
-        filtersTray.classList.add('pointer-events-none');
-        filtersBackdrop.classList.add('pointer-events-none');
-      }, 300);
-    }
-
-    if (filtersBtn) filtersBtn.addEventListener('click', openTray);
-    if (closeFiltersBtn) closeFiltersBtn.addEventListener('click', closeTray);
-    if (filtersBackdrop) filtersBackdrop.addEventListener('click', closeTray);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !filtersTray.classList.contains('pointer-events-none')) closeTray();
-    });
-
-    // ── XSS helper ─────────────────────────────────────────────────────────
-    function escapeHtml(str: any): string {
-      if (str == null) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    // ── Cascading area dropdown ────────────────────────────────────────────
-    function updateAreaOptions(selectedRegion: string) {
-      const areaSelect = document.getElementById('areaFilter') as unknown as HTMLSelectElement;
-      const currentArea = areaSelect.value;
-      areaSelect.innerHTML = '<option value="">All Areas</option>';
-
-      const areasToShow: string[] = selectedRegion
-        ? (regionToAreas[selectedRegion] || [])
-        : allAreas;
-
-      areasToShow.forEach((area: string) => {
-        const opt = document.createElement('option');
-        opt.value = area;
-        opt.textContent = area;
-        if (area === currentArea && (!selectedRegion || (regionToAreas[selectedRegion] || []).includes(currentArea))) {
-          opt.selected = true;
-        }
-        areaSelect.appendChild(opt);
-      });
-    }
-
-    // ── Filtering ──────────────────────────────────────────────────────────
-    function applyFilters() {
-      const dateFrom = (document.getElementById('dateFrom') as HTMLInputElement).value;
-      const dateTo = (document.getElementById('dateTo') as HTMLInputElement).value;
-      const crimeType = (document.getElementById('crimeTypeFilter') as unknown as HTMLSelectElement).value;
-      const region = (document.getElementById('regionFilter') as unknown as HTMLSelectElement).value;
-      const area = (document.getElementById('areaFilter') as unknown as HTMLSelectElement).value;
-
-      isFiltered = !!(dateFrom || dateTo || crimeType || region || area);
-
-      filteredCrimes = allCrimes.filter((crime: any) => {
-        const crimeDate = new Date(crime.date);
-        if (dateFrom && crimeDate < new Date(dateFrom)) return false;
-        if (dateTo && crimeDate > new Date(dateTo)) return false;
-        if (crimeType && crime.crimeType !== crimeType) return false;
-        if (region && crime.region !== region) return false;
-        if (area && crime.area !== area) return false;
-        return true;
-      });
-
-      currentPage = 1;
-      renderCrimes();
-      updateResultsCount();
-    }
-
-    // ── Rendering ──────────────────────────────────────────────────────────
-    function renderCrimes() {
-      const container = document.getElementById('crimeAccordions')!;
-      const loadMoreEl = document.getElementById('loadMore')!;
-
-      if (filteredCrimes.length === 0) {
-        container.innerHTML = `
-          <div class="rounded-lg p-8 text-center border border-slate-200 dark:border-[var(--ch-border-card)]">
-            <svg class="w-12 h-12 mx-auto mb-4 text-slate-300 dark:text-[hsl(0_0%_25%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <p class="text-sm mb-2 text-slate-500 dark:text-[var(--ch-text-faint)]">No crimes match your filters.</p>
-            <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_40%)]">Try broadening your date range, area, or crime type.</p>
-          </div>`;
-        loadMoreEl.style.display = 'none';
-        return;
-      }
-
-      const crimes = filteredCrimes.slice(0, currentPage * perPage);
-
-      if (isFiltered) {
-        // Flat list when filters are active
-        container.innerHTML = `<div class="space-y-1">${crimes.map(createCrimeListItemHTML).join('')}</div>`;
-      } else {
-        // Accordion mode grouped by date
-        const byDate = new Map<string, any[]>();
-        crimes.forEach((crime: any) => {
-          if (!byDate.has(crime.date)) byDate.set(crime.date, []);
-          byDate.get(crime.date)!.push(crime);
-        });
-
-        const sortedDates = Array.from(byDate.keys()).sort((a, b) =>
-          new Date(b).getTime() - new Date(a).getTime()
-        );
-
-        container.innerHTML = sortedDates
-          .map((date, index) => createAccordionHTML(date, byDate.get(date)!, index === 0))
-          .join('');
-      }
-
-      loadMoreEl.style.display = crimes.length >= filteredCrimes.length ? 'none' : 'inline-block';
-    }
-
-    function createCrimeListItemHTML(crime: any): string {
-      const crimeType = escapeHtml(crime.primaryCrimeType || crime.crimeType);
-      return `
-        <a href="/trinidad/crime/${escapeHtml(crime.slug)}/" class="crime-card relative py-2.5 px-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group block">
-          <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-rose-600 transition">${escapeHtml(crime.headline)}</div>
-          <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">
-            <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">${crimeType}</span>
-            <span>${escapeHtml(crime.area)}</span>
-          </div>
-        </a>`;
-    }
-
-    function calculateVictimCount(crimes: any[]): number {
-      return crimes.reduce((total: number, crime: any) => {
-        const v = crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1;
-        return total + v;
-      }, 0);
-    }
-
-    // Generates accordion HTML using the same da-* classes as server-rendered HTML
-    // so the event-delegation accordion toggle script works on dynamically rendered items too.
-    function createAccordionHTML(date: string, crimes: any[], isExpanded: boolean): string {
-      const formattedDate = new Date(date).toLocaleDateString('en-US', {
-        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
-      });
-      const incidentCount = crimes.length;
-      const victimCount = calculateVictimCount(crimes);
-
-      const crimeItems = crimes.map((crime: any) => {
-        const crimeType = escapeHtml(crime.primaryCrimeType || crime.crimeType);
-        return `
-          <a href="/trinidad/crime/${escapeHtml(crime.slug)}/" class="crime-card relative pl-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group block">
-            <div aria-hidden="true" class="absolute left-[-18px] top-4 w-2 h-2 rounded-full bg-slate-300 dark:bg-[hsl(0_0%_35%)]"></div>
-            <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-rose-600 transition">${escapeHtml(crime.headline)}</div>
-            <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">
-              <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">${crimeType}</span>
-              <span>${escapeHtml(crime.area)}</span>
-            </div>
-          </a>`;
-      }).join('');
-
-      return `
-        <div class="date-accordion mb-3" data-date="${escapeHtml(date)}">
-          <button
-            class="da-header w-full px-4 py-3 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group"
-            aria-expanded="${isExpanded}"
-          >
-            <div class="flex items-center gap-3">
-              <svg class="da-chevron w-4 h-4 text-slate-400 dark:text-[var(--ch-text-muted)] transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-              <div class="text-left">
-                <h3 class="text-body font-bold text-slate-700 dark:text-[var(--ch-text-heading)] leading-snug">${escapeHtml(formattedDate)}</h3>
-                <p class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)]">${incidentCount} ${incidentCount === 1 ? 'crime' : 'crimes'} · ${victimCount} ${victimCount === 1 ? 'victim' : 'victims'}</p>
-              </div>
-            </div>
-            <span class="px-2 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[var(--ch-text-muted)] text-caption font-medium">${incidentCount}</span>
-          </button>
-          <div class="da-content overflow-hidden${isExpanded ? ' is-open' : ''}">
-            <div class="relative pl-7 py-2">
-              <div class="absolute left-3.5 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
-              <div class="space-y-1">${crimeItems}</div>
-            </div>
-          </div>
-        </div>`;
-    }
-
-    // ── Results count ──────────────────────────────────────────────────────
-    function updateResultsCount() {
-      const showing = Math.min(currentPage * perPage, filteredCrimes.length);
-      const showingEl = document.getElementById('resultsShowing');
-      const totalEl = document.getElementById('resultsTotal');
-      if (showingEl) showingEl.textContent = String(showing);
-      if (totalEl) totalEl.textContent = String(filteredCrimes.length);
-    }
-
-    // ── Filter indicator (Filters button state + inline Clear) ─────────────
-    const filtersBtnEl = document.getElementById('filtersBtn')!;
-    const filtersBtnText = document.getElementById('filtersBtnText')!;
-    const clearFiltersInline = document.getElementById('clearFiltersInline')!;
-    const applyBtn = document.getElementById('applyFilters')!;
-
-    function showFilterActive() {
-      filtersBtnText.textContent = 'Filters Active ›';
-      (filtersBtnEl as HTMLElement).style.borderColor = '#e11d48';
-      (filtersBtnEl as HTMLElement).style.color = '#e11d48';
-      (filtersBtnEl as HTMLElement).style.backgroundColor = 'color-mix(in srgb, #e11d48 10%, transparent)';
-      clearFiltersInline.classList.remove('hidden');
-      (applyBtn as HTMLElement).style.backgroundColor = '#e11d48';
-      (applyBtn as HTMLElement).style.color = '#fff';
-      (applyBtn as HTMLElement).style.borderColor = '#e11d48';
-    }
-
-    function hideFilterActive() {
-      filtersBtnText.textContent = 'Filters ›';
-      (filtersBtnEl as HTMLElement).style.borderColor = '';
-      (filtersBtnEl as HTMLElement).style.color = '';
-      (filtersBtnEl as HTMLElement).style.backgroundColor = '';
-      clearFiltersInline.classList.add('hidden');
-      (applyBtn as HTMLElement).style.backgroundColor = '';
-      (applyBtn as HTMLElement).style.color = '';
-      (applyBtn as HTMLElement).style.borderColor = '';
-    }
-
-    function syncFilterIndicator() {
-      if (isFiltered) showFilterActive(); else hideFilterActive();
-    }
-
-    // ── Clear all filters ──────────────────────────────────────────────────
-    function clearAllFilters() {
-      (document.getElementById('dateFrom') as HTMLInputElement).value = '';
-      (document.getElementById('dateTo') as HTMLInputElement).value = '';
-      (document.getElementById('crimeTypeFilter') as unknown as HTMLSelectElement).value = '';
-      (document.getElementById('regionFilter') as unknown as HTMLSelectElement).value = '';
-      updateAreaOptions('');
-      (document.getElementById('areaFilter') as unknown as HTMLSelectElement).value = '';
-      applyFilters();
-      hideFilterActive();
-    }
-
-    // ── Event listeners ────────────────────────────────────────────────────
-    document.getElementById('dateFrom')!.addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
-    document.getElementById('dateTo')!.addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
-    document.getElementById('crimeTypeFilter')!.addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
-    document.getElementById('regionFilter')!.addEventListener('change', () => {
-      updateAreaOptions((document.getElementById('regionFilter') as unknown as HTMLSelectElement).value);
-      applyFilters();
-      syncFilterIndicator();
-    });
-    document.getElementById('areaFilter')!.addEventListener('change', () => { applyFilters(); syncFilterIndicator(); });
-
-    document.getElementById('clearFilters')!.addEventListener('click', clearAllFilters);
-    clearFiltersInline.addEventListener('click', clearAllFilters);
-
-    // Apply button closes the tray
-    applyBtn.addEventListener('click', closeTray);
-
-    document.getElementById('loadMore')!.addEventListener('click', () => {
-      currentPage++;
-      renderCrimes();
-      updateResultsCount();
-    });
-
-    // ── Initial setup ──────────────────────────────────────────────────────
-    // Server already rendered the first 30 accordions — only sync count + Load More visibility.
-    updateResultsCount();
-    const loadMoreEl = document.getElementById('loadMore')!;
-    loadMoreEl.style.display = filteredCrimes.length <= perPage ? 'none' : 'inline-block';
-  });
-</script>
-
-<!-- Accordion toggle: event delegation on container, re-fires on every navigation -->
+<!-- Accordion toggle: event delegation -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('crimeAccordions');
@@ -639,22 +404,14 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
       const header = (e.target as Element).closest('.da-header');
       if (!header) return;
       const accordion = header.closest('.date-accordion');
-      const content = accordion && accordion.querySelector('.da-content');
+      const content = accordion?.querySelector('.da-content');
       const chevron = header.querySelector('.da-chevron');
       const expanded = header.getAttribute('aria-expanded') === 'true';
       if (content && chevron) {
-        if (expanded) {
-          header.setAttribute('aria-expanded', 'false');
-          content.classList.remove('is-open');
-          chevron.classList.remove('rotate-90');
-        } else {
-          header.setAttribute('aria-expanded', 'true');
-          content.classList.add('is-open');
-          chevron.classList.add('rotate-90');
-        }
+        header.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        content.classList.toggle('is-open', !expanded);
+        chevron.classList.toggle('rotate-90', !expanded);
       }
     });
   });
 </script>
-
-</Layout>
