@@ -1,13 +1,11 @@
 ---
 /**
  * Individual Safety Tip — SSR with Cloudflare CDN caching
- * Resolves related story IDs from CSV at request time.
+ * JNews layout: dark hero → cardless article body → wider related tips grid
  */
 
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
-import Breadcrumbs from '../../../components/Breadcrumbs.astro';
-import Hero from '../../../components/Hero.astro';
 import TipCard from '../../../components/TipCard.astro';
 import TipVote from '../../../components/TipVote.astro';
 import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../../lib/crimeData';
@@ -26,12 +24,47 @@ if (!tip || tip.data.status !== 'published') {
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=86400');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-// Resolve related crime headlines from story IDs
+// Category → matching crime types for automatic incident linking
+const categoryToCrimeTypes: Record<string, string[]> = {
+  'Robbery':          ['Robbery'],
+  'Carjacking':       ['Carjacking', 'Robbery'],
+  'Home Invasion':    ['Home Invasion', 'Burglary'],
+  'ATM Crime':        ['Robbery'],
+  'Online Scam':      ['Fraud'],
+  'Kidnapping':       ['Kidnapping'],
+  'Sexual Violence':  ['Sexual Assault'],
+  'Fraud':            ['Fraud'],
+  'Assault':          ['Assault'],
+  'Domestic Violence':['Domestic Violence'],
+  'Extortion':        ['Extortion'],
+  'Shooting':         ['Shooting', 'Murder', 'Attempted Murder'],
+  'Burglary':         ['Burglary'],
+  'Other':            [],
+};
+
+const matchingTypes = categoryToCrimeTypes[tip.data.category] ?? [];
+const hasManualIds = tip.data.related_story_ids.length > 0;
+
 let relatedCrimes: Awaited<ReturnType<typeof getTrinidadCrimes>> = [];
-if (tip.data.related_story_ids.length > 0) {
+if (hasManualIds || matchingTypes.length > 0) {
   const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
   const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
-  relatedCrimes = allCrimes.filter(c => c.storyId && tip.data.related_story_ids.includes(c.storyId));
+
+  if (hasManualIds) {
+    // Editorial override: exact story IDs
+    relatedCrimes = allCrimes.filter(c => c.storyId && tip.data.related_story_ids.includes(c.storyId));
+  } else {
+    // Automatic: match by crime type, last 90 days, newest first, cap 6
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 90);
+    relatedCrimes = allCrimes
+      .filter(c => {
+        const type = c.primaryCrimeType || c.crimeType;
+        return type && matchingTypes.includes(type) && c.dateObj >= cutoff;
+      })
+      .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
+      .slice(0, 6);
+  }
 }
 
 // Related tips: same category or context, max 3, excluding self
@@ -54,6 +87,9 @@ const severityBadge: Record<string, string> = {
   medium: 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60',
   low:    'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60',
 };
+
+// Breadcrumb: truncate title to avoid overflow
+const shortTitle = tip.data.title.split(' ').slice(0, 5).join(' ') + (tip.data.title.split(' ').length > 5 ? '…' : '');
 ---
 
 <Layout title={title} description={description} ogType="article">
@@ -73,124 +109,134 @@ const severityBadge: Record<string, string> = {
     }
   })} />
 
-  <Hero
-    compact
-    narrowContainer={true}
-    title={tip.data.title}
-    subtitle={`${tip.data.category} · ${tip.data.context}${tip.data.area ? ` · ${tip.data.area}` : ''}`}
-  >
-    <Breadcrumbs items={[
-      { label: 'Home', href: routes.home },
-      { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
-      { label: 'Safety Tips', href: routes.trinidad.safetyTips },
-      { label: tip.data.category, href: buildRoute.safetyTipsCategory(tip.data.category) },
-      { label: tip.data.title }
-    ]} slot="before" />
-  </Hero>
+  <!-- Dark Hero -->
+  <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <nav aria-label="Breadcrumb" class="mb-4">
+        <ol class="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap">
+          <li><a href={routes.home} class="hover:text-slate-300 transition">Home</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li><a href={routes.trinidad.dashboard} class="hover:text-slate-300 transition">Trinidad &amp; Tobago</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li><a href={routes.trinidad.safetyTips} class="hover:text-slate-300 transition">Safety Tips</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li><a href={buildRoute.safetyTipsCategory(tip.data.category)} class="hover:text-slate-300 transition">{tip.data.category}</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="text-slate-400 truncate max-w-[150px] sm:max-w-xs">{shortTitle}</li>
+        </ol>
+      </nav>
+      <h1 class="text-3xl sm:text-4xl font-black text-white leading-tight mb-2">{tip.data.title}</h1>
+      <p class="text-slate-400 text-sm">
+        {tip.data.category} &middot; {tip.data.context}{tip.data.area ? ` · ${tip.data.area}` : ''}
+      </p>
+    </div>
+  </section>
 
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
-    <div class="mb-3">
+  <!-- Article body -->
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+
+    <!-- Back link -->
+    <div class="mb-5">
       <a href={routes.trinidad.safetyTips} class="inline-flex items-center gap-1.5 text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
         All Safety Tips
       </a>
     </div>
 
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
-
-      <!-- Badges -->
-      <div class="flex flex-wrap gap-2 mb-5">
+    <!-- Badges -->
+    <div class="flex flex-wrap gap-2 mb-5">
+      <a
+        href={buildRoute.safetyTipsCategory(tip.data.category)}
+        class="px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/70 transition"
+      >
+        {tip.data.category}
+      </a>
+      <a
+        href={buildRoute.safetyTipsContext(tip.data.context)}
+        class="px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold bg-slate-100 dark:bg-[hsl(0_0%_12%)] text-slate-600 dark:text-[hsl(0_0%_65%)] hover:bg-slate-200 dark:hover:bg-[hsl(0_0%_15%)] transition"
+      >
+        {tip.data.context}
+      </a>
+      {tip.data.area && (
         <a
-          href={buildRoute.safetyTipsCategory(tip.data.category)}
-          class="px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/70 transition"
+          href={buildRoute.safetyTipsArea(tip.data.area.toLowerCase().replace(/\s+/g, '-'))}
+          class="px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold bg-slate-100 dark:bg-[hsl(0_0%_12%)] text-slate-500 dark:text-[hsl(0_0%_60%)] hover:bg-slate-200 dark:hover:bg-[hsl(0_0%_15%)] transition"
         >
-          {tip.data.category}
+          {tip.data.area}
         </a>
-        <a
-          href={buildRoute.safetyTipsContext(tip.data.context)}
-          class="px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold bg-slate-100 dark:bg-[hsl(0_0%_12%)] text-slate-600 dark:text-[hsl(0_0%_65%)] hover:bg-slate-200 dark:hover:bg-[hsl(0_0%_15%)] transition"
-        >
-          {tip.data.context}
-        </a>
-        {tip.data.area && (
-          <a
-            href={buildRoute.safetyTipsArea(tip.data.area.toLowerCase().replace(/\s+/g, '-'))}
-            class="px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold bg-slate-100 dark:bg-[hsl(0_0%_12%)] text-slate-500 dark:text-[hsl(0_0%_60%)] hover:bg-slate-200 dark:hover:bg-[hsl(0_0%_15%)] transition"
-          >
-            {tip.data.area}
-          </a>
-        )}
-        <span class={`px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold ${severityBadge[tip.data.severity]}`}>
-          {tip.data.severity.charAt(0).toUpperCase() + tip.data.severity.slice(1)} severity
-        </span>
-      </div>
-
-      <!-- Tip body -->
-      <div class="tip-body text-body text-slate-700 dark:text-[var(--ch-text-strong)] leading-relaxed mb-5">
-        <Content />
-      </div>
-
-      <!-- Meta -->
-      <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)] mb-5">
-        Added {tip.data.date_added.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-        {tip.data.date_updated && ` · Updated ${tip.data.date_updated.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`}
-        · Source: {tip.data.source === 'community' ? 'Community (reviewed)' : 'Editorial'}
-      </p>
-
-      <!-- Related incidents -->
-      {relatedCrimes.length > 0 && (
-        <div class="mb-5 pt-5 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">
-          <p class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] uppercase tracking-wider mb-3">
-            Related incidents ({relatedCrimes.length})
-          </p>
-          <ul class="space-y-2">
-            {relatedCrimes.map(crime => (
-              <li>
-                <a href={buildRoute.crime(crime.slug)} class="group flex items-start gap-2">
-                  <span class="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-rose-400"></span>
-                  <span>
-                    <span class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-strong)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">{crime.headline}</span>
-                    <span class="ml-2 text-caption text-slate-400 dark:text-[var(--ch-text-faint)]">{crime.area} · {crime.dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
       )}
-
-      <!-- Tip voting -->
-      <TipVote tipId={tip.slug} gasUrl={gasUrl} />
-
-      <!-- Share + back -->
-      <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">
-        <div class="flex items-center gap-4">
-          <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">
-            ← All tips
-          </a>
-          <a href={routes.trinidad.safetyTipsSubmit} class="text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline transition">
-            Submit a tip →
-          </a>
-        </div>
-        <button
-          id="shareTipBtn"
-          class="px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[var(--ch-border)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-rose-500 dark:hover:border-rose-700 hover:text-rose-600 dark:hover:text-rose-400 transition"
-        >
-          Share
-        </button>
-      </div>
+      <span class={`px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold ${severityBadge[tip.data.severity]}`}>
+        {tip.data.severity.charAt(0).toUpperCase() + tip.data.severity.slice(1)} severity
+      </span>
     </div>
 
-    <!-- Related tips -->
-    {relatedTips.length > 0 && (
-      <section class="mt-6">
-        <p class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] uppercase tracking-wider mb-3">Related tips</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {relatedTips.map(t => <TipCard tip={t} />)}
-        </div>
-      </section>
+    <!-- Tip body -->
+    <div class="tip-body text-body text-slate-700 dark:text-[var(--ch-text-strong)] leading-relaxed mb-5">
+      <Content />
+    </div>
+
+    <!-- Meta -->
+    <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)] mb-5">
+      Added {tip.data.date_added.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+      {tip.data.date_updated && ` · Updated ${tip.data.date_updated.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`}
+      · Source: {tip.data.source === 'community' ? 'Community (reviewed)' : 'Editorial'}
+    </p>
+
+    <!-- Related incidents -->
+    {relatedCrimes.length > 0 && (
+      <div class="mb-5 pt-5 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">
+        <p class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] uppercase tracking-wider mb-3">
+          Related incidents ({relatedCrimes.length})
+        </p>
+        <ul class="space-y-2">
+          {relatedCrimes.map(crime => (
+            <li>
+              <a href={buildRoute.crime(crime.slug)} class="group flex items-start gap-2">
+                <span class="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                <span>
+                  <span class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-strong)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">{crime.headline}</span>
+                  <span class="ml-2 text-caption text-slate-400 dark:text-[var(--ch-text-faint)]">{crime.area} · {crime.dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     )}
+
+    <!-- Tip voting -->
+    <TipVote tipId={tip.slug} gasUrl={gasUrl} />
+
+    <!-- Share + back footer -->
+    <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">
+      <div class="flex items-center gap-4">
+        <a href={routes.trinidad.safetyTips} class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">
+          ← All tips
+        </a>
+        <a href={routes.trinidad.safetyTipsSubmit} class="text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline transition">
+          Submit a tip →
+        </a>
+      </div>
+      <button
+        id="shareTipBtn"
+        class="px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[var(--ch-border)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-rose-500 dark:hover:border-rose-700 hover:text-rose-600 dark:hover:text-rose-400 transition"
+      >
+        Share
+      </button>
+    </div>
+
   </main>
+
+  <!-- Related tips — wider container -->
+  {relatedTips.length > 0 && (
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 pb-8">
+      <p class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] uppercase tracking-wider mb-3">Related tips</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {relatedTips.map(t => <TipCard tip={t} />)}
+      </div>
+    </section>
+  )}
+
 </Layout>
 
 <style is:global>
@@ -208,19 +254,19 @@ const severityBadge: Record<string, string> = {
   .tip-body li { line-height: 1.6; }
 </style>
 
-<script is:inline>
-  (function () {
-    var btn = document.getElementById('shareTipBtn');
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('shareTipBtn') as HTMLButtonElement | null;
     if (!btn) return;
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', () => {
       if (navigator.share) {
         navigator.share({ title: document.title, url: window.location.href });
       } else {
-        navigator.clipboard.writeText(window.location.href).then(function () {
+        navigator.clipboard.writeText(window.location.href).then(() => {
           btn.textContent = 'Copied!';
-          setTimeout(function () { btn.textContent = 'Share'; }, 2000);
+          setTimeout(() => { btn.textContent = 'Share'; }, 2000);
         });
       }
     });
-  })();
+  });
 </script>

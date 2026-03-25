@@ -61,6 +61,10 @@ Run through this checklist — update anything that's now stale:
 **Keep INDEX.md under 60 lines** — merge or archive stale entries if needed.
 Never duplicate content already in CLAUDE.md's hard rules.
 
+## Session Notes — Mar 25, 2026 (continued x3)
+- **`areas.astro` JNews redesign + MP strips** — dark hero (`from-slate-900 to-slate-800`, inline breadcrumb, live pulse, Compare/View Regions CTAs, `pb-16` for card overlap). 4-card vitals row (`-mt-5 z-10`): Incidents 90d (crimson), Highest Risk Area label+name+link (slate), Most Active Region count+name+link (amber), Areas Tracked (violet). `max-w-3xl` → `max-w-5xl`. MP strip per region group: `mpsData` loaded server-side, `mpsByRegionSlug` Map keyed by `regionSlugs` (same `generateNameSlug` canonical function — no drift confirmed). Each pill: 20px circular photo + party badge + name → profile link. Singular/plural "Member / Members of Parliament". Removed `Hero.astro` + `Breadcrumbs.astro` imports. Sort script unchanged (`querySelector('.grid')` targets area grid; MP row uses `flex` not `grid`). Bug fix: `areasWithCrime` was filtering on `totalCrimes` (all-time) instead of `crimeCount90d` — hero pulse always showed 196/196. Compare link added per region group: resolves to namesake area (e.g. Chaguanas → `?a=chaguanas`) with fallback to highest 90d crime area for multi-part regions. Pipe separator (`|`) between Compare and View Region. Build passes.
+- **Next:** —
+
 ## Session Notes — Mar 25, 2026 (continued x2)
 - **Homepage JNews WOW redesign** — SSR + CDN cache (was pre-rendered). Dark hero (H1 = "Live Crime Statistics for the Caribbean" — SEO H1 replacing brand tagline "Know Where. Stay Safe."; subtitle covers T&T/Jamaica/beyond; live pulse = crimes this week + murders; CTAs: Dashboard/Murder Count). T&T section: 2-col (island card left, 3 latest headline cards right) + explore tiles below. Dark separator "More Countries" → compact coming-soon row (Jamaica/Guyana/Barbados, `grid-cols-3`). QuickAnswers unchanged at bottom. `HomepagePulse` component removed from this page (D1 data inlined). CDN cache headers set via `Astro.response.headers.set`. Build passes.
 - **Next:** —

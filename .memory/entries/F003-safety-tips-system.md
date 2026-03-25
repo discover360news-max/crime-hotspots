@@ -3,12 +3,17 @@ id: F003
 type: feature
 status: active
 created: 2026-01-26
-updated: 2026-03-07
+updated: 2026-03-25
 related: [F005, C001]
 ---
 
 ## Summary
-43 safety tips (TIP-00001–TIP-00043) as of Mar 7, 2026. Tips live in `src/content/tips/` as Markdown with YAML frontmatter. Six pages (index, detail, category, context, area, submit). I (Claude) am the tip manager — I create tips from Kavell's input.
+75 tips (last: TIP-00085) as of Mar 25, 2026. Tips live in `src/content/tips/` as Markdown with YAML frontmatter. Six pages (index, detail, category, context, area, submit). I (Claude) am the tip manager — I create tips from Kavell's input.
+
+**Index + detail pages received JNews redesign (Mar 25 2026):**
+- Index: dark gradient hero (max-w-5xl), category pill filters replacing CategoryAccordion, flat 3-col TipCard grid (sm:2-col, lg:3-col), stats inline in hero text
+- Detail: dark gradient hero (max-w-5xl), removed rounded-3xl card wrapper, article body max-w-3xl, related tips section max-w-5xl (up to 3, lg:3-col), `is:inline` share script converted to DOMContentLoaded
+- CategoryAccordion no longer used on index — still available for other pages
 
 ## Implementation Details
 
@@ -17,10 +22,10 @@ related: [F005, C001]
 **Components:** `TipCard.astro`, `CompactTipCard.astro`, `CategoryAccordion.astro`, `TipVote.astro`
 
 **Category enum (exact strings for schema):**
-`Robbery`, `Carjacking`, `Home Invasion`, `ATM Crime`, `Online Scam`, `Kidnapping`, `Sexual Violence`, `Fraud`, `Assault`, `Shooting`, `Other`
+`Robbery`, `Carjacking`, `Home Invasion`, `ATM Crime`, `Online Scam`, `Kidnapping`, `Sexual Violence`, `Fraud`, `Assault`, `Domestic Violence`, `Extortion`, `Shooting`, `Burglary`, `Other`
 
 **Context enum:**
-`At Home`, `In Your Car`, `At the ATM`, `In a Mall`, `Walking Alone`, `Online`, `At Work`, `Using Public Transport`, `At an Event`, `At a Hotel`, `Other`
+`At Home`, `In Your Car`, `At the ATM`, `In a Mall`, `Walking Alone`, `Online`, `At Work`, `Using Public Transport`, `At an Event`, `At a Hotel`, `At a Bar`, `Other`
 
 **GAS web app:** `safetyTipSubmissions.gs` — receives POST from submit form + vote requests
 - Env var required: `PUBLIC_SAFETY_TIPS_GAS_URL` in Cloudflare Pages
@@ -43,3 +48,6 @@ related: [F005, C001]
 - 2026-03-01: Tip voting system added (TipVote.astro)
 - 2026-03-06: `At a Hotel` context added to enum
 - 2026-03-07: 43 tips live
+- 2026-03-17: `At a Bar` context added to enum
+- 2026-03-24: 75 tips live (last: TIP-00085)
+- 2026-03-25: JNews redesign — index + detail pages (dark hero, pill filters, cardless detail)

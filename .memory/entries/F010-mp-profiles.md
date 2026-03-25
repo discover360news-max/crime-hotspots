@@ -17,6 +17,8 @@
 
 Region pages updated: `src/pages/trinidad/region/[slug].astro` — "Members of Parliament" card added between stat cards and area ranking.
 
+Areas index updated: `src/pages/trinidad/areas.astro` — MP strip added inside each region group (between region header and area grid). Pill format: 20px circular photo, party badge, name → profile link. Singular/plural label ("Member of Parliament" / "Members of Parliament"). Ambiguous MPs appear in both regions automatically (same `regionSlugs` lookup).
+
 Routes added: `routes.trinidad.mps`, `buildRoute.mp(nameSlug)`.
 
 Sitemap: `/trinidad/mp/` + 41 profile pages added to `sitemap-0.xml.ts` (priority 0.7, changefreq yearly).

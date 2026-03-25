@@ -3,56 +3,69 @@ export const prerender = true;
 
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
-import Hero from '../../../components/Hero.astro';
-import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import TipCard from '../../../components/TipCard.astro';
-import CategoryAccordion from '../../../components/CategoryAccordion.astro';
-import { routes, buildRoute } from '../../../config/routes';
-import { slugifyCategory } from '../../../lib/safetyTipsHelpers';
+import { routes } from '../../../config/routes';
 
 const allTips = await getCollection('tips', ({ data }) => data.status === 'published');
 
-// Group by category, sort each group high→medium→low then newest first
 const severityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
+// Group by category for pill counts (sorted by tip count desc)
 const byCategory: Record<string, typeof allTips> = {};
 allTips.forEach(tip => {
   const cat = tip.data.category;
   if (!byCategory[cat]) byCategory[cat] = [];
   byCategory[cat].push(tip);
 });
+const sortedCategories = Object.entries(byCategory).sort((a, b) => b[1].length - a[1].length);
 
-Object.values(byCategory).forEach(tips => {
-  tips.sort((a, b) => {
-    const sev = severityOrder[a.data.severity] - severityOrder[b.data.severity];
-    if (sev !== 0) return sev;
-    return b.data.date_added.getTime() - a.data.date_added.getTime();
-  });
+// Flat list: high → medium → low, then newest first within each severity
+const sortedTips = [...allTips].sort((a, b) => {
+  const sev = severityOrder[a.data.severity] - severityOrder[b.data.severity];
+  if (sev !== 0) return sev;
+  return b.data.date_added.getTime() - a.data.date_added.getTime();
 });
 
-// Categories sorted by tip count descending
-const sortedCategories = Object.entries(byCategory).sort((a, b) => b[1].length - a[1].length);
+const totalCount = allTips.length;
+const categoryCount = sortedCategories.length;
 ---
 
 <Layout
   title="Crime Safety Tips Trinidad & Tobago — CrimeHotSpots.com"
   description="Actionable crime safety tips for Trinidad & Tobago residents. Curated from real incident patterns to help you protect yourself from robbery, carjacking, home invasion and more."
 >
-  <Hero
-    compact
-    narrowContainer={true}
-    title="Crime Safety Tips"
-    subtitle="Practical, actionable advice curated from real crime incidents in Trinidad & Tobago."
-    primaryCTA={{ text: 'Submit a Tip', href: routes.trinidad.safetyTipsSubmit }}
-  >
-    <Breadcrumbs items={[
-      { label: 'Home', href: routes.home },
-      { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
-      { label: 'Safety Tips' }
-    ]} slot="before" />
-  </Hero>
 
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
+  <!-- Dark Hero -->
+  <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <nav aria-label="Breadcrumb" class="mb-4">
+        <ol class="flex items-center gap-1.5 text-xs text-slate-500">
+          <li><a href={routes.home} class="hover:text-slate-300 transition">Home</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li><a href={routes.trinidad.dashboard} class="hover:text-slate-300 transition">Trinidad &amp; Tobago</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="text-slate-400">Safety Tips</li>
+        </ol>
+      </nav>
+      <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight mb-2">Crime Safety Tips</h1>
+      <p class="text-slate-400 text-sm mb-5">{totalCount} tips across {categoryCount} categories — practical, actionable advice curated from real incidents in Trinidad &amp; Tobago.</p>
+      <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+        <span class="relative flex h-2 w-2 mt-1 shrink-0">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+        </span>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Tips are curated from <strong class="text-white">real crime incidents</strong> and reviewed before publishing. See a gap? <a href={routes.trinidad.safetyTipsSubmit} class="text-rose-400 hover:text-rose-300 transition underline">Submit a tip.</a>
+        </p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href={routes.trinidad.safetyTipsSubmit} class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition font-medium text-xs">Submit a Tip</a>
+        <a href={routes.trinidad.dashboard} class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs">View Dashboard</a>
+      </div>
+    </div>
+  </section>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6" data-pagefind-body>
 
     {allTips.length === 0 ? (
       <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-8 border border-slate-100 dark:border-[var(--ch-border-card)] text-center">
@@ -62,17 +75,65 @@ const sortedCategories = Object.entries(byCategory).sort((a, b) => b[1].length -
         </a>
       </div>
     ) : (
-      sortedCategories.map(([category, tips], i) => (
-        <CategoryAccordion
-          category={category}
-          count={tips.length}
-          categoryHref={buildRoute.safetyTipsCategory(slugifyCategory(category))}
-          isExpanded={i === 0}
-        >
-          {tips.map(tip => <TipCard tip={tip} />)}
-        </CategoryAccordion>
-      ))
+      <>
+        <!-- Category Pill Filters — horizontal scroll on mobile, wraps on desktop -->
+        <div class="-mx-4 sm:mx-0 px-4 sm:px-0 overflow-x-auto pb-2 mb-5">
+          <div class="flex gap-2 min-w-max sm:flex-wrap sm:min-w-0" id="categoryFilter">
+            <button data-filter="all" class="tip-pill px-3 py-1.5 rounded-full text-xs font-bold bg-rose-600 text-white transition">
+              All <span class="ml-1 opacity-75">{totalCount}</span>
+            </button>
+            {sortedCategories.map(([cat, tips]) => (
+              <button data-filter={cat} class="tip-pill px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-[hsl(0_0%_14%)] text-slate-600 dark:text-[hsl(0_0%_65%)] hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-600 dark:hover:text-rose-400 transition">
+                {cat} <span class="ml-1 opacity-70">{tips.length}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- Tips Grid -->
+        <div id="tipsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {sortedTips.map(tip => (
+            <div data-tip-category={tip.data.category}>
+              <TipCard tip={tip} />
+            </div>
+          ))}
+        </div>
+
+        <!-- Hidden until filter yields no results -->
+        <div id="noTipsResults" class="hidden text-center py-12">
+          <p class="text-slate-500 dark:text-[var(--ch-text-muted)] text-sm">No tips in this category yet.</p>
+        </div>
+      </>
     )}
 
   </main>
 </Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const pills = document.querySelectorAll<HTMLButtonElement>('.tip-pill');
+    const tipCards = document.querySelectorAll<HTMLElement>('[data-tip-category]');
+    const noResults = document.getElementById('noTipsResults');
+
+    const activeClass = 'tip-pill px-3 py-1.5 rounded-full text-xs font-bold bg-rose-600 text-white transition';
+    const inactiveClass = 'tip-pill px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 dark:bg-[hsl(0_0%_14%)] text-slate-600 dark:text-[hsl(0_0%_65%)] hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-600 dark:hover:text-rose-400 transition';
+
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        const filter = pill.getAttribute('data-filter');
+
+        pills.forEach(p => { p.className = inactiveClass; });
+        pill.className = activeClass;
+
+        let visibleCount = 0;
+        tipCards.forEach(card => {
+          const show = filter === 'all' || card.getAttribute('data-tip-category') === filter;
+          card.style.display = show ? '' : 'none';
+          if (show) visibleCount++;
+        });
+
+        if (noResults) noResults.classList.toggle('hidden', visibleCount > 0);
+      });
+    });
+  });
+</script>
