@@ -15,6 +15,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Hero from '../../components/Hero.astro';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
 import StatCards from '../../components/StatCards.astro';
 import DataTable from '../../components/DataTable.astro';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
@@ -279,6 +280,10 @@ const breadcrumbData = {
       { label: 'Statistics' }
     ]} slot="before" />
   </Hero>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-10">
+    <SocialProofStrip variant="strip" />
+  </div>
 
   <main class="max-w-3xl mx-auto px-4 py-8">
 

@@ -6,6 +6,7 @@ import Layout from '../../../../layouts/Layout.astro';
 import Hero from '../../../../components/Hero.astro';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import TipCard from '../../../../components/TipCard.astro';
+import SocialProofStrip from '../../../../components/SocialProofStrip.astro';
 import { routes } from '../../../../config/routes';
 import { slugifyCategory } from '../../../../lib/safetyTipsHelpers';
 
@@ -44,6 +45,10 @@ tips.sort((a, b) => b.data.date_added.getTime() - a.data.date_added.getTime());
       { label: context }
     ]} slot="before" />
   </Hero>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-6">
+    <SocialProofStrip variant="strip" />
+  </div>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[var(--ch-border-card)]">

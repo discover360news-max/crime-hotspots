@@ -6,6 +6,7 @@
 
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import SocialProofStrip from '../components/SocialProofStrip.astro';
 import { routes } from '../config/routes';
 
 const title = "Support Crime Hotspots — Keep Caribbean Crime Data Free";
@@ -80,6 +81,11 @@ const description = "Crime Hotspots is free, ad-free, and independent. Support t
           <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">New features, new islands, and ongoing data quality — building tools that actually serve Caribbean communities.</p>
         </div>
       </div>
+    </div>
+
+    <!-- Social Proof -->
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-10">
+      <SocialProofStrip variant="strip" />
     </div>
 
     <!-- Divider -->

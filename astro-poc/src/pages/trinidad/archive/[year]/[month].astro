@@ -8,6 +8,7 @@
 import Layout from '../../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import Hero from '../../../../components/Hero.astro';
+import SocialProofStrip from '../../../../components/SocialProofStrip.astro';
 import SiteNotificationBanner from '../../../../components/SiteNotificationBanner.astro';
 import QuickInsightsCard from '../../../../components/QuickInsightsCard.astro';
 // import CrimeDetailModal from '../../../../components/CrimeDetailModal.astro';
@@ -204,6 +205,10 @@ const breadcrumbs = [
   >
     <Breadcrumbs items={breadcrumbs} slot="before" />
   </Hero>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-6">
+    <SocialProofStrip variant="strip" incidentCount={allCrimes.length} />
+  </div>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-ignore>
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">

@@ -6,6 +6,7 @@
 
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import SocialProofStrip from '../components/SocialProofStrip.astro';
 import { routes } from '../config/routes';
 
 const title = "Contact Us — Crime Hotspots Caribbean";
@@ -84,6 +85,11 @@ const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
       <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)] text-center mt-8">
         We typically respond within 24-48 hours.
       </p>
+    </div>
+
+    <!-- Social Proof -->
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-6">
+      <SocialProofStrip variant="strip" />
     </div>
 
     <!-- Report Crime CTA -->

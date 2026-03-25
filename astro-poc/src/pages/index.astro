@@ -8,6 +8,7 @@
 import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import QuickAnswers from '../components/QuickAnswers.astro';
+import SocialProofStrip from '../components/SocialProofStrip.astro';
 import { routes, buildRoute } from '../config/routes';
 import { getAllCrimesFromD1, getTrinidadCrimes } from '../lib/crimeData';
 import { getHotAreas } from '../lib/trendingHelpers';
@@ -60,33 +61,43 @@ const description = "Real-time crime statistics, murder counts, and safety data 
        ═══════════════════════════════════════════════════════════ -->
   <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+      <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
 
-      <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight mb-3">
-        Live Crime Statistics<br class="hidden sm:block" /> for the Caribbean
-      </h1>
-      <p class="text-slate-400 text-sm sm:text-base mb-6 max-w-xl">
-        Real-time murder counts, incident tracking, and safety data for Trinidad &amp; Tobago, Jamaica, and beyond.
-      </p>
+        <!-- Left: headline + pulse + CTAs -->
+        <div>
+          <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight mb-3">
+            Live Crime Statistics<br class="hidden sm:block" /> for the Caribbean
+          </h1>
+          <p class="text-slate-400 text-sm sm:text-base mb-6 max-w-xl">
+            Real-time murder counts, incident tracking, and safety data for Trinidad &amp; Tobago, Jamaica, and beyond.
+          </p>
 
-      <!-- Live pulse -->
-      <div class="flex items-start gap-2.5 mb-6 bg-white/5 rounded-lg px-4 py-3 border border-white/10 max-w-xl">
-        <span class="relative flex h-2 w-2 mt-1 shrink-0">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-        </span>
-        <p class="text-slate-300 text-sm leading-relaxed">{heroPulse}</p>
+          <!-- Live pulse -->
+          <div class="flex items-start gap-2.5 mb-6 bg-white/5 rounded-lg px-4 py-3 border border-white/10 max-w-xl">
+            <span class="relative flex h-2 w-2 mt-1 shrink-0">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+            </span>
+            <p class="text-slate-300 text-sm leading-relaxed">{heroPulse}</p>
+          </div>
+
+          <!-- CTAs -->
+          <div class="flex gap-3 flex-wrap">
+            <a href={routes.trinidad.dashboard} class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition font-medium text-xs">
+              Explore Dashboard
+            </a>
+            <a href={routes.trinidad.murderCount} class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs">
+              Murder Count
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: social proof 2×2 -->
+        <div class="w-full lg:w-52">
+          <SocialProofStrip variant="hero" incidentCount={allCrimes.length} />
+        </div>
+
       </div>
-
-      <!-- CTAs -->
-      <div class="flex gap-3 flex-wrap">
-        <a href={routes.trinidad.dashboard} class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition font-medium text-xs">
-          Explore Dashboard
-        </a>
-        <a href={routes.trinidad.murderCount} class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs">
-          Murder Count
-        </a>
-      </div>
-
     </div>
   </section>
 
@@ -260,6 +271,13 @@ const description = "Real-time crime statistics, murder counts, and safety data 
         </div>
       </div>
 
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         SOCIAL PROOF
+         ═══════════════════════════════════════════════════════════ -->
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
+      <SocialProofStrip variant="strip" incidentCount={allCrimes.length} />
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════

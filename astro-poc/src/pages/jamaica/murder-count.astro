@@ -10,6 +10,7 @@
 
 import Layout from '../../layouts/Layout.astro';
 import FlipCounter from '../../components/FlipCounter.astro';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import InfoPopup from '../../components/InfoPopup.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
@@ -195,6 +196,11 @@ const latestMurders = crimesCurrent
           <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-3">
             Annualized rate from {daysElapsed} days of data. Assumes current pace continues through year end. Based on population estimate of {(POPULATION / 1000000).toFixed(1)}M.
           </p>
+        </div>
+
+        <!-- Social Proof -->
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
+          <SocialProofStrip variant="strip" />
         </div>
 
         <!-- Action Buttons -->

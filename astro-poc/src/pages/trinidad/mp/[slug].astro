@@ -11,6 +11,7 @@ export const prerender = true;
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import Hero from '../../../components/Hero.astro';
+import SocialProofStrip from '../../../components/SocialProofStrip.astro';
 import StatCards from '../../../components/StatCards.astro';
 import mpsData from '../../../data/mps.json';
 import { getTrinidadCrimes, generateNameSlug } from '../../../lib/crimeData';
@@ -146,6 +147,10 @@ const personSchema: Record<string, unknown> = {
   >
     <Breadcrumbs items={breadcrumbs} slot="before" />
   </Hero>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-6">
+    <SocialProofStrip variant="strip" />
+  </div>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
 

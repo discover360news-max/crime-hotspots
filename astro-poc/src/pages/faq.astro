@@ -6,6 +6,7 @@
 
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import SocialProofStrip from '../components/SocialProofStrip.astro';
 import { routes } from '../config/routes';
 
 const title = "FAQ — Crime Hotspots | Frequently Asked Questions";
@@ -141,6 +142,11 @@ const allQuestions = faqData.flatMap(category => category.questions);
     ]} />
     <h1 class="text-display text-slate-700 dark:text-[hsl(0_0%_95%)] font-bold mb-3 text-center pt-4">Frequently Asked Questions</h1>
     <p class="text-xs text-slate-500 dark:text-[hsl(0_0%_65%)] mb-8 text-center">Common questions about Crime Hotspots, our data sources, and how to use the platform.</p>
+
+    <!-- Social Proof -->
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-6">
+      <SocialProofStrip variant="strip" />
+    </div>
 
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
       {faqData.map((category) => (

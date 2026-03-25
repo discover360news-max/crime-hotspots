@@ -9,6 +9,7 @@
 import Layout from '../../layouts/Layout.astro';
 import GradientStatCard from '../../components/GradientStatCard.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
 import { getTrinidadCrimes, getAllCrimesFromD1, generateNameSlug } from '../../lib/crimeData';
 import { loadFullAreaData } from '../../lib/areaAliases';
 import { getRiskWeight } from '../../config/riskWeights';
@@ -225,6 +226,11 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
     <!-- Newsletter CTA -->
     <div class="mb-6">
       <NewsletterSignup variant="inline" source="areas-page" />
+    </div>
+
+    <!-- Social Proof -->
+    <div class="mb-6">
+      <SocialProofStrip variant="strip" incidentCount={allCrimes.length} />
     </div>
 
     <!-- Region Groups -->

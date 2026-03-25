@@ -11,6 +11,7 @@ import Layout from '../../layouts/Layout.astro';
 import FlipCounter from '../../components/FlipCounter.astro';
 import GradientStatCard from '../../components/GradientStatCard.astro';
 import MonthlyBreakdownChart from '../../components/MonthlyBreakdownChart.astro';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
 import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../lib/crimeData';
 import { countCrimeType } from '../../lib/dashboardHelpers';
 import { getCollection } from 'astro:content';
@@ -233,6 +234,11 @@ const faqData = {
         </>
       )}
     </div>
+  </div>
+
+  <!-- ── Social Proof ────────────────────────────────────────────────────────── -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
+    <SocialProofStrip variant="strip" incidentCount={allCrimes.length} />
   </div>
 
   <!-- ── Year Selector ───────────────────────────────────────────────────────── -->

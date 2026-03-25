@@ -7,6 +7,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
 
 const BATCH_SIZE = 6;
 
@@ -129,6 +130,11 @@ function formatShortDate(date: Date) {
         ))}
       </div>
     )}
+
+    <!-- ========== SOCIAL PROOF ========== -->
+    <div class="mb-6">
+      <SocialProofStrip variant="strip" />
+    </div>
 
     <!-- ========== MORE REPORTS LIST (posts 4+) ========== -->
     {listPosts.length > 0 && (

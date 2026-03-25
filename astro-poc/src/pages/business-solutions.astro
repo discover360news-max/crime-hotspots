@@ -7,6 +7,7 @@
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Hero from '../components/Hero.astro';
+import SocialProofStrip from '../components/SocialProofStrip.astro';
 
 const title = "Turn Crime Data Into Strategic Intelligence — Business Solutions";
 const description = "Enterprise crime intelligence for security firms, real estate agencies, insurance companies, and researchers. Structured Caribbean crime data via API, custom analytics, and data licensing.";
@@ -27,6 +28,10 @@ const description = "Enterprise crime intelligence for security firms, real esta
     primaryCTA={{ text: "Explore Solutions", href: "#solutions", icon: "arrow" }}
     secondaryCTA={{ text: "Contact Sales", href: "mailto:discover360news@gmail.com?subject=Business%20Solutions%20Inquiry&body=Hi%20Crime%20Hotspots%20Team%2C%0A%0AI'm%20interested%20in%20learning%20more%20about%20your%20business%20solutions.%20Specifically%2C%20I%20would%20like%20to%20discuss%3A%0A%0A%5BPlease%20describe%20your%20needs%20-%20API%20access%2C%20custom%20reports%2C%20data%20licensing%2C%20etc.%5D%0A%0ACompany%3A%20%0AIndustry%3A%20%0AContact%20Name%3A%20%0A%0AThank%20you%21" }}
   />
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 pb-6">
+    <SocialProofStrip variant="strip" />
+  </div>
 
   <!-- Content -->
   <main class="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 text-slate-700 dark:text-[hsl(0_0%_82%)]">

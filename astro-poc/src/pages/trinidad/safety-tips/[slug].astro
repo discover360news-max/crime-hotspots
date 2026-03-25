@@ -7,6 +7,7 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import TipCard from '../../../components/TipCard.astro';
+import SocialProofStrip from '../../../components/SocialProofStrip.astro';
 import TipVote from '../../../components/TipVote.astro';
 import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../../lib/crimeData';
 import { routes, buildRoute } from '../../../config/routes';
@@ -112,23 +113,30 @@ const shortTitle = tip.data.title.split(' ').slice(0, 5).join(' ') + (tip.data.t
   <!-- Dark Hero -->
   <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-      <nav aria-label="Breadcrumb" class="mb-4">
-        <ol class="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap">
-          <li><a href={routes.home} class="hover:text-slate-300 transition">Home</a></li>
-          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li><a href={routes.trinidad.dashboard} class="hover:text-slate-300 transition">Trinidad &amp; Tobago</a></li>
-          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li><a href={routes.trinidad.safetyTips} class="hover:text-slate-300 transition">Safety Tips</a></li>
-          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li><a href={buildRoute.safetyTipsCategory(tip.data.category)} class="hover:text-slate-300 transition">{tip.data.category}</a></li>
-          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li class="text-slate-400 truncate max-w-[150px] sm:max-w-xs">{shortTitle}</li>
-        </ol>
-      </nav>
-      <h1 class="text-3xl sm:text-4xl font-black text-white leading-tight mb-2">{tip.data.title}</h1>
-      <p class="text-slate-400 text-sm">
-        {tip.data.category} &middot; {tip.data.context}{tip.data.area ? ` · ${tip.data.area}` : ''}
-      </p>
+      <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
+        <div>
+          <nav aria-label="Breadcrumb" class="mb-4">
+            <ol class="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap">
+              <li><a href={routes.home} class="hover:text-slate-300 transition">Home</a></li>
+              <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+              <li><a href={routes.trinidad.dashboard} class="hover:text-slate-300 transition">Trinidad &amp; Tobago</a></li>
+              <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+              <li><a href={routes.trinidad.safetyTips} class="hover:text-slate-300 transition">Safety Tips</a></li>
+              <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+              <li><a href={buildRoute.safetyTipsCategory(tip.data.category)} class="hover:text-slate-300 transition">{tip.data.category}</a></li>
+              <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+              <li class="text-slate-400 truncate max-w-[150px] sm:max-w-xs">{shortTitle}</li>
+            </ol>
+          </nav>
+          <h1 class="text-3xl sm:text-4xl font-black text-white leading-tight mb-2">{tip.data.title}</h1>
+          <p class="text-slate-400 text-sm">
+            {tip.data.category} &middot; {tip.data.context}{tip.data.area ? ` · ${tip.data.area}` : ''}
+          </p>
+        </div>
+        <div class="w-full lg:w-52">
+          <SocialProofStrip variant="hero" />
+        </div>
+      </div>
     </div>
   </section>
 

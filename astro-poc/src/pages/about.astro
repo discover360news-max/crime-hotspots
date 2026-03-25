@@ -7,6 +7,7 @@
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import Hero from '../components/Hero.astro';
+import SocialProofStrip from '../components/SocialProofStrip.astro';
 
 const title = "About Crime Hotspots — Caribbean Crime Data Transparency & Methodology";
 const description = "Learn about Crime Hotspots Caribbean and our rigorous data methodology. We provide verified crime statistics to empower communities. Read our mission.";
@@ -24,6 +25,10 @@ const description = "Learn about Crime Hotspots Caribbean and our rigorous data 
       { label: 'About' }
     ]} slot="before" />
   </Hero>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-6">
+    <SocialProofStrip variant="strip" />
+  </div>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5 text-slate-700 dark:text-[hsl(0_0%_82%)]">
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)] leading-relaxed">

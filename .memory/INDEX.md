@@ -32,6 +32,7 @@ B025 | BUG | fixed | SSR dashboard path fetched only `/api/crimes/` — `.trend-
 B026 | BUG | fixed | `/api/dashboard` trend queries always used `now-3/33/63d` regardless of year param — historical year (e.g. 2025) showed live 2026 rolling-window arrows next to 2025 totals. Fix: skip trend queries for non-current years; return zero trends → indicators hidden. → api/dashboard.ts
 B027 | BUG | active | 301 on slug-not-found SSR pages gets browser-cached permanently — transient `loadFullAreaData()` failure poisons all visits forever. Use 302 for region/area/archive. crime/[slug] 301s are fine (intentional permanent migrations). → B027-301-redirect-browser-cache.md
 B028 | BUG | active | `flex-1` without `min-w-0` overflows narrow containers — flex children default to `min-width:auto` and won't shrink below intrinsic width. Fixed in NewsletterSignup card variant (content div + email input). Always add `min-w-0` alongside `flex-1` when container width is constrained. → B028-flex-min-w-0-overflow.md
+B029 | BUG | fixed | `escapeHtml()` in Astro `{expr}` causes double-encoding — Astro auto-escapes text nodes, so `{escapeHtml(x)}` renders `&#39;` literally. Use `{x}` directly; `escapeHtml()` only for `set:html`/`innerHTML`. → B029-escaphtml-double-encoding-astro.md
 
 ## Learnings & Patterns (L)
 L001 | LEARN | archived | ~~astro:page-load~~ — SPA removed Mar 15 2026. Use DOMContentLoaded. Do NOT re-introduce ClientRouter → L001-astro-page-load-pattern.md
@@ -63,6 +64,7 @@ D007 | DEC | active | Search: replaced Pagefind with D1 FTS5. crimes_fts virtual
 IDEA001 | IDEA | tabled | Criminal behavioural patterns page: public editorial (~1500w, 8 documented patterns from tips corpus) + internal content strategy doc. Value confirmed. Constraint: frame as "documented patterns" not stats. Tabled Mar 22 2026 — revisit when tips batch work slows.
 
 ## Features (F)
+F016 | FEAT | in-progress | SocialProofStrip: site-wide social proof component. 3 variants (hero/sidebar/strip). Central data: src/data/social-proof.json (update weekly). Live D1 incident count. Homepage + Dashboard done. 36 pages remain. Tracker: docs/guides/SOCIAL-PROOF-STRIP-IMPLEMENTATION.md → F016-social-proof-strip.md
 F010 | FEAT | active | MP profiles (T&T): 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg. Socials render as brand SVG icons. → F010-mp-profiles.md
 F012 | FEAT | active | MP profiles (Jamaica): 63 pages /jamaica/mp/[slug]/, index /jamaica/mp/, mps-jamaica.json. Same card layout as T&T. Photo min-h-[500px]. TikTok in socials. Photos in public/images/mps/jamaica/. Crime stats placeholder until D1 pipeline live. → site-features.md
 F014 | WORKFLOW | active | MP data update workflow: contact info, photos, parliament profiles, bulk updates, gotchas → docs/guides/MP-UPDATE-WORKFLOW.md

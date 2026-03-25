@@ -12,6 +12,7 @@ import { getHotAreas } from '../../lib/trendingHelpers';
 import { countCrimeType } from '../../lib/dashboardHelpers';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { routes, buildRoute } from '../../config/routes';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
@@ -89,6 +90,8 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
   <!-- Dark Hero -->
   <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
+      <div>
       <nav aria-label="Breadcrumb" class="mb-4">
         <ol class="flex items-center gap-1.5 text-xs text-slate-500">
           <li><a href="/" class="hover:text-slate-300 transition">Home</a></li>
@@ -121,6 +124,11 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         Data as of {freshnessText}
       </p>
+      </div>
+      <div class="w-full lg:w-52">
+        <SocialProofStrip variant="hero" incidentCount={allCrimes.length} />
+      </div>
+      </div>
     </div>
   </section>
 

@@ -10,6 +10,7 @@ export const prerender = true;
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { routes, buildRoute } from '../../config/routes';
 
@@ -338,6 +339,11 @@ const newsArticleSchema = {
         </a>
       </div>
     </article>
+
+    <!-- Social Proof -->
+    <div class="mt-6 max-w-2xl">
+      <SocialProofStrip variant="strip" />
+    </div>
 
     <!-- More Weekly Reports -->
     {relatedPosts.length > 0 && (

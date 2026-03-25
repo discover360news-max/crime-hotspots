@@ -9,6 +9,7 @@ export const prerender = true;
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Hero from '../../components/Hero.astro';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
 import { getCollection } from 'astro:content';
 import { routes } from '../../config/routes';
 
@@ -79,6 +80,10 @@ const articleSchema = {
       { label: article.data.title }
     ]} slot="before" />
   </Hero>
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 pb-6">
+    <SocialProofStrip variant="strip" />
+  </div>
 
   <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6">
     <div class="flex gap-8 items-start">

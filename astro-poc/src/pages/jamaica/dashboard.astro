@@ -10,6 +10,7 @@ export const prerender = true;
 import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Hero from '../../components/Hero.astro';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
 import { routes } from '../../config/routes';
 
 // TODO: wire to Jamaica D1 — replace empty array with getAllCrimesFromD1(db, 'JM')
@@ -35,6 +36,10 @@ const pageDescription = 'Live crime statistics and interactive map for Jamaica. 
   >
     <Breadcrumbs items={breadcrumbs} slot="before" />
   </Hero>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-10">
+    <SocialProofStrip variant="strip" />
+  </div>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">

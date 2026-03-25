@@ -6,6 +6,7 @@
 
 import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import SocialProofStrip from '../components/SocialProofStrip.astro';
 import { routes } from '../config/routes';
 
 const title = "Our Methodology — How We Collect and Verify Caribbean Crime Data | Crime Hotspots";
@@ -29,6 +30,11 @@ const description = "Learn how Crime Hotspots Caribbean collects, verifies, and 
           We exist to bridge the gap between official reporting and public perception by aggregating data from trusted media and community sources. This methodology page outlines the rigorous processes, technologies, and ethical standards we employ to ensure the information presented on our site is as accurate and verifiable as possible, building the Trustworthiness (E-E-A-T) essential for a reliable data source.
         </p>
       </section>
+
+      <!-- Social Proof -->
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-10">
+        <SocialProofStrip variant="strip" />
+      </div>
 
       <!-- Our Data Sources -->
       <section class="mb-5">
