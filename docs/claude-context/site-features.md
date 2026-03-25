@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 25, 2026 (headlines.astro JNews dark hero; generateCrimeTypeThumbnails.ts build generator retired)
+**Last Updated:** March 25, 2026 (headlines.astro full JNews redesign — dark date bands, type chips, sidebar; headlinesPage.ts extracted; NewsletterSignup card overflow fix B028)
 
 ---
 
@@ -43,7 +43,7 @@
 | Page | Route | Rendering | Purpose |
 |------|-------|-----------|---------|
 | Dashboard | `/trinidad/` | **SSR + CDN cache** | **JNews-style hierarchy (Mar 24 2026):** dark hero band → 4 gradient `GradientStatCard` vitals (Total Incidents / Murders / Victims / Crimes/Day) → `DashboardStory` narrative → crime breakdown scroll → sticky year filter bar → 2-col section (Leaflet map left / Top Areas `TopRegionsCard` right) → Quick Insights card. Stat cards (11: All Crimes + 10 crime types) below. Filters drawer (crime type/region/area). Trend indicators. Initial render has real D1 data — shimmers only appear on year filter changes. `onYearChange` wrapped in try/catch — prevents shimmer freeze if API fails. |
-| Headlines | `/trinidad/headlines/` | Pre-rendered | **JNews dark hero (Mar 25 2026):** H1 = "Latest Crime Headlines", live pulse = "{N} crimes in the last 30 days", CTA row (Dashboard/Murder Count/Filters). Date accordion list below unchanged. |
+| Headlines | `/trinidad/headlines/` | Pre-rendered | **JNews full redesign (Mar 25 2026):** Dark hero (H1 = "Latest Crime Headlines", live pulse = "{N} crimes in the last 30 days", CTA row: Dashboard / Murder Count / Filters). Type filter chips row (horizontal scroll, frequency-ordered, syncs with filter tray select). Two-column layout `lg:grid-cols-[1fr_272px]`. Main: crime list grouped by date — dark slate separator bands (`bg-slate-800`) as accordion headers (weekday + date + crime count + victim count), top 3 days expanded. Crime cards: colored left bar (rose/amber/slate hex via inline style) + type pill + area + headline (line-clamp-2) + chevron arrow. Flat list when any filter is active. Load More pagination (30/page). Sidebar: YTD murders dark gradient card + hot areas top 3 (links to area pages) + `NewsletterSignup variant="card"`. Filter tray (right drawer): date range + crime type + region + area cascading. JS extracted to `headlinesPage.ts`. |
 | Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | **JNews article layout (Mar 25 2026):** category pill (crime type, rose) + related type pills above H1 → `font-black` H1 (headline) → byline row (date · area · source) → featured crime type thumbnail image (`h-40 sm:h-52 object-cover rounded-xl`) → slim nav row (Dashboard/Headlines/Safety Tips) → `SiteNotificationBanner` → `lg:grid-cols-[1fr_256px]` main+sidebar. Main: summary text → report issue card → `SafetyContext` → `CompactTipCard` (max 3, matched by type+area) → `FeedbackToggle` → `TrendingHotspots` → prev/next nav. Sidebar: share card (X/Facebook/WhatsApp) → `RelatedCrimes` → support card. `max-w-4xl` container. Share script uses `DOMContentLoaded`. `image` field added to NewsArticle JSON-LD schema. |
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
 | Area Detail | `/trinidad/area/[slug]` | **SSR + CDN cache** | **JNews hierarchy (Mar 24 2026):** dark hero (H1 = "{areaName}", live pulse = risk score + 90d incident count, freshness line) → 4-card GradientStatCard vitals (Risk Score/amber, Incidents 90d/slate, Murders YTD/crimson, Top Crime Type/violet) → 2-col layout (1fr/256px). Main: AreaNarrative summary, expandable extra stats tray (Shootings/Home Invasions/etc.), SafetyContext, FeedbackToggle, compare prompt, newsletter, crime type breakdown table, recent headlines accordion, related areas. MPSidebar (showAll=false). |
@@ -158,7 +158,7 @@
 | BlogRotatingBanner.astro | Auto-rotating blog promotion (5s, country-filtered) |
 | SiteNotificationBanner.astro | Dismissible site-wide notification |
 | FeedbackToggle.astro | Helpful/not helpful toggle on crime pages |
-| NewsletterSignup.astro | Buttondown email signup — 3 variants: `card` (area pages), `inline` (statistics), `footer` (Layout footer, subscribe tray, crime modal). POSTs directly to Buttondown embed endpoint (browser-side). |
+| NewsletterSignup.astro | Buttondown email signup — 3 variants: `card` (area pages, headlines sidebar), `inline` (statistics), `footer` (Layout footer, subscribe tray, crime modal). POSTs directly to Buttondown embed endpoint (browser-side). **`card` variant:** `flex-1 min-w-0` on both the content wrapper div and email input — required to prevent overflow in narrow containers (272px sidebar). See B028. |
 
 ---
 
@@ -178,6 +178,7 @@
 | modalShareHandlers.ts | Social sharing (WhatsApp, Facebook, X, copy link) |
 | modalReportHandler.ts | Issue reporting form submission |
 | modalLifecycle.ts | Modal open/close, pushState URL updates, popstate |
+| headlinesPage.ts | Headlines page filter/chip/render logic. Reads `window.__hlData` set by `define:vars` in headlines.astro. Key functions: `getTypeStyle()` (must stay in sync with same function in headlines.astro frontmatter), `createCrimeCardHTML()`, `createSeparatorAccordionHTML()`, `syncChips()`, `applyFilters()`, `renderCrimes()`, `clearAllFilters()`. Top 3 date groups expanded by default (`index < 3`). |
 
 ---
 
