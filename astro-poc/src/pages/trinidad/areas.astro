@@ -1,19 +1,20 @@
 ---
 /**
  * Trinidad Areas Index Page
- * Lists all 179 areas grouped by region with crime counts and risk levels
+ * Lists all 179 areas grouped by region with crime counts, risk levels, and MPs
+ * JNews layout: dark hero → stat vitals row → search/sort → region groups (with MP strips)
  * Target keywords: "trinidad crime by area", "safest areas in trinidad"
  */
 
 import Layout from '../../layouts/Layout.astro';
-import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import Hero from '../../components/Hero.astro';
+import GradientStatCard from '../../components/GradientStatCard.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import { getTrinidadCrimes, getAllCrimesFromD1, generateNameSlug } from '../../lib/crimeData';
 import { loadFullAreaData } from '../../lib/areaAliases';
 import { getRiskWeight } from '../../config/riskWeights';
 import { usesVictimCount } from '../../config/crimeTypeConfig';
 import { routes, buildRoute } from '../../config/routes';
-import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import mpsData from '../../data/mps.json';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
@@ -110,7 +111,7 @@ areaStats.forEach(a => {
   regionGroups.get(region)!.push(a);
 });
 
-// Sort regions alphabetically, sort areas within each region by crime count (highest first)
+// Sort regions alphabetically, sort areas within each region alphabetically
 const sortedRegions = Array.from(regionGroups.entries())
   .sort((a, b) => a[0].localeCompare(b[0]))
   .map(([region, areas]) => ({
@@ -122,30 +123,76 @@ const sortedRegions = Array.from(regionGroups.entries())
 const totalAreas = areaStats.length;
 const areasWithCrime = areaStats.filter(a => a.totalCrimes > 0).length;
 
-const breadcrumbs = [
-  { label: 'Home', href: routes.home },
-  { label: 'Trinidad & Tobago', href: routes.trinidad.dashboard },
-  { label: 'Areas' },
-];
+// Vitals for stat cards
+const totalCrimes90d = areaStats.reduce((sum, a) => sum + a.crimeCount90d, 0);
+const highestRiskArea = areaStats.length > 0
+  ? areaStats.reduce((max, a) => a.weightedScore > max.weightedScore ? a : max, areaStats[0])
+  : null;
+const mostActiveRegion = sortedRegions.length > 0
+  ? sortedRegions.reduce((max, r) => r.totalCrimes > max.totalCrimes ? r : max, sortedRegions[0])
+  : null;
+
+// MPs grouped by region slug — same lookup used in region/[slug].astro
+const partyBadgeClass: Record<string, string> = {
+  PNM: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400',
+  UNC: 'bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400',
+  TPP: 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_65%)]',
+};
+const mpsByRegionSlug = new Map<string, typeof mpsData[number][]>();
+mpsData.forEach(mp => {
+  mp.regionSlugs.forEach(rSlug => {
+    if (!mpsByRegionSlug.has(rSlug)) mpsByRegionSlug.set(rSlug, []);
+    mpsByRegionSlug.get(rSlug)!.push(mp);
+  });
+});
 
 const pageTitle = `Trinidad Crime Statistics by Area - ${totalAreas} Areas | Crime Hotspots`;
 const pageDescription = `Crime statistics for ${totalAreas} areas across Trinidad & Tobago. Risk levels, crime counts, and detailed breakdowns for every area. Updated daily.`;
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  <Hero
-    compact
-    narrowContainer={true}
-    title="Crime Statistics by Area"
-    subtitle={`Explore crime data across ${sortedRegions.length} regions and ${totalAreas} areas in Trinidad & Tobago.`}
-    badge="Updated daily • Risk levels based on 90-day rolling window"
-    primaryCTA={{ text: 'Compare Areas', href: routes.trinidad.compare, icon: 'arrow' }}
-    secondaryCTA={{ text: 'View Regions', href: routes.trinidad.regions, icon: 'arrow' }}
-  >
-    <Breadcrumbs items={breadcrumbs} slot="before" />
-  </Hero>
 
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
+  <!-- Dark Hero -->
+  <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-16 sm:pb-20">
+      <nav aria-label="Breadcrumb" class="mb-4">
+        <ol class="flex items-center gap-1.5 text-xs text-slate-500">
+          <li><a href={routes.home} class="hover:text-slate-300 transition">Home</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li><a href={routes.trinidad.dashboard} class="hover:text-slate-300 transition">Trinidad &amp; Tobago</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="text-slate-400">Areas</li>
+        </ol>
+      </nav>
+      <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight mb-2">Crime by Area</h1>
+      <p class="text-slate-400 text-sm mb-5">Explore crime data across {sortedRegions.length} regions and {totalAreas} areas in Trinidad &amp; Tobago.</p>
+      <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+        <span class="relative flex h-2 w-2 mt-1 shrink-0">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+        </span>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          <strong class="text-white">{areasWithCrime} of {totalAreas} areas</strong> recorded crime in the last 90 days. Risk levels updated daily.
+        </p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href={routes.trinidad.compare} class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition font-medium text-xs">Compare Areas</a>
+        <a href={routes.trinidad.regions} class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs">View Regions</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Vitals Row (overlaps hero) -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 -mt-5 relative z-10">
+      <GradientStatCard variant="crimson" value={String(totalCrimes90d)} label="Incidents (90 days)" sublabel="across all areas" />
+      <GradientStatCard variant="slate" value={highestRiskArea?.riskLabel ?? '—'} label="Highest Risk Area" sublabel={highestRiskArea?.name ?? ''} href={highestRiskArea ? buildRoute.area(highestRiskArea.slug) : undefined} />
+      <GradientStatCard variant="amber" value={String(mostActiveRegion?.totalCrimes ?? 0)} label="Most Active Region" sublabel={mostActiveRegion?.region ?? ''} href={mostActiveRegion ? buildRoute.region(generateNameSlug(mostActiveRegion.region)) : undefined} />
+      <GradientStatCard variant="violet" value={String(totalAreas)} label="Areas Tracked" sublabel={`${sortedRegions.length} regions`} />
+    </div>
+  </div>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-6" data-pagefind-body>
 
     <!-- Search/Filter + Sort -->
     <div class="mb-6 flex flex-col sm:flex-row gap-3">
@@ -182,58 +229,89 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
 
     <!-- Region Groups -->
     <div id="regionContainer" class="space-y-4">
-      {sortedRegions.map(({ region, areas, totalCrimes }) => (
-        <section class="region-group bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[var(--ch-border-card)]" data-region={region.toLowerCase()}>
-          <!-- Region Header -->
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h2 class="text-heading font-bold text-slate-800 dark:text-[var(--ch-text)] leading-tight">{region}</h2>
-              <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">{areas.length} areas • {totalCrimes} crimes (90 days)</p>
-            </div>
-            <a
-              href={buildRoute.region(generateNameSlug(region))}
-              class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
-            >
-              View Region
-            </a>
-          </div>
+      {sortedRegions.map(({ region, areas, totalCrimes }) => {
+        const regionSlug = generateNameSlug(region);
+        const regionMPs = mpsByRegionSlug.get(regionSlug) ?? [];
+        return (
+          <section class="region-group bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-lg shadow-sm p-4 sm:p-6 border border-slate-100 dark:border-[var(--ch-border-card)]" data-region={region.toLowerCase()}>
 
-          <!-- Area Cards Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {areas.map(area => (
+            <!-- Region Header -->
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-heading font-bold text-slate-800 dark:text-[var(--ch-text)] leading-tight">{region}</h2>
+                <p class="text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">{areas.length} areas • {totalCrimes} crimes (90 days)</p>
+              </div>
               <a
-                href={buildRoute.area(area.slug)}
-                class="area-card flex flex-col bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
-                data-area={area.name.toLowerCase()}
-                data-known-as={area.knownAs?.toLowerCase() || ''}
-                data-crime-count={area.crimeCount90d}
+                href={buildRoute.region(regionSlug)}
+                class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
               >
-                <div class="flex items-start justify-between mb-2">
-                  <div class="flex-1 min-w-0">
-                    <h3 class="text-caption font-bold text-slate-800 dark:text-[var(--ch-text-heading)] group-hover:text-rose-600 transition line-clamp-1">
-                      {area.name}
-                    </h3>
-                    {area.knownAs && area.knownAs !== area.name && (
-                      <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)] truncate">
-                        Also known as: {area.knownAs}
-                      </p>
-                    )}
-                  </div>
-                  <!-- Risk Badge (weighted score, relative to highest area — matches dashboard) -->
-                  <span class={`flex-shrink-0 ml-2 px-2 py-0.5 rounded-full text-caption font-bold ${area.badgeClass}`}>
-                    {area.riskLabel}
-                  </span>
-                </div>
-
-                <div class="mt-auto flex items-center justify-between text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">
-                  <span>{area.crimeCount90d} incident{area.crimeCount90d !== 1 ? 's' : ''} (90d)</span>
-                  <span class="text-slate-400 dark:text-[hsl(0_0%_45%)]">{area.division}</span>
-                </div>
+                View Region
               </a>
-            ))}
-          </div>
-        </section>
-      ))}
+            </div>
+
+            <!-- MPs for this region -->
+            {regionMPs.length > 0 && (
+              <div class="mb-4 pb-4 border-b border-slate-100 dark:border-[var(--ch-border-subtle)]">
+                <p class="text-[10px] font-semibold text-slate-400 dark:text-[var(--ch-text-faint)] uppercase tracking-wide mb-2">{regionMPs.length === 1 ? 'Member of Parliament' : 'Members of Parliament'}</p>
+                <div class="flex flex-wrap gap-2">
+                  {regionMPs.map(mp => {
+                    const badge = partyBadgeClass[mp.party] ?? partyBadgeClass['TPP'];
+                    const displayName = mp.honorific ? `${mp.honorific} ${mp.fullName}` : mp.fullName;
+                    const photoSrc = mp.photo ? `/images/mps/${mp.photo}` : '/images/mps/placeholder.svg';
+                    return (
+                      <a
+                        href={`/trinidad/mp/${mp.nameSlug}/`}
+                        class="flex items-center gap-1.5 bg-slate-50 dark:bg-[hsl(0_0%_10%)] border border-slate-200 dark:border-[var(--ch-border-card)] rounded-full pl-0.5 pr-2.5 py-0.5 hover:border-rose-300 dark:hover:border-rose-700 transition group"
+                      >
+                        <div class="shrink-0 w-5 h-5 rounded-full overflow-hidden bg-slate-200 dark:bg-[hsl(0_0%_20%)]">
+                          <img src={photoSrc} alt="" class="w-full h-full object-cover" loading="lazy" />
+                        </div>
+                        <span class={`px-1 py-0 rounded-full text-[10px] font-medium leading-4 ${badge}`}>{mp.party}</span>
+                        <span class="text-xs text-slate-600 dark:text-[var(--ch-text-muted)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition truncate">{displayName}</span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <!-- Area Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {areas.map(area => (
+                <a
+                  href={buildRoute.area(area.slug)}
+                  class="area-card flex flex-col bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
+                  data-area={area.name.toLowerCase()}
+                  data-known-as={area.knownAs?.toLowerCase() || ''}
+                  data-crime-count={area.crimeCount90d}
+                >
+                  <div class="flex items-start justify-between mb-2">
+                    <div class="flex-1 min-w-0">
+                      <h3 class="text-caption font-bold text-slate-800 dark:text-[var(--ch-text-heading)] group-hover:text-rose-600 transition line-clamp-1">
+                        {area.name}
+                      </h3>
+                      {area.knownAs && area.knownAs !== area.name && (
+                        <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)] truncate">
+                          Also known as: {area.knownAs}
+                        </p>
+                      )}
+                    </div>
+                    <span class={`flex-shrink-0 ml-2 px-2 py-0.5 rounded-full text-caption font-bold ${area.badgeClass}`}>
+                      {area.riskLabel}
+                    </span>
+                  </div>
+
+                  <div class="mt-auto flex items-center justify-between text-caption text-slate-500 dark:text-[var(--ch-text-muted)]">
+                    <span>{area.crimeCount90d} incident{area.crimeCount90d !== 1 ? 's' : ''} (90d)</span>
+                    <span class="text-slate-400 dark:text-[hsl(0_0%_45%)]">{area.division}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+          </section>
+        );
+      })}
     </div>
 
     <!-- No results message -->
