@@ -180,7 +180,7 @@ export function getCrimeTypeThumbnailUrl(crimeType: string, baseUrl = 'https://c
   const slug = slugify(crimeType);
   const knownTypes = Object.keys(CRIME_THUMBNAILS).map(slugify);
   const path = knownTypes.includes(slug)
-    ? `/images/crime-types/${slug}.png`
-    : '/images/crime-types/generic.png';
+    ? `/images/crime-types/${slug}.webp`
+    : '/images/crime-types/generic.webp';
   return `${baseUrl}${path}`;
 }
