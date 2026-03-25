@@ -82,7 +82,7 @@ const latestMurders = crimesCurrent
     c.relatedCrimeTypes?.split(',').map(t => t.trim()).includes('Murder')
   )
   .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
-  .slice(0, 10);
+  .slice(0, 6);
 ---
 
 <Layout title={title} description={description} includePagefind={false} noindex={true}>

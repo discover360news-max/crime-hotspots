@@ -88,7 +88,7 @@ const murdersByMonth = Array.from({ length: 12 }, (_, i) =>
   ).length
 );
 
-// Latest 10 murders for sidebar (from selected year)
+// Latest 6 murders for sidebar (from selected year)
 const latestMurders = selectedCrimes
   .filter(c =>
     c.primaryCrimeType === 'Murder' ||
@@ -96,7 +96,7 @@ const latestMurders = selectedCrimes
     c.relatedCrimeTypes?.split(',').map(t => t.trim()).includes('Murder')
   )
   .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
-  .slice(0, 10);
+  .slice(0, 6);
 
 // Latest blog post
 const blogPosts = await getCollection('blog', ({ data }) => data.country === 'tt');
