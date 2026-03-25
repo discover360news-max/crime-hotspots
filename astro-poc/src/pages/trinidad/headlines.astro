@@ -12,7 +12,6 @@ import { getHotAreas } from '../../lib/trendingHelpers';
 import { countCrimeType } from '../../lib/dashboardHelpers';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { routes, buildRoute } from '../../config/routes';
-import { escapeHtml } from '../../lib/escapeHtml';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
@@ -188,12 +187,12 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
                           <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
                               <span class={`${style.pillClass} inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide`}>
-                                {escapeHtml(pill)}
+                                {pill}
                               </span>
-                              <span class="text-[10px] text-slate-400 dark:text-[hsl(0_0%_45%)] truncate">{escapeHtml(crime.area)}</span>
+                              <span class="text-[10px] text-slate-400 dark:text-[hsl(0_0%_45%)] truncate">{crime.area}</span>
                             </div>
                             <p class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-slate-900 dark:group-hover:text-white leading-snug line-clamp-2 transition-colors">
-                              {escapeHtml(crime.headline)}
+                              {crime.headline}
                             </p>
                           </div>
                           <svg class="w-3.5 h-3.5 text-slate-300 dark:text-[hsl(0_0%_30%)] group-hover:text-rose-500 transition-colors shrink-0 mt-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -257,7 +256,7 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
                 >
                   <div class="flex items-center gap-2 min-w-0">
                     <span class="text-xs font-bold text-slate-300 dark:text-[hsl(0_0%_35%)] w-4 shrink-0">{i + 1}</span>
-                    <span class="text-sm text-slate-700 dark:text-[var(--ch-text)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">{escapeHtml(area.area)}</span>
+                    <span class="text-sm text-slate-700 dark:text-[var(--ch-text)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors truncate">{area.area}</span>
                   </div>
                   <span class="text-xs font-bold text-rose-600 dark:text-rose-400 shrink-0 ml-2">{area.count}</span>
                 </a>
