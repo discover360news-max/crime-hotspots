@@ -340,6 +340,40 @@ const detectedCountryId = Object.entries(countryPathMap).find(
 <body class="bg-slate-100 dark:bg-[var(--ch-bg)] text-slate-700 dark:text-[var(--ch-text)] min-h-screen font-sans transition-colors duration-200">
 
 
+  <!-- Utility Bar — desktop only, non-sticky, scrolls away -->
+  <div class="w-full bg-slate-900 dark:bg-[hsl(0_0%_5%)] hidden md:block" data-pagefind-ignore>
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav class="flex items-center justify-between h-8" aria-label="Quick navigation">
+        <ul class="flex items-center gap-1 list-none m-0 p-0">
+          <li>
+            <a href={routes.trinidad.statistics} class={`text-xs transition ${Astro.url.pathname.startsWith('/trinidad/statistics') ? 'text-white' : 'text-slate-400 hover:text-white'}`}>
+              Statistics
+            </a>
+          </li>
+          <li class="text-slate-700 text-xs px-2" aria-hidden="true">·</li>
+          <li>
+            <a href={routes.trinidad.regions} class={`text-xs transition ${Astro.url.pathname.startsWith('/trinidad/regions') ? 'text-white' : 'text-slate-400 hover:text-white'}`}>
+              Regions
+            </a>
+          </li>
+          <li class="text-slate-700 text-xs px-2" aria-hidden="true">·</li>
+          <li>
+            <a href={routes.trinidad.compare} class={`text-xs transition ${Astro.url.pathname.startsWith('/trinidad/compare') ? 'text-white' : 'text-slate-400 hover:text-white'}`}>
+              Compare Areas
+            </a>
+          </li>
+          <li class="text-slate-700 text-xs px-2" aria-hidden="true">·</li>
+          <li>
+            <a href={routes.trinidad.safetyTips} class={`text-xs transition ${Astro.url.pathname.startsWith('/trinidad/safety-tips') ? 'text-white' : 'text-slate-400 hover:text-white'}`}>
+              Safety Tips
+            </a>
+          </li>
+        </ul>
+        <p class="text-xs text-slate-600 hidden lg:block">Free &amp; ad-free Caribbean crime data</p>
+      </nav>
+    </div>
+  </div>
+
   <!-- Header Component -->
   <Header isHomepage={isHomepage} />
 

@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 25, 2026 (murders.astro JNews hierarchy; crime/[slug].astro JNews article layout; AI-generated WebP crime type images)
+**Last Updated:** March 25, 2026 (regions.astro JNews dark hero; compare.astro dark hero + max-w-5xl throughout; utility bar above header in Layout.astro)
 
 ---
 
@@ -48,11 +48,11 @@
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
 | Area Detail | `/trinidad/area/[slug]` | **SSR + CDN cache** | **JNews hierarchy (Mar 24 2026):** dark hero (H1 = "{areaName}", live pulse = risk score + 90d incident count, freshness line) → 4-card GradientStatCard vitals (Risk Score/amber, Incidents 90d/slate, Murders YTD/crimson, Top Crime Type/violet) → 2-col layout (1fr/256px). Main: AreaNarrative summary, expandable extra stats tray (Shootings/Home Invasions/etc.), SafetyContext, FeedbackToggle, compare prompt, newsletter, crime type breakdown table, recent headlines accordion, related areas. MPSidebar (showAll=false). |
 | Statistics | `/trinidad/statistics/` | **SSR + CDN cache** | Two-tier crime rates: previous year final (official) + current year annualized at current pace. All displayed rates are annualized for apples-to-apples comparison. Raw YTD rates removed Mar 2026. FAQPage JSON-LD (4 Q&As) + Dataset + BreadcrumbList. |
-| Regions | `/trinidad/regions/` | Pre-rendered | Browse by region |
+| Regions | `/trinidad/regions/` | Pre-rendered | **JNews dark hero (Mar 25 2026):** compact dark hero (H1 = "Crime by Region", pulse = "{N} regions tracked. Sorted by crime volume.") + rose/ghost CTAs → `max-w-5xl` card grid. No vitals row (directory page). Cards: 2-col grid, each showing Incidents (90d) / Murders (YTD) / Areas count. |
 | Region Detail | `/trinidad/region/[slug]` | **SSR + CDN cache** | JNews hierarchy (Mar 24 2026): dark hero (H1 = "{regionName} Region", live pulse = 90d incident count), 4-card GradientStatCard vitals (Incidents 90d/slate, Murders YTD/crimson, Avg Risk Score/amber, Most Active Area/violet), expandable extra stats tray, dark separator band ("Regional Breakdown"), area ranking grid, crime breakdown YoY table, recent headlines accordion. MPSidebar (showAll=true). |
 | MP Index | `/trinidad/mp/` | Pre-rendered | Directory of all 41 MPs grouped by region. Each card: photo, honorific name, party badge, constituency. |
 | MP Profile | `/trinidad/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left, identity+contact right. Crime stat cards per region (reuses region page pattern). JSON-LD Person schema. Ambiguous MPs show boundary note + two region sections. Data: `src/data/mps.json`. |
-| Compare | `/trinidad/compare/` | **SSR + CDN cache** | Side-by-side area comparison. Pre-loads Port of Spain vs San Juan by default. Rose gradient hero + sticky selector bar (matches dashboard pattern). Area list + per-area stats derived from D1 at request time; 90-day window always current. |
+| Compare | `/trinidad/compare/` | **SSR + CDN cache** | Side-by-side area comparison. Pre-loads Port of Spain vs San Juan by default. **Dark slate hero (Mar 25 2026):** from-slate-900 to-slate-800, H1 font-black text-white, inline breadcrumb nav. Sticky selector bar (Area A / Area B dropdowns). All containers `max-w-5xl`. Area list + per-area stats derived from D1 at request time; 90-day window always current. |
 | Murder Count | `/trinidad/murder-count/` | **SSR + CDN cache** | `max-w-5xl` sidebar layout. Left: flip counter, YoY comparison, 3 rate cards (YTD / **Annualized** / Previous Final), blog post. Right sidebar: share buttons (`.sb-share-btn` pattern), latest 10 murder incidents with "View all {year} murders →" link to `/trinidad/murders/`, newsletter. Single `<h1>` with 3 spans = "Trinidad & Tobago Murder Count {year}". FAQPage JSON-LD (3 Q&As: count, rate, toll) + WebPage + Dataset (dateModified) + BreadcrumbList. |
 | Murders List | `/trinidad/murders/` | **SSR + CDN cache** | **JNews hierarchy (Mar 25 2026):** dark hero (H1 = murder count as large number, subtitle = "Murders in Trinidad & Tobago · {year}", live pulse = YoY same-period comparison sentence) → 4-card GradientStatCard vitals (Murders YTD/crimson, Projected Annual/amber, vs Last Year %/violet, Days with Murders/slate) → "All Murders" section label → date-grouped list. YoY computed against same calendar date in previous year (not full-year total). `max-w-5xl`. Load more: 14 groups initially, +14 per click. Schema: `WebPage` + `Dataset` (`slot="head"`). |
 | Archive Index | `/trinidad/archive/` | Pre-rendered | Browse by year |
@@ -92,12 +92,12 @@
 ### Core Layout (`src/layouts/`)
 | File | Purpose | Key Props |
 |------|---------|-----------|
-| Layout.astro | Root layout wrapper — `<head>`, fonts, CSP, GA4, Pagefind, Turnstile, footer | `ogType` (default `"website"`, pass `"article"` on crime/blog pages), `includePagefind` (default `true`), `includeTurnstile` (default `false`). **`<slot name="head" />`** at line 137 — DO NOT REMOVE (crime pages inject JSON-LD here). |
+| Layout.astro | Root layout wrapper — `<head>`, fonts, CSP, GA4, Pagefind, Turnstile, utility bar, footer | `ogType` (default `"website"`, pass `"article"` on crime/blog pages), `includePagefind` (default `true`), `includeTurnstile` (default `false`). **`<slot name="head" />`** at line 137 — DO NOT REMOVE (crime pages inject JSON-LD here). **Utility bar** (Mar 25 2026): `bg-slate-900`, `hidden md:block`, non-sticky (scrolls away), 4 links (Statistics · Regions · Compare Areas · Safety Tips), active state via `Astro.url.pathname`, tagline right (`hidden lg:block`). Rendered above `<Header />`. |
 
 ### Navigation & Layout
 | Component | Purpose |
 |-----------|---------|
-| Header.astro | Top nav, direct links on Trinidad pages, active section indicator. Mobile: `logo-icon.png` (36px square). Ghost Subscribe buttons. ♥ Support → Ko-fi (desktop + hamburger). Mobile menu + subscribe tray are native `<dialog>` elements. |
+| Header.astro | Sticky `top-0 z-40` top nav. Sits below the non-sticky utility bar in Layout.astro. Direct links on Trinidad pages, active section indicator. Mobile: `logo-icon.png` (36px square). Ghost Subscribe buttons. ♥ Support → Ko-fi (desktop + hamburger). Mobile menu + subscribe tray are native `<dialog>` elements. **`top-16` references on filter/control bars remain correct** — utility bar is non-sticky so header height is still 64px. |
 | BottomNav.astro | Mobile bottom tab bar (Dashboard, Headlines, Areas, Report, More). Config-driven from `countries.ts`. More menu is a native `<dialog>` bottom sheet. Country indicator strip always visible. |
 | MPSidebar.astro | Sticky right-column sidebar for area + region pages. Sections: share buttons (`.sb-share-btn` pattern), MPs card, Ko-fi card. `showAll=false` (area): 2 MPs + chevron toggle. `showAll=true` (region): all on desktop, mobile toggle. Design rules: `.memory/entries/C004-mpsidebar-design-rules.md`. |
 | Breadcrumbs.astro | Breadcrumb navigation for SEO |
