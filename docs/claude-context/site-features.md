@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 24, 2026 (area/[slug].astro JNews hierarchy; region/[slug].astro JNews hierarchy; Dashboard JNews hierarchy overhaul; GradientStatCard added; 301→302 on slug-not-found)
+**Last Updated:** March 25, 2026 (murders.astro JNews hierarchy; crime/[slug].astro JNews article layout; AI-generated WebP crime type images)
 
 ---
 
@@ -44,7 +44,7 @@
 |------|-------|-----------|---------|
 | Dashboard | `/trinidad/` | **SSR + CDN cache** | **JNews-style hierarchy (Mar 24 2026):** dark hero band → 4 gradient `GradientStatCard` vitals (Total Incidents / Murders / Victims / Crimes/Day) → `DashboardStory` narrative → crime breakdown scroll → sticky year filter bar → 2-col section (Leaflet map left / Top Areas `TopRegionsCard` right) → Quick Insights card. Stat cards (11: All Crimes + 10 crime types) below. Filters drawer (crime type/region/area). Trend indicators. Initial render has real D1 data — shimmers only appear on year filter changes. `onYearChange` wrapped in try/catch — prevents shimmer freeze if API fails. |
 | Headlines | `/trinidad/headlines/` | Pre-rendered | Latest crimes, date accordion, victim counts, empty state for filters |
-| Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | Individual crime page, safety context, related crimes, trending hotspots |
+| Crime Detail | `/trinidad/crime/[slug]` | **SSR + CDN cache** | **JNews article layout (Mar 25 2026):** category pill (crime type, rose) + related type pills above H1 → `font-black` H1 (headline) → byline row (date · area · source) → featured crime type thumbnail image (`h-40 sm:h-52 object-cover rounded-xl`) → slim nav row (Dashboard/Headlines/Safety Tips) → `SiteNotificationBanner` → `lg:grid-cols-[1fr_256px]` main+sidebar. Main: summary text → report issue card → `SafetyContext` → `CompactTipCard` (max 3, matched by type+area) → `FeedbackToggle` → `TrendingHotspots` → prev/next nav. Sidebar: share card (X/Facebook/WhatsApp) → `RelatedCrimes` → support card. `max-w-4xl` container. Share script uses `DOMContentLoaded`. `image` field added to NewsArticle JSON-LD schema. |
 | Areas Index | `/trinidad/areas/` | Pre-rendered | Browse all crime areas |
 | Area Detail | `/trinidad/area/[slug]` | **SSR + CDN cache** | **JNews hierarchy (Mar 24 2026):** dark hero (H1 = "{areaName}", live pulse = risk score + 90d incident count, freshness line) → 4-card GradientStatCard vitals (Risk Score/amber, Incidents 90d/slate, Murders YTD/crimson, Top Crime Type/violet) → 2-col layout (1fr/256px). Main: AreaNarrative summary, expandable extra stats tray (Shootings/Home Invasions/etc.), SafetyContext, FeedbackToggle, compare prompt, newsletter, crime type breakdown table, recent headlines accordion, related areas. MPSidebar (showAll=false). |
 | Statistics | `/trinidad/statistics/` | **SSR + CDN cache** | Two-tier crime rates: previous year final (official) + current year annualized at current pace. All displayed rates are annualized for apples-to-apples comparison. Raw YTD rates removed Mar 2026. FAQPage JSON-LD (4 Q&As) + Dataset + BreadcrumbList. |
@@ -54,7 +54,7 @@
 | MP Profile | `/trinidad/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left, identity+contact right. Crime stat cards per region (reuses region page pattern). JSON-LD Person schema. Ambiguous MPs show boundary note + two region sections. Data: `src/data/mps.json`. |
 | Compare | `/trinidad/compare/` | **SSR + CDN cache** | Side-by-side area comparison. Pre-loads Port of Spain vs San Juan by default. Rose gradient hero + sticky selector bar (matches dashboard pattern). Area list + per-area stats derived from D1 at request time; 90-day window always current. |
 | Murder Count | `/trinidad/murder-count/` | **SSR + CDN cache** | `max-w-5xl` sidebar layout. Left: flip counter, YoY comparison, 3 rate cards (YTD / **Annualized** / Previous Final), blog post. Right sidebar: share buttons (`.sb-share-btn` pattern), latest 10 murder incidents with "View all {year} murders →" link to `/trinidad/murders/`, newsletter. Single `<h1>` with 3 spans = "Trinidad & Tobago Murder Count {year}". FAQPage JSON-LD (3 Q&As: count, rate, toll) + WebPage + Dataset (dateModified) + BreadcrumbList. |
-| Murders List | `/trinidad/murders/` | SSR + CDN cache | Current-year murders only, date-grouped chronological list, links to individual crime pages. Header shows victim-aware `countCrimeType()` total; secondary line "across N incidents" shown when counts differ. Day badge also victim-aware. Load more: 14 groups initially, +14 per click. Sitemap: `priority 0.8, changefreq daily`. Schema: `WebPage` + `Dataset` (`slot="head"`), self-updating variableMeasured. |
+| Murders List | `/trinidad/murders/` | **SSR + CDN cache** | **JNews hierarchy (Mar 25 2026):** dark hero (H1 = murder count as large number, subtitle = "Murders in Trinidad & Tobago · {year}", live pulse = YoY same-period comparison sentence) → 4-card GradientStatCard vitals (Murders YTD/crimson, Projected Annual/amber, vs Last Year %/violet, Days with Murders/slate) → "All Murders" section label → date-grouped list. YoY computed against same calendar date in previous year (not full-year total). `max-w-5xl`. Load more: 14 groups initially, +14 per click. Schema: `WebPage` + `Dataset` (`slot="head"`). |
 | Archive Index | `/trinidad/archive/` | Pre-rendered | Browse by year |
 | Archive Month | `/trinidad/archive/[year]/[month]` | Pre-rendered | Crimes for specific month |
 
@@ -205,7 +205,7 @@
 | crimeColors.ts | Crime type → color hex mapping | 15 types (no Vehicle Theft). Exports `getCrimeTailwindColor()`, `getCrimeHexColor()`. Must stay in sync with crimeSchema.ts. |
 | areaAliases.ts | Area name aliases (handles quoted CSV fields) | Used by tooltip + area pages |
 | generateOgImage.ts | Dynamic OG image generation (satori + sharp) | Used by murder-count page (1200×630 PNG) |
-| generateCrimeTypeThumbnails.ts | Build-time crime type thumbnail images | Used during build |
+| generateCrimeTypeThumbnails.ts | Crime type thumbnail URL resolver | `getCrimeTypeThumbnailUrl()` returns `/images/crime-types/{slug}.webp` (or `generic.webp`). Images are AI-generated WebP files in `public/images/crime-types/` (replaced PNG, Mar 25 2026). Build-time generator (`generateAllCrimeTypeThumbnails`) still writes `.png` but is run manually via script — not called during `npm run build`. |
 
 ---
 
