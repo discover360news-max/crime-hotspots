@@ -1,13 +1,16 @@
 ---
 /**
  * Trinidad Murder Rate & Count
- * JNews layout: dark hero (flip counter) → GradientStatCard vitals → monthly breakdown → sidebar
+ * JNews layout: dark hero (flip counter) → GradientStatCard vitals → year filter →
+ *               monthly breakdown → sidebar
+ * Supports ?year= URL param for historical year views.
  * Target keywords: "trinidad murder rate", "trinidad murder toll", "how many murders in trinidad 2026"
  */
 
 import Layout from '../../layouts/Layout.astro';
 import FlipCounter from '../../components/FlipCounter.astro';
 import GradientStatCard from '../../components/GradientStatCard.astro';
+import MonthlyBreakdownChart from '../../components/MonthlyBreakdownChart.astro';
 import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../lib/crimeData';
 import { countCrimeType } from '../../lib/dashboardHelpers';
 import { getCollection } from 'astro:content';
@@ -20,58 +23,73 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalida
 
 const db = Astro.locals.runtime?.env?.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
-const currentYear = new Date().getFullYear();
-const previousYear = currentYear - 1;
-const crimes2026 = allCrimes.filter(crime => crime.year === currentYear);
-const crimes2025 = allCrimes.filter(crime => crime.year === previousYear);
+
+const now = new Date();
+const currentYear = now.getFullYear();
+
+// Year filter — URL param with fallback to current year
+const paramYear = parseInt(Astro.url.searchParams.get('year') ?? '');
+const selectedYear = (paramYear && paramYear >= 2024 && paramYear <= currentYear) ? paramYear : currentYear;
+const isCurrentYear = selectedYear === currentYear;
+
+// Available years (descending) computed from data — no extra fetch
+const availableYears = [...new Set(allCrimes.map(c => c.year))].sort((a, b) => b - a);
+
+// Filter by selected year
+const selectedCrimes = allCrimes.filter(c => c.year === selectedYear);
+const previousYearCrimes = allCrimes.filter(c => c.year === selectedYear - 1);
+const hasPreviousYear = previousYearCrimes.length > 0;
 
 // Murder counts
-const murderCount = countCrimeType(crimes2026, 'Murder');
-const murderCount2025SamePeriod = countCrimeType(crimes2025.filter(crime => {
-  const now = new Date();
-  const crimeDate = new Date(crime.date);
-  const startOfPreviousYear = new Date(`${previousYear}-01-01`);
-  const dayOfCurrentYear = Math.floor((now.getTime() - new Date(`${currentYear}-01-01`).getTime()) / (1000 * 60 * 60 * 24));
-  const samePeriodEnd = new Date(startOfPreviousYear.getTime() + (dayOfCurrentYear * 24 * 60 * 60 * 1000));
-  return crimeDate >= startOfPreviousYear && crimeDate <= samePeriodEnd;
-}), 'Murder');
+const murderCount = countCrimeType(selectedCrimes, 'Murder');
+const previousYearMurders = countCrimeType(previousYearCrimes, 'Murder');
 
-// YoY
-const yoyChange = murderCount2025SamePeriod > 0
-  ? ((murderCount - murderCount2025SamePeriod) / murderCount2025SamePeriod) * 100
+// YoY: same-period for current year, full-year for past years
+const samePeriodPreviousMurders = isCurrentYear && hasPreviousYear
+  ? countCrimeType(previousYearCrimes.filter(crime => {
+      const crimeDate = new Date(crime.date);
+      const startOfPrevYear = new Date(`${selectedYear - 1}-01-01`);
+      const dayOfSelectedYear = Math.floor(
+        (now.getTime() - new Date(`${selectedYear}-01-01`).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      const samePeriodEnd = new Date(startOfPrevYear.getTime() + dayOfSelectedYear * 24 * 60 * 60 * 1000);
+      return crimeDate >= startOfPrevYear && crimeDate <= samePeriodEnd;
+    }), 'Murder')
+  : previousYearMurders;
+
+const yoyChange = samePeriodPreviousMurders > 0
+  ? ((murderCount - samePeriodPreviousMurders) / samePeriodPreviousMurders) * 100
   : 0;
 const yoyDirection = yoyChange > 0.5 ? 'up' : yoyChange < -0.5 ? 'down' : 'same';
 
 // Rates
 const POPULATION = 1500000;
 const currentMurderRate = ((murderCount / POPULATION) * 100000).toFixed(1);
-const murderCount2025Full = countCrimeType(crimes2025, 'Murder');
-const murderRate2025 = ((murderCount2025Full / POPULATION) * 100000).toFixed(1);
+const previousYearMurderRate = hasPreviousYear
+  ? ((previousYearMurders / POPULATION) * 100000).toFixed(1)
+  : '—';
 
-// Annualized projection
-const now = new Date();
-const startOfYear = new Date(`${currentYear}-01-01`);
-const daysPassed = Math.max(1, Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)));
+// Annualized projection (current year only)
+const startOfYear = new Date(`${selectedYear}-01-01`);
+const daysPassed = isCurrentYear
+  ? Math.max(1, Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24)))
+  : 365;
 const projectedAnnualMurders = Math.round((murderCount / daysPassed) * 365);
 const projectedMurderRate = ((projectedAnnualMurders / POPULATION) * 100000).toFixed(1);
-
-// Pace
 const daysPerMurder = murderCount > 0 ? Math.round(daysPassed / murderCount) : 0;
 
-// Monthly breakdown
-const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-const currentMonthIdx = now.getMonth(); // 0-indexed
+// Monthly breakdown — currentMonthIdx=12 on closed years so all bars render as "past"
+const chartMonthIdx = isCurrentYear ? now.getMonth() : 12;
 const murdersByMonth = Array.from({ length: 12 }, (_, i) =>
-  crimes2026.filter(c =>
+  selectedCrimes.filter(c =>
     (c.primaryCrimeType === 'Murder' || c.crimeType === 'Murder' ||
      c.relatedCrimeTypes?.split(',').map(t => t.trim()).includes('Murder')) &&
     c.month === i + 1
   ).length
 );
-const maxMonthlyMurders = Math.max(...murdersByMonth.filter(v => v > 0), 1);
 
-// Latest 10 murders for sidebar
-const latestMurders = crimes2026
+// Latest 10 murders for sidebar (from selected year)
+const latestMurders = selectedCrimes
   .filter(c =>
     c.primaryCrimeType === 'Murder' ||
     c.crimeType === 'Murder' ||
@@ -86,12 +104,24 @@ const latestPost = blogPosts.sort((a, b) =>
   new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
 )[0];
 
-const lastUpdated = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+const lastUpdated = isCurrentYear
+  ? now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+  : 'Full year data';
+
 const ogImagePath = '/og-images/murder-count.png';
 const pageUrl = 'https://crimehotspots.com/trinidad/murder-count/';
-const shareText = `Trinidad Murder Count ${currentYear}: ${murderCount} murders so far. Track live statistics at Crime Hotspots.`;
-const title = `Trinidad Murder Count ${currentYear}: ${murderCount} Murders So Far — Updated Daily | Crime Hotspots`;
-const description = `Trinidad murder count ${currentYear}: ${murderCount} murders (death toll updated daily). Murder rate: ${currentMurderRate} per 100k. Murder toll projected at ${projectedMurderRate} per 100k for full year. Track the Trinidad & Tobago murder toll and murder rate live.`;
+const shareText = `Trinidad Murder Count ${selectedYear}: ${murderCount} murders${isCurrentYear ? ' so far' : ''}. Track live statistics at Crime Hotspots.`;
+const title = isCurrentYear
+  ? `Trinidad Murder Count ${selectedYear}: ${murderCount} Murders So Far — Updated Daily | Crime Hotspots`
+  : `Trinidad Murder Count ${selectedYear}: ${murderCount} Murders (Final) | Crime Hotspots`;
+const description = isCurrentYear
+  ? `Trinidad murder count ${selectedYear}: ${murderCount} murders (updated daily). Murder rate: ${currentMurderRate} per 100k. Projected at ${projectedMurderRate} per 100k for full year. Track the Trinidad & Tobago murder toll live.`
+  : `Trinidad murder count ${selectedYear}: ${murderCount} murders (final). Murder rate: ${currentMurderRate} per 100,000 population. Historical data for Trinidad & Tobago.`;
+
+// YoY card value for past years
+const yoyCardValue = !hasPreviousYear ? 'N/A'
+  : yoyDirection === 'same' ? '~0%'
+  : `${yoyDirection === 'up' ? '+' : '-'}${Math.abs(yoyChange).toFixed(0)}%`;
 
 const faqData = {
   "@context": "https://schema.org",
@@ -99,26 +129,30 @@ const faqData = {
   "mainEntity": [
     {
       "@type": "Question",
-      "name": `How many murders in Trinidad and Tobago in ${currentYear}?`,
+      "name": `How many murders in Trinidad and Tobago in ${selectedYear}?`,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": `Trinidad and Tobago has recorded ${murderCount} murders so far in ${currentYear} (as of ${lastUpdated}). At the current pace, the annualized murder rate is ${projectedMurderRate} per 100,000 population, with ${projectedAnnualMurders} murders projected by year end. Data is updated daily.`
+        "text": isCurrentYear
+          ? `Trinidad and Tobago has recorded ${murderCount} murders so far in ${selectedYear} (as of ${lastUpdated}). At the current pace, the annualized murder rate is ${projectedMurderRate} per 100,000 population, with ${projectedAnnualMurders} murders projected by year end. Data is updated daily.`
+          : `Trinidad and Tobago recorded ${murderCount} murders in ${selectedYear} (final). The murder rate was ${currentMurderRate} per 100,000 population.`
       }
     },
     {
       "@type": "Question",
-      "name": `What is the Trinidad murder rate in ${currentYear}?`,
+      "name": `What is the Trinidad murder rate in ${selectedYear}?`,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": `Trinidad and Tobago's annualized murder rate in ${currentYear} is ${projectedMurderRate} per 100,000 population, based on ${murderCount} murders in the first ${daysPassed} days of the year. The ${previousYear} final murder rate was ${murderRate2025} per 100,000 — one of the highest in the Caribbean.`
+        "text": isCurrentYear
+          ? `Trinidad and Tobago's annualized murder rate in ${selectedYear} is ${projectedMurderRate} per 100,000 population, based on ${murderCount} murders in the first ${daysPassed} days. The ${selectedYear - 1} final murder rate was ${previousYearMurderRate} per 100,000.`
+          : `Trinidad and Tobago's murder rate in ${selectedYear} was ${currentMurderRate} per 100,000 population (${murderCount} total murders).`
       }
     },
     {
       "@type": "Question",
-      "name": `What is the Trinidad murder toll so far in ${currentYear}?`,
+      "name": `What is the Trinidad murder toll${isCurrentYear ? ' so far' : ''} in ${selectedYear}?`,
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": `The Trinidad murder toll stands at ${murderCount} as of ${lastUpdated}. This is ${yoyDirection === 'up' ? `up ${Math.abs(yoyChange).toFixed(0)}% compared to the same period in ${previousYear}` : yoyDirection === 'down' ? `down ${Math.abs(yoyChange).toFixed(0)}% compared to the same period in ${previousYear}` : `similar to the same period in ${previousYear}`} (${murderCount2025SamePeriod} murders). Data updated daily from verified news sources.`
+        "text": `The Trinidad murder toll${isCurrentYear ? ' stands' : ' stood'} at ${murderCount}${isCurrentYear ? ` as of ${lastUpdated}` : ` for the full year ${selectedYear}`}. This is ${yoyDirection === 'up' ? `up ${Math.abs(yoyChange).toFixed(0)}%` : yoyDirection === 'down' ? `down ${Math.abs(yoyChange).toFixed(0)}%` : 'similar'} compared to ${isCurrentYear ? `the same period in ${selectedYear - 1}` : `${selectedYear - 1}`} (${samePeriodPreviousMurders} murders). Data updated daily from verified news sources.`
       }
     }
   ]
@@ -144,7 +178,7 @@ const faqData = {
 
       <!-- H1 -->
       <h1 class="text-lg sm:text-xl font-bold text-white/70 text-center mb-8 uppercase tracking-widest">
-        Trinidad & Tobago · Murder Count · {currentYear}
+        Trinidad & Tobago · Murder Count · {selectedYear}
       </h1>
 
       <!-- Flip Counter — bigger via .hero-counter-wrap override -->
@@ -155,14 +189,14 @@ const faqData = {
       <!-- Live pulse -->
       <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-8 text-sm">
         <span class="text-slate-300">
-          <span class="font-bold text-white">{murderCount}</span> murders recorded in {currentYear}
+          <span class="font-bold text-white">{murderCount}</span> murders {isCurrentYear ? 'recorded in' : 'in'} {selectedYear}
         </span>
-        {yoyDirection !== 'same' && (
+        {yoyDirection !== 'same' && hasPreviousYear && (
           <span class={`font-bold ${yoyDirection === 'down' ? 'text-emerald-400' : 'text-rose-400'}`}>
-            {yoyDirection === 'down' ? '↓' : '↑'} {Math.abs(yoyChange).toFixed(0)}% vs {previousYear}
+            {yoyDirection === 'down' ? '↓' : '↑'} {Math.abs(yoyChange).toFixed(0)}% vs {selectedYear - 1}
           </span>
         )}
-        <span class="text-xs text-slate-500">Updated {lastUpdated}</span>
+        <span class="text-xs text-slate-500">{lastUpdated}</span>
       </div>
 
       <!-- CTAs -->
@@ -173,7 +207,7 @@ const faqData = {
         </a>
         <a href={routes.trinidad.murders}
           class="px-6 py-3 min-h-[44px] flex items-center justify-center border border-slate-600 text-slate-300 rounded-lg hover:bg-slate-700 active:bg-slate-600 transition font-medium text-sm">
-          All {currentYear} Murders
+          All {selectedYear} Murders
         </a>
       </div>
 
@@ -183,10 +217,40 @@ const faqData = {
   <!-- ── Vitals Row (overlaps hero) ──────────────────────────────────────────── -->
   <div class="max-w-5xl mx-auto px-4 sm:px-6">
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 -mt-5 relative z-10">
-      <GradientStatCard variant="crimson" value={currentMurderRate} label="YTD Rate" sublabel="per 100k population" />
-      <GradientStatCard variant="slate"   value={projectedMurderRate} label="Annualized Rate" sublabel={`per 100k · ${projectedAnnualMurders} projected`} />
-      <GradientStatCard variant="slate"   value={murderRate2025} label={`${previousYear} Final Rate`} sublabel={`${murderCount2025Full} total murders`} />
-      <GradientStatCard variant="amber"   value={daysPerMurder > 0 ? `~${daysPerMurder}d` : '—'} label="Days Between Murders" sublabel="at current pace" />
+      {isCurrentYear ? (
+        <>
+          <GradientStatCard variant="crimson" value={currentMurderRate} label="YTD Rate" sublabel="per 100k population" />
+          <GradientStatCard variant="slate"   value={projectedMurderRate} label="Annualized Rate" sublabel={`per 100k · ${projectedAnnualMurders} projected`} />
+          <GradientStatCard variant="slate"   value={previousYearMurderRate} label={`${selectedYear - 1} Final Rate`} sublabel={`${previousYearMurders} total murders`} />
+          <GradientStatCard variant="amber"   value={daysPerMurder > 0 ? `~${daysPerMurder}d` : '—'} label="Days Between Murders" sublabel="at current pace" />
+        </>
+      ) : (
+        <>
+          <GradientStatCard variant="crimson" value={currentMurderRate} label="Final Rate" sublabel="per 100k population" />
+          <GradientStatCard variant="slate"   value={String(murderCount)} label="Total Murders" sublabel={`${selectedYear} full year`} />
+          <GradientStatCard variant="slate"   value={yoyCardValue} label={`vs ${selectedYear - 1}`} sublabel="full year comparison" />
+          <GradientStatCard variant="amber"   value={murderCount > 0 ? `~${(murderCount / 365).toFixed(1)}` : '0'} label="Daily Average" sublabel="murders per day" />
+        </>
+      )}
+    </div>
+  </div>
+
+  <!-- ── Year Selector ───────────────────────────────────────────────────────── -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 mt-6">
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="text-xs text-slate-500 dark:text-[var(--ch-text-faint)]">Year:</span>
+      {availableYears.map(year => (
+        <a
+          href={year === currentYear ? '/trinidad/murder-count/' : `/trinidad/murder-count/?year=${year}`}
+          class={`px-3 py-1.5 rounded-full text-xs font-medium transition ${
+            year === selectedYear
+              ? 'bg-rose-600 text-white'
+              : 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_60%)] hover:bg-slate-200 dark:hover:bg-[hsl(0_0%_20%)]'
+          }`}
+        >
+          {year}
+        </a>
+      ))}
     </div>
   </div>
 
@@ -198,56 +262,38 @@ const faqData = {
       <main class="min-w-0 space-y-8">
 
         <!-- YoY comparison -->
-        <div class="bg-slate-50 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-4">
-          <div class="flex items-center gap-1">
-            <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_70%)]">
-              Same period in {previousYear}: <span class="font-bold text-slate-800 dark:text-[var(--ch-text-heading)]">{murderCount2025SamePeriod}</span> murders
-            </p>
-            <InfoPopup id="murder-comparison-info">
-              <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">How We Compare Years</p>
-              <p class="mb-3">To make a fair comparison, we only look at the same time window in both years. For example, if today is February 10, we compare January 1–February 10 of {currentYear} against January 1–February 10 of {previousYear}.</p>
-              <p>The percentage below shows whether murders are trending higher or lower than the same point last year. A green arrow means fewer murders so far this year.</p>
-            </InfoPopup>
+        {hasPreviousYear && (
+          <div class="bg-slate-50 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-4">
+            <div class="flex items-center gap-1">
+              <p class="text-sm text-slate-600 dark:text-[hsl(0_0%_70%)]">
+                {isCurrentYear ? `Same period in ${selectedYear - 1}:` : `${selectedYear - 1} full year:`}
+                {' '}<span class="font-bold text-slate-800 dark:text-[var(--ch-text-heading)]">{samePeriodPreviousMurders}</span> murders
+              </p>
+              {isCurrentYear && (
+                <InfoPopup id="murder-comparison-info">
+                  <p class="font-bold mb-2 text-slate-700 dark:text-[var(--ch-text-heading)]">How We Compare Years</p>
+                  <p class="mb-3">To make a fair comparison, we only look at the same time window in both years. For example, if today is February 10, we compare January 1–February 10 of {selectedYear} against January 1–February 10 of {selectedYear - 1}.</p>
+                  <p>A green arrow means fewer murders so far this year.</p>
+                </InfoPopup>
+              )}
+            </div>
+            {yoyDirection !== 'same' && (
+              <p class={`text-xs mt-2 ${yoyDirection === 'down' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                {yoyDirection === 'down' ? '↓' : '↑'} {Math.abs(yoyChange).toFixed(0)}% vs {selectedYear - 1}
+              </p>
+            )}
           </div>
-          {yoyDirection !== 'same' && (
-            <p class={`text-xs mt-2 ${yoyDirection === 'down' ? 'text-emerald-600' : 'text-rose-600'}`}>
-              {yoyDirection === 'down' ? '↓' : '↑'} {Math.abs(yoyChange).toFixed(0)}% vs {previousYear}
-            </p>
-          )}
-        </div>
+        )}
 
         <!-- Monthly breakdown -->
-        <div class="bg-white dark:bg-[var(--ch-surface)] rounded-xl border border-slate-200 dark:border-[var(--ch-border-card)] p-5">
-          <h2 class="text-sm font-bold text-slate-700 dark:text-[var(--ch-text-heading)] mb-5">
-            Murders by Month — {currentYear}
-          </h2>
-
-          <!-- Bar chart -->
-          <div class="grid grid-cols-12 gap-1.5 items-end" style="height:64px;">
-            {murdersByMonth.map((count, i) => (
-              <div
-                class={`rounded-sm ${i > currentMonthIdx ? 'bg-slate-200 dark:bg-[hsl(0_0%_18%)]' : i === currentMonthIdx ? 'bg-rose-500' : 'bg-slate-400 dark:bg-slate-500'}`}
-                style={`height:${i > currentMonthIdx ? 3 : count === 0 ? 3 : Math.max(6, Math.round((count / maxMonthlyMurders) * 60))}px`}
-              ></div>
-            ))}
-          </div>
-
-          <!-- Labels + counts -->
-          <div class="grid grid-cols-12 gap-1.5 mt-2">
-            {murdersByMonth.map((count, i) => (
-              <div class="text-center">
-                <div class="text-[8px] leading-none text-slate-400 dark:text-[hsl(0_0%_40%)]">{monthNames[i]}</div>
-                <div class={`text-[9px] font-bold leading-none mt-0.5 ${i > currentMonthIdx ? 'text-slate-300 dark:text-[hsl(0_0%_28%)]' : i === currentMonthIdx ? 'text-rose-500' : 'text-slate-500 dark:text-[hsl(0_0%_50%)]'}`}>
-                  {i > currentMonthIdx ? '' : String(count)}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-4">
-            Based on {daysPassed} days of data · annualized rate assumes current pace through year end · population estimate {(POPULATION / 1_000_000).toFixed(1)}M
-          </p>
-        </div>
+        <MonthlyBreakdownChart
+          values={murdersByMonth}
+          currentMonthIdx={chartMonthIdx}
+          label={`Murders by Month — ${selectedYear}`}
+          footnote={isCurrentYear
+            ? `Based on ${daysPassed} days of data · annualized rate assumes current pace through year end · population estimate ${(POPULATION / 1_000_000).toFixed(1)}M`
+            : `Full year · ${murderCount} total murders · population estimate ${(POPULATION / 1_000_000).toFixed(1)}M`}
+        />
 
         <!-- Action buttons -->
         <div class="flex flex-col sm:flex-row gap-3">
@@ -256,7 +302,7 @@ const faqData = {
             View Dashboard
           </a>
           <a href={routes.trinidad.statistics}
-            class="px-6 py-3 min-h-[44px] flex items-center justify-center border border-slate-300 dark:border-[var(--ch-border)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_15%)] transition font-medium text-sm">
+            class="px-6 py-3 min-h-[44px] flex items-center justify-center border border-slate-300 dark:border-[var(--ch-border)] text-slate-600 dark:text-[hsl(0_0%_70%)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-sm">
             All Crime Statistics
           </a>
         </div>
@@ -329,7 +375,7 @@ const faqData = {
             <div class="px-3 pb-3 pt-1">
               <a href={routes.trinidad.murders}
                 class="block text-center text-xs font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 py-1.5">
-                View all {currentYear} murders &rarr;
+                View all {selectedYear} murders &rarr;
               </a>
             </div>
           </div>
@@ -347,7 +393,7 @@ const faqData = {
   <script type="application/ld+json" set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": `Trinidad & Tobago Murder Rate & Count ${currentYear}`,
+    "name": `Trinidad & Tobago Murder Rate & Count ${selectedYear}`,
     "description": description,
     "url": pageUrl,
     "breadcrumb": {
@@ -360,16 +406,15 @@ const faqData = {
     },
     "mainEntity": {
       "@type": "Dataset",
-      "name": `Trinidad & Tobago Murder Statistics ${currentYear}`,
-      "description": "Live murder count and murder rate per 100,000 population for Trinidad & Tobago",
+      "name": `Trinidad & Tobago Murder Statistics ${selectedYear}`,
+      "description": `Live murder count and murder rate per 100,000 population for Trinidad & Tobago — ${selectedYear}`,
       "variableMeasured": [
         { "@type": "PropertyValue", "name": "Murder Count", "value": murderCount, "unitText": "murders" },
         { "@type": "PropertyValue", "name": "Murder Rate", "value": currentMurderRate, "unitText": "per 100,000 population" },
         { "@type": "PropertyValue", "name": "Projected Annual Murder Rate", "value": projectedMurderRate, "unitText": "per 100,000 population" },
-        { "@type": "PropertyValue", "name": "Projected Annual Murder Count", "value": projectedAnnualMurders, "unitText": "murders" },
-        { "@type": "PropertyValue", "name": `${previousYear} Final Murder Count`, "value": murderCount2025Full, "unitText": "murders" }
+        { "@type": "PropertyValue", "name": "Projected Annual Murder Count", "value": projectedAnnualMurders, "unitText": "murders" }
       ],
-      "temporalCoverage": currentYear.toString(),
+      "temporalCoverage": selectedYear.toString(),
       "spatialCoverage": { "@type": "Place", "name": "Trinidad and Tobago" },
       "creator": { "@type": "Organization", "name": "Crime Hotspots", "url": "https://crimehotspots.com" },
       "license": "https://creativecommons.org/licenses/by/4.0/",
@@ -440,7 +485,6 @@ const faqData = {
   :global(.hero-counter-wrap .flip-counter[data-digits="4"] .flip-digit-bottom) {
     line-height: 0;
   }
-
   @media (max-width: 480px) {
     :global(.hero-counter-wrap .flip-counter[data-digits="3"] .flip-digit),
     :global(.hero-counter-wrap .flip-counter[data-digits="4"] .flip-digit) {
@@ -459,7 +503,6 @@ const faqData = {
       line-height: 0;
     }
   }
-
   @media (min-width: 768px) {
     :global(.hero-counter-wrap .flip-counter[data-digits="3"] .flip-digit),
     :global(.hero-counter-wrap .flip-counter[data-digits="4"] .flip-digit) {

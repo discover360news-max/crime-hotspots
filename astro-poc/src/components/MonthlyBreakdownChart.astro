@@ -1,0 +1,85 @@
+---
+/**
+ * MonthlyBreakdownChart — generic 12-bar monthly chart
+ *
+ * Props:
+ *   values         — 12 numbers, one per month (Jan=0 … Dec=11)
+ *   currentMonthIdx — 0-indexed month boundary:
+ *                     • current year  → now.getMonth()  (future months grayed out)
+ *                     • closed year   → 12             (all months shown as past)
+ *   label          — optional heading above chart
+ *   footnote       — optional caption below chart
+ *   accentColor    — bar color for the current month (default: 'rose')
+ */
+
+interface Props {
+  values: number[];
+  currentMonthIdx: number;
+  label?: string;
+  footnote?: string;
+  accentColor?: 'rose' | 'amber' | 'slate';
+}
+
+const { values, currentMonthIdx, label, footnote, accentColor = 'rose' } = Astro.props;
+
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const maxValue = Math.max(...values.filter(v => v > 0), 1);
+
+// Static class strings — must be literal for Tailwind to include them
+const accentBar  = accentColor === 'amber' ? 'bg-amber-500'
+                 : accentColor === 'slate' ? 'bg-slate-600 dark:bg-slate-400'
+                 : 'bg-rose-500';
+const accentText = accentColor === 'amber' ? 'text-amber-500'
+                 : accentColor === 'slate' ? 'text-slate-600 dark:text-slate-400'
+                 : 'text-rose-500';
+---
+
+<div class="bg-white dark:bg-[var(--ch-surface)] rounded-xl border border-slate-200 dark:border-[var(--ch-border-card)] p-5">
+  {label && (
+    <h2 class="text-sm font-bold text-slate-700 dark:text-[var(--ch-text-heading)] mb-5">{label}</h2>
+  )}
+
+  <!-- Bar chart -->
+  <div class="grid grid-cols-12 gap-1.5 items-end" style="height:64px;">
+    {values.map((count, i) => (
+      <div
+        class={`rounded-sm ${
+          i > currentMonthIdx
+            ? 'bg-slate-200 dark:bg-[hsl(0_0%_18%)]'
+            : i === currentMonthIdx
+            ? accentBar
+            : 'bg-slate-400 dark:bg-slate-500'
+        }`}
+        style={`height:${
+          i > currentMonthIdx ? 3
+          : count === 0 ? 3
+          : Math.max(6, Math.round((count / maxValue) * 60))
+        }px`}
+      ></div>
+    ))}
+  </div>
+
+  <!-- Month labels + counts -->
+  <div class="grid grid-cols-12 gap-1.5 mt-2">
+    {values.map((count, i) => (
+      <div class="text-center">
+        <div class="text-[8px] leading-none text-slate-400 dark:text-[hsl(0_0%_40%)]">
+          {monthNames[i]}
+        </div>
+        <div class={`text-[9px] font-bold leading-none mt-0.5 ${
+          i > currentMonthIdx
+            ? 'text-slate-300 dark:text-[hsl(0_0%_28%)]'
+            : i === currentMonthIdx
+            ? accentText
+            : 'text-slate-500 dark:text-[hsl(0_0%_50%)]'
+        }`}>
+          {i > currentMonthIdx ? '' : String(count)}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  {footnote && (
+    <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-4">{footnote}</p>
+  )}
+</div>
