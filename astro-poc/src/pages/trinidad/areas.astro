@@ -121,7 +121,7 @@ const sortedRegions = Array.from(regionGroups.entries())
   }));
 
 const totalAreas = areaStats.length;
-const areasWithCrime = areaStats.filter(a => a.totalCrimes > 0).length;
+const areasWithCrime = areaStats.filter(a => a.crimeCount90d > 0).length;
 
 // Vitals for stat cards
 const totalCrimes90d = areaStats.reduce((sum, a) => sum + a.crimeCount90d, 0);
