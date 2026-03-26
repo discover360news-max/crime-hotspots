@@ -1,15 +1,13 @@
 ---
 /**
  * Help Centre Index
- * Search bar + section cards + links to FAQ, Methodology, Contact
+ * JNews dark hero + search + section cards
  */
 
 export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
-import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import Hero from '../../components/Hero.astro';
-import SocialProofStrip from '../../components/SocialProofStrip.astro';
+import HeroBg from '../../components/HeroBg.astro';
 import { getCollection } from 'astro:content';
 import { routes } from '../../config/routes';
 
@@ -29,9 +27,11 @@ for (const s of SECTIONS) {
   sectionMap.set(s, allArticles.filter(a => a.data.section === s));
 }
 
+const populatedSections = SECTIONS.filter(s => (sectionMap.get(s) ?? []).length > 0);
+
 // Serialise for client-side search
 const helpIndex = allArticles.map(a => ({
-  slug: a.id,
+  id: a.id,
   title: a.data.title,
   section: a.data.section,
   summary: a.data.summary,
@@ -53,26 +53,59 @@ const collectionPageSchema = {
 
 <Layout title={title} description={description}>
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(collectionPageSchema)} />
-  <Hero
-    compact
-    narrowContainer={true}
-    title="Help Centre"
-    subtitle="How can we help?"
-  >
-    <Breadcrumbs items={[
-      { label: 'Home', href: '/' },
-      { label: 'Help Centre' }
-    ]} slot="before" />
-  </Hero>
 
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 pb-6">
-    <SocialProofStrip variant="strip" />
-  </div>
+  <!-- ═══════════════════════════════════════════════════════════════
+       HERO — dark gradient, full viewport width
+       ═══════════════════════════════════════════════════════════════ -->
+  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800">
+    <HeroBg />
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
 
+      <!-- Breadcrumb -->
+      <nav aria-label="Breadcrumb" class="mb-4">
+        <ol class="flex items-center gap-1.5 text-xs text-slate-500">
+          <li><a href="/" class="hover:text-slate-300 transition">Home</a></li>
+          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+          <li class="text-slate-400">Help Centre</li>
+        </ol>
+      </nav>
+
+      <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight mb-2">Help Centre</h1>
+      <p class="text-slate-400 text-sm mb-5">Browse articles by topic or search for an answer.</p>
+
+      <!-- Article count pulse -->
+      <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+        <span class="relative flex h-2 w-2 mt-1 shrink-0">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+        </span>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          <strong class="text-white">{allArticles.length} articles</strong> across <strong class="text-white">{populatedSections.length} sections</strong>.
+          Can't find what you need? <a href={routes.contact} class="text-rose-400 hover:text-rose-300 transition">Contact us.</a>
+        </p>
+      </div>
+
+      <!-- CTAs -->
+      <div class="flex gap-3 flex-wrap">
+        <a href={routes.faq} class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 active:bg-rose-700 transition font-medium text-xs">
+          FAQ
+        </a>
+        <a href={routes.contact} class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white active:bg-white/5 transition font-medium text-xs">
+          Contact Us
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       CONTENT ZONE
+       ═══════════════════════════════════════════════════════════════ -->
   <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6">
 
-    <!-- Search bar -->
-    <div class="relative mb-10 max-w-2xl mx-auto">
+    <!-- Search -->
+    <p class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)] px-1 mb-3">Search articles</p>
+    <div class="relative mb-8">
       <label for="help-search" class="sr-only">Search help articles</label>
       <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
         <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -84,28 +117,35 @@ const collectionPageSchema = {
         type="search"
         placeholder="Search help articles..."
         autocomplete="off"
-        class="w-full pl-12 pr-4 py-3.5 rounded-xl border border-slate-200 dark:border-[var(--ch-border-card)] bg-white dark:bg-[var(--ch-surface)] text-slate-700 dark:text-[var(--ch-text)] text-body placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-400 dark:focus:ring-rose-600 shadow-sm"
+        class="w-full pl-12 pr-4 py-3.5 rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] bg-white dark:bg-[var(--ch-surface)] text-slate-700 dark:text-[var(--ch-text)] text-body placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-rose-400 dark:focus:ring-rose-600 shadow-sm"
         aria-label="Search help articles"
       />
     </div>
 
     <!-- Search results (hidden until user types) -->
-    <div id="help-results" hidden class="mb-10 max-w-2xl mx-auto">
-      <p id="help-results-count" class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] mb-3"></p>
+    <div id="help-results" hidden class="mb-10">
+      <p id="help-results-count" class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)] px-1 mb-3"></p>
       <ul id="help-results-list" class="space-y-3"></ul>
     </div>
 
-    <!-- Section cards grid -->
+    <!-- Section cards -->
     <div id="help-sections">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-12">
+      <p class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)] px-1 mb-3">Browse by topic</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
         {SECTIONS.map(section => {
           const articles = sectionMap.get(section) ?? [];
           if (articles.length === 0) return null;
+          const sectionId = section.toLowerCase().replace(/\s+/g, '-');
           return (
-            <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-xl border border-slate-100 dark:border-[var(--ch-border-card)] p-5 shadow-sm flex flex-col">
+            <div
+              id={sectionId}
+              class="bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition flex flex-col"
+            >
               <div class="mb-3">
-                <h2 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text-strong)]">{section}</h2>
-                <p class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] mt-0.5">{articles.length} article{articles.length !== 1 ? 's' : ''}</p>
+                <h2 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text-heading)]">{section}</h2>
+                <p class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] mt-0.5">
+                  {articles.length} article{articles.length !== 1 ? 's' : ''}
+                </p>
               </div>
               <ul class="space-y-1.5 flex-1">
                 {articles.slice(0, 3).map(article => (
@@ -133,17 +173,17 @@ const collectionPageSchema = {
 
       <!-- Footer CTA cards -->
       <div class="border-t border-slate-200 dark:border-[var(--ch-border)] pt-8">
-        <h3 class="text-body font-bold text-slate-700 dark:text-[var(--ch-text)] mb-4">More resources</h3>
+        <p class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)] px-1 mb-4">More resources</p>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <a href={routes.faq} class="block bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-xl border border-slate-100 dark:border-[var(--ch-border-card)] p-4 hover:border-rose-300 dark:hover:border-rose-800 transition group">
+          <a href={routes.faq} class="block bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group">
             <p class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-strong)] group-hover:text-rose-600 dark:group-hover:text-rose-400">FAQ</p>
             <p class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] mt-1">Quick answers to common questions</p>
           </a>
-          <a href={routes.methodology} class="block bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-xl border border-slate-100 dark:border-[var(--ch-border-card)] p-4 hover:border-rose-300 dark:hover:border-rose-800 transition group">
+          <a href={routes.methodology} class="block bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group">
             <p class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-strong)] group-hover:text-rose-600 dark:group-hover:text-rose-400">Methodology</p>
             <p class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] mt-1">How we collect and process data</p>
           </a>
-          <a href={routes.contact} class="block bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-xl border border-slate-100 dark:border-[var(--ch-border-card)] p-4 hover:border-rose-300 dark:hover:border-rose-800 transition group">
+          <a href={routes.contact} class="block bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group">
             <p class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-strong)] group-hover:text-rose-600 dark:group-hover:text-rose-400">Contact Us</p>
             <p class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)] mt-1">Get in touch with our team</p>
           </a>
@@ -164,7 +204,7 @@ const collectionPageSchema = {
 
     if (!input || !results || !resultsList || !resultsCount || !sections) return;
 
-    function renderResults(matches, q) {
+    function renderResults(matches) {
       resultsList.innerHTML = '';
       resultsCount.textContent = matches.length === 0
         ? 'No articles found'
@@ -172,12 +212,12 @@ const collectionPageSchema = {
 
       for (const article of matches) {
         const li = document.createElement('li');
-        li.className = 'bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] rounded-xl border border-slate-100 dark:border-[hsl(0_0%_18%)] p-4';
+        li.className = 'bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition';
         li.innerHTML = `
-          <a href="/help/${article.id}/" class="block">
+          <a href="/help/${escapeHtml(article.id)}/" class="block">
             <p class="text-body font-bold text-rose-600 dark:text-rose-400 hover:underline leading-snug">${escapeHtml(article.title)}</p>
-            <p class="text-caption text-slate-400 dark:text-[hsl(0_0%_50%)] mt-1">${escapeHtml(article.section)}</p>
-            <p class="text-caption text-slate-600 dark:text-[hsl(0_0%_60%)] mt-1.5 leading-relaxed">${escapeHtml(article.summary)}</p>
+            <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)] mt-1">${escapeHtml(article.section)}</p>
+            <p class="text-caption text-slate-600 dark:text-[var(--ch-text-muted)] mt-1.5 leading-relaxed">${escapeHtml(article.summary)}</p>
           </a>
         `;
         resultsList.appendChild(li);
@@ -200,7 +240,7 @@ const collectionPageSchema = {
         a.summary.toLowerCase().includes(q) ||
         a.section.toLowerCase().includes(q)
       );
-      renderResults(matches, q);
+      renderResults(matches);
       results.hidden = false;
       sections.hidden = true;
     });
