@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import footerBgImg from '../assets/images/footer-bg.webp';
 import Header from '../components/Header.astro';
 import NewsletterSignup from '../components/NewsletterSignup.astro';
 import BottomNav from '../components/BottomNav.astro';
@@ -394,8 +396,19 @@ const detectedCountryId = Object.entries(countryPathMap).find(
   </main>
 
   <!-- Footer -->
-  <footer class="bg-white/85 dark:bg-[hsl(0_0%_6%)] mt-16" data-pagefind-ignore>
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+  <footer class="relative overflow-hidden bg-white/85 dark:bg-[hsl(0_0%_6%)] mt-16" data-pagefind-ignore>
+    <Image
+      src={footerBgImg}
+      alt=""
+      aria-hidden="true"
+      class="absolute inset-0 w-full h-full object-cover object-top mix-blend-screen opacity-25 pointer-events-none select-none hidden dark:block"
+      loading="lazy"
+      width={1200}
+      height={300}
+      format="webp"
+      quality={70}
+    />
+    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-8">
       <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[var(--ch-border)] to-transparent mb-8"></div>
       <!-- Navigation Columns -->
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
