@@ -8,6 +8,9 @@ import Layout from '../layouts/Layout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import SocialProofStrip from '../components/SocialProofStrip.astro';
 import { routes } from '../config/routes';
+import socialProof from '../data/social-proof.json';
+
+const kofiPct = Math.min(100, Math.round((socialProof.kofi_supporters / socialProof.kofi_goal) * 100));
 
 const title = "Support Crime Hotspots — Keep Caribbean Crime Data Free";
 const description = "Crime Hotspots is free, ad-free, and independent. Support the project on Ko-fi to help keep it running for communities across the Caribbean.";
@@ -40,6 +43,18 @@ const description = "Crime Hotspots is free, ad-free, and independent. Support t
         Support on Ko-fi
       </a>
       <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)]">One-time or monthly — any amount helps.</p>
+    </div>
+
+    <!-- Goal tracker -->
+    <div class="w-full max-w-md mx-auto mb-10">
+      <div class="flex items-center justify-between text-xs mb-2">
+        <span class="font-semibold uppercase tracking-wide text-slate-400 dark:text-[var(--ch-text-faint)]">Community Goal</span>
+        <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_82%)]">{socialProof.kofi_goal} Ko-fi supporters</span>
+      </div>
+      <div class="h-2 w-full rounded-full bg-slate-200 dark:bg-[hsl(0_0%_18%)] overflow-hidden">
+        <div class="h-full rounded-full bg-rose-500 dark:bg-rose-600 transition-all" style={`width: ${kofiPct}%`}></div>
+      </div>
+      <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-2 text-center">Help us reach {socialProof.kofi_goal} supporters to keep this platform free.</p>
     </div>
 
     <!-- What support covers -->

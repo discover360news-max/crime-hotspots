@@ -18,6 +18,7 @@ import { getCollection } from 'astro:content';
 import { routes, buildRoute } from '../../config/routes';
 import InfoPopup from '../../components/InfoPopup.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import socialProof from '../../data/social-proof.json';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
@@ -303,6 +304,21 @@ const faqData = {
             ? `Based on ${daysPassed} days of data · annualized rate assumes current pace through year end · population estimate ${(POPULATION / 1_000_000).toFixed(1)}M`
             : `Full year · ${murderCount} total murders · population estimate ${(POPULATION / 1_000_000).toFixed(1)}M`}
         />
+
+        <!-- Ko-fi CTA -->
+        <div class="rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] bg-slate-50 dark:bg-[hsl(0_0%_9%)] px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-3">
+          <p class="text-sm text-slate-600 dark:text-[var(--ch-text-muted)] flex-1 min-w-0">
+            Keeping this data ad-free for <strong class="text-slate-800 dark:text-[var(--ch-text-heading)]">{socialProof.monthly_readers_display}</strong> readers depends on community support.
+          </p>
+          <a
+            href="https://ko-fi.com/crimehotspots"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="shrink-0 inline-flex items-center justify-center px-4 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-lg transition"
+          >
+            Support on Ko-fi
+          </a>
+        </div>
 
         <!-- Action buttons -->
         <div class="flex flex-col sm:flex-row gap-3">
