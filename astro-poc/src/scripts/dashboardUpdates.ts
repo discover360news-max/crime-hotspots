@@ -11,6 +11,7 @@ import { generateNameSlug } from '../lib/csvParser';
 import { getRiskWeight } from '../config/riskWeights';
 import { usesVictimCount } from '../config/crimeTypeConfig';
 import { buildRoute } from '../config/routes';
+import { escapeHtml } from '../lib/escapeHtml';
 
 /**
  * Calculate risk score for a single crime
@@ -358,7 +359,7 @@ export function updateTopRegions(crimes: Crime[]) {
     return `
     <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[var(--ch-border-card)] hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_14%)] rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
-        <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] truncate flex-1">${region}</span>
+        <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] truncate flex-1">${escapeHtml(region)}</span>
         <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-400 dark:text-[var(--ch-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
@@ -518,7 +519,7 @@ export function applyPrecomputedTopRegions(regions: TopRegionEntry[]): void {
     return `
     <a href="${buildRoute.region(regionSlug)}" class="${mobileHidden} flex flex-col gap-1 pb-3 border-b border-slate-200 dark:border-[var(--ch-border-card)] hover:bg-slate-100 dark:hover:bg-[hsl(0_0%_14%)] active:bg-slate-100 dark:active:bg-[hsl(0_0%_14%)] rounded-lg px-2 -mx-2 py-2 transition">
       <div class="flex justify-between items-center gap-2">
-        <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] truncate flex-1">${region}</span>
+        <span class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] truncate flex-1">${escapeHtml(region)}</span>
         <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-400 dark:text-[var(--ch-text-faint)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>

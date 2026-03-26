@@ -40,3 +40,9 @@ This is double-encoding.
 ## Fix
 
 Removed all `escapeHtml()` calls from Astro template expressions and the now-unused import in `trinidad/headlines.astro`.
+
+## Recurrence — Mar 26 2026
+
+Same bug appeared on `src/pages/index.astro` homepage headline cards and hotspots widget. `escapeHtml()` had been added to `{crime.headline}`, `{crime.area}`, `{crime.primaryCrimeType}`, and `{area.area}`. All stripped, import removed.
+
+**Pattern to watch:** Any page that renders crime data fields inline is a candidate. Whenever adding crime field rendering, default to bare `{crime.field}` — never wrap in `escapeHtml()` unless using `set:html`.

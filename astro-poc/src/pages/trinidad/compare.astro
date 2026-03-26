@@ -216,6 +216,8 @@ const pageDescription = 'Compare crime statistics between any two areas in Trini
 </script>
 
 <script>
+  import { escapeHtml } from '../../lib/escapeHtml';
+
   document.addEventListener('DOMContentLoaded', () => {
   // Area links: keep in sync with src/config/routes.ts
   const { availableAreas, areaStatsMap } = (window as any).__compareData || {};
@@ -296,7 +298,7 @@ const pageDescription = 'Compare crime statistics between any two areas in Trini
       const clsA = countA < countB ? 'text-emerald-600' : countA > countB ? 'text-rose-600' : 'text-slate-600';
       const clsB = countB < countA ? 'text-emerald-600' : countB > countA ? 'text-rose-600' : 'text-slate-600';
       breakdownRows += `<tr class="hover:bg-slate-50">
-        <td class="px-4 py-2 text-slate-700">${type}</td>
+        <td class="px-4 py-2 text-slate-700">${escapeHtml(type)}</td>
         <td class="px-4 py-2 text-right font-medium ${clsA}">${countA}</td>
         <td class="px-4 py-2 text-right font-medium ${clsB}">${countB}</td>
       </tr>`;
@@ -311,8 +313,8 @@ const pageDescription = 'Compare crime statistics between any two areas in Trini
           <thead class="bg-slate-50 border-b border-slate-100">
             <tr>
               <th class="px-4 py-2 text-left text-xs font-bold text-slate-500">Type</th>
-              <th class="px-4 py-2 text-right text-xs font-bold text-slate-500">${areaA.name}</th>
-              <th class="px-4 py-2 text-right text-xs font-bold text-slate-500">${areaB.name}</th>
+              <th class="px-4 py-2 text-right text-xs font-bold text-slate-500">${escapeHtml(areaA.name)}</th>
+              <th class="px-4 py-2 text-right text-xs font-bold text-slate-500">${escapeHtml(areaB.name)}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">${breakdownRows}</tbody>
@@ -320,21 +322,21 @@ const pageDescription = 'Compare crime statistics between any two areas in Trini
       </div>` : '';
 
     const knownAsA = areaA.knownAs && areaA.knownAs !== areaA.name
-      ? `<p class="text-xs text-slate-400">Also known as: ${areaA.knownAs}</p>` : '';
+      ? `<p class="text-xs text-slate-400">Also known as: ${escapeHtml(areaA.knownAs)}</p>` : '';
     const knownAsB = areaB.knownAs && areaB.knownAs !== areaB.name
-      ? `<p class="text-xs text-slate-400">Also known as: ${areaB.knownAs}</p>` : '';
+      ? `<p class="text-xs text-slate-400">Also known as: ${escapeHtml(areaB.knownAs)}</p>` : '';
 
     resultsEl.innerHTML = `
       <div class="space-y-6">
         <div class="grid grid-cols-2 gap-4 text-center">
           <div class="bg-white rounded-lg border border-slate-200 p-4">
-            <a href="/trinidad/area/${slugA}/" class="text-base font-bold text-slate-800 hover:text-rose-600 transition">${areaA.name}</a>
-            <p class="text-xs text-slate-400 mt-1">${areaA.region} Region</p>
+            <a href="/trinidad/area/${escapeHtml(slugA)}/" class="text-base font-bold text-slate-800 hover:text-rose-600 transition">${escapeHtml(areaA.name)}</a>
+            <p class="text-xs text-slate-400 mt-1">${escapeHtml(areaA.region)} Region</p>
             ${knownAsA}
           </div>
           <div class="bg-white rounded-lg border border-slate-200 p-4">
-            <a href="/trinidad/area/${slugB}/" class="text-base font-bold text-slate-800 hover:text-rose-600 transition">${areaB.name}</a>
-            <p class="text-xs text-slate-400 mt-1">${areaB.region} Region</p>
+            <a href="/trinidad/area/${escapeHtml(slugB)}/" class="text-base font-bold text-slate-800 hover:text-rose-600 transition">${escapeHtml(areaB.name)}</a>
+            <p class="text-xs text-slate-400 mt-1">${escapeHtml(areaB.region)} Region</p>
             ${knownAsB}
           </div>
         </div>
@@ -357,8 +359,8 @@ const pageDescription = 'Compare crime statistics between any two areas in Trini
             <thead class="bg-slate-50 border-b border-slate-200">
               <tr>
                 <th class="px-4 py-3 text-left font-bold text-slate-700">Metric</th>
-                <th class="px-4 py-3 text-right font-bold text-slate-700">${areaA.name}</th>
-                <th class="px-4 py-3 text-right font-bold text-slate-700">${areaB.name}</th>
+                <th class="px-4 py-3 text-right font-bold text-slate-700">${escapeHtml(areaA.name)}</th>
+                <th class="px-4 py-3 text-right font-bold text-slate-700">${escapeHtml(areaB.name)}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">

@@ -3,7 +3,7 @@ id: F001
 type: feature
 status: active
 created: 2026-01-27
-updated: 2026-03-07
+updated: 2026-03-26
 related: [CFG001, CFG003]
 ---
 
@@ -31,8 +31,9 @@ Security grade A (Jan 27, 2026). Four-layer protection: XSS escaping via escapeH
 
 ## Known Accepted Risks
 - `unsafe-inline` / `unsafe-eval` in CSP — required by Leaflet.js, mitigated by escapeHtml()
-- Moderate `undici` CVE in transitive wrangler dependency — upstream unpatched, server-side only
+- 5 moderate npm CVEs in `@astrojs/language-server` chain (yaml/lodash/volar-service-yaml) — dev/IDE only, zero production exposure. Fix requires breaking downgrade of `@astrojs/check`. Leave as-is.
 
 ## Change Log
 - 2026-01-18: XSS fixes — escapeHtml utility + secured CrimeDetailModal + headlines
 - 2026-01-27: Security hardening audit — grade A-; CSP tightened, Secure cookie flag added
+- 2026-03-26: Full security sweep — 3 XSS gaps patched (SearchModal latest-crimes, compare.astro area/region/type data, dashboardUpdates.ts region names); removed error detail leak from /api/search 500 response; added HSTS header; npm audit fix (resolved rollup/fast-xml-parser/picomatch HIGH, lodash MODERATE)

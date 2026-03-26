@@ -34,6 +34,7 @@ B027 | BUG | active | 301 on slug-not-found SSR pages gets browser-cached perman
 B028 | BUG | active | `flex-1` without `min-w-0` overflows narrow containers — flex children default to `min-width:auto` and won't shrink below intrinsic width. Fixed in NewsletterSignup card variant (content div + email input). Always add `min-w-0` alongside `flex-1` when container width is constrained. → B028-flex-min-w-0-overflow.md
 B029 | BUG | fixed | `escapeHtml()` in Astro `{expr}` causes double-encoding — Astro auto-escapes text nodes, so `{escapeHtml(x)}` renders `&#39;` literally. Use `{x}` directly; `escapeHtml()` only for `set:html`/`innerHTML`. → B029-escaphtml-double-encoding-astro.md
 B030 | BUG | active | zsh glob expansion breaks `git add` on bracket filenames (`[slug].astro`) even when quoted. Fix: prefix with `noglob` → B030-zsh-noglob-bracket-filenames.md
+B031 | BUG | active | Bulk Astro import injection via script: MUST scope to frontmatter only (between `---` fences). dashboard.astro import landed in `<script>` block → blank page, no build error → B031-astro-frontmatter-import-injection.md
 
 ## Learnings & Patterns (L)
 L001 | LEARN | archived | ~~astro:page-load~~ — SPA removed Mar 15 2026. Use DOMContentLoaded. Do NOT re-introduce ClientRouter → L001-astro-page-load-pattern.md
@@ -51,6 +52,7 @@ L012 | LEARN | active | Dashboard script extraction (Mar 10 2026): 869→554 lin
 L013 | LEARN | active | Crime classification rules: 2 hard rules (Carjacking→Robbery, HomeInvasion→Burglary), Shooting vs AttemptedMurder intent standard, Robbery≠Theft, Gun Present≠Shooting (armed robbery at gunpoint = Robbery only, not Shooting). Encoded in schema.gs + crimeTypeProcessor.gs + claudePrompts.gs (both TT+JM). Doc: docs/guides/CRIME-CLASSIFICATION-RULES.md → L013-crime-classification-rules.md
 L014 | LEARN | active | CSS var token system: `--ch-*` vars in Layout.astro control all dark mode colours. Use `var(--ch-*)` in Tailwind, never raw HSL. One edit = site-wide change. → L014-css-var-token-system.md
 L015 | LEARN | active | SEO on-page patterns: H1 must be single element with full keyword phrase, FAQPage JSON-LD targets People Also Ask, dateModified on Dataset = freshness signal, yearless queries are content gap not optimisation problem → L015-seo-on-page-patterns.md
+L016 | LEARN | active | Dark section texture overlay: `mix-blend-screen` makes image bg transparent, CSS `mask-image` radial gradient clears centre for text contrast. HeroBg.astro = 13 hero pages. Footer inline in Layout.astro (dark mode only) → L016-hero-texture-overlay-pattern.md
 
 ## Decisions (D)
 D001 | DEC | active | Crime pages: full SSR + Cloudflare CDN 24h cache (migrated from hybrid prerender) → D001-crime-page-ssr.md
@@ -101,4 +103,4 @@ SM001 | WORKFLOW | active | Weekly social image prompts for Gemini: 4 images (3 
 T001 | TOOL | archived | dedup-2025: one-time GAS script to de-duplicate Raw Articles sheet entries. `google-apps-script/tools/dedup-2025/dedup.gs` + `index.html`. Ran Mar 2026; kept for reference if de-dup needed again.
 
 ## Dependencies (DEP)
-DEP001 | DEP | active | Key deps: satori+sharp (OG images), astro-pagefind (search), @astrojs/rss → DEP001-key-dependencies.md
+DEP001 | DEP | active | Key deps: astro 6, @astrojs/cloudflare v13, @cloudflare/workers-types, satori+sharp (OG images), papaparse (needs nodejs_compat) → DEP001-key-dependencies.md
