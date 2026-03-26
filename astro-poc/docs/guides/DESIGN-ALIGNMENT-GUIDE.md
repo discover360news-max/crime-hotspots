@@ -314,6 +314,13 @@ Already has "rose gradient hero + sticky selector bar". Only minor tweak: swap t
 
 ---
 
+### `help/index.astro` + `help/[slug].astro` — DONE (Mar 26 2026)
+**Was:** `Hero.astro` (light gradient). **Now:** Full JNews dark hero.
+- Index: pulse shows article + section count, FAQ + Contact CTAs, section cards use solid JNews card style, muted section labels, section anchor IDs added for deep-linking from article breadcrumbs.
+- Slug: article title as `font-black` H1, section + date in hero subtitle, "All {section} articles" rose CTA. All cards (article, related, prev/next, sidebar) updated to solid JNews style. No vitals row (no data to surface).
+
+---
+
 ## UX Patterns and Tips
 
 ### Show the pulse before the filter
@@ -382,7 +389,9 @@ Every new element needs a dark mode pair. Rules:
 
 ## What NOT to Do
 
-**Don't replace Hero.astro on content pages.** Hero.astro is correct for About, Methodology, FAQ, Contact, Help articles, Safety Tips. Those pages are editorial/informational — the light gradient is right. Only data pages get the dark hero.
+**Don't replace Hero.astro on pure editorial pages.** Hero.astro is correct for About, Methodology, FAQ, Contact, Safety Tips — pages that are entirely text/copy with no navigable sections or user actions. Only data pages get the dark hero.
+
+**Exception — Help Centre (updated Mar 26 2026):** `help/index.astro` and `help/[slug].astro` use the full JNews dark hero. Although these are content pages, they have navigable section structure, search, CTAs, and sidebar navigation — enough interactive hierarchy to warrant the dark hero treatment for site cohesion.
 
 **Don't add a vitals row to every page.** If a page doesn't have 3-4 distinct headline numbers, don't force it. A region page with 1 area and 5 crimes doesn't need four gradient cards — it needs a clear statement of the data it has.
 
