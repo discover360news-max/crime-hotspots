@@ -250,13 +250,13 @@ const description = "Real-time crime statistics, murder counts, and safety data 
           <!-- This Week's Hotspots — anchored to bottom -->
           {hotAreas.length > 0 && (
             <div class="mt-auto pt-3">
+              <div class="flex items-center justify-between px-1 mb-3">
+                <h3 class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">This Week's Hotspots</h3>
+                <a href={routes.trinidad.areas} class="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium transition">
+                  All areas →
+                </a>
+              </div>
               <div class="bg-white/70 dark:bg-[var(--ch-surface)] rounded-xl border border-slate-100 dark:border-[var(--ch-border-subtle)] overflow-hidden">
-                <div class="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 dark:border-[var(--ch-border-subtle)]">
-                  <h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-[var(--ch-text-muted)]">This Week's Hotspots</h3>
-                  <a href={routes.trinidad.areas} class="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium transition">
-                    All areas →
-                  </a>
-                </div>
                 <div>
                   {hotAreas.map(area => {
                     const murders = murdersByArea.get(area.area) || 0;
