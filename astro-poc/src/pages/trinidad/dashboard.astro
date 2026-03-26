@@ -25,6 +25,7 @@ import { dataUpdateNotice } from '../../config/siteNotifications';
 import { getCountryName } from '../../data/countries';
 import { routes, buildRoute } from '../../config/routes';
 import '../../styles/dashboard.css';
+import HeroBg from '../../components/HeroBg.astro';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
@@ -674,7 +675,6 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
   <script>
     import { initializeStatsScroll } from '../../scripts/statsScroll';
-import HeroBg from '../../components/HeroBg.astro';
     document.addEventListener('DOMContentLoaded', () => { initializeStatsScroll(); });
   </script>
 
