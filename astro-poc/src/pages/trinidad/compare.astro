@@ -19,6 +19,7 @@ Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
 import { env } from 'cloudflare:workers';
+import HeroBg from '../../components/HeroBg.astro';
 const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
@@ -81,7 +82,8 @@ const pageDescription = 'Compare crime statistics between any two areas in Trini
 
 <Layout title={pageTitle} description={pageDescription}>
   <!-- Dark Hero -->
-  <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800" data-pagefind-ignore>
+  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800" data-pagefind-ignore>
+    <HeroBg />
     <div class="mx-auto max-w-5xl px-4 sm:px-6 py-8 sm:py-10">
       <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
         <div>

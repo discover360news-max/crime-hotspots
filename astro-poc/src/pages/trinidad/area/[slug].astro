@@ -50,6 +50,7 @@ const areaRegionMPs = mpsData.filter(mp => mp.regionSlugs.includes(regionSlug));
 
 // Fetch crimes — D1 at runtime, CSV fallback for local dev
 import { env } from 'cloudflare:workers';
+import HeroBg from '../../../components/HeroBg.astro';
 const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
@@ -223,7 +224,8 @@ const lastUpdated = new Date().toLocaleDateString('en-US', { month: 'long', day:
   <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
 
   <!-- Dark Hero -->
-  <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
+  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800">
+    <HeroBg />
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
         <div>

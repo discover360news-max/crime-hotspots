@@ -1,0 +1,19 @@
+---
+/**
+ * HeroBg — signal-dot texture overlay for dark hero sections.
+ * Drop as first child inside any `relative overflow-hidden` dark hero <section>.
+ */
+import { Image } from 'astro:assets';
+import heroBgImg from '../assets/images/hero-bg.webp';
+---
+<Image
+  src={heroBgImg}
+  alt=""
+  aria-hidden="true"
+  class="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-30 pointer-events-none select-none"
+  loading="eager"
+  width={1200}
+  height={400}
+  format="webp"
+  quality={80}
+/>

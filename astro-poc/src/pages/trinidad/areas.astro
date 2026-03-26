@@ -21,6 +21,7 @@ Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
 import { env } from 'cloudflare:workers';
+import HeroBg from '../../components/HeroBg.astro';
 const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 const areaData = await loadFullAreaData();
@@ -155,7 +156,8 @@ const pageDescription = `Crime statistics for ${totalAreas} areas across Trinida
 <Layout title={pageTitle} description={pageDescription}>
 
   <!-- Dark Hero -->
-  <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
+  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800">
+    <HeroBg />
     <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-16 sm:pb-20">
       <nav aria-label="Breadcrumb" class="mb-4">
         <ol class="flex items-center gap-1.5 text-xs text-slate-500">

@@ -6,6 +6,7 @@ import Layout from '../../../layouts/Layout.astro';
 import TipCard from '../../../components/TipCard.astro';
 import SocialProofStrip from '../../../components/SocialProofStrip.astro';
 import { routes } from '../../../config/routes';
+import HeroBg from '../../../components/HeroBg.astro';
 
 const allTips = await getCollection('tips', ({ data }) => data.status === 'published');
 
@@ -37,7 +38,8 @@ const categoryCount = sortedCategories.length;
 >
 
   <!-- Dark Hero -->
-  <section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
+  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800">
+    <HeroBg />
     <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
       <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
         <div>

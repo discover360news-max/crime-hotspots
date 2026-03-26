@@ -8,13 +8,13 @@
 import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import QuickAnswers from '../components/QuickAnswers.astro';
+import HeroBg from '../components/HeroBg.astro';
 import SocialProofStrip from '../components/SocialProofStrip.astro';
 import { routes, buildRoute } from '../config/routes';
 import { getAllCrimesFromD1, getTrinidadCrimes } from '../lib/crimeData';
 import { getHotAreas } from '../lib/trendingHelpers';
 import { countCrimeType } from '../lib/dashboardHelpers';
 
-import heroBgImg from '../assets/images/hero-bg.webp';
 import trinidadImg from '../assets/images/trinidad.jpg';
 import trinidadDarkImg from '../assets/images/trinidad-card-trsp-bg.png';
 import jamaicaImg from '../assets/images/jamaica-card-trsp-bg.png';
@@ -71,18 +71,8 @@ const description = "Real-time crime statistics, murder counts, and safety data 
        DARK HERO
        ═══════════════════════════════════════════════════════════ -->
   <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800">
-    <Image
-      src={heroBgImg}
-      alt=""
-      aria-hidden="true"
-      class="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-30 pointer-events-none select-none"
-      loading="eager"
-      width={1200}
-      height={400}
-      format="webp"
-      quality={80}
-    />
-    <div class="relative max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+    <HeroBg />
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
       <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
 
         <!-- Left: headline + pulse + CTAs -->
