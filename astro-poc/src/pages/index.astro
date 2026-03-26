@@ -41,7 +41,8 @@ const murdersThisWeek = countCrimeType(thisWeekCrimes, 'Murder');
 const weekChange = lastWeekCrimes.length > 0
   ? Math.round(((thisWeekCrimes.length - lastWeekCrimes.length) / lastWeekCrimes.length) * 100)
   : 0;
-const topArea = getHotAreas(allCrimes, 1)[0];
+const hotAreas = getHotAreas(allCrimes, 3);
+const topArea = hotAreas[0];
 
 // Latest 3 crimes for headline cards
 const latestCrimes = allCrimes.slice(0, 3);
@@ -124,7 +125,7 @@ const description = "Real-time crime statistics, murder counts, and safety data 
       </div>
 
       <!-- Two-column: island card (left) + latest headlines (right) -->
-      <div class="grid lg:grid-cols-[1fr_1.6fr] gap-5 mb-8 items-start">
+      <div class="grid lg:grid-cols-[1fr_1.6fr] gap-5 mb-8">
 
         <!-- LEFT: Island identity card -->
         <a
@@ -202,37 +203,75 @@ const description = "Real-time crime statistics, murder counts, and safety data 
           </div>
         </a>
 
-        <!-- RIGHT: Latest headlines grid -->
-        <div>
-          <div class="flex items-center justify-between px-1 mb-3">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">Latest Headlines</h3>
-            <a href={routes.trinidad.headlines} class="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium transition">
-              View all →
-            </a>
+        <!-- RIGHT: Latest headlines + This Week's Hotspots -->
+        <div class="flex flex-col">
+
+          <!-- Headlines -->
+          <div>
+            <div class="flex items-center justify-between px-1 mb-3">
+              <h3 class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)]">Latest Headlines</h3>
+              <a href={routes.trinidad.headlines} class="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium transition">
+                View all →
+              </a>
+            </div>
+            <div class="flex flex-col gap-3">
+              {latestCrimes.map(crime => {
+                const pill = escapeHtml(crime.primaryCrimeType ?? crime.crimeType);
+                const date = new Intl.DateTimeFormat('en-TT', { month: 'short', day: 'numeric' }).format(crime.dateObj);
+                return (
+                  <a
+                    href={buildRoute.crime(crime.slug)}
+                    class="group block bg-white/70 dark:bg-[var(--ch-surface)] rounded-xl border border-slate-100 dark:border-[var(--ch-border-subtle)] p-4 hover:shadow-md hover:border-slate-200 dark:hover:border-[var(--ch-border-card)] transition-all"
+                  >
+                    <div class="flex items-center gap-2 mb-1.5">
+                      <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide text-rose-700 bg-rose-50 dark:bg-rose-950/40 dark:text-rose-400">
+                        {pill}
+                      </span>
+                      <span class="text-[10px] text-slate-400 dark:text-[var(--ch-text-faint)]">{escapeHtml(crime.area)}</span>
+                      <span class="text-[10px] text-slate-300 dark:text-[hsl(0_0%_30%)] ml-auto shrink-0">{date}</span>
+                    </div>
+                    <p class="text-sm font-medium text-slate-700 dark:text-[var(--ch-text)] line-clamp-2 leading-snug group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                      {escapeHtml(crime.headline)}
+                    </p>
+                  </a>
+                );
+              })}
+            </div>
           </div>
-          <div class="flex flex-col gap-3">
-            {latestCrimes.map(crime => {
-              const pill = escapeHtml(crime.primaryCrimeType ?? crime.crimeType);
-              const date = new Intl.DateTimeFormat('en-TT', { month: 'short', day: 'numeric' }).format(crime.dateObj);
-              return (
-                <a
-                  href={buildRoute.crime(crime.slug)}
-                  class="group block bg-white/70 dark:bg-[var(--ch-surface)] rounded-xl border border-slate-100 dark:border-[var(--ch-border-subtle)] p-4 hover:shadow-md hover:border-slate-200 dark:hover:border-[var(--ch-border-card)] transition-all"
-                >
-                  <div class="flex items-center gap-2 mb-1.5">
-                    <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide text-rose-700 bg-rose-50 dark:bg-rose-950/40 dark:text-rose-400">
-                      {pill}
-                    </span>
-                    <span class="text-[10px] text-slate-400 dark:text-[var(--ch-text-faint)]">{escapeHtml(crime.area)}</span>
-                    <span class="text-[10px] text-slate-300 dark:text-[hsl(0_0%_30%)] ml-auto shrink-0">{date}</span>
-                  </div>
-                  <p class="text-sm font-medium text-slate-700 dark:text-[var(--ch-text)] line-clamp-2 leading-snug group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
-                    {escapeHtml(crime.headline)}
-                  </p>
-                </a>
-              );
-            })}
-          </div>
+
+          <!-- This Week's Hotspots — anchored to bottom -->
+          {hotAreas.length > 0 && (
+            <div class="mt-auto pt-3">
+              <div class="bg-white/70 dark:bg-[var(--ch-surface)] rounded-xl border border-slate-100 dark:border-[var(--ch-border-subtle)] overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 dark:border-[var(--ch-border-subtle)]">
+                  <h3 class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-[var(--ch-text-muted)]">This Week's Hotspots</h3>
+                  <a href={routes.trinidad.areas} class="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium transition">
+                    All areas →
+                  </a>
+                </div>
+                <div>
+                  {hotAreas.map(area => (
+                    <a
+                      href={buildRoute.area(area.areaSlug)}
+                      class="group flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-[var(--ch-surface-sub)] transition-colors border-b border-slate-50 dark:border-[var(--ch-border-subtle)] last:border-0"
+                    >
+                      <span class="text-[10px] font-bold tabular-nums text-slate-300 dark:text-[hsl(0_0%_30%)] w-3 shrink-0">{area.rank}</span>
+                      <span class="text-sm font-medium text-slate-700 dark:text-[var(--ch-text)] flex-1 min-w-0 truncate group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                        {escapeHtml(area.area)}
+                      </span>
+                      <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 shrink-0">
+                        {area.count}
+                      </span>
+                      <svg class="w-3.5 h-3.5 text-slate-300 dark:text-[hsl(0_0%_30%)] shrink-0 group-hover:text-rose-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
 
       </div>
