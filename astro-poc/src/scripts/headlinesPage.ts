@@ -44,6 +44,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 0);
   }
 
+  function countCrimes(crimes: any[]): number {
+    return crimes.reduce((sum: number, crime: any) => {
+      let count = (crime.primaryCrimeType || crime.crimeType) ? 1 : 0;
+      if (crime.relatedCrimeTypes) {
+        const related = crime.relatedCrimeTypes.split(',').map((t: string) => t.trim()).filter((t: string) => t);
+        count += related.length;
+      }
+      return sum + count;
+    }, 0);
+  }
+
   // ── HTML generators ────────────────────────────────────────────────────────
 
   function createCrimeCardHTML(crime: any): string {
@@ -232,11 +243,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── Results count ──────────────────────────────────────────────────────────
   function updateResultsCount() {
-    const showing = Math.min(currentPage * perPage, filteredCrimes.length);
+    const rowsShowing = Math.min(currentPage * perPage, filteredCrimes.length);
+    const visibleCrimes = filteredCrimes.slice(0, rowsShowing);
     const showingEl = document.getElementById('resultsShowing');
     const totalEl = document.getElementById('resultsTotal');
-    if (showingEl) showingEl.textContent = String(showing);
-    if (totalEl) totalEl.textContent = String(filteredCrimes.length);
+    if (showingEl) showingEl.textContent = String(countCrimes(visibleCrimes));
+    if (totalEl) totalEl.textContent = String(countCrimes(filteredCrimes));
   }
 
   // ── Filter indicator ───────────────────────────────────────────────────────

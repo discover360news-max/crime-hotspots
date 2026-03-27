@@ -68,6 +68,7 @@ IDEA001 | IDEA | tabled | Criminal behavioural patterns page: public editorial (
 
 ## Features (F)
 F016 | FEAT | complete | SocialProofStrip: all 38 pages done. 3 variants (hero/sidebar/strip). Data: src/data/social-proof.json (update weekly). Live D1 incident count. Tracker: docs/guides/SOCIAL-PROOF-STRIP-IMPLEMENTATION.md → F016-social-proof-strip.md
+F017 | FEAT | active | Contextual Ko-fi CTAs + goal tracker: CTA box on TT murder-count (after MonthlyBreakdownChart) + TT statistics (after StatCards). Goal tracker on support page (bar, goal shown, count hidden). All numbers from social-proof.json (kofi_supporters, kofi_goal). Jamaica pending F013. → F017-kofi-cta-goal-tracker.md
 F010 | FEAT | active | MP profiles (T&T): 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg. Socials render as brand SVG icons. → F010-mp-profiles.md
 F012 | FEAT | active | MP profiles (Jamaica): 63 pages /jamaica/mp/[slug]/, index /jamaica/mp/, mps-jamaica.json. Same card layout as T&T. Photo min-h-[500px]. TikTok in socials. Photos in public/images/mps/jamaica/. Crime stats placeholder until D1 pipeline live. → site-features.md
 F014 | WORKFLOW | active | MP data update workflow: contact info, photos, parliament profiles, bulk updates, gotchas → docs/guides/MP-UPDATE-WORKFLOW.md

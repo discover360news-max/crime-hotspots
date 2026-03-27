@@ -4,12 +4,12 @@
   "monthly_readers_display": "4,000+",
   "monthly_readers_short": "4K+",
   "monthly_impressions": 11300,
-  "monthly_impressions_display": "11K+",
+  "monthly_impressions_display": "11.3K+",
   "monthly_impressions_short": "11K+",
   "areas_monitored": 135,
   "areas_monitored_display": "135",
   "areas_monitored_short": "135",
-  "incident_count_fallback": 2000,
+  "incident_count_fallback": 2700,
   "kofi_supporters": 38,
   "kofi_goal": 50
 }
