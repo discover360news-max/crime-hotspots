@@ -4,7 +4,7 @@ section: Safety Tips
 summary: Safety tips are community-contributed and editorially reviewed practical precautions organised by crime type and context. Browse by category, location, or situation.
 order: 1
 related: [submitting-a-safety-tip, finding-your-area, understanding-risk-scores]
-date_updated: 2026-03-01
+date_updated: 2026-03-27
 ---
 
 ## Using Safety Tips

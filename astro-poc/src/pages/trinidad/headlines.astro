@@ -14,6 +14,7 @@ import { getTotalCrimeCount } from '../../lib/statisticsHelpers';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { routes, buildRoute } from '../../config/routes';
 import SocialProofStrip from '../../components/SocialProofStrip.astro';
+import SocialFollow from '../../components/SocialFollow.astro';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
@@ -232,6 +233,11 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
             Load More
           </button>
         </div>
+
+        <!-- Social Follow -->
+        <div class="mt-6">
+          <SocialFollow variant="strip" />
+        </div>
       </div>
 
       <!-- ── Sidebar ─────────────────────────────────────────────────────── -->
@@ -282,6 +288,9 @@ const description = `Trinidad & Tobago crime headlines updated daily. Filter inc
             </a>
           </div>
         )}
+
+        <!-- Social Follow -->
+        <SocialFollow variant="sidebar" />
 
         <!-- Newsletter -->
         <NewsletterSignup variant="card" source="headlines-sidebar" />

@@ -53,11 +53,9 @@ Extract from each flagged row:
 
 **Rule: No duplicate tips.** If a new story is covered by an existing tip's tactic, attach the story to that tip — do not create a new file. One tip per tactic, no matter how many stories illustrate the same behaviour.
 
-Before creating anything, confirm no existing tip covers the same tactic.
+Before creating anything, open **`docs/guides/SAFETY-TIP-INDEX.md`** — the full registry of all tips, grouped by category with story cross-reference. Scan the relevant category section. Only open individual tip files if a title looks like a possible match and you need to confirm the prevention angle.
 
-```
-Glob pattern="*.md" path="astro-poc/src/content/tips/"
-```
+> Use the index as your first and primary overlap check. Only fall back to Glob/Grep if the index seems stale or you need to search by story ID across all files.
 
 Scan titles for same category + context. Ask: "Does any existing tip give the same actionable advice?"
 
@@ -111,7 +109,7 @@ Glob pattern="*.md" path="astro-poc/src/content/tips/"
 
 Find the highest-numbered file. Next tip = last ID + 1. Zero-pad to 5 digits (`TIP-00031`, `TIP-00032`, etc.).
 
-> **Current last tip:** TIP-00085 (as of March 24, 2026)
+> **Current last tip:** TIP-00090 (as of March 27, 2026)
 
 ---
 
@@ -162,9 +160,15 @@ A schema mismatch or missing required field will fail immediately. Fix before pr
 
 ---
 
-## Step 8 — Update `recent-changes.md`
+## Step 8 — Update Index + Changelog
 
-Add entries under the current date in `docs/claude-context/recent-changes.md`:
+**Update `docs/guides/SAFETY-TIP-INDEX.md`:**
+- Add each new tip row to the correct category table.
+- Add all new/updated Story IDs to the Story → Tip cross-reference at the bottom.
+- Update the header: `Last updated` date, `Total` count, `Last` tip ID.
+
+**Update `docs/claude-context/recent-changes.md`:**
+Add entries under the current date:
 ```
 - **NEW TIP TIP-XXXXX** — [Title] ([Category] / [Context])
 ```
@@ -241,6 +245,7 @@ Replace `Robbery` with any category name.
 | `astro-poc/src/components/TipVote.astro` | Voting widget on tip detail pages |
 | `google-apps-script/trinidad/safetyTipSubmissions.gs` | Handles community submissions + votes |
 | `docs/guides/SAFETY-TIP-WORKFLOW.md` | This document |
+| `docs/guides/SAFETY-TIP-INDEX.md` | Full tip registry — scan before creating any tip |
 | `docs/claude-context/recent-changes.md` | Changelog entry |
 
 ---

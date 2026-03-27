@@ -101,6 +101,7 @@ Follow these steps in order. Do not skip any.
 | `docs/claude-context/site-features.md` | What pages/components/scripts/algorithms exist |
 | `docs/guides/DESIGN-TOKENS.md` | Before any UI/styling change |
 | `docs/guides/SAFETY-TIP-WORKFLOW.md` | Before creating or editing any safety tip |
+| `docs/guides/SAFETY-TIP-INDEX.md` | Overlap check — scan before creating any tip (read by workflow Step 2) |
 | `docs/guides/RISK-SCORING-METHODOLOGY.md` | If touching TopRegionsCard or riskWeights.ts |
 | `docs/claude-context/SEO-CONFIG.md` | SEO infrastructure, Layout slot rules, OG types |
 | `google-apps-script/trinidad/README.md` | GAS automation overview |

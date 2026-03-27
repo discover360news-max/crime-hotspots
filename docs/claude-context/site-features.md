@@ -61,7 +61,7 @@
 ### Safety Tips
 | Page | Route | Rendering | Purpose |
 |------|-------|-----------|---------|
-| Safety Tips Index | `/trinidad/safety-tips/` | Pre-rendered | Category accordion (sorted by tip count), 25 launch tips |
+| Safety Tips Index | `/trinidad/safety-tips/` | Pre-rendered | Pill filters (category + context), flat 3-col TipCard grid (sm:2-col, lg:3-col). 90 tips as of Mar 27 2026. CategoryAccordion no longer used here. |
 | Tip Detail | `/trinidad/safety-tips/[slug]` | **SSR + CDN cache** | Full tip with body, related incidents, related tips, back link |
 | Category | `/trinidad/safety-tips/category/[cat]/` | Pre-rendered | All tips for one category |
 | Context | `/trinidad/safety-tips/context/[ctx]/` | Pre-rendered | Tips by situation context |
@@ -149,7 +149,7 @@
 |-----------|---------|
 | TipCard.astro | Full tip card for index/category/context/area pages. Badge reads "Category while Context" (muted slate). |
 | CompactTipCard.astro | Inline tip card on crime detail pages (max 3, matched by crime type + area) |
-| CategoryAccordion.astro | Collapsible category section for safety tips index. Sorted by tip count, first expanded. Own class names (`cat-*`) — does not conflict with DateAccordion. |
+| CategoryAccordion.astro | Collapsible category section — used on category/context/area tip pages. **Not used on the safety tips index** (replaced by pill filters + flat grid, Mar 25 2026). Sorted by tip count, first expanded. Own class names (`cat-*`) — does not conflict with DateAccordion. |
 
 ### Utility & Engagement
 | Component | Purpose |
@@ -262,7 +262,7 @@ Same structure applies to `google-apps-script/jamaica/` (identical split). Full 
 ### Safety Tips
 | Script | Purpose |
 |--------|---------|
-| safetyTipSubmissions.gs | Web app — receives POST from `/safety-tips/submit/`, appends to "Safety Tip Submissions" sheet tab, sends notification email. Deploy as: Execute as Me, Access: Anyone. Script Property: `NOTIFICATION_EMAIL`. Env var needed: `PUBLIC_SAFETY_TIPS_GAS_URL` in Cloudflare Pages. |
+| safetyTipSubmissions.gs | Web app — receives POST from `/safety-tips/submit/`, appends to "Safety Tip Submissions" sheet tab, sends notification email. Deploy as: Execute as Me, Access: Anyone. Script Property: `NOTIFICATION_EMAIL`. Env var needed: `PUBLIC_SAFETY_TIPS_GAS_URL` in Cloudflare Workers (GitHub Actions repo variable, build-time). |
 
 ### Content & Distribution
 | Script | Purpose |

@@ -8,6 +8,19 @@
 
 ## March 2026
 
+### Safety tips batch: Stories 668–675 (Mar 27, 2026)
+
+- **NEW TIP TIP-00086** — Securing Burglar-Proofing Against Physical Removal (Burglary / At Home) — Story 668: Mandingo Road burglar removed window bars from frame during daytime absence. Distinct from TIP-00036 (bar cutting / armed occupied-home invasion at night).
+- **NEW TIP TIP-00087** — Avoiding Ambush on Unverified Business Field Visits (Robbery / At Work) — Story 669: Salesman lured to Petit Bourg side street by fake client "Nick"; accomplice emerged from bushes at gunpoint. Distinct from TIP-00057 (ambush at your own business) and TIP-00021 (marketplace).
+- **NEW TIP TIP-00088** — Protecting Your Home Against Opportunistic Fire Attack (Other / At Home) — Story 670: Venezuelan national attempted residential arson on Lakeview Drive, Carapo, Arima; captured on CCTV. Distinct from TIP-00078 (arson following explicit threats in a property dispute).
+- **NEW TIP TIP-00089** — Responding to Coordinated Multi-Home Armed Invasion (Home Invasion / At Home) — Story 671: 6 armed men invaded two neighbouring Charlieville homes simultaneously at 1 a.m. Distinct from TIP-00050 (lone-occupant invasion); new prevention angle is community-level coordinated response.
+- **NEW TIP TIP-00090** — Identifying and Avoiding Vehicle Purchase Deposit Scams (Fraud / Online) — Story 675: Fake "Car Hive Limited" advertised Honda Vezel rent-to-own; victim paid 2 × TT$5,000 deposits, vehicle never delivered. Distinct from TIP-00030 (seller-side protection) — this covers buyer-side scam.
+- **UPDATED TIP-00058** — Added Story 672 (ABC Nursery School, Glamorgan: defective front door lock left unsecured overnight). Same close-of-business discipline applies; partial overlap noted.
+- **UPDATED TIP-00077** — Added Story 673 (police officer's San Fernando apartment burglarised over 24-day absence; forced metal door lock). Direct match — extended absence / no trusted contact monitoring.
+- **UPDATED TIP-00059** — Added Story 674 (Caroni North Bank Road: victim allowed passenger to take wheel, then was slashed). Existing tip covers attack inside shared vehicle; new story adds "ceding vehicle control" dimension — captured within existing advice.
+
+---
+
 ### JNews design rollout: statistics + footer (Mar 24, session 3)
 
 - **`statistics.astro`** — JNews hierarchy applied. Replaced `Hero.astro` with custom dark hero (`from-slate-900 to-slate-800`, inline breadcrumb, live pulse, rose CTA + ghost download CTA, freshness line). Added 4-card vitals row: Total Crimes (slate) / Murders (crimson) / YoY Change (amber) / Murder Rate per 100k (violet). Full-width dark separator band ("Crime by Type, Region & Rate") between StatCards section and detailed tables — separator is a direct `<Layout>` child to match dashboard (not inside the constrained container). `max-w-3xl` → `max-w-5xl` throughout. `yoyChangeDisplay` variable guards NaN/zero-denominator edge case.
