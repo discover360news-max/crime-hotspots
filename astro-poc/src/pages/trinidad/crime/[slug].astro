@@ -96,6 +96,45 @@ if (crime) {
 // Crime type thumbnail — relative path for local and production serving
 const thumbnailPath = crime ? getCrimeTypeThumbnailUrl(crime.crimeType, '') : '';
 
+// Build counted crime type chips.
+// When the primary type also appears in related (valid — e.g. Robbery primary + Robbery×2 related
+// = 3 robbery victims), we merge those into the primary chip count rather than showing a
+// confusing duplicate slate chip. Related entries that differ from primary get their own slate chips.
+const primaryType = crime ? (crime.primaryCrimeType || crime.crimeType) : '';
+let primaryTotalCount = 1; // starts at 1 for the primary itself
+const relatedTypeCounts = new Map<string, number>();
+if (crime?.relatedCrimeTypes?.trim()) {
+  for (const t of crime.relatedCrimeTypes.split(',').map(t => t.trim()).filter(Boolean)) {
+    if (t === primaryType) {
+      primaryTotalCount++;
+    } else {
+      relatedTypeCounts.set(t, (relatedTypeCounts.get(t) ?? 0) + 1);
+    }
+  }
+}
+
+// Build a plain-language incident composition summary shown between the chips and the headline.
+// Only rendered when the incident contains Murder or Attempted Murder (the only types that
+// translate cleanly to "killed / injured" language without guessing).
+let incidentSummaryText: string | null = null;
+if (crime && (relatedTypeCounts.size > 0 || primaryTotalCount > 1)) {
+  const allCounts = new Map(relatedTypeCounts);
+  if (primaryType === 'Murder') {
+    allCounts.set('Murder', (allCounts.get('Murder') ?? 0) + primaryTotalCount);
+  } else if (primaryType === 'Attempted Murder') {
+    allCounts.set('Attempted Murder', (allCounts.get('Attempted Murder') ?? 0) + primaryTotalCount);
+  }
+  const killed = allCounts.get('Murder') ?? 0;
+  const injured = allCounts.get('Attempted Murder') ?? 0;
+  if (killed > 0 || injured > 0) {
+    const total = [...allCounts.values()].reduce((a, b) => a + b, 0);
+    const parts: string[] = [];
+    if (killed > 0) parts.push(`${killed} killed`);
+    if (injured > 0) parts.push(`${injured} injured`);
+    incidentSummaryText = `${total} ${total === 1 ? 'person' : 'people'} involved — ${parts.join(' · ')}`;
+  }
+}
+
 // SEO Meta Tags
 const title = crime ? `${crime.headline} | Crime Hotspots Trinidad` : 'Story Not Found | Crime Hotspots Trinidad';
 const description = crime
@@ -167,21 +206,28 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
 
     <!-- Article Header -->
     <header class="mt-4 mb-5">
-      <!-- Category pill — crime type label above the headline -->
+      <!-- Crime type chips + incident composition summary -->
       <div class="mb-2" data-pagefind-ignore>
         <span class="inline-flex items-center px-3 py-1 rounded-full bg-rose-600 text-white text-xs font-semibold uppercase tracking-wide">
-          {crime.crimeType}
+          {crime.crimeType}{primaryTotalCount > 1 && <span class="ml-1 opacity-70 font-normal">×{primaryTotalCount}</span>}
         </span>
-        {crime.relatedCrimeTypes && crime.relatedCrimeTypes.trim() && (
+        {relatedTypeCounts.size > 0 && (
           <>
-            {[...new Set(crime.relatedCrimeTypes.split(',').map((t) => t.trim()))].map((relatedCrime) => (
+            {[...relatedTypeCounts.entries()].map(([type, count]) => (
               <span class="ml-1.5 inline-flex items-center px-3 py-1 rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[var(--ch-text-strong)] text-xs font-medium">
-                {relatedCrime}
+                {type}{count > 1 && <span class="ml-1 opacity-50 font-normal">×{count}</span>}
               </span>
             ))}
           </>
         )}
       </div>
+
+      <!-- Incident composition summary — only shown for multi-outcome incidents (murder/attempted murder mix) -->
+      {incidentSummaryText && (
+        <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mb-3" data-pagefind-ignore>
+          {incidentSummaryText}
+        </p>
+      )}
 
       <!-- H1 — article headline -->
       <h1 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-[var(--ch-text-heading)] leading-tight mb-3">
