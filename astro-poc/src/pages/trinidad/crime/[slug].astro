@@ -207,26 +207,32 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
     <!-- Article Header -->
     <header class="mt-4 mb-5">
       <!-- Crime type chips + incident composition summary -->
-      <div class="mb-2" data-pagefind-ignore>
-        <span class="inline-flex items-center px-3 py-1 rounded-full bg-rose-600 text-white text-xs font-semibold uppercase tracking-wide">
-          {crime.crimeType}{primaryTotalCount > 1 && <span class="ml-1 opacity-70 font-normal">×{primaryTotalCount}</span>}
-        </span>
-        {relatedTypeCounts.size > 0 && (
-          <>
+      {(relatedTypeCounts.size > 0 || incidentSummaryText) ? (
+        <!-- Glass panel: groups chips + summary for multi-crime incidents -->
+        <div class="mb-4 p-3 rounded-xl bg-white/85 dark:bg-[hsl(0_0%_100%_/_0.04)] backdrop-blur-md border border-slate-200/80 dark:border-[hsl(0_0%_100%_/_0.08)]" data-pagefind-ignore>
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="inline-flex items-center px-3 py-1 rounded-full bg-rose-600 text-white text-xs font-semibold uppercase tracking-wide">
+              {crime.crimeType}{primaryTotalCount > 1 && <span class="ml-1 opacity-70 font-normal">×{primaryTotalCount}</span>}
+            </span>
             {[...relatedTypeCounts.entries()].map(([type, count]) => (
-              <span class="ml-1.5 inline-flex items-center px-3 py-1 rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[var(--ch-text-strong)] text-xs font-medium">
+              <span class="inline-flex items-center px-3 py-1 rounded-full bg-slate-200 dark:bg-[hsl(0_0%_20%)] text-slate-600 dark:text-[var(--ch-text-strong)] text-xs font-medium">
                 {type}{count > 1 && <span class="ml-1 opacity-50 font-normal">×{count}</span>}
               </span>
             ))}
-          </>
-        )}
-      </div>
-
-      <!-- Incident composition summary — only shown for multi-outcome incidents (murder/attempted murder mix) -->
-      {incidentSummaryText && (
-        <p class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mb-3" data-pagefind-ignore>
-          {incidentSummaryText}
-        </p>
+          </div>
+          {incidentSummaryText && (
+            <p class="mt-2 text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">
+              {incidentSummaryText}
+            </p>
+          )}
+        </div>
+      ) : (
+        <!-- Plain pill for single-crime incidents -->
+        <div class="mb-2" data-pagefind-ignore>
+          <span class="inline-flex items-center px-3 py-1 rounded-full bg-rose-600 text-white text-xs font-semibold uppercase tracking-wide">
+            {crime.crimeType}
+          </span>
+        </div>
       )}
 
       <!-- H1 — article headline -->
