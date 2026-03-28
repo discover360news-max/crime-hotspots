@@ -3,12 +3,12 @@ id: F003
 type: feature
 status: active
 created: 2026-01-26
-updated: 2026-03-27
+updated: 2026-03-28
 related: [F005, C001]
 ---
 
 ## Summary
-90 tips (last: TIP-00090) as of Mar 27, 2026. Tips live in `src/content/tips/` as Markdown with YAML frontmatter. Six pages (index, detail, category, context, area, submit). I (Claude) am the tip manager — I create tips from Kavell's input.
+95 tips (last: TIP-00095) as of Mar 28, 2026. Tips live in `src/content/tips/` as Markdown with YAML frontmatter. Six pages (index, detail, category, context, area, submit). I (Claude) am the tip manager — I create tips from Kavell's input.
 
 **Index + detail pages received JNews redesign (Mar 25 2026):**
 - Index: dark gradient hero (max-w-5xl), category pill filters replacing CategoryAccordion, flat 3-col TipCard grid (sm:2-col, lg:3-col), stats inline in hero text
@@ -52,3 +52,4 @@ related: [F005, C001]
 - 2026-03-24: 75 tips live (last: TIP-00085)
 - 2026-03-25: JNews redesign — index + detail pages (dark hero, pill filters, cardless detail)
 - 2026-03-27: 90 tips live (last: TIP-00090). Stories 668–675: 5 new tips (TIP-00086–90); Stories 672/673/674 attached to TIP-00058/77/59. (Pre-session count was 85, not 75 — memory was stale.)
+- 2026-03-28: 95 tips live (last: TIP-00095). Stories 681–685: 5 new tips (TIP-00091–95). TIP-00091 Assault/In a Mall, TIP-00092 Domestic Violence/Walking Alone, TIP-00093 Burglary/At Work, TIP-00094 Robbery/In a Mall, TIP-00095 Burglary/At Home.

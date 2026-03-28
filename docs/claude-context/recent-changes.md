@@ -8,6 +8,16 @@
 
 ## March 2026
 
+### Safety tips batch: Stories 681–685 (Mar 28, 2026)
+
+- **NEW TIP TIP-00091** — Staying Safe During Unexpected Public Confrontations (Assault / In a Mall) — Story 681: Rajkumar Pope fatally beaten at a shop in south Trinidad; neck grab + repeated head punches. No existing Assault tip covers unprovoked stranger attack at a retail/food establishment.
+- **NEW TIP TIP-00092** — Staying Safe When Your Partner Has an Abusive Ex (Domestic Violence / Walking Alone) — Story 682: Labourer Stephen Leith fatally stabbed on Waterlane Street by his girlfriend's ex-partner, who had a protection order against him. TIP-00054 covers recognising danger in your own domestic situation; this covers third-party risk to a new partner — different prevention angle.
+- **NEW TIP TIP-00093** — Preventing Tool-Assisted Forced Entry to Your Business (Burglary / At Work) — Story 683: Three men forced entry to a Santa Flora bar using tools, captured on CCTV. TIP-00058 covers overnight security; TIP-00069 covers overlooked entry points — neither addresses organized daytime tool-based forced entry.
+- **NEW TIP TIP-00094** — Never Leave Devices Unattended at Public Counters (Robbery / In a Mall) — Story 684: Samsung S24 Ultra ($17,000) stolen from KFC Independence Square counter while owner sat down to eat. TIP-00006 covers bag handling/pickpockets; does not cover device-on-counter abandonment.
+- **NEW TIP TIP-00095** — Protecting Parked Vehicles From Parts Theft (Burglary / At Home) — Story 685: Nissan Almera occupants caught stripping car parts at Webb Trace, Cunupia. TIP-00061 is hybrid battery theft specifically; this covers regular vehicle parts stripping.
+
+---
+
 ### Safety tips batch: Stories 668–675 (Mar 27, 2026)
 
 - **NEW TIP TIP-00086** — Securing Burglar-Proofing Against Physical Removal (Burglary / At Home) — Story 668: Mandingo Road burglar removed window bars from frame during daytime absence. Distinct from TIP-00036 (bar cutting / armed occupied-home invasion at night).

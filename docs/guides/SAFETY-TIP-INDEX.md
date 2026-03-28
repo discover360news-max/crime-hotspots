@@ -3,7 +3,7 @@
 > **Purpose:** Overlap check before creating or updating a tip. Scan the relevant category section first. If a title is ambiguous, open the file for detail — do not read all files.
 >
 > **Files:** `astro-poc/src/content/tips/tip-XXXXX-[slug].md`
-> **Last updated:** 2026-03-27 | **Total:** 90 tips | **Last:** TIP-00090
+> **Last updated:** 2026-03-28 | **Total:** 95 tips | **Last:** TIP-00095
 
 ---
 
@@ -21,7 +21,7 @@
 
 ## Tip Registry
 
-### Assault (8)
+### Assault (9)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
@@ -33,6 +33,7 @@
 | TIP-00041 | In Your Car | Bystander Safety During Road Confrontations and Gunfire | 494 |
 | TIP-00048 | At Work | Staying Safe During Roadside Enforcement Duties | 515 |
 | TIP-00067 | At a Bar | Avoiding Dangerous Escalation at Late-Night Bars | 572 |
+| TIP-00091 | In a Mall | Staying Safe During Unexpected Public Confrontations | 681 |
 
 ---
 
@@ -46,7 +47,7 @@
 
 ---
 
-### Burglary (7)
+### Burglary (9)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
@@ -57,6 +58,8 @@
 | TIP-00074 | At Home | Designing Security Lighting Criminals Cannot Map | 594 |
 | TIP-00077 | At Home | Securing Your Property During Extended Absence | 615, 673 |
 | TIP-00086 | At Home | Securing Burglar-Proofing Against Physical Removal | 668 |
+| TIP-00093 | At Work | Preventing Tool-Assisted Forced Entry to Your Business | 683 |
+| TIP-00095 | At Home | Protecting Parked Vehicles From Parts Theft | 685 |
 
 ---
 
@@ -74,11 +77,12 @@
 
 ---
 
-### Domestic Violence (1)
+### Domestic Violence (2)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
 | TIP-00054 | At Home | Recognising Escalating Danger in a Domestic Situation | — |
+| TIP-00092 | Walking Alone | Staying Safe When Your Partner Has an Abusive Ex | 682 |
 
 ---
 
@@ -162,7 +166,7 @@
 
 ---
 
-### Robbery (28)
+### Robbery (29)
 
 > **Confusable pairs — check these before creating a new Robbery tip:**
 > - **Workplace cash:** TIP-00015 (deposit timing/route/person) vs TIP-00020 (deposit variance amounts). Both At Work. Check both for any cash-in-transit tactic.
@@ -200,6 +204,7 @@
 | TIP-00084 | At Work | Employee Safety During an Armed Retail Raid | 637 |
 | TIP-00085 | Walking Alone | Protecting Yourself in a Chase-and-Overpower Robbery | 639 |
 | TIP-00087 | At Work | Avoiding Ambush on Unverified Business Field Visits | 669 |
+| TIP-00094 | In a Mall | Never Leave Devices Unattended at Public Counters | 684 |
 
 ---
 
@@ -264,6 +269,11 @@
 | | | | | | | 673 | TIP-00077 |
 | | | | | | | 674 | TIP-00059 |
 | | | | | | | 675 | TIP-00090 |
+| | | | | | | 681 | TIP-00091 |
+| | | | | | | 682 | TIP-00092 |
+| | | | | | | 683 | TIP-00093 |
+| | | | | | | 684 | TIP-00094 |
+| | | | | | | 685 | TIP-00095 |
 | | | | | | | 738 | TIP-00026 |
 | | | | | | | 1024 | TIP-00026 |
 | | | | | | | 1267 | TIP-00026 |
