@@ -6,6 +6,7 @@
 import { getTrinidadCrimes, getAllCrimesFromD1 } from '../lib/crimeData';
 import { getHotAreas } from '../lib/trendingHelpers';
 import { countCrimeType } from '../lib/dashboardHelpers';
+import { getTotalCrimeCount } from '../lib/statisticsHelpers';
 import { escapeHtml } from '../lib/escapeHtml';
 import { routes, buildRoute } from '../config/routes';
 
@@ -32,8 +33,10 @@ const thisWeekCrimes = allCrimes.filter(c => c.dateObj >= weekAgo);
 const lastWeekCrimes = allCrimes.filter(c => c.dateObj >= twoWeeksAgo && c.dateObj < weekAgo);
 
 // Week-over-week change
-const weekChange = lastWeekCrimes.length > 0
-  ? Math.round(((thisWeekCrimes.length - lastWeekCrimes.length) / lastWeekCrimes.length) * 100)
+const thisWeekCount = getTotalCrimeCount(thisWeekCrimes);
+const lastWeekCount = getTotalCrimeCount(lastWeekCrimes);
+const weekChange = lastWeekCount > 0
+  ? Math.round(((thisWeekCount - lastWeekCount) / lastWeekCount) * 100)
   : 0;
 
 // Top trending area
@@ -65,7 +68,7 @@ const latestCrime = allCrimes[0]; // Already sorted newest first
         <div class="grid grid-cols-3 gap-3 mb-3">
           <div>
             <div class="text-xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">
-              {thisWeekCrimes.length}
+              {thisWeekCount}
             </div>
             <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">
               crimes
@@ -140,7 +143,7 @@ const latestCrime = allCrimes[0]; // Already sorted newest first
           <div class="grid grid-cols-3 gap-4 mb-4">
             <div>
               <div class="text-2xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">
-                {thisWeekCrimes.length}
+                {thisWeekCount}
               </div>
               <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">
                 crimes
