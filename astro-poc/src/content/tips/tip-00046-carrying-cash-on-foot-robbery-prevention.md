@@ -7,9 +7,9 @@ area: ""
 severity: "high"
 source: "manual"
 status: "published"
-related_story_ids: ["503"]
+related_story_ids: ["503", "692"]
 date_added: 2026-03-09
-date_updated:
+date_updated: 2026-03-30
 ---
 
 When a person regularly carries cash from their workplace — as a cashier, small-business employee, or market vendor — they can become a target if that routine becomes observable to anyone in the surrounding area. In this type of robbery, the attacker does not rely on opportunity alone; they wait for a specific person at a specific time, having confirmed in advance that the person will have money on them. The victim is not chosen at random but identified through surveillance — whether from someone watching the workplace, overhearing conversations, or simply noting repeated patterns over days or weeks. Carrying cash visibly, departing at the same time each day, or discussing earnings in public all contribute to building a profile that a potential attacker can act on.

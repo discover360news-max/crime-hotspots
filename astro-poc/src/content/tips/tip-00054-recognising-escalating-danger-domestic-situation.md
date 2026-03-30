@@ -7,9 +7,9 @@ area: ""
 severity: "high"
 source: "manual"
 status: "published"
-related_story_ids: []
+related_story_ids: ["701"]
 date_added: 2026-03-13
-date_updated:
+date_updated: 2026-03-30
 ---
 
 Domestic violence rarely begins with a sudden, severe act — it typically follows a pattern of escalating control, intimidation, and periodic violence that becomes normalised over time, making it harder for the person experiencing it to recognise when the risk of serious harm has reached a critical point. The danger of staying is highest when an abuser's behaviour shifts from isolated incidents toward a sustained pattern of monitoring, isolation from support networks, and unpredictable eruptions of force that are increasingly severe or followed by threats to prevent the victim from leaving or seeking help. In Trinidad and Tobago, options exist for people experiencing domestic violence — the Domestic Violence Hotline (800-SAVE / 800-7283) and the Family Court can issue protection orders — but the first step is being able to identify the pattern clearly enough to act on it. Leaving is often the most dangerous moment and requires planning, not impulse.

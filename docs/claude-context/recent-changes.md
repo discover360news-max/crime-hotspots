@@ -8,6 +8,19 @@
 
 ## March 2026
 
+### Safety tips: TIP-00096 to TIP-00099 + 4 story attachments (Mar 30, 2026)
+
+- **NEW TIP TIP-00096** — Hardening Residential Door Locks Against Forced Entry (Burglary / At Home) — Story 695
+- **NEW TIP TIP-00097** — Reporting Suspicious Individuals in Your Residential Building (Shooting / At Home) — Story 697
+- **NEW TIP TIP-00098** — Passenger Safety Protocols for Private Hire Drivers (Robbery / In Your Car) — Story 699
+- **NEW TIP TIP-00099** — Never Invite Strangers Into Short-Term Rental Accommodation (Robbery / At a Hotel) — Story 700
+- **UPDATED TIP-00046** — added Story 692 (proprietor robbed carrying cash on foot to bank)
+- **UPDATED TIP-00054** — added Story 701 (alcohol-triggered DV, recurring pattern)
+- **UPDATED TIP-00067** — added Story 696 (2v1 chopping assault at bar)
+- **UPDATED TIP-00021** — added Story 698 (knife robbery at Facebook Marketplace meetup in Laventille); severity upgraded from `low` to `medium`
+
+---
+
 ### datePublished replaces dateObj for all rolling window filters site-wide (Mar 30, 2026)
 
 Previously all date range filters used `dateObj` (crime incident date). Crimes are dated when they *happened*, not when they were published — creating a reporting lag that made weekly/monthly stats consistently undercount recent activity. `datePublished` (when the crime entered the system) is now the primary date for all rolling windows, falling back to `dateObj` for legacy rows.

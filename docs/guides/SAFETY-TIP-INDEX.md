@@ -3,7 +3,7 @@
 > **Purpose:** Overlap check before creating or updating a tip. Scan the relevant category section first. If a title is ambiguous, open the file for detail — do not read all files.
 >
 > **Files:** `astro-poc/src/content/tips/tip-XXXXX-[slug].md`
-> **Last updated:** 2026-03-28 | **Total:** 95 tips | **Last:** TIP-00095
+> **Last updated:** 2026-03-30 | **Total:** 99 tips | **Last:** TIP-00099
 
 ---
 
@@ -47,7 +47,7 @@
 
 ---
 
-### Burglary (9)
+### Burglary (10)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
@@ -60,6 +60,7 @@
 | TIP-00086 | At Home | Securing Burglar-Proofing Against Physical Removal | 668 |
 | TIP-00093 | At Work | Preventing Tool-Assisted Forced Entry to Your Business | 683 |
 | TIP-00095 | At Home | Protecting Parked Vehicles From Parts Theft | 685 |
+| TIP-00096 | At Home | Hardening Residential Door Locks Against Forced Entry | 695 |
 
 ---
 
@@ -166,7 +167,7 @@
 
 ---
 
-### Robbery (29)
+### Robbery (31)
 
 > **Confusable pairs — check these before creating a new Robbery tip:**
 > - **Workplace cash:** TIP-00015 (deposit timing/route/person) vs TIP-00020 (deposit variance amounts). Both At Work. Check both for any cash-in-transit tactic.
@@ -205,6 +206,8 @@
 | TIP-00085 | Walking Alone | Protecting Yourself in a Chase-and-Overpower Robbery | 639 |
 | TIP-00087 | At Work | Avoiding Ambush on Unverified Business Field Visits | 669 |
 | TIP-00094 | In a Mall | Never Leave Devices Unattended at Public Counters | 684 |
+| TIP-00098 | In Your Car | Passenger Safety Protocols for Private Hire Drivers | 699 |
+| TIP-00099 | At a Hotel | Never Invite Strangers Into Short-Term Rental Accommodation | 700 |
 
 ---
 
@@ -218,7 +221,7 @@
 
 ---
 
-### Shooting (6)
+### Shooting (7)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
@@ -228,6 +231,7 @@
 | TIP-00060 | In Your Car | Responding When Your Vehicle Is Shot At | 541 |
 | TIP-00079 | Walking Alone | Reducing Risk When You May Be a Drive-By Target | 627 |
 | TIP-00083 | Walking Alone | Limiting Outdoor Exposure in Residential Areas After Dark | 636 |
+| TIP-00097 | At Home | Reporting Suspicious Individuals in Your Residential Building | 697 |
 
 ---
 
@@ -274,6 +278,14 @@
 | | | | | | | 683 | TIP-00093 |
 | | | | | | | 684 | TIP-00094 |
 | | | | | | | 685 | TIP-00095 |
+| | | | | | | 692 | TIP-00046 |
+| | | | | | | 695 | TIP-00096 |
+| | | | | | | 696 | TIP-00067 |
+| | | | | | | 697 | TIP-00097 |
+| | | | | | | 698 | TIP-00021 |
+| | | | | | | 699 | TIP-00098 |
+| | | | | | | 700 | TIP-00099 |
+| | | | | | | 701 | TIP-00054 |
 | | | | | | | 738 | TIP-00026 |
 | | | | | | | 1024 | TIP-00026 |
 | | | | | | | 1267 | TIP-00026 |
