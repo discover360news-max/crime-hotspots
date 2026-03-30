@@ -23,7 +23,7 @@ const areaData = await loadFullAreaData();
 
 const cutoff90d = new Date();
 cutoff90d.setDate(cutoff90d.getDate() - 90);
-const recentCrimes = allCrimes.filter(c => c.dateObj >= cutoff90d);
+const recentCrimes = allCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff90d);
 
 // Build region stats
 const regionMap = new Map<string, { areas: string[]; crimeCount: number; murders: number; }>();

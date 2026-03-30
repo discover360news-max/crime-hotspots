@@ -18,13 +18,17 @@ import {
 } from '../../lib/crimeData';
 import type { Crime } from '../../lib/crimeData';
 
-// Fields to omit — these are Date instances that don't survive JSON.stringify cleanly
-const DATE_FIELDS = new Set(['dateObj', 'datePublished', 'dateUpdated']);
+// Fields to omit — Date instances that don't survive JSON.stringify cleanly
+// datePublished is serialized as an ISO string so the client can reconstruct it
+const DATE_FIELDS_OMIT = new Set(['dateObj', 'dateUpdated']);
 
 function serializeCrime(crime: Crime): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(crime)) {
-    if (!DATE_FIELDS.has(key)) {
+    if (key === 'datePublished') {
+      // Serialize as ISO string; client reconstructs with new Date(c.datePublished)
+      out[key] = value instanceof Date ? value.toISOString() : undefined;
+    } else if (!DATE_FIELDS_OMIT.has(key)) {
       out[key] = value;
     }
   }

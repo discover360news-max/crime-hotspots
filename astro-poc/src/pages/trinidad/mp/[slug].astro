@@ -66,7 +66,7 @@ const regionStats = mp.regionSlugs.map((regionSlug: string) => {
   const regionCrimes = allCrimes.filter(c => c.region === regionName);
   const currentYTD = filterToSamePeriod(regionCrimes.filter(c => c.year === currentYear), currentYear);
   const previousYTD = filterToSamePeriod(regionCrimes.filter(c => c.year === previousYear), previousYear);
-  const crimes90d = regionCrimes.filter(c => c.dateObj >= cutoff90d);
+  const crimes90d = regionCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff90d);
   const crimes90dPrev = regionCrimes.filter(c => c.dateObj >= cutoff90dPrevStart && c.dateObj <= cutoff90dPrevEnd);
   return {
     regionSlug,

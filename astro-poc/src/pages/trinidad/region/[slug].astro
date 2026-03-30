@@ -55,8 +55,8 @@ cutoff90d.setDate(cutoff90d.getDate() - 90);
 const cutoff30d = new Date();
 cutoff30d.setDate(cutoff30d.getDate() - 30);
 
-const recentCrimes90d = regionCrimes.filter(c => c.dateObj >= cutoff90d);
-const recentCrimes30d = regionCrimes.filter(c => c.dateObj >= cutoff30d);
+const recentCrimes90d = regionCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff90d);
+const recentCrimes30d = regionCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff30d);
 
 // Same 90-day window last year (for YoY comparison of the incidents card)
 const cutoff90dPrevStart = new Date(cutoff90d);

@@ -234,9 +234,9 @@ function generateHotAreasHTML_(allCrimes: any[]): string {
   cutoff.setDate(cutoff.getDate() - 7);
   cutoff.setHours(0, 0, 0, 0);
 
-  // Filter to last 7 days
+  // Filter to last 7 days — use datePublished when available (matches weekly stat logic)
   const recentCrimes = allCrimes.filter(c => {
-    const d = toDate(c.dateObj, c.date);
+    const d = c.datePublished instanceof Date ? c.datePublished : toDate(c.dateObj, c.date);
     return d >= cutoff;
   });
 

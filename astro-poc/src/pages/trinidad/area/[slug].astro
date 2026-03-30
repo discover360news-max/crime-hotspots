@@ -67,16 +67,16 @@ cutoff90d.setDate(cutoff90d.getDate() - 90);
 const cutoff30d = new Date();
 cutoff30d.setDate(cutoff30d.getDate() - 30);
 
-const recentCrimes90d = areaCrimes.filter(c => c.dateObj >= cutoff90d);
-const recentCrimes30d = areaCrimes.filter(c => c.dateObj >= cutoff30d);
+const recentCrimes90d = areaCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff90d);
+const recentCrimes30d = areaCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff30d);
 
 // 7-day and 14-day windows for AreaNarrative week-over-week
 const cutoff7d = new Date();
 cutoff7d.setDate(cutoff7d.getDate() - 7);
 const cutoff14d = new Date();
 cutoff14d.setDate(cutoff14d.getDate() - 14);
-const thisWeekCrimes = areaCrimes.filter(c => c.dateObj >= cutoff7d);
-const lastWeekCrimes = areaCrimes.filter(c => c.dateObj >= cutoff14d && c.dateObj < cutoff7d);
+const thisWeekCrimes = areaCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff7d);
+const lastWeekCrimes = areaCrimes.filter(c => { const d = c.datePublished ?? c.dateObj; return d >= cutoff14d && d < cutoff7d; });
 
 // Same 90-day window last year (for YoY comparison of the incidents card)
 const cutoff90dPrevStart = new Date(cutoff90d);
@@ -160,7 +160,7 @@ const suggestedCompare = relatedAreas
   .filter(a => a.hasCrimes)
   .map(a => ({
     ...a,
-    recentCount: allCrimes.filter(c => c.area === a.name && c.dateObj >= cutoff90d).length,
+    recentCount: allCrimes.filter(c => c.area === a.name && (c.datePublished ?? c.dateObj) >= cutoff90d).length,
   }))
   .sort((a, b) => b.recentCount - a.recentCount)[0];
 

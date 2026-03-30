@@ -63,7 +63,7 @@ if (hasManualIds || matchingTypes.length > 0) {
     relatedCrimes = allCrimes
       .filter(c => {
         const type = c.primaryCrimeType || c.crimeType;
-        return type && matchingTypes.includes(type) && c.dateObj >= cutoff;
+        return type && matchingTypes.includes(type) && (c.datePublished ?? c.dateObj) >= cutoff;
       })
       .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
       .slice(0, 6);

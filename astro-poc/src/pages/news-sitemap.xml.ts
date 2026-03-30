@@ -37,10 +37,10 @@ export const GET: APIRoute = async ({ locals }) => {
     const toDate = new Date().toISOString().slice(0, 10);
     const crimes = db
       ? await getCrimesByDateRangeFromD1(db, fromDate, toDate)
-      : (await getTrinidadCrimes()).filter(c => c.dateObj >= twoDaysAgo);
+      : (await getTrinidadCrimes()).filter(c => (c.datePublished ?? c.dateObj) >= twoDaysAgo);
     crimeEntries = crimes
-      .filter(c => c.dateObj >= twoDaysAgo)
-      .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
+      .filter(c => (c.datePublished ?? c.dateObj) >= twoDaysAgo)
+      .sort((a, b) => (b.datePublished ?? b.dateObj).getTime() - (a.datePublished ?? a.dateObj).getTime())
       .slice(0, 100) // Cap at 100; Google News sitemap max is 1,000
       .map(c => ({
         loc: `https://crimehotspots.com${buildRoute.crime(c.slug)}`,

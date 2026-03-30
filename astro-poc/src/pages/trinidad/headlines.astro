@@ -81,7 +81,7 @@ const latestCrimeDate = allCrimes[0]?.dateObj ?? new Date();
 const freshnessText = latestCrimeDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 const cutoff30d = new Date();
 cutoff30d.setDate(cutoff30d.getDate() - 30);
-const count30d = allCrimes.filter(c => c.dateObj >= cutoff30d).length;
+const count30d = allCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff30d).length;
 
 // Sidebar data
 const ytdMurders = countCrimeType(allCrimes.filter(c => c.year === currentYear), 'Murder');

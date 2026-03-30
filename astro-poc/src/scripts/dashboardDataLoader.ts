@@ -279,6 +279,7 @@ export async function initializeDashboardData(): Promise<void> {
       const crimes = (crimesData.crimes as any[]).map(c => ({
         ...c,
         dateObj: new Date(c.year, c.month - 1, c.day),
+        datePublished: c.datePublished ? new Date(c.datePublished) : undefined,
       }));
       (window as any).__crimesData = crimes;
       const { applyPrecomputedStats } = await import('./dashboardUpdates');
@@ -309,10 +310,11 @@ export async function initializeDashboardData(): Promise<void> {
       }),
     ]) as [any, any];
 
-    // Reconstruct dateObj (omitted from JSON serialization)
+    // Reconstruct Date instances from serialized values
     const crimes = (crimesData.crimes as any[]).map(c => ({
       ...c,
       dateObj: new Date(c.year, c.month - 1, c.day),
+      datePublished: c.datePublished ? new Date(c.datePublished) : undefined,
     }));
 
     (window as any).__crimesData = crimes;

@@ -29,7 +29,7 @@ const areaData = await loadFullAreaData();
 // Calculate 90-day cutoff for recent crime counts
 const cutoffDate = new Date();
 cutoffDate.setDate(cutoffDate.getDate() - 90);
-const recentCrimes = allCrimes.filter(c => c.dateObj >= cutoffDate);
+const recentCrimes = allCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoffDate);
 
 // Weighted risk score per crime — mirrors TopRegionsCard logic
 function calculateCrimeRisk(crime: any): number {

@@ -55,7 +55,7 @@ const areaStatsMap: Record<string, {
 
 for (const area of availableAreas) {
   const crimes = allCrimes.filter(c => c.area === area.name);
-  const recent90d = crimes.filter(c => c.dateObj >= cutoff90d);
+  const recent90d = crimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff90d);
   const crimesCurrent = filterToSamePeriod(crimes.filter(c => c.year === currentYear), currentYear);
   const crimesPrevious = filterToSamePeriod(crimes.filter(c => c.year === previousYear), previousYear);
   const safety = getSafetyContext(area.name, allCrimes);
