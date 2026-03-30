@@ -8,6 +8,30 @@
 
 ## March 2026
 
+### datePublished replaces dateObj for all rolling window filters site-wide (Mar 30, 2026)
+
+Previously all date range filters used `dateObj` (crime incident date). Crimes are dated when they *happened*, not when they were published — creating a reporting lag that made weekly/monthly stats consistently undercount recent activity. `datePublished` (when the crime entered the system) is now the primary date for all rolling windows, falling back to `dateObj` for legacy rows.
+
+**Rule going forward:** `(c.datePublished ?? c.dateObj)` for any rolling window filter. `c.dateObj` only for YoY comparisons (intentional historical anchors). See L017.
+
+**Client-side fix (required to make this work end-to-end):**
+- **`src/pages/api/crimes.ts`** — `datePublished` was being stripped from JSON. Now serialized as ISO string.
+- **`src/scripts/dashboardDataLoader.ts`** — Both SSR and non-SSR reconstruction paths now rebuild `datePublished` as a `Date` from the ISO string.
+- **`src/scripts/modalHtmlGenerators.ts`** — Hot areas 7-day filter updated.
+
+**Server-side (rolling windows only — YoY left on dateObj):**
+- `HomepagePulse.astro`, `DashboardStory.astro`, `dashboard.astro`, `index.astro` — 7/14d weekly windows (also removed `lagDays=3` workaround — no longer needed)
+- `areas.astro`, `regions.astro` — 90d
+- `area/[slug].astro` — 7/14/30/90d + per-area count
+- `region/[slug].astro` — 30/90d
+- `mp/[slug].astro` — 90d
+- `compare.astro` — 90d
+- `headlines.astro` — 30d
+- `safety-tips/[slug].astro` — 90d
+- `news-sitemap.xml.ts` — 2d filter + sort
+
+---
+
 ### Fix: _redirects double redirect causing GA4 split views (Mar 30, 2026)
 
 - **`public/_redirects`** — All destination URLs updated to include trailing slashes (e.g. `/trinidad/dashboard/` not `/trinidad/dashboard`). Previously, old-URL visitors hit a double redirect: `_redirects` fired first (no slash), then Astro's `trailingSlash: 'always'` fired a second redirect to add the slash. GA4 was recording the intermediate no-slash URL as a separate page, splitting view counts — e.g. dashboard showed 1,670 views on `/trinidad/dashboard/` and 410 views on `/trinidad/dashboard` as two distinct entries.

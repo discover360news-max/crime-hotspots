@@ -56,6 +56,7 @@ L013 | LEARN | active | Crime classification rules: 2 hard rules (Carjacking→R
 L014 | LEARN | active | CSS var token system: `--ch-*` vars in Layout.astro control all dark mode colours. Use `var(--ch-*)` in Tailwind, never raw HSL. One edit = site-wide change. → L014-css-var-token-system.md
 L015 | LEARN | active | SEO on-page patterns: H1 must be single element with full keyword phrase, FAQPage JSON-LD targets People Also Ask, dateModified on Dataset = freshness signal, yearless queries are content gap not optimisation problem → L015-seo-on-page-patterns.md
 L016 | LEARN | active | Dark section texture overlay: `mix-blend-screen` makes image bg transparent, CSS `mask-image` radial gradient clears centre for text contrast. HeroBg.astro = 13 hero pages. Footer inline in Layout.astro (dark mode only) → L016-hero-texture-overlay-pattern.md
+L017 | LEARN | active | Date filtering: ALL rolling windows use `datePublished ?? dateObj`. YoY stays on dateObj. API serializes datePublished as ISO string; client reconstructs it. → L017-date-filtering-pattern.md
 
 ## Decisions (D)
 D001 | DEC | active | Crime pages: full SSR + Cloudflare CDN 24h cache (migrated from hybrid prerender) → D001-crime-page-ssr.md
