@@ -58,14 +58,13 @@ const freshnessText = latestCrimeDate.toLocaleDateString('en-GB', { day: 'numeri
 // Hottest area slug for vitals card link
 const dangerousAreaSlug = generateNameSlug(insights.mostDangerousRegion);
 
-// This-week stats for hero pulse (3-day lag — crimes are logged by incident date)
+// This-week stats — filtered by datePublished (when added to the system),
+// falling back to dateObj for legacy rows without a publish date.
 const now = new Date();
-const lagDays = 3;
-const weekEnd = new Date(); weekEnd.setDate(now.getDate() - lagDays); weekEnd.setHours(0, 0, 0, 0);
-const weekAgo = new Date(); weekAgo.setDate(now.getDate() - (7 + lagDays)); weekAgo.setHours(0, 0, 0, 0);
-const twoWeeksAgo = new Date(); twoWeeksAgo.setDate(now.getDate() - (14 + lagDays)); twoWeeksAgo.setHours(0, 0, 0, 0);
-const thisWeekCrimes = allCrimes.filter(c => c.dateObj >= weekAgo && c.dateObj < weekEnd);
-const lastWeekCrimes = allCrimes.filter(c => c.dateObj >= twoWeeksAgo && c.dateObj < weekAgo);
+const weekAgo = new Date(); weekAgo.setDate(now.getDate() - 7); weekAgo.setHours(0, 0, 0, 0);
+const twoWeeksAgo = new Date(); twoWeeksAgo.setDate(now.getDate() - 14); twoWeeksAgo.setHours(0, 0, 0, 0);
+const thisWeekCrimes = allCrimes.filter(c => (c.datePublished ?? c.dateObj) >= weekAgo);
+const lastWeekCrimes = allCrimes.filter(c => { const d = c.datePublished ?? c.dateObj; return d >= twoWeeksAgo && d < weekAgo; });
 const murdersThisWeek = countCrimeType(thisWeekCrimes, 'Murder');
 const murdersLastWeek = countCrimeType(lastWeekCrimes, 'Murder');
 const murderChange = murdersLastWeek > 0

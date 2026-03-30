@@ -15,22 +15,18 @@ interface Props {
 
 const { allCrimes } = Astro.props;
 
-// This week's crimes — offset by 3-day lag (crimes are logged by incident date,
-// not entry date, so the most recent 3 days are always incomplete)
+// This week's crimes — filtered by datePublished (when added to the system),
+// falling back to dateObj for legacy rows without a publish date.
 const now = new Date();
-const lagDays = 3;
-const weekEnd = new Date();
-weekEnd.setDate(now.getDate() - lagDays);
-weekEnd.setHours(0, 0, 0, 0);
 const weekAgo = new Date();
-weekAgo.setDate(now.getDate() - (7 + lagDays));
+weekAgo.setDate(now.getDate() - 7);
 weekAgo.setHours(0, 0, 0, 0);
 const twoWeeksAgo = new Date();
-twoWeeksAgo.setDate(now.getDate() - (14 + lagDays));
+twoWeeksAgo.setDate(now.getDate() - 14);
 twoWeeksAgo.setHours(0, 0, 0, 0);
 
-const thisWeekCrimes = allCrimes.filter(c => c.dateObj >= weekAgo && c.dateObj < weekEnd);
-const lastWeekCrimes = allCrimes.filter(c => c.dateObj >= twoWeeksAgo && c.dateObj < weekAgo);
+const thisWeekCrimes = allCrimes.filter(c => (c.datePublished ?? c.dateObj) >= weekAgo);
+const lastWeekCrimes = allCrimes.filter(c => { const d = c.datePublished ?? c.dateObj; return d >= twoWeeksAgo && d < weekAgo; });
 
 // Top area this week — derived from the same lag-adjusted thisWeekCrimes window
 // so the "leads with X" count matches the incident count shown in the banner

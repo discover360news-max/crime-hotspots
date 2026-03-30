@@ -29,8 +29,8 @@ weekAgo.setDate(now.getDate() - 7);
 const twoWeeksAgo = new Date();
 twoWeeksAgo.setDate(now.getDate() - 14);
 
-const thisWeekCrimes = allCrimes.filter(c => c.dateObj >= weekAgo);
-const lastWeekCrimes = allCrimes.filter(c => c.dateObj >= twoWeeksAgo && c.dateObj < weekAgo);
+const thisWeekCrimes = allCrimes.filter(c => (c.datePublished ?? c.dateObj) >= weekAgo);
+const lastWeekCrimes = allCrimes.filter(c => { const d = c.datePublished ?? c.dateObj; return d >= twoWeeksAgo && d < weekAgo; });
 
 // Week-over-week change
 const thisWeekCount = getTotalCrimeCount(thisWeekCrimes);
