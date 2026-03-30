@@ -72,6 +72,12 @@
  * - Medium (Instagram)
  * - Short (Twitter/X)
  *
+ * Hotspot areas now include week-over-week change per area:
+ *   • Laventille: 8 incidents (+3 ↑)
+ *   • Port of Spain: 5 incidents (-1 ↓)
+ *   • San Fernando: 3 incidents (→ 0)
+ * Use this block as input for the social image workflow (F2/F3 formats).
+ *
  * ========================================
  * YEAR TRANSITIONS:
  * ========================================
@@ -571,8 +577,8 @@ function calculateStats(currentWeekCrimes, previousWeekCrimes) {
   // Sort by current count (descending)
   changes.sort((a, b) => b.current - a.current);
 
-  // Get top areas
-  const topAreas = getTopAreas(currentWeekCrimes, 3);
+  // Get top areas with week-over-week comparison
+  const topAreas = getTopAreas(currentWeekCrimes, previousWeekCrimes, 3);
 
   return {
     changes: changes,
@@ -624,21 +630,32 @@ function countByCrimeType(crimes) {
 }
 
 /**
- * Get top N areas by crime count
+ * Get top N areas by crime count with week-over-week comparison
  */
-function getTopAreas(crimes, limit) {
+function getTopAreas(crimes, previousCrimes, limit) {
   const areaCounts = {};
+  const previousAreaCounts = {};
 
   crimes.forEach(crime => {
     const area = crime['Area'] || 'Unknown';
     areaCounts[area] = (areaCounts[area] || 0) + 1;
   });
 
+  previousCrimes.forEach(crime => {
+    const area = crime['Area'] || 'Unknown';
+    previousAreaCounts[area] = (previousAreaCounts[area] || 0) + 1;
+  });
+
   const sorted = Object.entries(areaCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, limit);
 
-  return sorted.map(([area, count]) => ({ area, count }));
+  return sorted.map(([area, count]) => {
+    const previous = previousAreaCounts[area] || 0;
+    const diff = count - previous;
+    const arrow = diff > 0 ? '↑' : (diff < 0 ? '↓' : '→');
+    return { area, count, previous, diff, arrow };
+  });
 }
 
 /**
@@ -663,8 +680,11 @@ function generatePostTexts(stats, startDate, endDate) {
     return `• ${c.type}: ${c.current} incidents (${sign}${c.diff}, ${c.arrow}${Math.abs(Math.round(c.percentChange))}%)`;
   }).join('\n');
 
-  // Build hotspots line
-  const hotspots = stats.topAreas.map(a => `${a.area} (${a.count})`).join(', ');
+  // Build hotspots lines with week-over-week change per area
+  const hotspotLines = stats.topAreas.map(a => {
+    const sign = a.diff >= 0 ? '+' : '';
+    return `• ${a.area}: ${a.count} incidents (${sign}${a.diff} ${a.arrow})`;
+  }).join('\n');
 
   // LONG VERSION (Facebook, WhatsApp)
   const longPost = `🇹🇹 Trinidad Crime Update (${dateRange})
@@ -674,7 +694,8 @@ function generatePostTexts(stats, startDate, endDate) {
 Top Crime Types:
 ${crimeLines}
 
-🔥 Hotspots: ${hotspots}
+🔥 Hotspots:
+${hotspotLines}
 
 View interactive dashboard: ${SOCIAL_CONFIG.dashboardUrl}
 
@@ -710,13 +731,16 @@ View dashboard: ${SOCIAL_CONFIG.dashboardUrl}
     return `• ${c.type}: ${c.current} (${sign}${c.diff}, ${c.arrow}${Math.abs(Math.round(c.percentChange))}%)`;
   }).join('\n');
 
+  const topArea = stats.topAreas[0];
+  const topAreaSign = topArea.diff >= 0 ? '+' : '';
+
   const mediumPost = `🇹🇹 Crime Update (${dateRange})
 
 📊 Total: ${totalTrend}
 
 ${mediumCrimeLines}
 
-🔥 Top: ${stats.topAreas[0].area} (${stats.topAreas[0].count})
+🔥 Top area: ${topArea.area} — ${topArea.count} incidents (${topAreaSign}${topArea.diff} ${topArea.arrow})
 
 View dashboard: ${SOCIAL_CONFIG.dashboardUrl}
 
@@ -730,7 +754,7 @@ View dashboard: ${SOCIAL_CONFIG.dashboardUrl}
 
 Total: ${totalTrend}
 Top type: ${topCrime.type} (${topCrime.current})
-Top area: ${stats.topAreas[0].area}
+Top area: ${topArea.area} (${topAreaSign}${topArea.diff} ${topArea.arrow})
 
 ${SOCIAL_CONFIG.dashboardUrl}
 
@@ -772,8 +796,11 @@ function generateMonthlyPostTexts(stats, currentMonthStart, currentMonthEnd, pre
     return `• ${c.type}: ${c.current} incidents (${sign}${c.diff}, ${c.arrow}${Math.abs(Math.round(c.percentChange))}%)`;
   }).join('\n');
 
-  // Build hotspots line
-  const hotspots = stats.topAreas.map(a => `${a.area} (${a.count})`).join(', ');
+  // Build hotspots lines with month-over-month change per area
+  const hotspotLines = stats.topAreas.map(a => {
+    const sign = a.diff >= 0 ? '+' : '';
+    return `• ${a.area}: ${a.count} incidents (${sign}${a.diff} ${a.arrow})`;
+  }).join('\n');
 
   // LONG VERSION (Facebook, WhatsApp)
   const longPost = `🇹🇹 Trinidad Crime Report - ${currentMonthName}
@@ -783,7 +810,8 @@ function generateMonthlyPostTexts(stats, currentMonthStart, currentMonthEnd, pre
 Top Crime Types:
 ${crimeLines}
 
-🔥 Hotspots: ${hotspots}
+🔥 Hotspots:
+${hotspotLines}
 
 View interactive dashboard: ${SOCIAL_CONFIG.dashboardUrl}
 
@@ -819,13 +847,16 @@ View dashboard: ${SOCIAL_CONFIG.dashboardUrl}
     return `• ${c.type}: ${c.current} (${sign}${c.diff}, ${c.arrow}${Math.abs(Math.round(c.percentChange))}%)`;
   }).join('\n');
 
+  const topArea = stats.topAreas[0];
+  const topAreaSign = topArea.diff >= 0 ? '+' : '';
+
   const mediumPost = `🇹🇹 ${currentMonthName} Crime Report
 
 📊 Total: ${totalTrend}
 
 ${mediumCrimeLines}
 
-🔥 Top: ${stats.topAreas[0].area} (${stats.topAreas[0].count})
+🔥 Top area: ${topArea.area} — ${topArea.count} incidents (${topAreaSign}${topArea.diff} ${topArea.arrow})
 
 View dashboard: ${SOCIAL_CONFIG.dashboardUrl}
 
@@ -839,7 +870,7 @@ View dashboard: ${SOCIAL_CONFIG.dashboardUrl}
 
 Total: ${stats.totalCurrent} (${totalSign}${totalDiff})
 Top: ${topCrime.type} (${topCrime.current})
-Hotspot: ${stats.topAreas[0].area}
+Hotspot: ${topArea.area} (${topAreaSign}${topArea.diff} ${topArea.arrow})
 
 ${SOCIAL_CONFIG.dashboardUrl}
 

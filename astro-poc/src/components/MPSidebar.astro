@@ -105,6 +105,9 @@ function mpCard(mp: MP) {
               Member{mps.length !== 1 ? 's' : ''} of Parliament
             </p>
             <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_40%)] mt-0.5">{regionName} Region</p>
+            <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_40%)] mt-0.5">
+              {showAll ? 'Elected representatives for this region' : 'Elected representative for this area'}
+            </p>
           </div>
           {showAll && (
             <button

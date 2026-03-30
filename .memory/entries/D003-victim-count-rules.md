@@ -3,7 +3,7 @@ id: D003
 type: decision
 status: active
 created: 2026-01-01
-updated: 2026-03-07
+updated: 2026-03-28
 related: [L009, B010]
 ---
 
@@ -32,9 +32,11 @@ Example — shooting where 5 injured, 2 died:
 
 Analytics code counts repetitions via `.split(',').map(t => t.trim()).filter(Boolean).length` — each repetition = 1 victim. **Do NOT change this encoding without migrating all D1 data and updating all parsers.**
 
-Validated March 2026: 2,633 records checked; only 1 instance of primary appearing in related (data entry error). Cross-field dedup is NOT needed.
+Validated March 2026: 2,633 records checked. Primary appearing in related is **sometimes intentional** — e.g. Robbery primary + Robbery×2 related = 3 robbery victims across the same incident. Cross-field dedup is NOT needed in analytics.
 
-**Display dedup:** `CrimeDetailModal.astro` and `crime/[slug].astro` both use `[...new Set(...)]` before rendering pills — shows each crime type once. This is display-only and does NOT affect analytics. Do not remove the Set().
+**Display — `crime/[slug].astro` (Mar 28 2026):** Uses a `Map`-based count instead of `Set()`. Same-type related entries are merged into the primary chip (`[Robbery ×3]` in rose). Different-type related entries get their own slate chips with counts (`[Attempted Murder ×3]`). Do NOT re-introduce `Set()` here — it hides victim counts and caused false "data error" reports.
+
+**Display — `CrimeDetailModal.astro`:** Still uses `[...new Set(...)]` for pill rendering. Counts are not shown in the modal. If parity with the detail page is needed, apply the same Map-based approach.
 
 ## Known Issues / Gotchas
 - `Murder|Murder` in related crimes = 2 separate murders (e.g. 4 shot, 2 died) — intentional, do NOT deduplicate
@@ -46,3 +48,4 @@ Validated March 2026: 2,633 records checked; only 1 instance of primary appearin
 - 2026-01-01: Victim count system implemented
 - 2026-03-02: Confirmed and locked in with Kavell
 - 2026-03-17: Documented repetition convention; added display dedup to modal + slug page
+- 2026-03-28: Clarified primary-in-related is valid (not always an error). Updated crime/[slug].astro to Map-based chip counting — merges same-type related into primary chip, shows counts on all chips. CrimeDetailModal still uses Set() (no counts shown there).

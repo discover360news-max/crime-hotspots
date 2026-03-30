@@ -20,6 +20,7 @@ related: [D003, L007, B010]
 - `calculateInsights()` in `dashboardHelpers.ts` — area map
 - `updateQuickInsights()` in `dashboardUpdates.ts` — client-side filter updates
 - `compare.astro` — `total90d` and `totalAll` both use crime count
+- `HomepagePulse.astro` — "This Week" crimes count + week-over-week % (fixed Mar 29 2026; was raw row count)
 
 **The murder exception:**
 ```ts
@@ -36,8 +37,9 @@ related: [D003, L007, B010]
 - Raw row count would undercount crimes (misses related types)
 - Victim count would overcount (inflated by high-victim events)
 - `Murder|Murder` in related crimes = 2 deaths — never deduplicate with Set() in analytics
-- **Display is different from analytics:** `CrimeDetailModal` and `crime/[slug]` deduplicate pills with `Set()` for display only — this is correct and intentional. Do NOT remove it. Do NOT apply Set() in analytics functions.
+- **Display is different from analytics:** `CrimeDetailModal` still deduplicates pills with `Set()`. `crime/[slug]` (Mar 28 2026) uses a `Map`-based count instead — shows `Type ×N` per chip and merges same-type related entries into the primary chip. Do NOT apply Set() in analytics functions.
 
 ## Change Log
 - 2026-03-03: Methodology locked in with Kavell; applied across all calculation points
 - 2026-03-17: Clarified display-dedup vs analytics-dedup distinction
+- 2026-03-29: HomepagePulse "This Week" crimes count fixed — now uses getTotalCrimeCount() instead of raw .length

@@ -1,243 +1,322 @@
-# Social Image Generation Workflow
-## Weekly Crime Stats — Gemini Image Prompts
+# Social Image Workflow
+## Weekly Crime Stats — Multi-Format Testing Framework
 
 **Platform:** Facebook + Instagram (via Meta Business Suite)
-**Aspect ratio:** 4:5 portrait (1080×1350px) — optimal for both feeds without cropping
-**Text rendering:** Burnt into image by Gemini
-**Images per week:** 4 (3 crime spikes + 1 positive trend)
+**Aspect ratio:** 4:5 portrait (1080×1350px)
+**Images per week:** 4
+**Goal:** Week-by-week format testing until a formula is proven
+
+---
+
+## The Core Principle
+
+Nobody shares crime stats. They share content that feels like a direct warning to them personally.
+
+Before publishing any image, ask: *"Would someone who lives in this area share this to warn a friend?"*
+If the answer is no, the image is wrong — regardless of how good it looks.
 
 ---
 
 ## Step 1 — Paste the Weekly Stats
 
-Paste the weekly update block in this format:
-
 ```
-📊 Total: [N] incidents ([change])
+Total: [N] incidents ([change] vs last week)
 
 Top Crime Types:
-• [Type]: [N] incidents ([change], [direction]%)
+• [Type]: [N] incidents ([+/-N], [+/-%])
 • ...
 
-Hotspots: [Area] ([N]), [Area] ([N])
+Hotspots (areas with highest concentration):
+• [Area]: [N] incidents
+• [Area]: [N] incidents
+• [Area]: [N] incidents
 ```
 
 ---
 
-## Step 2 — Select the 4 Images
+## Step 2 — Select the 4 Posts
 
-**Pick 3 crime spike images** using this priority order:
-1. Highest **percentage increase** (most alarming growth signal)
-2. Highest **raw volume** (most common crime — most relatable)
-3. Highest **emotional weight** (violence, invasion of safety)
+Each week pick 4 stats to post. Use this priority order:
 
-**Pick 1 positive image:**
-- Biggest **percentage decrease** — must be at least -20% to be worth celebrating
-- If no stat qualifies, use overall total if it dropped week-over-week
+1. The hotspot area with the biggest spike — leads with a named neighbourhood
+2. The crime type with the highest % increase
+3. The crime type with the highest raw volume (most common = most relatable)
+4. One positive stat — biggest % decrease (only if -20% or more), otherwise use overall total if it dropped
 
 ---
 
-## Step 3 — Assign Styles
+## Step 3 — Pick a Format for Each Post
 
-| Image | Style |
-|-------|-------|
-| Positive stat | Clinical / Data Journalism |
-| Highest volume crime | Clinical / Data Journalism |
-| Highest % spike | Raw / Visceral |
-| Emotional weight crime | Raw / Visceral |
+This is the testing layer. Each week, assign formats from the table below. **Rotate formats week to week** — never repeat the same format in the same slot two weeks running. The Tracking Log records what was used so you can compare engagement.
 
----
+### Format Menu
 
-## Step 4 — Pick a Creative Concept
+| ID | Name | Description | Tool |
+|----|------|-------------|------|
+| **F1** | Pure Text Card | Black background, red label, bold white stat, one supporting line. No image. | Canva |
+| **F2** | Neighbourhood Warning | Named area front and centre. One stat. Dark bg. Feels like a direct alert. | Canva |
+| **F3** | Leaderboard Card | Top 3 hotspot areas ranked with incident counts. More info = more reason to share. | Canva |
+| **F4** | Question Hook | Opens with a question ("Is [Area] getting safer?"), answers with the stat. | Canva |
+| **F5** | AI Scene Image | Photorealistic generated scene with text overlay. See templates below. | Gemini + Canva |
 
-The library below is a **starting point, not a ceiling.** Each week, Claude should:
-1. Check the library for a strong match
-2. If nothing fits precisely — **invent a bespoke concept** for that week's specific data
-3. Add strong new concepts to the library with a date tag so it grows over time
+**Default week-1 assignment:**
 
-Rotate concepts week-to-week. Never repeat the same concept two weeks running for the same crime type.
+| Post | Stat | Format |
+|------|------|--------|
+| 1 — Named hotspot spike | Area with biggest rise | F2 — Neighbourhood Warning |
+| 2 — Biggest % crime spike | Crime type | F1 — Pure Text Card |
+| 3 — Highest volume crime | Crime type | F3 — Leaderboard Card |
+| 4 — Positive stat | Decrease or overall drop | F1 — Pure Text Card |
 
----
-
-### Visual Alignment Rule
-
-**The subject must be immediately recognisable as connected to that crime type — without the viewer needing to read the text.**
-
-A viewer who sees the image for 1 second should feel **surprise or anger** before they read a word. Generic props that require logical leaps (e.g. a padlock for assault) are invalid — they dilute the emotional punch and confuse the message.
-
-**Crime-type direction guide** *(use as inspiration, not a locked list — add to it):*
-
-| Crime Type | Avoid | Direction |
-|------------|-------|-----------|
-| Assault | Padlocks, keys, generic crime tape | Physical impact — broken glasses, hospital wristband, bruised skin close-up, overturned scene |
-| Robbery | Generic bags, evidence bags | Loss and violation — scattered belongings on dark ground, open empty wallet, motion blur of a snatched item |
-| Theft | Generic props | Missing or damaged — shattered car window, damaged phone, outline where something was |
-| Burglary | Intact padlocks | Forced entry — splintered door frame, cut chain, pried window frame |
-| Seizures | Generic crime tape | The haul itself — contraband spread, drugs/cash/weapons laid out, evidence bags being handled |
-| Attempted Murder | Neutral props | Close brush with death — hospital wristband, surgical glove with smear, aftermath of violence |
-| Shooting | Generic alleys | Ballistic aftermath — shell casings, shattered glass at head height, police tape |
-| Murder | Any prop | Aftermath only, no body — police tape, burned wreck, empty scene under hard light |
-| Overall total (up) | Any single prop | Scale and atmosphere — rain-slicked city street at night, police lights across a skyline |
-| Overall total (down) | Celebration imagery | Absence of harm — empty evidence bag, open handcuffs, clean unmarked surface |
+Swap formats in subsequent weeks and track results in the Tracking Log.
 
 ---
 
-### Style Library *(evolving — add new entries as invented)*
+## Format Templates
 
-#### Clinical / Data Journalism
-Aesthetic: pure white or pale grey background, cold neutral studio lighting, zero shadows, forensic, detached.
+### F1 — Pure Text Card
 
-| # | Subject | Crime types | Added |
-|---|---------|-------------|-------|
-| C1 | Shattered car window glass spread on white surface | Theft, carjacking | Mar 2026 |
-| C2 | Single closed padlock on white surface | Burglary positive / security messaging only | Mar 2026 |
-| C3 | Empty evidence bag lying flat on white | Positive stats — absence of crime | Mar 2026 |
-| C4 | Lone key in a lock, overhead shot | Burglary prevention angle | Mar 2026 |
-| C5 | Wallet lying open and empty, overhead shot | Theft, robbery | Mar 2026 |
-| C6 | Torn legal document on white surface | Fraud, financial crime | Mar 2026 |
-| C7 | CCTV camera close-up, neutral bg | Surveillance / deterrence angle | Mar 2026 |
-| C8 | Empty handcuffs lying open on white | Positive stats — nobody arrested, no crime | Mar 2026 |
-| C9 | Police evidence tags laid out in a row | Seizures | Mar 2026 |
-| C10 | Single item (phone, bag, watch) with visible damage | Theft, robbery | Mar 2026 |
-| C11 | Broken eyeglasses lying on white surface, one lens cracked | Assault, domestic violence | Mar 2026 |
-| C12 | Single latex surgical glove, pristine white — with one faint smear | Attempted murder, assault (clinical contrast) | Mar 2026 |
+**Canva layout:**
+- Background: `#0D0D0D` (near-black)
+- Top label: Red pill badge — `CRIME ALERT` or `THIS WEEK` in white caps, 14–16px
+- Headline: Bold white, 56–64px, 2–3 lines max
+- Supporting line: Regular weight white, 22–24px, muted opacity
+- Bottom: `crimehotspots.com` wordmark, small, bottom-left
 
-#### Raw / Visceral
-Aesthetic: dark or textured background, hard directional light, deep shadows, high contrast, unsettling.
-
-| # | Subject | Crime types | Added |
-|---|---------|-------------|-------|
-| V1 | Top-down confiscated contraband spread on dark concrete | Seizures — drugs, weapons, cash | Mar 2026 |
-| V2 | Splintered wooden door frame — forced entry | Burglary, home invasion | Mar 2026 |
-| V3 | Single overturned chair under a dangling bare bulb | Assault, general violence | Mar 2026 |
-| V4 | Dark alley with single harsh streetlight | Robbery, shooting | Mar 2026 |
-| V5 | Gloved hands holding an evidence bag against dark bg | Seizures, investigation | Mar 2026 |
-| V6 | Close-up of broken padlock, chain cut | Burglary, forced entry | Mar 2026 |
-| V7 | Smashed window on a dark surface, glass fragments | Robbery, theft | Mar 2026 |
-| V8 | Silhouette of a figure against a lit doorway | General unease, home invasion | Mar 2026 |
-| V9 | Hospital wristband on a dark surface, clinical light | Assault, shooting, attempted murder | Mar 2026 |
-| V10 | Burned-out car wreck at night, embers faint | Arson, extreme crime | Mar 2026 |
-| V11 | Police tape stretched across a dark background | Any crime — aftermath | Mar 2026 |
-| V12 | Close-up hands in handcuffs, dramatic lighting | Arrest, seizure | Mar 2026 |
-| V13 | Scattered personal items on dark wet ground — phone, keys, wallet | Robbery, mugging | Mar 2026 |
-| V14 | Shell casings on dark concrete, single overhead light | Shooting, attempted murder | Mar 2026 |
-
-#### Cinematic / Atmospheric *(experimental — added Mar 2026)*
-Aesthetic: real-world environments, low ambient light, depth, moody — more editorial than forensic.
-
-| # | Subject | Crime types | Added |
-|---|---------|-------------|-------|
-| A1 | Overhead rain-slicked urban street at night, police strobe out of focus in distance | Overall totals, general crime | Mar 2026 |
-
-#### High-Contrast B&W / Graphic *(experimental — added Mar 2026)*
-Aesthetic: colour stripped entirely, extreme crushed blacks and blown-out whites, almost graphic-design-level contrast.
-
-| # | Subject | Crime types | Added |
-|---|---------|-------------|-------|
-| G1 | Heavy object (padlock, cuffs, evidence bag) under extreme B&W contrast | Burglary, positive stats | Mar 2026 |
-
----
-
-### Adding New Concepts
-
-When a new concept is invented during a weekly run, add it to the relevant style table above with:
-- A new sequential ID (C13, V15, A2, G2, etc.)
-- Subject description
-- Crime type(s) it suits
-- Date added
-
-If a concept underperforms or feels wrong in retrospect, note it in the **Concept Log** below.
-
----
-
-## Step 5 — Fill the Prompt Template
-
-### Clinical Template
-
+**Content structure:**
 ```
-Photorealistic [CONCEPT DESCRIPTION], [BACKGROUND — pure white / pale grey surface],
-cold neutral studio lighting, zero shadows. Forensic, detached, data journalism aesthetic.
-Portrait orientation 4:5. Bold [black / dark green for positive] sans-serif text upper left:
-"[CRIME TYPE]: [DIRECTION][PERCENTAGE]%". Smaller secondary grey line directly below:
-"[N] incidents — [up/down] [CHANGE] this week". No borders, no branding. Stark, minimal.
+[RED BADGE] CRIME ALERT
+
+[CRIME TYPE OR AREA]
+up [N]% this week
+
+[N] incidents — [+/-CHANGE] vs last week
 ```
 
-### Visceral Template
+**Positive variant:** swap red badge for dark green, headline in white, supporting line in light green.
 
+---
+
+### F2 — Neighbourhood Warning Card
+
+**Canva layout:**
+- Background: `#0D0D0D` or dark navy
+- Top-left: Small location pin icon + neighbourhood name in muted caps (e.g. `LAVENTILLE`)
+- Headline: Bold white, large — the stat itself (e.g. `Robberies up 40%`)
+- Sub-line: "This week — [N] incidents" in smaller regular weight
+- Bottom strip: thin red or amber horizontal rule, then `crimehotspots.com`
+
+**Content structure:**
 ```
-Photorealistic [CONCEPT DESCRIPTION], [BACKGROUND — dark concrete / black surface],
-harsh single-source directional light casting sharp shadows. High contrast, gritty, raw.
+[PIN ICON] [NEIGHBOURHOOD NAME]
+
+[CRIME TYPE] up [N]%
+this week
+
+[N] incidents recorded
+[+CHANGE] vs last week
+
+crimehotspots.com
+```
+
+**Rule:** Always include a named area — never post a generic stat with no location.
+
+---
+
+### F3 — Leaderboard Card
+
+Best used for the overall hotspot summary or the most common crime type.
+
+**Canva layout:**
+- Background: `#0D0D0D`
+- Title row: `THIS WEEK'S HOTSPOTS` or `TOP CRIME AREAS` — red caps label
+- Ranked list: 3 rows, each with rank number (large, muted), area name (bold white), incident count (right-aligned, accent colour)
+- Optional: small up/down arrow next to each count showing week-over-week direction
+- Bottom: `crimehotspots.com`
+
+**Content structure:**
+```
+[RED LABEL] THIS WEEK'S HOTSPOTS
+
+#1  [Area Name]          [N] incidents  ↑
+#2  [Area Name]          [N] incidents  →
+#3  [Area Name]          [N] incidents  ↓
+
+Week of [DATE] — crimehotspots.com
+```
+
+---
+
+### F4 — Question Hook Card
+
+Opens with a question that speaks directly to the viewer's personal safety. The stat is the answer.
+
+**Canva layout:**
+- Background: dark, same palette
+- Top line: Question in regular weight, muted white — smaller than the answer
+- Answer: Large bold white stat
+- Small supporting context line
+- Bottom: `crimehotspots.com`
+
+**Content structure:**
+```
+Is [Area] getting safer?
+
+Not this week.
+[Crime Type] up [N]%.
+
+[N] incidents — [CHANGE] vs last week
+crimehotspots.com
+```
+
+Or for a positive stat:
+```
+One thing that improved
+in [Area] this week:
+
+[Crime Type] down [N]%.
+
+[N] incidents — [CHANGE] vs last week
+crimehotspots.com
+```
+
+---
+
+### F5 — AI Scene Image (Gemini)
+
+Use sparingly — test against the text formats first to establish whether scene imagery adds anything.
+
+#### Clinical Template
+```
+Photorealistic [SUBJECT], pure white or pale grey surface,
+cold neutral studio lighting, zero shadows. Forensic, detached.
+Portrait orientation 4:5. Bold black sans-serif text upper left:
+"[CRIME TYPE]: [DIRECTION][PERCENTAGE]%"
+Smaller grey line directly below: "[N] incidents — [up/down] [CHANGE] this week"
+No borders, no branding.
+```
+
+#### Visceral Template
+```
+Photorealistic [SUBJECT], dark concrete or black surface,
+harsh single-source directional light, deep shadows. High contrast, raw.
 Portrait orientation 4:5. Bold white sans-serif text upper left:
-"[CRIME TYPE]: [DIRECTION][PERCENTAGE]%". Smaller secondary white line directly below:
-"[N] incidents — [up/down] [CHANGE] this week". No other text or branding. Visceral, dramatic.
+"[CRIME TYPE]: [DIRECTION][PERCENTAGE]%"
+Smaller white line directly below: "[N] incidents — [up/down] [CHANGE] this week"
+No other text or branding.
 ```
+
+#### Subject Library
+
+**Clinical (white/pale bg):**
+
+| ID | Subject | Crime types |
+|----|---------|-------------|
+| C1 | Shattered car window glass on white | Theft, carjacking |
+| C3 | Empty evidence bag lying flat | Positive stats |
+| C5 | Wallet open and empty, overhead | Theft, robbery |
+| C8 | Open handcuffs on white | Positive stats |
+| C9 | Evidence tags in a row | Seizures |
+| C11 | Broken eyeglasses, one lens cracked | Assault |
+| C12 | Latex glove with faint smear | Attempted murder, assault |
+
+**Visceral (dark bg):**
+
+| ID | Subject | Crime types |
+|----|---------|-------------|
+| V1 | Confiscated contraband on dark concrete | Seizures |
+| V2 | Splintered door frame | Burglary, home invasion |
+| V7 | Smashed window on dark surface | Robbery, theft |
+| V9 | Hospital wristband, clinical light | Assault, shooting |
+| V13 | Scattered belongings on wet ground | Robbery, mugging |
+| V14 | Shell casings, overhead light | Shooting |
+
+**Cinematic:**
+
+| ID | Subject | Crime types |
+|----|---------|-------------|
+| A1 | Rain-slicked urban street at night, police strobe distant | Overall totals |
+
+Add new subjects here with a date tag. Never repeat the same subject two weeks running for the same crime type.
 
 ---
 
-## Step 6 — Text Values Reference
-
-Fill in from the weekly stats:
+## Step 4 — Text Values Reference
 
 | Field | Format | Example |
 |-------|--------|---------|
-| CRIME TYPE | Title case | `Seizures` |
+| CRIME TYPE | Title case | `Robberies` |
+| AREA | Proper name | `Laventille` |
 | DIRECTION | Arrow only | `↑` or `↓` |
-| PERCENTAGE | No decimal | `83%` |
+| PERCENTAGE | No decimal | `40%` |
 | N | Integer | `11` |
-| up/down | Word | `up` or `down` |
-| CHANGE | Integer | `5` |
+| CHANGE | +/- integer | `+5` or `-3` |
 
-**Positive stat:** Use **dark green** bold text. All others: **white** (visceral) or **black** (clinical).
+**Colour rules:**
+- Positive stat → dark green label/badge, white text
+- Crime spike → red label/badge, white text
+- Neutral → amber or white label
 
 ---
 
-## Quality Checklist (after generation)
+## Quality Checklist
 
-- [ ] Percentage and arrow direction match the stats
-- [ ] Numbers are correct (Gemini occasionally hallucinates digits)
-- [ ] Text is legible — no blending into background
-- [ ] No unintended text or watermarks in the image
-- [ ] 4:5 crop is clean — no important subject cut off
+- [ ] A named area or specific crime type is in the headline — no generic stats
+- [ ] Numbers match the weekly data exactly
+- [ ] Arrow direction matches the change (up = ↑, down = ↓)
+- [ ] Text is legible at thumbnail size (check at 25% zoom)
+- [ ] 4:5 crop is clean — nothing important cut off
+- [ ] `crimehotspots.com` appears on every image
 - [ ] The 4 images feel visually distinct from each other
-- [ ] **Visual subject is directly tied to the crime type** — a viewer could identify the crime category without reading the text
-- [ ] **Emotional response check** — does the image produce surprise or anger on first glance?
+- [ ] The "would they share this to warn a friend?" test passes
 
 ---
 
 ## How to Invoke This Workflow with Claude
 
-Paste the weekly update block and say:
+Paste the weekly stats block and say:
 
-> "Generate this week's 4 social images using the social image workflow."
+> "Generate this week's 4 social posts using the social image workflow."
 
 Claude will:
 1. Select the 4 stats
-2. Assign clinical/visceral styles
-3. Suggest a creative concept for each (rotating from the library)
-4. Output 4 ready-to-paste Gemini prompts
+2. Assign formats based on the rotation (checking the Tracking Log for what ran last week)
+3. Output copy-ready content for each format — text, layout notes, and (if F5) a Gemini prompt
 
-You can also say:
-- "Use concept V4 for the seizures image" to override the concept choice
-- "Make all 4 clinical this week" to override styles
-- "Skip the positive image this week" if no stat qualifies
-
----
+Override options:
+- "Use F1 for all 4 this week" — override formats
+- "Skip the positive post" — if no stat qualifies
+- "Use V9 for the assault image" — override subject choice for F5
 
 ---
 
-## Concept Log
+## Tracking Log
 
-Track what was used, what worked, what to retire. Update after each week once engagement data is in.
+Update after each week once engagement data is in.
 
-| Week | Image | Concept used | Style | Notes |
-|------|-------|--------------|-------|-------|
-| Mar 12-20 | Seizures ↑17% | V1 contraband spread | Visceral | First run — no data yet |
-| Mar 12-20 | Attempted Murder ↑13% | C12 surgical glove + smear | Clinical contrast | First run — no data yet |
-| Mar 12-20 | Total ↑18% | A1 rain-slicked street at night | Cinematic | New style — testing |
-| Mar 12-20 | Assault ↓17% | C3 empty evidence bag | Clinical | Replaced invalid padlock concept |
+**Performance key:** — = no data | ✓ strong (keep using) | ~ average | ✗ retire
 
-*Performance key: — = no data yet | ✓ = strong performer (keep rotating in) | ~ = average | ✗ = retire*
+| Week | Post | Stat used | Format | Likes | Comments | Shares | Notes |
+|------|------|-----------|--------|-------|----------|--------|-------|
+| Mar 12–20 | Seizures ↑17% | Seizures | F5 V1 Visceral | — | — | — | First run, no engagement data |
+| Mar 12–20 | Attempted Murder ↑13% | Att. Murder | F5 C12 Clinical | — | — | — | First run |
+| Mar 12–20 | Total ↑18% | Overall | F5 A1 Cinematic | — | — | — | First run |
+| Mar 12–20 | Assault ↓17% | Assault | F5 C3 Clinical | — | — | — | First run |
+| Mar 19–27 | San Fernando +5 | Area spike | F2 Neighbourhood Warning | — | — | — | First Canva run |
+| Mar 19–27 | Assault ↑40% | Crime spike | F1 Pure Text Card | — | — | — | First Canva run |
+| Mar 19–27 | Top crime types leaderboard | Volume | F3 Leaderboard Card | — | — | — | First Canva run |
+| Mar 19–27 | Robbery ↓41% | Positive | F4 Question Hook | — | — | — | First Canva run |
 
 ---
 
-*Created: Mar 2026 | Platform: FB + IG via Meta Business Suite*
+## Format Rotation Guide
+
+Once you have 4+ weeks of data, use this to decide what to keep testing:
+
+1. Any format with consistent shares → keep in rotation, increase frequency
+2. Any format with zero shares 3 weeks running → retire, replace with an untested format
+3. The first format to produce a share from someone outside your existing followers = the breakthrough format — double down on it
+
+---
+
+*Created: Mar 2026 | Redesigned: Mar 2026 | Platform: FB + IG via Meta Business Suite*

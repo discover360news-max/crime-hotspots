@@ -8,6 +8,32 @@
 
 ## March 2026
 
+### Fix: _redirects double redirect causing GA4 split views (Mar 30, 2026)
+
+- **`public/_redirects`** — All destination URLs updated to include trailing slashes (e.g. `/trinidad/dashboard/` not `/trinidad/dashboard`). Previously, old-URL visitors hit a double redirect: `_redirects` fired first (no slash), then Astro's `trailingSlash: 'always'` fired a second redirect to add the slash. GA4 was recording the intermediate no-slash URL as a separate page, splitting view counts — e.g. dashboard showed 1,670 views on `/trinidad/dashboard/` and 410 views on `/trinidad/dashboard` as two distinct entries.
+
+---
+
+### Social image workflow redesigned + area comparison data added (Mar 29, 2026)
+
+- **`docs/guides/SOCIAL-IMAGE-WORKFLOW.md`** — Full redesign. Replaced single Gemini image style with a 5-format testing framework (F1 pure text card, F2 neighbourhood warning, F3 leaderboard, F4 question hook, F5 AI scene). F1–F4 built in Canva, F5 via Gemini. Named area required in every post — key change from old approach. Weekly tracking log added to measure which formats get shares. Canva is the primary production tool; Claude outputs copy ready to paste into templates.
+- **`google-apps-script/trinidad/socialMediaStats.gs`** — `getTopAreas()` now accepts previous period crimes and returns `diff` + `arrow` per area alongside `count`. All three post formats (long/medium/short) in both weekly and monthly generators updated to show per-area week-over-week change (e.g. `Laventille: 8 incidents (+3 ↑)`).
+
+---
+
+### HomepagePulse: crimes count uses primary+related methodology (Mar 29, 2026)
+
+- **`HomepagePulse.astro`** — "This Week" crimes number and week-over-week % now use `getTotalCrimeCount()` (primary + related types per row) instead of raw row count. Consistent with the rest of the site per L009.
+
+---
+
+### Crime detail page: incident composition display + glass panel (Mar 28, 2026)
+
+- **`crime/[slug].astro`** — Crime type chips now show victim counts per type instead of deduplicated type names. Replaced `new Set()` chip render with a `Map`-based count: `Attempted Murder ×3`, `Murder ×1`. Primary chip absorbs same-type related entries into a merged count (e.g. Robbery primary + Robbery×2 related → `[Robbery ×3]` in rose rather than a duplicate slate chip). Incident composition summary line (`"4 people involved — 1 killed · 3 injured"`) rendered between chips and H1 when Murder or Attempted Murder are present. Fixes false-positive "data error" user reports caused by invisible victim counts.
+- **`crime/[slug].astro`** — Multi-crime incidents (related types present or summary text present) now group chips + summary inside a frosted glass panel (`bg-white/85 backdrop-blur-md`, 1px `border-slate-200/80` light / `hsl(0_0%_100%_/_0.08)` dark, `rounded-xl`). Single-crime incidents keep the plain rose pill with no wrapper. Chips inside panel use `flex flex-wrap gap-1.5` instead of `ml-1.5` offsets.
+
+---
+
 ### Safety tips batch: Stories 681–685 (Mar 28, 2026)
 
 - **NEW TIP TIP-00091** — Staying Safe During Unexpected Public Confrontations (Assault / In a Mall) — Story 681: Rajkumar Pope fatally beaten at a shop in south Trinidad; neck grab + repeated head punches. No existing Assault tip covers unprovoked stranger attack at a retail/food establishment.

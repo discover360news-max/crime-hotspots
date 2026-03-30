@@ -11,6 +11,7 @@ import { routes } from '../config/routes';
 import socialProof from '../data/social-proof.json';
 
 const kofiPct = Math.min(100, Math.round((socialProof.kofi_supporters / socialProof.kofi_goal) * 100));
+const kofiRemaining = socialProof.kofi_goal - socialProof.kofi_supporters;
 
 const title = "Support Crime Hotspots — Keep Caribbean Crime Data Free";
 const description = "Crime Hotspots is free, ad-free, and independent. Support the project on Ko-fi to help keep it running for communities across the Caribbean.";
@@ -49,12 +50,12 @@ const description = "Crime Hotspots is free, ad-free, and independent. Support t
     <div class="w-full max-w-md mx-auto mb-10">
       <div class="flex items-center justify-between text-xs mb-2">
         <span class="font-semibold uppercase tracking-wide text-slate-400 dark:text-[var(--ch-text-faint)]">Community Goal</span>
-        <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_82%)]">{socialProof.kofi_goal} Ko-fi supporters</span>
+        <span class="font-bold text-slate-700 dark:text-[hsl(0_0%_82%)]">{socialProof.kofi_supporters} of {socialProof.kofi_goal} supporters</span>
       </div>
       <div class="h-2 w-full rounded-full bg-slate-200 dark:bg-[hsl(0_0%_18%)] overflow-hidden">
         <div class="h-full rounded-full bg-rose-500 dark:bg-rose-600 transition-all" style={`width: ${kofiPct}%`}></div>
       </div>
-      <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-2 text-center">Help us reach {socialProof.kofi_goal} supporters to keep this platform free.</p>
+      <p class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)] mt-2 text-center">We need {kofiRemaining} more {kofiRemaining === 1 ? 'supporter' : 'supporters'} to hit our goal — be one of them.</p>
     </div>
 
     <!-- What support covers -->
@@ -103,29 +104,5 @@ const description = "Crime Hotspots is free, ad-free, and independent. Support t
       <SocialProofStrip variant="strip" />
     </div>
 
-    <!-- Divider -->
-    <div class="w-full h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-[hsl(0_0%_22%)] to-transparent my-8"></div>
-
-    <!-- Secondary CTAs -->
-    <div class="grid sm:grid-cols-2 gap-4 text-center">
-      <a
-        href={routes.report}
-        class="group flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_75%)] hover:border-rose-600 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 transition text-caption font-bold"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-        </svg>
-        Submit a Crime Report
-      </a>
-      <a
-        href={routes.help}
-        class="group flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-slate-200 dark:border-[hsl(0_0%_22%)] text-slate-600 dark:text-[hsl(0_0%_75%)] hover:border-rose-600 hover:text-rose-600 dark:hover:border-rose-500 dark:hover:text-rose-400 transition text-caption font-bold"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Visit the Help Centre
-      </a>
-    </div>
   </main>
 </Layout>

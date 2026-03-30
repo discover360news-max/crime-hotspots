@@ -3,6 +3,9 @@
 > Read this first. One-liner per entry. Open the entry file for details.
 > Session protocol: `.memory/SESSION.md` | Full feature list: `docs/claude-context/site-features.md`
 
+## User & Workflow
+user-claude-throttle-windows | USER | active | Claude peak hours + Kavell's timezone windows (UK until Apr 10, then Tobago) — re-fetch source URL periodically → user-claude-throttle-windows.md
+
 ## Bugs & Gotchas (B)
 B001 | BUG | active | Astro `{expr}` in `<script>` NOT evaluated — use set:html → B001-astro-script-expression.md
 B002 | BUG | active | `is:inline` does NOT re-run on SPA nav — always use astro:page-load → B002-isinline-spa-rerun.md
@@ -98,7 +101,7 @@ CFG003 | CFG | active | Cloudflare caching: ALL crime-data pages SSR + CDN ~23h.
 CFG004 | CFG | active | astro.config.mjs: output:server, Cloudflare adapter, key integrations → CFG004-astro-config.md
 
 ## Social Media (SM)
-SM001 | WORKFLOW | active | Weekly social image prompts for Gemini: 4 images (3 spikes + 1 positive), clinical/visceral styles, creative concept library → docs/guides/SOCIAL-IMAGE-WORKFLOW.md
+SM001 | WORKFLOW | active | Weekly social posts: 5 formats (F1 pure text, F2 neighbourhood warning, F3 leaderboard, F4 question hook, F5 Gemini scene). Rotate formats week-to-week, track in Tracking Log. Canva for F1–F4, Gemini for F5 → docs/guides/SOCIAL-IMAGE-WORKFLOW.md
 
 ## Tools (T)
 T001 | TOOL | archived | dedup-2025: one-time GAS script to de-duplicate Raw Articles sheet entries. `google-apps-script/tools/dedup-2025/dedup.gs` + `index.html`. Ran Mar 2026; kept for reference if de-dup needed again.
