@@ -16,7 +16,7 @@ import { getTrinidadCrimes, getAllCrimesFromD1, getCrimesByMonthFromD1, type Cri
 import { dataUpdateNotice } from '../../../../config/siteNotifications';
 import { getCountryName } from '../../../../data/countries';
 import { routes, buildRoute } from '../../../../config/routes';
-import { usesVictimCount } from '../../../../config/crimeTypeConfig';
+import { usesVictimCount, crimeHasVictims } from '../../../../config/crimeTypeConfig';
 
 const { year: yearParam, month: monthParam } = Astro.params;
 const year = parseInt(yearParam ?? '', 10);
@@ -111,7 +111,7 @@ const totalVictims = crimes.reduce((sum, crime) => {
   if (primaryType && usesVictimCount(primaryType)) {
     return sum + (crime.victimCount || 1);
   }
-  return sum + 1;
+  return crimeHasVictims(primaryType) ? sum + 1 : sum;
 }, 0);
 const victimsPerDay = Math.round(totalVictims / daysInMonth);
 
@@ -180,8 +180,10 @@ const sortedDates = Array.from(crimesByDate.keys()).sort((a, b) =>
 // Helper to calculate victim count for a group
 function calculateVictimCount(groupCrimes: Crime[]): number {
   return groupCrimes.reduce((total, crime) => {
-    const vc = crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1;
-    return total + vc;
+    const primaryType = crime.primaryCrimeType || crime.crimeType;
+    if (!crimeHasVictims(primaryType)) return total;
+    if (usesVictimCount(primaryType)) return total + (crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1);
+    return total + 1;
   }, 0);
 }
 

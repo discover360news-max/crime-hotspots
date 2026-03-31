@@ -14,6 +14,7 @@ import { routes, buildRoute } from '../config/routes';
 import { getAllCrimesFromD1, getTrinidadCrimes } from '../lib/crimeData';
 import { getHotAreas } from '../lib/trendingHelpers';
 import { countCrimeType } from '../lib/dashboardHelpers';
+import { usesVictimCount, crimeHasVictims } from '../config/crimeTypeConfig';
 
 import trinidadImg from '../assets/images/trinidad.jpg';
 import trinidadDarkImg from '../assets/images/trinidad-card-trsp-bg.png';
@@ -49,7 +50,10 @@ const murdersByArea = new Map<string, number>();
 const victimsByArea = new Map<string, number>();
 thisWeekCrimes.forEach(c => {
   const area = c.area || 'Unknown';
-  const victims = c.victimCount && c.victimCount > 1 ? c.victimCount : 1;
+  const primaryType = c.primaryCrimeType || c.crimeType;
+  const victims = !crimeHasVictims(primaryType) ? 0
+    : usesVictimCount(primaryType) && c.victimCount && c.victimCount > 0 ? c.victimCount
+    : 1;
   victimsByArea.set(area, (victimsByArea.get(area) || 0) + victims);
   if (c.primaryCrimeType === 'Murder') {
     murdersByArea.set(area, (murdersByArea.get(area) || 0) + victims);

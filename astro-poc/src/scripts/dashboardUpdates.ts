@@ -9,7 +9,7 @@ import { countCrimeType } from '../lib/dashboardHelpers';
 import { getTotalCrimeCount } from '../lib/statisticsHelpers';
 import { generateNameSlug } from '../lib/csvParser';
 import { getRiskWeight } from '../config/riskWeights';
-import { usesVictimCount } from '../config/crimeTypeConfig';
+import { usesVictimCount, crimeHasVictims } from '../config/crimeTypeConfig';
 import { buildRoute } from '../config/routes';
 import { escapeHtml } from '../lib/escapeHtml';
 
@@ -233,7 +233,7 @@ export function updateQuickInsights(crimes: Crime[]) {
       return sum + victimCount;
     }
 
-    return sum + 1; // Count as 1 if crime type doesn't use victim count
+    return crimeHasVictims(primaryType) ? sum + 1 : sum;
   }, 0);
 
   const avgPerDay = (totalCrimes / daysDiff).toFixed(1);

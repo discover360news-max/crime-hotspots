@@ -10,6 +10,7 @@ import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import { getTrinidadCrimes, getAllCrimesFromD1, generateNameSlug, type Crime } from '../../lib/crimeData';
 import { getHotAreas } from '../../lib/trendingHelpers';
 import { countCrimeType } from '../../lib/dashboardHelpers';
+import { usesVictimCount, crimeHasVictims } from '../../config/crimeTypeConfig';
 import { getTotalCrimeCount } from '../../lib/statisticsHelpers';
 import { dataUpdateNotice } from '../../config/siteNotifications';
 import { routes, buildRoute } from '../../config/routes';
@@ -63,7 +64,12 @@ initialCrimes.forEach(crime => {
 const sortedDates = Array.from(crimesByDate.keys()).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
 function calculateVictimCount(crimes: Crime[]): number {
-  return crimes.reduce((total, crime) => total + (crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1), 0);
+  return crimes.reduce((total, crime) => {
+    const primaryType = crime.primaryCrimeType || crime.crimeType;
+    if (!crimeHasVictims(primaryType)) return total;
+    if (usesVictimCount(primaryType)) return total + (crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1);
+    return total + 1;
+  }, 0);
 }
 
 // Color helper — must stay in sync with headlinesPage.ts getTypeStyle()

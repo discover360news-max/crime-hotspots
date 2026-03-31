@@ -23,7 +23,7 @@
 
 import type { CrimeTypeLabel } from './crimeSchema';
 
-export const CRIME_TYPE_CONFIG: Record<CrimeTypeLabel, { useVictimCount: boolean }> = {
+export const CRIME_TYPE_CONFIG: Record<CrimeTypeLabel, { useVictimCount: boolean; hasVictims?: boolean }> = {
   // Victim-count crimes (count each victim for PRIMARY crime only)
   Murder: { useVictimCount: true },
   'Attempted Murder': { useVictimCount: true },
@@ -42,7 +42,7 @@ export const CRIME_TYPE_CONFIG: Record<CrimeTypeLabel, { useVictimCount: boolean
   Arson: { useVictimCount: false },
   Burglary: { useVictimCount: false },
   'Home Invasion': { useVictimCount: false },
-  Seizures: { useVictimCount: false },
+  Seizures: { useVictimCount: false, hasVictims: false },
   Theft: { useVictimCount: false },
 };
 
@@ -57,4 +57,12 @@ export type CrimeType = CrimeTypeLabel;
  */
 export function usesVictimCount(crimeType: string): boolean {
   return CRIME_TYPE_CONFIG[crimeType as CrimeType]?.useVictimCount ?? false;
+}
+
+/**
+ * Returns false for crime types that have no victims (e.g. Seizures).
+ * Used to exclude these from victim totals instead of counting them as 1.
+ */
+export function crimeHasVictims(crimeType: string): boolean {
+  return CRIME_TYPE_CONFIG[crimeType as CrimeType]?.hasVictims !== false;
 }

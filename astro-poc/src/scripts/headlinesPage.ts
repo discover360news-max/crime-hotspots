@@ -3,7 +3,10 @@
  * Reads from window.__hlData (set by define:vars in headlines.astro)
  *
  * HTML structure this script generates must mirror headlines.astro server render exactly.
+ * NOTE: calculateVictimCount must stay in sync with the server-side version in headlines.astro
  */
+
+import { usesVictimCount, crimeHasVictims } from '../config/crimeTypeConfig';
 
 document.addEventListener('DOMContentLoaded', () => {
   const { allCrimes, regionToAreas, allAreas } = (window as any).__hlData || {};
@@ -39,8 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function calculateVictimCount(crimes: any[]): number {
     return crimes.reduce((total: number, crime: any) => {
-      const v = crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1;
-      return total + v;
+      const primaryType = crime.primaryCrimeType || crime.crimeType;
+      if (!crimeHasVictims(primaryType)) return total;
+      if (usesVictimCount(primaryType)) return total + (crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1);
+      return total + 1;
     }, 0);
   }
 

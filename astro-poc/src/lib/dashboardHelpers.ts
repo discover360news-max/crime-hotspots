@@ -4,7 +4,7 @@
  */
 
 import type { Crime } from './crimeData';
-import { usesVictimCount } from '../config/crimeTypeConfig';
+import { usesVictimCount, crimeHasVictims } from '../config/crimeTypeConfig';
 
 /**
  * Count crimes by type across both primaryCrimeType and relatedCrimeTypes
@@ -95,7 +95,7 @@ export const calculateInsights = (crimeData: Crime[]) => {
         : 1;
       return sum + victimCount;
     }
-    return sum + 1;
+    return crimeHasVictims(primaryType) ? sum + 1 : sum;
   }, 0);
 
   // Average crimes per day
