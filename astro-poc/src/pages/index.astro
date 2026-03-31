@@ -44,12 +44,15 @@ const weekChange = lastWeekCrimes.length > 0
 const hotAreas = getHotAreas(allCrimes, 3);
 const topArea = hotAreas[0];
 
-// Per-area murder count for hotspots widget (this week)
+// Per-area murder + victim counts for hotspots widget (this week)
 const murdersByArea = new Map<string, number>();
+const victimsByArea = new Map<string, number>();
 thisWeekCrimes.forEach(c => {
+  const area = c.area || 'Unknown';
+  const victims = c.victimCount && c.victimCount > 1 ? c.victimCount : 1;
+  victimsByArea.set(area, (victimsByArea.get(area) || 0) + victims);
   if (c.primaryCrimeType === 'Murder') {
-    const area = c.area || 'Unknown';
-    murdersByArea.set(area, (murdersByArea.get(area) || 0) + (c.victimCount && c.victimCount > 1 ? c.victimCount : 1));
+    murdersByArea.set(area, (murdersByArea.get(area) || 0) + victims);
   }
 });
 
@@ -262,8 +265,10 @@ const description = "Real-time crime statistics, murder counts, and safety data 
                 <div>
                   {hotAreas.map(area => {
                     const murders = murdersByArea.get(area.area) || 0;
+                    const victims = victimsByArea.get(area.area) || 0;
                     const crimesLabel = `${area.count} crime${area.count !== 1 ? 's' : ''}`;
                     const murdersLabel = murders > 0 ? ` · ${murders} murder${murders !== 1 ? 's' : ''}` : '';
+                    const victimsLabel = victims > 0 ? ` · ${victims} victim${victims !== 1 ? 's' : ''}` : '';
                     return (
                       <a
                         href={buildRoute.area(area.areaSlug)}
@@ -275,7 +280,7 @@ const description = "Real-time crime statistics, murder counts, and safety data 
                             {area.area}
                           </span>
                           <span class="text-[10px] text-slate-400 dark:text-[var(--ch-text-faint)]">
-                            {crimesLabel}{murdersLabel}
+                            {crimesLabel}{murdersLabel}{victimsLabel}
                           </span>
                         </div>
                         <svg class="w-3.5 h-3.5 text-slate-300 dark:text-[hsl(0_0%_30%)] shrink-0 group-hover:text-rose-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
