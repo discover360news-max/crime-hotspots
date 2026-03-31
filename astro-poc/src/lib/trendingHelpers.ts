@@ -41,9 +41,9 @@ export function getHotAreas(allCrimes: Crime[], limit: number = 5): HotArea[] {
   cutoff.setDate(cutoff.getDate() - 7);
   cutoff.setHours(0, 0, 0, 0);
 
-  // Filter to last 7 days
+  // Filter to last 7 days — use datePublished ?? dateObj (L017)
   const recentCrimes = allCrimes.filter(c => {
-    const d = toDate(c.dateObj, c.date);
+    const d = toDate((c.datePublished ?? c.dateObj) as Date | string | undefined, c.date);
     return d >= cutoff;
   });
 
