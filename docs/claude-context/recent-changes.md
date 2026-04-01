@@ -8,6 +8,14 @@
 
 ## March 2026
 
+### Safety tips: TIP-00100 to TIP-00102 (Mar 31, 2026)
+
+- **NEW TIP TIP-00100** — Avoiding Armed Robbery at Late-Night ATMs (ATM Crime / At the ATM) — Story 707
+- **NEW TIP TIP-00101** — Recognising Coordinated Passenger Robbery in Taxis (Carjacking / In Your Car) — Story 712
+- **NEW TIP TIP-00102** — Avoiding Robbery From Dating App Meetup Lures (Robbery / Other) — Story 713
+
+---
+
 ### Safety tips: TIP-00096 to TIP-00099 + 4 story attachments (Mar 30, 2026)
 
 - **NEW TIP TIP-00096** — Hardening Residential Door Locks Against Forced Entry (Burglary / At Home) — Story 695

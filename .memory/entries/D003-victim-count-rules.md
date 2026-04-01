@@ -3,7 +3,7 @@ id: D003
 type: decision
 status: active
 created: 2026-01-01
-updated: 2026-03-28
+updated: 2026-03-31
 related: [L009, B010]
 ---
 
@@ -37,6 +37,12 @@ Validated March 2026: 2,633 records checked. Primary appearing in related is **s
 **Display — `crime/[slug].astro` (Mar 28 2026):** Uses a `Map`-based count instead of `Set()`. Same-type related entries are merged into the primary chip (`[Robbery ×3]` in rose). Different-type related entries get their own slate chips with counts (`[Attempted Murder ×3]`). Do NOT re-introduce `Set()` here — it hides victim counts and caused false "data error" reports.
 
 **Display — `CrimeDetailModal.astro`:** Still uses `[...new Set(...)]` for pill rendering. Counts are not shown in the modal. If parity with the detail page is needed, apply the same Map-based approach.
+
+## hasVictims Flag (Mar 31 2026)
+
+Some crime types have no victims at all (e.g. Seizures). These use `hasVictims: false` in `crimeTypeConfig.ts`. The `crimeHasVictims()` helper returns false for these types, causing them to contribute **0** to victim totals instead of the default fallback of 1.
+
+Currently only Seizures has `hasVictims: false`. All other `useVictimCount: false` types (Extortion, Fraud, Burglary, etc.) still fall back to 1 per incident. Risk score calculations are unaffected — Seizures still contributes 1 incident to risk scoring.
 
 ## Known Issues / Gotchas
 - `Murder|Murder` in related crimes = 2 separate murders (e.g. 4 shot, 2 died) — intentional, do NOT deduplicate

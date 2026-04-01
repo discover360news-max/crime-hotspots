@@ -37,7 +37,7 @@ const areaData = await loadFullAreaData();
 const areaInfo = areaData.find(a => generateNameSlug(a.area) === slug);
 
 if (!areaInfo) {
-  return Astro.redirect('/404/', 302);
+  return Astro.redirect('/trinidad/areas/', 302);
 }
 
 const { area: areaName, region, division, knownAs } = areaInfo;

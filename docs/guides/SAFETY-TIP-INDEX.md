@@ -3,7 +3,7 @@
 > **Purpose:** Overlap check before creating or updating a tip. Scan the relevant category section first. If a title is ambiguous, open the file for detail — do not read all files.
 >
 > **Files:** `astro-poc/src/content/tips/tip-XXXXX-[slug].md`
-> **Last updated:** 2026-03-30 | **Total:** 99 tips | **Last:** TIP-00099
+> **Last updated:** 2026-03-31 | **Total:** 102 tips | **Last:** TIP-00102
 
 ---
 
@@ -37,13 +37,14 @@
 
 ---
 
-### ATM Crime (3)
+### ATM Crime (4)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
 | TIP-00002 | At the ATM | Post-Withdrawal ATM Awareness | — |
 | TIP-00008 | At the ATM | Physical Shielding of ATM PINs | — |
 | TIP-00023 | In a Mall | Choosing High-Visibility ATMs | — |
+| TIP-00100 | At the ATM | Avoiding Armed Robbery at Late-Night ATMs | 707 |
 
 ---
 
@@ -64,7 +65,7 @@
 
 ---
 
-### Carjacking (7)
+### Carjacking (8)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
@@ -75,6 +76,7 @@
 | TIP-00044 | At Home | Vary Your Morning Departure to Avoid Ambush | 506 |
 | TIP-00059 | In Your Car | Recognising Escalation Inside a Shared Vehicle | 540, 674 |
 | TIP-00080 | In Your Car | Complying Safely During an Armed Carjacking | 629 |
+| TIP-00101 | In Your Car | Recognising Coordinated Passenger Robbery in Taxis | 712 |
 
 ---
 
@@ -167,7 +169,7 @@
 
 ---
 
-### Robbery (31)
+### Robbery (32)
 
 > **Confusable pairs — check these before creating a new Robbery tip:**
 > - **Workplace cash:** TIP-00015 (deposit timing/route/person) vs TIP-00020 (deposit variance amounts). Both At Work. Check both for any cash-in-transit tactic.
@@ -208,6 +210,7 @@
 | TIP-00094 | In a Mall | Never Leave Devices Unattended at Public Counters | 684 |
 | TIP-00098 | In Your Car | Passenger Safety Protocols for Private Hire Drivers | 699 |
 | TIP-00099 | At a Hotel | Never Invite Strangers Into Short-Term Rental Accommodation | 700 |
+| TIP-00102 | Other | Avoiding Robbery From Dating App Meetup Lures | 713 |
 
 ---
 
@@ -286,6 +289,9 @@
 | | | | | | | 699 | TIP-00098 |
 | | | | | | | 700 | TIP-00099 |
 | | | | | | | 701 | TIP-00054 |
+| | | | | | | 707 | TIP-00100 |
+| | | | | | | 712 | TIP-00101 |
+| | | | | | | 713 | TIP-00102 |
 | | | | | | | 738 | TIP-00026 |
 | | | | | | | 1024 | TIP-00026 |
 | | | | | | | 1267 | TIP-00026 |
