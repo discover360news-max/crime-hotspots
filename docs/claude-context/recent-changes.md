@@ -6,6 +6,29 @@
 
 ---
 
+## April 2026
+
+### SEO audit + 404 fix: 998 broken URLs resolved (Apr 1, 2026)
+
+GSC export (last 3 months) revealed 2,916 pages with 404 errors suppressing core keyword rankings. Root cause: Story_IDs changed twice — once during dedup (T001, Mar 2026) and once when Story_ID formula was made static — causing Google to hold old ID-format URLs (e.g. `1612-diego-martin...`) that no longer existed in D1.
+
+**Fix:** `src/data/id-redirect-overrides.json` (998 entries). Keyed by old slug (no slashes), values are full paths. Build-safe — `redirectGenerator.ts` does not touch this file. Checked in `[slug].astro` after `oldSlug` D1 lookup, before fuzzy match.
+
+- 941 entries: old ID-format slug → correct current slug (301)
+- 57 entries: fully deleted stories → `/trinidad/` (301)
+- `area/[slug].astro`: unknown area slugs now 302 to `/trinidad/areas/` (was `/404/`)
+
+**Redirect system reminder:** `redirect-map.json` is reference only — regenerated at build time by `redirectGenerator.ts` from the CSV. Never edit it manually. Runtime redirects use D1 `old_slug` column + `id-redirect-overrides.json` + fuzzy match. See B032.
+
+**GSC action required:** Pages → Not indexed → Not found (404) → Validate Fix. Allow 1–2 weeks for Google to re-crawl.
+
+**Remaining keyword work identified (not yet done):**
+- Murder-count page: 4,832 impressions at position 6.2 — title/H1 optimisation needed
+- Statistics page: 4,619 impressions at position 7.2 — same
+- Core brand keywords ("trinidad and tobago crime rate", "crime hotspot") ranking 30–65 — structural on-page work needed
+
+---
+
 ## March 2026
 
 ### Safety tips: TIP-00100 to TIP-00102 (Mar 31, 2026)

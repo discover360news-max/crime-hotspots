@@ -326,6 +326,45 @@ Cloudflare Pages applies ALL matching rules and uses the more specific path when
 
 ---
 
+## 10. Slug Redirect System
+
+### How Crime Page Redirects Work at Runtime
+
+The SSR handler in `src/pages/trinidad/crime/[slug].astro` resolves slugs in this order:
+
+| Step | What it checks | Handles |
+|------|---------------|---------|
+| 1 | D1 direct slug match | Normal page load |
+| 2 | D1 `old_slug` column | Headline-date → ID-words (pre-migration format) |
+| 3 | `src/data/id-redirect-overrides.json` | Story_ID shifts from dedup + formula→static (see B032) |
+| 4 | Fuzzy word match (strip numeric prefix) | Miscellaneous ID changes |
+| 5 | 404 | Unknown slug |
+
+### redirect-map.json — Reference Only
+
+`src/data/redirect-map.json` is **regenerated every build** by `redirectGenerator.ts` from the live CSV. It maps old headline-date slugs → current ID-words slugs. **Never edit it manually** — changes are overwritten on next `npm run build`.
+
+It is used for inspection and validation only, not at runtime.
+
+### id-redirect-overrides.json — Build-Safe Manual Overrides
+
+`src/data/id-redirect-overrides.json` is the only manually-maintained redirect file. It is not touched by any build process. Keys are slugs (no slashes), values are full paths:
+
+```json
+{
+  "1612-diego-martin-man-gunned-down-near": "/trinidad/crime/684-diego-martin-man-gunned-down-near/",
+  "515-licensing-officer-assaulted-by-maxi-driver": "/trinidad/"
+}
+```
+
+Add entries here whenever a Story_ID shift causes new 404s (after dedup, sheet restructuring, etc.). See B032 for the full procedure.
+
+### area/[slug].astro Fallback
+
+Unknown area slugs 302 to `/trinidad/areas/` (not `/404/`). Per B027, area pages use 302 not 301.
+
+---
+
 ## Known Accepted Gaps
 
 | Gap | Reason | Impact |

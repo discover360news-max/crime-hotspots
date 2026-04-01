@@ -38,6 +38,7 @@ B028 | BUG | active | `flex-1` without `min-w-0` overflows narrow containers —
 B029 | BUG | fixed | `escapeHtml()` in Astro `{expr}` causes double-encoding — Astro auto-escapes text nodes, so `{escapeHtml(x)}` renders `&#39;` literally. Use `{x}` directly; `escapeHtml()` only for `set:html`/`innerHTML`. → B029-escaphtml-double-encoding-astro.md
 B030 | BUG | active | zsh glob expansion breaks `git add` on bracket filenames (`[slug].astro`) even when quoted. Fix: prefix with `noglob` → B030-zsh-noglob-bracket-filenames.md
 B031 | BUG | active | Bulk Astro import injection via script: MUST scope to frontmatter only (between `---` fences). dashboard.astro import landed in `<script>` block → blank page, no build error → B031-astro-frontmatter-import-injection.md
+B032 | BUG | active | Story_ID shifts (dedup + formula→static) left ~1k indexed URLs 404ing. Fix: id-redirect-overrides.json checked in [slug].astro. redirect-map.json is reference only — never edit manually. → B032-id-redirect-overrides.md
 
 ## Learnings & Patterns (L)
 L001 | LEARN | archived | ~~astro:page-load~~ — SPA removed Mar 15 2026. Use DOMContentLoaded. Do NOT re-introduce ClientRouter → L001-astro-page-load-pattern.md
