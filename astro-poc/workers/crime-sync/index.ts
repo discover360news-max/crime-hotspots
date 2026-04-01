@@ -220,6 +220,32 @@ async function syncCsvToD1(db: D1Database, csvUrl: string, year: string): Promis
   return upsertCount;
 }
 
+const INDEXNOW_KEY = '0360e20a9d964df1961e301d0ed29ed5';
+const INDEXNOW_URLS = [
+  'https://crimehotspots.com/trinidad/murder-count/',
+  'https://crimehotspots.com/trinidad/statistics/',
+  'https://crimehotspots.com/trinidad/dashboard/',
+];
+
+async function pingIndexNow(): Promise<void> {
+  try {
+    const res = await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        host: 'crimehotspots.com',
+        key: INDEXNOW_KEY,
+        keyLocation: `https://crimehotspots.com/${INDEXNOW_KEY}.txt`,
+        urlList: INDEXNOW_URLS,
+      }),
+    });
+    console.log(`[sync] IndexNow ping: ${res.status}`);
+  } catch (err) {
+    // Non-fatal — sync succeeded even if ping fails
+    console.warn('[sync] IndexNow ping failed:', err instanceof Error ? err.message : String(err));
+  }
+}
+
 async function runFullSync(db: D1Database): Promise<void> {
   const start = Date.now();
   let total = 0;
@@ -235,6 +261,8 @@ async function runFullSync(db: D1Database): Promise<void> {
   }
 
   console.log(`[sync] Full sync complete: ${total} rows upserted in ${Date.now() - start}ms`);
+
+  await pingIndexNow();
 }
 
 // ============================================================================
