@@ -8,6 +8,26 @@
 
 ## April 2026
 
+### LCP fixes: HeroBg + crime-type thumbnails (Apr 2, 2026)
+
+- **HeroBg.astro**: `loading="eager"` → `loading="lazy"` + `fetchpriority="low"`. Decorative texture overlay (15% opacity, aria-hidden) was being selected as LCP candidate on all 13 hero pages (4–5s). Now excluded from LCP consideration entirely.
+- **Crime-type thumbnails**: All 17 images in `public/images/crime-types/` resized from 1408×768 to 800×440 via one-off sharp script (deleted post-run). Directory dropped from ~9.7MB → 1.1MB. `attempted-murder.webp`: 276K → 23K. Expected LCP improvement on all `/trinidad/crime/[slug]/` pages.
+
+---
+
+### Safety tips: TIP-00103 to TIP-00107 + 3 story attachments (Apr 1, 2026)
+
+- **NEW TIP TIP-00103** — Reinforcing Structural Weak Points Against Forced Entry (Home Invasion / At Home) — Story 718
+- **NEW TIP TIP-00104** — Protecting Yourself During an Armed Robbery at a Bar (Robbery / At a Bar) — Story 720
+- **NEW TIP TIP-00105** — Protecting Utility Infrastructure on Your Property (Burglary / At Home) — Story 721
+- **NEW TIP TIP-00106** — Reducing Exposure to Vehicle-Based Attacks When Walking at Night (Assault / Walking Alone) — Story 722
+- **NEW TIP TIP-00107** — Staying Safe When an Ex-Partner Becomes Threatening in Public (Kidnapping / At a Bar) — Story 724
+- **ATTACHED** Story 719 → TIP-00064 (drive-by chain snatch at doubles stand)
+- **ATTACHED** Story 723 → TIP-00084 (armed proprietor holdup at mini mart)
+- **ATTACHED** Story 725 → TIP-00077 (28-day absence burglary, St. James)
+
+---
+
 ### SEO audit + 404 fix: 998 broken URLs resolved (Apr 1, 2026)
 
 GSC export (last 3 months) revealed 2,916 pages with 404 errors suppressing core keyword rankings. Root cause: Story_IDs changed twice — once during dedup (T001, Mar 2026) and once when Story_ID formula was made static — causing Google to hold old ID-format URLs (e.g. `1612-diego-martin...`) that no longer existed in D1.
