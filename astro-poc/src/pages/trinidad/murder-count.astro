@@ -117,11 +117,11 @@ const ogImagePath = '/og-images/murder-count.png';
 const pageUrl = 'https://crimehotspots.com/trinidad/murder-count/';
 const shareText = `Trinidad Murder Count ${selectedYear}: ${murderCount} murders${isCurrentYear ? ' so far' : ''}. Track live statistics at Crime Hotspots.`;
 const title = isCurrentYear
-  ? `Trinidad Murder Count ${selectedYear}: ${murderCount} Murders So Far — Updated Daily | Crime Hotspots`
-  : `Trinidad Murder Count ${selectedYear}: ${murderCount} Murders (Final) | Crime Hotspots`;
+  ? `Trinidad Murder Toll ${selectedYear}: ${murderCount} Murders — Live Count | Crime Hotspots`
+  : `Trinidad Murder Toll ${selectedYear}: ${murderCount} Murders (Final) | Crime Hotspots`;
 const description = isCurrentYear
-  ? `Trinidad murder count ${selectedYear}: ${murderCount} murders (updated daily). Murder rate: ${currentMurderRate} per 100k. Projected at ${projectedMurderRate} per 100k for full year. Track the Trinidad & Tobago murder toll live.`
-  : `Trinidad murder count ${selectedYear}: ${murderCount} murders (final). Murder rate: ${currentMurderRate} per 100,000 population. Historical data for Trinidad & Tobago.`;
+  ? `${murderCount} murders recorded in Trinidad & Tobago in ${selectedYear}. Murder rate: ${currentMurderRate} per 100k — projected ${projectedMurderRate} per 100k by year end. Breakdown by month, area, and crime type. Updated daily.`
+  : `${murderCount} murders recorded in Trinidad & Tobago in ${selectedYear}. Murder rate: ${currentMurderRate} per 100,000 population. Full breakdown by month, area, and crime type.`;
 
 // YoY card value for past years
 const yoyCardValue = !hasPreviousYear ? 'N/A'
