@@ -3,7 +3,7 @@
 > **Purpose:** Overlap check before creating or updating a tip. Scan the relevant category section first. If a title is ambiguous, open the file for detail — do not read all files.
 >
 > **Files:** `astro-poc/src/content/tips/tip-XXXXX-[slug].md`
-> **Last updated:** 2026-03-31 | **Total:** 102 tips | **Last:** TIP-00102
+> **Last updated:** 2026-04-01 | **Total:** 107 tips | **Last:** TIP-00107
 
 ---
 
@@ -34,6 +34,7 @@
 | TIP-00048 | At Work | Staying Safe During Roadside Enforcement Duties | 515 |
 | TIP-00067 | At a Bar | Avoiding Dangerous Escalation at Late-Night Bars | 572 |
 | TIP-00091 | In a Mall | Staying Safe During Unexpected Public Confrontations | 681 |
+| TIP-00106 | Walking Alone | Reducing Exposure to Vehicle-Based Attacks When Walking at Night | 722 |
 
 ---
 
@@ -62,6 +63,7 @@
 | TIP-00093 | At Work | Preventing Tool-Assisted Forced Entry to Your Business | 683 |
 | TIP-00095 | At Home | Protecting Parked Vehicles From Parts Theft | 685 |
 | TIP-00096 | At Home | Hardening Residential Door Locks Against Forced Entry | 695 |
+| TIP-00105 | At Home | Protecting Utility Infrastructure on Your Property | 721 |
 
 ---
 
@@ -130,6 +132,7 @@
 | TIP-00065 | At Home | Securing Rear and Perimeter Entry Points at Home | 569 |
 | TIP-00081 | At Home | Vetting Acquaintances Before Granting Home Access | 630 |
 | TIP-00089 | At Home | Responding to Coordinated Multi-Home Armed Invasion | 671 |
+| TIP-00103 | At Home | Reinforcing Structural Weak Points Against Forced Entry | 718 |
 
 > **Note on similar tips:**
 > - TIP-00036 = bar **cutting** (tools), occupied home, armed robbery. TIP-00086 *(Burglary)* = bar **removal** (prying), empty home, daytime.
@@ -145,6 +148,7 @@
 | TIP-00011 | In Your Car | What to Do If Forced into a Vehicle | — |
 | TIP-00016 | In Your Car | De-escalation in Forced Transit Situations | — |
 | TIP-00073 | Other | Avoiding Isolated Locations on Late-Night Outings | 592 |
+| TIP-00107 | At a Bar | Staying Safe When an Ex-Partner Becomes Threatening in Public | 724 |
 
 ---
 
@@ -211,6 +215,7 @@
 | TIP-00098 | In Your Car | Passenger Safety Protocols for Private Hire Drivers | 699 |
 | TIP-00099 | At a Hotel | Never Invite Strangers Into Short-Term Rental Accommodation | 700 |
 | TIP-00102 | Other | Avoiding Robbery From Dating App Meetup Lures | 713 |
+| TIP-00104 | At a Bar | Protecting Yourself During an Armed Robbery at a Bar | 720 |
 
 ---
 
@@ -292,6 +297,14 @@
 | | | | | | | 707 | TIP-00100 |
 | | | | | | | 712 | TIP-00101 |
 | | | | | | | 713 | TIP-00102 |
+| | | | | | | 718 | TIP-00103 |
+| | | | | | | 719 | TIP-00064 |
+| | | | | | | 720 | TIP-00104 |
+| | | | | | | 721 | TIP-00105 |
+| | | | | | | 722 | TIP-00106 |
+| | | | | | | 723 | TIP-00084 |
+| | | | | | | 724 | TIP-00107 |
+| | | | | | | 725 | TIP-00077 |
 | | | | | | | 738 | TIP-00026 |
 | | | | | | | 1024 | TIP-00026 |
 | | | | | | | 1267 | TIP-00026 |
