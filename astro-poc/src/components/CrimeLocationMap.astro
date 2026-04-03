@@ -80,6 +80,23 @@ const zoom = hasStreet ? 15 : 13;
     border: 2.5px solid white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
   }
+
+  /* Attribution bar — compact + dark-mode aware */
+  #crimeLocationMap .leaflet-control-attribution {
+    font-size: 9px !important;
+    padding: 1px 4px !important;
+    opacity: 0.75;
+    background: rgba(255, 255, 255, 0.75) !important;
+  }
+
+  .dark #crimeLocationMap .leaflet-control-attribution {
+    background: hsl(0 0% 10% / 0.8) !important;
+    color: hsl(0 0% 60%) !important;
+  }
+
+  .dark #crimeLocationMap .leaflet-control-attribution a {
+    color: hsl(0 0% 75%) !important;
+  }
 </style>
 
 <script>
@@ -118,7 +135,7 @@ const zoom = hasStreet ? 15 : 13;
         tap: false,
       }).setView([lat, lng], zoom);
 
-      const cartoLight = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+      const cartoLight = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
       const cartoDark  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
 
       const tileLayer = L.tileLayer(isDark() ? cartoDark : cartoLight, {
