@@ -8,6 +8,16 @@
 
 ## April 2026
 
+### Safety tips: TIP-00113 + 6 story attachments (Apr 3, 2026)
+
+- **NEW TIP TIP-00113** — Verifying Job Offers to Avoid Trafficking Lures (Sexual Violence / Other) — Story 752
+- **ATTACHED** Story 751 → TIP-00108 (pensioner befriended at bank, lured into vehicle, same helper-lure-after-withdrawal M.O.)
+- **ATTACHED** Stories 754, 755 → TIP-00034 (Sherman Lambkin, Valencia — door kicked in at 2:30-2:45 AM, pre-dawn forced entry; two articles, same incident)
+- **ATTACHED** Story 756 → TIP-00021 (victim lured to buy item, instructed to follow seller to remote location, ambushed — marketplace lure-and-redirect M.O.)
+- **ATTACHED** Story 757 → TIP-00071 (student robbed at knifepoint in track off Shade Lane, Malabar, 7:42 PM — isolated residential lane after dark)
+
+---
+
 ### Safety tips: TIP-00108 to TIP-00112 + 5 story attachments + 1 index correction (Apr 3, 2026)
 
 - **NEW TIP TIP-00108** — Avoiding Helper-Lure Ambushes After Bank Withdrawals (ATM Crime / In Your Car) — Story 734

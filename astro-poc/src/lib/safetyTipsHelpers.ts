@@ -7,21 +7,25 @@ import type { CollectionEntry } from 'astro:content';
 
 export type TipCategory =
   | 'Robbery' | 'Carjacking' | 'Home Invasion' | 'ATM Crime' | 'Online Scam'
-  | 'Kidnapping' | 'Sexual Violence' | 'Fraud' | 'Assault' | 'Other';
+  | 'Kidnapping' | 'Sexual Violence' | 'Fraud' | 'Assault' | 'Domestic Violence'
+  | 'Extortion' | 'Shooting' | 'Burglary' | 'Other';
 
 /** Map CSV crime type strings to tip category enum values */
 export function normalizedCrimeType(crimeType: string): TipCategory {
   if (!crimeType) return 'Other';
   const type = crimeType.trim().toLowerCase();
 
-  if (type === 'robbery' || type === 'theft' || type === 'burglary') return 'Robbery';
+  if (type === 'robbery' || type === 'theft') return 'Robbery';
+  if (type === 'burglary') return 'Burglary';
   if (type === 'carjacking') return 'Carjacking';
   if (type === 'home invasion') return 'Home Invasion';
   if (type === 'kidnapping') return 'Kidnapping';
   if (type === 'sexual assault') return 'Sexual Violence';
-  if (type === 'assault' || type === 'shooting') return 'Assault';
+  if (type === 'assault') return 'Assault';
+  if (type === 'shooting' || type === 'murder' || type === 'attempted murder') return 'Shooting';
   if (type === 'fraud') return 'Fraud';
-  if (type === 'murder') return 'Assault'; // Murder → Assault prevention tips (closest match)
+  if (type === 'domestic violence') return 'Domestic Violence';
+  if (type === 'extortion') return 'Extortion';
 
   return 'Other';
 }

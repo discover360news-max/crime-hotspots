@@ -3,7 +3,7 @@
 > **Purpose:** Overlap check before creating or updating a tip. Scan the relevant category section first. If a title is ambiguous, open the file for detail — do not read all files.
 >
 > **Files:** `astro-poc/src/content/tips/tip-XXXXX-[slug].md`
-> **Last updated:** 2026-04-03 | **Total:** 112 tips | **Last:** TIP-00112
+> **Last updated:** 2026-04-03 | **Total:** 113 tips | **Last:** TIP-00113
 
 ---
 
@@ -47,7 +47,7 @@
 | TIP-00008 | At the ATM | Physical Shielding of ATM PINs | — |
 | TIP-00023 | In a Mall | Choosing High-Visibility ATMs | — |
 | TIP-00100 | At the ATM | Avoiding Armed Robbery at Late-Night ATMs | 707 |
-| TIP-00108 | In Your Car | Avoiding Helper-Lure Ambushes After Bank Withdrawals | 734 |
+| TIP-00108 | In Your Car | Avoiding Helper-Lure Ambushes After Bank Withdrawals | 734, 751 |
 
 ---
 
@@ -125,7 +125,7 @@
 | TIP-00025 | At Home | Visitor Identification via Technology | — |
 | TIP-00027 | At Home | Daytime Home Security While You're Inside | 458, 618, 741 |
 | TIP-00031 | At a Hotel | Securing Your Hotel Room Door at Night | 479 |
-| TIP-00034 | At Home | Hardening Your Home Against Forced Pre-Dawn Entry | 482, 595 |
+| TIP-00034 | At Home | Hardening Your Home Against Forced Pre-Dawn Entry | 482, 595, 754, 755 |
 | TIP-00036 | At Home | Protecting Against Window Bar Cutting and Armed Robbery | 484 |
 | TIP-00045 | At Home | Recognising Fake Weapons and False Police Authority | 507 |
 | TIP-00049 | At Home | Preventing Push-In Robbery at Your Home | 521, 549 |
@@ -159,7 +159,7 @@
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
 | TIP-00005 | Online | Verifying Emergency WhatsApp Requests | — |
-| TIP-00021 | Online | Safe Marketplace Transaction Protocol | — |
+| TIP-00021 | Online | Safe Marketplace Transaction Protocol | 698, 756 |
 | TIP-00030 | Online | Payment-Before-Release for Online Sales | 473, 571 |
 
 > **Note:** TIP-00030 protects **sellers** (fake buyer sends proxy to collect without paying). TIP-00090 *(Fraud)* protects **buyers** (fake seller takes deposits and disappears).
@@ -205,7 +205,7 @@
 | TIP-00064 | Walking Alone | Concealing Jewellery When Walking in Public | 551, 587, 616, 617, 628, 719, 735 |
 | TIP-00066 | Walking Alone | Reducing Snatch-Theft Risk While Waiting for Transport | 570 |
 | TIP-00070 | At Work | Protecting Open Religious and Community Premises | 584 |
-| TIP-00071 | Walking Alone | Reducing Ambush Risk on Residential Lanes | 585, 738 |
+| TIP-00071 | Walking Alone | Reducing Ambush Risk on Residential Lanes | 585, 738, 757 |
 | TIP-00072 | At Home | Vehicle-Based Robbery at Your Home Gate | 588 |
 | TIP-00075 | Using Public Transport | Protecting Shift Workers at Isolated Transport Stops | 597 |
 | TIP-00076 | Using Public Transport | Armed Robbery Along Transit Corridors at Night | 614 |
@@ -231,6 +231,7 @@
 | TIP-00014 | Walking Alone | Share Your Route When Walking Alone at Night | — |
 | TIP-00019 | Walking Alone | Digital Check-ins for Night Movement | — |
 | TIP-00068 | Other | Recognising Signs of Human Trafficking Near You | 581 |
+| TIP-00113 | Other | Verifying Job Offers to Avoid Trafficking Lures | 752 |
 
 ---
 
@@ -320,6 +321,12 @@
 | | | | | | | 741 | TIP-00027 |
 | | | | | | | 742 | TIP-00111 |
 | | | | | | | 743 | TIP-00112 |
+| | | | | | | 751 | TIP-00108 |
+| | | | | | | 752 | TIP-00113 |
+| | | | | | | 754 | TIP-00034 |
+| | | | | | | 755 | TIP-00034 |
+| | | | | | | 756 | TIP-00021 |
+| | | | | | | 757 | TIP-00071 |
 | | | | | | | 1024 | TIP-00026 |
 | | | | | | | 1267 | TIP-00026 |
 
