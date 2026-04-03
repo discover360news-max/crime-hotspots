@@ -221,6 +221,7 @@ Edit the frontmatter `status` field. No build change required.
 1. Edit `astro-poc/src/content/config.ts` — add the new string to the relevant `z.enum([...])` array
 2. Update the **Current valid categories / contexts** tables in this document
 3. Update the MEMORY.md entry for the Safety Tips System
+4. **If adding a new category:** also update `astro-poc/src/lib/safetyTipsHelpers.ts` — add the category to the `TipCategory` type union AND add a mapping in `normalizedCrimeType()` so crime detail pages can surface tips in that category. Without this step, tips in the new category will never appear on any crime detail page.
 
 ### Reviewing all tips in a category
 
