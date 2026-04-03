@@ -8,6 +8,22 @@
 
 ## April 2026
 
+### Safety tips: TIP-00108 to TIP-00112 + 5 story attachments + 1 index correction (Apr 3, 2026)
+
+- **NEW TIP TIP-00108** — Avoiding Helper-Lure Ambushes After Bank Withdrawals (ATM Crime / In Your Car) — Story 734
+- **NEW TIP TIP-00109** — Recognising Erratic Behaviour as an Attack Setup (Assault / In Your Car) — Story 736
+- **NEW TIP TIP-00110** — Securing Your Belongings When Leaving Your Seat at a Bar (Robbery / At a Bar) — Story 739
+- **NEW TIP TIP-00111** — Protecting Yourself During Roadside Vehicle Sales (Robbery / In Your Car) — Story 742
+- **NEW TIP TIP-00112** — Reporting Robbery by a Person in Authority (Robbery / Other) — Story 743
+- **ATTACHED** Story 735 → TIP-00064 (bump-from-behind bracelet snatch, Frederick Street)
+- **ATTACHED** Story 737 → TIP-00101 (5 men posing as taxi passengers, vehicle taken)
+- **ATTACHED** Story 738 → TIP-00071 (two bandits on Persad Lane, El Socorro)
+- **ATTACHED** Story 740 → TIP-00037 (driver spotted approaching men and drove off, dashcam)
+- **ATTACHED** Story 741 → TIP-00027 (two armed men, daytime forced entry, Balkissoon Trace)
+- **INDEX CORRECTION**: Story 738 was incorrectly attached to TIP-00026 (Shooting / At an Event) — removed from TIP-00026, moved to TIP-00071 (Robbery / Walking Alone) where it belongs.
+
+---
+
 ### LCP fixes: HeroBg + crime-type thumbnails (Apr 2, 2026)
 
 - **HeroBg.astro**: `loading="eager"` → `loading="lazy"` + `fetchpriority="low"`. Decorative texture overlay (15% opacity, aria-hidden) was being selected as LCP candidate on all 13 hero pages (4–5s). Now excluded from LCP consideration entirely.

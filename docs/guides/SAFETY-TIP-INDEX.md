@@ -3,7 +3,7 @@
 > **Purpose:** Overlap check before creating or updating a tip. Scan the relevant category section first. If a title is ambiguous, open the file for detail — do not read all files.
 >
 > **Files:** `astro-poc/src/content/tips/tip-XXXXX-[slug].md`
-> **Last updated:** 2026-04-01 | **Total:** 107 tips | **Last:** TIP-00107
+> **Last updated:** 2026-04-03 | **Total:** 112 tips | **Last:** TIP-00112
 
 ---
 
@@ -21,7 +21,7 @@
 
 ## Tip Registry
 
-### Assault (9)
+### Assault (10)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
@@ -35,10 +35,11 @@
 | TIP-00067 | At a Bar | Avoiding Dangerous Escalation at Late-Night Bars | 572 |
 | TIP-00091 | In a Mall | Staying Safe During Unexpected Public Confrontations | 681 |
 | TIP-00106 | Walking Alone | Reducing Exposure to Vehicle-Based Attacks When Walking at Night | 722 |
+| TIP-00109 | In Your Car | Recognising Erratic Behaviour as an Attack Setup | 736 |
 
 ---
 
-### ATM Crime (4)
+### ATM Crime (5)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
@@ -46,6 +47,7 @@
 | TIP-00008 | At the ATM | Physical Shielding of ATM PINs | — |
 | TIP-00023 | In a Mall | Choosing High-Visibility ATMs | — |
 | TIP-00100 | At the ATM | Avoiding Armed Robbery at Late-Night ATMs | 707 |
+| TIP-00108 | In Your Car | Avoiding Helper-Lure Ambushes After Bank Withdrawals | 734 |
 
 ---
 
@@ -78,7 +80,7 @@
 | TIP-00044 | At Home | Vary Your Morning Departure to Avoid Ambush | 506 |
 | TIP-00059 | In Your Car | Recognising Escalation Inside a Shared Vehicle | 540, 674 |
 | TIP-00080 | In Your Car | Complying Safely During an Armed Carjacking | 629 |
-| TIP-00101 | In Your Car | Recognising Coordinated Passenger Robbery in Taxis | 712 |
+| TIP-00101 | In Your Car | Recognising Coordinated Passenger Robbery in Taxis | 712, 737 |
 
 ---
 
@@ -121,7 +123,7 @@
 | TIP-00004 | At Home | Establishing a Nightly Home Lock-up Routine | — |
 | TIP-00009 | At Home | Verification Protocol for Unexpected Visitors | — |
 | TIP-00025 | At Home | Visitor Identification via Technology | — |
-| TIP-00027 | At Home | Daytime Home Security While You're Inside | 458, 618 |
+| TIP-00027 | At Home | Daytime Home Security While You're Inside | 458, 618, 741 |
 | TIP-00031 | At a Hotel | Securing Your Hotel Room Door at Night | 479 |
 | TIP-00034 | At Home | Hardening Your Home Against Forced Pre-Dawn Entry | 482, 595 |
 | TIP-00036 | At Home | Protecting Against Window Bar Cutting and Armed Robbery | 484 |
@@ -173,7 +175,7 @@
 
 ---
 
-### Robbery (32)
+### Robbery (35)
 
 > **Confusable pairs — check these before creating a new Robbery tip:**
 > - **Workplace cash:** TIP-00015 (deposit timing/route/person) vs TIP-00020 (deposit variance amounts). Both At Work. Check both for any cash-in-transit tactic.
@@ -192,7 +194,7 @@
 | TIP-00028 | In a Mall | Device Handling During In-Person Sales | 459 |
 | TIP-00032 | In Your Car | Recognising and Responding to Road-Block Robberies | 480 |
 | TIP-00033 | At Work | Preventing False-Customer Entry Robberies at Retail Premises | 481, 520, 596, 620, 638 |
-| TIP-00037 | In Your Car | Avoiding Being Targeted While Parked Alone in a Vehicle | 489, 495 |
+| TIP-00037 | In Your Car | Avoiding Being Targeted While Parked Alone in a Vehicle | 489, 495, 740 |
 | TIP-00038 | Other | Staying Safe When Travelling Through Remote Areas | 490 |
 | TIP-00042 | In a Mall | Staying Vigilant in Mall and Shopping Centre Carparks | 496 |
 | TIP-00043 | At Work | Counter-Surveillance and Window Security for Retail Businesses | 497 |
@@ -200,10 +202,10 @@
 | TIP-00047 | In Your Car | Concealing Valuables Before Exiting Your Vehicle | 514 |
 | TIP-00051 | In Your Car | Armed Window-Smash Robbery on Vehicles Parked at Home | 531 |
 | TIP-00052 | Using Public Transport | Avoiding Jewellery Theft on Public Transport | 532 |
-| TIP-00064 | Walking Alone | Concealing Jewellery When Walking in Public | 551, 587, 616, 617, 628 |
+| TIP-00064 | Walking Alone | Concealing Jewellery When Walking in Public | 551, 587, 616, 617, 628, 719, 735 |
 | TIP-00066 | Walking Alone | Reducing Snatch-Theft Risk While Waiting for Transport | 570 |
 | TIP-00070 | At Work | Protecting Open Religious and Community Premises | 584 |
-| TIP-00071 | Walking Alone | Reducing Ambush Risk on Residential Lanes | 585 |
+| TIP-00071 | Walking Alone | Reducing Ambush Risk on Residential Lanes | 585, 738 |
 | TIP-00072 | At Home | Vehicle-Based Robbery at Your Home Gate | 588 |
 | TIP-00075 | Using Public Transport | Protecting Shift Workers at Isolated Transport Stops | 597 |
 | TIP-00076 | Using Public Transport | Armed Robbery Along Transit Corridors at Night | 614 |
@@ -216,6 +218,9 @@
 | TIP-00099 | At a Hotel | Never Invite Strangers Into Short-Term Rental Accommodation | 700 |
 | TIP-00102 | Other | Avoiding Robbery From Dating App Meetup Lures | 713 |
 | TIP-00104 | At a Bar | Protecting Yourself During an Armed Robbery at a Bar | 720 |
+| TIP-00110 | At a Bar | Securing Your Belongings When Leaving Your Seat at a Bar | 739 |
+| TIP-00111 | In Your Car | Protecting Yourself During Roadside Vehicle Sales | 742 |
+| TIP-00112 | Other | Reporting Robbery by a Person in Authority | 743 |
 
 ---
 
@@ -233,7 +238,7 @@
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
-| TIP-00026 | At an Event | Nighttime Venue Perimeter Awareness | 343, 738, 1024, 1267 |
+| TIP-00026 | At an Event | Nighttime Venue Perimeter Awareness | 343, 1024, 1267 |
 | TIP-00056 | At Home | When a Dispute Follows You Home | 537 |
 | TIP-00057 | At Work | Ambush Risk Arriving at Your Business | 538 |
 | TIP-00060 | In Your Car | Responding When Your Vehicle Is Shot At | 541 |
@@ -305,7 +310,16 @@
 | | | | | | | 723 | TIP-00084 |
 | | | | | | | 724 | TIP-00107 |
 | | | | | | | 725 | TIP-00077 |
-| | | | | | | 738 | TIP-00026 |
+| | | | | | | 734 | TIP-00108 |
+| | | | | | | 735 | TIP-00064 |
+| | | | | | | 736 | TIP-00109 |
+| | | | | | | 737 | TIP-00101 |
+| | | | | | | 738 | TIP-00071 |
+| | | | | | | 739 | TIP-00110 |
+| | | | | | | 740 | TIP-00037 |
+| | | | | | | 741 | TIP-00027 |
+| | | | | | | 742 | TIP-00111 |
+| | | | | | | 743 | TIP-00112 |
 | | | | | | | 1024 | TIP-00026 |
 | | | | | | | 1267 | TIP-00026 |
 

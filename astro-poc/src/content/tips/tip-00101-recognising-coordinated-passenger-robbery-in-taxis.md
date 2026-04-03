@@ -7,7 +7,7 @@ area: ""
 severity: "high"
 source: "manual"
 status: "published"
-related_story_ids: ["712"]
+related_story_ids: ["712", "737"]
 date_added: 2026-03-31
 date_updated:
 ---
