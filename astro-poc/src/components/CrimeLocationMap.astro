@@ -1,0 +1,150 @@
+---
+/**
+ * CrimeLocationMap — Single-pin zoomed-in map for crime detail pages.
+ * Shows the exact crime location with a pulsing marker in the crime-type colour.
+ * No clustering. Leaflet CSS loaded via includeLeaflet={true} on the parent Layout.
+ */
+
+interface Props {
+  latitude: number;
+  longitude: number;
+  crimeType: string;
+  /** When a street address is known, zoom in tighter (15 vs 13). */
+  hasStreet: boolean;
+}
+
+const { latitude, longitude, crimeType, hasStreet } = Astro.props;
+
+const CRIME_COLORS: Record<string, string> = {
+  'Murder': '#e11d48',
+  'Attempted Murder': '#f43f5e',
+  'Kidnapping': '#ec4899',
+  'Sexual Assault': '#c026d3',
+  'Shooting': '#dc2626',
+  'Assault': '#8b5cf6',
+  'Home Invasion': '#9333ea',
+  'Carjacking': '#f59e0b',
+  'Arson': '#ea580c',
+  'Robbery': '#f97316',
+  'Domestic Violence': '#fb7185',
+  'Extortion': '#059669',
+  'Fraud': '#14b8a6',
+  'Burglary': '#eab308',
+  'Theft': '#06b6d4',
+  'Seizures': '#3b82f6',
+};
+
+const markerColor = CRIME_COLORS[crimeType] ?? '#64748b';
+const zoom = hasStreet ? 15 : 13;
+---
+
+<div
+  id="crimeLocationMap"
+  class="w-full h-40 sm:h-52"
+  data-lat={latitude}
+  data-lng={longitude}
+  data-color={markerColor}
+  data-zoom={zoom}
+></div>
+
+<style is:global>
+  @keyframes crimeMarkerPulse {
+    0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.55; }
+    100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+  }
+
+  .ch-crime-pin {
+    position: relative;
+    width: 14px;
+    height: 14px;
+  }
+
+  .ch-crime-pin .ch-pin-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    animation: crimeMarkerPulse 1.8s ease-out infinite;
+  }
+
+  .ch-crime-pin .ch-pin-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2.5px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('crimeLocationMap');
+    if (!container) return;
+
+    const lat  = parseFloat((container as HTMLElement).dataset.lat ?? '');
+    const lng  = parseFloat((container as HTMLElement).dataset.lng ?? '');
+    const color = (container as HTMLElement).dataset.color ?? '#64748b';
+    const zoom = parseInt((container as HTMLElement).dataset.zoom ?? '13', 10);
+
+    if (isNaN(lat) || isNaN(lng)) return;
+
+    // Leaflet JS may already be loaded (dashboard pages, etc.)
+    if ((window as any).L) {
+      initMap();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    script.onload = initMap;
+    document.head.appendChild(script);
+
+    function initMap() {
+      if ((container as any)._leaflet_id) return; // already initialized
+
+      const L = (window as any).L;
+      const isDark = () => document.documentElement.classList.contains('dark');
+
+      const map = L.map(container, {
+        dragging: true,
+        scrollWheelZoom: false,
+        zoomControl: true,
+        tap: false,
+      }).setView([lat, lng], zoom);
+
+      const cartoLight = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+      const cartoDark  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+
+      const tileLayer = L.tileLayer(isDark() ? cartoDark : cartoLight, {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19,
+      }).addTo(map);
+
+      // Swap tiles when the user toggles dark mode
+      const themeObserver = new MutationObserver(() => {
+        tileLayer.setUrl(isDark() ? cartoDark : cartoLight);
+      });
+      themeObserver.observe(document.documentElement, { attributeFilter: ['class'] });
+
+      const pinIcon = L.divIcon({
+        html: `<div class="ch-crime-pin">
+          <div class="ch-pin-pulse" style="background:${color}"></div>
+          <div class="ch-pin-dot"   style="background:${color}"></div>
+        </div>`,
+        className: '',
+        iconSize:   [14, 14],
+        iconAnchor: [7, 7],
+      });
+
+      L.marker([lat, lng], { icon: pinIcon }).addTo(map);
+      map.invalidateSize();
+    }
+  });
+</script>

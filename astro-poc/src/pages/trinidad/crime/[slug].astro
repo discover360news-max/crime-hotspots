@@ -24,6 +24,7 @@ import { routes, buildRoute } from '../../../config/routes';
 import { getCrimeTypeThumbnailUrl } from '../../../lib/generateCrimeTypeThumbnails';
 import { getCollection } from 'astro:content';
 import CompactTipCard from '../../../components/CompactTipCard.astro';
+import CrimeLocationMap from '../../../components/CrimeLocationMap.astro';
 import { normalizedCrimeType, sortTipsByAreaRelevance } from '../../../lib/safetyTipsHelpers';
 import idRedirectOverrides from '../../../data/id-redirect-overrides.json';
 
@@ -148,14 +149,34 @@ if (crime && (relatedTypeCounts.size > 0 || primaryTotalCount > 1)) {
 
 // SEO Meta Tags
 const title = crime ? `${crime.headline} | Crime Hotspots Trinidad` : 'Story Not Found | Crime Hotspots Trinidad';
+
+// Description: truncate summary to first sentence ≤155 chars so Google doesn't rewrite it.
+// Prefix with area so location appears in the snippet even when the headline is long and
+// the area name is cut off in the SERP title display.
+function buildCrimeDescription(summary: string, area: string, crimeType: string, date: string): string {
+  const base = summary || `${crimeType} in ${area} on ${date}. View details, location, and related crimes.`;
+  // Find the end of the first sentence that fits within 155 chars
+  const MAX = 155;
+  const prefix = `${area} — `;
+  const budget = MAX - prefix.length;
+  let firstSentence = base;
+  const periodIdx = base.indexOf('. ');
+  if (periodIdx !== -1 && periodIdx + 1 <= budget) {
+    firstSentence = base.slice(0, periodIdx + 1);
+  } else if (base.length > budget) {
+    firstSentence = base.slice(0, budget).trimEnd() + '…';
+  }
+  return prefix + firstSentence;
+}
+
 const description = crime
-  ? (crime.summary || `${crime.crimeType} in ${crime.area} on ${crime.date}. View details, location, and related crimes.`)
+  ? buildCrimeDescription(crime.summary, crime.area, crime.crimeType, crime.date)
   : 'This story may have been updated or removed. Browse our latest crime reports.';
 const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
 ---
 
 {crime ? (
-<Layout title={title} description={description} ogImage={ogImage} ogType="article">
+<Layout title={title} description={description} ogImage={ogImage} ogType="article" includeLeaflet={true}>
   <!-- SEO CRITICAL: NewsArticle structured data — injected into <head> via slot="head".
        Google uses this for news carousels, rich snippets, and article indexing signals.
        DO NOT remove fields or the slot="head" attribute. See docs/claude-context/SEO-CONFIG.md. -->
@@ -281,13 +302,13 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
       </div>
     </header>
 
-    <!-- Featured image — crime type thumbnail -->
+    <!-- Crime location map — zoomed in on the incident, pulsing marker -->
     <div class="mb-5 rounded-xl overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_12%)]" data-pagefind-ignore>
-      <img
-        src={thumbnailPath}
-        alt={`${crime.crimeType} report`}
-        class="w-full h-40 sm:h-52 object-cover"
-        loading="eager"
+      <CrimeLocationMap
+        latitude={crime.latitude}
+        longitude={crime.longitude}
+        crimeType={crime.primaryCrimeType || crime.crimeType}
+        hasStreet={!!crime.street}
       />
     </div>
 
