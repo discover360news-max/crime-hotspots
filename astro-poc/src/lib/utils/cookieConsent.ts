@@ -38,10 +38,13 @@ export class CookieConsent {
 
     this.consentGiven = this.checkConsent();
 
-    // Returning user: restore granted consent so Consent Mode v2 fires correctly
-    if (this.consentGiven) {
+    // Returning user: restore consent state so Consent Mode v2 fires correctly
+    const savedChoice = this.getCookie(CONSENT_COOKIE_NAME);
+    if (savedChoice === 'accepted') {
       this._updateGtagConsent('granted');
       this.config.onAccept();
+    } else if (savedChoice === 'declined') {
+      this._updateGtagConsent('denied');
     }
   }
 
@@ -50,7 +53,7 @@ export class CookieConsent {
    */
   checkConsent() {
     const consent = this.getCookie(CONSENT_COOKIE_NAME);
-    return consent === 'accepted';
+    return consent === 'accepted' || consent === 'declined';
   }
 
   /**
@@ -90,7 +93,7 @@ export class CookieConsent {
       left: 0;
       right: 0;
       background: ${bg};
-      padding: 1.25rem 1.5rem;
+      padding: 1.25rem 2rem;
       box-shadow: 0 -4px 12px -2px rgba(0, 0, 0, 0.1);
       border-top: 1px solid ${borderColor};
       z-index: 9999;
@@ -102,17 +105,17 @@ export class CookieConsent {
 
     banner.innerHTML = `
       <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;">
-        <div style="flex: 1; min-width: 300px;">
-          <p style="margin: 0; font-size: 0.875rem; line-height: 1.5; color: ${textColor};">
-            <strong style="font-weight: 600; color: ${textColor};">We value your privacy</strong><br>
-            <span style="color: ${mutedColor};">We use cookies to analyze site traffic and improve your experience. By clicking "Accept", you consent to our use of analytics cookies.</span>
-            <a href="/privacy/" style="color: ${this.config.primaryColor}; text-decoration: underline; font-weight: 500;">Learn more</a>
+        <div style="flex: 1; min-width: 280px;">
+          <p style="margin: 0; font-size: 0.875rem; line-height: 1.6; color: ${textColor};">
+            <strong style="font-weight: 600; color: ${textColor};">Analytics cookies</strong><br>
+            <span style="color: ${mutedColor};">We use Google Analytics to see which crime reports get read most — no ads, no third-party tracking. Your data stays anonymous.</span>
+            <a href="/privacy/" style="color: ${this.config.primaryColor}; text-decoration: underline; font-weight: 500; margin-left: 0.25rem;">Privacy policy</a>
           </p>
         </div>
-        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; padding: 0 0.5rem;">
           <button id="cookie-decline" style="
-            padding: 0.375rem 1rem;
-            min-height: 22px;
+            padding: 0.5rem 1.25rem;
+            min-height: 36px;
             background: ${declineBg};
             color: ${textColor};
             border: none;
@@ -125,8 +128,8 @@ export class CookieConsent {
             Decline
           </button>
           <button id="cookie-accept" style="
-            padding: 0.375rem 1rem;
-            min-height: 22px;
+            padding: 0.5rem 1.25rem;
+            min-height: 36px;
             background: ${this.config.primaryColor};
             color: white;
             border: none;
@@ -136,7 +139,7 @@ export class CookieConsent {
             transition: all 0.2s;
             font-size: 0.875rem;
           " onmouseover="this.style.background='#be123c'" onmouseout="this.style.background='${this.config.primaryColor}'">
-            Accept All Cookies
+            Accept Analytics
           </button>
         </div>
       </div>
