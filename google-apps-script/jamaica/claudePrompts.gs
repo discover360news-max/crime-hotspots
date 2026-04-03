@@ -25,8 +25,8 @@ JSON SCHEMA:
       "all_crime_types": ["Murder", "Kidnapping"],
       "area": "Parish or community (e.g., Portmore, St. Catherine OR Arnett Gardens, St. Andrew)",
       "street": "Street address INCLUDING business names/landmarks",
-      "headline": "Brief headline with victim name/age in parentheses if known",
-      "details": "3-5 sentences using ONLY facts stated in the article — do NOT infer. Separate logical paragraphs with || delimiter (omitting || is an error). Prioritise: (1) what happened + when/where, (2) victim details, (3) police response. Use fewer sentences if article is thin.",
+      "headline": "Headline max 75 chars. Lead with the most-searched identifier — usually the specific community or venue (e.g. 'Arnett Gardens: Man Shot Dead During Argument'). Include notable monetary amounts near the start. Add victim name/age in parentheses at the end if known. NEVER trail with 'in [place]' or 'at [venue]' — bring location to the front.",
+      "details": "3-5 sentences using ONLY facts stated in the article — do NOT infer. Separate logical paragraphs with || delimiter (omitting || is an error). SENTENCE 1 MUST name: the specific location (community/venue), any notable monetary amount, and the victim's name or role — these are the top search terms for this incident. Prioritise: (1) who + what + specific location + amounts, (2) how it happened / timeline, (3) police response. Use fewer sentences if article is thin.",
       "victims": [{"name": "Name or null", "age": number_or_null, "aliases": []}],
       "victimCount": number,
       "location_country": "Jamaica|Other",
@@ -314,8 +314,22 @@ Do NOT return crime_date: null because the underlying crime predates the article
 OUTPUT EXAMPLE
 \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
 
-Good details field (with || paragraph breaks):
-"Labourer Devon Campbell, 32, was shot and killed in a drive-by shooting on Spanish Town Road, Kingston on Monday evening. Witnesses reported hearing multiple gunshots around 7:30 PM as a dark-coloured vehicle sped past.||Campbell was pronounced dead at the scene by emergency responders.||Police from the Kingston Central Division are investigating the motive and searching for suspects. No arrests have been made."
+Good headline (location-first, key terms within first 60 chars):
+"Spanish Town Road: Labourer Devon Campbell (32) Shot Dead in Drive-By"
+"Arnett Gardens: Man Stabbed to Death During Street Dispute"
+"New Kingston: Tourist Robbed of $2M JMD at Gunpoint Outside Hotel"
+
+Bad headline (location buried at the end — key term cut off in Google search results):
+"Labourer Shot Dead in Drive-By Shooting on Spanish Town Road, Kingston" — WRONG
+"Man Stabbed During Dispute in the Community of Arnett Gardens, St. Andrew" — WRONG
+
+Good details field (sentence 1 names specific location + amounts + victim; || paragraph breaks):
+"Labourer Devon Campbell, 32, was shot and killed on Spanish Town Road, Kingston on Monday evening. Witnesses reported hearing multiple gunshots around 7:30 PM as a dark-coloured vehicle sped past.||Campbell was pronounced dead at the scene by emergency responders.||Police from the Kingston Central Division are investigating the motive and searching for suspects. No arrests have been made."
+
+"A tourist had $2 million JMD stolen at gunpoint outside the Knutsford Court Hotel, New Kingston on Saturday night, police confirmed.||Two armed men approached the victim as he exited the hotel and demanded cash before fleeing in a waiting vehicle.||Officers from the Counter-Terrorism and Organised Crime Investigation Branch are reviewing CCTV footage."
+
+Bad details (key identifiers buried — sentence 1 is generic):
+"A tourist was targeted in a robbery after leaving a hotel in Kingston on Saturday night." — WRONG (no specific location name, no amount in sentence 1)
 
 Bad (too short): "Labourer Devon Campbell was shot dead in Kingston."
 Bad (no || separators): paragraphs must be split with || \u2014 running them together without breaks is an error.`;}
