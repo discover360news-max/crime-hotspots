@@ -142,27 +142,15 @@ const description = "Real-time crime statistics, murder counts, and safety data 
       </div>
 
       <!-- Two-column: island card (left) + latest headlines (right) -->
-      <div class="grid lg:grid-cols-[1fr_1.6fr] gap-5 mb-8">
+      <div class="grid grid-cols-[1fr_1.6fr] gap-3 sm:gap-5 mb-8">
 
         <!-- LEFT: Island identity card -->
         <a
           href={routes.trinidad.dashboard}
           class="group relative block rounded-2xl shadow-sm overflow-hidden dark:ring-1 dark:ring-white/15 bg-white/70 dark:bg-[var(--ch-surface)] hover:shadow-lg transition-shadow duration-300"
         >
-          <!-- Card header -->
-          <div class="flex items-center justify-between px-3 pt-2.5 pb-2">
-            <span class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-strong)]">🇹🇹 Trinidad &amp; Tobago</span>
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-600/90 text-white text-[10px] font-bold tracking-wide uppercase">
-              <span class="relative flex h-1.5 w-1.5">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
-              </span>
-              Live
-            </span>
-          </div>
-
           <!-- Island image -->
-          <div class="w-full aspect-[4/3] lg:aspect-square overflow-hidden bg-white/70 dark:bg-transparent">
+          <div class="w-full aspect-square overflow-hidden bg-white/70 dark:bg-transparent">
             <Image
               src={trinidadImg}
               alt="Trinidad & Tobago island map"
@@ -188,9 +176,9 @@ const description = "Real-time crime statistics, murder counts, and safety data 
           <!-- Inline stats -->
           <div class="px-4 pb-4 pt-3 border-t border-slate-200 dark:border-[var(--ch-border)] bg-slate-50 dark:bg-[var(--ch-surface-sub)]">
             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-[var(--ch-text-muted)] mb-2">This Week</p>
-            <div class="grid grid-cols-3 gap-3 mb-3">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 mb-3">
               <div>
-                <div class="text-xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">{thisWeekCrimes.length}</div>
+                <div class="text-lg sm:text-xl font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">{thisWeekCrimes.length}</div>
                 <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">
                   crimes
                   {weekChange !== 0 && (
@@ -201,18 +189,18 @@ const description = "Real-time crime statistics, murder counts, and safety data 
                 </div>
               </div>
               {topArea && (
-                <div>
+                <div class="hidden sm:block">
                   <div class="text-sm font-bold text-slate-700 dark:text-[var(--ch-text-heading)] truncate">{topArea.area}</div>
                   <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">top area</div>
                 </div>
               )}
               <div>
-                <div class="text-xl font-bold text-rose-600">{murdersThisWeek}</div>
+                <div class="text-lg sm:text-xl font-bold text-rose-600">{murdersThisWeek}</div>
                 <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">murders</div>
               </div>
             </div>
             <div class="inline-flex items-center gap-1 text-sm font-bold text-rose-600 group-hover:text-rose-700 dark:group-hover:text-rose-400 transition-colors">
-              Explore Dashboard
+              Explore
               <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
