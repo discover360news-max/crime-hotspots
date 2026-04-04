@@ -197,38 +197,46 @@ const incidentsShort = fmtIncidentsShort(incidents);
 {variant === 'hero' && (
   <div class="grid grid-cols-2 gap-1.5">
 
-    <div class="rounded-lg py-2 px-2.5 bg-blue-500/10 border border-blue-400/20 flex items-center gap-1.5">
-      <svg class="w-3.5 h-3.5 shrink-0 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-      </svg>
-      <span class="text-sm font-bold text-blue-300 leading-none">{socialProof.monthly_readers_short}</span>
-      <span class="text-[9px] text-slate-400 leading-none">readers</span>
+    <div class="rounded-lg py-2 px-2.5 sm:py-2.5 sm:px-3 bg-blue-500/10 border border-blue-400/20 flex items-center gap-1.5 sm:block">
+      <div class="flex items-center gap-1.5 sm:mb-1">
+        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+        </svg>
+        <span class="text-sm sm:text-lg font-bold text-blue-300 leading-none">{socialProof.monthly_readers_short}</span>
+      </div>
+      <p class="text-[9px] sm:text-[10px] text-slate-400 leading-none">readers<span class="hidden sm:inline"> monthly</span></p>
     </div>
 
-    <div class="rounded-lg py-2 px-2.5 bg-violet-500/10 border border-violet-400/20 flex items-center gap-1.5">
-      <svg class="w-3.5 h-3.5 shrink-0 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-      <span class="text-sm font-bold text-violet-300 leading-none">{socialProof.monthly_impressions_short}</span>
-      <span class="text-[9px] text-slate-400 leading-none">impressions</span>
+    <div class="rounded-lg py-2 px-2.5 sm:py-2.5 sm:px-3 bg-violet-500/10 border border-violet-400/20 flex items-center gap-1.5 sm:block">
+      <div class="flex items-center gap-1.5 sm:mb-1">
+        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        <span class="text-sm sm:text-lg font-bold text-violet-300 leading-none">{socialProof.monthly_impressions_short}</span>
+      </div>
+      <p class="text-[9px] sm:text-[10px] text-slate-400 leading-none">impressions<span class="hidden sm:inline"> monthly</span></p>
     </div>
 
-    <div class="rounded-lg py-2 px-2.5 bg-rose-500/10 border border-rose-400/20 flex items-center gap-1.5">
-      <svg class="w-3.5 h-3.5 shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-      </svg>
-      <span class="text-sm font-bold text-rose-300 leading-none">{incidentsShort}</span>
-      <span class="text-[9px] text-slate-400 leading-none">incidents</span>
+    <div class="rounded-lg py-2 px-2.5 sm:py-2.5 sm:px-3 bg-rose-500/10 border border-rose-400/20 flex items-center gap-1.5 sm:block">
+      <div class="flex items-center gap-1.5 sm:mb-1">
+        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+        </svg>
+        <span class="text-sm sm:text-lg font-bold text-rose-300 leading-none">{incidentsShort}</span>
+      </div>
+      <p class="text-[9px] sm:text-[10px] text-slate-400 leading-none">incidents tracked</p>
     </div>
 
-    <div class="rounded-lg py-2 px-2.5 bg-emerald-500/10 border border-emerald-400/20 flex items-center gap-1.5">
-      <svg class="w-3.5 h-3.5 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-      </svg>
-      <span class="text-sm font-bold text-emerald-300 leading-none">{socialProof.areas_monitored_short}</span>
-      <span class="text-[9px] text-slate-400 leading-none">areas</span>
+    <div class="rounded-lg py-2 px-2.5 sm:py-2.5 sm:px-3 bg-emerald-500/10 border border-emerald-400/20 flex items-center gap-1.5 sm:block">
+      <div class="flex items-center gap-1.5 sm:mb-1">
+        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+        </svg>
+        <span class="text-sm sm:text-lg font-bold text-emerald-300 leading-none">{socialProof.areas_monitored_short}</span>
+      </div>
+      <p class="text-[9px] sm:text-[10px] text-slate-400 leading-none">areas monitored</p>
     </div>
 
   </div>
