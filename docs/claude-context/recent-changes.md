@@ -8,6 +8,29 @@
 
 ## April 2026
 
+### Jamaica D1 Phase B + C1 live (Apr 5, 2026)
+
+- **crime-sync worker**: added `JM_DB` binding + `runJamaicaSync()` + `POST /sync/jamaica` endpoint. Daily cron now syncs both islands. `syncCsvToD1` accepts `country` param for FTS URL path.
+- **`workers/crime-sync/wrangler.toml`**: added `crime-hotspots-jamaica-db` (ID: 78bcc398). Schema applied, first sync: 30 rows, all 2026, Jan 17–Apr 3.
+- **`astro-poc/wrangler.toml`**: added `JM_DB` binding — site deploys as a **Worker** not Pages; bindings must live here, not the Pages dashboard.
+- **`src/env.d.ts`**: added `JM_DB?: D1Database` to `Cloudflare.Env` — required for `env.JM_DB` to resolve at runtime.
+- **`jamaica/statistics.astro` + `jamaica/murder-count.astro`**: wired to `env.JM_DB` via `getAllCrimesFromD1`; `noindex` → `false`. Both pages now serve live D1 data.
+- **GAS `claudePrompts.gs` (TT + JM)**: fixed multi-victim classification rule. When victims have different outcomes, repeat the outcome type in `all_crime_types` once per victim (e.g. 3 shot, 2 die → `["Shooting","Murder","Murder"]`). `victimCount` stays accurate total. No code changes needed — `countCrimeType` already handles repeated related types via `matchCount`.
+
+**Bugs hit during this work:**
+- `env.JM_DB` was `undefined` because `JM_DB` wasn't declared in `Cloudflare.Env` in `env.d.ts` (fix: add to interface)
+- Stats page white because `JAMAICA_CSV_URL` import was removed but still referenced in Dataset structured data — silent B016-style ReferenceError
+- Binding added to Pages dashboard had no effect — site is a Worker, not Pages
+
+---
+
+### Safety tips: 2 story attachments (Apr 4, 2026)
+
+- **ATTACHED** Story 761 → TIP-00009 (woman used as decoy to get victim to open front door; armed attackers forced entry — deceptive visitor / soft-entry M.O.)
+- **ATTACHED** Story 762 → TIP-00090 (fake Facebook Marketplace car seller, two deposits collected, fake ID provided, victim blocked — same deposit-scam M.O.)
+
+---
+
 ### Safety tips: TIP-00113 + 6 story attachments (Apr 3, 2026)
 
 - **NEW TIP TIP-00113** — Verifying Job Offers to Avoid Trafficking Lures (Sexual Violence / Other) — Story 752

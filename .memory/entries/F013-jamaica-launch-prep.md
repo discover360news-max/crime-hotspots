@@ -12,8 +12,8 @@
 | 1. FB Submitter country toggle | Claude | **DONE** | Year toggle hidden for JA, Country toggle (T&T/JA), country-aware filter + routing, `appendToJamaicaProduction()`. Set `JAMAICA_PIPELINE_SHEET_ID` manually. |
 | 2. RegionData CSV + area aliases | **DONE** | — | `JAMAICA_REGION_DATA_CSV_URL` wired, 113 areas, 13 aliases baked to `area-aliases-jamaica.json` |
 | 3. Activate GAS pipeline triggers | Kavell | **DONE** | 9 triggers live (RSS@14/22/6, Fetch@15/23/7, Claude@16/0/8 UTC). First run at 14:00 UTC Mar 17. |
-| 4. Jamaica D1 + sync worker | Claude | **DEFERRED** | Do NOT set up until pipeline produces confirmed rows |
-| 5. Uncomment TODO in statistics + murder-count | Claude | **DEFERRED** | One-liner per page — unblocked by step 4 |
+| 4. Jamaica D1 + sync worker | Claude | **DONE** | DB: crime-hotspots-jamaica-db (78bcc398). Schema applied. 30 rows synced. Daily cron live. |
+| 5. Uncomment TODO in statistics + murder-count | Claude | **DONE** | Both pages wired to JM_DB. noindex flipped false. Live Apr 5 2026. |
 | 6. Wire headlines + dashboard to Jamaica D1 | Claude | **DEFERRED** | New API endpoints (see Phase C below) |
 | 7. MP photos upload | Kavell | **IN PROGRESS** | `public/images/mps/jamaica/` — 63 MPs |
 | 8. Homepage card → live link | Claude | **DEFERRED** | Remove opacity/disabled, swap badge to "LIVE", move card above Guyana/Barbados |
@@ -159,3 +159,4 @@
 | Mar 17, 2026 | JAMAICA-INTEGRATION-PLAN.md updated with Phase 1.5 enhancements and 108-day launch plan. |
 | Mar 18, 2026 | murder-count.astro aligned with statistics.astro projection terminology: `daysPassed`→`daysElapsed`, `projectedAnnualMurders`→`murderProjected`, `projectedMurderRate`→`murderRateProjected`. Card label "Projected Rate"→"Annualized Rate". Sub-text now shows `{murderCount} murders in {daysElapsed} days`. Footer note added explaining annualization methodology. |
 | Mar 19, 2026 | Date accuracy overhaul (B023) applied to Jamaica pipeline: `rssCollector.gs` pubDate 3-step fallback; `processor.gs` publishDateMissing flag + null crime_date → Review Queue routing; `claudeClient.gs` dayOfWeek timezone fix + "a day after" cross-reference rule + ONGOING CRIMES rule block. Parity with Trinidad pipeline. |
+| Apr 5, 2026 | Phase B + C1 complete. Jamaica D1 live (30 rows). crime-sync worker updated with JM_DB + POST /sync/jamaica. statistics + murder-count wired to live D1 data. noindex removed. |

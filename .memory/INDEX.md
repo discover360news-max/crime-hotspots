@@ -39,6 +39,7 @@ B029 | BUG | fixed | `escapeHtml()` in Astro `{expr}` causes double-encoding —
 B030 | BUG | active | zsh glob expansion breaks `git add` on bracket filenames (`[slug].astro`) even when quoted. Fix: prefix with `noglob` → B030-zsh-noglob-bracket-filenames.md
 B031 | BUG | active | Bulk Astro import injection via script: MUST scope to frontmatter only (between `---` fences). dashboard.astro import landed in `<script>` block → blank page, no build error → B031-astro-frontmatter-import-injection.md
 B032 | BUG | active | Story_ID shifts (dedup + formula→static) left ~1k indexed URLs 404ing. Fix: id-redirect-overrides.json checked in [slug].astro. redirect-map.json is reference only — never edit manually. → B032-id-redirect-overrides.md
+B033 | BUG | active | New D1 binding needs 3 files: astro-poc/wrangler.toml + src/env.d.ts (Cloudflare.Env) + workers/crime-sync/wrangler.toml. Site is a Worker not Pages — dashboard bindings do nothing. → B033-new-d1-binding-checklist.md
 
 ## Learnings & Patterns (L)
 L001 | LEARN | archived | ~~astro:page-load~~ — SPA removed Mar 15 2026. Use DOMContentLoaded. Do NOT re-introduce ClientRouter → L001-astro-page-load-pattern.md
@@ -59,6 +60,9 @@ L015 | LEARN | active | SEO on-page patterns: H1 must be single element with ful
 L016 | LEARN | active | Dark section texture overlay: `mix-blend-screen` makes image bg transparent, CSS `mask-image` radial gradient clears centre for text contrast. HeroBg.astro = 13 hero pages. Footer inline in Layout.astro (dark mode only) → L016-hero-texture-overlay-pattern.md
 L017 | LEARN | active | Date filtering: ALL rolling windows use `datePublished ?? dateObj`. YoY stays on dateObj. API serializes datePublished as ISO string; client reconstructs it. → L017-date-filtering-pattern.md
 
+## Feedback (FB)
+feedback-nav-design | FEEDBACK | active | Desktop nav must be all text links — no bordered/filled buttons mixed in. Icon-only buttons (search, theme) at far right only → feedback-nav-design.md
+
 ## Decisions (D)
 D001 | DEC | active | Crime pages: full SSR + Cloudflare CDN 24h cache (migrated from hybrid prerender) → D001-crime-page-ssr.md
 D002 | DEC | active | CSV URLs: single source of truth in csvUrls.ts — all other files import from it → D002-csv-single-source.md
@@ -67,6 +71,7 @@ D004 | DEC | active | Slug migration: Story_ID+6words new format; legacy headlin
 D005 | DEC | active | Migrated to Astro (Dec 2025) from Vite for SSR, content collections, scalability → D005-astro-migration.md
 D006 | DEC | active | CSV → D1 migration. ALL PHASES COMPLETE (incl. dashboard + compare, Mar 24 2026). Dashboard + Compare now SSR+CDN. Shimmer skipped on SSR initial load (window.__dashboardSSR). Only mp/[slug].astro still uses CSV (pre-rendered, intentional). → D006-d1-migration-plan.md
 D007 | DEC | active | Search: replaced Pagefind with D1 FTS5. crimes_fts virtual table (FTS5). /api/search endpoint (crimes via FTS5, MPs via mps.json, areas via D1 LIKE). Sync worker clears+repopulates FTS on every sync. → D007-search-d1-fts.md
+D008 | DEC | active | Homepage T&T card is always two-column beside Headlines/Hotspots — no lg: gate. Mobile shows 2 headlines + 1 hotspot; sm+ shows 3+3. Do not revert. → D008-homepage-island-card-layout.md
 
 ## Backlog (IDEA)
 IDEA001 | IDEA | tabled | Criminal behavioural patterns page: public editorial (~1500w, 8 documented patterns from tips corpus) + internal content strategy doc. Value confirmed. Constraint: frame as "documented patterns" not stats. Tabled Mar 22 2026 — revisit when tips batch work slows.
@@ -77,12 +82,12 @@ F017 | FEAT | active | Contextual Ko-fi CTAs + goal tracker: CTA box on TT murde
 F010 | FEAT | active | MP profiles (T&T): 41 pages /trinidad/mp/[slug]/, index /trinidad/mp/, mps.json, region page card, placeholder.svg. Socials render as brand SVG icons. → F010-mp-profiles.md
 F012 | FEAT | active | MP profiles (Jamaica): 63 pages /jamaica/mp/[slug]/, index /jamaica/mp/, mps-jamaica.json. Same card layout as T&T. Photo min-h-[500px]. TikTok in socials. Photos in public/images/mps/jamaica/. Crime stats placeholder until D1 pipeline live. → site-features.md
 F014 | WORKFLOW | active | MP data update workflow: contact info, photos, parliament profiles, bulk updates, gotchas → docs/guides/MP-UPDATE-WORKFLOW.md
-F013 | FEAT | in-progress | Jamaica launch prep: statistics + murder-count at T&T parity, RegionData CSV wired (113 areas, area-aliases-jamaica.json), FB submitter country selector pending, D1 deferred. Launch sequence in entry. → F013-jamaica-launch-prep.md
+F013 | FEAT | in-progress | Jamaica launch prep: Phase B+C1 done (D1 live, stats+MC wired). Remaining: C2-C6 (headlines, crime pages, archive, search), D (parish/area pages, MP photos), Jul 4 target. → F013-jamaica-launch-prep.md
 F015 | FEAT | active | Help Centre: /help/ index + 14 pre-rendered articles (6 sections), nav + footer links, sitemap (priority 0.7/0.6). SESSION.md staleness checker maps features → articles. → site-features.md
 F011 | FEAT | active | Data Capability Sheet: /data-capability-sheet/ — B2B institutional one-pager, PDF-printable, content in capabilitySheetConfig.ts. CSV/PDF formats are on-engagement only, not self-serve → F011-data-capability-sheet.md
 F001 | FEAT | active | Security: escapeHtml, sanitizeUrl, CSP headers, Turnstile, Secure cookies → F001-security-system.md
 F002 | FEAT | active | GAS pipeline: RSS → preFilter → Claude Haiku → Sheets → CSV → site → F002-gas-automation-pipeline.md
-F003 | FEAT | active | Safety tips: 75 tips (last: TIP-00085, Mar 24 2026), category/context/area pages, submit form, voting. Categories: Robbery, Carjacking, Home Invasion, ATM Crime, Online Scam, Kidnapping, Sexual Violence, Fraud, Assault, Domestic Violence, Extortion, Shooting, Burglary, Other. Contexts include At a Bar (added Mar 17 2026) → F003-safety-tips-system.md
+F003 | FEAT | active | Safety tips: 113 tips (last: TIP-00113, Apr 4 2026), category/context/area pages, submit form, voting. Adding a new category ALSO requires updating safetyTipsHelpers.ts. → F003-safety-tips-system.md
 F004 | FEAT | active | Weekly blog: Mon 10AM GAS → Claude Haiku → GitHub commit → Cloudflare deploy → F004-weekly-blog-automation.md
 F005 | FEAT | active | Safety context: area crime score 1–10, 90-day window, 3 risk levels → F005-safety-context-system.md
 F006 | FEAT | active | Slug redirects: SSR handles legacy→new; redirect-map.json is reference only → F006-slug-redirect-system.md
