@@ -72,9 +72,22 @@ Context types marked [context] describe setting or relationship \u2014 they ALWA
 
 MULTIPLE VICTIMS OVERRIDE (same continuous event, same location, same time):
 If a lower-severity crime affects more victims than a higher one, it becomes primary.
-Example: "3 people shot, 1 dies" \u2192 one crime object (one event), all_crime_types: ["Shooting", "Murder"], victimCount: 3
-(Shooting is primary \u2014 3 victims vs Murder's 1. victimCount counts all affected by the primary crime.)
 This override applies ONLY within a single event. Different events \u2192 separate crime objects.
+
+victimCount = ALL victims total (every person harmed in this incident).
+When victims have different outcomes, repeat the outcome type in all_crime_types ONCE PER VICTIM it applies to.
+This is how the stats correctly count each outcome — the system counts occurrences of each type in the list.
+
+\u2705 "2 shot, 1 dies, 1 injured" \u2192 all_crime_types: ["Shooting", "Murder"], victimCount: 2
+   (Shooting primary \u2014 both were shot. Murder once = 1 death counted in murder stats.)
+\u2705 "3 shot, 2 die, 1 injured" \u2192 all_crime_types: ["Shooting", "Murder", "Murder"], victimCount: 3
+   (Shooting primary \u2014 all 3 shot. Murder TWICE = 2 deaths, each counted separately in murder stats.)
+\u2705 "1 shot dead (only victim)" \u2192 all_crime_types: ["Murder", "Shooting"], victimCount: 1
+   (Single victim: Murder stays primary. No override \u2014 no other victim to trigger it.)
+\u2705 "2 kidnapped, 1 also murdered" \u2192 all_crime_types: ["Kidnapping", "Murder"], victimCount: 2
+   (Kidnapping primary \u2014 both taken. Murder once = 1 death.)
+\u274c WRONG: "2 shot, 1 dies" \u2192 all_crime_types: ["Murder", "Shooting"], victimCount: 2
+   (Murder cannot be primary when 1 victim survived \u2014 Shooting is the common mechanism for all.)
 
 \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
 HARD IMPLICATION RULES \u2014 ALWAYS APPLY, NO CONFIRMATION NEEDED

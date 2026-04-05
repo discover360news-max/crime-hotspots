@@ -7,5 +7,10 @@ binding = "DB"
 database_name = "crime-hotspots-db"
 database_id = "23311480-68d6-45ec-b351-e6185a5af80a"
 
+[[d1_databases]]
+binding = "JM_DB"
+database_name = "crime-hotspots-jamaica-db"
+database_id = "78bcc398-91d5-401a-a092-840f53f27676"
+
 [triggers]
 crons = ["0 5 * * *"]   # Daily 05:00 UTC (1:00 AM Trinidad) — runs before 06:00 UTC site rebuild

@@ -19,7 +19,6 @@ import SocialProofStrip from '../../components/SocialProofStrip.astro';
 import StatCards from '../../components/StatCards.astro';
 import DataTable from '../../components/DataTable.astro';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
-import { JAMAICA_CSV_URL } from '../../config/csvUrls';
 import { routes } from '../../config/routes';
 import {
   compareYearToDate,
@@ -31,14 +30,14 @@ import {
   TRACKED_CRIME_TYPES
 } from '../../lib/statisticsHelpers';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
-import type { Crime } from '../../lib/crimeData';
+import { getAllCrimesFromD1 } from '../../lib/crimeData';
+import { env } from 'cloudflare:workers';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-// TODO: wire to Jamaica D1 when pipeline is live
-// Replace: const allCrimes = db ? await getAllCrimesFromD1(db, 'JM') : [];
-const allCrimes: Crime[] = [];
+const db = env.JM_DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : [];
 
 // Dynamic year handling
 const currentYear = new Date().getFullYear();
@@ -254,7 +253,7 @@ const breadcrumbData = {
 };
 ---
 
-<Layout title={title} description={description} noindex={true}>
+<Layout title={title} description={description} noindex={false}>
   <Hero
     compact
     narrowContainer={true}

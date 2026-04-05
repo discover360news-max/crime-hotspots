@@ -16,14 +16,14 @@ import InfoPopup from '../../components/InfoPopup.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import { countCrimeType } from '../../lib/dashboardHelpers';
 import { routes } from '../../config/routes';
-import type { Crime } from '../../lib/crimeData';
+import { getAllCrimesFromD1 } from '../../lib/crimeData';
+import { env } from 'cloudflare:workers';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-// TODO: wire to Jamaica D1 when pipeline is live
-// Replace: const allCrimes = db ? await getAllCrimesFromD1(db, 'JM') : [];
-const allCrimes: Crime[] = [];
+const db = env.JM_DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : [];
 
 const currentYear = new Date().getFullYear();
 const previousYear = currentYear - 1;
@@ -86,7 +86,7 @@ const latestMurders = crimesCurrent
   .slice(0, 6);
 ---
 
-<Layout title={title} description={description} includePagefind={false} noindex={true}>
+<Layout title={title} description={description} includePagefind={false} noindex={false}>
   <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8" data-pagefind-ignore>
     <!-- Breadcrumbs -->
     <div class="mb-6">

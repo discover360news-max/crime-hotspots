@@ -15,17 +15,21 @@ import Papa from 'papaparse';
 
 export interface Env {
   DB: D1Database;
+  JM_DB?: D1Database; // Jamaica D1 — optional so worker still deploys without it
   // Optional: set SYNC_SECRET to protect the POST /sync endpoint
   SYNC_SECRET?: string;
 }
 
-// Year CSV URLs — mirrors TRINIDAD_CSV_URLS in astro-poc/src/config/csvUrls.ts.
+// Trinidad CSV URLs by year — mirrors TRINIDAD_CSV_URLS in astro-poc/src/config/csvUrls.ts.
 // 'current' is the same sheet as the latest year, so we don't add it separately.
-// historicalTrends is intentionally excluded (one-time migration only; removed post-migration).
 const YEAR_CSV_URLS: Record<string, string> = {
   '2025': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1749261532&single=true&output=csv',
   '2026': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTB-ktijzh1ySAy3NpfrcPEEEEs90q-0F0V8UxZxCTlTTbk4Qsa1cbLhlPwh38ie2_bGJYQX8n5vy8v/pub?gid=1963637925&single=true&output=csv',
 };
+
+// Jamaica CSV URL — mirrors JAMAICA_CSV_URL in astro-poc/src/config/csvUrls.ts.
+// Single sheet (no year split yet). Year prefix is derived from each row's date.
+const JAMAICA_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaZbgg8gAOl5DBg0GAuohDnecZL3qG4olfL5O57UPc2eg7bXj0w1UoRJ3TELGUXcRUTXVhFDzb6VgV/pub?gid=1963637925&single=true&output=csv';
 
 // ============================================================================
 // SLUG GENERATION (mirrors csvParser.ts — keep in sync)
@@ -110,7 +114,7 @@ const INSERT_FTS_SQL = `
   INSERT INTO crimes_fts(story_id, title, body, url) VALUES (?, ?, ?, ?)
 `;
 
-async function syncCsvToD1(db: D1Database, csvUrl: string, year: string): Promise<number> {
+async function syncCsvToD1(db: D1Database, csvUrl: string, year: string, country: 'trinidad' | 'jamaica' = 'trinidad'): Promise<number> {
   console.log(`[sync] Fetching ${year} CSV...`);
   const response = await fetch(csvUrl);
   if (!response.ok) {
@@ -205,7 +209,7 @@ async function syncCsvToD1(db: D1Database, csvUrl: string, year: string): Promis
 
       // FTS entry — title=headline, body=searchable metadata fields
       const ftsBody = [area, region, crimeType, street, summary].filter(Boolean).join(' ');
-      const ftsUrl = `/trinidad/crime/${slug}/`;
+      const ftsUrl = `/${country}/crime/${slug}/`;
       stmts.push(db.prepare(INSERT_FTS_SQL).bind(storyId, headline, ftsBody, ftsUrl));
 
       upsertCount++;
@@ -218,6 +222,89 @@ async function syncCsvToD1(db: D1Database, csvUrl: string, year: string): Promis
 
   console.log(`[sync] ${year}: upserted ${upsertCount}, skipped ${skipCount}`);
   return upsertCount;
+}
+
+async function runJamaicaSync(db: D1Database): Promise<void> {
+  const start = Date.now();
+
+  await db.prepare('DELETE FROM crimes').run();
+  await db.prepare('DELETE FROM crimes_fts').run();
+  console.log('[sync/jamaica] crimes + crimes_fts cleared — will re-populate from CSV');
+
+  // Jamaica CSV is a single sheet. Year prefix is derived per-row from the date column.
+  // Parse the CSV in one pass, grouping rows by year for the storyId prefix.
+  console.log('[sync/jamaica] Fetching Jamaica CSV...');
+  const response = await fetch(JAMAICA_CSV_URL);
+  if (!response.ok) {
+    throw new Error(`[sync/jamaica] HTTP ${response.status} fetching Jamaica CSV`);
+  }
+  const csvText = await response.text();
+
+  const parsed = Papa.parse<CsvRow>(csvText, {
+    header: true,
+    skipEmptyLines: true,
+    transform: (value: string) => value.trim(),
+  });
+
+  const rows = parsed.data;
+  console.log(`[sync/jamaica] Parsed ${rows.length} rows`);
+
+  let upsertCount = 0;
+  let skipCount = 0;
+
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const batch = rows.slice(i, i + BATCH_SIZE);
+    const stmts: D1PreparedStatement[] = [];
+
+    for (const row of batch) {
+      const rawStoryId = col(row, 'story_id', 'Story_ID');
+      const headline = col(row, 'Headline');
+      const dateStr = col(row, 'Date');
+
+      if (!rawStoryId || !headline || !dateStr) { skipCount++; continue; }
+
+      const dateObj = parseDate(dateStr);
+      if (isNaN(dateObj.getTime())) { skipCount++; continue; }
+
+      const rowYear = dateObj.getFullYear().toString();
+      const normalizedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+      const storyId = `${rowYear}-${rawStoryId}`;
+      const oldSlug = generateSlug(headline, dateObj);
+      const slug = generateSlugWithId(rawStoryId, headline);
+
+      const summary = col(row, 'Summary') || null;
+      const crimeType = col(row, 'primaryCrimeType') || null;
+      const primaryCrimeType = col(row, 'primaryCrimeType') || null;
+      const relatedCrimeTypes = col(row, 'relatedCrimeTypes') || null;
+      const victimCount = parseNullableInt(col(row, 'victimCount'));
+      const street = col(row, 'Street Address', 'Street') || null;
+      const area = col(row, 'Area') || null;
+      const region = col(row, 'Region') || null;
+      const url = col(row, 'URL') || null;
+      const source = col(row, 'Source') || null;
+      const latitude = parseNullableFloat(col(row, 'Latitude'));
+      const longitude = parseNullableFloat(col(row, 'Longitude'));
+      const datePublished = col(row, 'Date_Published') || null;
+      const dateUpdated = col(row, 'Date_Updated') || null;
+
+      stmts.push(
+        db.prepare(INSERT_SQL).bind(
+          storyId, normalizedDate, headline, summary, crimeType, primaryCrimeType,
+          relatedCrimeTypes, victimCount, street, area, region, url, source,
+          latitude, longitude, datePublished, dateUpdated, slug, oldSlug,
+          dateObj.getFullYear(), dateObj.getMonth() + 1, dateObj.getDate(),
+        ),
+      );
+
+      const ftsBody = [area, region, crimeType, street, summary].filter(Boolean).join(' ');
+      stmts.push(db.prepare(INSERT_FTS_SQL).bind(storyId, headline, ftsBody, `/jamaica/crime/${slug}/`));
+      upsertCount++;
+    }
+
+    if (stmts.length > 0) await db.batch(stmts);
+  }
+
+  console.log(`[sync/jamaica] Full sync complete: ${upsertCount} rows upserted, ${skipCount} skipped in ${Date.now() - start}ms`);
 }
 
 const INDEXNOW_KEY = '0360e20a9d964df1961e301d0ed29ed5';
@@ -270,33 +357,50 @@ async function runFullSync(db: D1Database): Promise<void> {
 // ============================================================================
 
 export default {
-  // Cron trigger — runs daily at 10:00 UTC
+  // Cron trigger — runs daily at 05:00 UTC (before 06:00 site rebuild)
   async scheduled(_event: ScheduledEvent, env: Env, _ctx: ExecutionContext): Promise<void> {
     await runFullSync(env.DB);
+    if (env.JM_DB) await runJamaicaSync(env.JM_DB);
   },
 
-  // HTTP handler — POST /sync (protected by SYNC_SECRET) for manual trigger / one-time migration
+  // HTTP handler — manual sync endpoints (protected by SYNC_SECRET)
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    if (request.method === 'POST' && url.pathname === '/sync') {
-      // Require secret if configured
+    if (request.method === 'POST') {
       if (env.SYNC_SECRET) {
         const auth = request.headers.get('x-sync-secret');
         if (auth !== env.SYNC_SECRET) {
           return new Response('Unauthorized', { status: 401 });
         }
       }
-      try {
-        await runFullSync(env.DB);
-        return new Response('Sync complete', { status: 200 });
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        console.error('[sync] Sync failed:', message);
-        return new Response(`Sync failed: ${message}`, { status: 500 });
+
+      // POST /sync — Trinidad full sync
+      if (url.pathname === '/sync') {
+        try {
+          await runFullSync(env.DB);
+          return new Response('Trinidad sync complete', { status: 200 });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          console.error('[sync] Trinidad sync failed:', message);
+          return new Response(`Sync failed: ${message}`, { status: 500 });
+        }
+      }
+
+      // POST /sync/jamaica — Jamaica full sync
+      if (url.pathname === '/sync/jamaica') {
+        if (!env.JM_DB) return new Response('JM_DB not bound', { status: 503 });
+        try {
+          await runJamaicaSync(env.JM_DB);
+          return new Response('Jamaica sync complete', { status: 200 });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          console.error('[sync/jamaica] Sync failed:', message);
+          return new Response(`Jamaica sync failed: ${message}`, { status: 500 });
+        }
       }
     }
 
-    return new Response('Crime Sync Worker — POST /sync to trigger manually', { status: 200 });
+    return new Response('Crime Sync Worker — POST /sync (Trinidad) | POST /sync/jamaica', { status: 200 });
   },
 };
