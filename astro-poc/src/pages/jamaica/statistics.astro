@@ -31,6 +31,7 @@ import {
 } from '../../lib/statisticsHelpers';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import { getAllCrimesFromD1 } from '../../lib/crimeData';
+import { JAMAICA_CSV_URL } from '../../config/csvUrls';
 import { env } from 'cloudflare:workers';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
