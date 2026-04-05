@@ -9,7 +9,8 @@
 import { usesVictimCount, crimeHasVictims } from '../config/crimeTypeConfig';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const { allCrimes, regionToAreas, allAreas } = (window as any).__hlData || {};
+  const { allCrimes, regionToAreas, allAreas, crimePath } = (window as any).__hlData || {};
+  const _crimePath: string = crimePath ?? '/trinidad/crime/';
   if (!allCrimes) return;
 
   // ── State ──────────────────────────────────────────────────────────────────
@@ -66,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const crimeType = escapeHtml(crime.primaryCrimeType || crime.crimeType);
     const style = getTypeStyle(crime.primaryCrimeType || crime.crimeType);
     return `
-      <a href="/trinidad/crime/${escapeHtml(crime.slug)}/"
+      <a href="${_crimePath}${escapeHtml(crime.slug)}/"
         class="crime-card group flex items-start gap-3 py-3 px-3 rounded-xl hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_11%)] transition-colors block">
         <div class="w-1 rounded-full shrink-0 mt-0.5" style="background:${style.hex};min-height:36px;align-self:stretch"></div>
         <div class="flex-1 min-w-0">

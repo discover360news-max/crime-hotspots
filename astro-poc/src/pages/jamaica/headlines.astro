@@ -1,62 +1,401 @@
 ---
 /**
  * Jamaica Headlines Page
- * SSR shell — data will appear once Jamaica D1 is configured.
- * Route: /jamaica/headlines/
+ * SSR — data from JM_DB. Same layout as T&T headlines.
+ * Crime cards link to /jamaica/crime/[slug]/ (C4, built next).
+ * Hot-areas sidebar widget omitted until area pages exist (Phase D3).
  */
 
+export const prerender = false;
+
 import Layout from '../../layouts/Layout.astro';
-import Breadcrumbs from '../../components/Breadcrumbs.astro';
-import Hero from '../../components/Hero.astro';
-import SocialProofStrip from '../../components/SocialProofStrip.astro';
+import NewsletterSignup from '../../components/NewsletterSignup.astro';
+import { getAllCrimesFromD1, type Crime } from '../../lib/crimeData';
+import { countCrimeType } from '../../lib/dashboardHelpers';
+import { usesVictimCount, crimeHasVictims } from '../../config/crimeTypeConfig';
+import { getTotalCrimeCount } from '../../lib/statisticsHelpers';
 import { routes } from '../../config/routes';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
+import SocialFollow from '../../components/SocialFollow.astro';
+import HeroBg from '../../components/HeroBg.astro';
+import { env } from 'cloudflare:workers';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-// TODO: wire to Jamaica D1 — replace empty array with getAllCrimesFromD1(db, 'JM')
-const allCrimes: never[] = [];
+const db = env.JM_DB as D1Database | undefined;
+const allCrimes = db ? await getAllCrimesFromD1(db) : [];
 
-const breadcrumbs = [
-  { label: 'Home', href: '/' },
-  { label: 'Jamaica', href: routes.jamaica.dashboard },
-  { label: 'Headlines' },
-];
+const currentYear = new Date().getFullYear();
 
-const pageTitle = 'Jamaica Crime Headlines | Crime Hotspots';
-const pageDescription = 'Browse verified crime incidents from Jamaica, filtered by parish, crime type, and date. Coming soon.';
+// Filter data for tray
+const areas = [...new Set(allCrimes.map(c => c.area).filter(Boolean))].sort();
+const regions = [...new Set(allCrimes.map(c => c.region).filter(Boolean))].sort();
+const crimeTypes = [...new Set(allCrimes.map(c => c.crimeType).filter(Boolean))].sort();
+const regionToAreas: Record<string, string[]> = {};
+allCrimes.forEach(c => {
+  if (c.region && c.area) {
+    if (!regionToAreas[c.region]) regionToAreas[c.region] = [];
+    if (!regionToAreas[c.region].includes(c.area)) regionToAreas[c.region].push(c.area);
+  }
+});
+Object.values(regionToAreas).forEach(arr => (arr as string[]).sort());
+
+// Crime type chips: ordered by frequency
+const typeFreq = allCrimes.reduce((acc: Record<string, number>, c) => {
+  const t = c.primaryCrimeType || c.crimeType;
+  if (t) acc[t] = (acc[t] || 0) + 1;
+  return acc;
+}, {});
+const crimeTypesByFreq = Object.entries(typeFreq)
+  .sort((a, b) => b[1] - a[1])
+  .map(([type]) => type);
+
+// Server-render first 30 crimes grouped by date
+const initialCrimes = allCrimes.slice(0, 30);
+const initialCrimeCount = getTotalCrimeCount(initialCrimes);
+const totalCrimeCount = getTotalCrimeCount(allCrimes);
+const crimesByDate = new Map<string, Crime[]>();
+initialCrimes.forEach(crime => {
+  const key = crime.date;
+  if (!crimesByDate.has(key)) crimesByDate.set(key, []);
+  crimesByDate.get(key)!.push(crime);
+});
+const sortedDates = Array.from(crimesByDate.keys()).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
+function calculateVictimCount(crimes: Crime[]): number {
+  return crimes.reduce((total, crime) => {
+    const primaryType = crime.primaryCrimeType || crime.crimeType;
+    if (!crimeHasVictims(primaryType)) return total;
+    if (usesVictimCount(primaryType)) return total + (crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1);
+    return total + 1;
+  }, 0);
+}
+
+function getTypeStyle(crimeType: string): { hex: string; pillClass: string } {
+  const t = (crimeType || '').toLowerCase();
+  if (['murder', 'attempted murder'].some(s => t.includes(s)))
+    return { hex: '#e11d48', pillClass: 'text-rose-700 bg-rose-50 dark:bg-rose-950/40 dark:text-rose-400' };
+  if (['shooting', 'kidnapping', 'sexual assault', 'home invasion', 'arson', 'carjacking', 'robbery', 'domestic violence', 'extortion'].some(s => t.includes(s)))
+    return { hex: '#f59e0b', pillClass: 'text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400' };
+  return { hex: '#94a3b8', pillClass: 'text-slate-600 bg-slate-100 dark:bg-[hsl(0_0%_15%)] dark:text-[hsl(0_0%_60%)]' };
+}
+
+// Freshness + 30-day pulse
+const latestCrimeDate = allCrimes[0]?.dateObj ?? new Date();
+const freshnessText = latestCrimeDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const cutoff30d = new Date(); cutoff30d.setDate(cutoff30d.getDate() - 30);
+const count30d = allCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff30d).length;
+
+// Sidebar murder count
+const ytdMurders = countCrimeType(allCrimes.filter(c => c.year === currentYear), 'Murder');
+
+const showBeta = new Date() < new Date('2026-07-04T00:00:00');
+
+const title = `Jamaica Crime Headlines — Latest Reports | Crime Hotspots`;
+const description = `Jamaica crime headlines updated daily. Browse and filter verified incidents by parish, crime type, and date.`;
 ---
 
-<Layout title={pageTitle} description={pageDescription} noindex={true}>
-  <Hero
-    compact
-    narrowContainer={true}
-    title="Jamaica Headlines"
-    subtitle="Crime incidents — coming soon"
-    primaryCTA={{ text: 'Dashboard', href: routes.jamaica.dashboard, icon: 'arrow' }}
-  >
-    <Breadcrumbs items={breadcrumbs} slot="before" />
-  </Hero>
+<Layout title={title} description={description} noindex={false} includeTurnstile={true}>
 
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-10">
-    <SocialProofStrip variant="strip" />
+  <!-- Dark Hero -->
+  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800">
+    <HeroBg />
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
+        <div>
+          <nav aria-label="Breadcrumb" class="mb-4">
+            <ol class="flex items-center gap-1.5 text-xs text-slate-500">
+              <li><a href="/" class="hover:text-slate-300 transition">Home</a></li>
+              <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+              <li><a href={routes.jamaica.dashboard} class="hover:text-slate-300 transition">Jamaica</a></li>
+              <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
+              <li class="text-slate-400">Headlines</li>
+            </ol>
+          </nav>
+          <div class="flex items-center gap-2.5 mb-2">
+            <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Latest Crime Headlines</h1>
+            {showBeta && (
+              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-amber-400 text-amber-900 self-center shrink-0">Beta</span>
+            )}
+          </div>
+          <p class="text-slate-400 text-sm mb-5">Jamaica crime reports, updated daily.</p>
+          <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10 max-w-xl">
+            <span class="relative flex h-2 w-2 mt-1 shrink-0">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+            </span>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              <strong class="text-white">{count30d} {count30d === 1 ? 'crime' : 'crimes'}</strong> reported in the last 30 days.
+            </p>
+          </div>
+          <div class="flex gap-3 flex-wrap items-center">
+            <a href={routes.jamaica.dashboard} class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition font-medium text-xs">Dashboard</a>
+            <a href={routes.jamaica.murderCount} class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs">Murder Count</a>
+            <button id="filtersBtn" class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs">
+              <span id="filtersBtnText">Filters ›</span>
+            </button>
+            <button id="clearFiltersInline" class="hidden text-xs text-rose-400 hover:text-rose-300 font-medium whitespace-nowrap transition">Clear</button>
+          </div>
+          <p class="text-slate-500 text-xs mt-5 flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Data as of {freshnessText}
+          </p>
+        </div>
+        <div class="w-full lg:w-52">
+          <SocialProofStrip variant="hero" incidentCount={allCrimes.length} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Type Filter Chips -->
+  <div class="relative max-w-5xl mx-auto px-4 sm:px-6 pt-5 pb-1">
+    <div id="chipScrollArea" class="flex items-center gap-2 overflow-x-auto pb-1">
+      <button class="chip-filter chip-active shrink-0" data-type="">All</button>
+      {crimeTypesByFreq.map(type => (
+        <button class="chip-filter shrink-0" data-type={type}>{type}</button>
+      ))}
+    </div>
+    <div id="chipFade" class="pointer-events-none absolute right-4 sm:right-6 top-0 bottom-1 w-12 bg-gradient-to-l from-slate-100 dark:from-[hsl(0_0%_8%)] to-transparent transition-opacity duration-200"></div>
   </div>
 
-  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
-    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-5" data-pagefind-ignore>
+    <div class="lg:grid lg:grid-cols-[1fr_272px] lg:gap-8 lg:items-start">
 
-      <div class="text-center py-12">
-        <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)]">
-          Crime headlines will appear here once the Jamaica data pipeline is live.
-        </p>
-        <a
-          href={routes.jamaica.dashboard}
-          class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-rose-600 dark:text-rose-400 hover:underline"
-        >
-          Back to Dashboard
-        </a>
+      <!-- ── Main column ── -->
+      <div>
+        <!-- Results row -->
+        <div class="mb-4 text-xs flex flex-wrap items-center justify-between gap-y-1.5 text-slate-400 dark:text-[var(--ch-text-faint)]">
+          <span>Showing <span id="resultsShowing">{initialCrimeCount}</span> of <span id="resultsTotal">{totalCrimeCount}</span> crimes</span>
+        </div>
+
+        <!-- Crime accordions -->
+        <div id="crimeAccordions">
+          {sortedDates.map((date, index) => {
+            const crimes = crimesByDate.get(date)!;
+            const isExpanded = index < 3;
+            const incidentCount = crimes.length;
+            const victimCount = calculateVictimCount(crimes);
+            const c0 = crimes[0];
+            const d = new Date(c0.year, c0.month - 1, c0.day);
+            const weekday = d.toLocaleDateString('en-US', { weekday: 'long' });
+            const shortDate = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            return (
+              <div class="date-accordion mb-4" data-date={date}>
+                <button
+                  class="da-header w-full text-left bg-slate-800 dark:bg-[hsl(0_0%_8%)] rounded-xl px-4 py-3 flex items-center justify-between group hover:bg-slate-700 dark:hover:bg-[hsl(0_0%_11%)] transition-colors"
+                  aria-expanded={isExpanded ? 'true' : 'false'}
+                >
+                  <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{weekday}</p>
+                    <h3 class="text-white font-black text-base leading-tight">{shortDate}</h3>
+                    <p class="text-slate-400 text-xs mt-0.5">{incidentCount} {incidentCount === 1 ? 'crime' : 'crimes'} · {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+                  </div>
+                  <svg class={`da-chevron w-4 h-4 text-slate-500 transition-transform${isExpanded ? ' rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </button>
+                <div class={`da-content overflow-hidden${isExpanded ? ' is-open' : ''}`}>
+                  <div class="space-y-1 pt-2">
+                    {crimes.map(crime => {
+                      const style = getTypeStyle(crime.primaryCrimeType ?? crime.crimeType);
+                      const pill = crime.primaryCrimeType ?? crime.crimeType;
+                      return (
+                        <a
+                          href={`/jamaica/crime/${crime.slug}/`}
+                          class="crime-card group flex items-start gap-3 py-3 px-3 rounded-xl hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_11%)] transition-colors block"
+                        >
+                          <div class="w-1 rounded-full shrink-0 mt-0.5" style={`background:${style.hex};min-height:36px;align-self:stretch`}></div>
+                          <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                              <span class={`${style.pillClass} inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide`}>
+                                {pill}
+                              </span>
+                              <span class="text-[10px] text-slate-400 dark:text-[hsl(0_0%_45%)] truncate">{crime.area}</span>
+                            </div>
+                            <p class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-slate-900 dark:group-hover:text-white leading-snug line-clamp-2 transition-colors">
+                              {crime.headline}
+                            </p>
+                          </div>
+                          <svg class="w-3.5 h-3.5 text-slate-300 dark:text-[hsl(0_0%_30%)] group-hover:text-rose-500 transition-colors shrink-0 mt-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                          </svg>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <!-- Load More -->
+        <div class="mt-6 text-center">
+          <button
+            id="loadMore"
+            class="px-4 py-1.5 border-2 border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-700 dark:text-[var(--ch-text-strong)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 active:bg-rose-50 dark:active:bg-rose-950/40 rounded-lg transition font-medium text-xs"
+          >
+            Load More
+          </button>
+        </div>
+
+        <div class="mt-6">
+          <SocialFollow variant="strip" />
+        </div>
       </div>
+
+      <!-- ── Sidebar ── -->
+      <aside class="hidden lg:flex flex-col gap-5 sticky top-20 mt-0">
+
+        <!-- Jamaica murder count card -->
+        <a
+          href={routes.jamaica.murderCount}
+          class="group block rounded-xl overflow-hidden shadow-sm"
+        >
+          <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-5 group-hover:from-slate-800 group-hover:to-slate-700 transition-colors">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Jamaica · {currentYear}</p>
+            <div class="text-5xl font-black text-white leading-none mb-1">{ytdMurders}</div>
+            <p class="text-slate-400 text-xs mb-4">murders year to date</p>
+            <span class="inline-flex items-center gap-1 text-rose-400 text-xs font-medium group-hover:text-rose-300 transition-colors">
+              View full count
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </span>
+          </div>
+        </a>
+
+        <!-- Social Follow -->
+        <SocialFollow variant="sidebar" />
+
+        <!-- Newsletter -->
+        <NewsletterSignup variant="card" source="jamaica-headlines-sidebar" />
+
+      </aside>
 
     </div>
   </main>
+
+  <!-- Filter Tray -->
+  <div id="filtersTray" class="fixed inset-0 z-50 pointer-events-none overflow-hidden">
+    <div id="filtersBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+    <div id="filtersTrayContent" class="absolute right-0 top-0 h-full max-w-[min(20rem,calc(100vw-2rem))] w-full bg-white/85 dark:bg-[var(--ch-surface)]/90 backdrop-blur-lg rounded-l-2xl shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto overflow-y-auto">
+      <div class="p-5">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-heading font-bold text-slate-700 dark:text-[var(--ch-text)]">Filters</h2>
+          <button id="closeFiltersBtn" class="text-slate-400 dark:text-[var(--ch-text-faint)] hover:text-slate-600 dark:hover:text-[hsl(0_0%_75%)] transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <label for="dateFrom" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">From Date</label>
+            <input type="date" id="dateFrom" class="filter-date-input w-full px-4 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]" />
+          </div>
+          <div>
+            <label for="dateTo" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">To Date</label>
+            <input type="date" id="dateTo" class="filter-date-input w-full px-4 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]" />
+          </div>
+          <div>
+            <label for="crimeTypeFilter" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">Crime Type</label>
+            <select id="crimeTypeFilter" class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]">
+              <option value="">All Types</option>
+              {crimeTypes.map(type => <option value={type}>{type}</option>)}
+            </select>
+          </div>
+          <div>
+            <label for="regionFilter" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">Parish</label>
+            <select id="regionFilter" class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]">
+              <option value="">All Parishes</option>
+              {regions.map(region => <option value={region}>{region}</option>)}
+            </select>
+          </div>
+          <div>
+            <label for="areaFilter" class="block text-sm font-medium text-slate-700 dark:text-[var(--ch-text-strong)] mb-2">Area</label>
+            <select id="areaFilter" class="filter-select w-full pl-4 pr-10 py-2.5 border border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition font-medium text-xs bg-white/50 dark:bg-[var(--ch-surface-sub)]">
+              <option value="">All Areas</option>
+              {areas.map(area => <option value={area}>{area}</option>)}
+            </select>
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button id="clearFilters" class="flex-1 px-4 py-2 text-rose-600 hover:text-rose-700 transition font-medium text-xs">Clear Filters</button>
+            <button id="applyFilters" class="flex-1 px-4 py-2 border-2 border-slate-300 dark:border-[var(--ch-border)] text-slate-500 dark:text-[var(--ch-text-muted)] rounded-lg transition-all duration-200 font-medium text-xs">Apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </Layout>
+
+<style>
+  :global(.da-content) {
+    height: 0;
+    transition: height 300ms ease, margin-top 200ms ease;
+  }
+  :global(.da-content.is-open) {
+    height: auto;
+    margin-top: 0;
+  }
+  .chip-filter {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    border: 1.5px solid #e2e8f0;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 150ms, color 150ms, background 150ms;
+    white-space: nowrap;
+  }
+  .chip-filter:hover { border-color: #fda4af; color: #e11d48; }
+  .chip-filter.chip-active { background: #e11d48; border-color: #e11d48; color: #fff; }
+  :global(.dark) .chip-filter { border-color: hsl(0 0% 20%); color: hsl(0 0% 55%); }
+  :global(.dark) .chip-filter:hover { border-color: hsl(346 77% 49% / 0.5); color: #fb7185; }
+  :global(.dark) .chip-filter.chip-active { background: #e11d48; border-color: #e11d48; color: #fff; }
+  #chipScrollArea::-webkit-scrollbar { display: none; }
+  #chipScrollArea { -ms-overflow-style: none; scrollbar-width: none; }
+  .filter-date-input::-webkit-calendar-picker-indicator { padding: 2px; margin-right: 2px; cursor: pointer; opacity: 0.5; }
+  .filter-date-input::-webkit-calendar-picker-indicator:hover { opacity: 0.8; }
+</style>
+
+<!-- Data bridge: pass crimePath so headlinesPage.ts generates Jamaica crime URLs -->
+<script define:vars={{ allCrimes, regionToAreas, allAreas: areas }}>
+  window.__hlData = { allCrimes, regionToAreas, allAreas, crimePath: '/jamaica/crime/' };
+</script>
+
+<script src="../../scripts/headlinesPage.ts"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const chipScroll = document.getElementById('chipScrollArea');
+    const chipFade = document.getElementById('chipFade');
+    if (chipScroll && chipFade) {
+      chipScroll.addEventListener('scroll', () => {
+        const atEnd = chipScroll.scrollLeft + chipScroll.clientWidth >= chipScroll.scrollWidth - 4;
+        chipFade.style.opacity = atEnd ? '0' : '1';
+      }, { passive: true });
+    }
+  });
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('crimeAccordions');
+    if (!container) return;
+    container.addEventListener('click', (e) => {
+      const header = (e.target as Element).closest('.da-header');
+      if (!header) return;
+      const accordion = header.closest('.date-accordion');
+      const content = accordion?.querySelector('.da-content');
+      const chevron = header.querySelector('.da-chevron');
+      const expanded = header.getAttribute('aria-expanded') === 'true';
+      if (content && chevron) {
+        header.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        content.classList.toggle('is-open', !expanded);
+        chevron.classList.toggle('rotate-90', !expanded);
+      }
+    });
+  });
+</script>
