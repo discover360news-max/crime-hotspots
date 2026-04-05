@@ -8,7 +8,7 @@
 import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import QuickAnswers from '../components/QuickAnswers.astro';
-import HeroBg from '../components/HeroBg.astro';
+import DarkHero from '../components/DarkHero.astro';
 import SocialProofStrip from '../components/SocialProofStrip.astro';
 import { routes, buildRoute } from '../config/routes';
 import { getAllCrimesFromD1, getTrinidadCrimes } from '../lib/crimeData';
@@ -74,12 +74,7 @@ const description = "Real-time crime statistics, murder counts, and safety data 
 
 <Layout title={title} description={description} includeLeaflet={false} includePagefind={false}>
 
-  <!-- ═══════════════════════════════════════════════════════════
-       DARK HERO
-       ═══════════════════════════════════════════════════════════ -->
-  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800">
-    <HeroBg />
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+  <DarkHero padding="py-10 sm:py-14">
       <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
 
         <!-- Left: headline + pulse + CTAs -->
@@ -118,7 +113,7 @@ const description = "Real-time crime statistics, murder counts, and safety data 
 
       </div>
     </div>
-  </section>
+  </DarkHero>
 
   <main>
 

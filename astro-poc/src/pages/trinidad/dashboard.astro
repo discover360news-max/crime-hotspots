@@ -25,7 +25,7 @@ import { dataUpdateNotice } from '../../config/siteNotifications';
 import { getCountryName } from '../../data/countries';
 import { routes, buildRoute } from '../../config/routes';
 import '../../styles/dashboard.css';
-import HeroBg from '../../components/HeroBg.astro';
+import DarkHero from '../../components/DarkHero.astro';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
@@ -97,12 +97,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
 <Layout title={title} description={description} includeLeaflet={true} includeTurnstile={true}>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       HERO — dark gradient, full viewport width
-       ═══════════════════════════════════════════════════════════════ -->
-  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800" data-pagefind-ignore>
-    <HeroBg />
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+  <DarkHero padding="py-8 sm:py-10" pagefindIgnore={true}>
 
       <!-- Breadcrumb (light) -->
       <nav aria-label="Breadcrumb" class="mb-4">
@@ -190,7 +185,7 @@ const description = "Track Trinidad & Tobago crime statistics for 2026. Live mur
 
       </div>
     </div>
-  </section>
+  </DarkHero>
 
 
   <!-- ═══════════════════════════════════════════════════════════════

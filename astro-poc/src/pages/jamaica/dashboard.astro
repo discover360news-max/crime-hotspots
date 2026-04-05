@@ -15,7 +15,7 @@ import QuickInsightsCard from '../../components/QuickInsightsCard.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import DashboardInfoCards from '../../components/DashboardInfoCards.astro';
 import SocialProofStrip from '../../components/SocialProofStrip.astro';
-import HeroBg from '../../components/HeroBg.astro';
+import DarkHero from '../../components/DarkHero.astro';
 import { getAllCrimesFromD1 } from '../../lib/crimeData';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
 import { getTotalCrimeCount } from '../../lib/statisticsHelpers';
@@ -107,12 +107,7 @@ const description = `Jamaica crime statistics ${currentYear}. Live murder count,
 
 <Layout title={title} description={description} noindex={false}>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       HERO
-       ═══════════════════════════════════════════════════════════════ -->
-  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800" data-pagefind-ignore>
-    <HeroBg />
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+  <DarkHero padding="py-8 sm:py-10" pagefindIgnore={true}>
 
       <!-- Breadcrumb -->
       <nav aria-label="Breadcrumb" class="mb-4">
@@ -193,7 +188,7 @@ const description = `Jamaica crime statistics ${currentYear}. Live murder count,
 
       </div>
     </div>
-  </section>
+  </DarkHero>
 
 
   <!-- ═══════════════════════════════════════════════════════════════

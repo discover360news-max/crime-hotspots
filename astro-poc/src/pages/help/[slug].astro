@@ -7,7 +7,7 @@
 export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
-import HeroBg from '../../components/HeroBg.astro';
+import DarkHero from '../../components/DarkHero.astro';
 import { getCollection, render } from 'astro:content';
 import { routes } from '../../config/routes';
 
@@ -68,52 +68,22 @@ const articleSchema = {
 <Layout title={title} description={description}>
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(articleSchema)} />
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       HERO — dark gradient, full viewport width
-       ═══════════════════════════════════════════════════════════════ -->
-  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800">
-    <HeroBg />
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-
-      <!-- Breadcrumb -->
-      <nav aria-label="Breadcrumb" class="mb-4">
-        <ol class="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap">
-          <li><a href="/" class="hover:text-slate-300 transition">Home</a></li>
-          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li><a href="/help/" class="hover:text-slate-300 transition">Help Centre</a></li>
-          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li><a href={`/help/#${sectionAnchor}`} class="hover:text-slate-300 transition">{article.data.section}</a></li>
-          <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-          <li class="text-slate-400">{article.data.title}</li>
-        </ol>
-      </nav>
-
-      <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight mb-2">{article.data.title}</h1>
-      <p class="text-slate-400 text-sm mb-5">
-        {article.data.section}
-        {article.data.date_updated && (
-          <> &middot; Updated {article.data.date_updated.toLocaleDateString('en-TT', { year: 'numeric', month: 'long', day: 'numeric' })}</>
-        )}
-      </p>
-
-      <!-- CTAs -->
-      <div class="flex gap-3 flex-wrap">
-        <a
-          href={`/help/#${sectionAnchor}`}
-          class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 active:bg-rose-700 transition font-medium text-xs"
-        >
-          All {article.data.section} articles
-        </a>
-        <a
-          href={routes.contact}
-          class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white active:bg-white/5 transition font-medium text-xs"
-        >
-          Contact Us
-        </a>
-      </div>
-
-    </div>
-  </section>
+  <DarkHero
+    title={article.data.title}
+    subtitle={article.data.date_updated
+      ? `${article.data.section} · Updated ${article.data.date_updated.toLocaleDateString('en-TT', { year: 'numeric', month: 'long', day: 'numeric' })}`
+      : article.data.section}
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Help Centre', href: '/help/' },
+      { label: article.data.section, href: `/help/#${sectionAnchor}` },
+      { label: article.data.title },
+    ]}
+    ctas={[
+      { text: `All ${article.data.section} articles`, href: `/help/#${sectionAnchor}`, variant: 'primary' },
+      { text: 'Contact Us', href: routes.contact },
+    ]}
+  />
 
   <!-- ═══════════════════════════════════════════════════════════════
        CONTENT ZONE

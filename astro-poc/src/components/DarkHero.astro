@@ -1,0 +1,188 @@
+---
+/**
+ * DarkHero — dark gradient hero shell for all data and dashboard pages.
+ *
+ * Standard mode (props + named slots):
+ *   Props: title, subtitle, titleSize, breadcrumbs, ctas, freshness, padding, pagefindIgnore
+ *   slot "title-addon"  — inline element after H1 (e.g. a Beta badge)
+ *   slot "pulse"        — text content inside the live pulse banner; no banner if slot is empty
+ *   slot "cta-extra"    — extra CTA elements (e.g. JS-bound buttons) appended after cta links
+ *   slot "right"        — right panel; when provided, triggers 2-column grid layout
+ *
+ * Shell mode (default slot):
+ *   Render only the outer section + HeroBg + container. Pass all inner HTML via the default slot.
+ *   Use for pages with complex/unique inner layouts (dashboards, homepage, murder-count).
+ *
+ * <DarkHero
+ *   title="Crime by Region"
+ *   subtitle="Compare crime activity across 12 regions."
+ *   breadcrumbs={[{ label: 'Home', href: '/' }, { label: 'T&T', href: '/trinidad/dashboard/' }, { label: 'Regions' }]}
+ *   ctas={[
+ *     { text: 'Compare Areas', href: '/trinidad/compare/', variant: 'primary' },
+ *     { text: 'View by Area', href: '/trinidad/areas/' },
+ *   ]}
+ *   freshness="Data as of 5 Apr 2026"
+ * >
+ *   <Fragment slot="pulse">
+ *     <strong class="text-white">12 regions</strong> tracked. Sorted by crime volume.
+ *   </Fragment>
+ *   <SocialProofStrip slot="right" variant="hero" incidentCount={allCrimes.length} />
+ * </DarkHero>
+ */
+
+import HeroBg from './HeroBg.astro';
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Cta {
+  text: string;
+  href: string;
+  variant?: 'primary' | 'ghost';
+  target?: string;
+  rel?: string;
+}
+
+interface Props {
+  title?: string;
+  subtitle?: string;
+  /** 'sm' = text-3xl/4xl  'md' = text-4xl/5xl (default)  'lg' = text-5xl/6xl */
+  titleSize?: 'sm' | 'md' | 'lg';
+  breadcrumbs?: BreadcrumbItem[];
+  ctas?: Cta[];
+  /** Clock text rendered at the bottom of the left column, e.g. "Data as of 5 Apr 2026" */
+  freshness?: string;
+  /** Tailwind padding classes for the inner container. Default: 'py-8 sm:py-10' */
+  padding?: string;
+  pagefindIgnore?: boolean;
+}
+
+const {
+  title,
+  subtitle,
+  titleSize = 'md',
+  breadcrumbs,
+  ctas,
+  freshness,
+  padding = 'py-8 sm:py-10',
+  pagefindIgnore = false,
+} = Astro.props;
+
+const hasDefault    = Astro.slots.has('default');
+const hasRight      = Astro.slots.has('right');
+const hasPulse      = Astro.slots.has('pulse');
+const hasCtaExtra   = Astro.slots.has('cta-extra');
+const hasTitleAddon = Astro.slots.has('title-addon');
+
+const titleClass = {
+  sm: 'text-3xl sm:text-4xl font-black text-white leading-tight',
+  md: 'text-4xl sm:text-5xl font-black text-white leading-tight',
+  lg: 'text-5xl sm:text-6xl font-black text-white leading-none tracking-tight',
+}[titleSize];
+---
+
+<section
+  class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800"
+  data-pagefind-ignore={pagefindIgnore ? '' : undefined}
+>
+  <HeroBg />
+  <div class={`max-w-5xl mx-auto px-4 sm:px-6 ${padding}`}>
+
+    {hasDefault ? (
+      <slot />
+    ) : (
+      <Fragment>
+
+        {breadcrumbs && breadcrumbs.length > 0 && (
+          <nav aria-label="Breadcrumb" class="mb-4">
+            <ol class="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap">
+              {breadcrumbs.map((crumb, i) => (
+                <Fragment>
+                  <li>
+                    {crumb.href
+                      ? <a href={crumb.href} class="hover:text-slate-300 transition">{crumb.label}</a>
+                      : <span class="text-slate-400">{crumb.label}</span>
+                    }
+                  </li>
+                  {i < breadcrumbs.length - 1 && (
+                    <li aria-hidden="true">
+                      <svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </li>
+                  )}
+                </Fragment>
+              ))}
+            </ol>
+          </nav>
+        )}
+
+        <div class={hasRight ? 'grid lg:grid-cols-[1fr_auto] gap-8 items-center' : undefined}>
+
+          <div>
+            {title && (
+              <div class="flex items-center gap-2.5 mb-2">
+                <h1 class={titleClass}>{title}</h1>
+                {hasTitleAddon && <slot name="title-addon" />}
+              </div>
+            )}
+
+            {subtitle && (
+              <p class="text-slate-400 text-sm mb-5">{subtitle}</p>
+            )}
+
+            {hasPulse && (
+              <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10 max-w-xl">
+                <span class="relative flex h-2 w-2 mt-1 shrink-0">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                </span>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                  <slot name="pulse" />
+                </p>
+              </div>
+            )}
+
+            {(ctas?.length || hasCtaExtra) && (
+              <div class="flex gap-3 flex-wrap items-center">
+                {ctas?.map(cta => (
+                  <a
+                    href={cta.href}
+                    target={cta.target}
+                    rel={cta.rel}
+                    class={cta.variant === 'primary'
+                      ? 'px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 active:bg-rose-700 transition font-medium text-xs whitespace-nowrap'
+                      : 'px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white active:bg-white/5 transition font-medium text-xs whitespace-nowrap'}
+                  >
+                    {cta.text}
+                  </a>
+                ))}
+                <slot name="cta-extra" />
+              </div>
+            )}
+
+            {freshness && (
+              <p class="text-slate-500 text-xs mt-5 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {freshness}
+              </p>
+            )}
+          </div>
+
+          {hasRight && (
+            <div class="w-full lg:w-52">
+              <slot name="right" />
+            </div>
+          )}
+
+        </div>
+
+      </Fragment>
+    )}
+
+  </div>
+</section>

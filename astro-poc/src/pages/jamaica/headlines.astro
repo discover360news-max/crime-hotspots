@@ -17,7 +17,7 @@ import { getTotalCrimeCount } from '../../lib/statisticsHelpers';
 import { routes } from '../../config/routes';
 import SocialProofStrip from '../../components/SocialProofStrip.astro';
 import SocialFollow from '../../components/SocialFollow.astro';
-import HeroBg from '../../components/HeroBg.astro';
+import DarkHero from '../../components/DarkHero.astro';
 import { env } from 'cloudflare:workers';
 
 Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
@@ -98,56 +98,34 @@ const description = `Jamaica crime headlines updated daily. Browse and filter ve
 
 <Layout title={title} description={description} noindex={false} includeTurnstile={true}>
 
-  <!-- Dark Hero -->
-  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800">
-    <HeroBg />
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-      <div class="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
-        <div>
-          <nav aria-label="Breadcrumb" class="mb-4">
-            <ol class="flex items-center gap-1.5 text-xs text-slate-500">
-              <li><a href="/" class="hover:text-slate-300 transition">Home</a></li>
-              <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-              <li><a href={routes.jamaica.dashboard} class="hover:text-slate-300 transition">Jamaica</a></li>
-              <li><svg class="w-3 h-3 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-              <li class="text-slate-400">Headlines</li>
-            </ol>
-          </nav>
-          <div class="flex items-center gap-2.5 mb-2">
-            <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight">Latest Crime Headlines</h1>
-            {showBeta && (
-              <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-amber-400 text-amber-900 self-center shrink-0">Beta</span>
-            )}
-          </div>
-          <p class="text-slate-400 text-sm mb-5">Jamaica crime reports, updated daily.</p>
-          <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10 max-w-xl">
-            <span class="relative flex h-2 w-2 mt-1 shrink-0">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-            </span>
-            <p class="text-slate-300 text-sm leading-relaxed">
-              <strong class="text-white">{count30d} {count30d === 1 ? 'crime' : 'crimes'}</strong> reported in the last 30 days.
-            </p>
-          </div>
-          <div class="flex gap-3 flex-wrap items-center">
-            <a href={routes.jamaica.dashboard} class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition font-medium text-xs">Dashboard</a>
-            <a href={routes.jamaica.murderCount} class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs">Murder Count</a>
-            <button id="filtersBtn" class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs">
-              <span id="filtersBtnText">Filters ›</span>
-            </button>
-            <button id="clearFiltersInline" class="hidden text-xs text-rose-400 hover:text-rose-300 font-medium whitespace-nowrap transition">Clear</button>
-          </div>
-          <p class="text-slate-500 text-xs mt-5 flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Data as of {freshnessText}
-          </p>
-        </div>
-        <div class="w-full lg:w-52">
-          <SocialProofStrip variant="hero" incidentCount={allCrimes.length} />
-        </div>
-      </div>
-    </div>
-  </section>
+  <DarkHero
+    title="Latest Crime Headlines"
+    subtitle="Jamaica crime reports, updated daily."
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Jamaica', href: routes.jamaica.dashboard },
+      { label: 'Headlines' },
+    ]}
+    ctas={[
+      { text: 'Dashboard', href: routes.jamaica.dashboard, variant: 'primary' },
+      { text: 'Murder Count', href: routes.jamaica.murderCount },
+    ]}
+    freshness={`Data as of ${freshnessText}`}
+  >
+    {showBeta && (
+      <span slot="title-addon" class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-amber-400 text-amber-900 self-center shrink-0">Beta</span>
+    )}
+    <Fragment slot="pulse">
+      <strong class="text-white">{count30d} {count30d === 1 ? 'crime' : 'crimes'}</strong> reported in the last 30 days.
+    </Fragment>
+    <Fragment slot="cta-extra">
+      <button id="filtersBtn" class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs whitespace-nowrap">
+        <span id="filtersBtnText">Filters ›</span>
+      </button>
+      <button id="clearFiltersInline" class="hidden text-xs text-rose-400 hover:text-rose-300 font-medium whitespace-nowrap transition">Clear</button>
+    </Fragment>
+    <SocialProofStrip slot="right" variant="hero" incidentCount={allCrimes.length} />
+  </DarkHero>
 
   <!-- Type Filter Chips -->
   <div class="relative max-w-5xl mx-auto px-4 sm:px-6 pt-5 pb-1">

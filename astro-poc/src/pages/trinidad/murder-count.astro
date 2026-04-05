@@ -25,7 +25,7 @@ Astro.response.headers.set('CDN-Cache-Control', 'max-age=3600');
 Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
 import { env } from 'cloudflare:workers';
-import HeroBg from '../../components/HeroBg.astro';
+import DarkHero from '../../components/DarkHero.astro';
 const db = env.DB as D1Database | undefined;
 const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
 
@@ -166,10 +166,7 @@ const faqData = {
 
 <Layout title={title} description={description} includePagefind={false} ogImage={`https://crimehotspots.com${ogImagePath}`}>
 
-  <!-- ── Dark Hero ────────────────────────────────────────────────────────────── -->
-  <section class="relative overflow-hidden w-full bg-gradient-to-br from-slate-900 to-slate-800">
-    <HeroBg />
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 pt-8 pb-16 sm:pb-20">
+  <DarkHero padding="pt-8 pb-16 sm:pb-20">
 
       <!-- Breadcrumbs -->
       <nav aria-label="Breadcrumb" class="mb-6">
@@ -225,7 +222,7 @@ const faqData = {
       </div>
 
     </div>
-  </section>
+  </DarkHero>
 
   <!-- ── Vitals Row (overlaps hero) ──────────────────────────────────────────── -->
   <div class="max-w-5xl mx-auto px-4 sm:px-6">

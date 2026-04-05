@@ -24,7 +24,7 @@ Keep this hierarchy in mind for every page. A statistics page should surface "he
 Run through this before starting any redesign work.
 
 ```
-[ ] Is it currently using Hero.astro? → Replace with a custom <section> (see Dark Hero Pattern below)
+[ ] Is it currently using Hero.astro? → Replace with `DarkHero.astro` (see Dark Hero Section below)
 [ ] What are the 2-4 numbers a user most wants to see? → These become GradientStatCard vitals
 [ ] Is there natural "what's happening" + "here's the breakdown" hierarchy in the data?
 [ ] Is this page pre-rendered or SSR? (affects whether shimmer patterns are needed)
@@ -45,64 +45,60 @@ Run through this before starting any redesign work.
 
 The opening of any data page. Full viewport width, slate-900 gradient. This is the only place on the page that goes edge-to-edge.
 
+**Use `DarkHero.astro` — do not hand-roll the `<section>` markup.** All 17 dark hero pages use this component (Apr 2026). `HeroBg` is imported only inside the component.
+
 ```astro
-<section class="w-full bg-gradient-to-br from-slate-900 to-slate-800">
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+import DarkHero from '../../components/DarkHero.astro';
+import SocialProofStrip from '../../components/SocialProofStrip.astro';
 
-    <!-- Breadcrumb — always light slate, never rose -->
-    <nav aria-label="Breadcrumb" class="mb-4">
-      <ol class="flex items-center gap-1.5 text-xs text-slate-500">
-        <li><a href="/" class="hover:text-slate-300 transition">Home</a></li>
-        <li><!-- chevron svg --></li>
-        <li class="text-slate-400">Page Name</li>
-      </ol>
-    </nav>
-
-    <!-- H1: big, black weight, white -->
-    <h1 class="text-4xl sm:text-5xl font-black text-white leading-tight mb-2">
-      Page Title
-    </h1>
-
-    <!-- Subtitle: muted slate, not white -->
-    <p class="text-slate-400 text-sm mb-5">Supporting context here</p>
-
-    <!-- Live pulse (only if data is recent/live) -->
-    <div class="flex items-start gap-2.5 mb-5 bg-white/5 rounded-lg px-4 py-3 border border-white/10">
-      <span class="relative flex h-2 w-2 mt-1 shrink-0">
-        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-        <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-      </span>
-      <p class="text-slate-300 text-sm leading-relaxed">
-        Key live stat or context sentence here.
-      </p>
-    </div>
-
-    <!-- CTAs: rose primary + ghost secondary -->
-    <div class="flex gap-3 flex-wrap">
-      <a href="..." class="px-4 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-500 transition font-medium text-xs">
-        Primary Action
-      </a>
-      <a href="..." class="px-4 py-2 rounded-lg border border-slate-500 text-slate-300 hover:border-slate-400 hover:text-white transition font-medium text-xs">
-        Secondary Action
-      </a>
-    </div>
-
-    <!-- Freshness line — builds trust -->
-    <p class="text-slate-500 text-xs mt-5 flex items-center gap-1">
-      <!-- clock svg -->
-      Data as of {freshnessText}
-    </p>
-
-  </div>
-</section>
+<DarkHero
+  title="Crime by Region"
+  subtitle="Compare crime activity across 12 regions in Trinidad & Tobago."
+  breadcrumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Trinidad & Tobago', href: '/trinidad/dashboard/' },
+    { label: 'Regions' },
+  ]}
+  ctas={[
+    { text: 'Compare Areas', href: '/trinidad/compare/', variant: 'primary' },
+    { text: 'View by Area', href: '/trinidad/areas/' },
+  ]}
+  freshness={`Data as of ${lastUpdated}`}
+>
+  <Fragment slot="pulse">
+    <strong class="text-white">12 regions</strong> tracked. Sorted by crime volume.
+  </Fragment>
+  <SocialProofStrip slot="right" variant="hero" incidentCount={allCrimes.length} />
+</DarkHero>
 ```
 
+**Props:**
+| Prop | Type | Default | Notes |
+|------|------|---------|-------|
+| `title` | `string` | — | H1 text |
+| `subtitle` | `string` | — | Muted paragraph below H1 |
+| `titleSize` | `'sm'`/`'md'`/`'lg'` | `'md'` | sm=3xl/4xl, md=4xl/5xl, lg=5xl/6xl |
+| `breadcrumbs` | `{label, href?}[]` | — | Omit on homepage |
+| `ctas` | `{text, href, variant?, target?, rel?}[]` | — | `variant:'primary'` = rose bg |
+| `freshness` | `string` | — | Clock row at bottom of left column |
+| `padding` | `string` | `'py-8 sm:py-10'` | Override for overlap effects |
+| `pagefindIgnore` | `boolean` | `false` | Adds `data-pagefind-ignore` |
+
+**Named slots:**
+| Slot | Purpose |
+|------|---------|
+| `pulse` | Text inside the live indicator banner; no banner if empty |
+| `title-addon` | Inline element after H1 (e.g. Beta badge) |
+| `cta-extra` | JS-bound buttons appended after `ctas` links |
+| `right` | Right panel — triggers 2-col grid when provided |
+| *(default)* | Shell mode: replaces all inner layout (dashboards, murder-count) |
+
 **Rules:**
-- Use `from-slate-900 to-slate-800` — no other gradient on the hero
-- H1 is always `font-black` (900 weight), never `font-bold`
-- Never put rose text inside the dark hero (rose is for CTAs and accents only)
-- The live pulse only appears if there is actually something live to report — do not show it with placeholder text
-- The optional right-column card (blog post, summary card) uses `bg-white/8 border border-white/10`
+- `title` is always rendered `font-black` (900 weight) — never override this
+- `pulse` slot only when there is something live to report — do not fill with placeholder text
+- `right` slot triggers the 2-column grid (`lg:grid-cols-[1fr_auto]`) — omit it for single-column pages
+- For pages with JS-updatable subtitle spans or complex right columns, use the default slot (shell mode) and put all inner markup there
+- The right panel is always `w-full lg:w-52` — use `<SocialProofStrip variant="hero" />` as the standard right panel
 
 ---
 
@@ -411,7 +407,7 @@ Every new element needs a dark mode pair. Rules:
 
 1. Read the existing page in full — understand every data variable before touching layout
 2. Identify the 4 most important numbers → plan the vitals row
-3. Replace `Hero.astro` with the dark hero `<section>` (copy from dashboard.astro, edit content)
+3. Replace `Hero.astro` with `<DarkHero>` — pass `title`, `subtitle`, `breadcrumbs`, `ctas`, `freshness` as props; use named slots for `pulse`, `right`, `cta-extra` as needed
 4. Add the vitals row using `GradientStatCard` with appropriate variants and IDs
 5. Add the content zone wrapper (`max-w-5xl mx-auto px-4 sm:px-6 py-6`)
 6. Add the dark separator band before the densest data section (if it benefits from a visual break)
