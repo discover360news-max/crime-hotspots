@@ -110,7 +110,7 @@
 |----|---------|-------|---------|
 | TIP-00010 | Online | Social Media Identity Protection | — |
 | TIP-00024 | Online | Identifying Fake Prize and Lottery Scams | — |
-| TIP-00090 | Online | Identifying and Avoiding Vehicle Purchase Deposit Scams | 675 |
+| TIP-00090 | Online | Identifying and Avoiding Vehicle Purchase Deposit Scams | 675, 762 |
 
 > **Note:** TIP-00010 = identity/profile harvesting. TIP-00024 = prize/lottery lures. TIP-00090 = fake seller requesting deposits before delivery.
 
@@ -121,7 +121,7 @@
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
 | TIP-00004 | At Home | Establishing a Nightly Home Lock-up Routine | — |
-| TIP-00009 | At Home | Verification Protocol for Unexpected Visitors | — |
+| TIP-00009 | At Home | Verification Protocol for Unexpected Visitors | 761 |
 | TIP-00025 | At Home | Visitor Identification via Technology | — |
 | TIP-00027 | At Home | Daytime Home Security While You're Inside | 458, 618, 741 |
 | TIP-00031 | At a Hotel | Securing Your Hotel Room Door at Night | 479 |
@@ -327,6 +327,8 @@
 | | | | | | | 755 | TIP-00034 |
 | | | | | | | 756 | TIP-00021 |
 | | | | | | | 757 | TIP-00071 |
+| | | | | | | 761 | TIP-00009 |
+| | | | | | | 762 | TIP-00090 |
 | | | | | | | 1024 | TIP-00026 |
 | | | | | | | 1267 | TIP-00026 |
 

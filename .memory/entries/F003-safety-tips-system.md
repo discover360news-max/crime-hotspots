@@ -3,12 +3,12 @@ id: F003
 type: feature
 status: active
 created: 2026-01-26
-updated: 2026-04-01
+updated: 2026-04-04
 related: [F005, C001]
 ---
 
 ## Summary
-107 tips (last: TIP-00107) as of Apr 1, 2026. Tips live in `src/content/tips/` as Markdown with YAML frontmatter. Six pages (index, detail, category, context, area, submit). I (Claude) am the tip manager — I create tips from Kavell's input.
+113 tips (last: TIP-00113) as of Apr 4, 2026. Tips live in `src/content/tips/` as Markdown with YAML frontmatter. Six pages (index, detail, category, context, area, submit). I (Claude) am the tip manager — I create tips from Kavell's input.
 
 **Index + detail pages received JNews redesign (Mar 25 2026):**
 - Index: dark gradient hero (max-w-5xl), category pill filters replacing CategoryAccordion, flat 3-col TipCard grid (sm:2-col, lg:3-col), stats inline in hero text
@@ -42,6 +42,7 @@ related: [F005, C001]
 - `related_story_ids` field must be strings: `["00842"]` not `[842]`
 - Voting requires redeployment of GAS + env var confirmed
 - `PUBLIC_SAFETY_TIPS_GAS_URL` must match current active deployment URL
+- **When adding a new tip category:** MUST also update `src/lib/safetyTipsHelpers.ts` — add to `TipCategory` type union AND add a case in `normalizedCrimeType()`. Without this, tips in the new category will never surface on crime detail pages. Fixed Apr 3 2026 for Burglary, Shooting, Domestic Violence, Extortion.
 
 ## Change Log
 - 2026-01-26: Safety tips system launched (25 initial tips)
@@ -56,3 +57,5 @@ related: [F005, C001]
 - 2026-03-30: 99 tips live (last: TIP-00099). 4 new tips (TIP-00096–99) + 4 story attachments (692, 696, 698, 701).
 - 2026-03-31: 102 tips live (last: TIP-00102). 3 new tips: TIP-00100 ATM Crime/At the ATM (Story 707), TIP-00101 Carjacking/In Your Car (Story 712), TIP-00102 Robbery/Other (Story 713).
 - 2026-04-01: 107 tips live (last: TIP-00107). 5 new tips (TIP-00103–107); 3 story attachments (719→064, 723→084, 725→077). New: TIP-00103 Home Invasion/At Home (718), TIP-00104 Robbery/At a Bar (720), TIP-00105 Burglary/At Home (721), TIP-00106 Assault/Walking Alone (722), TIP-00107 Kidnapping/At a Bar (724).
+- 2026-04-03: 112 tips live (last: TIP-00112). 5 new (TIP-00108–112); 6 story attachments. New: TIP-00108 ATM Crime/In Your Car (734), TIP-00109 Assault/In Your Car (736), TIP-00110 Robbery/At a Bar (739), TIP-00111 Robbery/In Your Car (742), TIP-00112 Robbery/Other (743).
+- 2026-04-03: 113 tips live (last: TIP-00113). 1 new (TIP-00113 Sexual Violence/Other — Story 752, trafficking recruitment lures); 5 story attachments (751→108, 754+755→034, 756→021, 757→071). Fixed safetyTipsHelpers.ts crime-type mapping gaps (Burglary, Shooting, Domestic Violence, Extortion).
