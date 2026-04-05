@@ -1,0 +1,62 @@
+---
+/**
+ * JamaicaTipCard — Full tip card for Jamaica safety tips pages.
+ * Mirrors TipCard.astro but typed to CollectionEntry<'tipsJamaica'>.
+ */
+
+import type { CollectionEntry } from 'astro:content';
+import { buildRoute } from '../config/routes';
+
+interface Props {
+  tip: CollectionEntry<'tipsJamaica'>;
+}
+
+const { tip } = Astro.props;
+const { data } = tip;
+
+const severityDot: Record<string, string> = {
+  high:   'bg-rose-500',
+  medium: 'bg-amber-400',
+  low:    'bg-emerald-500',
+};
+
+const href = buildRoute.jamaicaSafetyTip(tip.id);
+const relatedCount = data.related_story_ids.length;
+---
+
+<a
+  href={href}
+  class="block bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-4 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
+>
+  <div class="flex items-start gap-2 mb-2">
+    <span
+      class={`flex-shrink-0 mt-1.5 w-2 h-2 rounded-full ${severityDot[data.severity]}`}
+      title={`${data.severity} severity`}
+    ></span>
+    <h3 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition leading-snug">
+      {data.title}
+    </h3>
+  </div>
+
+  <div class="flex flex-wrap gap-1.5 mb-3">
+    <span class="text-caption font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_14%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">
+      {data.category} <span class="font-normal text-slate-400 dark:text-[hsl(0_0%_45%)]">while</span> {data.context}
+    </span>
+    {data.area && (
+      <span class="text-caption font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_14%)] text-slate-400 dark:text-[var(--ch-text-muted)]">
+        {data.area}
+      </span>
+    )}
+  </div>
+
+  <div class="flex items-center justify-between">
+    {relatedCount > 0 ? (
+      <span class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)]">
+        {relatedCount} related incident{relatedCount !== 1 ? 's' : ''}
+      </span>
+    ) : <span />}
+    <span class="text-caption font-bold text-slate-400 dark:text-[var(--ch-text-faint)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">
+      Read →
+    </span>
+  </div>
+</a>

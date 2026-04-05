@@ -48,4 +48,22 @@ const help = defineCollection({
   }),
 });
 
-export const collections = { blog, tips, help };
+const tipsJamaica = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/tips-jamaica' }),
+  schema: z.object({
+    tip_id: z.string(),
+    title: z.string(),
+    category: z.enum(SAFETY_TIP_CATEGORIES),
+    context: z.enum(SAFETY_TIP_CONTEXTS),
+    area: z.string().default(''),
+    severity: z.enum(['low', 'medium', 'high']),
+    source: z.enum(['manual', 'community']),
+    status: z.enum(['published', 'pending-review']),
+    related_story_ids: z.array(z.string()).default([]),
+    adapted_from: z.string().default(''),
+    date_added: z.date(),
+    date_updated: z.date().nullish(),
+  }),
+});
+
+export const collections = { blog, tips, tipsJamaica, help };

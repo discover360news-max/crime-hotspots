@@ -1,0 +1,257 @@
+---
+/**
+ * Jamaica Individual Safety Tip — SSR with Cloudflare CDN caching
+ * Route: /jamaica/safety-tips/[slug]
+ *
+ * Mirrors /trinidad/safety-tips/[slug].astro but uses tipsJamaica collection
+ * and JM_DB for related crime incidents.
+ */
+
+import { getCollection, render } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import JamaicaTipCard from '../../../components/JamaicaTipCard.astro';
+import SocialProofStrip from '../../../components/SocialProofStrip.astro';
+import TipVote from '../../../components/TipVote.astro';
+import { getAllCrimesFromD1 } from '../../../lib/crimeData';
+import { routes, buildRoute } from '../../../config/routes';
+import { PUBLIC_SAFETY_TIPS_GAS_URL } from 'astro:env/client';
+import { env } from 'cloudflare:workers';
+import DarkHero from '../../../components/DarkHero.astro';
+
+const { slug } = Astro.params;
+
+const allTips = await getCollection('tipsJamaica');
+const tip = allTips.find(t => t.id === slug);
+
+if (!tip || tip.data.status !== 'published') {
+  return new Response(null, { status: 404 });
+}
+
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=86400');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+const categoryToCrimeTypes: Record<string, string[]> = {
+  'Robbery':          ['Robbery'],
+  'Carjacking':       ['Carjacking', 'Robbery'],
+  'Home Invasion':    ['Home Invasion', 'Burglary'],
+  'ATM Crime':        ['Robbery'],
+  'Online Scam':      ['Fraud'],
+  'Kidnapping':       ['Kidnapping'],
+  'Sexual Violence':  ['Sexual Assault'],
+  'Fraud':            ['Fraud'],
+  'Assault':          ['Assault'],
+  'Domestic Violence':['Domestic Violence'],
+  'Extortion':        ['Extortion'],
+  'Shooting':         ['Shooting', 'Murder', 'Attempted Murder'],
+  'Burglary':         ['Burglary'],
+  'Other':            [],
+};
+
+const matchingTypes = categoryToCrimeTypes[tip.data.category] ?? [];
+const hasManualIds = tip.data.related_story_ids.length > 0;
+
+let relatedCrimes: Awaited<ReturnType<typeof getAllCrimesFromD1>> = [];
+if (hasManualIds || matchingTypes.length > 0) {
+  const db = env.JM_DB as D1Database | undefined;
+  const allCrimes = db ? await getAllCrimesFromD1(db) : [];
+
+  if (hasManualIds) {
+    relatedCrimes = allCrimes.filter(c => c.storyId && tip.data.related_story_ids.includes(c.storyId));
+  } else {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 90);
+    relatedCrimes = allCrimes
+      .filter(c => {
+        const type = c.primaryCrimeType || c.crimeType;
+        return type && matchingTypes.includes(type) && (c.datePublished ?? c.dateObj) >= cutoff;
+      })
+      .sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime())
+      .slice(0, 6);
+  }
+}
+
+const relatedTips = allTips
+  .filter(t =>
+    t.id !== slug &&
+    t.data.status === 'published' &&
+    (t.data.category === tip.data.category || t.data.context === tip.data.context)
+  )
+  .slice(0, 3);
+
+const { Content } = await render(tip);
+const gasUrl = PUBLIC_SAFETY_TIPS_GAS_URL || '';
+
+const title = `${tip.data.title} | Safety Tips Jamaica — CrimeHotSpots.com`;
+const description = `Safety tip for ${tip.data.category} in Jamaica. Context: ${tip.data.context}. Actionable advice to keep you safer.`;
+
+const severityBadge: Record<string, string> = {
+  high:   'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/60',
+  medium: 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60',
+  low:    'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60',
+};
+
+const shortTitle = tip.data.title.split(' ').slice(0, 5).join(' ') + (tip.data.title.split(' ').length > 5 ? '…' : '');
+---
+
+<Layout title={title} description={description} ogType="article">
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: tip.data.title,
+    datePublished: tip.data.date_added.toISOString(),
+    dateModified: (tip.data.date_updated || tip.data.date_added).toISOString(),
+    description,
+    url: `https://crimehotspots.com${buildRoute.jamaicaSafetyTip(tip.id)}`,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Crime Hotspots',
+      url: 'https://crimehotspots.com',
+      logo: { '@type': 'ImageObject', url: 'https://crimehotspots.com/og-image.jpg' }
+    }
+  })} />
+
+  <DarkHero
+    title={tip.data.title}
+    titleSize="sm"
+    subtitle={`${tip.data.category} · ${tip.data.context}${tip.data.area ? ` · ${tip.data.area}` : ''}`}
+    breadcrumbs={[
+      { label: 'Home', href: routes.home },
+      { label: 'Jamaica', href: routes.jamaica.dashboard },
+      { label: 'Safety Tips', href: routes.jamaica.safetyTips },
+      { label: tip.data.category, href: buildRoute.jamaicaSafetyTipsCategory(tip.data.category) },
+      { label: shortTitle },
+    ]}
+  >
+    <SocialProofStrip slot="right" variant="hero" />
+  </DarkHero>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+
+    <div class="mb-5">
+      <a href={routes.jamaica.safetyTips} class="inline-flex items-center gap-1.5 text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        All Safety Tips
+      </a>
+    </div>
+
+    <div class="flex flex-wrap gap-2 mb-5">
+      <a
+        href={buildRoute.jamaicaSafetyTipsCategory(tip.data.category)}
+        class="px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/70 transition"
+      >
+        {tip.data.category}
+      </a>
+      <a
+        href={buildRoute.jamaicaSafetyTipsContext(tip.data.context)}
+        class="px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold bg-slate-100 dark:bg-[hsl(0_0%_12%)] text-slate-600 dark:text-[hsl(0_0%_65%)] hover:bg-slate-200 dark:hover:bg-[hsl(0_0%_15%)] transition"
+      >
+        {tip.data.context}
+      </a>
+      {tip.data.area && (
+        <a
+          href={buildRoute.jamaicaSafetyTipsArea(tip.data.area.toLowerCase().replace(/\s+/g, '-'))}
+          class="px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold bg-slate-100 dark:bg-[hsl(0_0%_12%)] text-slate-500 dark:text-[hsl(0_0%_60%)] hover:bg-slate-200 dark:hover:bg-[hsl(0_0%_15%)] transition"
+        >
+          {tip.data.area}
+        </a>
+      )}
+      <span class={`px-3 py-1 min-h-[22px] rounded-lg text-caption font-bold ${severityBadge[tip.data.severity]}`}>
+        {tip.data.severity.charAt(0).toUpperCase() + tip.data.severity.slice(1)} severity
+      </span>
+    </div>
+
+    <div class="tip-body text-body text-slate-700 dark:text-[var(--ch-text-strong)] leading-relaxed mb-5">
+      <Content />
+    </div>
+
+    <p class="text-caption text-slate-400 dark:text-[var(--ch-text-faint)] mb-5">
+      Added {tip.data.date_added.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+      {tip.data.date_updated && ` · Updated ${tip.data.date_updated.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`}
+      · Source: {tip.data.source === 'community' ? 'Community (reviewed)' : 'Editorial'}
+      {tip.data.adapted_from && ` · Adapted from ${tip.data.adapted_from}`}
+    </p>
+
+    {relatedCrimes.length > 0 && (
+      <div class="mb-5 pt-5 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">
+        <p class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] uppercase tracking-wider mb-3">
+          Related incidents ({relatedCrimes.length})
+        </p>
+        <ul class="space-y-2">
+          {relatedCrimes.map(crime => (
+            <li>
+              <a href={buildRoute.jamaicaCrime(crime.slug)} class="group flex items-start gap-2">
+                <span class="mt-1.5 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                <span>
+                  <span class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-strong)] group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">{crime.headline}</span>
+                  <span class="ml-2 text-caption text-slate-400 dark:text-[var(--ch-text-faint)]">{crime.area} · {crime.dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    <TipVote tipId={tip.id} gasUrl={gasUrl} />
+
+    <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-[hsl(0_0%_16%)]">
+      <div class="flex items-center gap-4">
+        <a href={routes.jamaica.safetyTips} class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] hover:text-rose-600 dark:hover:text-rose-400 transition">
+          ← All tips
+        </a>
+        <a href={routes.jamaica.safetyTipsSubmit} class="text-caption font-bold text-rose-600 dark:text-rose-400 hover:underline transition">
+          Submit a tip →
+        </a>
+      </div>
+      <button
+        id="shareTipBtn"
+        class="px-4 py-1.5 min-h-[22px] rounded-lg border border-slate-300 dark:border-[var(--ch-border)] text-caption font-bold text-slate-600 dark:text-[hsl(0_0%_65%)] hover:border-rose-500 dark:hover:border-rose-700 hover:text-rose-600 dark:hover:text-rose-400 transition"
+      >
+        Share
+      </button>
+    </div>
+
+  </main>
+
+  {relatedTips.length > 0 && (
+    <section class="max-w-5xl mx-auto px-4 sm:px-6 pb-8">
+      <p class="text-caption font-bold text-slate-500 dark:text-[var(--ch-text-muted)] uppercase tracking-wider mb-3">Related tips</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {relatedTips.map(t => <JamaicaTipCard tip={t} />)}
+      </div>
+    </section>
+  )}
+
+</Layout>
+
+<style is:global>
+  .tip-body p { margin-bottom: 1rem; }
+  .tip-body p:last-child { margin-bottom: 0; }
+  .tip-body strong { font-weight: 700; color: inherit; }
+  .tip-body ul {
+    list-style: disc;
+    padding-left: 1.4rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .tip-body li { line-height: 1.6; }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('shareTipBtn') as HTMLButtonElement | null;
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({ title: document.title, url: window.location.href });
+      } else {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = 'Share'; }, 2000);
+        });
+      }
+    });
+  });
+</script>

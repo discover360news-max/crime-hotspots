@@ -42,13 +42,15 @@ export const routes = {
     mps: '/trinidad/mp/',
   },
   jamaica: {
-    dashboard:   '/jamaica/dashboard/',
-    headlines:   '/jamaica/headlines/',
-    archive:     '/jamaica/archive/',
-    parishes:    '/jamaica/parishes/',
-    statistics:  '/jamaica/statistics/',
-    murderCount: '/jamaica/murder-count/',
-    mps:         '/jamaica/mp/',
+    dashboard:        '/jamaica/dashboard/',
+    headlines:        '/jamaica/headlines/',
+    archive:          '/jamaica/archive/',
+    parishes:         '/jamaica/parishes/',
+    statistics:       '/jamaica/statistics/',
+    murderCount:      '/jamaica/murder-count/',
+    mps:              '/jamaica/mp/',
+    safetyTips:       '/jamaica/safety-tips/',
+    safetyTipsSubmit: '/jamaica/safety-tips/submit/',
   },
 } as const;
 
@@ -67,11 +69,15 @@ export const buildRoute = {
   safetyTipsContext: (context: string) => `/trinidad/safety-tips/context/${slugifyParam(context)}/`,
   safetyTipsArea: (area: string) => `/trinidad/safety-tips/area/${area}/`,
   mp: (nameSlug: string) => `/trinidad/mp/${nameSlug}/`,
-  jamaicaMp:      (nameSlug: string) => `/jamaica/mp/${nameSlug}/`,
-  jamaicaParish:  (slug: string)     => `/jamaica/parish/${slug}/`,
-  jamaicaCrime:   (slug: string)     => `/jamaica/crime/${slug}/`,
-  jamaicaArchive: (year: number, month?: string) =>
+  jamaicaMp:                (nameSlug: string) => `/jamaica/mp/${nameSlug}/`,
+  jamaicaParish:            (slug: string)     => `/jamaica/parish/${slug}/`,
+  jamaicaCrime:             (slug: string)     => `/jamaica/crime/${slug}/`,
+  jamaicaArchive:           (year: number, month?: string) =>
     month ? `/jamaica/archive/${year}/${month}/` : `/jamaica/archive/${year}/`,
+  jamaicaSafetyTip:         (slug: string)     => `/jamaica/safety-tips/${slug}/`,
+  jamaicaSafetyTipsCategory:(category: string) => `/jamaica/safety-tips/category/${slugifyParam(category)}/`,
+  jamaicaSafetyTipsContext: (context: string)  => `/jamaica/safety-tips/context/${slugifyParam(context)}/`,
+  jamaicaSafetyTipsArea:    (area: string)     => `/jamaica/safety-tips/area/${area}/`,
 } as const;
 
 /** Slugify a category/context string for use in URL path segments */

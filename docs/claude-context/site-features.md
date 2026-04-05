@@ -2,11 +2,11 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** April 5, 2026 (Jamaica archive pages C5 + buildRoute.jamaicaCrime/jamaicaArchive)
+**Last Updated:** April 5, 2026 (Jamaica safety tips engine — 6 pages, tipsJamaica collection, JamaicaTipCard/JamaicaCompactTipCard, routes, helpers)
 
 ---
 
-## Pages & Routes (31 pages)
+## Pages & Routes (37 pages)
 
 ### Marketing & Static
 | Page | Route | Purpose |
@@ -66,15 +66,25 @@
 | Archive Index | `/trinidad/archive/` | Pre-rendered | Browse by year |
 | Archive Month | `/trinidad/archive/[year]/[month]` | Pre-rendered | Crimes for specific month |
 
-### Safety Tips
+### Safety Tips — Trinidad
 | Page | Route | Rendering | Purpose |
 |------|-------|-----------|---------|
-| Safety Tips Index | `/trinidad/safety-tips/` | Pre-rendered | Pill filters (category + context), flat 3-col TipCard grid (sm:2-col, lg:3-col). 90 tips as of Mar 27 2026. CategoryAccordion no longer used here. |
-| Tip Detail | `/trinidad/safety-tips/[slug]` | **SSR + CDN cache** | Full tip with body, related incidents, related tips, back link |
+| Safety Tips Index | `/trinidad/safety-tips/` | Pre-rendered | Pill filters (category + context), flat 3-col TipCard grid (sm:2-col, lg:3-col). 113 tips as of Apr 3 2026. Collection: `tips`. |
+| Tip Detail | `/trinidad/safety-tips/[slug]` | **SSR + CDN cache** | Full tip with body, related incidents (env.DB), related tips, share, TipVote |
 | Category | `/trinidad/safety-tips/category/[cat]/` | Pre-rendered | All tips for one category |
 | Context | `/trinidad/safety-tips/context/[ctx]/` | Pre-rendered | Tips by situation context |
 | Area | `/trinidad/safety-tips/area/[area]/` | Pre-rendered | Area-specific tips (min 3 to render) |
 | Submit | `/trinidad/safety-tips/submit/` | Pre-rendered | Community submission form → GAS → "Safety Tip Submissions" sheet |
+
+### Safety Tips — Jamaica
+| Page | Route | Rendering | Purpose |
+|------|-------|-----------|---------|
+| Safety Tips Index | `/jamaica/safety-tips/` | Pre-rendered | Pill filters, 3-col JamaicaTipCard grid. Collection: `tipsJamaica`. 0 tips at launch. Empty-state message shown until first tip added. |
+| Tip Detail | `/jamaica/safety-tips/[slug]` | **SSR + CDN 24h** | Full tip with body, related incidents (env.JM_DB), related tips, share, TipVote. `adapted_from` shown in meta if tip was adapted from a T&T tip. |
+| Category | `/jamaica/safety-tips/category/[cat]/` | Pre-rendered | All Jamaica tips for one category |
+| Context | `/jamaica/safety-tips/context/[ctx]/` | Pre-rendered | Jamaica tips by situation context |
+| Area | `/jamaica/safety-tips/area/[area]/` | Pre-rendered | Area-specific Jamaica tips (min 3 to render) |
+| Submit | `/jamaica/safety-tips/submit/` | Pre-rendered | Community submission form → GAS (passes `country: 'jamaica'` in body) |
 
 ### Blog & Tools
 | Page | Route | Purpose |
@@ -155,8 +165,10 @@
 ### Safety Tips
 | Component | Purpose |
 |-----------|---------|
-| TipCard.astro | Full tip card for index/category/context/area pages. Badge reads "Category while Context" (muted slate). |
-| CompactTipCard.astro | Inline tip card on crime detail pages (max 3, matched by crime type + area) |
+| TipCard.astro | Full tip card — T&T tips (`CollectionEntry<'tips'>`). Route: `buildRoute.safetyTip`. |
+| CompactTipCard.astro | Inline tip card on T&T crime detail pages (max 3, matched by crime type + area). |
+| JamaicaTipCard.astro | Full tip card — Jamaica tips (`CollectionEntry<'tipsJamaica'>`). Route: `buildRoute.jamaicaSafetyTip`. |
+| JamaicaCompactTipCard.astro | Inline tip card on Jamaica crime detail pages (max 3, matched by crime type + area). |
 | CategoryAccordion.astro | Collapsible category section — used on category/context/area tip pages. **Not used on the safety tips index** (replaced by pill filters + flat grid, Mar 25 2026). Sorted by tip count, first expanded. Own class names (`cat-*`) — does not conflict with DateAccordion. |
 
 ### Utility & Engagement

@@ -8,6 +8,22 @@
 
 ## April 2026
 
+### Jamaica Safety Tips engine (Apr 5, 2026)
+
+- **`src/content.config.ts`**: added `tipsJamaica` collection — same schema as `tips` + `adapted_from: z.string().default('')` field
+- **`src/content/tips-jamaica/`**: directory created (empty, `.gitkeep`)
+- **`src/lib/safetyTipsHelpersJamaica.ts`**: re-exports `normalizedCrimeType` + `slugifyCategory` from T&T module; adds `sortJamaicaTipsByAreaRelevance` typed to `CollectionEntry<'tipsJamaica'>[]`
+- **`src/config/routes.ts`**: added `routes.jamaica.safetyTips` + `routes.jamaica.safetyTipsSubmit`; added `buildRoute.jamaicaSafetyTip/Category/Context/Area`
+- **`src/components/JamaicaTipCard.astro`**: full tip card typed to `tipsJamaica`; routes to `buildRoute.jamaicaSafetyTip`
+- **`src/components/JamaicaCompactTipCard.astro`**: inline crime-detail tip card typed to `tipsJamaica`
+- **6 new pages**: `/jamaica/safety-tips/` (pre-rendered), `/jamaica/safety-tips/[slug]` (SSR+CDN, uses JM_DB for related crimes), `/category/[cat]` (pre-rendered), `/context/[ctx]` (pre-rendered), `/area/[area]` (pre-rendered, min 3 tips), `/submit/` (pre-rendered, passes `country:'jamaica'` to GAS)
+- **`/jamaica/crime/[slug].astro`**: swapped `CompactTipCard` → `JamaicaCompactTipCard`, `getCollection('tips')` → `getCollection('tipsJamaica')`, Safety Tips nav link → `routes.jamaica.safetyTips`, "View all →" → Jamaica route
+- **Workflow docs**: `docs/guides/SAFETY-TIP-WORKFLOW-JAMAICA.md` + `docs/guides/SAFETY-TIP-INDEX-JAMAICA.md` created
+
+**Jamaica tip workflow:** cross-reference T&T tips first (≥60% applicable → adapt, note `adapted_from`). Tip IDs: `JM-TIP-00001` format. Files: `src/content/tips-jamaica/jm-tip-XXXXX-[slug].md`.
+
+---
+
 ### Jamaica D1 Phase B + C1 live (Apr 5, 2026)
 
 - **crime-sync worker**: added `JM_DB` binding + `runJamaicaSync()` + `POST /sync/jamaica` endpoint. Daily cron now syncs both islands. `syncCsvToD1` accepts `country` param for FTS URL path.

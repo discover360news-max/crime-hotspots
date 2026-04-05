@@ -21,13 +21,13 @@ import AreaNameTooltip from '../../../components/AreaNameTooltip.astro';
 import SafetyContext from '../../../components/SafetyContext.astro';
 import FeedbackToggle from '../../../components/FeedbackToggle.astro';
 import RelatedCrimes from '../../../components/RelatedCrimes.astro';
-import CompactTipCard from '../../../components/CompactTipCard.astro';
+import JamaicaCompactTipCard from '../../../components/JamaicaCompactTipCard.astro';
 import CrimeLocationMap from '../../../components/CrimeLocationMap.astro';
 import { getLocalName } from '../../../lib/areaAliases';
 import { getSafetyContext } from '../../../lib/safetyHelpers';
 import { getCrimeTypeThumbnailUrl } from '../../../lib/generateCrimeTypeThumbnails';
 import { getCollection } from 'astro:content';
-import { normalizedCrimeType, sortTipsByAreaRelevance } from '../../../lib/safetyTipsHelpers';
+import { normalizedCrimeType, sortJamaicaTipsByAreaRelevance } from '../../../lib/safetyTipsHelpersJamaica';
 import { routes } from '../../../config/routes';
 import jamaicaAliasesJson from '../../../data/area-aliases-jamaica.json';
 import { env } from 'cloudflare:workers';
@@ -82,13 +82,13 @@ const truncatedHeadline = crime
   : '';
 
 // Safety tips matched by crime type + area
-let matchedTips: Awaited<ReturnType<typeof getCollection<'tips'>>> = [];
+let matchedTips: Awaited<ReturnType<typeof getCollection<'tipsJamaica'>>> = [];
 if (crime) {
   const tipCategory = normalizedCrimeType(crime.primaryCrimeType || crime.crimeType);
-  const allTips = await getCollection('tips', ({ data }) =>
+  const allTips = await getCollection('tipsJamaica', ({ data }) =>
     data.status === 'published' && data.category === tipCategory
   );
-  matchedTips = sortTipsByAreaRelevance(allTips, crime.area).slice(0, 3);
+  matchedTips = sortJamaicaTipsByAreaRelevance(allTips, crime.area).slice(0, 3);
 }
 
 const thumbnailPath = crime ? getCrimeTypeThumbnailUrl(crime.crimeType, '') : '';
@@ -264,7 +264,7 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
         class="px-4 py-1.5 min-h-[32px] flex items-center justify-center border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-600 dark:text-[var(--ch-text-strong)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition font-medium text-xs whitespace-nowrap">
         Headlines
       </a>
-      <a href={routes.trinidad.safetyTips}
+      <a href={routes.jamaica.safetyTips}
         class="px-4 py-1.5 min-h-[32px] flex items-center justify-center border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-600 dark:text-[var(--ch-text-strong)] hover:border-rose-600 dark:hover:border-rose-500 hover:text-rose-600 dark:hover:text-rose-400 rounded-lg transition font-medium text-xs whitespace-nowrap">
         Safety Tips
       </a>
@@ -325,9 +325,9 @@ const ogImage = crime ? getCrimeTypeThumbnailUrl(crime.crimeType) : undefined;
           <div class="mt-4 mb-6 bg-white dark:bg-[var(--ch-surface)] border border-slate-200 dark:border-[var(--ch-border-card)] rounded-lg p-4">
             <div class="flex items-center justify-between mb-3">
               <h3 class="text-xs font-bold text-slate-700 dark:text-[hsl(0_0%_88%)] uppercase tracking-wider">Safety Tips</h3>
-              <a href="/safety-tips/" class="text-caption text-rose-600 dark:text-rose-400 hover:underline">View all →</a>
+              <a href={routes.jamaica.safetyTips} class="text-caption text-rose-600 dark:text-rose-400 hover:underline">View all →</a>
             </div>
-            {matchedTips.map(tip => <CompactTipCard tip={tip} />)}
+            {matchedTips.map(tip => <JamaicaCompactTipCard tip={tip} />)}
           </div>
         )}
 

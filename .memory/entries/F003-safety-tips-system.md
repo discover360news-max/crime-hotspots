@@ -8,7 +8,9 @@ related: [F005, C001]
 ---
 
 ## Summary
-113 tips (last: TIP-00113) as of Apr 4, 2026. Tips live in `src/content/tips/` as Markdown with YAML frontmatter. Six pages (index, detail, category, context, area, submit). I (Claude) am the tip manager — I create tips from Kavell's input.
+**T&T:** 113 tips (last: TIP-00113) as of Apr 4, 2026. Tips live in `src/content/tips/` as Markdown with YAML frontmatter. Six pages (index, detail, category, context, area, submit). I (Claude) am the tip manager — I create tips from Kavell's input.
+
+**Jamaica:** Separate collection in `src/content/tips-jamaica/`. Tip IDs: `JM-TIP-00001` format. Pages: `/jamaica/safety-tips/` (Phase D, not yet built). Workflow: `docs/guides/SAFETY-TIP-WORKFLOW-JAMAICA.md`. Index: `docs/guides/SAFETY-TIP-INDEX-JAMAICA.md`. Cross-reference T&T tips before creating any JM tip (≥60% applicable → adapt, not recreate). 0 tips live as of Apr 5 2026.
 
 **Index + detail pages received JNews redesign (Mar 25 2026):**
 - Index: dark gradient hero (max-w-5xl), category pill filters replacing CategoryAccordion, flat 3-col TipCard grid (sm:2-col, lg:3-col), stats inline in hero text

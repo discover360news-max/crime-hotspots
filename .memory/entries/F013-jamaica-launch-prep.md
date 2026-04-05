@@ -63,7 +63,7 @@
 | D1. MP photos | Kavell | Upload to `public/images/mps/jamaica/filename.jpg`; set `photo: "jamaica/filename.jpg"` in mps-jamaica.json |
 | D2. Parishes detail pages | Claude | `/jamaica/parish/[slug]` — T&T region page equivalent; MPs card uses `parishSlugs` |
 | D3. Area detail pages | Claude | `/jamaica/area/[slug]` — risk score, crime breakdown, safety context |
-| D4. Jamaica-specific safety tips | Kavell + Claude | Add tips tagged to Kingston, MoBay contexts; existing tips mostly applicable |
+| D4. Jamaica-specific safety tips | Kavell + Claude | **ENGINE DONE Apr 5 2026.** `tipsJamaica` collection, 6 pages, JamaicaTipCard/CompactTipCard, routes, helpers, workflow docs. Tip content pending — Kavell supplies stories, Claude creates JM-TIP-XXXXX files using SAFETY-TIP-WORKFLOW-JAMAICA.md (cross-references T&T first). |
 | D5. Homepage Explore tiles | Claude | Add Jamaica equivalent tiles once data is live (2nd row or dynamic country switch) |
 
 ### Phase E — SEO & Infrastructure (Weeks 6–12)
@@ -166,4 +166,5 @@
 | Apr 5, 2026 | Phase C3 complete. `/jamaica/headlines/` full SSR: type chips, date accordions, filter tray (parish/area/type/date), load more, sidebar murder count card. `headlinesPage.ts` now reads `window.__hlData.crimePath` (backwards-compatible default: `/trinidad/crime/`). |
 | Apr 5, 2026 | Phase C4 complete. `/jamaica/crime/[slug]` SSR+CDN crime detail pages. Jamaica aliases from baked JSON. `RelatedCrimes.astro` has new optional `crimePath` prop. `TrendingHotspots` omitted (hardcoded T&T routes — add in Phase D). |
 | Apr 5, 2026 | Phase C5 complete. `/jamaica/archive/` (SSR index) + `/jamaica/archive/[year]/[month]` (SSR month page). `buildRoute.jamaicaCrime(slug)` and `buildRoute.jamaicaArchive(year, month?)` added to routes.ts. Beta banners on both pages. |
+| Apr 5, 2026 | Phase D4 engine complete. `tipsJamaica` collection, 6 safety tips pages, JamaicaTipCard/CompactTipCard components, routes, safetyTipsHelpersJamaica.ts, workflow + index docs. Crime detail page wired. Tip content pending. |
 | Apr 5, 2026 | Phase C6 complete. `/api/search/` extended: JM_DB crimes_fts + region LIKE queries run in parallel with T&T. Jamaica crimes get `meta: 'Crime incident · Jamaica'`. Parish results use new `type: 'parish'` (green badge, "Parish" label). SearchModal placeholder + footer updated to mention parishes. |
