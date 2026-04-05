@@ -6,6 +6,7 @@
 declare namespace Cloudflare {
   interface Env {
     DB: D1Database;
+    JM_DB?: D1Database;
     BUTTONDOWN_API_KEY?: string;
   }
 }
