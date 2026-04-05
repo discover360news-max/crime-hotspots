@@ -68,6 +68,7 @@ const murderProjected = Math.round((murderCount / daysElapsed) * daysInYear);
 const murderRateProjected = ((murderProjected / POPULATION) * 100000).toFixed(1);
 
 const lastUpdated = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+const showBeta = new Date() < new Date('2026-07-04T00:00:00');
 
 const pageUrl = 'https://crimehotspots.com/jamaica/murder-count/';
 const shareText = `Jamaica Murder Count ${currentYear}: ${murderCount} murders so far. Track live statistics at Crime Hotspots.`;
@@ -96,6 +97,13 @@ const latestMurders = crimesCurrent
         { label: 'Murder Rate & Count' },
       ]} />
     </div>
+
+    {showBeta && (
+      <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-amber-50 dark:bg-[hsl(38_80%_8%)] border border-amber-200 dark:border-amber-800/50 mb-6">
+        <span class="shrink-0 inline-block px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-amber-400 text-amber-900">Beta</span>
+        <p class="text-xs text-amber-700 dark:text-amber-400">Jamaica data is in early access. Full public launch: July 4, 2026.</p>
+      </div>
+    )}
 
     <!-- Page header -->
     <div class="text-center mb-8">

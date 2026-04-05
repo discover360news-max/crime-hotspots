@@ -154,6 +154,7 @@ const robberyRateProjected = ((robberyProjected / POPULATION) * 100000).toFixed(
 const totalCrimeRateProjected = ((totalCrimesProjected / POPULATION) * 100000).toFixed(1);
 
 const canonicalUrl = 'https://crimehotspots.com/jamaica/statistics/';
+const showBeta = new Date() < new Date('2026-07-04T00:00:00');
 
 // SEO
 const title = `Jamaica Crime Statistics & Crime Rate ${currentYear} - Live Data | Crime Hotspots`;
@@ -284,6 +285,15 @@ const breadcrumbData = {
   <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-10">
     <SocialProofStrip variant="strip" />
   </div>
+
+  {showBeta && (
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 mb-2">
+      <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-amber-50 dark:bg-[hsl(38_80%_8%)] border border-amber-200 dark:border-amber-800/50">
+        <span class="shrink-0 inline-block px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-amber-400 text-amber-900">Beta</span>
+        <p class="text-xs text-amber-700 dark:text-amber-400">Jamaica data is in early access. Full public launch: July 4, 2026.</p>
+      </div>
+    </div>
+  )}
 
   <main class="max-w-3xl mx-auto px-4 py-8">
 
