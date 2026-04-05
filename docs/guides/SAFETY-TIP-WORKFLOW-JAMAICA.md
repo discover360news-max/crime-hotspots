@@ -128,7 +128,7 @@ Glob pattern="*.md" path="astro-poc/src/content/tips-jamaica/"
 
 Find the highest-numbered file. Next tip = last ID + 1. Zero-pad to 5 digits (`JM-TIP-00001`, `JM-TIP-00002`, etc.).
 
-> **Current last tip:** None yet — first Jamaica tip will be `JM-TIP-00001`.
+> **Current last tip:** JM-TIP-00009 (2026-04-05)
 
 ---
 

@@ -8,6 +8,20 @@
 
 ## April 2026
 
+### Jamaica tips batch 1 — JM-TIP-00001 to JM-TIP-00009 (Apr 5, 2026)
+
+- **NEW JM TIP JM-TIP-00001** — Securing Your Licensed Firearm During Disputes (Shooting / At Home)
+- **NEW JM TIP JM-TIP-00002** — Recognising Suspicious Activity at ATM Machines (ATM Crime / At the ATM)
+- **NEW JM TIP JM-TIP-00003** — Protecting Yourself From Predatory Taxi Drivers (Sexual Violence / Using Public Transport)
+- **NEW JM TIP JM-TIP-00004** — Securing Your Bedroom Door Against Forced Entry (Home Invasion / At Home)
+- **NEW JM TIP JM-TIP-00005** — Identifying and Avoiding Lottery Scam Calls (Online Scam / Online) — adapted from TIP-00024
+- **NEW JM TIP JM-TIP-00006** — Reducing Exposure When Walking in Urban Areas at Night (Shooting / Walking Alone) — adapted from TIP-00083
+- **NEW JM TIP JM-TIP-00007** — When a Debt Dispute Escalates to Your Home (Home Invasion / At Home) — adapted from TIP-00056
+- **NEW JM TIP JM-TIP-00008** — Securing Window Panes Against Silent Forced Entry (Burglary / At Home)
+- **NEW JM TIP JM-TIP-00009** — Protecting Your Identity From Romance Scam Cloning (Fraud / Online) — adapted from TIP-00010
+
+---
+
 ### Jamaica Safety Tips engine (Apr 5, 2026)
 
 - **`src/content.config.ts`**: added `tipsJamaica` collection — same schema as `tips` + `adapted_from: z.string().default('')` field
