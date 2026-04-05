@@ -14,7 +14,7 @@
 | 3. Activate GAS pipeline triggers | Kavell | **DONE** | 9 triggers live (RSS@14/22/6, Fetch@15/23/7, Claude@16/0/8 UTC). First run at 14:00 UTC Mar 17. |
 | 4. Jamaica D1 + sync worker | Claude | **DONE** | DB: crime-hotspots-jamaica-db (78bcc398). Schema applied. 30 rows synced. Daily cron live. |
 | 5. Uncomment TODO in statistics + murder-count | Claude | **DONE** | Both pages wired to JM_DB. noindex flipped false. Live Apr 5 2026. |
-| 6. Wire headlines + dashboard to Jamaica D1 | Claude | **DEFERRED** | New API endpoints (see Phase C below) |
+| 6. Wire headlines + dashboard to Jamaica D1 | Claude | **DONE** | C2–C4 complete Apr 5 2026 |
 | 7. MP photos upload | Kavell | **IN PROGRESS** | `public/images/mps/jamaica/` — 63 MPs |
 | 8. Homepage card → live link | Claude | **DEFERRED** | Remove opacity/disabled, swap badge to "LIVE", move card above Guyana/Barbados |
 
@@ -48,12 +48,12 @@
 
 | Task | Notes |
 |------|-------|
-| C1. Statistics + murder-count | Remove `const allCrimes: Crime[] = []` stub; wire to Jamaica D1 via `getAllCrimesFromD1(JM_DB)` or equivalent |
-| C2. New Jamaica API endpoints | `/api/jamaica/dashboard/` + `/api/jamaica/crimes/` — mirrors T&T pattern but uses `JM_DB` binding |
-| C3. Headlines page | Wire `DateAccordion` + `CrimeCard` to Jamaica crimes; add year filter |
-| C4. Crime detail pages | `/jamaica/crime/[slug]` — same SSR+CDN pattern as `/trinidad/crime/[slug]` |
-| C5. Archive pages | `/jamaica/archive/[year]/[month]` — pre-rendered, queries `JM_DB` at build |
-| C6. Search update | Extend `/api/search/` to also query Jamaica `crimes_fts` + `JM_DB` area LIKE |
+| C1. Statistics + murder-count | **DONE** Apr 5 2026 — wired to JM_DB, noindex removed |
+| C2. New Jamaica API endpoints + dashboard | **DONE** Apr 5 2026 — `/api/jamaica/crimes/` + `/api/jamaica/dashboard/`; dashboard upgraded from stub to full SSR (vitals, crime breakdown, top parishes, quick insights) |
+| C3. Headlines page | **DONE** Apr 5 2026 — full SSR headlines: type chips, date accordions, filter tray, load more, sidebar murder count card. `headlinesPage.ts` now reads `window.__hlData.crimePath` (backwards-compatible). |
+| C4. Crime detail pages | **DONE** Apr 5 2026 — `/jamaica/crime/[slug]` SSR+CDN. Jamaica aliases from baked JSON. `RelatedCrimes` now accepts `crimePath` prop (default `/trinidad/crime/`). `TrendingHotspots` omitted (T&T-hardcoded routes — Phase D revisit). |
+| C5. Archive pages | **PENDING** — `/jamaica/archive/[year]/[month]` |
+| C6. Search update | **PENDING** — extend `/api/search/` to query Jamaica `crimes_fts` |
 
 ### Phase D — Content & Polish (Weeks 4–10) | Owner: Mixed
 **Goal:** Parish pages, area pages, safety tips, MP photos — all at T&T parity.
@@ -94,13 +94,13 @@
 
 | Page | Status | Blocked by |
 |------|--------|-----------|
-| `/jamaica/` — Dashboard | Shell stub | Phase C2 |
-| `/jamaica/headlines/` | Shell stub | Phase C3 |
+| `/jamaica/dashboard/` | **Live** — full SSR dashboard | — |
+| `/jamaica/headlines/` | **Live** — full SSR headlines | — |
+| `/jamaica/crime/[slug]` | **Live** — SSR+CDN crime detail | — |
+| `/jamaica/statistics/` | **Live** — full SSR + JM_DB | — |
+| `/jamaica/murder-count/` | **Live** — full SSR + JM_DB | — |
 | `/jamaica/parishes/` | Shell stub | Phase D2 |
-| `/jamaica/statistics/` | Full production (TODO stub) | Phase C1 |
-| `/jamaica/murder-count/` | Full production (TODO stub) | Phase C1 |
 | `/jamaica/archive/` | Shell stub | Phase C5 |
-| `/jamaica/crime/[slug]` | Not built | Phase C4 |
 | `/jamaica/area/[slug]` | Not built | Phase D3 |
 | `/jamaica/parish/[slug]` | Not built | Phase D2 |
 | `/jamaica/mp/` | **Live** — 63 MPs | — |
@@ -160,3 +160,7 @@
 | Mar 18, 2026 | murder-count.astro aligned with statistics.astro projection terminology: `daysPassed`→`daysElapsed`, `projectedAnnualMurders`→`murderProjected`, `projectedMurderRate`→`murderRateProjected`. Card label "Projected Rate"→"Annualized Rate". Sub-text now shows `{murderCount} murders in {daysElapsed} days`. Footer note added explaining annualization methodology. |
 | Mar 19, 2026 | Date accuracy overhaul (B023) applied to Jamaica pipeline: `rssCollector.gs` pubDate 3-step fallback; `processor.gs` publishDateMissing flag + null crime_date → Review Queue routing; `claudeClient.gs` dayOfWeek timezone fix + "a day after" cross-reference rule + ONGOING CRIMES rule block. Parity with Trinidad pipeline. |
 | Apr 5, 2026 | Phase B + C1 complete. Jamaica D1 live (30 rows). crime-sync worker updated with JM_DB + POST /sync/jamaica. statistics + murder-count wired to live D1 data. noindex removed. |
+| Apr 5, 2026 | Beta banners (amber, server-side, auto-expire Jul 4 2026) added to statistics, murder-count, dashboard, and headlines. |
+| Apr 5, 2026 | Phase C2 complete. `/api/jamaica/crimes/` + `/api/jamaica/dashboard/` endpoints live. `/jamaica/dashboard/` upgraded from stub to full SSR dashboard (vitals, crime breakdown, top parishes, quick insights, newsletter). |
+| Apr 5, 2026 | Phase C3 complete. `/jamaica/headlines/` full SSR: type chips, date accordions, filter tray (parish/area/type/date), load more, sidebar murder count card. `headlinesPage.ts` now reads `window.__hlData.crimePath` (backwards-compatible default: `/trinidad/crime/`). |
+| Apr 5, 2026 | Phase C4 complete. `/jamaica/crime/[slug]` SSR+CDN crime detail pages. Jamaica aliases from baked JSON. `RelatedCrimes.astro` has new optional `crimePath` prop. `TrendingHotspots` omitted (hardcoded T&T routes — add in Phase D). |

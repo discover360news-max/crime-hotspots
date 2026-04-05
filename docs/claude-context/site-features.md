@@ -28,14 +28,21 @@
 ### Jamaica Crime Data
 | Page | Route | Rendering | Purpose |
 |------|-------|-----------|---------|
-| Dashboard | `/jamaica/` | Pre-rendered | Jamaica crime dashboard (data pipeline pending) |
-| Headlines | `/jamaica/headlines/` | Pre-rendered | Jamaica headlines |
-| Parishes | `/jamaica/parishes/` | Pre-rendered | Browse by parish |
-| Statistics | `/jamaica/statistics/` | **SSR + CDN cache** | Full statistics page (T&T parity). Dataset + FAQPage (4 Q&As) + BreadcrumbList JSON-LD. Population 2.8M, "parishes" language. Dynamic years. `allCrimes: Crime[] = []` stub until Jamaica D1 live (one TODO comment to uncomment). |
-| Murder Count | `/jamaica/murder-count/` | **SSR + CDN cache** | Full murder count page (T&T parity). FlipCounter, YoY comparison, 3 rate cards (YTD / **Annualized** / Previous Final). WebPage + Dataset + BreadcrumbList JSON-LD. Population 2.8M. Latest incidents sidebar hidden until data live. `allCrimes: Crime[] = []` stub until Jamaica D1 live. |
-| Archive Index | `/jamaica/archive/` | Pre-rendered | Browse by year |
+| Dashboard | `/jamaica/dashboard/` | **SSR + CDN cache** | Full live dashboard. Dark hero + this-week pulse + vitals row (4 GradientStatCards) + crime breakdown scroll + top parishes bar chart (inline, no links — parish pages Phase D2) + QuickInsightsCard + newsletter + related resources. Reads `env.JM_DB`. Beta banner (server-side, auto-expires Jul 4 2026). |
+| Headlines | `/jamaica/headlines/` | **SSR + CDN cache** | Full live headlines. Dark hero + type chips + date accordions + filter tray (parish/area/type/date) + Load More + sidebar murder count card + newsletter. Reads `env.JM_DB`. Crime cards link to `/jamaica/crime/[slug]/`. `window.__hlData.crimePath = '/jamaica/crime/'` passed to `headlinesPage.ts`. Beta banner. |
+| Crime Detail | `/jamaica/crime/[slug]` | **SSR + CDN 24h** | Individual crime pages. Crime type chips + headline + byline + CrimeLocationMap + article body + report issue + SafetyContext + safety tips + share buttons + RelatedCrimes (crimePath prop) + prev/next nav. Jamaica aliases from baked JSON. NewsArticle JSON-LD (addressCountry: JM). No TrendingHotspots (T&T-hardcoded routes). |
+| Parishes | `/jamaica/parishes/` | Pre-rendered | Browse by parish — stub |
+| Statistics | `/jamaica/statistics/` | **SSR + CDN cache** | Full statistics page (T&T parity). Dataset + FAQPage (4 Q&As) + BreadcrumbList JSON-LD. Population 2.8M, "parishes" language. Dynamic years. Wired to `env.JM_DB`. Beta banner. |
+| Murder Count | `/jamaica/murder-count/` | **SSR + CDN cache** | Full murder count page (T&T parity). FlipCounter, YoY comparison, 3 rate cards. Wired to `env.JM_DB`. Beta banner. |
+| Archive Index | `/jamaica/archive/` | Pre-rendered | Browse by year — stub (Phase C5) |
 | MP Index | `/jamaica/mp/` | Pre-rendered | Directory of all 63 MPs grouped by parish. Each card: photo, name, party badge, constituency. |
-| MP Profile | `/jamaica/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left (`min-h-[500px]`), identity+contact right. Social links rendered as brand SVG icons (Facebook, Instagram, X, YouTube, TikTok). JSON-LD Person schema. Data: `src/data/mps-jamaica.json`. Crime stats placeholder until Jamaica D1 pipeline is live. |
+| MP Profile | `/jamaica/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left (`min-h-[500px]`), identity+contact right. Social links rendered as brand SVG icons (Facebook, Instagram, X, YouTube, TikTok). JSON-LD Person schema. Data: `src/data/mps-jamaica.json`. |
+
+### Jamaica API Endpoints
+| Endpoint | Route | Purpose |
+|----------|-------|---------|
+| Jamaica Crimes | `/api/jamaica/crimes/` | Returns Crime[] from JM_DB. `?year=2026\|2025\|all`. Same serialization as `/api/crimes/`. |
+| Jamaica Dashboard | `/api/jamaica/dashboard/` | Returns `{ stats, trends, insights, topRegions }` from JM_DB. `?year=` param. Same schema as `/api/dashboard/`. |
 
 ---
 
