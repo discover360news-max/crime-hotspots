@@ -34,7 +34,7 @@
       <input
         id="searchInput"
         type="search"
-        placeholder="Search crimes, MPs, areas..."
+        placeholder="Search crimes, MPs, areas, parishes..."
         class="w-full pl-9 pr-10 py-3 border-2 border-slate-200 dark:border-[var(--ch-border)] rounded-lg text-base text-slate-700 dark:text-[var(--ch-text-heading)] bg-white dark:bg-[hsl(0_0%_12%)] placeholder-slate-400 dark:placeholder-[hsl(0_0%_45%)] focus:outline-none focus:border-rose-500 dark:focus:border-rose-500 focus:shadow-[0_0_0_3px_rgba(225,29,72,0.1)] dark:focus:shadow-[0_0_0_3px_rgba(225,29,72,0.15)] transition"
         autocomplete="off"
         spellcheck="false"
@@ -86,7 +86,7 @@
   <!-- Footer Help Text -->
   <div class="px-6 pb-6 pt-2 border-t border-slate-200 dark:border-[var(--ch-border-card)]">
     <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] text-center">
-      Search through all crime incidents, MPs, and areas
+      Search through all crime incidents, MPs, areas and parishes
     </p>
   </div>
 </dialog>
@@ -314,14 +314,15 @@
 
   // ── Search results rendering ─────────────────────────────────────────────
   function typeBadgeClass(type: string): string {
-    if (type === 'crime') return 'search-type-badge--crime';
-    if (type === 'mp')    return 'search-type-badge--mp';
+    if (type === 'crime')  return 'search-type-badge--crime';
+    if (type === 'mp')     return 'search-type-badge--mp';
     return 'search-type-badge--area';
   }
 
   function typeLabel(type: string): string {
-    if (type === 'crime') return 'Crime';
-    if (type === 'mp')    return 'MP';
+    if (type === 'crime')  return 'Crime';
+    if (type === 'mp')     return 'MP';
+    if (type === 'parish') return 'Parish';
     return 'Area';
   }
 

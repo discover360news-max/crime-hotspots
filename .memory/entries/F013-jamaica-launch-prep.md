@@ -53,7 +53,7 @@
 | C3. Headlines page | **DONE** Apr 5 2026 — full SSR headlines: type chips, date accordions, filter tray, load more, sidebar murder count card. `headlinesPage.ts` now reads `window.__hlData.crimePath` (backwards-compatible). |
 | C4. Crime detail pages | **DONE** Apr 5 2026 — `/jamaica/crime/[slug]` SSR+CDN. Jamaica aliases from baked JSON. `RelatedCrimes` now accepts `crimePath` prop (default `/trinidad/crime/`). `TrendingHotspots` omitted (T&T-hardcoded routes — Phase D revisit). |
 | C5. Archive pages | **DONE** Apr 5 2026 — `/jamaica/archive/` (SSR index) + `/jamaica/archive/[year]/[month]` (SSR month page). `buildRoute.jamaicaCrime` + `buildRoute.jamaicaArchive` added to routes.ts. Beta banners on both pages. |
-| C6. Search update | **PENDING** — extend `/api/search/` to query Jamaica `crimes_fts` |
+| C6. Search update | **DONE** Apr 5 2026 — `/api/search/` queries JM_DB crimes_fts (parallel, 5/country) + region LIKE for parishes. Jamaica crimes labelled "Crime incident · Jamaica". Parish badge type added. |
 
 ### Phase D — Content & Polish (Weeks 4–10) | Owner: Mixed
 **Goal:** Parish pages, area pages, safety tips, MP photos — all at T&T parity.
@@ -166,3 +166,4 @@
 | Apr 5, 2026 | Phase C3 complete. `/jamaica/headlines/` full SSR: type chips, date accordions, filter tray (parish/area/type/date), load more, sidebar murder count card. `headlinesPage.ts` now reads `window.__hlData.crimePath` (backwards-compatible default: `/trinidad/crime/`). |
 | Apr 5, 2026 | Phase C4 complete. `/jamaica/crime/[slug]` SSR+CDN crime detail pages. Jamaica aliases from baked JSON. `RelatedCrimes.astro` has new optional `crimePath` prop. `TrendingHotspots` omitted (hardcoded T&T routes — add in Phase D). |
 | Apr 5, 2026 | Phase C5 complete. `/jamaica/archive/` (SSR index) + `/jamaica/archive/[year]/[month]` (SSR month page). `buildRoute.jamaicaCrime(slug)` and `buildRoute.jamaicaArchive(year, month?)` added to routes.ts. Beta banners on both pages. |
+| Apr 5, 2026 | Phase C6 complete. `/api/search/` extended: JM_DB crimes_fts + region LIKE queries run in parallel with T&T. Jamaica crimes get `meta: 'Crime incident · Jamaica'`. Parish results use new `type: 'parish'` (green badge, "Parish" label). SearchModal placeholder + footer updated to mention parishes. |

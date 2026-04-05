@@ -89,7 +89,7 @@
 |----------|-------|---------|
 | Dashboard API | `/api/dashboard/?year=2026\|2025\|all` | Pre-computed stats, trends, insights, topRegions from D1. Cache: 1h browser / ~23h CDN edge. |
 | Crimes API | `/api/crimes/?year=2026\|2025\|all` | Full Crime objects from D1 (Date fields stripped; client reconstructs `dateObj` from year/month/day). Same cache headers. |
-| Search API | `/api/search/?q=...` | D1 FTS5 search for crimes + LIKE for areas + static filter for MPs. Returns typed `SearchResult[]`. No CDN cache. Min 2 chars. |
+| Search API | `/api/search/?q=...` | Queries T&T (DB) and Jamaica (JM_DB) in parallel. T&T: FTS5 crimes + LIKE areas + mps.json MPs. Jamaica: FTS5 crimes (meta "Crime incident · Jamaica") + LIKE region/parishes + mps-jamaica.json MPs. Returns typed `SearchResult[]` (types: `crime\|mp\|area\|parish`). Per-country crime cap: 5. No CDN cache. Min 2 chars. |
 | Health | `/api/health.json` | Build health status (pre-rendered static) |
 | Latest Crimes | `/api/latest-crimes.json` | Latest 20 crimes for SearchModal suggestions (pre-rendered static) |
 
@@ -149,7 +149,7 @@
 | Component | Purpose |
 |-----------|---------|
 | IslandSelectorModal.astro | Unified island picker (dashboard/headlines/archives/areas). Exposes `window.openIslandModal(section)`. Backward-compat aliases: `openDashboardModal()`, `openHeadlinesModal()`, etc. Replaced 4 separate modal files. |
-| SearchModal.astro | Site-wide search (Ctrl+K). Powered by `/api/search` (D1 FTS5 crimes, mps.json MPs, D1 LIKE areas). Dark mode. Custom debounced input (300ms). Typed result cards (Crime/MP/Area badges). Suggestions panel (empty state): recent searches (localStorage `ch_search_history`, max 5), 2 latest crimes (fetched from `/api/latest-crimes.json`), static crime-type chips. |
+| SearchModal.astro | Site-wide search (Ctrl+K). Powered by `/api/search` (T&T + Jamaica in parallel). Dark mode. Custom debounced input (300ms). Typed result cards: Crime (rose), MP (slate), Area (green, T&T), Parish (green, Jamaica). `typeLabel()` maps `'parish'` → `'Parish'`; `typeBadgeClass()` maps it to `search-type-badge--area`. Suggestions panel (empty state): recent searches (localStorage `ch_search_history`, max 5), 2 latest crimes (fetched from `/api/latest-crimes.json`), static crime-type chips. |
 | ReportIssueModal.astro | Report crime data issues |
 
 ### Safety Tips
@@ -308,7 +308,7 @@ Same structure applies to `google-apps-script/jamaica/` (identical split). Full 
 - **Structured Data:** JSON-LD (WebPage, BreadcrumbList, Dataset, BlogPosting, Article, CollectionPage)
 - **Sitemap:** Auto-generated, submitted to Google Search Console
 - **OG Images:** Dynamic murder count OG image (satori + sharp, regenerates daily)
-- **Search:** D1 FTS5 via `/api/search` (crimes, MPs, areas). Dark mode. Suggestions on empty state. No build-time indexing.
+- **Search:** D1 FTS5 via `/api/search` (T&T + Jamaica parallel: crimes, MPs, areas/parishes). Dark mode. Suggestions on empty state. No build-time indexing.
 
 ### Analytics
 - **Google Analytics 4:** With cookie consent gate

@@ -67,7 +67,8 @@ Never duplicate content already in CLAUDE.md's hard rules.
 - **JNews hierarchy rollout COMPLETE** — Dark hero + 4-card GradientStatCard vitals across: dashboard, statistics, murders, murder-count, crime/[slug], area/[slug], region/[slug], areas, headlines, homepage (SSR). Hero.astro + Breadcrumbs.astro retired from all pages.
 - **Mar 26 2026:** Homepage T&T section — "This Week's Hotspots" widget (top 3 areas, "X crimes · Y murders", anchored bottom with `mt-auto`). Fixed `escapeHtml()` double-encoding on index.astro homepage (B029 recurrence). Added `HeroBg.astro` texture overlay component to 13 dark-hero pages + footer-bg in Layout.astro (dark mode only). B031: bulk import injection bug — dashboard.astro import landed in `<script>` block, fixed manually.
 - **Mar 26 2026 (security sweep):** Full audit — patched 3 XSS gaps (SearchModal latest-crimes, compare.astro area/region/type, dashboardUpdates.ts regions); removed `detail:msg` info leak from `/api/search` 500; added HSTS header to `_headers`; `npm audit fix` (3 HIGH + 1 MODERATE resolved). 5 moderate CVEs remain in `@astrojs/language-server` chain — dev-only, accepted risk. See F001.
-- **Next:** —
+- **Apr 5 2026:** Jamaica C1–C6 complete. D1 live. All 7 core pages wired to JM_DB (dashboard, headlines, crime/[slug], statistics, murder-count, archive index + month). Beta banners (amber, auto-expire Jul 4 2026). Search extended: `/api/search/` queries JM_DB in parallel — crimes (meta "· Jamaica"), parishes (region LIKE), mps-jamaica.json MPs. `SearchResult.type` now includes `'parish'`. Phase F (homepage card flip, BottomNav, HomepagePulse) is next. D tasks (parish/area pages) can run in parallel.
+- **Next:** Phase F — flip homepage Jamaica card to live link, set `available: true` in countries.ts (BottomNav), add HomepagePulse Jamaica variant.
 
 ## Adding a New Crime Type — Mandatory Procedure
 
