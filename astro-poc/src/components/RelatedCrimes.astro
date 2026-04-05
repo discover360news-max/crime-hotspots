@@ -31,9 +31,10 @@ interface Props {
   currentCrime: Crime;
   allCrimes: Crime[];
   maxCards?: number;
+  crimePath?: string;
 }
 
-const { currentCrime, allCrimes, maxCards = 5 } = Astro.props;
+const { currentCrime, allCrimes, maxCards = 5, crimePath = '/trinidad/crime/' } = Astro.props;
 
 // Filter out current crime
 const otherCrimes = allCrimes.filter(c => c.slug !== currentCrime.slug);
@@ -96,7 +97,7 @@ const areaSlug = currentCrime.area.toLowerCase().replace(/\s+/g, '-').replace(/[
 
         return (
           <a
-            href={buildRoute.crime(crime.slug)}
+            href={`${crimePath}${crime.slug}/`}
             class="block p-3 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-100 dark:border-[var(--ch-border-subtle)] hover:border-rose-200 dark:hover:border-rose-800 hover:shadow-sm transition-all group"
           >
             <div class="flex items-start gap-2">
