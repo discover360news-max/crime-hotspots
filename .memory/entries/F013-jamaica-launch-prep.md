@@ -52,7 +52,7 @@
 | C2. New Jamaica API endpoints + dashboard | **DONE** Apr 5 2026 — `/api/jamaica/crimes/` + `/api/jamaica/dashboard/`; dashboard upgraded from stub to full SSR (vitals, crime breakdown, top parishes, quick insights) |
 | C3. Headlines page | **DONE** Apr 5 2026 — full SSR headlines: type chips, date accordions, filter tray, load more, sidebar murder count card. `headlinesPage.ts` now reads `window.__hlData.crimePath` (backwards-compatible). |
 | C4. Crime detail pages | **DONE** Apr 5 2026 — `/jamaica/crime/[slug]` SSR+CDN. Jamaica aliases from baked JSON. `RelatedCrimes` now accepts `crimePath` prop (default `/trinidad/crime/`). `TrendingHotspots` omitted (T&T-hardcoded routes — Phase D revisit). |
-| C5. Archive pages | **PENDING** — `/jamaica/archive/[year]/[month]` |
+| C5. Archive pages | **DONE** Apr 5 2026 — `/jamaica/archive/` (SSR index) + `/jamaica/archive/[year]/[month]` (SSR month page). `buildRoute.jamaicaCrime` + `buildRoute.jamaicaArchive` added to routes.ts. Beta banners on both pages. |
 | C6. Search update | **PENDING** — extend `/api/search/` to query Jamaica `crimes_fts` |
 
 ### Phase D — Content & Polish (Weeks 4–10) | Owner: Mixed
@@ -100,7 +100,8 @@
 | `/jamaica/statistics/` | **Live** — full SSR + JM_DB | — |
 | `/jamaica/murder-count/` | **Live** — full SSR + JM_DB | — |
 | `/jamaica/parishes/` | Shell stub | Phase D2 |
-| `/jamaica/archive/` | Shell stub | Phase C5 |
+| `/jamaica/archive/` | **Live** — SSR index, JM_DB | — |
+| `/jamaica/archive/[year]/[month]` | **Live** — SSR month page, JM_DB | — |
 | `/jamaica/area/[slug]` | Not built | Phase D3 |
 | `/jamaica/parish/[slug]` | Not built | Phase D2 |
 | `/jamaica/mp/` | **Live** — 63 MPs | — |
@@ -164,3 +165,4 @@
 | Apr 5, 2026 | Phase C2 complete. `/api/jamaica/crimes/` + `/api/jamaica/dashboard/` endpoints live. `/jamaica/dashboard/` upgraded from stub to full SSR dashboard (vitals, crime breakdown, top parishes, quick insights, newsletter). |
 | Apr 5, 2026 | Phase C3 complete. `/jamaica/headlines/` full SSR: type chips, date accordions, filter tray (parish/area/type/date), load more, sidebar murder count card. `headlinesPage.ts` now reads `window.__hlData.crimePath` (backwards-compatible default: `/trinidad/crime/`). |
 | Apr 5, 2026 | Phase C4 complete. `/jamaica/crime/[slug]` SSR+CDN crime detail pages. Jamaica aliases from baked JSON. `RelatedCrimes.astro` has new optional `crimePath` prop. `TrendingHotspots` omitted (hardcoded T&T routes — add in Phase D). |
+| Apr 5, 2026 | Phase C5 complete. `/jamaica/archive/` (SSR index) + `/jamaica/archive/[year]/[month]` (SSR month page). `buildRoute.jamaicaCrime(slug)` and `buildRoute.jamaicaArchive(year, month?)` added to routes.ts. Beta banners on both pages. |

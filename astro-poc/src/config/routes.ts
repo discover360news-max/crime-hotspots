@@ -67,8 +67,11 @@ export const buildRoute = {
   safetyTipsContext: (context: string) => `/trinidad/safety-tips/context/${slugifyParam(context)}/`,
   safetyTipsArea: (area: string) => `/trinidad/safety-tips/area/${area}/`,
   mp: (nameSlug: string) => `/trinidad/mp/${nameSlug}/`,
-  jamaicaMp:     (nameSlug: string) => `/jamaica/mp/${nameSlug}/`,
-  jamaicaParish: (slug: string)     => `/jamaica/parish/${slug}/`,
+  jamaicaMp:      (nameSlug: string) => `/jamaica/mp/${nameSlug}/`,
+  jamaicaParish:  (slug: string)     => `/jamaica/parish/${slug}/`,
+  jamaicaCrime:   (slug: string)     => `/jamaica/crime/${slug}/`,
+  jamaicaArchive: (year: number, month?: string) =>
+    month ? `/jamaica/archive/${year}/${month}/` : `/jamaica/archive/${year}/`,
 } as const;
 
 /** Slugify a category/context string for use in URL path segments */

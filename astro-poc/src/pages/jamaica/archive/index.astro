@@ -1,62 +1,122 @@
 ---
 /**
  * Jamaica Archive Index Page
- * Prerendered shell — archive entries will appear once Jamaica D1 is configured.
- * Route: /jamaica/archive/
+ * Lists all available monthly archives.
+ * SSR — data from JM_DB binding, CDN-cached ~23h.
+ * URL: /jamaica/archive/
  */
-
-export const prerender = true;
 
 import Layout from '../../../layouts/Layout.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import Hero from '../../../components/Hero.astro';
 import SocialProofStrip from '../../../components/SocialProofStrip.astro';
-import { routes } from '../../../config/routes';
+import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
+import { getAllCrimesFromD1 } from '../../../lib/crimeData';
+import { dataUpdateNotice } from '../../../config/siteNotifications';
+import { routes, buildRoute } from '../../../config/routes';
 
-// TODO: wire to Jamaica D1 — replace empty array with getAllCrimesFromD1(db, 'JM')
-const archives: never[] = [];
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
 
-const breadcrumbs = [
-  { label: 'Home', href: '/' },
-  { label: 'Jamaica', href: routes.jamaica.dashboard },
-  { label: 'Archive' },
-];
+import { env } from 'cloudflare:workers';
+const db = env.JM_DB as D1Database | undefined;
+const crimes = db ? await getAllCrimesFromD1(db) : [];
 
-const pageTitle = 'Jamaica Crime Archives | Crime Hotspots';
-const pageDescription = 'Browse Jamaica crime statistics archives by month. Coming soon.';
+const showBeta = new Date() < new Date('2026-07-04T00:00:00');
+
+// Group by year and month
+const archiveMap = new Map<string, { year: number; month: number; count: number }>();
+crimes.forEach(crime => {
+  const key = `${crime.year}-${String(crime.month).padStart(2, '0')}`;
+  if (!archiveMap.has(key)) {
+    archiveMap.set(key, { year: crime.year, month: crime.month, count: 0 });
+  }
+  archiveMap.get(key)!.count++;
+});
+
+// Sort by year/month descending (newest first)
+const archives = Array.from(archiveMap.values()).sort((a, b) => {
+  if (a.year !== b.year) return b.year - a.year;
+  return b.month - a.month;
+});
+
+const now = new Date();
+const currentYear = now.getFullYear();
+const currentMonth = now.getMonth() + 1;
+
+const title = 'Jamaica Crime Archives | Crime Hotspots';
+const description = 'Browse crime statistics archives for Jamaica by month. View trends, statistics, and detailed reports.';
 ---
 
-<Layout title={pageTitle} description={pageDescription} noindex={true}>
+<Layout title={title} description={description}>
   <Hero
-    compact
+    title="Crime Archives"
+    subtitle={`Browse ${crimes.length} crime incidents organized by month — Jamaica`}
+    compact={true}
     narrowContainer={true}
-    title="Jamaica Crime Archives"
-    subtitle="Monthly archives — coming soon"
     primaryCTA={{ text: 'Dashboard', href: routes.jamaica.dashboard, icon: 'dashboard' }}
     secondaryCTA={{ text: 'Headlines', href: routes.jamaica.headlines }}
   >
-    <Breadcrumbs items={breadcrumbs} slot="before" />
+    <Breadcrumbs items={[
+      { label: 'Home', href: routes.home },
+      { label: 'Jamaica', href: routes.jamaica.dashboard },
+      { label: 'Archive' }
+    ]} slot="before" />
   </Hero>
 
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-10">
-    <SocialProofStrip variant="strip" />
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-6">
+    <SocialProofStrip variant="strip" incidentCount={crimes.length} />
   </div>
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5">
     <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
 
-      <div class="text-center py-12">
-        <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)]">
-          Monthly archives will appear here once the Jamaica data pipeline is live.
-        </p>
-        <a
-          href={routes.jamaica.dashboard}
-          class="mt-4 inline-flex items-center gap-1 text-sm font-medium text-rose-600 dark:text-rose-400 hover:underline"
-        >
-          Back to Dashboard
-        </a>
+    {showBeta && (
+      <div class="mb-6 flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700/50 px-4 py-3">
+        <span class="inline-block shrink-0 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-amber-400 text-amber-900 mt-0.5">Beta</span>
+        <p class="text-sm text-amber-800 dark:text-amber-300">Jamaica data is in beta. Archives grow as the pipeline matures — expect gaps in early months.</p>
       </div>
+    )}
 
+    <!-- Site Notification Banner -->
+    <SiteNotificationBanner notification={dataUpdateNotice} />
+
+    <!-- Archive List -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {archives.map(archive => {
+        const monthName = new Date(archive.year, archive.month - 1).toLocaleDateString('en-US', { month: 'long' });
+        return (
+          <a
+            href={buildRoute.jamaicaArchive(archive.year, String(archive.month).padStart(2, '0'))}
+            class="block bg-white/70 dark:bg-[var(--ch-surface)]/70 rounded-lg shadow-sm border border-slate-200 dark:border-[var(--ch-border-subtle)] p-6 hover:border-rose-600 hover:shadow-md active:shadow-lg transition group"
+          >
+            <div class="flex items-start justify-between">
+              <div>
+                <h2 class={`text-body font-bold transition ${archive.year === currentYear && archive.month === currentMonth ? 'text-rose-600 group-hover:text-rose-700' : 'text-slate-500 dark:text-[var(--ch-text-muted)] group-hover:text-rose-600'}`}>
+                  {monthName}<br />{archive.year}
+                </h2>
+                <p class="text-tiny text-slate-500 dark:text-[var(--ch-text-muted)] mt-1">
+                  {archive.count} {archive.count === 1 ? 'crime' : 'crimes'}
+                </p>
+              </div>
+              <svg class="w-5 h-5 text-slate-400 dark:text-[hsl(0_0%_45%)] group-hover:text-rose-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">
+              View full report
+            </div>
+          </a>
+        );
+      })}
     </div>
+
+    {archives.length === 0 && (
+      <div class="text-center py-12">
+        <p class="text-body text-slate-600 dark:text-[var(--ch-text-muted)]">No archives available yet.</p>
+      </div>
+    )}
+
+    </div><!-- /card -->
   </main>
 </Layout>

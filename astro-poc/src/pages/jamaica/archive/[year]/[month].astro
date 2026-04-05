@@ -1,0 +1,422 @@
+---
+/**
+ * Jamaica Monthly Archive Page
+ * SSR — data from JM_DB binding, CDN-cached ~23h.
+ * URL: /jamaica/archive/[year]/[month]
+ *
+ * Mirrors /trinidad/archive/[year]/[month].astro
+ */
+
+import Layout from '../../../../layouts/Layout.astro';
+import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import Hero from '../../../../components/Hero.astro';
+import SocialProofStrip from '../../../../components/SocialProofStrip.astro';
+import SiteNotificationBanner from '../../../../components/SiteNotificationBanner.astro';
+import QuickInsightsCard from '../../../../components/QuickInsightsCard.astro';
+import { getAllCrimesFromD1, getCrimesByMonthFromD1, type Crime } from '../../../../lib/crimeData';
+import { dataUpdateNotice } from '../../../../config/siteNotifications';
+import { routes, buildRoute } from '../../../../config/routes';
+import { usesVictimCount, crimeHasVictims } from '../../../../config/crimeTypeConfig';
+
+const { year: yearParam, month: monthParam } = Astro.params;
+const year = parseInt(yearParam ?? '', 10);
+const month = parseInt(monthParam ?? '', 10);
+
+if (isNaN(year) || isNaN(month) || month < 1 || month > 12) {
+  return Astro.redirect('/404/', 302);
+}
+
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+import { env } from 'cloudflare:workers';
+const db = env.JM_DB as D1Database | undefined;
+const [crimes, allCrimes]: [Crime[], Crime[]] = db
+  ? await Promise.all([getCrimesByMonthFromD1(db, year, month), getAllCrimesFromD1(db)])
+  : [[], []];
+
+if (crimes.length === 0) {
+  return Astro.redirect('/404/', 302);
+}
+
+const showBeta = new Date() < new Date('2026-07-04T00:00:00');
+
+const monthName = new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long' });
+const title = `${monthName} ${year} Crime Archive | Jamaica`;
+const description = `${crimes.length} crimes reported in Jamaica during ${monthName} ${year}. Month-over-month trends, year-over-year comparisons, and detailed statistics.`;
+
+// Group by crime type
+const crimesByType = crimes.reduce((acc, crime) => {
+  acc[crime.crimeType] = (acc[crime.crimeType] || 0) + 1;
+  return acc;
+}, {} as Record<string, number>);
+
+const topCrimeTypes = Object.entries(crimesByType)
+  .sort(([, a], [, b]) => b - a)
+  .slice(0, 5);
+
+// Get previous month's data for comparison
+const prevMonth = month === 1 ? 12 : month - 1;
+const prevYear = month === 1 ? year - 1 : year;
+const prevMonthCrimes = allCrimes.filter(c => c.year === prevYear && c.month === prevMonth);
+
+// Get same month from previous year
+const lastYearCrimes = allCrimes.filter(c => c.year === year - 1 && c.month === month);
+
+// Month-over-month change
+const momChange = crimes.length - prevMonthCrimes.length;
+const momPercent = prevMonthCrimes.length > 0
+  ? Math.round((momChange / prevMonthCrimes.length) * 100)
+  : 0;
+
+// Year-over-year change
+const yoyChange = crimes.length - lastYearCrimes.length;
+const yoyPercent = lastYearCrimes.length > 0
+  ? Math.round((yoyChange / lastYearCrimes.length) * 100)
+  : 0;
+
+// Deadliest day of the month
+const crimesByDay = crimes.reduce((acc, crime) => {
+  const day = new Date(crime.date).getDate();
+  acc[day] = (acc[day] || 0) + 1;
+  return acc;
+}, {} as Record<number, number>);
+
+const deadliestDay = Object.entries(crimesByDay)
+  .sort(([, a], [, b]) => b - a)[0];
+
+// Top trending crime type
+const prevMonthByType = prevMonthCrimes.reduce((acc, crime) => {
+  acc[crime.crimeType] = (acc[crime.crimeType] || 0) + 1;
+  return acc;
+}, {} as Record<string, number>);
+
+// Quick Insights
+const daysInMonth = new Date(year, month, 0).getDate();
+const avgPerDay = (crimes.length / daysInMonth).toFixed(1);
+
+const totalVictims = crimes.reduce((sum, crime) => {
+  const primaryType = crime.primaryCrimeType || crime.crimeType;
+  if (primaryType && usesVictimCount(primaryType)) {
+    return sum + (crime.victimCount || 1);
+  }
+  return crimeHasVictims(primaryType) ? sum + 1 : sum;
+}, 0);
+const victimsPerDay = Math.round(totalVictims / daysInMonth);
+
+const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const dayOfWeekCount = new Map<string, number>();
+crimes.forEach(crime => {
+  const date = new Date(crime.date);
+  const dayName = dayNames[date.getDay()];
+  dayOfWeekCount.set(dayName, (dayOfWeekCount.get(dayName) || 0) + 1);
+});
+const mostDangerousDay = Array.from(dayOfWeekCount.entries())
+  .sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+
+const busiestMonth = deadliestDay ? `${monthName} ${deadliestDay[0]}` : 'N/A';
+
+// Area stats
+const areaCount = new Map<string, number>();
+crimes.forEach(crime => {
+  const area = crime.area || 'Unknown';
+  areaCount.set(area, (areaCount.get(area) || 0) + 1);
+});
+const areaArray = Array.from(areaCount.entries()).sort((a, b) => b[1] - a[1]);
+
+const top3Count = areaArray.slice(0, 3).reduce((sum, [, count]) => sum + count, 0);
+const top3Percentage = crimes.length > 0 ? ((top3Count / crimes.length) * 100).toFixed(0) : '0';
+
+const validAreas = areaArray.filter(([area]) => area && area !== 'Unknown' && area.trim() !== '');
+const mostDangerousRegion = validAreas[0]?.[0] || 'N/A';
+const mostDangerousRegionCount = validAreas[0]?.[1] || 0;
+const safestRegion = validAreas[validAreas.length - 1]?.[0] || 'N/A';
+const safestRegionCount = validAreas[validAreas.length - 1]?.[1] || 0;
+
+const insights = {
+  avgPerDay,
+  victimsPerDay,
+  mostDangerousDay,
+  busiestMonth,
+  top3Percentage,
+  mostDangerousRegion,
+  mostDangerousRegionCount,
+  safestRegion,
+  safestRegionCount,
+};
+
+// Group crimes by date for accordion display
+const crimesByDate = new Map<string, Crime[]>();
+crimes.forEach(crime => {
+  const dateKey = crime.date;
+  if (!crimesByDate.has(dateKey)) {
+    crimesByDate.set(dateKey, []);
+  }
+  crimesByDate.get(dateKey)!.push(crime);
+});
+
+const sortedDates = Array.from(crimesByDate.keys()).sort((a, b) =>
+  new Date(b).getTime() - new Date(a).getTime()
+);
+
+function calculateVictimCount(groupCrimes: Crime[]): number {
+  return groupCrimes.reduce((total, crime) => {
+    const primaryType = crime.primaryCrimeType || crime.crimeType;
+    if (!crimeHasVictims(primaryType)) return total;
+    if (usesVictimCount(primaryType)) return total + (crime.victimCount && crime.victimCount > 0 ? crime.victimCount : 1);
+    return total + 1;
+  }, 0);
+}
+
+const breadcrumbs = [
+  { label: 'Home', href: routes.home },
+  { label: 'Jamaica', href: routes.jamaica.dashboard },
+  { label: 'Archive', href: routes.jamaica.archive },
+  { label: String(year), href: routes.jamaica.archive },
+  { label: monthName },
+];
+---
+
+<Layout title={title} description={description} includeTurnstile={true}>
+  <Hero
+    title={`${monthName} ${year} Archive`}
+    subtitle={`${crimes.length} crimes reported in Jamaica`}
+    compact={true}
+    narrowContainer={true}
+    primaryCTA={{ text: 'Dashboard', href: routes.jamaica.dashboard, icon: 'dashboard' }}
+    secondaryCTA={{ text: 'Headlines', href: routes.jamaica.headlines }}
+  >
+    <Breadcrumbs items={breadcrumbs} slot="before" />
+  </Hero>
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 pb-6">
+    <SocialProofStrip variant="strip" incidentCount={allCrimes.length} />
+  </div>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-ignore>
+    <div class="bg-white/70 dark:bg-[hsl(0_0%_8%_/_0.7)] backdrop-blur-md rounded-3xl shadow-md p-6 sm:p-8 border border-slate-100 dark:border-[var(--ch-border-card)]">
+
+    {showBeta && (
+      <div class="mb-6 flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700/50 px-4 py-3">
+        <span class="inline-block shrink-0 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest bg-amber-400 text-amber-900 mt-0.5">Beta</span>
+        <p class="text-sm text-amber-800 dark:text-amber-300">Jamaica data is in beta. Some months may have incomplete coverage as the pipeline matures.</p>
+      </div>
+    )}
+
+    <!-- Site Notification Banner -->
+    <SiteNotificationBanner notification={dataUpdateNotice} />
+
+    <!-- Horizontal Scroll Stats Cards -->
+    <div class="relative mb-8">
+      <div class="flex items-center gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar">
+        <!-- Total Crimes Card -->
+        <div class="flex-shrink-0 snap-start bg-white/70 dark:bg-[var(--ch-surface)]/70 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 dark:border-[var(--ch-border-subtle)] p-6 w-64">
+          <div class="text-xs font-semibold text-slate-500 dark:text-[var(--ch-text-muted)] mb-2">Total Crimes</div>
+          <div class="text-display font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">{crimes.length}</div>
+          {prevMonthCrimes.length > 0 && (
+            <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-2 flex items-center gap-1">
+              <span class={momChange >= 0 ? 'text-red-600' : 'text-emerald-600'}>
+                {momChange >= 0 ? '↑' : '↓'} {Math.abs(momChange)} ({Math.abs(momPercent)}%)
+              </span>
+              <span>vs prev month</span>
+            </div>
+          )}
+        </div>
+
+        <!-- Year-over-Year Card -->
+        {lastYearCrimes.length > 0 && (
+          <div class="flex-shrink-0 snap-start bg-white/70 dark:bg-[var(--ch-surface)]/70 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 dark:border-[var(--ch-border-subtle)] p-6 w-64">
+            <div class="text-xs font-semibold text-slate-500 dark:text-[var(--ch-text-muted)] mb-2">vs {monthName} {year - 1}</div>
+            <div class="text-display font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">{lastYearCrimes.length}</div>
+            <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-2 flex items-center gap-1">
+              <span class={yoyChange >= 0 ? 'text-red-600' : 'text-emerald-600'}>
+                {yoyChange >= 0 ? '↑' : '↓'} {Math.abs(yoyChange)} ({Math.abs(yoyPercent)}%)
+              </span>
+              <span>year-over-year</span>
+            </div>
+          </div>
+        )}
+
+        <!-- Top Crime Types -->
+        {topCrimeTypes.map(([type, count]) => (
+          <div class="flex-shrink-0 snap-start bg-white/70 dark:bg-[var(--ch-surface)]/70 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 dark:border-[var(--ch-border-subtle)] p-6 w-64">
+            <div class="text-xs font-semibold text-slate-500 dark:text-[var(--ch-text-muted)] mb-2">{type}</div>
+            <div class="text-display font-bold text-slate-700 dark:text-[var(--ch-text-heading)]">{count}</div>
+            {prevMonthByType[type] && (
+              <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)] mt-2 flex items-center gap-1">
+                {(() => {
+                  const prevCount = prevMonthByType[type] || 0;
+                  const change = count - prevCount;
+                  const percent = prevCount > 0 ? Math.round((change / prevCount) * 100) : 0;
+                  return (
+                    <span class={change >= 0 ? 'text-red-600' : 'text-emerald-600'}>
+                      {change >= 0 ? '↑' : '↓'} {Math.abs(change)} ({Math.abs(percent)}%)
+                    </span>
+                  );
+                })()}
+                <span>vs prev month</span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <!-- Scroll Hint -->
+      <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white/70 dark:from-[hsl(0_0%_8%_/_0.7)] to-transparent pointer-events-none flex items-center justify-end pr-2">
+        <svg class="w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Quick Insights -->
+    <div class="mb-8">
+      <QuickInsightsCard insights={insights} busiestLabel="Deadliest Day" />
+    </div>
+
+    <!-- Crime Headlines by Date -->
+    <section>
+      <h2 class="text-heading font-bold mb-4" style="color:var(--ch-text)">All Headlines ({crimes.length})</h2>
+
+      <div id="crimeAccordions">
+        {sortedDates.map((date, index) => {
+          const dateCrimes = crimesByDate.get(date)!;
+          const incidentCount = dateCrimes.length;
+          const victimCount = calculateVictimCount(dateCrimes);
+          const isExpanded = index === 0;
+          const formattedDate = new Date(date).toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          });
+
+          return (
+            <div class="date-accordion mb-3" data-date={date}>
+              <button
+                class="da-header w-full px-4 py-3 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] hover:border-rose-300 dark:hover:border-rose-700 transition flex items-center justify-between group"
+                aria-expanded={isExpanded ? 'true' : 'false'}
+              >
+                <div class="flex items-center gap-3">
+                  <svg
+                    class={`da-chevron w-4 h-4 text-slate-400 dark:text-[var(--ch-text-muted)] transition-transform duration-200 flex-shrink-0 ${isExpanded ? 'rotate-90' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+
+                  <div class="text-left">
+                    <h3 class="text-caption font-bold text-slate-700 dark:text-[var(--ch-text-heading)] leading-snug">{formattedDate}</h3>
+                    <p class="text-caption text-slate-400 dark:text-[var(--ch-text-muted)]">{incidentCount} {incidentCount === 1 ? 'crime' : 'crimes'} · {victimCount} {victimCount === 1 ? 'victim' : 'victims'}</p>
+                  </div>
+                </div>
+
+                <span class="px-2 py-0.5 rounded-full border border-slate-300 dark:border-[hsl(0_0%_30%)] text-slate-500 dark:text-[var(--ch-text-muted)] text-caption font-medium">
+                  {incidentCount}
+                </span>
+              </button>
+
+              <div class={`da-content overflow-hidden${isExpanded ? ' is-open' : ''}`}>
+                <div class="relative pl-7 py-2">
+                  <div class="absolute left-3.5 top-0 bottom-0 w-px border-l-2 border-dotted border-slate-300 dark:border-[hsl(0_0%_25%)]"></div>
+
+                  <div class="space-y-1">
+                    {dateCrimes.map(crime => (
+                      <a
+                        href={buildRoute.jamaicaCrime(crime.slug)}
+                        class="crime-card relative pl-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group block"
+                      >
+                        <div aria-hidden="true" class="absolute left-[-18px] top-4 w-2 h-2 rounded-full bg-slate-300 dark:bg-[hsl(0_0%_35%)]"></div>
+
+                        <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-rose-600 transition">
+                          {crime.headline}
+                        </div>
+                        <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">
+                          <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">{crime.primaryCrimeType || crime.crimeType}</span>
+                          <span>{crime.area}</span>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+
+    </div><!-- /card -->
+  </main>
+</Layout>
+
+<script>
+  function initArchiveAccordions() {
+    const headers = document.querySelectorAll('#crimeAccordions .da-header');
+    headers.forEach((header) => {
+      if ((header as HTMLElement).dataset.init) return;
+      (header as HTMLElement).dataset.init = '1';
+      header.addEventListener('click', () => {
+        const accordion = header.closest('.date-accordion');
+        const content = accordion?.querySelector('.da-content');
+        const chevron = header.querySelector('.da-chevron');
+        const expanded = header.getAttribute('aria-expanded') === 'true';
+        if (!content) return;
+        if (expanded) {
+          header.setAttribute('aria-expanded', 'false');
+          content.classList.remove('is-open');
+          chevron?.classList.remove('rotate-90');
+        } else {
+          header.setAttribute('aria-expanded', 'true');
+          content.classList.add('is-open');
+          chevron?.classList.add('rotate-90');
+        }
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initArchiveAccordions);
+</script>
+
+<style>
+  :global(.da-content) {
+    height: 0;
+    transition: height 300ms ease, margin-top 200ms ease;
+  }
+  :global(.da-content.is-open) {
+    height: auto;
+    margin-top: 0.75rem;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    .hide-scrollbar {
+      -ms-overflow-style: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #fda4af transparent;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: block;
+      height: 6px;
+    }
+    .hide-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .hide-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #fda4af;
+      border-radius: 3px;
+    }
+    .hide-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: #fb7185;
+    }
+  }
+</style>

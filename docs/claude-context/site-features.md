@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** March 26, 2026 (HeroBg texture overlay component + homepage hotspots widget)
+**Last Updated:** April 5, 2026 (Jamaica archive pages C5 + buildRoute.jamaicaCrime/jamaicaArchive)
 
 ---
 
@@ -34,7 +34,8 @@
 | Parishes | `/jamaica/parishes/` | Pre-rendered | Browse by parish — stub |
 | Statistics | `/jamaica/statistics/` | **SSR + CDN cache** | Full statistics page (T&T parity). Dataset + FAQPage (4 Q&As) + BreadcrumbList JSON-LD. Population 2.8M, "parishes" language. Dynamic years. Wired to `env.JM_DB`. Beta banner. |
 | Murder Count | `/jamaica/murder-count/` | **SSR + CDN cache** | Full murder count page (T&T parity). FlipCounter, YoY comparison, 3 rate cards. Wired to `env.JM_DB`. Beta banner. |
-| Archive Index | `/jamaica/archive/` | Pre-rendered | Browse by year — stub (Phase C5) |
+| Archive Index | `/jamaica/archive/` | **SSR + CDN cache** | Browse by year. Groups crimes from JM_DB by month, grid of month cards linking to monthly pages. Beta banner. |
+| Archive Month | `/jamaica/archive/[year]/[month]` | **SSR + CDN cache** | Crimes for specific month. Scrollable stat cards (total, YoY, top crime types) + QuickInsightsCard + date-accordion headline list linking to `/jamaica/crime/[slug]/`. 302 redirect to /404/ if no data. Beta banner. |
 | MP Index | `/jamaica/mp/` | Pre-rendered | Directory of all 63 MPs grouped by parish. Each card: photo, name, party badge, constituency. |
 | MP Profile | `/jamaica/mp/[nameSlug]` | Pre-rendered | Individual MP profile. 2-col card: photo left (`min-h-[500px]`), identity+contact right. Social links rendered as brand SVG icons (Facebook, Instagram, X, YouTube, TikTok). JSON-LD Person schema. Data: `src/data/mps-jamaica.json`. |
 
