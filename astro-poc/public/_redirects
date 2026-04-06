@@ -20,6 +20,12 @@
 /dashboard-guyana / 301
 /headlines-guyana.html / 301
 /headlines-guyana / 301
+/guyana/* / 301
+
+# Archive year-only URLs (e.g. /trinidad/archive/2025) — no year-level page exists
+/trinidad/archive/2025 /trinidad/archive/ 301
+/trinidad/archive/2026 /trinidad/archive/ 301
+/trinidad/archive/2027 /trinidad/archive/ 301
 
 
 # Email protection (Cloudflare artifact)

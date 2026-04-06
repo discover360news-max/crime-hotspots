@@ -7,6 +7,13 @@ import { BUTTONDOWN_API_KEY } from 'astro:env/server';
  * BUTTONDOWN_API_KEY must be set in Cloudflare Pages environment variables.
  * For local dev, add it to astro-poc/.env: BUTTONDOWN_API_KEY=your_key_here
  */
+export const GET: APIRoute = () => {
+  return new Response(null, {
+    status: 301,
+    headers: { Location: '/' },
+  });
+};
+
 export const POST: APIRoute = async ({ request }) => {
   const json = (body: object, status = 200) =>
     new Response(JSON.stringify(body), {
