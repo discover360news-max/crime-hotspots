@@ -145,8 +145,8 @@ const description = `Jamaica crime statistics ${currentYear}. Live murder count,
                   <span class={weekChange > 0 ? 'text-rose-400' : 'text-emerald-400'}>
                     {' '}({weekChange > 0 ? '+' : ''}{weekChange}% vs last week)
                   </span>
-                )}.
-                {topArea && <> <span class="text-white font-medium">{topArea[0]}</span> leads with {topArea[1]}.</>}
+                )}
+                {topArea ? <> <span class="text-white font-medium">{topArea[0]}</span> leads with {topArea[1]}.</> : '.'}
                 {murdersThisWeek > 0 && murderChange !== 0 && (
                   <> Murders{' '}
                     <span class={murderChange > 0 ? 'font-medium text-rose-400' : 'font-medium text-emerald-400'}>
