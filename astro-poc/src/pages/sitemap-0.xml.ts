@@ -96,7 +96,10 @@ export const GET: APIRoute = async ({ locals }) => {
 
     return {
       url: buildRoute.crime(crime.slug).slice(1),
-      lastmod: (crime.dateUpdated ?? crime.datePublished ?? crime.dateObj).toISOString(),
+      lastmod: (() => {
+        const d = crime.dateUpdated ?? crime.datePublished ?? crime.dateObj;
+        return d instanceof Date && !isNaN(d.getTime()) ? d.toISOString() : crime.dateObj.toISOString();
+      })(),
       priority,
       changefreq: 'monthly' as const
     };
