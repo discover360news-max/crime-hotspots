@@ -4,6 +4,8 @@ import type { APIRoute } from 'astro';
  * Sitemap Index
  * Points to the main sitemap containing all URLs
  */
+export const prerender = false;
+
 export const GET: APIRoute = () => {
   const now = new Date().toISOString();
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

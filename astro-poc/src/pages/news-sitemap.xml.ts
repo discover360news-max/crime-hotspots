@@ -12,6 +12,8 @@ import { getTrinidadCrimes, getCrimesByDateRangeFromD1 } from '../lib/crimeData'
  *
  * Spec: https://developers.google.com/search/docs/crawling-indexing/sitemaps/news-sitemap
  */
+export const prerender = false;
+
 export const GET: APIRoute = async ({ locals }) => {
   const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 

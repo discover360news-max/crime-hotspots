@@ -14,7 +14,11 @@ import mpsJamaicaData from '../data/mps-jamaica.json';
  * - Crime detail pages (1,700+ dynamically generated)
  * - Archive pages (monthly archives)
  * - Blog posts
+ *
+ * Must be SSR — D1 is only available at runtime, not build time.
  */
+export const prerender = false;
+
 export const GET: APIRoute = async ({ locals }) => {
   const db = env.DB as D1Database | undefined;
   // Get all crimes for crime pages
