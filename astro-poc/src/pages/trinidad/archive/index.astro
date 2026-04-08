@@ -10,7 +10,7 @@ import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import Hero from '../../../components/Hero.astro';
 import SocialProofStrip from '../../../components/SocialProofStrip.astro';
 import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
-import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../../lib/crimeData';
+import { getCrimesWithFallback } from '../../../lib/crimeData';
 import { dataUpdateNotice } from '../../../config/siteNotifications';
 import { getCountryName } from '../../../data/countries';
 import { routes, buildRoute } from '../../../config/routes';
@@ -20,7 +20,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalida
 
 import { env } from 'cloudflare:workers';
 const db = env.DB as D1Database | undefined;
-const crimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
+const crimes = await getCrimesWithFallback(db);
 
 // Group by year and month
 const archiveMap = new Map<string, { year: number; month: number; count: number }>();

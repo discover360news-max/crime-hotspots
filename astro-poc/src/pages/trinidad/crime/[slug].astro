@@ -7,7 +7,7 @@
  */
 
 import Layout from '../../../layouts/Layout.astro';
-import { getTrinidadCrimes, getAllCrimesFromD1, type Crime } from '../../../lib/crimeData';
+import { getCrimesWithFallback, type Crime } from '../../../lib/crimeData';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import ReportIssueModal from '../../../components/ReportIssueModal.astro';
 import SiteNotificationBanner from '../../../components/SiteNotificationBanner.astro';
@@ -34,7 +34,7 @@ import idRedirectOverrides from '../../../data/id-redirect-overrides.json';
 const { slug } = Astro.params;
 import { env } from 'cloudflare:workers';
 const db = env.DB as D1Database | undefined;
-const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
+const allCrimes = await getCrimesWithFallback(db);
 const crime = allCrimes.find(c => c.slug === slug);
 
 // Fallback: check if this is a legacy slug → 301 to new URL

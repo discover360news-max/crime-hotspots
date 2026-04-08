@@ -5,7 +5,7 @@
  */
 
 import Layout from '../../layouts/Layout.astro';
-import { getAllCrimesFromD1, getTrinidadCrimes, generateNameSlug } from '../../lib/crimeData';
+import { getCrimesWithFallback, generateNameSlug } from '../../lib/crimeData';
 import { countCrimeType, calculateInsights } from '../../lib/dashboardHelpers';
 import { getTotalCrimeCount } from '../../lib/statisticsHelpers';
 import { getCollection } from 'astro:content';
@@ -32,10 +32,10 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalida
 
 import { env } from 'cloudflare:workers';
 const db = env.DB as D1Database | undefined;
-const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
+const allCrimes = await getCrimesWithFallback(db);
 
 const availableYears = [...new Set(allCrimes.map(c => c.year))].sort((a, b) => b - a);
-const currentYear = availableYears[0];
+const currentYear = availableYears[0] ?? new Date().getFullYear();
 const crimes = allCrimes.filter(crime => crime.year === currentYear);
 const insights = calculateInsights(crimes);
 

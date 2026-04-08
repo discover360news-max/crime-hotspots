@@ -11,7 +11,7 @@ import StatCards from '../../../components/StatCards.astro';
 import DataTable from '../../../components/DataTable.astro';
 import MPSidebar from '../../../components/MPSidebar.astro';
 import SocialProofStrip from '../../../components/SocialProofStrip.astro';
-import { getTrinidadCrimes, getAllCrimesFromD1, getCrimesByRegionFromD1, generateNameSlug } from '../../../lib/crimeData';
+import { getCrimesWithFallback, getCrimesByRegionFromD1, generateNameSlug } from '../../../lib/crimeData';
 import { loadFullAreaData } from '../../../lib/areaAliases';
 import { calculateAreaCrimeScore } from '../../../lib/safetyHelpers';
 import { countCrimeType } from '../../../lib/dashboardHelpers';
@@ -40,11 +40,11 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalida
 import { env } from 'cloudflare:workers';
 import DarkHero from '../../../components/DarkHero.astro';
 const db = env.DB as D1Database | undefined;
-const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
+const allCrimes = await getCrimesWithFallback(db);
 
 // Region crimes
 const regionCrimes = db
-  ? await getCrimesByRegionFromD1(db, regionName)
+  ? await getCrimesByRegionFromD1(db, regionName).catch(() => allCrimes.filter(c => c.region === regionName))
   : allCrimes.filter(c => c.region === regionName);
 
 // Date ranges

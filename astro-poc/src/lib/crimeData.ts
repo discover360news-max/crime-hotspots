@@ -39,6 +39,8 @@ let fetchPromise: Promise<Crime[]> | null = null;
 // ============================================================================
 async function fetchWithRetry(url: string, maxRetries = 3): Promise<string> {
   const delays = [2000, 4000, 8000];
+  // Per-attempt timeout: bail after 8s so retries don't cause Cloudflare to kill the Worker
+  const FETCH_TIMEOUT_MS = 8000;
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -49,7 +51,14 @@ async function fetchWithRetry(url: string, maxRetries = 3): Promise<string> {
         console.log(`[CSV] ${ts} Retry ${attempt}/${maxRetries} for ${url.slice(0, 60)}... (waiting ${delay / 1000}s)`);
         await new Promise(r => setTimeout(r, delay));
       }
-      const response = await fetch(url);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+      let response: Response;
+      try {
+        response = await fetch(url, { signal: controller.signal });
+      } finally {
+        clearTimeout(timeoutId);
+      }
       if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       return await response.text();
     } catch (err) {
@@ -400,6 +409,21 @@ export async function getAllCrimesFromD1(db: D1Database): Promise<Crime[]> {
     .prepare('SELECT * FROM crimes ORDER BY year DESC, month DESC, day DESC')
     .all<D1CrimeRow>();
   return results.map(mapD1RowToCrime);
+}
+
+/**
+ * SSR helper: try D1 first, fall back to CSV if D1 throws.
+ * Use this in every SSR page instead of the inline ternary pattern.
+ * Prevents D1 network/service hiccups from becoming 5xx responses.
+ */
+export async function getCrimesWithFallback(db: D1Database | undefined): Promise<Crime[]> {
+  if (!db) return getTrinidadCrimes();
+  try {
+    return await getAllCrimesFromD1(db);
+  } catch (err) {
+    console.error('[D1] getAllCrimesFromD1 failed, falling back to CSV:', err);
+    return getTrinidadCrimes();
+  }
 }
 
 /**

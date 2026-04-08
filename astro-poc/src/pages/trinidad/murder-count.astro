@@ -12,7 +12,7 @@ import FlipCounter from '../../components/FlipCounter.astro';
 import GradientStatCard from '../../components/GradientStatCard.astro';
 import MonthlyBreakdownChart from '../../components/MonthlyBreakdownChart.astro';
 import SocialProofStrip from '../../components/SocialProofStrip.astro';
-import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../lib/crimeData';
+import { getCrimesWithFallback } from '../../lib/crimeData';
 import { countCrimeType } from '../../lib/dashboardHelpers';
 import { getCollection } from 'astro:content';
 import { routes, buildRoute } from '../../config/routes';
@@ -27,7 +27,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalida
 import { env } from 'cloudflare:workers';
 import DarkHero from '../../components/DarkHero.astro';
 const db = env.DB as D1Database | undefined;
-const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
+const allCrimes = await getCrimesWithFallback(db);
 
 const now = new Date();
 const currentYear = now.getFullYear();

@@ -7,7 +7,7 @@
 import Layout from '../../layouts/Layout.astro';
 import SiteNotificationBanner from '../../components/SiteNotificationBanner.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
-import { getTrinidadCrimes, getAllCrimesFromD1, generateNameSlug, type Crime } from '../../lib/crimeData';
+import { getCrimesWithFallback, generateNameSlug, type Crime } from '../../lib/crimeData';
 import { getHotAreas } from '../../lib/trendingHelpers';
 import { countCrimeType } from '../../lib/dashboardHelpers';
 import { usesVictimCount, crimeHasVictims } from '../../config/crimeTypeConfig';
@@ -23,10 +23,10 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalida
 import { env } from 'cloudflare:workers';
 import DarkHero from '../../components/DarkHero.astro';
 const db = env.DB as D1Database | undefined;
-const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
+const allCrimes = await getCrimesWithFallback(db);
 
 const availableYears = [...new Set(allCrimes.map(c => c.year))].sort((a, b) => b - a);
-const currentYear = availableYears[0];
+const currentYear = availableYears[0] ?? new Date().getFullYear();
 
 // Filter data
 const areas = [...new Set(allCrimes.map(c => c.area).filter(Boolean))].sort();

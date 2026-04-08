@@ -9,7 +9,7 @@ import Layout from '../../../layouts/Layout.astro';
 import TipCard from '../../../components/TipCard.astro';
 import SocialProofStrip from '../../../components/SocialProofStrip.astro';
 import TipVote from '../../../components/TipVote.astro';
-import { getTrinidadCrimes, getAllCrimesFromD1 } from '../../../lib/crimeData';
+import { getCrimesWithFallback } from '../../../lib/crimeData';
 import { routes, buildRoute } from '../../../config/routes';
 import { PUBLIC_SAFETY_TIPS_GAS_URL } from 'astro:env/client';
 import { env } from 'cloudflare:workers';
@@ -48,10 +48,10 @@ const categoryToCrimeTypes: Record<string, string[]> = {
 const matchingTypes = categoryToCrimeTypes[tip.data.category] ?? [];
 const hasManualIds = tip.data.related_story_ids.length > 0;
 
-let relatedCrimes: Awaited<ReturnType<typeof getTrinidadCrimes>> = [];
+let relatedCrimes: Awaited<ReturnType<typeof getCrimesWithFallback>> = [];
 if (hasManualIds || matchingTypes.length > 0) {
   const db = env.DB as D1Database | undefined;
-  const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
+  const allCrimes = await getCrimesWithFallback(db);
 
   if (hasManualIds) {
     // Editorial override: exact story IDs

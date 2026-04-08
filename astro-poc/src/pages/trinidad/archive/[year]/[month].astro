@@ -12,7 +12,7 @@ import SocialProofStrip from '../../../../components/SocialProofStrip.astro';
 import SiteNotificationBanner from '../../../../components/SiteNotificationBanner.astro';
 import QuickInsightsCard from '../../../../components/QuickInsightsCard.astro';
 // import CrimeDetailModal from '../../../../components/CrimeDetailModal.astro';
-import { getTrinidadCrimes, getAllCrimesFromD1, getCrimesByMonthFromD1, type Crime } from '../../../../lib/crimeData';
+import { getCrimesWithFallback, getCrimesByMonthFromD1, type Crime } from '../../../../lib/crimeData';
 import { dataUpdateNotice } from '../../../../config/siteNotifications';
 import { getCountryName } from '../../../../data/countries';
 import { routes, buildRoute } from '../../../../config/routes';
@@ -31,12 +31,10 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalida
 
 import { env } from 'cloudflare:workers';
 const db = env.DB as D1Database | undefined;
-const [crimes, allCrimes] = db
-  ? await Promise.all([getCrimesByMonthFromD1(db, year, month), getAllCrimesFromD1(db)])
-  : await (async () => {
-      const all = await getTrinidadCrimes();
-      return [all.filter(c => c.year === year && c.month === month), all] as [Crime[], Crime[]];
-    })();
+const allCrimes = await getCrimesWithFallback(db);
+const crimes: Crime[] = db
+  ? await getCrimesByMonthFromD1(db, year, month).catch(() => allCrimes.filter(c => c.year === year && c.month === month))
+  : allCrimes.filter(c => c.year === year && c.month === month);
 
 if (crimes.length === 0) {
   return Astro.redirect('/404/', 302);

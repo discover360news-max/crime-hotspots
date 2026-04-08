@@ -10,7 +10,7 @@ import Layout from '../../layouts/Layout.astro';
 import GradientStatCard from '../../components/GradientStatCard.astro';
 import NewsletterSignup from '../../components/NewsletterSignup.astro';
 import SocialProofStrip from '../../components/SocialProofStrip.astro';
-import { getTrinidadCrimes, getAllCrimesFromD1, generateNameSlug } from '../../lib/crimeData';
+import { getCrimesWithFallback, generateNameSlug } from '../../lib/crimeData';
 import { loadFullAreaData } from '../../lib/areaAliases';
 import { getRiskWeight } from '../../config/riskWeights';
 import { usesVictimCount } from '../../config/crimeTypeConfig';
@@ -23,7 +23,7 @@ Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalida
 import { env } from 'cloudflare:workers';
 import DarkHero from '../../components/DarkHero.astro';
 const db = env.DB as D1Database | undefined;
-const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
+const allCrimes = await getCrimesWithFallback(db);
 const areaData = await loadFullAreaData();
 
 // Calculate 90-day cutoff for recent crime counts
