@@ -264,12 +264,12 @@ export function initializeLeafletMap(
     addExpandControl(map, containerId);
 
     // Add CARTO tiles — swap between light/dark based on theme
-    const cartoLight = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-    const cartoDark  = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    const cartoLight = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    const cartoDark  = 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png';
     const isDark = () => document.documentElement.classList.contains('dark');
 
     const tileLayer = L.tileLayer(isDark() ? cartoDark : cartoLight, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://stadiamaps.com/">Stadia Maps</a>',
       subdomains: 'abcd',
       maxZoom: 18
     }).addTo(map);

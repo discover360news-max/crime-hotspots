@@ -117,8 +117,8 @@ const ogImagePath = '/og-images/murder-count.png';
 const pageUrl = 'https://crimehotspots.com/trinidad/murder-count/';
 const shareText = `Trinidad Murder Count ${selectedYear}: ${murderCount} murders${isCurrentYear ? ' so far' : ''}. Track live statistics at Crime Hotspots.`;
 const title = isCurrentYear
-  ? `Trinidad Murder Toll ${selectedYear}: ${murderCount} Murders — Live Count | Crime Hotspots`
-  : `Trinidad Murder Toll ${selectedYear}: ${murderCount} Murders (Final) | Crime Hotspots`;
+  ? `${murderCount} Murders in Trinidad ${selectedYear} — Live Toll, Rate & Monthly Breakdown | Crime Hotspots`
+  : `${murderCount} Murders in Trinidad ${selectedYear} (Final) — Toll, Rate & Breakdown | Crime Hotspots`;
 const description = isCurrentYear
   ? `${murderCount} murders recorded in Trinidad & Tobago in ${selectedYear}. Murder rate: ${currentMurderRate} per 100k — projected ${projectedMurderRate} per 100k by year end. Breakdown by month, area, and crime type. Updated daily.`
   : `${murderCount} murders recorded in Trinidad & Tobago in ${selectedYear}. Murder rate: ${currentMurderRate} per 100,000 population. Full breakdown by month, area, and crime type.`;
@@ -182,8 +182,8 @@ const faqData = {
       <!-- H1 — keyword-bearing, dynamic count, matches <title> tag -->
       <h1 class="text-2xl sm:text-3xl font-black text-white text-center mb-3 leading-tight">
         {isCurrentYear
-          ? `Trinidad Murder Count ${selectedYear}: ${murderCount} Murders So Far`
-          : `Trinidad Murder Count ${selectedYear}: ${murderCount} Murders (Final)`}
+          ? `${murderCount} Murders in Trinidad & Tobago ${selectedYear} — Updated Today`
+          : `${murderCount} Murders in Trinidad & Tobago ${selectedYear} (Final)`}
       </h1>
       <p class="text-slate-400 text-sm text-center mb-8">
         {isCurrentYear

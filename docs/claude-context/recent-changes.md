@@ -8,6 +8,47 @@
 
 ## April 2026
 
+### SEO: murder-count + statistics title/H1 optimisation (Apr 8, 2026)
+
+GSC data showed murder-count at pos 6.2 (5,441 impressions, 8.2% CTR) and statistics at pos 7.01 (5,678 impressions, 4.37% CTR). Leading queries are number-first ("how many murders in trinidad for 2026 today", "trinidad murder toll 2026"). Titles and H1s updated to lead with the count.
+
+**murder-count.astro:**
+- Title: `{X} Murders in Trinidad {year} — Live Toll, Rate & Monthly Breakdown | Crime Hotspots`
+- H1: `{X} Murders in Trinidad & Tobago {year} — Updated Today`
+- Past-year variants updated to match pattern
+
+**statistics.astro:**
+- Title: `Trinidad Crime Rate {year}: {X} Crimes, {X} Murders — Updated Daily | Crime Hotspots`
+- H1 (DarkHero title prop): `Trinidad Crime Rate {year}: {X} Crimes, {X} Murders`
+- Primary keyword shifted from "Statistics" to "Crime Rate" based on higher-CTR query cluster
+
+### Leaflet map tile layer updates (Apr 8, 2026)
+
+- Light mode: CARTO Positron → **CARTO Voyager** (more colour, roads/parks visible)
+- Dark mode: CARTO Dark Matter → **Stadia Alidade Smooth Dark** (dark base with blue water, green parks)
+- Attribution banner: globally dark pill style (dark charcoal, 8px, no box shadow) — moved from scoped `CrimeLocationMap.astro` to `dashboard.css` so it applies to all map instances including the dashboard
+
+---
+
+### T&T Safety Tips batch — TIP-00114 to TIP-00117 + 9 story attachments (Apr 7, 2026)
+
+**New tips:**
+- **NEW TIP TIP-00114** — Recognising Workplace Isolation as an Extortion Setup (Extortion / At Work)
+- **NEW TIP TIP-00115** — Securing a Home-Based Business Against Armed Invasion (Home Invasion / At Home)
+- **NEW TIP TIP-00116** — Responding to Gunfire at Outdoor Community Gatherings (Shooting / At an Event)
+- **NEW TIP TIP-00117** — Reducing Exposure to Pre-Dawn Targeted Shootings at Home (Shooting / At Home)
+
+**Stories attached to existing tips:**
+- Story 766 → TIP-00067 (Late-Night Bar Escalation)
+- Stories 771, 777, 778 → TIP-00064 (Concealing Jewellery Walking in Public)
+- Story 773 → TIP-00084 (Employee Safety During Armed Retail Raid)
+- Story 774 → TIP-00085 (Chase-and-Overpower Robbery)
+- Story 776 → TIP-00104 (Armed Robbery at a Bar)
+- Story 779 → TIP-00006 (High-Traffic Shopping Awareness)
+- Story 786 → TIP-00080 (Complying Safely During Armed Carjacking)
+
+---
+
 ### Jamaica tips batch 1 — JM-TIP-00001 to JM-TIP-00009 (Apr 5, 2026)
 
 - **NEW JM TIP JM-TIP-00001** — Securing Your Licensed Firearm During Disputes (Shooting / At Home)

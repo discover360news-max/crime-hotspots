@@ -3,7 +3,7 @@
 > **Purpose:** Overlap check before creating or updating a tip. Scan the relevant category section first. If a title is ambiguous, open the file for detail — do not read all files.
 >
 > **Files:** `astro-poc/src/content/tips/tip-XXXXX-[slug].md`
-> **Last updated:** 2026-04-03 | **Total:** 113 tips | **Last:** TIP-00113
+> **Last updated:** 2026-04-07 | **Total:** 117 tips | **Last:** TIP-00117
 
 ---
 
@@ -32,7 +32,7 @@
 | TIP-00040 | At Home | Never Exit Your Home Based on an Unverified Claim | 492 |
 | TIP-00041 | In Your Car | Bystander Safety During Road Confrontations and Gunfire | 494 |
 | TIP-00048 | At Work | Staying Safe During Roadside Enforcement Duties | 515 |
-| TIP-00067 | At a Bar | Avoiding Dangerous Escalation at Late-Night Bars | 572 |
+| TIP-00067 | At a Bar | Avoiding Dangerous Escalation at Late-Night Bars | 572, 696, 766 |
 | TIP-00091 | In a Mall | Staying Safe During Unexpected Public Confrontations | 681 |
 | TIP-00106 | Walking Alone | Reducing Exposure to Vehicle-Based Attacks When Walking at Night | 722 |
 | TIP-00109 | In Your Car | Recognising Erratic Behaviour as an Attack Setup | 736 |
@@ -79,7 +79,7 @@
 | TIP-00029 | In Your Car | Dual-Flank Vehicle Approach Awareness | 474 |
 | TIP-00044 | At Home | Vary Your Morning Departure to Avoid Ambush | 506 |
 | TIP-00059 | In Your Car | Recognising Escalation Inside a Shared Vehicle | 540, 674 |
-| TIP-00080 | In Your Car | Complying Safely During an Armed Carjacking | 629 |
+| TIP-00080 | In Your Car | Complying Safely During an Armed Carjacking | 629, 786 |
 | TIP-00101 | In Your Car | Recognising Coordinated Passenger Robbery in Taxis | 712, 737 |
 
 ---
@@ -93,12 +93,13 @@
 
 ---
 
-### Extortion (2)
+### Extortion (3)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
 | TIP-00055 | Other | Responding to Extortion and Threatening Demands | 586, 592 |
 | TIP-00078 | At Home | Protecting Your Residence When Arson Is Threatened | 621 |
+| TIP-00114 | At Work | Recognising Workplace Isolation as an Extortion Setup | 770 |
 
 > **Note:** TIP-00078 is specifically for arson threats tied to a **property dispute**. Unprovoked residential fire attacks → TIP-00088 (Other / At Home).
 
@@ -116,7 +117,7 @@
 
 ---
 
-### Home Invasion (14)
+### Home Invasion (15)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
@@ -135,6 +136,7 @@
 | TIP-00081 | At Home | Vetting Acquaintances Before Granting Home Access | 630 |
 | TIP-00089 | At Home | Responding to Coordinated Multi-Home Armed Invasion | 671 |
 | TIP-00103 | At Home | Reinforcing Structural Weak Points Against Forced Entry | 718 |
+| TIP-00115 | At Home | Securing a Home-Based Business Against Armed Invasion | 775 |
 
 > **Note on similar tips:**
 > - TIP-00036 = bar **cutting** (tools), occupied home, armed robbery. TIP-00086 *(Burglary)* = bar **removal** (prying), empty home, daytime.
@@ -186,7 +188,7 @@
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
 | TIP-00003 | Walking Alone | Situational Awareness While Walking Alone | — |
-| TIP-00006 | In a Mall | High-Traffic Shopping Awareness | — |
+| TIP-00006 | In a Mall | High-Traffic Shopping Awareness | 779 |
 | TIP-00012 | Using Public Transport | Staying Safe on Maxi Taxis and Buses | — |
 | TIP-00015 | At Work | Unpredictable Cash Deposit Routines at Work | — |
 | TIP-00017 | Using Public Transport | Public Transport Cargo Awareness | — |
@@ -202,7 +204,7 @@
 | TIP-00047 | In Your Car | Concealing Valuables Before Exiting Your Vehicle | 514 |
 | TIP-00051 | In Your Car | Armed Window-Smash Robbery on Vehicles Parked at Home | 531 |
 | TIP-00052 | Using Public Transport | Avoiding Jewellery Theft on Public Transport | 532 |
-| TIP-00064 | Walking Alone | Concealing Jewellery When Walking in Public | 551, 587, 616, 617, 628, 719, 735 |
+| TIP-00064 | Walking Alone | Concealing Jewellery When Walking in Public | 551, 587, 616, 617, 628, 719, 735, 771, 777, 778 |
 | TIP-00066 | Walking Alone | Reducing Snatch-Theft Risk While Waiting for Transport | 570 |
 | TIP-00070 | At Work | Protecting Open Religious and Community Premises | 584 |
 | TIP-00071 | Walking Alone | Reducing Ambush Risk on Residential Lanes | 585, 738, 757 |
@@ -210,14 +212,14 @@
 | TIP-00075 | Using Public Transport | Protecting Shift Workers at Isolated Transport Stops | 597 |
 | TIP-00076 | Using Public Transport | Armed Robbery Along Transit Corridors at Night | 614 |
 | TIP-00082 | At a Bar | Concealing Jewellery at Late-Night Bar Exits | 634 |
-| TIP-00084 | At Work | Employee Safety During an Armed Retail Raid | 637 |
-| TIP-00085 | Walking Alone | Protecting Yourself in a Chase-and-Overpower Robbery | 639 |
+| TIP-00084 | At Work | Employee Safety During an Armed Retail Raid | 637, 723, 773 |
+| TIP-00085 | Walking Alone | Protecting Yourself in a Chase-and-Overpower Robbery | 639, 774 |
 | TIP-00087 | At Work | Avoiding Ambush on Unverified Business Field Visits | 669 |
 | TIP-00094 | In a Mall | Never Leave Devices Unattended at Public Counters | 684 |
 | TIP-00098 | In Your Car | Passenger Safety Protocols for Private Hire Drivers | 699 |
 | TIP-00099 | At a Hotel | Never Invite Strangers Into Short-Term Rental Accommodation | 700 |
 | TIP-00102 | Other | Avoiding Robbery From Dating App Meetup Lures | 713 |
-| TIP-00104 | At a Bar | Protecting Yourself During an Armed Robbery at a Bar | 720 |
+| TIP-00104 | At a Bar | Protecting Yourself During an Armed Robbery at a Bar | 720, 776 |
 | TIP-00110 | At a Bar | Securing Your Belongings When Leaving Your Seat at a Bar | 739 |
 | TIP-00111 | In Your Car | Protecting Yourself During Roadside Vehicle Sales | 742 |
 | TIP-00112 | Other | Reporting Robbery by a Person in Authority | 743 |
@@ -235,7 +237,7 @@
 
 ---
 
-### Shooting (7)
+### Shooting (9)
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
@@ -246,6 +248,8 @@
 | TIP-00079 | Walking Alone | Reducing Risk When You May Be a Drive-By Target | 627 |
 | TIP-00083 | Walking Alone | Limiting Outdoor Exposure in Residential Areas After Dark | 636 |
 | TIP-00097 | At Home | Reporting Suspicious Individuals in Your Residential Building | 697 |
+| TIP-00116 | At an Event | Responding to Gunfire at Outdoor Community Gatherings | 783 |
+| TIP-00117 | At Home | Reducing Exposure to Pre-Dawn Targeted Shootings at Home | 785 |
 
 ---
 
@@ -329,6 +333,19 @@
 | | | | | | | 757 | TIP-00071 |
 | | | | | | | 761 | TIP-00009 |
 | | | | | | | 762 | TIP-00090 |
+| | | | | | | 766 | TIP-00067 |
+| | | | | | | 770 | TIP-00114 |
+| | | | | | | 771 | TIP-00064 |
+| | | | | | | 773 | TIP-00084 |
+| | | | | | | 774 | TIP-00085 |
+| | | | | | | 775 | TIP-00115 |
+| | | | | | | 776 | TIP-00104 |
+| | | | | | | 777 | TIP-00064 |
+| | | | | | | 778 | TIP-00064 |
+| | | | | | | 779 | TIP-00006 |
+| | | | | | | 783 | TIP-00116 |
+| | | | | | | 785 | TIP-00117 |
+| | | | | | | 786 | TIP-00080 |
 | | | | | | | 1024 | TIP-00026 |
 | | | | | | | 1267 | TIP-00026 |
 

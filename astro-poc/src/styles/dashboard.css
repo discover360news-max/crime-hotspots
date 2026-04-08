@@ -76,6 +76,21 @@
   border-radius: 6px;
 }
 
+/* Attribution banner — compact dark pill on all maps */
+.leaflet-control-attribution {
+  font-size: 8px !important;
+  padding: 1px 5px !important;
+  line-height: 1.4;
+  background: hsl(0 0% 8% / 0.82) !important;
+  color: hsl(0 0% 55%) !important;
+  border-radius: 4px 0 0 0;
+  box-shadow: none !important;
+}
+
+.leaflet-control-attribution a {
+  color: hsl(0 0% 70%) !important;
+}
+
 /* Dark mode Leaflet controls (need !important to override Leaflet's .leaflet-bar styles) */
 :root.dark .leaflet-control-expand {
   background: hsl(0 0% 10%) !important;

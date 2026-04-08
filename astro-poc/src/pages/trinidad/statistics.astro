@@ -175,7 +175,7 @@ const totalCrimeRateProjected = ((totalCrimesProjected / POPULATION) * 100000).t
 const ogImagePath = '/og-images/statistics.png';
 
 // SEO
-const title = `Trinidad Crime Statistics ${currentYear}: ${total2026YTD} Crimes, ${murderCount} Murders | Crime Hotspots`;
+const title = `Trinidad Crime Rate ${currentYear}: ${total2026YTD} Crimes, ${murderCount} Murders — Updated Daily | Crime Hotspots`;
 const description = `Trinidad & Tobago ${currentYear}: ${total2026YTD} crimes — ${murderCount} murders (${murderRateProjected}/100k projected), ${robberyCount} robberies, ${shootingCount} shootings. Compare to ${previousYear}: ${murderRatePrevious}/100k. Updated daily.`;
 const canonicalUrl = "https://crimehotspots.com/trinidad/statistics/";
 
@@ -285,7 +285,7 @@ const breadcrumbData = {
 <Layout title={title} description={description} ogImage={`https://crimehotspots.com${ogImagePath}`}>
 
   <DarkHero
-    title={`Trinidad & Tobago Crime Statistics ${currentYear}`}
+    title={`Trinidad Crime Rate ${currentYear}: ${total2026YTD} Crimes, ${murderCount} Murders`}
     subtitle="Real-time crime statistics for Trinidad & Tobago. Updated daily from verified news sources."
     breadcrumbs={[
       { label: 'Home', href: '/' },
