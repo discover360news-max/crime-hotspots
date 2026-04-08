@@ -25,7 +25,7 @@ GSC data showed murder-count at pos 6.2 (5,441 impressions, 8.2% CTR) and statis
 ### Leaflet map tile layer updates (Apr 8, 2026)
 
 - Light mode: CARTO Positron → **CARTO Voyager** (more colour, roads/parks visible)
-- Dark mode: CARTO Dark Matter → **Stadia Alidade Smooth Dark** (dark base with blue water, green parks)
+- Dark mode: Stadia Alidade Smooth Dark dropped in favour of **CSS filter inversion** on CARTO Voyager — `invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)` applied to `.leaflet-tile-pane` in `dashboard.css`. Single tile source, no third-party account or usage limits.
 - Attribution banner: globally dark pill style (dark charcoal, 8px, no box shadow) — moved from scoped `CrimeLocationMap.astro` to `dashboard.css` so it applies to all map instances including the dashboard
 
 ---

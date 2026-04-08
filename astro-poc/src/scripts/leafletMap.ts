@@ -263,22 +263,13 @@ export function initializeLeafletMap(
     // Add expand/collapse control
     addExpandControl(map, containerId);
 
-    // Add CARTO tiles — swap between light/dark based on theme
-    const cartoLight = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-    const cartoDark  = 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png';
-    const isDark = () => document.documentElement.classList.contains('dark');
-
-    const tileLayer = L.tileLayer(isDark() ? cartoDark : cartoLight, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a> &copy; <a href="https://stadiamaps.com/">Stadia Maps</a>',
+    // CARTO Voyager tiles — single source for both light and dark.
+    // Dark mode inversion is handled via CSS filter on .leaflet-tile-pane in dashboard.css
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd',
       maxZoom: 18
     }).addTo(map);
-
-    // Watch for theme changes and swap tile URL reactively
-    const themeObserver = new MutationObserver(() => {
-      tileLayer.setUrl(isDark() ? cartoDark : cartoLight);
-    });
-    themeObserver.observe(document.documentElement, { attributeFilter: ['class'] });
 
     // Create marker cluster group
     const markers = L.markerClusterGroup({
