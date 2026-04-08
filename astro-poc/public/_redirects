@@ -28,6 +28,11 @@
 /trinidad/archive/2027 /trinidad/archive/ 301
 
 
+# /index and /index.html — /*.html catch-all sends /index.html → /index (not a real page)
+# Must be BEFORE the /*.html catch-all to take precedence
+/index / 301
+/index.html / 301
+
 # Email protection (Cloudflare artifact)
 /cdn-cgi/l/email-protection / 301
 
