@@ -7,7 +7,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "astro": "astro"
+    "astro": "astro",
+    "seed:local": "node scripts/seed-local-d1.js",
+    "seed:local:tt": "node scripts/seed-local-d1.js tt",
+    "seed:local:jm": "node scripts/seed-local-d1.js jm"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.1.3",
@@ -26,6 +29,7 @@
     "@astrojs/check": "latest",
     "@cloudflare/workers-types": "^4.20260317.1",
     "@types/papaparse": "^5.5.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.81.0"
   }
 }

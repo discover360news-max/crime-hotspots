@@ -71,6 +71,7 @@ export const buildRoute = {
   mp: (nameSlug: string) => `/trinidad/mp/${nameSlug}/`,
   jamaicaMp:                (nameSlug: string) => `/jamaica/mp/${nameSlug}/`,
   jamaicaParish:            (slug: string)     => `/jamaica/parish/${slug}/`,
+  jamaicaArea:              (slug: string)     => `/jamaica/area/${slug}/`,
   jamaicaCrime:             (slug: string)     => `/jamaica/crime/${slug}/`,
   jamaicaArchive:           (year: number, month?: string) =>
     month ? `/jamaica/archive/${year}/${month}/` : `/jamaica/archive/${year}/`,

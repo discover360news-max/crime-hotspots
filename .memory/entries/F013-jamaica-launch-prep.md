@@ -1,6 +1,6 @@
 # F013 — Jamaica Launch Preparation
 
-**Status:** In Progress — Foundation complete, pipeline pending
+**Status:** In Progress — Phase D underway (parish/area pages live, tips content pending)
 **Target date:** July 4, 2026 (108 days from Mar 17, 2026)
 
 ---
@@ -15,7 +15,7 @@
 | 4. Jamaica D1 + sync worker | Claude | **DONE** | DB: crime-hotspots-jamaica-db (78bcc398). Schema applied. 30 rows synced. Daily cron live. |
 | 5. Uncomment TODO in statistics + murder-count | Claude | **DONE** | Both pages wired to JM_DB. noindex flipped false. Live Apr 5 2026. |
 | 6. Wire headlines + dashboard to Jamaica D1 | Claude | **DONE** | C2–C4 complete Apr 5 2026 |
-| 7. MP photos upload | Kavell | **IN PROGRESS** | `public/images/mps/jamaica/` — 63 MPs |
+| 7. MP photos upload | Kavell | **DONE** | Photos uploaded to `public/images/mps/jamaica/` |
 | 8. Homepage card → live link | Claude | **DEFERRED** | Remove opacity/disabled, swap badge to "LIVE", move card above Guyana/Barbados |
 
 ---
@@ -60,10 +60,10 @@
 
 | Task | Owner | Notes |
 |------|-------|-------|
-| D1. MP photos | Kavell | Upload to `public/images/mps/jamaica/filename.jpg`; set `photo: "jamaica/filename.jpg"` in mps-jamaica.json |
-| D2. Parishes detail pages | Claude | `/jamaica/parish/[slug]` — T&T region page equivalent; MPs card uses `parishSlugs` |
-| D3. Area detail pages | Claude | `/jamaica/area/[slug]` — risk score, crime breakdown, safety context |
-| D4. Jamaica-specific safety tips | Kavell + Claude | **ENGINE DONE Apr 5 2026.** `tipsJamaica` collection, 6 pages, JamaicaTipCard/CompactTipCard, routes, helpers, workflow docs. Tip content pending — Kavell supplies stories, Claude creates JM-TIP-XXXXX files using SAFETY-TIP-WORKFLOW-JAMAICA.md (cross-references T&T first). |
+| D1. MP photos | Kavell | **DONE** Apr 8 2026 — Photos uploaded to `public/images/mps/jamaica/` |
+| D2. Parishes detail pages | Claude | **DONE** Apr 8 2026 — `/jamaica/parish/[slug]` SSR+CDN. `loadFullJamaicaAreaData()` resolves slug via `Parish` CSV column. Area ranking, crime breakdown, headlines accordion, MPSidebar (`mpBasePath="/jamaica/mp/"`, JLP/PNP colours). Beta banner. Parishes listing wired up (cards now link). |
+| D3. Area detail pages | Claude | **DONE** Apr 8 2026 — `/jamaica/area/[slug]` SSR+CDN. AreaNarrative, SafetyContext, FeedbackToggle, related areas (same parish + cross-parish). No compare CTA. Breadcrumb → parish page. `buildRoute.jamaicaArea` added to routes.ts. |
+| D4. Jamaica-specific safety tips | Kavell + Claude | **ENGINE DONE.** `tipsJamaica` collection, 6 pages live. 10 tips in content. Kavell supplies stories → Claude creates `JM-TIP-XXXXX` files. Content batch ready — begin next session. |
 | D5. Homepage Explore tiles | Claude | Add Jamaica equivalent tiles once data is live (2nd row or dynamic country switch) |
 
 ### Phase E — SEO & Infrastructure (Weeks 6–12)
@@ -99,13 +99,13 @@
 | `/jamaica/crime/[slug]` | **Live** — SSR+CDN crime detail | — |
 | `/jamaica/statistics/` | **Live** — full SSR + JM_DB | — |
 | `/jamaica/murder-count/` | **Live** — full SSR + JM_DB | — |
-| `/jamaica/parishes/` | Shell stub | Phase D2 |
+| `/jamaica/parishes/` | **Live** — links to parish detail pages | — |
 | `/jamaica/archive/` | **Live** — SSR index, JM_DB | — |
 | `/jamaica/archive/[year]/[month]` | **Live** — SSR month page, JM_DB | — |
-| `/jamaica/area/[slug]` | Not built | Phase D3 |
-| `/jamaica/parish/[slug]` | Not built | Phase D2 |
+| `/jamaica/area/[slug]` | **Live** — SSR+CDN area detail | — |
+| `/jamaica/parish/[slug]` | **Live** — SSR+CDN parish detail | — |
 | `/jamaica/mp/` | **Live** — 63 MPs | — |
-| `/jamaica/mp/[nameSlug]` | **Live** — 63 profiles | Photos pending (D1) |
+| `/jamaica/mp/[nameSlug]` | **Live** — 63 profiles + photos | — |
 
 ---
 
@@ -168,3 +168,8 @@
 | Apr 5, 2026 | Phase C5 complete. `/jamaica/archive/` (SSR index) + `/jamaica/archive/[year]/[month]` (SSR month page). `buildRoute.jamaicaCrime(slug)` and `buildRoute.jamaicaArchive(year, month?)` added to routes.ts. Beta banners on both pages. |
 | Apr 5, 2026 | Phase D4 engine complete. `tipsJamaica` collection, 6 safety tips pages, JamaicaTipCard/CompactTipCard components, routes, safetyTipsHelpersJamaica.ts, workflow + index docs. Crime detail page wired. Tip content pending. |
 | Apr 5, 2026 | Phase C6 complete. `/api/search/` extended: JM_DB crimes_fts + region LIKE queries run in parallel with T&T. Jamaica crimes get `meta: 'Crime incident · Jamaica'`. Parish results use new `type: 'parish'` (green badge, "Parish" label). SearchModal placeholder + footer updated to mention parishes. |
+| Apr 8, 2026 | Local D1 debug: fixed `availableYears[0] ?? new Date().getFullYear()` in dashboard.astro + headlines.astro — empty local D1 was setting `__dashboardDefaultYear = "undefined"` causing client to fetch `?year=undefined` → 400. |
+| Apr 8, 2026 | `scripts/seed-local-d1.js` added + `npm run seed:local/tt/jm` scripts. Pulls remote D1 rows in 500-row batches → INSERT OR IGNORE SQL → local D1. Re-run after `.wrangler/state/` wipe. |
+| Apr 8, 2026 | Phase D1 complete. MP photos uploaded (`public/images/mps/jamaica/`). |
+| Apr 8, 2026 | Phase D2 complete. `/jamaica/parish/[slug]` SSR+CDN. `loadFullJamaicaAreaData()` added to areaAliases.ts (fetches Jamaica CSV, maps `Parish` column → `region`). `buildRoute.jamaicaArea` added to routes.ts. MPSidebar gets `mpBasePath` prop + JLP/PNP party badge colours. Parishes listing wired to parish detail pages. |
+| Apr 8, 2026 | Phase D3 complete. `/jamaica/area/[slug]` SSR+CDN. `AreaNarrative.compareUrl` made optional (omitted for Jamaica — no compare page). Breadcrumb → parish page. Related areas: same-parish + cross-parish. |

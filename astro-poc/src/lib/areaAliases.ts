@@ -12,7 +12,7 @@
  */
 
 import { parseFullCSV, stripQuotes } from './csvParser';
-import { REGION_DATA_CSV_URL, REGION_POPULATION_CSV_URL } from '../config/csvUrls';
+import { REGION_DATA_CSV_URL, REGION_POPULATION_CSV_URL, JAMAICA_REGION_DATA_CSV_URL } from '../config/csvUrls';
 
 export interface AreaInfo {
   area: string;
@@ -174,16 +174,17 @@ export async function loadFullAreaData(): Promise<AreaInfo[]> {
 }
 
 /**
- * Parses CSV text and returns full AreaInfo array
+ * Parses CSV text and returns full AreaInfo array.
+ * @param regionColumn - Column name to use as the `region` field (default: 'Region'; use 'Parish' for Jamaica CSV)
  */
-export function parseFullAreaData(csvText: string): AreaInfo[] {
+export function parseFullAreaData(csvText: string, regionColumn: string = 'Region'): AreaInfo[] {
   const rows = parseFullCSV(csvText);
   if (rows.length < 2) return [];
 
   const headers = rows[0].map((h) => stripQuotes(h));
 
   const areaIndex = headers.indexOf('Area');
-  const regionIndex = headers.indexOf('Region');
+  const regionIndex = headers.indexOf(regionColumn);
   const divisionIndex = headers.indexOf('Division');
   const knownAsIndex = headers.indexOf('known_as');
 
@@ -213,4 +214,34 @@ export function parseFullAreaData(csvText: string): AreaInfo[] {
   }
 
   return areas;
+}
+
+// ============================================================================
+// JAMAICA FULL AREA DATA
+// ============================================================================
+
+let cachedJamaicaAreaData: AreaInfo[] | null = null;
+
+/**
+ * Fetches and parses the Jamaica RegionData CSV.
+ * Maps the `Parish` column to the `region` field so the same AreaInfo interface
+ * is used downstream (parish pages, area pages).
+ */
+export async function loadFullJamaicaAreaData(): Promise<AreaInfo[]> {
+  if (cachedJamaicaAreaData !== null) return cachedJamaicaAreaData;
+
+  try {
+    const response = await fetch(JAMAICA_REGION_DATA_CSV_URL);
+    if (!response.ok) {
+      console.error('Failed to fetch Jamaica RegionData CSV:', response.statusText);
+      return [];
+    }
+
+    const csvText = await response.text();
+    cachedJamaicaAreaData = parseFullAreaData(csvText, 'Parish');
+    return cachedJamaicaAreaData;
+  } catch (error) {
+    console.error('Error loading Jamaica area data:', error);
+    return [];
+  }
 }

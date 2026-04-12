@@ -2,7 +2,7 @@
 
 **Purpose:** Holistic view of every active feature on crimehotspots.com. Check this to understand what the site does before making changes.
 
-**Last Updated:** April 5, 2026 (Jamaica safety tips engine — 6 pages, tipsJamaica collection, JamaicaTipCard/JamaicaCompactTipCard, routes, helpers)
+**Last Updated:** April 8, 2026 (Jamaica parish + area pages live — D2/D3 complete)
 
 ---
 
@@ -31,7 +31,9 @@
 | Dashboard | `/jamaica/dashboard/` | **SSR + CDN cache** | Full live dashboard. Dark hero + this-week pulse + vitals row (4 GradientStatCards) + crime breakdown scroll + top parishes bar chart (inline, no links — parish pages Phase D2) + QuickInsightsCard + newsletter + related resources. Reads `env.JM_DB`. Beta banner (server-side, auto-expires Jul 4 2026). |
 | Headlines | `/jamaica/headlines/` | **SSR + CDN cache** | Full live headlines. Dark hero + type chips + date accordions + filter tray (parish/area/type/date) + Load More + sidebar murder count card + newsletter. Reads `env.JM_DB`. Crime cards link to `/jamaica/crime/[slug]/`. `window.__hlData.crimePath = '/jamaica/crime/'` passed to `headlinesPage.ts`. Beta banner. |
 | Crime Detail | `/jamaica/crime/[slug]` | **SSR + CDN 24h** | Individual crime pages. Crime type chips + headline + byline + CrimeLocationMap + article body + report issue + SafetyContext + safety tips + share buttons + RelatedCrimes (crimePath prop) + prev/next nav. Jamaica aliases from baked JSON. NewsArticle JSON-LD (addressCountry: JM). No TrendingHotspots (T&T-hardcoded routes). |
-| Parishes | `/jamaica/parishes/` | Pre-rendered | Browse by parish — stub |
+| Parishes | `/jamaica/parishes/` | Pre-rendered | Browse all 14 parishes — cards link to parish detail pages |
+| Parish Detail | `/jamaica/parish/[slug]` | **SSR + CDN cache** | Parish-level aggregate stats. `loadFullJamaicaAreaData()` maps `Parish` CSV column → `region`. Vitals row (Incidents 90d/slate, Murders YTD/crimson, Avg Risk Score/amber, Most Active Area/violet), area ranking grid, crime breakdown YoY table, headlines accordion, MPSidebar (`mpBasePath="/jamaica/mp/"`, JLP/PNP party badge colours). Beta banner. |
+| Area Detail | `/jamaica/area/[slug]` | **SSR + CDN cache** | Area-level crime stats. AreaNarrative, SafetyContext, FeedbackToggle, crime breakdown table, headlines accordion, related areas (same parish + cross-parish), MPSidebar. No compare CTA (no Jamaica compare page). Breadcrumb → parish page via `buildRoute.jamaicaParish`. Beta banner. |
 | Statistics | `/jamaica/statistics/` | **SSR + CDN cache** | Full statistics page (T&T parity). Dataset + FAQPage (4 Q&As) + BreadcrumbList JSON-LD. Population 2.8M, "parishes" language. Dynamic years. Wired to `env.JM_DB`. Beta banner. |
 | Murder Count | `/jamaica/murder-count/` | **SSR + CDN cache** | Full murder count page (T&T parity). FlipCounter, YoY comparison, 3 rate cards. Wired to `env.JM_DB`. Beta banner. |
 | Archive Index | `/jamaica/archive/` | **SSR + CDN cache** | Browse by year. Groups crimes from JM_DB by month, grid of month cards linking to monthly pages. Beta banner. |
@@ -115,9 +117,9 @@
 ### Navigation & Layout
 | Component | Purpose |
 |-----------|---------|
-| Header.astro | Sticky `top-0 z-40` top nav. Sits below the non-sticky utility bar in Layout.astro. Direct links on Trinidad pages, active section indicator. Mobile: `logo-icon.png` (36px square). Ghost Subscribe buttons. ♥ Support → Ko-fi (desktop + hamburger). Mobile menu + subscribe tray are native `<dialog>` elements. **`top-16` references on filter/control bars remain correct** — utility bar is non-sticky so header height is still 64px. |
+| Header.astro | Sticky `top-0 z-40` top nav. Sits below the non-sticky utility bar in Layout.astro. Direct links on Trinidad pages, active section indicator. Mobile: `logo-icon.png` (36px square). Ghost Subscribe buttons. ♥ Support → Ko-fi (desktop + hamburger). Mobile menu + subscribe tray are native `<dialog>` elements. **`top-16` references on filter/control bars remain correct** — utility bar is non-sticky so header height is still 64px. **Subscribe tray order:** Support → Newsletter → Socials. Social items use `p-3` (not `p-4`) to fit above fold on mobile. Inner div has `overflow-y:auto h-full`. |
 | BottomNav.astro | Mobile bottom tab bar (Dashboard, Headlines, Areas, Report, More). Config-driven from `countries.ts`. More menu is a native `<dialog>` bottom sheet. Country indicator strip always visible. |
-| MPSidebar.astro | Sticky right-column sidebar for area + region pages. Sections: share buttons (`.sb-share-btn` pattern), MPs card, Ko-fi card. `showAll=false` (area): 2 MPs + chevron toggle. `showAll=true` (region): all on desktop, mobile toggle. Design rules: `.memory/entries/C004-mpsidebar-design-rules.md`. |
+| MPSidebar.astro | Sticky right-column sidebar for area + region pages. Sections: share buttons (`.sb-share-btn` pattern), MPs card, Ko-fi card. `showAll=false` (area): 2 MPs + chevron toggle. `showAll=true` (region): all on desktop, mobile toggle. `mpBasePath` prop (default `/trinidad/mp/`) — pass `/jamaica/mp/` on Jamaica pages. Party badge colours: PNM (red), UNC (orange), TPP (grey), JLP (green), PNP (orange). Design rules: `.memory/entries/C004-mpsidebar-design-rules.md`. |
 | Breadcrumbs.astro | Breadcrumb navigation for SEO |
 | SectionPickerModal.astro | Homepage island click → section chooser. Sections driven from `countries.ts` |
 | Hero.astro | Full-width gradient hero with CTAs, compact variant, `<slot>` support |

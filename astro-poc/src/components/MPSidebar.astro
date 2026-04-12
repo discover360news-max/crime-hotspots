@@ -28,9 +28,11 @@ interface Props {
   safetyScore?: string;
   /** When true: all MPs shown on desktop, mobile gets a collapse toggle */
   showAll?: boolean;
+  /** Base path for MP profile links. Defaults to /trinidad/mp/. Use /jamaica/mp/ for Jamaica pages. */
+  mpBasePath?: string;
 }
 
-const { mps, regionName, pageUrl, shareText, areaDisplayName, safetyScore, showAll = false } = Astro.props;
+const { mps, regionName, pageUrl, shareText, areaDisplayName, safetyScore, showAll = false, mpBasePath = '/trinidad/mp/' } = Astro.props;
 
 const computedShareText = shareText
   ?? `Crime stats for ${areaDisplayName}, Trinidad \u2014 Risk Level: ${safetyScore}/10. View details at Crime Hotspots.`;
@@ -39,9 +41,13 @@ const visibleMPs = showAll ? mps : mps.slice(0, 2);
 const hiddenMPs  = showAll ? []  : mps.slice(2);
 
 const partyBadgeClass: Record<string, string> = {
+  // T&T
   PNM: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400',
   UNC: 'bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400',
   TPP: 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_65%)]',
+  // Jamaica
+  JLP: 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400',
+  PNP: 'bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-400',
 };
 
 function mpCard(mp: MP) {
@@ -131,7 +137,7 @@ function mpCard(mp: MP) {
             const { displayName, photoSrc, badge } = mpCard(mp);
             return (
               <a
-                href={`/trinidad/mp/${mp.nameSlug}/`}
+                href={`${mpBasePath}${mp.nameSlug}/`}
                 class="flex items-center gap-2.5 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-2.5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm transition group"
               >
                 <div class="shrink-0 w-9 h-9 rounded-md overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
@@ -160,7 +166,7 @@ function mpCard(mp: MP) {
             const { displayName, photoSrc, badge } = mpCard(mp);
             return (
               <a
-                href={`/trinidad/mp/${mp.nameSlug}/`}
+                href={`${mpBasePath}${mp.nameSlug}/`}
                 class="flex items-center gap-2.5 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-2.5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm transition group"
               >
                 <div class="shrink-0 w-9 h-9 rounded-md overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">
@@ -189,7 +195,7 @@ function mpCard(mp: MP) {
                   const { displayName, photoSrc, badge } = mpCard(mp);
                   return (
                     <a
-                      href={`/trinidad/mp/${mp.nameSlug}/`}
+                      href={`${mpBasePath}${mp.nameSlug}/`}
                       class="flex items-center gap-2.5 bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-2.5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-sm transition group"
                     >
                       <div class="shrink-0 w-9 h-9 rounded-md overflow-hidden bg-slate-100 dark:bg-[hsl(0_0%_15%)]">

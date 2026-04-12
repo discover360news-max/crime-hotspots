@@ -11,7 +11,7 @@ import Layout from '../../layouts/Layout.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import Hero from '../../components/Hero.astro';
 import SocialProofStrip from '../../components/SocialProofStrip.astro';
-import { routes } from '../../config/routes';
+import { routes, buildRoute } from '../../config/routes';
 
 const parishes = [
   { name: 'Kingston',       slug: 'kingston',     constituencies: 3,  capital: 'Kingston City' },
@@ -39,7 +39,7 @@ const breadcrumbs = [
 ];
 
 const pageTitle = 'Jamaica Parishes — Crime Statistics by Parish | Crime Hotspots';
-const pageDescription = `Browse crime statistics for all 14 parishes in Jamaica across ${totalConstituencies} parliamentary constituencies. Data available once pipeline is live.`;
+const pageDescription = `Browse crime statistics for all 14 parishes in Jamaica across ${totalConstituencies} parliamentary constituencies. Updated daily.`;
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
@@ -48,8 +48,8 @@ const pageDescription = `Browse crime statistics for all 14 parishes in Jamaica 
     narrowContainer={true}
     title="Parishes of Jamaica"
     subtitle={`${parishes.length} parishes · ${totalConstituencies} constituencies`}
-    badge="Detailed statistics available once data pipeline is live"
-    primaryCTA={{ text: 'View MPs', href: routes.jamaica.mps, icon: 'arrow' }}
+    badge="Crime data updated daily"
+    primaryCTA={{ text: 'View Dashboard', href: routes.jamaica.dashboard, icon: 'arrow' }}
   >
     <Breadcrumbs items={breadcrumbs} slot="before" />
   </Hero>
@@ -60,21 +60,15 @@ const pageDescription = `Browse crime statistics for all 14 parishes in Jamaica 
 
   <main class="max-w-3xl mx-auto px-4 sm:px-6 py-5" data-pagefind-body>
 
-    <!-- Info banner -->
-    <div class="mb-6 flex items-start gap-2.5 p-4 rounded-lg bg-slate-50 dark:bg-[var(--ch-surface)] border border-slate-200 dark:border-[var(--ch-border-card)]">
-      <svg class="w-4 h-4 mt-0.5 shrink-0 text-slate-400 dark:text-[hsl(0_0%_45%)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-      <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)]">
-        Detailed crime statistics per parish will appear here once the Jamaica data pipeline is configured.
-        Individual parish pages are coming in a future update.
-      </p>
-    </div>
-
     <!-- Parish grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {parishes.map((parish, index) => (
-        <div class="block bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-5">
+        <a
+          href={buildRoute.jamaicaParish(parish.slug)}
+          class="block bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] p-5 hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md transition group"
+        >
           <div class="flex items-start justify-between mb-3">
-            <h2 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text-heading)]">
+            <h2 class="text-body font-bold text-slate-800 dark:text-[var(--ch-text-heading)] group-hover:text-rose-600 transition">
               {parish.name}
             </h2>
             <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] font-medium">#{index + 1}</span>
@@ -92,7 +86,7 @@ const pageDescription = `Browse crime statistics for all 14 parishes in Jamaica 
               <div class="text-xs text-slate-400 dark:text-[var(--ch-text-faint)]">Capital</div>
             </div>
           </div>
-        </div>
+        </a>
       ))}
     </div>
 

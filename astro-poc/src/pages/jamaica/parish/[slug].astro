@@ -1,0 +1,407 @@
+---
+/**
+ * Jamaica Parish Detail Page
+ * Aggregate crime statistics for a parish with child area ranking.
+ * Target keywords: "crime in {parish} jamaica", "{parish} crime statistics"
+ */
+
+import Layout from '../../../layouts/Layout.astro';
+import GradientStatCard from '../../../components/GradientStatCard.astro';
+import StatCards from '../../../components/StatCards.astro';
+import DataTable from '../../../components/DataTable.astro';
+import MPSidebar from '../../../components/MPSidebar.astro';
+import SocialProofStrip from '../../../components/SocialProofStrip.astro';
+import DarkHero from '../../../components/DarkHero.astro';
+import { getAllCrimesFromD1, getCrimesByRegionFromD1, generateNameSlug } from '../../../lib/crimeData';
+import { loadFullJamaicaAreaData } from '../../../lib/areaAliases';
+import { calculateAreaCrimeScore } from '../../../lib/safetyHelpers';
+import { countCrimeType } from '../../../lib/dashboardHelpers';
+import {
+  TRACKED_CRIME_TYPES,
+  calculatePercentChange,
+  filterToSamePeriod,
+} from '../../../lib/statisticsHelpers';
+import { escapeHtml } from '../../../lib/escapeHtml';
+import { routes, buildRoute } from '../../../config/routes';
+import mpsJamaicaData from '../../../data/mps-jamaica.json';
+
+const { slug } = Astro.params;
+
+// Resolve slug → parish name
+const areaData = await loadFullJamaicaAreaData();
+const parishes = new Set(areaData.map(a => a.region).filter(r => r));
+const parishName = Array.from(parishes).find(r => generateNameSlug(r) === slug);
+
+if (!parishName) {
+  return Astro.redirect('/jamaica/parishes/', 302);
+}
+
+Astro.response.headers.set('CDN-Cache-Control', 'max-age=82800');
+Astro.response.headers.set('Cache-Control', 'public, max-age=3600, must-revalidate');
+
+import { env } from 'cloudflare:workers';
+const jmDb = env.JM_DB as D1Database | undefined;
+
+if (!jmDb) {
+  return Astro.redirect('/jamaica/parishes/', 302);
+}
+
+const allCrimes = await getAllCrimesFromD1(jmDb);
+const parishCrimes = await getCrimesByRegionFromD1(jmDb, parishName);
+
+// Date ranges
+const currentYear = new Date().getFullYear();
+const previousYear = currentYear - 1;
+const cutoff90d = new Date();
+cutoff90d.setDate(cutoff90d.getDate() - 90);
+const cutoff30d = new Date();
+cutoff30d.setDate(cutoff30d.getDate() - 30);
+
+const recentCrimes90d = parishCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff90d);
+const recentCrimes30d = parishCrimes.filter(c => (c.datePublished ?? c.dateObj) >= cutoff30d);
+
+// Same 90-day window last year (YoY comparison)
+const cutoff90dPrevStart = new Date(cutoff90d);
+cutoff90dPrevStart.setFullYear(cutoff90dPrevStart.getFullYear() - 1);
+const cutoff90dPrevEnd = new Date();
+cutoff90dPrevEnd.setFullYear(cutoff90dPrevEnd.getFullYear() - 1);
+
+const crimesCurrent = parishCrimes.filter(c => c.year === currentYear);
+const crimesPrevious = parishCrimes.filter(c => c.year === previousYear);
+
+const crimesCurrentYTD = filterToSamePeriod(crimesCurrent, currentYear);
+const crimesPreviousYTD = filterToSamePeriod(crimesPrevious, previousYear);
+
+// Helper to build a YoY stat card
+function makeYoYCard(label: string, currentCount: number, previousCount: number) {
+  const yoyChange = calculatePercentChange(previousCount, currentCount);
+  return {
+    label,
+    current: currentCount,
+    previous: previousCount,
+    yoyChange,
+    direction: (currentCount > previousCount ? 'up' : currentCount < previousCount ? 'down' : 'flat') as 'up' | 'down' | 'flat',
+  };
+}
+
+// Average risk score across parish areas
+const parishAreaScores = areaData
+  .filter(a => a.region === parishName)
+  .map(a => calculateAreaCrimeScore(a.area, allCrimes));
+const avgRiskScore = parishAreaScores.length > 0
+  ? parishAreaScores.reduce((sum, s) => sum + s, 0) / parishAreaScores.length
+  : 1;
+
+const lastUpdated = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+// Extra stat cards (only show types with data)
+const extraStatCards = [
+  makeYoYCard('Shootings (YTD)', countCrimeType(crimesCurrentYTD, 'Shooting'), countCrimeType(crimesPreviousYTD, 'Shooting')),
+  makeYoYCard('Assaults (YTD)', countCrimeType(crimesCurrentYTD, 'Assault'), countCrimeType(crimesPreviousYTD, 'Assault')),
+  makeYoYCard('Burglaries (YTD)', countCrimeType(crimesCurrentYTD, 'Burglary'), countCrimeType(crimesPreviousYTD, 'Burglary')),
+  makeYoYCard('Robberies (YTD)', countCrimeType(crimesCurrentYTD, 'Robbery'), countCrimeType(crimesPreviousYTD, 'Robbery')),
+  makeYoYCard('Thefts (YTD)', countCrimeType(crimesCurrentYTD, 'Theft'), countCrimeType(crimesPreviousYTD, 'Theft')),
+  makeYoYCard('Kidnappings (YTD)', countCrimeType(crimesCurrentYTD, 'Kidnapping'), countCrimeType(crimesPreviousYTD, 'Kidnapping')),
+].filter(c => c.current > 0 || c.previous > 0);
+
+// Crime type breakdown
+const crimeTypeBreakdown = TRACKED_CRIME_TYPES.map(type => {
+  const currentCount = countCrimeType(crimesCurrentYTD, type);
+  const previousCount = countCrimeType(crimesPreviousYTD, type);
+  const change = calculatePercentChange(previousCount, currentCount);
+  return {
+    type,
+    currentCount,
+    previousCount,
+    change,
+    direction: change > 0.5 ? 'up' : change < -0.5 ? 'down' : 'same',
+  };
+}).filter(c => c.currentCount > 0 || c.previousCount > 0);
+
+// Area ranking within parish (by 90-day crime count)
+const parishAreas = areaData
+  .filter(a => a.region === parishName)
+  .map(a => {
+    const crimeCount = recentCrimes90d.filter(c => c.area === a.area).length;
+    const score = calculateAreaCrimeScore(a.area, allCrimes);
+    const level = score > 7 ? 'high' : score >= 4 ? 'neutral' : 'low';
+    return {
+      name: a.area,
+      slug: generateNameSlug(a.area),
+      knownAs: a.knownAs,
+      crimeCount,
+      score,
+      level,
+      hasCrimes: allCrimes.some(c => c.area === a.area),
+    };
+  })
+  .sort((a, b) => b.crimeCount - a.crimeCount);
+
+// Recent headlines grouped by date
+const headlinesByDate = new Map<string, typeof parishCrimes>();
+recentCrimes30d.slice(0, 20).forEach(crime => {
+  const dateKey = crime.dateObj.toLocaleDateString('en-JM', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  if (!headlinesByDate.has(dateKey)) headlinesByDate.set(dateKey, []);
+  headlinesByDate.get(dateKey)!.push(crime);
+});
+
+// Jamaica MPs for this parish
+const parishMPs = mpsJamaicaData.filter((mp: any) => mp.parishSlugs?.includes(slug!));
+
+const pageTitle = `${parishName} Parish Crime Statistics ${currentYear} | Crime Hotspots`;
+const pageDescription = `Crime statistics for ${parishName} Parish, Jamaica. ${recentCrimes90d.length} incidents in the last 90 days across ${parishAreas.length} areas. Updated daily.`;
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+
+  <!-- Beta banner -->
+  <div class="w-full bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-900/40 px-4 py-2 text-center">
+    <p class="text-xs text-amber-700 dark:text-amber-400">
+      Jamaica data is in beta. Coverage and accuracy improve daily as the pipeline matures.
+    </p>
+  </div>
+
+  <DarkHero
+    title={`${parishName} Parish`}
+    subtitle={`${parishAreas.length} areas tracked. Crime data updated daily from verified news sources.`}
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Jamaica', href: routes.jamaica.dashboard },
+      { label: 'Parishes', href: routes.jamaica.parishes },
+      { label: parishName },
+    ]}
+    ctas={[
+      { text: 'All Parishes', href: routes.jamaica.parishes, variant: 'primary' },
+      { text: 'View Headlines', href: routes.jamaica.headlines },
+    ]}
+    freshness={`Data as of ${lastUpdated}`}
+  >
+    <Fragment slot="pulse">
+      <strong class="text-white">{recentCrimes90d.length} incidents</strong> in the last 90 days across {parishAreas.length} areas.
+    </Fragment>
+    <SocialProofStrip slot="right" variant="hero" incidentCount={allCrimes.length} />
+  </DarkHero>
+
+  <!-- Vitals Row -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+      <GradientStatCard variant="slate"   value={recentCrimes90d.length}                                     label="Incidents"      sublabel="last 90 days" />
+      <GradientStatCard variant="crimson" value={countCrimeType(crimesCurrentYTD, 'Murder')}                 label="Murders"        sublabel="year to date" />
+      <GradientStatCard variant="amber"   value={Number.isNaN(avgRiskScore) ? '—' : avgRiskScore.toFixed(1)} label="Avg Risk Score" sublabel="out of 10" />
+      <GradientStatCard variant="violet"
+        value={parishAreas[0]?.crimeCount ?? 0}
+        label="Most Active Area"
+        sublabel={parishAreas[0]?.name ?? '—'}
+        href={parishAreas[0]?.hasCrimes ? buildRoute.jamaicaArea(parishAreas[0]?.slug) : undefined}
+      />
+    </div>
+
+    {extraStatCards.length > 0 && (
+      <div class="mt-2">
+        <button
+          id="moreStatsToggle"
+          class="w-full flex items-center justify-center gap-1 py-2 text-xs font-medium text-slate-400 dark:text-[hsl(0_0%_45%)] hover:text-rose-600 dark:hover:text-rose-400 transition cursor-pointer"
+        >
+          <span id="moreStatsLabel">More stats</span>
+          <svg id="moreStatsChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div id="moreStatsContent" class="hidden mt-2">
+          <StatCards stats={extraStatCards} />
+        </div>
+      </div>
+    )}
+  </div>
+
+  <!-- Dark Separator Band -->
+  <div class="w-full bg-slate-900 dark:bg-[hsl(0_0%_5%)] py-4">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6">
+      <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Parish Breakdown</p>
+      <h2 class="text-white font-black text-lg mt-0.5">Areas in {parishName}</h2>
+    </div>
+  </div>
+
+  <!-- Content Zone -->
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+    <div class="lg:grid lg:grid-cols-[1fr_256px] lg:gap-8 lg:items-start">
+
+      <main class="min-w-0" data-pagefind-body>
+
+        <!-- Area Ranking -->
+        <section>
+          {parishAreas.length > 0 ? (
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {parishAreas.map((area, index) => (
+                <a
+                  href={area.hasCrimes ? buildRoute.jamaicaArea(area.slug) : '#'}
+                  class={`block rounded-lg border p-4 transition ${
+                    area.hasCrimes
+                      ? 'bg-white dark:bg-[var(--ch-surface-sub)] border-slate-200 dark:border-[var(--ch-border-card)] hover:border-rose-300 dark:hover:border-rose-700 hover:shadow-md group'
+                      : 'bg-slate-50 dark:bg-[var(--ch-surface)] border-slate-100 dark:border-[var(--ch-border-subtle)] cursor-default'
+                  }`}
+                >
+                  <div class="flex items-start justify-between mb-2">
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] font-medium">#{index + 1}</span>
+                        <h3 class={`text-caption font-bold truncate ${
+                          area.hasCrimes ? 'text-slate-800 dark:text-[var(--ch-text-heading)] group-hover:text-rose-600 transition' : 'text-slate-400 dark:text-[hsl(0_0%_40%)]'
+                        }`}>
+                          {area.name}
+                        </h3>
+                      </div>
+                      {area.knownAs && area.knownAs !== area.name && (
+                        <p class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)] truncate ml-6">Also known as: {area.knownAs}</p>
+                      )}
+                    </div>
+                    <span class={`flex-shrink-0 ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${
+                      area.level === 'low' ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400' :
+                      area.level === 'neutral' ? 'bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-600 dark:text-[hsl(0_0%_65%)]' :
+                      'bg-amber-100 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400'
+                    }`}>
+                      Risk: {area.score.toFixed(1)}
+                    </span>
+                  </div>
+                  <div class="text-xs text-slate-500 dark:text-[var(--ch-text-muted)]">
+                    {area.crimeCount} incident{area.crimeCount !== 1 ? 's' : ''} (90d)
+                  </div>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div class="bg-slate-50 dark:bg-[var(--ch-surface)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-subtle)] p-6 text-center">
+              <p class="text-sm text-slate-500 dark:text-[var(--ch-text-muted)]">No areas on record for {parishName} yet.</p>
+            </div>
+          )}
+        </section>
+
+        <!-- Crime Type Breakdown -->
+        {crimeTypeBreakdown.length > 0 && (
+          <section class="mt-8">
+            <h2 class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">Crime Breakdown (Year-to-Date)</h2>
+            <DataTable headers={['Crime Type', String(currentYear), String(previousYear), 'Change']}>
+              {crimeTypeBreakdown.map(row => (
+                <tr class="hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)]">
+                  <td class="px-4 py-3 text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)]">{row.type}</td>
+                  <td class="px-4 py-3 text-sm text-right text-slate-700 dark:text-[hsl(0_0%_80%)]">{row.currentCount}</td>
+                  <td class="px-4 py-3 text-sm text-right text-slate-500 dark:text-[var(--ch-text-muted)]">{row.previousCount}</td>
+                  <td class={`px-4 py-3 text-sm text-right font-medium ${
+                    row.direction === 'up' ? 'text-rose-600' :
+                    row.direction === 'down' ? 'text-emerald-600' :
+                    'text-slate-400'
+                  }`}>
+                    {row.direction === 'up' ? '↑' : row.direction === 'down' ? '↓' : '→'}
+                    {Math.abs(row.change).toFixed(1)}%
+                  </td>
+                </tr>
+              ))}
+            </DataTable>
+          </section>
+        )}
+
+        <!-- Recent Headlines -->
+        {recentCrimes30d.length > 0 && (
+          <section class="mt-8">
+            <h2 class="text-sm font-bold text-slate-500 dark:text-[var(--ch-text-muted)] mb-4">
+              Recent Headlines
+              <span class="text-xs font-normal text-slate-400 dark:text-[hsl(0_0%_45%)] ml-2">Last 30 days</span>
+            </h2>
+
+            <div class="space-y-2">
+              {Array.from(headlinesByDate.entries()).map(([dateStr, crimes]) => (
+                <div class="bg-white dark:bg-[var(--ch-surface-sub)] rounded-lg border border-slate-200 dark:border-[var(--ch-border-card)] overflow-hidden">
+                  <button
+                    class="accordion-toggle w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition cursor-pointer"
+                    aria-expanded="false"
+                  >
+                    <div class="flex items-center gap-2">
+                      <svg class="accordion-chevron w-4 h-4 text-slate-400 dark:text-[hsl(0_0%_45%)] transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                      <span class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)]">{dateStr}</span>
+                    </div>
+                    <span class="text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">{crimes.length} incident{crimes.length !== 1 ? 's' : ''}</span>
+                  </button>
+
+                  <div class="accordion-content">
+                    <div class="border-t border-slate-100 dark:border-[var(--ch-border-subtle)] px-4 py-3 space-y-3">
+                      {crimes.map(crime => (
+                        <a
+                          href={buildRoute.jamaicaCrime(crime.slug)}
+                          class="block p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-[hsl(0_0%_12%)] transition group"
+                        >
+                          <div class="text-sm font-medium text-slate-700 dark:text-[hsl(0_0%_80%)] group-hover:text-rose-600 transition">
+                            {escapeHtml(crime.headline)}
+                          </div>
+                          <div class="flex items-center gap-2 mt-1 text-xs text-slate-400 dark:text-[hsl(0_0%_45%)]">
+                            <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[hsl(0_0%_15%)] text-slate-500 dark:text-[hsl(0_0%_60%)]">{crime.primaryCrimeType || crime.crimeType}</span>
+                            <span>{escapeHtml(crime.area)}</span>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+
+      <MPSidebar
+        mps={parishMPs}
+        regionName={parishName}
+        pageUrl={`https://crimehotspots.com/jamaica/parish/${slug}/`}
+        shareText={`Crime statistics for ${parishName} Parish, Jamaica. View details at Crime Hotspots.`}
+        showAll={true}
+        mpBasePath="/jamaica/mp/"
+      />
+
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .accordion-content {
+    height: 0;
+    overflow: hidden;
+    transition: height 300ms ease;
+  }
+  .accordion-content.is-open {
+    height: auto;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.accordion-toggle').forEach(button => {
+      button.addEventListener('click', function(this: HTMLElement) {
+        const content = this.nextElementSibling as HTMLElement;
+        const chevron = this.querySelector('.accordion-chevron') as HTMLElement;
+        const isOpen = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', String(!isOpen));
+        if (isOpen) {
+          content.classList.remove('is-open');
+        } else {
+          content.getBoundingClientRect();
+          content.classList.add('is-open');
+        }
+        chevron.style.transform = isOpen ? '' : 'rotate(90deg)';
+      });
+    });
+
+    const moreStatsToggle = document.getElementById('moreStatsToggle');
+    const moreStatsContent = document.getElementById('moreStatsContent');
+    const moreStatsLabel = document.getElementById('moreStatsLabel');
+    const moreStatsChevron = document.getElementById('moreStatsChevron');
+    if (moreStatsToggle && moreStatsContent && moreStatsLabel && moreStatsChevron) {
+      moreStatsToggle.addEventListener('click', () => {
+        const isOpen = !moreStatsContent.classList.contains('hidden');
+        moreStatsContent.classList.toggle('hidden');
+        (moreStatsChevron as HTMLElement).style.transform = isOpen ? '' : 'rotate(180deg)';
+        moreStatsLabel.textContent = isOpen ? 'More stats' : 'Less stats';
+      });
+    }
+  });
+</script>
