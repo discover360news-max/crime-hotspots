@@ -3,7 +3,7 @@
 > **Purpose:** Overlap check before creating or updating a tip. Scan the relevant category section first. If a title is ambiguous, open the file for detail — do not read all files.
 >
 > **Files:** `astro-poc/src/content/tips/tip-XXXXX-[slug].md`
-> **Last updated:** 2026-04-07 | **Total:** 117 tips | **Last:** TIP-00117
+> **Last updated:** 2026-04-12 | **Total:** 122 tips | **Last:** TIP-00122
 
 ---
 
@@ -29,13 +29,14 @@
 | TIP-00018 | At an Event | Crowd Safety and Exit Strategy | — |
 | TIP-00035 | Walking Alone | Recognising Hostile Intent from Known Contacts | 483 |
 | TIP-00039 | At Work | Recognising Dispute-Based Attacks at Your Business | 491 |
-| TIP-00040 | At Home | Never Exit Your Home Based on an Unverified Claim | 492 |
+| TIP-00040 | At Home | Never Exit Your Home Based on an Unverified Claim | 492, 813 |
 | TIP-00041 | In Your Car | Bystander Safety During Road Confrontations and Gunfire | 494 |
 | TIP-00048 | At Work | Staying Safe During Roadside Enforcement Duties | 515 |
 | TIP-00067 | At a Bar | Avoiding Dangerous Escalation at Late-Night Bars | 572, 696, 766 |
 | TIP-00091 | In a Mall | Staying Safe During Unexpected Public Confrontations | 681 |
 | TIP-00106 | Walking Alone | Reducing Exposure to Vehicle-Based Attacks When Walking at Night | 722 |
 | TIP-00109 | In Your Car | Recognising Erratic Behaviour as an Attack Setup | 736 |
+| TIP-00121 | At an Event | De-escalating Disputes in Outdoor Public Spaces | 827 |
 
 ---
 
@@ -58,14 +59,16 @@
 | TIP-00058 | At Work | Securing Your Business Premises Overnight | 539, 672 |
 | TIP-00061 | At Home | Protecting Your Hybrid Vehicle Overnight | 542 |
 | TIP-00063 | At a Hotel | Securing High-Value Items in Hotel Rooms | 550 |
-| TIP-00069 | At Work | Securing Overlooked Entry Points at Work | 582 |
+| TIP-00069 | At Work | Securing Overlooked Entry Points at Work | 582, 828 |
 | TIP-00074 | At Home | Designing Security Lighting Criminals Cannot Map | 594 |
-| TIP-00077 | At Home | Securing Your Property During Extended Absence | 615, 673 |
+| TIP-00077 | At Home | Securing Your Property During Extended Absence | 615, 673, 725, 829 |
 | TIP-00086 | At Home | Securing Burglar-Proofing Against Physical Removal | 668 |
 | TIP-00093 | At Work | Preventing Tool-Assisted Forced Entry to Your Business | 683 |
 | TIP-00095 | At Home | Protecting Parked Vehicles From Parts Theft | 685 |
 | TIP-00096 | At Home | Hardening Residential Door Locks Against Forced Entry | 695 |
 | TIP-00105 | At Home | Protecting Utility Infrastructure on Your Property | 721 |
+| TIP-00118 | In Your Car | Never Leave Devices in an Unattended Vehicle | 794 |
+| TIP-00119 | At Home | Protecting Your Parked Vehicle From Residential Theft | 820, 825 |
 
 ---
 
@@ -79,7 +82,7 @@
 | TIP-00029 | In Your Car | Dual-Flank Vehicle Approach Awareness | 474 |
 | TIP-00044 | At Home | Vary Your Morning Departure to Avoid Ambush | 506 |
 | TIP-00059 | In Your Car | Recognising Escalation Inside a Shared Vehicle | 540, 674 |
-| TIP-00080 | In Your Car | Complying Safely During an Armed Carjacking | 629, 786 |
+| TIP-00080 | In Your Car | Complying Safely During an Armed Carjacking | 629, 786, 835 |
 | TIP-00101 | In Your Car | Recognising Coordinated Passenger Robbery in Taxis | 712, 737 |
 
 ---
@@ -88,7 +91,7 @@
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
-| TIP-00054 | At Home | Recognising Escalating Danger in a Domestic Situation | — |
+| TIP-00054 | At Home | Recognising Escalating Danger in a Domestic Situation | 701, 814, 815, 830 |
 | TIP-00092 | Walking Alone | Staying Safe When Your Partner Has an Abusive Ex | 682 |
 
 ---
@@ -126,7 +129,7 @@
 | TIP-00025 | At Home | Visitor Identification via Technology | — |
 | TIP-00027 | At Home | Daytime Home Security While You're Inside | 458, 618, 741 |
 | TIP-00031 | At a Hotel | Securing Your Hotel Room Door at Night | 479 |
-| TIP-00034 | At Home | Hardening Your Home Against Forced Pre-Dawn Entry | 482, 595, 754, 755 |
+| TIP-00034 | At Home | Hardening Your Home Against Forced Pre-Dawn Entry | 482, 595, 754, 755, 822, 833, 834 |
 | TIP-00036 | At Home | Protecting Against Window Bar Cutting and Armed Robbery | 484 |
 | TIP-00045 | At Home | Recognising Fake Weapons and False Police Authority | 507 |
 | TIP-00049 | At Home | Preventing Push-In Robbery at Your Home | 521, 549 |
@@ -187,7 +190,7 @@
 
 | ID | Context | Title | Stories |
 |----|---------|-------|---------|
-| TIP-00003 | Walking Alone | Situational Awareness While Walking Alone | — |
+| TIP-00003 | Walking Alone | Situational Awareness While Walking Alone | 818 |
 | TIP-00006 | In a Mall | High-Traffic Shopping Awareness | 779 |
 | TIP-00012 | Using Public Transport | Staying Safe on Maxi Taxis and Buses | — |
 | TIP-00015 | At Work | Unpredictable Cash Deposit Routines at Work | — |
@@ -197,14 +200,14 @@
 | TIP-00032 | In Your Car | Recognising and Responding to Road-Block Robberies | 480 |
 | TIP-00033 | At Work | Preventing False-Customer Entry Robberies at Retail Premises | 481, 520, 596, 620, 638 |
 | TIP-00037 | In Your Car | Avoiding Being Targeted While Parked Alone in a Vehicle | 489, 495, 740 |
-| TIP-00038 | Other | Staying Safe When Travelling Through Remote Areas | 490 |
+| TIP-00038 | Other | Staying Safe When Travelling Through Remote Areas | 490, 832 |
 | TIP-00042 | In a Mall | Staying Vigilant in Mall and Shopping Centre Carparks | 496 |
 | TIP-00043 | At Work | Counter-Surveillance and Window Security for Retail Businesses | 497 |
 | TIP-00046 | Walking Alone | Protecting Yourself When Carrying Cash on Foot | 503 |
 | TIP-00047 | In Your Car | Concealing Valuables Before Exiting Your Vehicle | 514 |
 | TIP-00051 | In Your Car | Armed Window-Smash Robbery on Vehicles Parked at Home | 531 |
 | TIP-00052 | Using Public Transport | Avoiding Jewellery Theft on Public Transport | 532 |
-| TIP-00064 | Walking Alone | Concealing Jewellery When Walking in Public | 551, 587, 616, 617, 628, 719, 735, 771, 777, 778 |
+| TIP-00064 | Walking Alone | Concealing Jewellery When Walking in Public | 551, 587, 616, 617, 628, 719, 735, 771, 777, 778, 793, 819 |
 | TIP-00066 | Walking Alone | Reducing Snatch-Theft Risk While Waiting for Transport | 570 |
 | TIP-00070 | At Work | Protecting Open Religious and Community Premises | 584 |
 | TIP-00071 | Walking Alone | Reducing Ambush Risk on Residential Lanes | 585, 738, 757 |
@@ -212,8 +215,8 @@
 | TIP-00075 | Using Public Transport | Protecting Shift Workers at Isolated Transport Stops | 597 |
 | TIP-00076 | Using Public Transport | Armed Robbery Along Transit Corridors at Night | 614 |
 | TIP-00082 | At a Bar | Concealing Jewellery at Late-Night Bar Exits | 634 |
-| TIP-00084 | At Work | Employee Safety During an Armed Retail Raid | 637, 723, 773 |
-| TIP-00085 | Walking Alone | Protecting Yourself in a Chase-and-Overpower Robbery | 639, 774 |
+| TIP-00084 | At Work | Employee Safety During an Armed Retail Raid | 637, 723, 773, 816, 821, 823 |
+| TIP-00085 | Walking Alone | Protecting Yourself in a Chase-and-Overpower Robbery | 639, 774, 817 |
 | TIP-00087 | At Work | Avoiding Ambush on Unverified Business Field Visits | 669 |
 | TIP-00094 | In a Mall | Never Leave Devices Unattended at Public Counters | 684 |
 | TIP-00098 | In Your Car | Passenger Safety Protocols for Private Hire Drivers | 699 |
@@ -223,6 +226,8 @@
 | TIP-00110 | At a Bar | Securing Your Belongings When Leaving Your Seat at a Bar | 739 |
 | TIP-00111 | In Your Car | Protecting Yourself During Roadside Vehicle Sales | 742 |
 | TIP-00112 | Other | Reporting Robbery by a Person in Authority | 743 |
+| TIP-00120 | At a Bar | Avoiding Bar Restroom Ambush and Card Fraud | 824 |
+| TIP-00122 | In Your Car | Staying Safe During a Roadside Vehicle Breakdown | 831 |
 
 ---
 
@@ -246,7 +251,7 @@
 | TIP-00057 | At Work | Ambush Risk Arriving at Your Business | 538 |
 | TIP-00060 | In Your Car | Responding When Your Vehicle Is Shot At | 541 |
 | TIP-00079 | Walking Alone | Reducing Risk When You May Be a Drive-By Target | 627 |
-| TIP-00083 | Walking Alone | Limiting Outdoor Exposure in Residential Areas After Dark | 636 |
+| TIP-00083 | Walking Alone | Limiting Outdoor Exposure in Residential Areas After Dark | 636, 826 |
 | TIP-00097 | At Home | Reporting Suspicious Individuals in Your Residential Building | 697 |
 | TIP-00116 | At an Event | Responding to Gunfire at Outdoor Community Gatherings | 783 |
 | TIP-00117 | At Home | Reducing Exposure to Pre-Dawn Targeted Shootings at Home | 785 |
@@ -346,6 +351,31 @@
 | | | | | | | 783 | TIP-00116 |
 | | | | | | | 785 | TIP-00117 |
 | | | | | | | 786 | TIP-00080 |
+| | | | | | | 793 | TIP-00064 |
+| | | | | | | 794 | TIP-00118 |
+| | | | | | | 813 | TIP-00040 |
+| | | | | | | 814 | TIP-00054 |
+| | | | | | | 815 | TIP-00054 |
+| | | | | | | 816 | TIP-00084 |
+| | | | | | | 817 | TIP-00085 |
+| | | | | | | 818 | TIP-00003 |
+| | | | | | | 819 | TIP-00064 |
+| | | | | | | 820 | TIP-00119 |
+| | | | | | | 821 | TIP-00084 |
+| | | | | | | 822 | TIP-00034 |
+| | | | | | | 823 | TIP-00084 |
+| | | | | | | 824 | TIP-00120 |
+| | | | | | | 825 | TIP-00119 |
+| | | | | | | 826 | TIP-00083 |
+| | | | | | | 827 | TIP-00121 |
+| | | | | | | 828 | TIP-00069 |
+| | | | | | | 829 | TIP-00077 |
+| | | | | | | 830 | TIP-00054 |
+| | | | | | | 831 | TIP-00122 |
+| | | | | | | 832 | TIP-00038 |
+| | | | | | | 833 | TIP-00034 |
+| | | | | | | 834 | TIP-00034 |
+| | | | | | | 835 | TIP-00080 |
 | | | | | | | 1024 | TIP-00026 |
 | | | | | | | 1267 | TIP-00026 |
 

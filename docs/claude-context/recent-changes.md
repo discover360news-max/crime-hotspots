@@ -8,6 +8,36 @@
 
 ## April 2026
 
+### T&T Safety Tips batch — TIP-00119 to TIP-00122 + 19 story attachments (Apr 12, 2026)
+
+**New tips:**
+- **NEW TIP TIP-00119** — Protecting Your Parked Vehicle From Residential Theft (Burglary / At Home) — stories 820, 825
+- **NEW TIP TIP-00120** — Avoiding Bar Restroom Ambush and Card Fraud (Robbery / At a Bar) — story 824
+- **NEW TIP TIP-00121** — De-escalating Disputes in Outdoor Public Spaces (Assault / At an Event) — story 827
+- **NEW TIP TIP-00122** — Staying Safe During a Roadside Vehicle Breakdown (Robbery / In Your Car) — story 831
+
+**Stories attached to existing tips:**
+- Story 813 → TIP-00040 (Never Exit Home on Unverified Claim) — vehicle sale lure, victim shot outside home
+- Stories 814, 815, 830 → TIP-00054 (Escalating Domestic Danger) — partner phone theft + forced entry (814/830 same incident); intoxicated family member with knife (815)
+- Stories 816, 821, 823 → TIP-00084 (Employee Safety During Armed Retail Raid) — fast-food outlet safe forced; minimart proprietress; food stall late-night gunpoint robbery
+- Story 817 → TIP-00085 (Chase-and-Overpower Robbery) — struck from behind to knees, beaten, robbed while walking
+- Story 818 → TIP-00003 (Situational Awareness While Walking Alone) — pepper spray used to incapacitate before phone robbery
+- Story 819 → TIP-00064 (Concealing Jewellery Walking in Public) — gold chain snatched, suspects observed victim from nearby
+- Story 822 → TIP-00034 (Hardening Home Against Forced Pre-Dawn Entry) — pried windows/burglar-proofing at 4:45am
+- Stories 833, 834 → TIP-00034 — two pre-dawn forced entry home invasions; same getaway Hilux linked both
+- Story 826 → TIP-00083 (Limiting Outdoor Exposure After Dark) — shot while socialising at night in Chinapoo hotspot
+- Story 828 → TIP-00069 (Securing Overlooked Entry Points at Work) — clothing store burglarised via smashed bathroom window
+- Story 829 → TIP-00077 (Securing Property During Extended Absence) — home burgled during 3-day absence, rear door forced
+- Story 832 → TIP-00038 (Staying Safe in Remote Areas) — armed robbery at Salybia Beach, Toco
+- Story 835 → TIP-00080 (Complying Safely During Armed Carjacking) — Toyota Aqua carjacked at 5:30am in Couva
+
+---
+
+### Safety tips: TIP-00118 created, TIP-00064 updated (Apr 8, 2026)
+
+- **Story 793 → TIP-00064** (Concealing Jewellery When Walking in Public) — chain snatch on foot, San Juan. Added to `related_story_ids`.
+- **NEW TIP TIP-00118** — Never Leave Devices in an Unattended Vehicle (Burglary / In Your Car) — story 794, phone taken from unlocked parked truck outside restaurant in Tunapuna.
+
 ### SEO: murder-count + statistics title/H1 optimisation (Apr 8, 2026)
 
 GSC data showed murder-count at pos 6.2 (5,441 impressions, 8.2% CTR) and statistics at pos 7.01 (5,678 impressions, 4.37% CTR). Leading queries are number-first ("how many murders in trinidad for 2026 today", "trinidad murder toll 2026"). Titles and H1s updated to lead with the count.

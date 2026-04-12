@@ -4,6 +4,21 @@
 
 ---
 
+## Current Mode: Saturation (April 2026)
+
+The tip taxonomy is considered **complete**. With 118 tips across all major crime categories in T&T, new flagged stories are expected to attach to existing tips rather than create new ones. The default action for any incoming flagged row is **attach, not create**.
+
+**Create a new tip only if** the incoming story reveals a prevention angle not covered by *any* existing tip's actionable advice — not just a new incident of the same tactic. A different location, victim, or perpetrator is not sufficient justification. A genuinely new *what to do* is.
+
+**Ongoing maintenance priorities (in order):**
+1. Attach new stories to existing tips to keep evidence counts current
+2. Update tip content where new incidents reveal a better prevention angle
+3. Audit severity grades and prune near-duplicate tips (set weaker one to `pending-review`)
+
+New enum values (categories/contexts) should be added only if a genuinely new tip is being created that cannot fit any existing value.
+
+---
+
 ## My Role
 
 - I (Claude) own the full safety tip pipeline end-to-end.
@@ -51,7 +66,7 @@ Extract from each flagged row:
 
 ## Step 2 — Check for Overlap
 
-**Rule: No duplicate tips.** If a new story is covered by an existing tip's tactic, attach the story to that tip — do not create a new file. One tip per tactic, no matter how many stories illustrate the same behaviour.
+**Default: attach, not create.** The tip taxonomy is saturated. Attach the story to the closest matching existing tip unless the prevention advice would be genuinely different.
 
 Before creating anything, open **`docs/guides/SAFETY-TIP-INDEX.md`** — the full registry of all tips, grouped by category with story cross-reference. Scan the relevant category section. Only open individual tip files if a title looks like a possible match and you need to confirm the prevention angle.
 
@@ -59,9 +74,9 @@ Before creating anything, open **`docs/guides/SAFETY-TIP-INDEX.md`** — the ful
 
 Scan titles for same category + context. Ask: "Does any existing tip give the same actionable advice?"
 
-- **Yes** → update `related_story_ids` on the existing tip instead. No new file needed.
-- **Partially** → attach the story to the closest existing tip and note the partial overlap in `recent-changes.md`. Only create a new tip if the new story reveals a meaningfully different prevention angle.
-- **No** → proceed to Step 3.
+- **Yes** → update `related_story_ids` on the existing tip. No new file needed.
+- **Partially** → attach the story to the closest existing tip and note the partial overlap in `recent-changes.md`. Only create a new tip if the new story reveals a genuinely different prevention angle — not just a new incident of the same tactic.
+- **No, and the prevention angle is genuinely new** → proceed to Step 3. Be conservative; lean toward attach.
 
 **Tips most likely to overlap (check these first):**
 
@@ -73,6 +88,8 @@ Scan titles for same category + context. Ask: "Does any existing tip give the sa
 | ATM crime | TIP-00002, TIP-00008, TIP-00023 |
 | Online / social media fraud | TIP-00005, TIP-00010, TIP-00021, TIP-00024 |
 | Public transport | TIP-00012, TIP-00017 |
+| Jewellery snatch on foot | TIP-00064 (walking), TIP-00066 (transport stop), TIP-00082 (bar exit) |
+| Valuables left in vehicle | TIP-00047 (jewellery on exit), TIP-00118 (device in unattended vehicle) |
 
 ---
 
@@ -109,7 +126,7 @@ Glob pattern="*.md" path="astro-poc/src/content/tips/"
 
 Find the highest-numbered file. Next tip = last ID + 1. Zero-pad to 5 digits (`TIP-00031`, `TIP-00032`, etc.).
 
-> **Current last tip:** TIP-00117 (as of April 7, 2026)
+> **Current last tip:** TIP-00122 (as of April 12, 2026)
 
 ---
 
@@ -215,6 +232,15 @@ related_story_ids: ["123", "456"]
 - `pending-review` → tip exists but is hidden from the public listing
 
 Edit the frontmatter `status` field. No build change required.
+
+### Pruning near-duplicate tips
+
+When two tips give essentially the same actionable advice:
+1. Identify the weaker tip (thinner content, fewer stories, more generic advice)
+2. Move its `related_story_ids` to the stronger tip
+3. Set `status: "pending-review"` on the weaker tip
+4. Note in `recent-changes.md`: `- **PRUNED TIP-XXXXX** — merged into TIP-YYYYY ([reason])`
+5. Update the index: remove the pruned tip's row, update the surviving tip's Stories column
 
 ### Adding a new category or context value
 
