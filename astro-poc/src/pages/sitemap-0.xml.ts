@@ -1,6 +1,6 @@
 import { env } from 'cloudflare:workers';
 import type { APIRoute } from 'astro';
-import { getTrinidadCrimes, getAllCrimesFromD1, generateNameSlug } from '../lib/crimeData';
+import { getCrimesWithFallback, generateNameSlug } from '../lib/crimeData';
 import { getCollection } from 'astro:content';
 import { buildRoute } from '../config/routes';
 import { slugifyCategory } from '../lib/safetyTipsHelpers';
@@ -22,7 +22,7 @@ export const prerender = false;
 export const GET: APIRoute = async ({ locals }) => {
   const db = env.DB as D1Database | undefined;
   // Get all crimes for crime pages
-  const crimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
+  const crimes = await getCrimesWithFallback(db);
 
   // Get blog posts
   let blogPosts: any[] = [];

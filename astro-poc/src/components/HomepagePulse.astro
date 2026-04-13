@@ -3,7 +3,7 @@
  * HomepagePulse — "Right Now" data snapshot for a country
  * SSR — reads from D1 at request time; CDN cache keeps latency low
  */
-import { getTrinidadCrimes, getAllCrimesFromD1 } from '../lib/crimeData';
+import { getCrimesWithFallback } from '../lib/crimeData';
 import { getHotAreas } from '../lib/trendingHelpers';
 import { countCrimeType } from '../lib/dashboardHelpers';
 import { getTotalCrimeCount } from '../lib/statisticsHelpers';
@@ -20,7 +20,7 @@ const { countryName, dashboardUrl, embedded = false } = Astro.props;
 
 import { env } from 'cloudflare:workers';
 const db = env.DB as D1Database | undefined;
-const allCrimes = db ? await getAllCrimesFromD1(db) : await getTrinidadCrimes();
+const allCrimes = await getCrimesWithFallback(db);
 
 // This week's crimes
 const now = new Date();
